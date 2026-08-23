@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2 — arena + ground-contact proof handoff (2026-08-22)
+
+- Authorized the next bounded milestone after v0.1's decisive GPU continuation pass.
+- Preserved frozen v0.1 result boundary `1f7a36cc6165273fb658ba07a8458e8d8e60628a` and prohibited rewriting `results/v0.1/` evidence.
+- Defined a three-gate v0.2 implementation: stadium mesh/query engine; wheels/suspension/ground driving; chassis-vs-static-world contact.
+- Selected one shared immutable DFH/Stadium_P GPU triangle mesh rather than per-world geometry.
+- Added explicit collision-asset custody rules: prefer the exact local RocketSim `.cmf` assets when available, otherwise use `RLArenaCollisionDumper` or the RLBot extraction path; extracted game assets remain ignored and are never committed to the public repo.
+- Kept NVIDIA Warp as the primary backend and required measured comparison of normal Warp mesh BVH vs the Warp 1.16 cuBQL ray backend for suspension rays where supported.
+- Required RocketSim-derived `btVehicleRL` wheel transforms, raycasts, suspension, friction, steering and handbrake behavior rather than a generic bicycle/turn-radius approximation.
+- Defined GPU OBB-vs-triangle car-world contact using mesh AABB candidate queries plus a measured narrow-phase/impulse solver.
+- Added decomposed B0/B1/B2/B3 benchmarks to isolate the cost of contact-free motion, stadium rays, wheel mechanics and complete static-world contact.
+- Added contact-rich parity scenarios across floor, braking/acceleration, steering, powerslide, ramps, walls, ceiling, landings and chassis impacts through horizons up to 600 ticks.
+- Added verdict classes: `PASS_GREEN` at >=100k full static-world sim-s/s with parity; `PASS_YELLOW` at >=20k with parity and no architectural dead end; otherwise `PAUSE_RED`.
+- Explicitly excluded ball-world, car-ball, car-car, boost pads, game rules and training integration until a separate v0.3+ authorization.
+
 ## v0.1.0 — GPU physics proof implemented (2026-08-22)
 
 - Added a flattened, GPU-resident two-car/one-ball world state and fused NVIDIA Warp 120 Hz
