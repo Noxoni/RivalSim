@@ -2,75 +2,85 @@
 
 RivalSim is an experimental **GPU-native Rocket League 1v1 transition engine** intended to accelerate training for [Noxoni/Rival](https://github.com/Noxoni/Rival).
 
-The project is deliberately narrower than RocketSim. The initial target is standard Soccar 1v1 only:
+The project is deliberately narrower than RocketSim. The target is standard Soccar 1v1 only:
 
 - two cars;
 - one ball;
-- standard arena;
-- standard boost pads;
-- 120 Hz physics;
-- no rendering in the benchmark path.
+- standard DFH/Stadium_P arena;
+- standard boost pads later;
+- fixed 120 Hz physics;
+- no rendering in the training benchmark path.
 
-## Current milestone — v0.1 GPU physics proof
+## Current milestone — v0.2 arena + ground-contact proof
 
-RivalSim v0.1 is implemented and has passed its bounded performance/parity gate. It does
-**not** attempt to replace RocketSim yet.
+The v0.1 contact-free GPU proof passed decisively and is frozen at:
 
-Its job is to answer one question quickly:
+`1f7a36cc6165273fb658ba07a8458e8d8e60628a`
 
-> Can a batched GPU transition engine on the RTX 5090 advance thousands of independent Rocket League-like worlds fast enough, while tracking basic RocketSim/Rocket League motion closely enough, to justify continuing the project?
+Measured v0.1 best stable point:
 
-v0.1 implements only the physics needed to make that decision:
+- **131,072 worlds**;
+- **40,919,361.97 aggregate simulated game-seconds/s**;
+- **3,678.02x** best GPU vs same-equation CPU throughput;
+- **27/27** RocketSim parity scenarios passed at 1/4/8/30/60/120 ticks;
+- zero timed H2D/D2H traffic in the published GPU hot loop.
 
-- batched GPU state for two cars and one ball per world;
-- 120 Hz fixed-step integration;
-- gravity;
-- linear/angular rigid-body integration;
-- car velocity/angular-velocity caps;
-- airborne throttle;
-- boost acceleration/consumption;
-- jump impulse, sticky force and jump-hold bonus;
-- double-jump / flip timing and state;
-- airborne pitch/yaw/roll torque;
-- deterministic reset/random-state generation for parity tests.
+That result is intentionally contact-free and is not a full-simulator speedup claim. Frozen evidence remains under `results/v0.1/` and `docs/V0_1_RESULTS.md`.
 
-**Not in v0.1:** arena triangle collision, suspension/wheels, ground driving, ball/car contacts, car/car contacts, boost pads, goals, demos, or full RLGym integration.
+v0.2 now asks:
 
-Those are intentionally deferred until the GPU architecture proves it can beat CPU simulation by a large margin.
+> How much of that GPU headroom survives when RivalSim adds the real DFH static collision geometry, eight suspension rays per 1v1 world per physics tick, RocketSim-derived wheel/ground forces, and chassis-vs-arena contact?
 
-## v0.1 result
+### v0.2 scope
 
-On the measured RTX 5090 workstation, the best stable GPU point advanced 131,072 worlds at
-4.910 billion world ticks/s, or 40.919 million aggregate simulated game-seconds/s. The best
-same-equation NumPy CPU point reached 11,125.38 simulated game-seconds/s, for a measured
-3,678.02x same-equation GPU/CPU ratio. All 27 deterministic RocketSim parity scenarios passed
-at 1/4/8/30/60/120 ticks, including hard axis/sign/state-timing checks.
+- one immutable DFH/Stadium_P triangle mesh shared by all GPU worlds;
+- Warp mesh/BVH acceleration, including measured cuBQL ray-backend evaluation where supported;
+- four wheel raycasts per car;
+- RocketSim-compatible suspension;
+- wheel friction, throttle, brake, coast, steering and powerslide;
+- car hitbox vs static-world contact;
+- floor/ramp/wall/ceiling movement and landings;
+- contact-rich CPU RocketSim parity;
+- decomposed GPU benchmarks for mesh rays, wheel mechanics and complete static-world physics.
 
-This is a contact-free kernel result. Its 203,934.02x ratio to the existing 200.65 sim-s/s
-full RocketSim/RLGym system reference is **not apples-to-apples** and must not be presented as
-a full-simulator speedup.
+### Still excluded
 
-See [`docs/V0_1_RESULTS.md`](docs/V0_1_RESULTS.md) for the protocol, full sweep and limitations,
-and [`docs/REPRODUCING_V0_1.md`](docs/REPRODUCING_V0_1.md) for reproduction commands. The v0.1
-artifacts are frozen under [`results/v0.1/`](results/v0.1/). No v0.2 work is included.
+v0.2 does **not** implement:
 
-## Implementation choice
+- ball-world collision;
+- car-ball collision;
+- car-car collision;
+- bumps/demolitions;
+- boost pads;
+- scoring/game reset;
+- RLGym observations/rewards/PPO;
+- Rival policy inference.
 
-Use **NVIDIA Warp** first for the proof. Keep state tensor-native and GPU-resident. Do not build a Python object graph per world and do not round-trip per-tick state through CPU/NumPy.
+Those remain later milestones so static-world cost/fidelity can be measured cleanly.
 
-If the Warp proof succeeds, later milestones may keep Warp or migrate proven hot kernels to native CUDA C++.
+## Architecture
 
-## Performance reference
+RivalSim stays **GPU-resident and batched**. Do not build a Python object graph per environment and do not round-trip world state through CPU every tick.
 
-The current Rival CPU RocketSim training sweep measured a best point of:
+The v0.2 arena is a single shared GPU asset. Extracted Rocket League collision meshes are not committed to this public repository; only loader code, provenance, hashes, statistics and reproduction instructions belong in Git.
+
+NVIDIA Warp remains the primary implementation layer until profiling proves a reason to replace a measured hotspot with native CUDA/C++.
+
+## Performance references
+
+Current full Rival CPU RocketSim/RLGym reference:
 
 - 56 environments;
 - 12,039 agent-steps/s;
 - 200.65 aggregate simulated game-seconds/s.
 
-That is the real system-level reference RivalSim is trying to beat eventually.
+v0.2 remains a partial simulator, so this is a system reference rather than an apples-to-apples comparison.
 
-The v0.1 simplified kernel must show **large headroom**, not a marginal win, because later collision/suspension/contact work will reduce throughput.
+The v0.2 package classifies the complete static-world path as:
+
+- **PASS_GREEN:** parity passes and >=100,000 aggregate sim-s/s;
+- **PASS_YELLOW:** parity passes and 20,000–<100,000 sim-s/s with no architectural dead end;
+- **PAUSE_RED:** fidelity/architecture failure or <20,000 sim-s/s without a clear optimization path.
 
 ## Start here
 
@@ -78,17 +88,20 @@ Give Codex:
 
 `Read CODEX_START_PROMPT.md and execute it completely.`
 
-See:
+The active root prompt routes to:
 
-- `docs/ARCHITECTURE.md`
-- `docs/PHYSICS_ORACLES.md`
-- `docs/BENCHMARK_AND_PARITY.md`
-- `docs/ROADMAP.md`
-- `docs/V0_1_RESULTS.md`
-- `docs/REPRODUCING_V0_1.md`
+`handoff/v0.2/CODEX_START_PROMPT.md`
+
+Package contents:
+
+- `handoff/v0.2/README.md`
+- `handoff/v0.2/V0_2_SPEC.md`
+- `handoff/v0.2/BENCHMARK_AND_PARITY.md`
+- `handoff/v0.2/CODEX_START_PROMPT.md`
+- `handoff/v0.2/PACKAGE_MANIFEST.md`
 
 ## Relationship to RocketSim
 
-RocketSim remains the CPU reference and training backend unless/until RivalSim earns replacement through measured performance and transfer fidelity.
+RocketSim remains the primary CPU physics oracle until RivalSim earns replacement through performance **and transfer fidelity**.
 
-Any RocketSim-derived code incorporated into RivalSim must preserve its applicable MIT license notices and provenance.
+RivalSim is a training transition engine, not a replacement Rocket League client. Work is intended for offline bot training and research, not cheating in online Rocket League.
