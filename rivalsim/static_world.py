@@ -93,6 +93,7 @@ class StaticWorldSim(RivalSim):
         initial: StateSnapshot | None = None,
         geometry: ArenaGeometry | None = None,
         meshes: WarpArenaMeshes | None = None,
+        ray_backend: str = "cubql",
         action_tape: ActionTape | None = None,
     ):
         if variant not in VARIANT_LEVEL:
@@ -104,6 +105,10 @@ class StaticWorldSim(RivalSim):
         self.variant_level = VARIANT_LEVEL[variant]
         self.geometry = geometry or ArenaGeometry.load_soccar(collision_root)
         self.meshes = meshes or WarpArenaMeshes(self.geometry, self.device)
+        if ray_backend not in {"default", "cubql"}:
+            raise ValueError("ray_backend must be 'default' or 'cubql'")
+        self.ray_backend = ray_backend
+        self.ray_mesh = getattr(self.meshes, ray_backend)
         self.vehicle = VehicleState(self.state.car_count, self.device)
         self.tick_counter = wp.zeros(1, dtype=wp.int32, device=self.device)
         self.action_tape: DeviceActionTape | None = None
@@ -177,7 +182,7 @@ class StaticWorldSim(RivalSim):
                 wheel_pre_tick,
                 dim=state.car_count,
                 inputs=[
-                    self.meshes.cubql.id,
+                    self.ray_mesh.id,
                     int(self.variant_level >= 2),
                     state.car_pos,
                     state.car_vel,
@@ -194,6 +199,7 @@ class StaticWorldSim(RivalSim):
                     vehicle.wheel_hit_point,
                     vehicle.wheel_hit_normal,
                     vehicle.wheel_hit_distance,
+                    vehicle.wheel_hit_face,
                     vehicle.suspension_length,
                     vehicle.suspension_velocity,
                     vehicle.suspension_clipped_factor,
@@ -211,7 +217,10 @@ class StaticWorldSim(RivalSim):
                 ],
                 device=self.device,
             )
-        super()._launch_tick()
+        # B1 is intentionally the isolated ray-query component benchmark; the
+        # contact-rich origins remain fixed while the device action tape turns.
+        if self.variant_level != 1:
+            super()._launch_tick()
         if self.variant_level >= 3:
             state = self.state
             vehicle = self.vehicle
@@ -226,6 +235,11 @@ class StaticWorldSim(RivalSim):
                     state.car_ang_vel,
                     vehicle.candidate_count,
                     vehicle.contact_count,
+                    vehicle.candidate_total,
+                    vehicle.contact_total,
+                    vehicle.candidate_max,
+                    vehicle.contact_max,
+                    vehicle.penetration_max,
                     vehicle.contact_point,
                     vehicle.contact_normal,
                     vehicle.contact_penetration,
@@ -245,62 +259,108 @@ def make_contact_rich_state(num_envs: int, seed: int = 20260823) -> StateSnapsho
 
     state = StateSnapshot.empty(num_envs)
     rng = np.random.default_rng(seed)
-    patterns = np.arange(num_envs * 2).reshape(num_envs, 2) % 8
-    for env in range(num_envs):
-        for car in range(2):
-            pattern = int(patterns[env, car])
-            yaw = rng.uniform(-np.pi, np.pi)
-            pitch = 0.0
-            roll = 0.0
-            pos = np.array(
-                (rng.uniform(-2500, 2500), rng.uniform(-3500, 3500), 17.0),
-                dtype=np.float32,
-            )
-            velocity = rng.uniform(-250, 250, 3).astype(np.float32)
-            velocity[2] *= 0.15
-            if pattern == 1:  # tilted / partial landing
-                pos[2] = 32.0
-                pitch = 0.28
-                roll = -0.18
-                velocity[2] = -350.0
-            elif pattern == 2:  # side wall
-                pos[:] = (-4070.0, rng.uniform(-3500, 3500), rng.uniform(300, 1500))
-                pitch = np.pi / 2.0
-                velocity[:] = (40.0, rng.uniform(-500, 500), rng.uniform(-100, 100))
-            elif pattern == 3:  # opposite wall / scrape
-                pos[:] = (4070.0, rng.uniform(-3500, 3500), rng.uniform(200, 1400))
-                pitch = -np.pi / 2.0
-                velocity[:] = (-40.0, rng.uniform(-500, 500), rng.uniform(-100, 100))
-            elif pattern == 4:  # ceiling
-                pos[:] = (rng.uniform(-2500, 2500), rng.uniform(-3500, 3500), 2028.0)
-                roll = np.pi
-                velocity[:] = (rng.uniform(-300, 300), rng.uniform(-300, 300), 15.0)
-            elif pattern == 5:  # corner / ramp approach
-                pos[:] = (
-                    rng.choice((-3850.0, 3850.0)),
-                    rng.choice((-4600.0, 4600.0)),
-                    rng.uniform(90, 300),
-                )
-                pitch = rng.choice((-0.35, 0.35))
-                velocity[:] = rng.uniform(-600, 600, 3)
-            elif pattern == 6:  # back wall / goal family
-                pos[:] = (
-                    rng.uniform(-700, 700),
-                    rng.choice((-5100.0, 5100.0)),
-                    rng.uniform(120, 700),
-                )
-                roll = rng.choice((-np.pi / 2.0, np.pi / 2.0))
-                velocity[:] = rng.uniform(-350, 350, 3)
-            elif pattern == 7:  # off-center body strike
-                pos[2] = 4.0
-                pitch = 0.55
-                roll = 0.35
-                velocity[:] = (rng.uniform(-500, 500), rng.uniform(-500, 500), -180.0)
-            state.car_pos[env, car] = pos
-            state.car_vel[env, car] = velocity
-            state.car_ang_vel[env, car] = rng.uniform(-0.8, 0.8, 3)
-            state.car_quat[env, car] = _quat_from_euler(roll, pitch, yaw)
-            state.boost[env, car] = rng.uniform(20.0, 100.0)
+    car_count = num_envs * 2
+    patterns = np.arange(car_count) % 16
+    pos = state.car_pos.reshape(car_count, 3)
+    velocity = state.car_vel.reshape(car_count, 3)
+    angular = state.car_ang_vel.reshape(car_count, 3)
+    quat = state.car_quat.reshape(car_count, 4)
+    boost = state.boost.reshape(car_count)
+    pos[:, 0] = rng.uniform(-2200, 2200, car_count)
+    pos[:, 1] = rng.uniform(-3200, 3200, car_count)
+    pos[:, 2] = 17.0
+    velocity.fill(0.0)
+    angular[:] = rng.uniform(-0.8, 0.8, (car_count, 3))
+    yaw = rng.uniform(-np.pi, np.pi, car_count)
+    pitch = np.zeros(car_count)
+    roll = np.zeros(car_count)
+
+    velocity[patterns == 1, 0] = 400.0
+    velocity[patterns == 2, 0] = 1200.0
+    velocity[patterns == 3] = (650.0, 180.0, 0.0)
+    angular[patterns == 3] = (0.0, 0.0, 0.8)
+    velocity[patterns == 4, 0] = 1000.0
+
+    mask = patterns == 5
+    count = int(mask.sum())
+    pos[mask, 0] = rng.choice((-3850.0, 3850.0), count)
+    pos[mask, 1] = rng.choice((-4300.0, 4300.0), count)
+    pos[mask, 2] = rng.uniform(90, 240, count)
+    pitch[mask] = rng.choice((-0.35, 0.35), count)
+    velocity[mask] = rng.uniform(-600, 600, (count, 3))
+
+    mask = patterns == 6
+    count = int(mask.sum())
+    pos[mask, 0] = -4070.0
+    pos[mask, 1] = rng.uniform(-3500, 3500, count)
+    pos[mask, 2] = rng.uniform(300, 1500, count)
+    pitch[mask] = np.pi / 2.0
+    velocity[mask, 0] = 40.0
+    velocity[mask, 1] = rng.uniform(-500, 500, count)
+    velocity[mask, 2] = rng.uniform(-100, 100, count)
+
+    mask = patterns == 7
+    count = int(mask.sum())
+    pos[mask, 0] = rng.uniform(-700, 700, count)
+    pos[mask, 1] = rng.choice((-5100.0, 5100.0), count)
+    pos[mask, 2] = rng.uniform(120, 700, count)
+    roll[mask] = rng.choice((-np.pi / 2.0, np.pi / 2.0), count)
+    velocity[mask] = rng.uniform(-350, 350, (count, 3))
+
+    mask = patterns == 8
+    count = int(mask.sum())
+    pos[mask, 0] = rng.choice((-3850.0, 3850.0), count)
+    pos[mask, 1] = rng.choice((-4600.0, 4600.0), count)
+    pos[mask, 2] = rng.uniform(90, 300, count)
+    pitch[mask] = rng.choice((-0.35, 0.35), count)
+    roll[mask] = rng.choice((-0.2, 0.2), count)
+    velocity[mask] = rng.uniform(-600, 600, (count, 3))
+
+    mask = patterns == 9
+    count = int(mask.sum())
+    pos[mask, 0] = rng.uniform(-2500, 2500, count)
+    pos[mask, 1] = rng.uniform(-3500, 3500, count)
+    pos[mask, 2] = 2028.0
+    roll[mask] = np.pi
+    velocity[mask, 0:2] = rng.uniform(-300, 300, (count, 2))
+    velocity[mask, 2] = 15.0
+
+    mask = patterns == 10
+    count = int(mask.sum())
+    pos[mask, 2] = 180.0
+    velocity[mask, 0:2] = rng.uniform(-150, 150, (count, 2))
+    velocity[mask, 2] = -600.0
+    mask = patterns == 11
+    pos[mask, 2] = 35.0
+    pitch[mask] = 0.30
+    velocity[mask, 2] = -250.0
+    mask = patterns == 12
+    pos[mask, 2] = 27.0
+    roll[mask] = -0.18
+    pitch[mask] = 0.12
+    velocity[mask, 2] = -120.0
+
+    mask = patterns == 13
+    count = int(mask.sum())
+    pos[mask, 2] = 4.0
+    pitch[mask] = 0.55
+    velocity[mask, 0:2] = rng.uniform(-500, 500, (count, 2))
+    velocity[mask, 2] = -180.0
+    mask = patterns == 14
+    count = int(mask.sum())
+    pos[mask, 2] = 5.0
+    roll[mask] = 0.8
+    velocity[mask, 0] = rng.uniform(-400, 400, count)
+    velocity[mask, 1] = rng.uniform(-600, 600, count)
+    velocity[mask, 2] = -220.0
+    mask = patterns == 15
+    pos[mask, 2] = 31.0
+    roll[mask] = 0.42
+    pitch[mask] = -0.12
+    velocity[mask] = (350.0, 80.0, -160.0)
+
+    quat[:] = _quats_from_euler(roll, pitch, yaw)
+    boost[:] = rng.uniform(20.0, 100.0, car_count)
     state.validate()
     return state
 
@@ -321,3 +381,21 @@ def _quat_from_euler(roll: float, pitch: float, yaw: float) -> np.ndarray:
         ),
         dtype=np.float32,
     )
+
+
+def _quats_from_euler(roll: np.ndarray, pitch: np.ndarray, yaw: np.ndarray) -> np.ndarray:
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    result = np.column_stack(
+        (
+            sr * cp * cy - cr * sp * sy,
+            cr * sp * cy + sr * cp * sy,
+            cr * cp * sy - sr * sp * cy,
+            cr * cp * cy + sr * sp * sy,
+        )
+    )
+    return np.asarray(result, dtype=np.float32)

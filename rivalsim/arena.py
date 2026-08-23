@@ -146,9 +146,7 @@ class WarpArenaMeshes:
         self.geometry = geometry
         self.device = str(wp.get_device(device))
         self.points = wp.array(geometry.vertices_uu, dtype=wp.vec3, device=self.device)
-        self.indices = wp.array(
-            geometry.triangles.reshape(-1), dtype=wp.int32, device=self.device
-        )
+        self.indices = wp.array(geometry.triangles.reshape(-1), dtype=wp.int32, device=self.device)
         # Keep the conventional mesh for AABB iteration. cuBQL currently does
         # not implement mesh_query_aabb, but is benchmarked for wheel rays.
         self.default = wp.Mesh(self.points, self.indices)
@@ -172,8 +170,7 @@ def read_cmf(path: str | os.PathLike[str]) -> CollisionMesh:
         or max(triangle_count, vertex_count) > MAX_CMF_ELEMENTS
     ):
         raise ValueError(
-            f"invalid CMF counts in {resolved}: triangles={triangle_count}, "
-            f"vertices={vertex_count}"
+            f"invalid CMF counts in {resolved}: triangles={triangle_count}, vertices={vertex_count}"
         )
     index_bytes = triangle_count * 3 * np.dtype("<i4").itemsize
     vertex_bytes = vertex_count * 3 * np.dtype("<f4").itemsize
@@ -221,9 +218,7 @@ def rocketsim_mesh_hash(vertices: np.ndarray, triangles: np.ndarray) -> int:
             for _ in range(2):
                 current = (((current >> 16) ^ current) * 0x045D9F3B) & mask
             current = ((current >> 16) ^ current) & mask
-            combined = (
-                current + 0x9E3779B9 + ((value << 6) & mask) + (value >> 2)
-            ) & mask
+            combined = (current + 0x9E3779B9 + ((value << 6) & mask) + (value >> 2)) & mask
             value = (value ^ combined) & mask
     return value
 
@@ -285,9 +280,7 @@ def raycast_triangles_cpu(
             nearest = int(indices[np.argmin(t[indices])])
             hit[ray_index] = 1
             distance[ray_index] = np.float32(t[nearest])
-            normal[ray_index] = (raw_normals[nearest] / normal_lengths[nearest]).astype(
-                np.float32
-            )
+            normal[ray_index] = (raw_normals[nearest] / normal_lengths[nearest]).astype(np.float32)
             face[ray_index] = nearest
     return hit, distance, normal, face
 
@@ -325,7 +318,7 @@ def raycast_soccar_cpu(
             if abs(denominator) <= 1e-12:
                 continue
             candidate = float(np.dot(point - origin, plane_normal) / denominator)
-            if 0.0 <= candidate <= nearest and candidate <= maximum[ray_index]:
+            if 0.0 <= candidate < nearest and candidate <= maximum[ray_index]:
                 hit[ray_index] = 1
                 distance[ray_index] = np.float32(candidate)
                 normal[ray_index] = plane_normal.astype(np.float32)

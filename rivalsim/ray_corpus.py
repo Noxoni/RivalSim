@@ -110,6 +110,22 @@ def make_soccar_ray_corpus(seed: int = 20260823, rays_per_family: int = 96) -> R
     target[:, 1] += np.sign(source[:, 1]) * 2000.0
     add("misses", source, target)
 
+    source = np.column_stack(
+        (
+            rng.uniform(-3000, 3000, n),
+            rng.uniform(-4000, 4000, n),
+            rng.uniform(0.01, 0.5, n),
+        )
+    )
+    target = source.copy()
+    target[:, 2] = -10.0
+    half = n // 2
+    source[:half, 0] = rng.uniform(4095.5, 4095.99, half)
+    source[:half, 2] = rng.uniform(100, 1900, half)
+    target[:half] = source[:half]
+    target[:half, 0] = 4110.0
+    add("near_surface", source, target)
+
     origin_array = np.ascontiguousarray(np.concatenate(origins), dtype=np.float32)
     direction_array = np.ascontiguousarray(np.concatenate(directions), dtype=np.float32)
     direction_array /= np.linalg.norm(direction_array, axis=1, keepdims=True)

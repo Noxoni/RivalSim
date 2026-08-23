@@ -132,11 +132,7 @@ def _axis_penetration(
     p2 = wp.dot(v2, axis)
     tri_min = wp.min(p0, wp.min(p1, p2))
     tri_max = wp.max(p0, wp.max(p1, p2))
-    radius = (
-        half[0] * wp.abs(axis[0])
-        + half[1] * wp.abs(axis[1])
-        + half[2] * wp.abs(axis[2])
-    )
+    radius = half[0] * wp.abs(axis[0]) + half[1] * wp.abs(axis[1]) + half[2] * wp.abs(axis[2])
     return wp.min(tri_max, radius) - wp.max(tri_min, -radius)
 
 
@@ -319,6 +315,7 @@ def wheel_pre_tick(
     wheel_hit_point: wp.array(dtype=wp.vec3),
     wheel_hit_normal: wp.array(dtype=wp.vec3),
     wheel_hit_distance: wp.array(dtype=wp.float32),
+    wheel_hit_face: wp.array(dtype=wp.int32),
     suspension_length: wp.array(dtype=wp.float32),
     suspension_velocity: wp.array(dtype=wp.float32),
     suspension_clipped_factor: wp.array(dtype=wp.float32),
@@ -366,9 +363,56 @@ def wheel_pre_tick(
         ray_length = rest + MAX_SUSPENSION_TRAVEL + radius - SUSPENSION_SUBTRACTION
         source = pos + wp.quat_rotate(quat, connection)
         direction = -up
-        result = _world_ray(ray_mesh_id, source, direction, ray_length)
-        distance = result[0]
-        normal = wp.vec3(result[1], result[2], result[3])
+        distance = ray_length + 1.0
+        normal = wp.vec3(0.0, 0.0, 0.0)
+        hit_face = -1
+        ray_query = wp.mesh_query_ray(ray_mesh_id, source, direction, ray_length)
+        if ray_query.result:
+            distance = ray_query.t
+            normal = ray_query.normal
+            if wp.dot(normal, direction) > 0.0:
+                normal = -normal
+            hit_face = ray_query.face
+        denominator_plane = direction[2]
+        if wp.abs(denominator_plane) > 1.0e-8:
+            candidate_plane = -source[2] / denominator_plane
+            if (
+                candidate_plane >= 0.0
+                and candidate_plane <= ray_length
+                and candidate_plane < distance
+            ):
+                distance = candidate_plane
+                normal = wp.vec3(0.0, 0.0, 1.0)
+                hit_face = -2
+            candidate_plane = (SOCCAR_HEIGHT - source[2]) / denominator_plane
+            if (
+                candidate_plane >= 0.0
+                and candidate_plane <= ray_length
+                and candidate_plane < distance
+            ):
+                distance = candidate_plane
+                normal = wp.vec3(0.0, 0.0, -1.0)
+                hit_face = -3
+        denominator_plane = direction[0]
+        if wp.abs(denominator_plane) > 1.0e-8:
+            candidate_plane = (-SOCCAR_EXTENT_X - source[0]) / denominator_plane
+            if (
+                candidate_plane >= 0.0
+                and candidate_plane <= ray_length
+                and candidate_plane < distance
+            ):
+                distance = candidate_plane
+                normal = wp.vec3(1.0, 0.0, 0.0)
+                hit_face = -4
+            candidate_plane = (SOCCAR_EXTENT_X - source[0]) / denominator_plane
+            if (
+                candidate_plane >= 0.0
+                and candidate_plane <= ray_length
+                and candidate_plane < distance
+            ):
+                distance = candidate_plane
+                normal = wp.vec3(-1.0, 0.0, 0.0)
+                hit_face = -5
         hit = distance <= ray_length
         hit_point = source + direction * wp.min(distance, ray_length)
         sus_length = rest + MAX_SUSPENSION_TRAVEL
@@ -409,9 +453,7 @@ def wheel_pre_tick(
             if enable_forces != 0:
                 impulse = normal * (force_value * DT + pushback * CAR_MASS)
                 vel = vel + impulse * INV_MASS
-                ang_vel = ang_vel + _inverse_inertia_world(
-                    quat, wp.cross(contact_offset, impulse)
-                )
+                ang_vel = ang_vel + _inverse_inertia_world(quat, wp.cross(contact_offset, impulse))
 
                 old_steer = steer_angle[wheel_index]
                 axle = right * wp.cos(old_steer) - forward * wp.sin(old_steer)
@@ -432,10 +474,7 @@ def wheel_pre_tick(
                 if old_brake > 0.0 and wp.abs(longitudinal_speed) > 1.0e-5:
                     brake_delta = wp.min(wp.abs(longitudinal_speed), old_brake * DT)
                     brake_impulse = (
-                        -wp.sign(longitudinal_speed)
-                        * wheel_forward
-                        * brake_delta
-                        * CAR_MASS
+                        -wp.sign(longitudinal_speed) * wheel_forward * brake_delta * CAR_MASS
                     )
                     vel = vel + brake_impulse * INV_MASS
                     ang_vel = ang_vel + _inverse_inertia_world(
@@ -457,6 +496,7 @@ def wheel_pre_tick(
         wheel_hit_point[wheel_index] = hit_point
         wheel_hit_normal[wheel_index] = normal
         wheel_hit_distance[wheel_index] = distance
+        wheel_hit_face[wheel_index] = hit_face
         suspension_length[wheel_index] = sus_length
         suspension_velocity[wheel_index] = sus_velocity
         suspension_clipped_factor[wheel_index] = clipped
@@ -561,14 +601,10 @@ def _solve_contact(
     normal_impulse_magnitude = 0.0
     if normal_speed < 0.0:
         cross_rn = wp.cross(offset, normal)
-        angular_term = wp.dot(
-            normal, wp.cross(_inverse_inertia_world(quat, cross_rn), offset)
-        )
+        angular_term = wp.dot(normal, wp.cross(_inverse_inertia_world(quat, cross_rn), offset))
         denominator = INV_MASS + angular_term
         if denominator > 1.0e-9:
-            normal_impulse_magnitude = (
-                -(1.0 + CONTACT_RESTITUTION) * normal_speed / denominator
-            )
+            normal_impulse_magnitude = -(1.0 + CONTACT_RESTITUTION) * normal_speed / denominator
             impulse = normal * normal_impulse_magnitude
             vel = vel + impulse * INV_MASS
             ang_vel = ang_vel + _inverse_inertia_world(quat, wp.cross(offset, impulse))
@@ -595,10 +631,22 @@ def _solve_contact(
     correction = wp.max(0.0, penetration - CONTACT_SLOP) * CONTACT_CORRECTION
     pos = pos + normal * correction
     return wp.mat44(
-        pos[0], pos[1], pos[2], 0.0,
-        vel[0], vel[1], vel[2], 0.0,
-        ang_vel[0], ang_vel[1], ang_vel[2], 0.0,
-        0.0, 0.0, 0.0, 1.0,
+        pos[0],
+        pos[1],
+        pos[2],
+        0.0,
+        vel[0],
+        vel[1],
+        vel[2],
+        0.0,
+        ang_vel[0],
+        ang_vel[1],
+        ang_vel[2],
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     )
 
 
@@ -611,6 +659,11 @@ def chassis_contacts(
     car_ang_vel: wp.array(dtype=wp.vec3),
     candidate_count: wp.array(dtype=wp.int32),
     contact_count: wp.array(dtype=wp.int32),
+    candidate_total: wp.array(dtype=wp.float32),
+    contact_total: wp.array(dtype=wp.float32),
+    candidate_max: wp.array(dtype=wp.int32),
+    contact_max: wp.array(dtype=wp.int32),
+    penetration_max: wp.array(dtype=wp.float32),
     contact_point: wp.array(dtype=wp.vec3),
     contact_normal: wp.array(dtype=wp.vec3),
     contact_penetration: wp.array(dtype=wp.float32),
@@ -637,6 +690,7 @@ def chassis_contacts(
     )
     candidates = 0
     contacts = 0
+    maximum_penetration = 0.0
 
     # RocketSim adds these four infinite planes beside its CMF shapes.
     for plane in range(4):
@@ -659,6 +713,7 @@ def chassis_contacts(
         signed_distance = wp.dot(center - plane_point, normal)
         penetration = radius - signed_distance
         if penetration > 0.0 and contacts < 4:
+            maximum_penetration = wp.max(maximum_penetration, penetration)
             candidates = candidates + 1
             point = center - normal * radius
             packed = _solve_contact(pos, vel, quat, ang_vel, point, normal, penetration)
@@ -681,6 +736,7 @@ def chassis_contacts(
             sat = _triangle_obb_sat(v0, v1, v2, center, quat)
             penetration = sat[3]
             if penetration >= 0.0:
+                maximum_penetration = wp.max(maximum_penetration, penetration)
                 local_normal = wp.vec3(sat[0], sat[1], sat[2])
                 normal = wp.quat_rotate(quat, local_normal)
                 radius = (
@@ -710,3 +766,8 @@ def chassis_contacts(
     car_ang_vel[car] = ang_vel
     candidate_count[car] = candidates
     contact_count[car] = contacts
+    candidate_total[car] = candidate_total[car] + float(candidates)
+    contact_total[car] = contact_total[car] + float(contacts)
+    candidate_max[car] = wp.max(candidate_max[car], candidates)
+    contact_max[car] = wp.max(contact_max[car], contacts)
+    penetration_max[car] = wp.max(penetration_max[car], maximum_penetration)

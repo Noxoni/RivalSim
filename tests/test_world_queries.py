@@ -54,5 +54,6 @@ def test_ray_corpus_covers_every_required_family() -> None:
         "corners",
         "boundary_edges",
         "misses",
+        "near_surface",
     }
-    assert corpus.count == 16
+    assert corpus.count == 18
