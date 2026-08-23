@@ -1,4 +1,4 @@
-"""RivalSim v0.2 public API."""
+"""RivalSim v0.2.1 public API."""
 
 from rivalsim.arena import ArenaGeometry
 from rivalsim.controls import ControlBatch
@@ -14,4 +14,4 @@ __all__ = [
     "StateSnapshot",
     "StaticWorldSim",
 ]
-__version__ = "0.2.0"
+__version__ = "0.2.1"

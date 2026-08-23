@@ -8,8 +8,9 @@ import numpy as np
 import warp as wp
 
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
+from rivalsim.kernels.boost_pad import PAD_COUNT, SOCCAR_PAD_POSITIONS, boost_pad_tick
 from rivalsim.kernels.vehicle import (
-    chassis_contacts,
+    chassis_contacts_v021,
     increment_tick_counter,
     load_action_tape,
     wheel_pre_tick,
@@ -103,6 +104,8 @@ class StaticWorldSim(RivalSim):
             self.reset(initial)
         self.variant = variant
         self.variant_level = VARIANT_LEVEL[variant]
+        self.defer_car_angular_cap = self.variant_level >= 3
+        self.defer_car_linear_cap = self.variant_level >= 3
         self.geometry = geometry or ArenaGeometry.load_soccar(collision_root)
         self.meshes = meshes or WarpArenaMeshes(self.geometry, self.device)
         if ray_backend not in {"default", "cubql"}:
@@ -110,6 +113,18 @@ class StaticWorldSim(RivalSim):
         self.ray_backend = ray_backend
         self.ray_mesh = getattr(self.meshes, ray_backend)
         self.vehicle = VehicleState(self.state.car_count, self.device)
+        self.boost_pad_positions = wp.array(
+            SOCCAR_PAD_POSITIONS, dtype=wp.vec3, device=self.device
+        )
+        self.boost_pad_cooldown = wp.zeros(
+            self.num_envs * PAD_COUNT, dtype=wp.float32, device=self.device
+        )
+        self.boost_pad_previous_locked_car = wp.zeros(
+            self.num_envs * PAD_COUNT, dtype=wp.int32, device=self.device
+        )
+        self.inertia_transpose_mix = 1.0
+        self.plane_bt_mode = 4
+        self.support_hysteresis = 0.0000075
         self.tick_counter = wp.zeros(1, dtype=wp.int32, device=self.device)
         self.action_tape: DeviceActionTape | None = None
         if action_tape is not None:
@@ -119,12 +134,22 @@ class StaticWorldSim(RivalSim):
     def logical_state_bytes(self) -> int:
         base = StateSnapshot.empty(self.num_envs).nbytes
         vehicle = getattr(self, "vehicle", None)
-        return base + (0 if vehicle is None else vehicle.logical_bytes)
+        boost_pads = 0
+        if hasattr(self, "boost_pad_cooldown"):
+            boost_pads = self.num_envs * PAD_COUNT * 2 * 4
+        return base + (0 if vehicle is None else vehicle.logical_bytes) + boost_pads
 
     def reset(self, state: StateSnapshot | None = None, *, seed: int | None = None) -> None:
         super().reset(state, seed=seed)
         if hasattr(self, "vehicle"):
             self.vehicle = VehicleState(self.state.car_count, self.device)
+        if hasattr(self, "boost_pad_cooldown"):
+            self.boost_pad_cooldown = wp.zeros(
+                self.num_envs * PAD_COUNT, dtype=wp.float32, device=self.device
+            )
+            self.boost_pad_previous_locked_car = wp.zeros(
+                self.num_envs * PAD_COUNT, dtype=wp.int32, device=self.device
+            )
         self.tick_counter = wp.zeros(1, dtype=wp.int32, device=self.device)
 
     def set_action_tape(self, tape: ActionTape) -> None:
@@ -182,13 +207,26 @@ class StaticWorldSim(RivalSim):
                 wheel_pre_tick,
                 dim=state.car_count,
                 inputs=[
+                    self.tick_counter,
                     self.ray_mesh.id,
                     int(self.variant_level >= 2),
                     state.car_pos,
                     state.car_vel,
                     state.car_quat,
                     state.car_ang_vel,
+                    vehicle.solver_position,
+                    vehicle.rigid_position_bt,
+                    vehicle.solver_orientation,
+                    vehicle.solver_velocity,
+                    vehicle.rigid_velocity_bt,
+                    vehicle.solver_angular_velocity,
+                    vehicle.auto_roll_acceleration,
+                    vehicle.auto_roll_angular_acceleration,
+                    vehicle.contact_count,
+                    vehicle.contact_normal,
+                    vehicle.contact_face,
                     state.on_ground,
+                    state.air_control_disabled,
                     state.boost,
                     controls.throttle,
                     controls.steer,
@@ -205,6 +243,11 @@ class StaticWorldSim(RivalSim):
                     vehicle.suspension_clipped_factor,
                     vehicle.suspension_force,
                     vehicle.suspension_pushback,
+                    vehicle.wheel_axle,
+                    vehicle.wheel_forward,
+                    vehicle.wheel_friction_impulse,
+                    vehicle.side_impulse,
+                    vehicle.rolling_impulse,
                     vehicle.engine_acceleration,
                     vehicle.brake_acceleration,
                     vehicle.steer_angle,
@@ -225,16 +268,31 @@ class StaticWorldSim(RivalSim):
             state = self.state
             vehicle = self.vehicle
             wp.launch(
-                chassis_contacts,
+                chassis_contacts_v021,
                 dim=state.car_count,
                 inputs=[
                     self.meshes.default.id,
+                    self.meshes.internal_edge_angles,
+                    self.meshes.internal_edge_flags,
+                    self.meshes.bullet_bvh_rank,
+                    self.inertia_transpose_mix,
+                    self.plane_bt_mode,
+                    self.support_hysteresis,
                     state.car_pos,
                     state.car_vel,
                     state.car_quat,
                     state.car_ang_vel,
+                    vehicle.solver_position,
+                    vehicle.rigid_position_bt,
+                    vehicle.solver_orientation,
+                    vehicle.solver_velocity,
+                    vehicle.rigid_velocity_bt,
+                    vehicle.solver_angular_velocity,
+                    vehicle.auto_roll_acceleration,
+                    vehicle.auto_roll_angular_acceleration,
                     vehicle.candidate_count,
                     vehicle.contact_count,
+                    vehicle.world_contact_normal,
                     vehicle.candidate_total,
                     vehicle.contact_total,
                     vehicle.candidate_max,
@@ -242,7 +300,32 @@ class StaticWorldSim(RivalSim):
                     vehicle.penetration_max,
                     vehicle.contact_point,
                     vehicle.contact_normal,
+                    vehicle.contact_tangent,
+                    vehicle.contact_face,
+                    vehicle.contact_distance,
                     vehicle.contact_penetration,
+                    vehicle.contact_normal_jacobian,
+                    vehicle.contact_tangent_jacobian,
+                    vehicle.contact_normal_rhs,
+                    vehicle.contact_tangent_rhs,
+                    vehicle.contact_normal_impulse,
+                    vehicle.contact_tangent_impulse,
+                    vehicle.contact_push_impulse,
+                    vehicle.contact_lifetime,
+                    vehicle.plane_support_direction,
+                ],
+                device=self.device,
+            )
+            wp.launch(
+                boost_pad_tick,
+                dim=self.num_envs,
+                inputs=[
+                    self.boost_pad_positions,
+                    state.car_pos,
+                    state.car_quat,
+                    state.boost,
+                    self.boost_pad_cooldown,
+                    self.boost_pad_previous_locked_car,
                 ],
                 device=self.device,
             )

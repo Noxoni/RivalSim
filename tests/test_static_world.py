@@ -169,3 +169,25 @@ def test_contact_rich_stress_is_repeatably_deterministic(arena_assets) -> None:
         "penetration_max",
     ):
         np.testing.assert_array_equal(getattr(left_vehicle, name), getattr(right_vehicle, name))
+
+
+def test_soccar_boost_pad_pickup_cooldown_and_reset(arena_assets) -> None:
+    big = StateSnapshot.empty(1)
+    big.car_pos[0, 0] = (-3584.0, 0.0, 73.0)
+    big.boost[0, 0] = 0.0
+    sim = _sim(arena_assets, big)
+    sim.step(1, synchronize=True)
+    assert sim.snapshot().boost[0, 0] == pytest.approx(100.0)
+    assert float(sim.boost_pad_cooldown.numpy()[0]) == pytest.approx(10.0)
+
+    sim.step(1, synchronize=True)
+    assert float(sim.boost_pad_cooldown.numpy()[0]) == pytest.approx(10.0 - 1.0 / 120.0)
+
+    small = StateSnapshot.empty(1)
+    small.car_pos[0, 0] = (0.0, -4240.0, 70.0)
+    small.boost[0, 0] = 5.0
+    sim.reset(small)
+    sim.step(1, synchronize=True)
+    assert sim.snapshot().boost[0, 0] == pytest.approx(17.0)
+    cooldown = sim.boost_pad_cooldown.numpy().reshape(1, -1)
+    assert float(cooldown[0, 6]) == pytest.approx(4.0)

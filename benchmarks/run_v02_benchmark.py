@@ -1,4 +1,4 @@
-"""Run the prescribed B0/B1/B2/B3 RivalSim v0.2 GPU sweep."""
+"""Run the prescribed B0/B1/B2/B3 RivalSim static-world GPU sweep."""
 
 from __future__ import annotations
 
@@ -117,6 +117,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ticks", type=int, default=64)
     parser.add_argument("--max-worlds", type=int, default=262144)
     parser.add_argument("--seed", type=int, default=20260823)
+    parser.add_argument("--milestone", default="v0.2")
+    parser.add_argument("--parity-file", type=Path)
+    parser.add_argument(
+        "--reference-benchmark",
+        type=Path,
+        default=Path("results/v0.2/benchmark.json"),
+    )
     return parser.parse_args()
 
 
@@ -140,6 +147,11 @@ def main() -> int:
         seed=args.seed,
         graph_block_ticks=args.graph_block_ticks,
     )
+    if not stress["stress_gate_pass"]:
+        raise RuntimeError(
+            "stress gate failed before performance measurement: "
+            + json.dumps(stress, sort_keys=True)
+        )
     configurations = (
         ("B0", "B0", "cubql"),
         ("B1_default", "B1", "default"),
@@ -209,7 +221,7 @@ def main() -> int:
     component_costs = {
         name: b0_rate / point["world_ticks_per_s_median"] for name, point in common.items()
     }
-    parity_path = Path("results/v0.2/parity.json")
+    parity_path = args.parity_file or Path("results") / args.milestone / "parity.json"
     parity_pass = False
     if parity_path.exists():
         parity_result = json.loads(parity_path.read_text(encoding="utf-8"))
@@ -220,25 +232,22 @@ def main() -> int:
         for point in points
     )
     stable_scaling = any(point["worlds"] >= 4096 and point["stable"] for point in results["B3"])
-    performance_band = "below_red_threshold"
-    if b3_best["aggregate_simulated_game_seconds_per_s_median"] >= 100000.0:
-        performance_band = "green_threshold"
-    elif b3_best["aggregate_simulated_game_seconds_per_s_median"] >= 20000.0:
-        performance_band = "yellow_threshold"
-    verdict = "PAUSE_RED"
-    if (
-        parity_pass
-        and performance_band == "green_threshold"
-        and stable_scaling
-        and hot_loop_resident
-    ):
-        verdict = "PASS_GREEN"
-    elif parity_pass and performance_band == "yellow_threshold" and hot_loop_resident:
-        verdict = "PASS_YELLOW"
+    performance_band, verdict = _classify(
+        milestone=args.milestone,
+        rate=b3_best["aggregate_simulated_game_seconds_per_s_median"],
+        parity_pass=parity_pass,
+        stable_scaling=stable_scaling,
+        hot_loop_resident=hot_loop_resident,
+    )
+    v02_comparison = _annotate_v02_comparison(
+        results["B3"],
+        args.reference_benchmark,
+        b3_best["worlds"],
+    )
 
     output = {
         "schema_version": 1,
-        "milestone": "v0.2",
+        "milestone": args.milestone,
         "created_utc": datetime.now(UTC).isoformat(),
         "configuration": {
             "mandatory_batches": list(MANDATORY_BATCHES),
@@ -249,6 +258,7 @@ def main() -> int:
             "cuda_graph_block_ticks": args.graph_block_ticks,
             "stability_cv_max": STABILITY_CV_MAX,
             "seed": args.seed,
+            "parity_file": str(parity_path),
             "action_tape": {
                 "length": action_tape.length,
                 "hold_ticks": action_tape.hold_ticks,
@@ -267,6 +277,7 @@ def main() -> int:
         "geometry_query_gate": query_gate,
         "stress_gate": stress,
         "variants": results,
+        "frozen_v0_2_b3_comparison": v02_comparison,
         "summary": {
             "best_b3_worlds": b3_best["worlds"],
             "best_b3_world_ticks_per_s": b3_best["world_ticks_per_s_median"],
@@ -413,7 +424,7 @@ def run_stress_gate(
     rest_sim.capture_graph(graph_block_ticks)
     rest_sim.step_graph(2400, synchronize=True)
     rest = rest_sim.snapshot()
-    return {
+    result = {
         "worlds": 64,
         "measured_ticks": 2400,
         "capture_setup_ticks": graph_block_ticks,
@@ -432,6 +443,100 @@ def run_stress_gate(
         "floor_rest_speed_uu_per_s": float(np.linalg.norm(rest.car_vel[0, 0])),
         "floor_rest_stable": bool(
             15.0 < rest.car_pos[0, 0, 2] < 20.0 and np.linalg.norm(rest.car_vel[0, 0]) < 2.0
+        ),
+    }
+    result["hot_loop_gpu_resident"] = all(
+        int(item["hot_loop_host_to_device_bytes"]) == 0
+        and int(item["hot_loop_device_to_host_bytes"]) == 0
+        for item in metrics
+    )
+    result["stress_gate_pass"] = bool(
+        result["deterministic_equal"]
+        and result["finite"]
+        and result["bounded_velocity"]
+        and result["bounded_penetration"]
+        and result["floor_rest_stable"]
+        and result["hot_loop_gpu_resident"]
+    )
+    return result
+
+
+def _classify(
+    *,
+    milestone: str,
+    rate: float,
+    parity_pass: bool,
+    stable_scaling: bool,
+    hot_loop_resident: bool,
+) -> tuple[str, str]:
+    infrastructure_pass = stable_scaling and hot_loop_resident
+    if milestone == "v0.2.1":
+        if rate >= 500000.0:
+            performance_band = "green_threshold"
+        elif rate >= 100000.0:
+            performance_band = "pass_threshold"
+        else:
+            performance_band = "below_success_floor"
+        if not parity_pass:
+            return performance_band, "PAUSE_FIDELITY"
+        if not infrastructure_pass or rate < 100000.0:
+            return performance_band, "PAUSE_PERF"
+        if rate >= 500000.0:
+            return performance_band, "PASS_GREEN"
+        return performance_band, "PASS"
+
+    performance_band = "below_red_threshold"
+    if rate >= 100000.0:
+        performance_band = "green_threshold"
+    elif rate >= 20000.0:
+        performance_band = "yellow_threshold"
+    if parity_pass and performance_band == "green_threshold" and infrastructure_pass:
+        return performance_band, "PASS_GREEN"
+    if parity_pass and performance_band == "yellow_threshold" and hot_loop_resident:
+        return performance_band, "PASS_YELLOW"
+    return performance_band, "PAUSE_RED"
+
+
+def _annotate_v02_comparison(
+    current_points: list[dict[str, Any]],
+    reference_path: Path,
+    selected_worlds: int,
+) -> dict[str, Any]:
+    if not reference_path.exists():
+        return {
+            "available": False,
+            "reference_path": str(reference_path),
+            "reason": "reference benchmark not found",
+        }
+    reference = json.loads(reference_path.read_text(encoding="utf-8"))
+    reference_points = {
+        int(point["worlds"]): point for point in reference["variants"]["B3"]
+    }
+    comparisons: list[dict[str, Any]] = []
+    for point in current_points:
+        worlds = int(point["worlds"])
+        prior = reference_points.get(worlds)
+        if prior is None:
+            continue
+        prior_rate = float(prior["aggregate_simulated_game_seconds_per_s_median"])
+        current_rate = float(point["aggregate_simulated_game_seconds_per_s_median"])
+        comparisons.append(
+            {
+                "worlds": worlds,
+                "v0_2_aggregate_simulated_game_seconds_per_s": prior_rate,
+                "v0_2_1_aggregate_simulated_game_seconds_per_s": current_rate,
+                "retained_throughput_fraction": current_rate / prior_rate,
+                "slowdown_factor": prior_rate / current_rate,
+            }
+        )
+    return {
+        "available": True,
+        "reference_path": str(reference_path),
+        "reference_milestone": reference["milestone"],
+        "equal_batch_points": comparisons,
+        "selected_worlds_comparison": next(
+            (item for item in comparisons if item["worlds"] == selected_worlds),
+            None,
         ),
     }
 

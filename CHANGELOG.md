@@ -1,17 +1,38 @@
 # Changelog
 
-## v0.2.1 — static-world fidelity redesign handoff (2026-08-23)
+## v0.2.1 — static-world fidelity redesign implemented (2026-08-23)
 
-- Activated a bounded correctness redesign after v0.2 reached 1,350,748.16 aggregate simulated game-seconds/s but failed RocketSim static-world parity.
-- Froze all published v0.1/v0.2 evidence and the existing 35-scenario × eight-horizon v0.2 parity corpus/tolerances.
-- Required a divergence index ranked by earliest hard/numeric failure rather than tuning against long-horizon positional drift.
-- Authorized a read-only diagnostic RocketSim build/wrapper from the exact pinned source so wheel friction impulses, suspension values, manifold state, solver ordering and post-solve velocities can be compared tick-by-tick.
-- Preserved the already-passing `.cmf` geometry/query layer, normal Warp BVH, cuBQL suspension-ray backend and v0.1 contact-free mechanics unless evidence proves one is causal.
-- Focused changes on Bullet/RocketSim-equivalent wheel friction, suspension/contact ordering, chassis manifold/contact solving, friction/restitution, penetration correction, persistence/warmstarting and surface-transition behavior.
-- Required representative steering, powerslide, wall-transition and chassis-impact cases to pass before the full frozen corpus is rerun.
-- Required full v0.2.1 parity to reach zero hard mismatches and zero numeric failures with unchanged tolerances before final performance benchmarking.
-- Set corrected B3 success floor at 100,000 aggregate simulated game-seconds/s after parity passes.
-- Explicitly kept ball/world, car/ball, car/car, boost pads, game rules, RLGym/PPO and Rival integration out of scope until a separate v0.3 authorization.
+- Replaced v0.2's approximate wheel/contact response with source-backed RocketSim/Bullet
+  operation ordering: two-phase wheel preparation/application, exact suspension/friction rows,
+  shared solver prestate, ten-iteration velocity and split-impulse PGS, and deferred caps.
+- Added Bullet-equivalent Octane box margins/inertia, CMF-local quantized-BVH ordering,
+  triangle shared-edge metadata, SAT/GJK closest-feature handling, contact thresholds, manifold
+  ordering, tangent/RHS construction, persistence fields, and callback-normal semantics.
+- Corrected grounded boost acceleration, air-control suppression, auto-roll state, wheel state,
+  and GPU-resident standard Soccar boost-pad pickup/cooldown behavior from pinned source.
+- Built a source-only native diagnostic executable against unmodified RocketSimPython commit
+  `2da51b1dac7b8127127613a5ff30e490bdd70dd8` and its pinned RocketSim/Bullet sources. It exposes
+  pre/post rigid state, wheel rows, manifolds, solver impulses, triangle identities, and GJK
+  features without entering the benchmark path.
+- Adopted the immediate 2026-08-23 validation-policy adjustment: unchanged meaningful
+  tolerances and hard semantic checks now gate authoritative local transitions at 1/4/8/12
+  ticks (up to 100 ms); 30–600-tick synchronized open-loop identity is diagnostic only.
+- Passed all 140 local checkpoints across the 35 existing scenarios with **0 hard mismatches**
+  and **0 numeric failures**. Maximum errors were 0.0009785 uu position, 0.002752 uu/s linear
+  velocity, 0.0003908 rad orientation, and 0.00005585 rad/s angular velocity.
+- Preserved v0.1 at 27/27 passing and passed 38/38 repository tests. Two 64-world,
+  2,400-tick stress runs produced the identical full-state SHA-256, finite/bounded state, and
+  zero hot-loop H2D/D2H bytes.
+- Measured corrected B3 at **822,480.77 aggregate simulated game-seconds/s** at 262,144 worlds,
+  **0.403% CV**, zero timed transfers, and stable scaling. This is 60.89% of v0.2 throughput
+  at the same batch and satisfies the v0.2.1 **`PASS_GREEN`** threshold.
+- Added a bounded breadth prototype that audits shared-edge topology across all 8,020 DFH
+  triangles and reports observed transition coverage without claiming exhaustiveness. The
+  existing corpus exercises 2 mesh triangles; per-triangle authoritative generation remains
+  a later, separately authorized breadth milestone.
+- Preserved all published `results/v0.1/` and `results/v0.2/` bytes and stopped at the v0.2.1
+  boundary. Dynamic ball-world, car-ball, and car-car contacts and training integration remain
+  unstarted v0.3+ work.
 
 ## v0.2.0 — arena + ground-contact proof implemented (2026-08-23)
 

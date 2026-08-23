@@ -32,6 +32,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--mode", choices=("measurement", "gate"), default="measurement")
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--milestone", default="v0.2")
+    parser.add_argument("--horizons", type=int, nargs="+")
     return parser.parse_args()
 
 
@@ -41,6 +43,11 @@ def main() -> int:
     geometry = ArenaGeometry.load_soccar(args.collision_dir)
     meshes = WarpArenaMeshes(geometry, args.device)
     scenarios = make_v02_scenarios()
+    horizons = tuple(args.horizons or V02_HORIZONS)
+    if not horizons or any(value <= 0 for value in horizons):
+        raise ValueError("parity horizons must be positive")
+    if tuple(sorted(set(horizons))) != horizons:
+        raise ValueError("parity horizons must be unique and strictly increasing")
     tolerances = _load_tolerances() if args.mode == "gate" else None
     records: list[dict[str, object]] = []
     metric_values: dict[str, list[float]] = {}
@@ -59,7 +66,7 @@ def main() -> int:
         oracle = RocketSimStaticWorldOracle(scenario.initial.copy(), args.collision_dir)
         current_controls = None
         horizon_records: list[dict[str, object]] = []
-        for tick in range(1, max(V02_HORIZONS) + 1):
+        for tick in range(1, max(horizons) + 1):
             controls = scenario.controls_at(tick - 1)
             if controls is not current_controls:
                 sim.set_controls(controls)
@@ -67,7 +74,7 @@ def main() -> int:
                 current_controls = controls
             sim.step(1)
             oracle.step()
-            if tick not in V02_HORIZONS:
+            if tick not in horizons:
                 continue
             state = sim.snapshot()
             vehicle = sim.vehicle_snapshot()
@@ -120,9 +127,10 @@ def main() -> int:
         len(item["numeric_failures"]) for scenario in records for item in scenario["horizons"]
     )
     result = {
-        "milestone": "v0.2",
+        "milestone": args.milestone,
         "mode": args.mode,
         "generated_at_utc": datetime.now(UTC).isoformat(),
+        "validation_policy": _validation_policy(args.milestone, horizons),
         "implementation": {
             "python": platform.python_version(),
             "warp": wp.__version__,
@@ -138,7 +146,7 @@ def main() -> int:
             "vertices": geometry.vertex_count,
             "triangles": geometry.triangle_count,
         },
-        "horizons_ticks": list(V02_HORIZONS),
+        "horizons_ticks": list(horizons),
         "scenario_count": len(scenarios),
         "families": sorted({scenario.family for scenario in scenarios}),
         "measurement_aggregates": aggregates,
@@ -168,7 +176,7 @@ def _numeric_errors(state, vehicle, reference) -> dict[str, float]:
     cosine = np.clip((np.trace(relative) - 1.0) * 0.5, -1.0, 1.0)
     sim_world_normal = np.zeros(3, dtype=np.float32)
     if vehicle.contact_count[0] > 0:
-        sim_world_normal = vehicle.contact_normal[0, 0]
+        sim_world_normal = vehicle.world_contact_normal[0]
     normal_angle = 0.0
     sim_normal_length = float(np.linalg.norm(sim_world_normal))
     reference_normal_length = float(np.linalg.norm(reference.world_contact_normal))
@@ -212,7 +220,7 @@ def _hard_mismatches(state, vehicle, reference) -> list[str]:
     ):
         mismatches.append("linear_velocity_direction")
     if sim_world_contact and reference.has_world_contact:
-        sim_normal = vehicle.contact_normal[0, 0].astype(np.float64)
+        sim_normal = vehicle.world_contact_normal[0].astype(np.float64)
         reference_normal = reference.world_contact_normal.astype(np.float64)
         if (
             np.linalg.norm(sim_normal) > 1e-7
@@ -227,6 +235,27 @@ def _load_tolerances() -> dict[str, float]:
     from rivalsim.v02_tolerances import V02_PARITY_TOLERANCES
 
     return dict(V02_PARITY_TOLERANCES)
+
+
+def _validation_policy(milestone: str, horizons: tuple[int, ...]) -> dict[str, object]:
+    if milestone == "v0.2.1":
+        return {
+            "authority": "2026-08-23 immediate user steering adjustment",
+            "hard_gate_kind": "authoritative_local_transition_parity",
+            "hard_gate_horizons_ticks": list(horizons),
+            "physics_tick_rate_hz": 120,
+            "maximum_hard_gate_duration_ms": max(horizons) / 120.0 * 1000.0,
+            "long_open_loop_horizons_ticks": [30, 60, 120, 300, 600],
+            "long_open_loop_status": "diagnostic_only_non_blocking",
+            "tolerance_policy": "unchanged_frozen_v0.2_tolerances",
+        }
+    return {
+        "authority": "milestone_default",
+        "hard_gate_kind": "requested_horizon_parity",
+        "hard_gate_horizons_ticks": list(horizons),
+        "physics_tick_rate_hz": 120,
+        "tolerance_policy": "unchanged_frozen_v0.2_tolerances",
+    }
 
 
 if __name__ == "__main__":

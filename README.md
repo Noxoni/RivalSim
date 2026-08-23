@@ -7,53 +7,66 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - two cars;
 - one ball;
 - standard DFH/Stadium_P arena;
-- standard boost pads later;
+- standard static-world boost-pad pickup/cooldown state;
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.2 measured, `PAUSE_RED`
+## Current boundary — v0.2.1 complete, `PASS_GREEN`
 
-RivalSim v0.2 implemented the bounded arena + ground-contact proof and stopped at its required
-review gate. The complete static-world B3 path reached **1,350,748.16 aggregate simulated
-game-seconds/s** at 262,144 worlds with **0.998% CV**, zero timed host/device transfer, and a
-passing 2,400-tick determinism/stress check. This is a strong performance result for a partial
-static-world transition engine.
+RivalSim v0.2.1 completes the bounded static-world fidelity redesign. The corrected 35-scenario
+RocketSim corpus passes all **140 authoritative local-transition checkpoints** at 1, 4, 8, and
+12 ticks with **zero hard mismatches and zero numeric tolerance failures**. The meaningful
+frozen v0.2 tolerances were not widened. Twelve ticks is 100 ms at 120 Hz and three Rival
+`mechanics4` policy-decision intervals.
 
-The required RocketSim fidelity gate did not pass. Across 35 scenarios and eight horizons,
-85 scenario/horizon records contained hard state/contact/sign mismatches and 617 numeric
-checks exceeded the prospectively frozen tolerances. Correctness takes precedence over
-throughput, so the v0.2 verdict is **`PAUSE_RED`** and v0.3 is not authorized.
+The complete corrected B3 path reaches **822,480.77 aggregate simulated game-seconds/s** at
+262,144 worlds with **0.403% CV**, stable scaling, and zero timed host/device transfer. Two
+independent 64-world, 2,400-tick stress passes are finite, bounded, and full-state bit-identical.
+The v0.1 live corpus remains 27/27 passing, and the repository suite is 38/38 passing. This
+satisfies the v0.2.1 **`PASS_GREEN`** class: local parity plus at least 500,000 sim-s/s.
 
-Implemented v0.2 scope includes:
+The validation policy deliberately retires 30–600-tick synchronized open-loop identity as a
+hard requirement. Floating-point contact trajectories become chaotic after local branch choices;
+long behavior should ultimately be assessed closed-loop and by train-in-RivalSim transfer to
+RocketSim/RLBot. Long open-loop trajectories may still diagnose a systematic defect visible in
+the 1–12-tick window, but do not block this release.
+
+Implemented v0.2.1 static-world scope includes:
 
 - the exact external Soccar `.cmf` set as one shared 4,468-vertex / 8,020-triangle GPU asset;
 - independently checked CPU, normal Warp BVH, and cuBQL suspension-ray queries;
 - four wheel/suspension rays per car and eight per 1v1 world per tick;
-- RocketSim-derived suspension, throttle, brake, coast, steering, boost-ground interaction,
-  handbrake, and powerslide preparation;
-- oriented-box broadphase bounds, triangle-vs-OBB SAT narrow phase, and bounded static-contact
-  impulse/friction/correction response;
+- RocketSim-ordered two-phase wheel transforms, rays, suspension, bilateral/rolling friction,
+  throttle, brake, coast, steering, powerslide, and grounded boost;
+- Bullet-equivalent Octane box margins/inertia, per-CMF BVH ordering, shared-edge adjustment,
+  triangle SAT/GJK closest features, manifold/contact rows, ten-iteration velocity and split-
+  impulse solving, writeback, and deferred caps;
+- GPU-resident standard Soccar boost-pad pickup, lock, cooldown, and recharge state;
 - decomposed B0/B1/B2/B3 benchmarks, contact-rich parity, and deterministic stress evidence.
 
-The frozen v0.1 result remains at `1f7a36cc6165273fb658ba07a8458e8d8e60628a`;
-`results/v0.1/` was not modified. See `docs/V0_2_RESULTS.md`,
-`docs/REPRODUCING_V0_2.md`, and `results/v0.2/` for the v0.2 evidence.
+The bounded DFH breadth prototype audits adjacency topology over all 8,020 triangles but records
+that the current 35-scenario transition corpus physically exercises only 2 mesh triangles; many
+floor/wall cases use RocketSim's analytic planes. No exhaustive per-triangle claim is made. A
+future authority may scale authoritative local resets across the remaining mesh without reopening
+multi-second synchronized parity.
+
+Published v0.1 and v0.2 evidence remains byte-for-byte frozen. See `docs/V0_2_1_RESULTS.md`,
+`docs/REPRODUCING_V0_2_1.md`, and `results/v0.2.1/` for the current evidence.
 
 ### Explicitly excluded
 
-RivalSim v0.2 does **not** implement:
+RivalSim v0.2.1 does **not** implement:
 
 - ball-world collision;
 - car-ball collision;
 - car-car collision;
 - bumps/demolitions;
-- boost pads;
 - scoring/game reset;
 - RLGym observations/rewards/PPO;
 - Rival policy inference.
 
-Those remain later milestones. New authority and a static-world fidelity redesign/review are
-required before any v0.3 work.
+Those remain later milestones. v0.3 was not begun; new authority is required before dynamic
+contacts or training integration.
 
 ## Architecture
 
@@ -73,11 +86,28 @@ Current full Rival CPU RocketSim/RLGym reference:
 
 v0.2 remains a partial simulator, so this is a system reference rather than an apples-to-apples comparison.
 
-The v0.2 package classifies the complete static-world path as:
+The v0.2.1 package classifies the corrected complete static-world path as:
 
-- **PASS_GREEN:** parity passes and >=100,000 aggregate sim-s/s;
-- **PASS_YELLOW:** parity passes and 20,000–<100,000 sim-s/s with no architectural dead end;
-- **PAUSE_RED:** fidelity/architecture failure or <20,000 sim-s/s without a clear optimization path.
+- **PASS_GREEN:** local parity passes and >=500,000 aggregate sim-s/s;
+- **PASS:** local parity passes and 100,000–<500,000 sim-s/s;
+- **PAUSE_PERF:** local parity passes but throughput is <100,000 sim-s/s;
+- **PAUSE_FIDELITY:** any required local parity failure remains.
+
+## Published v0.2.1 authority and result
+
+The active handoff is preserved at `handoff/v0.2.1/CODEX_START_PROMPT.md`. The immediate
+2026-08-23 user steering adjustment governs the final 1/4/8/12-tick validation boundary and is
+recorded in the v0.2.1 evidence and reproduction guide.
+
+The result package is:
+
+- `docs/V0_2_1_RESULTS.md`;
+- `docs/REPRODUCING_V0_2_1.md`;
+- `results/v0.2.1/divergence_index.json`;
+- `results/v0.2.1/parity.json`;
+- `results/v0.2.1/coverage.json`;
+- `results/v0.2.1/benchmark.json`;
+- `results/v0.2.1/manifest.json`.
 
 ## Published v0.2 authority
 

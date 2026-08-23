@@ -147,6 +147,17 @@ class WarpArenaMeshes:
         self.device = str(wp.get_device(device))
         self.points = wp.array(geometry.vertices_uu, dtype=wp.vec3, device=self.device)
         self.indices = wp.array(geometry.triangles.reshape(-1), dtype=wp.int32, device=self.device)
+        edge_angles, edge_flags = build_internal_edge_data(geometry)
+        bvh_rank = build_bullet_bvh_rank(geometry)
+        self.internal_edge_angles = wp.array(
+            edge_angles, dtype=wp.vec3, device=self.device
+        )
+        self.internal_edge_flags = wp.array(
+            edge_flags, dtype=wp.int32, device=self.device
+        )
+        self.bullet_bvh_rank = wp.array(
+            bvh_rank, dtype=wp.int32, device=self.device
+        )
         # Keep the conventional mesh for AABB iteration. cuBQL currently does
         # not implement mesh_query_aabb, but is benchmarked for wheel rays.
         self.default = wp.Mesh(self.points, self.indices)
@@ -155,6 +166,306 @@ class WarpArenaMeshes:
     def refit(self) -> None:
         self.default.refit()
         self.cubql.refit()
+
+
+def build_internal_edge_data(
+    geometry: ArenaGeometry,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Build Bullet's per-triangle shared-edge angles and flags.
+
+    RocketSim calls ``btGenerateInternalEdgeInfo`` once for each source CMF.
+    The resulting angles and convex/swap flags drive
+    ``btAdjustInternalEdgeContacts`` on every generated mesh contact.  Keeping
+    the source meshes separate here is therefore part of the collision ABI.
+    """
+
+    angles = np.full(
+        (geometry.triangle_count, 3),
+        np.float32(2.0 * np.pi),
+        dtype=np.float32,
+    )
+    flags = np.zeros(geometry.triangle_count, dtype=np.int32)
+    face_offset = 0
+    edge_vertices = ((0, 1, 2), (1, 2, 0), (2, 0, 1))
+    for mesh in geometry.meshes:
+        vertices = np.asarray(mesh.vertices_bt, dtype=np.float32)
+        triangles = np.asarray(mesh.triangles, dtype=np.int32)
+        vertex_keys = [tuple(vertex.view(np.uint32).tolist()) for vertex in vertices]
+        edge_map: dict[
+            tuple[tuple[int, ...], tuple[int, ...]], list[tuple[int, int]]
+        ] = {}
+        for face, triangle in enumerate(triangles):
+            for edge, (start, end, _other) in enumerate(edge_vertices):
+                key_a = vertex_keys[int(triangle[start])]
+                key_b = vertex_keys[int(triangle[end])]
+                key = (key_a, key_b) if key_a <= key_b else (key_b, key_a)
+                edge_map.setdefault(key, []).append((face, edge))
+
+        for entries in edge_map.values():
+            if len(entries) < 2:
+                continue
+            for face, edge in entries:
+                neighbor = next(item for item in entries if item[0] != face)
+                edge_angle, edge_flags = _bullet_edge_data(
+                    vertices,
+                    triangles[face],
+                    edge,
+                    triangles[neighbor[0]],
+                )
+                angles[face_offset + face, edge] = edge_angle
+                flags[face_offset + face] |= edge_flags
+        face_offset += mesh.triangle_count
+    return angles, flags
+
+
+def build_bullet_bvh_rank(geometry: ArenaGeometry) -> np.ndarray:
+    """Return each face's visit rank in Bullet's quantized BVH.
+
+    ``btOptimizedBvh`` recursively partitions its leaf array in place, then
+    visits the resulting leaves in that fixed depth-first order for every AABB
+    query.  RocketSim owns one BVH per CMF, so ranks restart at every source
+    mesh and are offset only to make the combined array deterministic.
+    """
+
+    result = np.empty(geometry.triangle_count, dtype=np.int32)
+    face_offset = 0
+    rank_offset = 0
+    for mesh in geometry.meshes:
+        vertices = np.asarray(mesh.vertices_bt, dtype=np.float32)
+        triangle_vertices = vertices[np.asarray(mesh.triangles, dtype=np.int32)]
+        leaf_min = np.min(triangle_vertices, axis=1).astype(np.float32)
+        leaf_max = np.max(triangle_vertices, axis=1).astype(np.float32)
+        thin = leaf_max - leaf_min < np.float32(0.002)
+        leaf_min = np.where(thin, leaf_min - np.float32(0.001), leaf_min)
+        leaf_max = np.where(thin, leaf_max + np.float32(0.001), leaf_max)
+
+        bvh_min, _bvh_max, quantization = _bullet_quantization_bounds(
+            vertices.min(axis=0), vertices.max(axis=0)
+        )
+        quantized_min = _bullet_quantize(leaf_min, bvh_min, quantization, False)
+        quantized_max = _bullet_quantize(leaf_max, bvh_min, quantization, True)
+        faces = np.arange(mesh.triangle_count, dtype=np.int32)
+        _bullet_partition_leaves(
+            quantized_min,
+            quantized_max,
+            faces,
+            bvh_min,
+            quantization,
+            0,
+            mesh.triangle_count,
+        )
+        for rank, face in enumerate(faces):
+            result[face_offset + int(face)] = np.int32(rank_offset + rank)
+        face_offset += mesh.triangle_count
+        rank_offset += mesh.triangle_count
+    return result
+
+
+def _bullet_partition_leaves(
+    quantized_min: np.ndarray,
+    quantized_max: np.ndarray,
+    faces: np.ndarray,
+    bvh_min: np.ndarray,
+    quantization: np.ndarray,
+    start: int,
+    end: int,
+) -> None:
+    """Mirror ``btQuantizedBvh::buildTree``'s in-place leaf partition."""
+
+    count = end - start
+    if count <= 1:
+        return
+
+    def center(index: int) -> np.ndarray:
+        minimum = quantized_min[index].astype(np.float32) / quantization + bvh_min
+        maximum = quantized_max[index].astype(np.float32) / quantization + bvh_min
+        return np.asarray(np.float32(0.5) * (maximum + minimum), dtype=np.float32)
+
+    mean = np.zeros(3, dtype=np.float32)
+    for index in range(start, end):
+        mean = np.asarray(mean + center(index), dtype=np.float32)
+    mean = np.asarray(mean * np.float32(1.0 / count), dtype=np.float32)
+
+    variance = np.zeros(3, dtype=np.float32)
+    for index in range(start, end):
+        difference = np.asarray(center(index) - mean, dtype=np.float32)
+        variance = np.asarray(variance + difference * difference, dtype=np.float32)
+    variance = np.asarray(
+        variance * np.float32(1.0 / (count - 1)), dtype=np.float32
+    )
+    if variance[0] < variance[1]:
+        split_axis = 2 if variance[1] < variance[2] else 1
+    else:
+        split_axis = 2 if variance[0] < variance[2] else 0
+
+    split_value = mean[split_axis]
+    split = start
+    for index in range(start, end):
+        if center(index)[split_axis] > split_value:
+            if index != split:
+                quantized_min[[index, split]] = quantized_min[[split, index]]
+                quantized_max[[index, split]] = quantized_max[[split, index]]
+                faces[[index, split]] = faces[[split, index]]
+            split += 1
+
+    balanced_range = count // 3
+    if split <= start + balanced_range or split >= end - 1 - balanced_range:
+        split = start + (count >> 1)
+    _bullet_partition_leaves(
+        quantized_min,
+        quantized_max,
+        faces,
+        bvh_min,
+        quantization,
+        start,
+        split,
+    )
+    _bullet_partition_leaves(
+        quantized_min,
+        quantized_max,
+        faces,
+        bvh_min,
+        quantization,
+        split,
+        end,
+    )
+
+
+def _bullet_quantization_bounds(
+    local_min: np.ndarray, local_max: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    margin = np.float32(1.0)
+    bvh_min = np.asarray(local_min - margin, dtype=np.float32)
+    bvh_max = np.asarray(local_max + margin, dtype=np.float32)
+    quantization = np.asarray(
+        np.float32(65533.0) / (bvh_max - bvh_min), dtype=np.float32
+    )
+
+    quantized = _bullet_quantize(
+        bvh_min[None, :], bvh_min, quantization, False
+    )[0]
+    unquantized = np.asarray(
+        quantized.astype(np.float32) / quantization + bvh_min,
+        dtype=np.float32,
+    )
+    bvh_min = np.minimum(bvh_min, unquantized - margin).astype(np.float32)
+    quantization = np.asarray(
+        np.float32(65533.0) / (bvh_max - bvh_min), dtype=np.float32
+    )
+
+    quantized = _bullet_quantize(
+        bvh_max[None, :], bvh_min, quantization, True
+    )[0]
+    unquantized = np.asarray(
+        quantized.astype(np.float32) / quantization + bvh_min,
+        dtype=np.float32,
+    )
+    bvh_max = np.maximum(bvh_max, unquantized + margin).astype(np.float32)
+    quantization = np.asarray(
+        np.float32(65533.0) / (bvh_max - bvh_min), dtype=np.float32
+    )
+    return bvh_min, bvh_max, quantization
+
+
+def _bullet_quantize(
+    points: np.ndarray,
+    bvh_min: np.ndarray,
+    quantization: np.ndarray,
+    is_maximum: bool,
+) -> np.ndarray:
+    scaled = np.asarray((points - bvh_min) * quantization, dtype=np.float32)
+    if is_maximum:
+        integers = np.asarray(scaled + np.float32(1.0), dtype=np.uint16)
+        return np.asarray(integers | np.uint16(1), dtype=np.uint16)
+    integers = np.asarray(scaled, dtype=np.uint16)
+    return np.asarray(integers & np.uint16(0xFFFE), dtype=np.uint16)
+
+
+def _bullet_edge_data(
+    vertices: np.ndarray,
+    triangle_a: np.ndarray,
+    edge_a: int,
+    triangle_b: np.ndarray,
+) -> tuple[np.float32, np.int32]:
+    """Mirror one shared-edge result from Bullet's connectivity processor."""
+
+    edge_vertices = ((0, 1, 2), (1, 2, 0), (2, 0, 1))
+    start_a, end_a, other_a = edge_vertices[edge_a]
+    key_start = tuple(vertices[int(triangle_a[start_a])].view(np.uint32).tolist())
+    key_end = tuple(vertices[int(triangle_a[end_a])].view(np.uint32).tolist())
+    keys_b = [tuple(vertices[int(index)].view(np.uint32).tolist()) for index in triangle_b]
+    start_b = keys_b.index(key_start)
+    end_b = keys_b.index(key_end)
+    other_b = 3 - start_b - end_b
+
+    a = vertices[triangle_a]
+    b = vertices[triangle_b]
+    edge = _normalize_f32(a[end_a] - a[start_a])
+    normal_a = _normalize_f32(np.cross(a[1] - a[0], a[2] - a[0]))
+    # btConnectivityProcessor constructs tB with the shared edge reversed.
+    normal_b = _normalize_f32(
+        np.cross(b[start_b] - b[end_b], b[other_b] - b[end_b])
+    )
+    edge_cross_a = _normalize_f32(np.cross(edge, normal_a))
+    if np.dot(edge_cross_a, a[other_a] - a[start_a]) < 0.0:
+        edge_cross_a = -edge_cross_a
+    edge_cross_b = _normalize_f32(np.cross(edge, normal_b))
+    if np.dot(edge_cross_b, b[other_b] - b[start_b]) < 0.0:
+        edge_cross_b = -edge_cross_b
+    calculated_edge = np.cross(edge_cross_a, edge_cross_b)
+    if np.dot(calculated_edge, calculated_edge) < np.float32(0.0001):
+        return np.float32(0.0), np.int32(0)
+
+    calculated_edge = _normalize_f32(calculated_edge)
+    calculated_normal_a = _normalize_f32(np.cross(calculated_edge, edge_cross_a))
+    angle_2 = np.float32(
+        np.arctan2(
+            np.dot(edge_cross_b, calculated_normal_a),
+            np.dot(edge_cross_b, edge_cross_a),
+        )
+    )
+    angle_4 = np.float32(np.pi) - angle_2
+    is_convex = bool(np.dot(normal_a, edge_cross_b) < 0.0)
+    corrected_angle = angle_4 if is_convex else -angle_4
+    stored_angle = np.float32(-corrected_angle)
+
+    # btConnectivityProcessor verifies the reconstructed neighboring normal
+    # and records whether it must be flipped for this directed edge.
+    rotation_edge = a[start_a] - a[end_a]
+    computed_normal_b = _rotate_axis_angle_f32(
+        normal_a, rotation_edge, stored_angle
+    )
+    edge_flags = np.int32(0)
+    if is_convex:
+        edge_flags |= np.int32(1 << edge_a)
+    if np.dot(computed_normal_b, normal_b) < 0.0:
+        edge_flags |= np.int32(1 << (edge_a + 3))
+    return stored_angle, edge_flags
+
+
+def _normalize_f32(value: np.ndarray) -> np.ndarray:
+    value = np.asarray(value, dtype=np.float32)
+    length = np.float32(np.sqrt(np.dot(value, value)))
+    if length <= 0.0:
+        return np.zeros(3, dtype=np.float32)
+    return np.asarray(value / length, dtype=np.float32)
+
+
+def _rotate_axis_angle_f32(
+    value: np.ndarray, axis: np.ndarray, angle: np.float32
+) -> np.ndarray:
+    """Float32 Rodrigues rotation matching Bullet's axis-angle quaternion."""
+
+    unit_axis = _normalize_f32(axis)
+    sine = np.float32(np.sin(np.float32(angle)))
+    cosine = np.float32(np.cos(np.float32(angle)))
+    one_minus_cosine = np.float32(1.0) - cosine
+    return np.asarray(
+        value * cosine
+        + np.cross(unit_axis, value) * sine
+        + unit_axis * np.dot(unit_axis, value) * one_minus_cosine,
+        dtype=np.float32,
+    )
 
 
 def read_cmf(path: str | os.PathLike[str]) -> CollisionMesh:

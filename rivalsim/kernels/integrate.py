@@ -19,6 +19,7 @@ BALL_MAX_ANG_SPEED = float(c.BALL_MAX_ANG_SPEED)
 BALL_DRAG_FACTOR = float(c.BALL_DRAG_FACTOR)
 BOOST_USED_PER_SECOND = float(c.BOOST_USED_PER_SECOND)
 BOOST_MIN_TIME = float(c.BOOST_MIN_TIME)
+BOOST_ACCEL_GROUND = float(c.BOOST_ACCEL_GROUND)
 BOOST_ACCEL_AIR = float(c.BOOST_ACCEL_AIR)
 THROTTLE_AIR_ACCEL = float(c.THROTTLE_AIR_ACCEL)
 JUMP_ACCEL = float(c.JUMP_ACCEL)
@@ -98,6 +99,8 @@ def _integrate_quaternion(quat: wp.quat, ang_vel: wp.vec3) -> wp.quat:
 
 @wp.kernel
 def integrate_tick(
+    defer_car_linear_cap: int,
+    defer_car_angular_cap: int,
     car_pos: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
@@ -106,6 +109,7 @@ def integrate_tick(
     boosting_time: wp.array(dtype=wp.float32),
     time_since_boosted: wp.array(dtype=wp.float32),
     on_ground: wp.array(dtype=wp.int32),
+    air_control_disabled: wp.array(dtype=wp.int32),
     has_jumped: wp.array(dtype=wp.int32),
     is_jumping: wp.array(dtype=wp.int32),
     has_double_jumped: wp.array(dtype=wp.int32),
@@ -208,7 +212,11 @@ def integrate_tick(
         )
         angular_acceleration = angular_acceleration + wp.quat_rotate(quat, dodge_local)
 
-    do_air_control = airborne and ((not flipping) or (not rel_nonzero) or cancel)
+    do_air_control = (
+        airborne
+        and air_control_disabled[tid] == 0
+        and ((not flipping) or (not rel_nonzero) or cancel)
+    )
     if do_air_control:
         pitch_scale = 1.0
         if flipping:
@@ -363,7 +371,10 @@ def integrate_tick(
     if car_is_boosting != 0:
         car_boosting_time = car_boosting_time + DT
         car_boost = wp.max(0.0, car_boost - BOOST_USED_PER_SECOND * DT)
-        acceleration = acceleration + forward * BOOST_ACCEL_AIR
+        boost_acceleration = BOOST_ACCEL_AIR
+        if on_ground_for_tick:
+            boost_acceleration = BOOST_ACCEL_GROUND
+        acceleration = acceleration + forward * boost_acceleration
         car_time_since_boosted = 0.0
     else:
         car_boosting_time = 0.0
@@ -390,8 +401,10 @@ def integrate_tick(
     else:
         car_supersonic_time = 0.0
 
-    vel = _cap_vector(vel, CAR_MAX_SPEED)
-    ang_vel = _cap_vector(ang_vel, CAR_MAX_ANG_SPEED)
+    if defer_car_linear_cap == 0:
+        vel = _cap_vector(vel, CAR_MAX_SPEED)
+    if defer_car_angular_cap == 0:
+        ang_vel = _cap_vector(ang_vel, CAR_MAX_ANG_SPEED)
 
     car_pos[tid] = pos
     car_vel[tid] = vel

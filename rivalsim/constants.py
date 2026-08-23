@@ -21,6 +21,7 @@ BALL_DRAG = np.float32(0.03)
 BOOST_MAX = np.float32(100.0)
 BOOST_USED_PER_SECOND = np.float32(100.0 / 3.0)
 BOOST_MIN_TIME = np.float32(0.1)
+BOOST_ACCEL_GROUND = np.float32(2975.0 / 3.0)
 BOOST_ACCEL_AIR = np.float32(3175.0 / 3.0)
 
 THROTTLE_AIR_ACCEL = np.float32(200.0 / 3.0)

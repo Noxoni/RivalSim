@@ -24,6 +24,8 @@ class RivalSim:
             raise ValueError("num_envs must be positive")
         wp.init()
         self.device = str(wp.get_device(device))
+        self.defer_car_angular_cap = False
+        self.defer_car_linear_cap = False
         self.num_envs = num_envs
         initial = (
             StateSnapshot.random(num_envs, seed) if randomize else StateSnapshot.empty(num_envs)
@@ -118,6 +120,8 @@ class RivalSim:
             integrate_tick,
             dim=state.car_count,
             inputs=[
+                int(self.defer_car_linear_cap),
+                int(self.defer_car_angular_cap),
                 state.car_pos,
                 state.car_vel,
                 state.car_quat,
@@ -126,6 +130,7 @@ class RivalSim:
                 state.boosting_time,
                 state.time_since_boosted,
                 state.on_ground,
+                state.air_control_disabled,
                 state.has_jumped,
                 state.is_jumping,
                 state.has_double_jumped,

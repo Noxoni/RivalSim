@@ -213,6 +213,12 @@ class GpuState:
                 name,
                 wp.array(getattr(snapshot, name).reshape(-1), dtype=wp.int32, device=device),
             )
+        # Internal execution hint, intentionally excluded from the public
+        # snapshot and frozen logical-state accounting. Static-world wheel
+        # queries set it before integration; the void simulator leaves it zero.
+        self.air_control_disabled = wp.zeros(
+            snapshot.num_envs * 2, dtype=wp.int32, device=device
+        )
         self.ball_pos = wp.array(snapshot.ball_pos, dtype=wp.vec3, device=device)
         self.ball_vel = wp.array(snapshot.ball_vel, dtype=wp.vec3, device=device)
         self.ball_quat = wp.array(snapshot.ball_quat, dtype=wp.quat, device=device)
