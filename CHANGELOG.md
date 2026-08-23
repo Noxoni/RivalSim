@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.1 — static-world fidelity redesign handoff (2026-08-23)
+
+- Activated a bounded correctness redesign after v0.2 reached 1,350,748.16 aggregate simulated game-seconds/s but failed RocketSim static-world parity.
+- Froze all published v0.1/v0.2 evidence and the existing 35-scenario × eight-horizon v0.2 parity corpus/tolerances.
+- Required a divergence index ranked by earliest hard/numeric failure rather than tuning against long-horizon positional drift.
+- Authorized a read-only diagnostic RocketSim build/wrapper from the exact pinned source so wheel friction impulses, suspension values, manifold state, solver ordering and post-solve velocities can be compared tick-by-tick.
+- Preserved the already-passing `.cmf` geometry/query layer, normal Warp BVH, cuBQL suspension-ray backend and v0.1 contact-free mechanics unless evidence proves one is causal.
+- Focused changes on Bullet/RocketSim-equivalent wheel friction, suspension/contact ordering, chassis manifold/contact solving, friction/restitution, penetration correction, persistence/warmstarting and surface-transition behavior.
+- Required representative steering, powerslide, wall-transition and chassis-impact cases to pass before the full frozen corpus is rerun.
+- Required full v0.2.1 parity to reach zero hard mismatches and zero numeric failures with unchanged tolerances before final performance benchmarking.
+- Set corrected B3 success floor at 100,000 aggregate simulated game-seconds/s after parity passes.
+- Explicitly kept ball/world, car/ball, car/car, boost pads, game rules, RLGym/PPO and Rival integration out of scope until a separate v0.3 authorization.
+
 ## v0.2.0 — arena + ground-contact proof implemented (2026-08-23)
 
 - Added a strict little-endian RocketSim `.cmf` parser and deterministic Soccar loader with
