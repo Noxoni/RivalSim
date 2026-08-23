@@ -43,11 +43,23 @@ rays. B3 reached 1,350,748.16 aggregate simulated game-seconds/s at 262,144 worl
 35-scenario RocketSim parity gate failed. The final classification is therefore `PAUSE_RED`.
 
 See `docs/V0_2_RESULTS.md` and `results/v0.2/` for the frozen outcome. A static-world
-wheel-friction/contact-solver redesign requires review and new authority.
+wheel-friction/contact-solver redesign was subsequently authorized as v0.2.1.
 
-## v0.3 — Ball and dynamic contacts: not begun / blocked at v0.2 gate
+## v0.2.1 — Static-world fidelity redesign: complete / `PASS_GREEN`
 
-Do not begin this milestone while the v0.2 `PAUSE_RED` boundary is in force.
+The source-backed wheel, collision-feature, shared-edge, manifold, and Bullet-style iterative
+solver redesign passes all 140 authoritative 1/4/8/12-tick checkpoints with unchanged local
+tolerances. Corrected B3 reaches 822,480.77 aggregate simulated game-seconds/s at 262,144 worlds
+with zero timed transfers and passes regression/stress gates. Long synchronized 30–600-tick
+open-loop identity is diagnostic-only under the immediate 2026-08-23 policy adjustment.
+
+The bounded breadth prototype audits topology over all 8,020 DFH triangles but observes only 2
+mesh triangles in the existing local corpus; exhaustive authoritative per-triangle generation
+remains a future breadth milestone. See `docs/V0_2_1_RESULTS.md` and `results/v0.2.1/`.
+
+## v0.3 — Ball and dynamic contacts: not begun / separate authority required
+
+Do not begin this milestone without a new handoff even though v0.2.1 passed.
 
 Add:
 
@@ -64,8 +76,7 @@ This is likely the hardest fidelity milestone.
 
 Add:
 
-- 34 boost pads and recharge timers;
-- boost pickup geometry;
+- integration/validation of the existing 34-pad pickup/cooldown state in full episodes;
 - kickoff/respawn positions;
 - goals/scoring;
 - demolish/respawn rules;

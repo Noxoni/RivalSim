@@ -1,0 +1,3015 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.1",
+  "created_utc": "2026-08-23T15:41:54.401547+00:00",
+  "configuration": {
+    "mandatory_batches": [
+      1024,
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "maximum_adaptive_batch": 262144,
+    "ticks_per_repeat": 64,
+    "repeats": 5,
+    "warmup_ticks": 16,
+    "cuda_graph_block_ticks": 8,
+    "stability_cv_max": 0.05,
+    "seed": 20260823,
+    "parity_file": "results\\v0.2.1\\parity.json",
+    "action_tape": {
+      "length": 64,
+      "hold_ticks": 4,
+      "device_resident": true
+    },
+    "b3_state_distribution": "16-family deterministic contact-rich mixture"
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3",
+    "numpy": "2.5.2",
+    "warp": "1.16.0",
+    "device": "cuda:0",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "device_total_memory_bytes": 34190458880,
+    "cpu": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 16,
+    "physical_cpu_count": 8,
+    "nvidia_driver": "610.62",
+    "gpu_name": "NVIDIA GeForce RTX 5090"
+  },
+  "arena": {
+    "format": "RocketSim CMF",
+    "scale_uu_per_bt": 50.0,
+    "file_count": 16,
+    "vertices": 4468,
+    "triangles": 8020,
+    "bounds_uu": {
+      "min": [
+        -4107.333984375,
+        -5999.9951171875,
+        -13.267789840698242
+      ],
+      "max": [
+        4107.333984375,
+        5999.9951171875,
+        2075.4521484375
+      ]
+    },
+    "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "files": [
+      {
+        "file": "mesh_0.cmf",
+        "size_bytes": 16364,
+        "sha256": "8764D43B87BA134CACF1BE454D59D493630188E79C0D88639258B359BB511C4E",
+        "rocketsim_mesh_hash": "A160BAF9",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_1.cmf",
+        "size_bytes": 16364,
+        "sha256": "9D42E5DB7CDE5C7BE0783C256E15E819BD09351FCB2DEBD3205E3D055073C993",
+        "rocketsim_mesh_hash": "2811EEE8",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_2.cmf",
+        "size_bytes": 16364,
+        "sha256": "762EC145DB3C317D82314AD94AF6F8B591E822C26860ED3C0EE106ABA5591EEE",
+        "rocketsim_mesh_hash": "14B84668",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_3.cmf",
+        "size_bytes": 16364,
+        "sha256": "0DB5C559287BCD255B99E6F5DB341B874EC9A5FCF6137247CF16D913E178DB5C",
+        "rocketsim_mesh_hash": "EC759EBF",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_4.cmf",
+        "size_bytes": 18236,
+        "sha256": "92C3224DA44F1A359140647845A44457DF35541458B92485E7A3232BB596566A",
+        "rocketsim_mesh_hash": "94FB0D5C",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_5.cmf",
+        "size_bytes": 18236,
+        "sha256": "776C24B1231B4F7AB5437AF68E4CC1CC4D5CD7875B8CB386A67487162C3941A3",
+        "rocketsim_mesh_hash": "DEA07102",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_6.cmf",
+        "size_bytes": 18236,
+        "sha256": "A2262BFA2BFACCA3CAF3A8334F02B9B52624056853CC33A1340A23C3A33804E6",
+        "rocketsim_mesh_hash": "BD4FBEA8",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_7.cmf",
+        "size_bytes": 18236,
+        "sha256": "C887DF022D6A2B33E78A3CF8F5DD65D9CD61F4D72009781D40C32091119A06F3",
+        "rocketsim_mesh_hash": "39A47F63",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_8.cmf",
+        "size_bytes": 416,
+        "sha256": "3350567082D9A133F59F8471D941FDE6CCE20EB2B2BC26C2AB0566B7FB7A21E9",
+        "rocketsim_mesh_hash": "3D79D25D",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_9.cmf",
+        "size_bytes": 416,
+        "sha256": "4864911A7F0A3ADD929F41CC8F676CDE416DCC3C07AB08A30742C9893E8A6CE8",
+        "rocketsim_mesh_hash": "D84C7A68",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_10.cmf",
+        "size_bytes": 2480,
+        "sha256": "36CC44E14A0E500AEB6167A4D5FCE449B218B3D941DF3CA46F398D269B01AF3D",
+        "rocketsim_mesh_hash": "B81AC8B9",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_11.cmf",
+        "size_bytes": 2480,
+        "sha256": "7F4468BE0B0835A48996F92D1A2398F1290ACBF1152D39E1C53C2701D1FB6CE3",
+        "rocketsim_mesh_hash": "760358D3",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_12.cmf",
+        "size_bytes": 2480,
+        "sha256": "952A90A0FF27C2733D507E59BDCA8600968276EDDAD9A41B47A689010E805118",
+        "rocketsim_mesh_hash": "73AE4940",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_13.cmf",
+        "size_bytes": 2480,
+        "sha256": "B441F782F07E81C2444ED7A5C4ED618C26EF3E1940AC2C63C362154620631750",
+        "rocketsim_mesh_hash": "918F4A4E",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_14.cmf",
+        "size_bytes": 416,
+        "sha256": "085F7533C53A73DA664C129C3B1C93F5CE08CEB302AA5B993FF5FE95AF5D6AE8",
+        "rocketsim_mesh_hash": "1F8EE550",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_15.cmf",
+        "size_bytes": 416,
+        "sha256": "21C1D1EB450F9E09EE8D7D55E1D41BF563518F9B2DEB2AB5369C47139FAA2E4A",
+        "rocketsim_mesh_hash": "255BA8C1",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      }
+    ],
+    "source_root": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes",
+    "raw_geometry_bytes": 149856,
+    "bvh_allocation_bytes": null,
+    "bvh_allocation_note": "Warp 1.16 does not expose per-Mesh BVH allocation bytes"
+  },
+  "geometry_query_gate": {
+    "corpus_seed": 20260823,
+    "ray_count": 4608,
+    "category_counts": {
+      "boundary_edges": 512,
+      "ceiling": 512,
+      "corners": 512,
+      "floor": 512,
+      "goals_and_back_wall": 512,
+      "misses": 512,
+      "near_surface": 512,
+      "ramps_and_curves": 512,
+      "side_walls": 512
+    },
+    "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+    "backends": {
+      "default": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      },
+      "cubql": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      }
+    },
+    "selected_ray_backend": "cubql",
+    "selection_reason": "exact query parity and higher measured B1 throughput"
+  },
+  "stress_gate": {
+    "worlds": 64,
+    "measured_ticks": 2400,
+    "capture_setup_ticks": 8,
+    "seed": 20260823,
+    "runs": [
+      {
+        "finite": true,
+        "max_linear_speed_uu_per_s": 1317.3350830078125,
+        "max_angular_speed_rad_per_s": 5.5,
+        "max_penetration_uu": 33.43895721435547,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      },
+      {
+        "finite": true,
+        "max_linear_speed_uu_per_s": 1317.3350830078125,
+        "max_angular_speed_rad_per_s": 5.5,
+        "max_penetration_uu": 33.43895721435547,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      }
+    ],
+    "state_sha256_runs": [
+      "9046E933243ACCF3E1F64158402A628DBDEBFAA1ADD70CA5009CFC648F48A8D4",
+      "9046E933243ACCF3E1F64158402A628DBDEBFAA1ADD70CA5009CFC648F48A8D4"
+    ],
+    "deterministic_equal": true,
+    "finite": true,
+    "bounded_velocity": true,
+    "bounded_penetration": true,
+    "floor_rest_height_uu": 17.031972885131836,
+    "floor_rest_speed_uu_per_s": 3.489796654321253e-05,
+    "floor_rest_stable": true,
+    "hot_loop_gpu_resident": true,
+    "stress_gate_pass": true
+  },
+  "variants": {
+    "B0": [
+      {
+        "variant": "B0",
+        "worlds": 1024,
+        "ticks_per_repeat": 8192,
+        "calibration_seconds": 0.0005213000113144517,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07127020007465035,
+          0.07100039999932051,
+          0.06984989996999502,
+          0.07047779997810721,
+          0.06987850007135421
+        ],
+        "world_ticks_per_s_repeats": [
+          117701479.59755331,
+          118148742.8251148,
+          120094774.70409322,
+          119024827.71320593,
+          120045621.92139556
+        ],
+        "world_ticks_per_s_median": 119024827.71320593,
+        "world_ticks_per_s_mean": 119003089.35227256,
+        "aggregate_simulated_game_seconds_per_s_median": 991873.5642767161,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.009111909449124633,
+        "stable": true,
+        "wall_time_s": 0.3524768000934273,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 25,
+          "gpu_util_mean_percent": 92.0,
+          "gpu_util_max_percent": 92.0,
+          "vram_mean_bytes": 3012694016.0,
+          "vram_max_bytes": 3012694016,
+          "process_cpu_mean_percent": 71.91199999999999,
+          "process_cpu_max_percent": 104.4,
+          "system_cpu_mean_percent": 18.584
+        },
+        "logical_state_bytes": 2969600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 2048,
+        "ticks_per_repeat": 8192,
+        "calibration_seconds": 0.0005283999489620328,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07016860006842762,
+          0.06982680002693087,
+          0.07085379993077368,
+          0.07071289990562946,
+          0.07095700001809746
+        ],
+        "world_ticks_per_s_repeats": [
+          239098627.92814806,
+          240269008.3682676,
+          236786397.00893745,
+          237258209.21487007,
+          236442014.1172964
+        ],
+        "world_ticks_per_s_median": 237258209.21487007,
+        "world_ticks_per_s_mean": 237970851.32750392,
+        "aggregate_simulated_game_seconds_per_s_median": 1977151.7434572505,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.006905403755707551,
+        "stable": true,
+        "wall_time_s": 0.3525190999498591,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 25,
+          "gpu_util_mean_percent": 90.0,
+          "gpu_util_max_percent": 90.0,
+          "vram_mean_bytes": 3012694016.0,
+          "vram_max_bytes": 3012694016,
+          "process_cpu_mean_percent": 801.6840000000001,
+          "process_cpu_max_percent": 18447.4,
+          "system_cpu_mean_percent": 14.876000000000001
+        },
+        "logical_state_bytes": 5939200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 4096,
+        "ticks_per_repeat": 8192,
+        "calibration_seconds": 0.0005304000806063414,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07175480003934354,
+          0.07026810001116246,
+          0.07022520003374666,
+          0.07032880000770092,
+          0.07115590001922101
+        ],
+        "world_ticks_per_s_repeats": [
+          467626304.8827664,
+          477520126.41112685,
+          477811839.39491016,
+          477107984.15906185,
+          471562189.3748248
+        ],
+        "world_ticks_per_s_median": 477107984.15906185,
+        "world_ticks_per_s_mean": 474325688.84453803,
+        "aggregate_simulated_game_seconds_per_s_median": 3975899.8679921823,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.00958141018249675,
+        "stable": true,
+        "wall_time_s": 0.3537328001111746,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 24,
+          "gpu_util_mean_percent": 81.75,
+          "gpu_util_max_percent": 90.0,
+          "vram_mean_bytes": 3012694016.0,
+          "vram_max_bytes": 3012694016,
+          "process_cpu_mean_percent": 54.44583333333333,
+          "process_cpu_max_percent": 198.7,
+          "system_cpu_mean_percent": 14.466666666666667
+        },
+        "logical_state_bytes": 11878400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 8192,
+        "ticks_per_repeat": 8192,
+        "calibration_seconds": 0.0005280999466776848,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07124560000374913,
+          0.0694241999881342,
+          0.07163739996030927,
+          0.07022619992494583,
+          0.06946939998306334
+        ],
+        "world_ticks_per_s_repeats": [
+          941936961.6715777,
+          966649439.4097457,
+          936785310.985347,
+          955610072.4761204,
+          966020492.71134
+        ],
+        "world_ticks_per_s_median": 955610072.4761204,
+        "world_ticks_per_s_mean": 953400455.450826,
+        "aggregate_simulated_game_seconds_per_s_median": 7963417.270634336,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.014335105254670813,
+        "stable": true,
+        "wall_time_s": 0.3520027998602018,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 25,
+          "gpu_util_mean_percent": 87.16,
+          "gpu_util_max_percent": 96.0,
+          "vram_mean_bytes": 3046248448.0,
+          "vram_max_bytes": 3046248448,
+          "process_cpu_mean_percent": 52.76,
+          "process_cpu_max_percent": 115.5,
+          "system_cpu_mean_percent": 11.48
+        },
+        "logical_state_bytes": 23756800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 16384,
+        "ticks_per_repeat": 8192,
+        "calibration_seconds": 0.0005990000208839774,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.0793662000214681,
+          0.07892620004713535,
+          0.07897640008013695,
+          0.07807450008112937,
+          0.07909010001458228
+        ],
+        "world_ticks_per_s_repeats": [
+          1691119493.7353039,
+          1700547193.7055643,
+          1699466269.2121944,
+          1719098141.653557,
+          1697023116.360373
+        ],
+        "world_ticks_per_s_median": 1699466269.2121944,
+        "world_ticks_per_s_mean": 1701450842.9333985,
+        "aggregate_simulated_game_seconds_per_s_median": 14162218.91010162,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.00618185646973092,
+        "stable": true,
+        "wall_time_s": 0.39443340024445206,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 27,
+          "gpu_util_mean_percent": 96.5925925925926,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 3079802880.0,
+          "vram_max_bytes": 3079802880,
+          "process_cpu_mean_percent": 61.88148148148148,
+          "process_cpu_max_percent": 171.4,
+          "system_cpu_mean_percent": 15.907407407407407
+        },
+        "logical_state_bytes": 47513600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 32768,
+        "ticks_per_repeat": 6400,
+        "calibration_seconds": 0.0008036000654101372,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.08318949991371483,
+          0.082419199985452,
+          0.08258469996508211,
+          0.08205019996967167,
+          0.0832211000379175
+        ],
+        "world_ticks_per_s_repeats": [
+          2520933533.889724,
+          2544494487.1706753,
+          2539395312.7960787,
+          2555937707.3732586,
+          2519976302.938183
+        ],
+        "world_ticks_per_s_median": 2539395312.7960787,
+        "world_ticks_per_s_mean": 2536147468.833584,
+        "aggregate_simulated_game_seconds_per_s_median": 21161627.606633987,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.006123846766940146,
+        "stable": true,
+        "wall_time_s": 0.4134646998718381,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 3180466176.0,
+          "vram_max_bytes": 3180466176,
+          "process_cpu_mean_percent": 67.42857142857143,
+          "process_cpu_max_percent": 305.8,
+          "system_cpu_mean_percent": 17.289285714285715
+        },
+        "logical_state_bytes": 95027200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 65536,
+        "ticks_per_repeat": 4352,
+        "calibration_seconds": 0.001182700041681528,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.08288160001393408,
+          0.08201199991162866,
+          0.08259699994232506,
+          0.08352549991104752,
+          0.0828550000442192
+        ],
+        "world_ticks_per_s_repeats": [
+          3441206153.742809,
+          3477694389.934747,
+          3453063334.0091677,
+          3414677820.5906467,
+          3442310926.8937755
+        ],
+        "world_ticks_per_s_median": 3442310926.8937755,
+        "world_ticks_per_s_mean": 3445790525.0342293,
+        "aggregate_simulated_game_seconds_per_s_median": 28685924.390781462,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.00660484886864711,
+        "stable": true,
+        "wall_time_s": 0.4138710998231545,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 3381792768.0,
+          "vram_max_bytes": 3381792768,
+          "process_cpu_mean_percent": 83.57241379310345,
+          "process_cpu_max_percent": 127.2,
+          "system_cpu_mean_percent": 13.572413793103449
+        },
+        "logical_state_bytes": 190054400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 131072,
+        "ticks_per_repeat": 2432,
+        "calibration_seconds": 0.0021279999054968357,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07731490000151098,
+          0.08191929990425706,
+          0.08235919999424368,
+          0.08229960000608116,
+          0.08447230001911521
+        ],
+        "world_ticks_per_s_repeats": [
+          4122971173.6517835,
+          3891233254.8319883,
+          3870449251.841683,
+          3873252166.1884885,
+          3773628798.172493
+        ],
+        "world_ticks_per_s_median": 3873252166.1884885,
+        "world_ticks_per_s_mean": 3906306928.9372873,
+        "aggregate_simulated_game_seconds_per_s_median": 32277101.38490407,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.03316917671515539,
+        "stable": true,
+        "wall_time_s": 0.4083652999252081,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 3751088128.0,
+          "vram_max_bytes": 3751088128,
+          "process_cpu_mean_percent": 109.78928571428571,
+          "process_cpu_max_percent": 504.9,
+          "system_cpu_mean_percent": 11.942857142857141
+        },
+        "logical_state_bytes": 380108800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B0",
+        "worlds": 262144,
+        "ticks_per_repeat": 512,
+        "calibration_seconds": 0.010033900034613907,
+        "ray_backend": null,
+        "repeat_seconds": [
+          0.07716710004024208,
+          0.07769930001813918,
+          0.07823230000212789,
+          0.07883719995152205,
+          0.07607400009874254
+        ],
+        "world_ticks_per_s_repeats": [
+          1739312840.9646914,
+          1727399448.4978163,
+          1715630602.6583564,
+          1702466958.2701073,
+          1764304858.766307
+        ],
+        "world_ticks_per_s_median": 1727399448.4978163,
+        "world_ticks_per_s_mean": 1729822941.8314557,
+        "aggregate_simulated_game_seconds_per_s_median": 14394995.404148469,
+        "suspension_rays_per_s_median": 0.0,
+        "coefficient_of_variation": 0.013664023204404931,
+        "stable": true,
+        "wall_time_s": 0.38800990011077374,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 27,
+          "gpu_util_mean_percent": 78.44444444444444,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 95.69259259259259,
+          "process_cpu_max_percent": 293.0,
+          "system_cpu_mean_percent": 13.540740740740741
+        },
+        "logical_state_bytes": 760217600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      }
+    ],
+    "B1_default": [
+      {
+        "variant": "B1_default",
+        "worlds": 1024,
+        "ticks_per_repeat": 1280,
+        "calibration_seconds": 0.004100000020116568,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.087619400001131,
+          0.08809420000761747,
+          0.08698750007897615,
+          0.08789630001410842,
+          0.08795990003272891
+        ],
+        "world_ticks_per_s_repeats": [
+          14959244.185455289,
+          14878618.56838092,
+          15067912.04264974,
+          14912118.027603136,
+          14901335.716756107
+        ],
+        "world_ticks_per_s_median": 14912118.027603136,
+        "world_ticks_per_s_mean": 14943845.708169037,
+        "aggregate_simulated_game_seconds_per_s_median": 124267.65023002613,
+        "suspension_rays_per_s_median": 119296944.22082509,
+        "coefficient_of_variation": 0.005040810886104083,
+        "stable": true,
+        "wall_time_s": 0.43855730013456196,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 29.310344827586206,
+          "gpu_util_max_percent": 74.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 98.1896551724138,
+          "process_cpu_max_percent": 133.9,
+          "system_cpu_mean_percent": 8.510344827586207
+        },
+        "logical_state_bytes": 2969600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 2048,
+        "ticks_per_repeat": 1152,
+        "calibration_seconds": 0.00457520002964884,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.0753657000605017,
+          0.07534009998198599,
+          0.07477160007692873,
+          0.0763376000104472,
+          0.07492129993624985
+        ],
+        "world_ticks_per_s_repeats": [
+          31304638.557142258,
+          31315275.670779753,
+          31553370.498593573,
+          30906080.354597446,
+          31490323.873284537
+        ],
+        "world_ticks_per_s_median": 31315275.670779753,
+        "world_ticks_per_s_mean": 31313937.79087951,
+        "aggregate_simulated_game_seconds_per_s_median": 260960.63058983127,
+        "suspension_rays_per_s_median": 250522205.36623803,
+        "coefficient_of_variation": 0.008061146483867253,
+        "stable": true,
+        "wall_time_s": 0.37673630006611347,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 26,
+          "gpu_util_mean_percent": 62.38461538461539,
+          "gpu_util_max_percent": 69.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 91.52307692307691,
+          "process_cpu_max_percent": 104.4,
+          "system_cpu_mean_percent": 9.742307692307692
+        },
+        "logical_state_bytes": 5939200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 4096,
+        "ticks_per_repeat": 1088,
+        "calibration_seconds": 0.0049449000507593155,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.07659650000277907,
+          0.07564799999818206,
+          0.0766217999625951,
+          0.07590399996843189,
+          0.0771445999853313
+        ],
+        "world_ticks_per_s_repeats": [
+          58180830.7146973,
+          58910321.4904174,
+          58161619.82850219,
+          58711635.774839476,
+          57767465.26454702
+        ],
+        "world_ticks_per_s_median": 58180830.7146973,
+        "world_ticks_per_s_mean": 58346374.61460068,
+        "aggregate_simulated_game_seconds_per_s_median": 484840.25595581083,
+        "suspension_rays_per_s_median": 465446645.7175784,
+        "coefficient_of_variation": 0.00789199058176262,
+        "stable": true,
+        "wall_time_s": 0.3819148999173194,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 26,
+          "gpu_util_mean_percent": 89.76923076923077,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 97.15384615384616,
+          "process_cpu_max_percent": 126.3,
+          "system_cpu_mean_percent": 9.734615384615385
+        },
+        "logical_state_bytes": 11878400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 8192,
+        "ticks_per_repeat": 1216,
+        "calibration_seconds": 0.004330600029788911,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.08436999993864447,
+          0.08450730005279183,
+          0.0835427000420168,
+          0.08455959998536855,
+          0.08377350005321205
+        ],
+        "world_ticks_per_s_repeats": [
+          118068887.13102026,
+          117877059.06799832,
+          119238090.16215655,
+          117804152.35790668,
+          118909583.5040028
+        ],
+        "world_ticks_per_s_median": 118068887.13102026,
+        "world_ticks_per_s_mean": 118379554.44461691,
+        "aggregate_simulated_game_seconds_per_s_median": 983907.3927585022,
+        "suspension_rays_per_s_median": 944551097.0481621,
+        "coefficient_of_variation": 0.005503984486146736,
+        "stable": true,
+        "wall_time_s": 0.4207531000720337,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 98.42857142857143,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 97.11428571428571,
+          "process_cpu_max_percent": 163.4,
+          "system_cpu_mean_percent": 11.267857142857142
+        },
+        "logical_state_bytes": 23756800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 16384,
+        "ticks_per_repeat": 1088,
+        "calibration_seconds": 0.004813999985344708,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.07622679998166859,
+          0.07753860007505864,
+          0.07705990003887564,
+          0.07728089997544885,
+          0.07643239991739392
+        ],
+        "world_ticks_per_s_repeats": [
+          233852031.1004376,
+          229895716.23351905,
+          231323840.16858494,
+          230662324.14041537,
+          233222978.9888272
+        ],
+        "world_ticks_per_s_median": 231323840.16858494,
+        "world_ticks_per_s_mean": 231791378.12635684,
+        "aggregate_simulated_game_seconds_per_s_median": 1927698.6680715412,
+        "suspension_rays_per_s_median": 1850590721.3486795,
+        "coefficient_of_variation": 0.007277707814617354,
+        "stable": true,
+        "wall_time_s": 0.38453859998844564,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 26,
+          "gpu_util_mean_percent": 98.46153846153847,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 96.55384615384615,
+          "process_cpu_max_percent": 130.6,
+          "system_cpu_mean_percent": 14.930769230769231
+        },
+        "logical_state_bytes": 47513600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 32768,
+        "ticks_per_repeat": 640,
+        "calibration_seconds": 0.008149800007231534,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.08228520001284778,
+          0.082332200021483,
+          0.08252249995712191,
+          0.08164869993925095,
+          0.08138529991265386
+        ],
+        "world_ticks_per_s_repeats": [
+          254863815.08127302,
+          254718323.99143815,
+          254130934.1197449,
+          256850629.77859333,
+          257681915.80675527
+        ],
+        "world_ticks_per_s_median": 254863815.08127302,
+        "world_ticks_per_s_mean": 255649123.75556093,
+        "aggregate_simulated_game_seconds_per_s_median": 2123865.125677275,
+        "suspension_rays_per_s_median": 2038910520.6501842,
+        "coefficient_of_variation": 0.005984847709410353,
+        "stable": true,
+        "wall_time_s": 0.4101738998433575,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 98.93928571428572,
+          "process_cpu_max_percent": 201.1,
+          "system_cpu_mean_percent": 16.071428571428573
+        },
+        "logical_state_bytes": 95027200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 65536,
+        "ticks_per_repeat": 384,
+        "calibration_seconds": 0.015277600032277405,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.09319990000221878,
+          0.09148850000929087,
+          0.09011260000988841,
+          0.09206579998135567,
+          0.09112029999960214
+        ],
+        "world_ticks_per_s_repeats": [
+          270019860.52990276,
+          275070899.5933298,
+          279270867.75033075,
+          273346063.41438794,
+          276182409.40942776
+        ],
+        "world_ticks_per_s_median": 275070899.5933298,
+        "world_ticks_per_s_mean": 274778020.1394758,
+        "aggregate_simulated_game_seconds_per_s_median": 2292257.4966110815,
+        "suspension_rays_per_s_median": 2200567196.7466383,
+        "coefficient_of_variation": 0.01246618073524688,
+        "stable": true,
+        "wall_time_s": 0.4579871000023559,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 30,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489285632.0,
+          "vram_max_bytes": 4489285632,
+          "process_cpu_mean_percent": 97.17,
+          "process_cpu_max_percent": 122.6,
+          "system_cpu_mean_percent": 17.236666666666668
+        },
+        "logical_state_bytes": 190054400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 131072,
+        "ticks_per_repeat": 192,
+        "calibration_seconds": 0.027837000088766217,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.08292219997383654,
+          0.08254420000594109,
+          0.08134250005241483,
+          0.08426879998296499,
+          0.08179309999104589
+        ],
+        "world_ticks_per_s_repeats": [
+          303487172.40908074,
+          304876950.75109696,
+          309380999.8928462,
+          298637502.908399,
+          307676613.3421397
+        ],
+        "world_ticks_per_s_median": 304876950.75109696,
+        "world_ticks_per_s_mean": 304811847.8607125,
+        "aggregate_simulated_game_seconds_per_s_median": 2540641.2562591415,
+        "suspension_rays_per_s_median": 2439015606.0087757,
+        "coefficient_of_variation": 0.013622421922520419,
+        "stable": true,
+        "wall_time_s": 0.41287080000620335,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 97.42857142857143,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 97.14642857142857,
+          "process_cpu_max_percent": 130.0,
+          "system_cpu_mean_percent": 16.814285714285713
+        },
+        "logical_state_bytes": 380108800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_default",
+        "worlds": 262144,
+        "ticks_per_repeat": 128,
+        "calibration_seconds": 0.049539700034074485,
+        "ray_backend": "default",
+        "repeat_seconds": [
+          0.09971520002000034,
+          0.09966319997329265,
+          0.09980219998396933,
+          0.09976379992440343,
+          0.09858079999685287
+        ],
+        "world_ticks_per_s_repeats": [
+          336502679.56409687,
+          336678252.44414973,
+          336209342.13263494,
+          336338752.3873996,
+          340374920.8879539
+        ],
+        "world_ticks_per_s_median": 336502679.56409687,
+        "world_ticks_per_s_mean": 337220789.483247,
+        "aggregate_simulated_game_seconds_per_s_median": 2804188.996367474,
+        "suspension_rays_per_s_median": 2692021436.512775,
+        "coefficient_of_variation": 0.005254644833249159,
+        "stable": true,
+        "wall_time_s": 0.4975251998985186,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 34,
+          "gpu_util_mean_percent": 31.235294117647058,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 93.22647058823529,
+          "process_cpu_max_percent": 195.3,
+          "system_cpu_mean_percent": 16.194117647058825
+        },
+        "logical_state_bytes": 760217600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      }
+    ],
+    "B1_cubql": [
+      {
+        "variant": "B1_cubql",
+        "worlds": 1024,
+        "ticks_per_repeat": 1792,
+        "calibration_seconds": 0.0028723999857902527,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08565860008820891,
+          0.08693230000790209,
+          0.08536259992979467,
+          0.08496600005310029,
+          0.08571200002916157
+        ],
+        "world_ticks_per_s_repeats": [
+          21422344.027457353,
+          21108471.76289134,
+          21496627.34627551,
+          21596968.1855471,
+          21408997.565984692
+        ],
+        "world_ticks_per_s_median": 21422344.027457353,
+        "world_ticks_per_s_mean": 21406681.7776312,
+        "aggregate_simulated_game_seconds_per_s_median": 178519.5335621446,
+        "suspension_rays_per_s_median": 171378752.21965882,
+        "coefficient_of_variation": 0.008533498770452173,
+        "stable": true,
+        "wall_time_s": 0.42863150010816753,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 94.34827586206896,
+          "process_cpu_max_percent": 143.2,
+          "system_cpu_mean_percent": 15.786206896551725
+        },
+        "logical_state_bytes": 2969600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 2048,
+        "ticks_per_repeat": 1728,
+        "calibration_seconds": 0.003054699976928532,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08949670009315014,
+          0.08885759999975562,
+          0.0887049000011757,
+          0.0878985000308603,
+          0.08772099995985627
+        ],
+        "world_ticks_per_s_repeats": [
+          39542731.702024646,
+          39827139.153091386,
+          39895699.109666936,
+          40261710.93656332,
+          40343178.96079075
+        ],
+        "world_ticks_per_s_median": 39895699.109666936,
+        "world_ticks_per_s_mean": 39974091.97242741,
+        "aggregate_simulated_game_seconds_per_s_median": 332464.15924722445,
+        "suspension_rays_per_s_median": 319165592.8773355,
+        "coefficient_of_variation": 0.008228411851389476,
+        "stable": true,
+        "wall_time_s": 0.44267870008479804,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 30,
+          "gpu_util_mean_percent": 98.5,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 91.62333333333332,
+          "process_cpu_max_percent": 105.5,
+          "system_cpu_mean_percent": 17.853333333333335
+        },
+        "logical_state_bytes": 5939200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 4096,
+        "ticks_per_repeat": 1728,
+        "calibration_seconds": 0.0029814000008627772,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08610700001008809,
+          0.08621079998556525,
+          0.08650909992866218,
+          0.0858049999224022,
+          0.0860617000143975
+        ],
+        "world_ticks_per_s_repeats": [
+          82198752.70501553,
+          82099783.33555761,
+          81816687.56046039,
+          82488060.21095382,
+          82242019.37465702
+        ],
+        "world_ticks_per_s_median": 82198752.70501553,
+        "world_ticks_per_s_mean": 82169060.63732888,
+        "aggregate_simulated_game_seconds_per_s_median": 684989.6058751293,
+        "suspension_rays_per_s_median": 657590021.6401242,
+        "coefficient_of_variation": 0.0029619180754557454,
+        "stable": true,
+        "wall_time_s": 0.4306935998611152,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 94.65517241379311,
+          "process_cpu_max_percent": 189.0,
+          "system_cpu_mean_percent": 18.46896551724138
+        },
+        "logical_state_bytes": 11878400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 8192,
+        "ticks_per_repeat": 1664,
+        "calibration_seconds": 0.0031442000763490796,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08718370005954057,
+          0.08817720005754381,
+          0.08772139996290207,
+          0.08791320002637804,
+          0.0869183000177145
+        ],
+        "world_ticks_per_s_repeats": [
+          156353630.21632043,
+          154591980.59253624,
+          155395239.9957689,
+          155056214.49236202,
+          156831047.05478382
+        ],
+        "world_ticks_per_s_median": 155395239.9957689,
+        "world_ticks_per_s_mean": 155645622.47035426,
+        "aggregate_simulated_game_seconds_per_s_median": 1294960.3332980743,
+        "suspension_rays_per_s_median": 1243161919.9661512,
+        "coefficient_of_variation": 0.005946685719446194,
+        "stable": true,
+        "wall_time_s": 0.437913800124079,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 30,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489089024.0,
+          "vram_max_bytes": 4489089024,
+          "process_cpu_mean_percent": 92.41333333333334,
+          "process_cpu_max_percent": 104.8,
+          "system_cpu_mean_percent": 16.58
+        },
+        "logical_state_bytes": 23756800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 16384,
+        "ticks_per_repeat": 1472,
+        "calibration_seconds": 0.003554399940185249,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08417359995655715,
+          0.08271989994682372,
+          0.08335179998539388,
+          0.08265290001872927,
+          0.08332690002862364
+        ],
+        "world_ticks_per_s_repeats": [
+          286517958.2725125,
+          291553157.2874691,
+          289342857.6734537,
+          291789495.52326655,
+          289429319.8440777
+        ],
+        "world_ticks_per_s_median": 289429319.8440777,
+        "world_ticks_per_s_mean": 289726557.7201559,
+        "aggregate_simulated_game_seconds_per_s_median": 2411910.9987006476,
+        "suspension_rays_per_s_median": 2315434558.7526217,
+        "coefficient_of_variation": 0.0073467476670712305,
+        "stable": true,
+        "wall_time_s": 0.41622509993612766,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 97.60714285714286,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489285632.0,
+          "vram_max_bytes": 4489285632,
+          "process_cpu_mean_percent": 93.06428571428572,
+          "process_cpu_max_percent": 126.8,
+          "system_cpu_mean_percent": 17.521428571428572
+        },
+        "logical_state_bytes": 47513600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 32768,
+        "ticks_per_repeat": 896,
+        "calibration_seconds": 0.00610999995842576,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.0897521999431774,
+          0.08581280009821057,
+          0.08494829991832376,
+          0.08591130003333092,
+          0.08602519996929914
+        ],
+        "world_ticks_per_s_repeats": [
+          327124326.96455413,
+          342141591.538769,
+          345623491.32624465,
+          341749315.73156476,
+          341296829.4229843
+        ],
+        "world_ticks_per_s_median": 341749315.73156476,
+        "world_ticks_per_s_mean": 339587110.9968234,
+        "aggregate_simulated_game_seconds_per_s_median": 2847910.9644297063,
+        "suspension_rays_per_s_median": 2733994525.852518,
+        "coefficient_of_variation": 0.021126547662841312,
+        "stable": true,
+        "wall_time_s": 0.4324497999623418,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 97.37931034482759,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489755683.310345,
+          "vram_max_bytes": 4489940992,
+          "process_cpu_mean_percent": 96.32758620689656,
+          "process_cpu_max_percent": 128.9,
+          "system_cpu_mean_percent": 31.25172413793103
+        },
+        "logical_state_bytes": 95027200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 65536,
+        "ticks_per_repeat": 448,
+        "calibration_seconds": 0.011936899973079562,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08274720003828406,
+          0.08167950005736202,
+          0.08231259998865426,
+          0.08273420005571097,
+          0.0823797999182716
+        ],
+        "world_ticks_per_s_repeats": [
+          354817177.9397509,
+          359455285.34553856,
+          356690567.4714068,
+          354872930.1815898,
+          356399603.1688347
+        ],
+        "world_ticks_per_s_median": 356399603.1688347,
+        "world_ticks_per_s_mean": 356447112.8214241,
+        "aggregate_simulated_game_seconds_per_s_median": 2969996.6930736224,
+        "suspension_rays_per_s_median": 2851196825.3506775,
+        "coefficient_of_variation": 0.005294338914137138,
+        "stable": true,
+        "wall_time_s": 0.4118533000582829,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 98.5,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489744384.0,
+          "vram_max_bytes": 4489744384,
+          "process_cpu_mean_percent": 94.64285714285714,
+          "process_cpu_max_percent": 201.0,
+          "system_cpu_mean_percent": 20.935714285714287
+        },
+        "logical_state_bytes": 190054400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 131072,
+        "ticks_per_repeat": 256,
+        "calibration_seconds": 0.021760900039225817,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.0867813000222668,
+          0.08671069995034486,
+          0.08710639993660152,
+          0.0871667000465095,
+          0.0871982000535354
+        ],
+        "world_ticks_per_s_repeats": [
+          386655097.254713,
+          386969912.8160082,
+          385212016.84861106,
+          384945535.1882815,
+          384806475.12677133
+        ],
+        "world_ticks_per_s_median": 385212016.84861106,
+        "world_ticks_per_s_mean": 385717807.446877,
+        "aggregate_simulated_game_seconds_per_s_median": 3210100.140405092,
+        "suspension_rays_per_s_median": 3081696134.7888885,
+        "coefficient_of_variation": 0.002634053598968774,
+        "stable": true,
+        "wall_time_s": 0.4349633000092581,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489744384.0,
+          "vram_max_bytes": 4489744384,
+          "process_cpu_mean_percent": 98.94827586206897,
+          "process_cpu_max_percent": 158.4,
+          "system_cpu_mean_percent": 16.920689655172414
+        },
+        "logical_state_bytes": 380108800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B1_cubql",
+        "worlds": 262144,
+        "ticks_per_repeat": 128,
+        "calibration_seconds": 0.04021929996088147,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08106299990322441,
+          0.08033939998131245,
+          0.08100690005812794,
+          0.08140350005123764,
+          0.08151839999482036
+        ],
+        "world_ticks_per_s_repeats": [
+          413930301.6179805,
+          417658483.97928053,
+          414216961.4677567,
+          412198885.5378442,
+          411617892.42836016
+        ],
+        "world_ticks_per_s_median": 413930301.6179805,
+        "world_ticks_per_s_mean": 413924505.0062444,
+        "aggregate_simulated_game_seconds_per_s_median": 3449419.1801498374,
+        "suspension_rays_per_s_median": 3311442412.943844,
+        "coefficient_of_variation": 0.005707660006483148,
+        "stable": true,
+        "wall_time_s": 0.4053311999887228,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 14.178571428571429,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4486458221.714286,
+          "vram_max_bytes": 4489744384,
+          "process_cpu_mean_percent": 99.44285714285715,
+          "process_cpu_max_percent": 178.7,
+          "system_cpu_mean_percent": 19.860714285714288
+        },
+        "logical_state_bytes": 760217600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      }
+    ],
+    "B2": [
+      {
+        "variant": "B2",
+        "worlds": 1024,
+        "ticks_per_repeat": 1152,
+        "calibration_seconds": 0.0045047999592497945,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08627830003388226,
+          0.08456430002115667,
+          0.08493080001790076,
+          0.08531859994400293,
+          0.08503379998728633
+        ],
+        "world_ticks_per_s_repeats": [
+          13672592.060074685,
+          13949716.366183726,
+          13889519.464686155,
+          13826387.22124176,
+          13872695.330284815
+        ],
+        "world_ticks_per_s_median": 13872695.330284815,
+        "world_ticks_per_s_mean": 13842182.08849423,
+        "aggregate_simulated_game_seconds_per_s_median": 115605.79441904013,
+        "suspension_rays_per_s_median": 110981562.64227852,
+        "coefficient_of_variation": 0.0075549820554877516,
+        "stable": true,
+        "wall_time_s": 0.42612580000422895,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4491466398.896552,
+          "vram_max_bytes": 4491972608,
+          "process_cpu_mean_percent": 94.96206896551725,
+          "process_cpu_max_percent": 208.6,
+          "system_cpu_mean_percent": 17.05862068965517
+        },
+        "logical_state_bytes": 2969600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 2048,
+        "ticks_per_repeat": 1280,
+        "calibration_seconds": 0.004037200007587671,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.0965249000582844,
+          0.09584239998366684,
+          0.09610770002473146,
+          0.09553409996442497,
+          0.09607930004131049
+        ],
+        "world_ticks_per_s_repeats": [
+          27158173.677642785,
+          27351568.83014968,
+          27276066.322734006,
+          27439835.629122723,
+          27284128.827675465
+        ],
+        "world_ticks_per_s_median": 27284128.827675465,
+        "world_ticks_per_s_mean": 27301954.657464933,
+        "aggregate_simulated_game_seconds_per_s_median": 227367.74023062887,
+        "suspension_rays_per_s_median": 218273030.62140372,
+        "coefficient_of_variation": 0.0038035089487182604,
+        "stable": true,
+        "wall_time_s": 0.48008840007241815,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 32,
+          "gpu_util_mean_percent": 98.71875,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489924608.0,
+          "vram_max_bytes": 4491972608,
+          "process_cpu_mean_percent": 94.309375,
+          "process_cpu_max_percent": 137.5,
+          "system_cpu_mean_percent": 17.509375
+        },
+        "logical_state_bytes": 5939200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 4096,
+        "ticks_per_repeat": 1280,
+        "calibration_seconds": 0.004188699997030199,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.1006280001020059,
+          0.10102810000535101,
+          0.10168860002886504,
+          0.10108809999655932,
+          0.10132550005801022
+        ],
+        "world_ticks_per_s_repeats": [
+          52101601.887002915,
+          51895264.7800197,
+          51558188.41553302,
+          51864462.78225082,
+          51742947.204784386
+        ],
+        "world_ticks_per_s_median": 51864462.78225082,
+        "world_ticks_per_s_mean": 51832493.01391817,
+        "aggregate_simulated_game_seconds_per_s_median": 432203.85651875683,
+        "suspension_rays_per_s_median": 414915702.2580066,
+        "coefficient_of_variation": 0.00386633396737704,
+        "stable": true,
+        "wall_time_s": 0.5057583001907915,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 34,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489524645.6470585,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 99.3970588235294,
+          "process_cpu_max_percent": 209.3,
+          "system_cpu_mean_percent": 16.16764705882353
+        },
+        "logical_state_bytes": 11878400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 8192,
+        "ticks_per_repeat": 1088,
+        "calibration_seconds": 0.004751799977384508,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08925580000504851,
+          0.08740319998469204,
+          0.08810980000998825,
+          0.08836699998937547,
+          0.08796160004567355
+        ],
+        "world_ticks_per_s_repeats": [
+          99857891.58234945,
+          101974481.50137548,
+          101156693.11460952,
+          100862267.60070631,
+          101327124.51083235
+        ],
+        "world_ticks_per_s_median": 101156693.11460952,
+        "world_ticks_per_s_mean": 101035691.66197462,
+        "aggregate_simulated_game_seconds_per_s_median": 842972.442621746,
+        "suspension_rays_per_s_median": 809253544.9168762,
+        "coefficient_of_variation": 0.007663672845678029,
+        "stable": true,
+        "wall_time_s": 0.4410974000347778,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 29,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489405404.689655,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 105.19655172413792,
+          "process_cpu_max_percent": 208.4,
+          "system_cpu_mean_percent": 15.889655172413793
+        },
+        "logical_state_bytes": 23756800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 16384,
+        "ticks_per_repeat": 1088,
+        "calibration_seconds": 0.004777400055900216,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09130850003566593,
+          0.08978489995934069,
+          0.09021290007513016,
+          0.09086589992512017,
+          0.09036279993597418
+        ],
+        "world_ticks_per_s_repeats": [
+          195225986.55149394,
+          198538863.529084,
+          197596928.8777382,
+          196176915.81429,
+          197269141.8662361
+        ],
+        "world_ticks_per_s_median": 197269141.8662361,
+        "world_ticks_per_s_mean": 196961567.32776845,
+        "aggregate_simulated_game_seconds_per_s_median": 1643909.5155519673,
+        "suspension_rays_per_s_median": 1578153134.9298887,
+        "coefficient_of_variation": 0.006528641953694913,
+        "stable": true,
+        "wall_time_s": 0.45253499993123114,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 30,
+          "gpu_util_mean_percent": 98.0,
+          "gpu_util_max_percent": 98.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 98.52666666666667,
+          "process_cpu_max_percent": 139.5,
+          "system_cpu_mean_percent": 11.796666666666665
+        },
+        "logical_state_bytes": 47513600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 32768,
+        "ticks_per_repeat": 704,
+        "calibration_seconds": 0.007695400039665401,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09364380000624806,
+          0.09469689999241382,
+          0.093917699996382,
+          0.09316100005526096,
+          0.0953654000768438
+        ],
+        "world_ticks_per_s_repeats": [
+          246344894.14633775,
+          243605355.633057,
+          245626458.06795394,
+          247621558.23054922,
+          241897711.13434917
+        ],
+        "world_ticks_per_s_median": 245626458.06795394,
+        "world_ticks_per_s_mean": 245019195.44244942,
+        "aggregate_simulated_game_seconds_per_s_median": 2046887.150566283,
+        "suspension_rays_per_s_median": 1965011664.5436316,
+        "coefficient_of_variation": 0.009271217723827803,
+        "stable": true,
+        "wall_time_s": 0.47078480012714863,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 32,
+          "gpu_util_mean_percent": 98.5,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 93.46875,
+          "process_cpu_max_percent": 120.7,
+          "system_cpu_mean_percent": 10.40625
+        },
+        "logical_state_bytes": 95027200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 65536,
+        "ticks_per_repeat": 320,
+        "calibration_seconds": 0.01601030002348125,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.08169310004450381,
+          0.08120859996415675,
+          0.0807019000640139,
+          0.08099899999797344,
+          0.08158299990464002
+        ],
+        "world_ticks_per_s_repeats": [
+          256711031.75880682,
+          258242600.03566438,
+          259864017.86531782,
+          258910850.75772166,
+          257057475.509763
+        ],
+        "world_ticks_per_s_median": 258242600.03566438,
+        "world_ticks_per_s_mean": 258157195.18545476,
+        "aggregate_simulated_game_seconds_per_s_median": 2152021.6669638697,
+        "suspension_rays_per_s_median": 2065940800.285315,
+        "coefficient_of_variation": 0.005046595249399206,
+        "stable": true,
+        "wall_time_s": 0.4061855999752879,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 28,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 101.93214285714285,
+          "process_cpu_max_percent": 248.5,
+          "system_cpu_mean_percent": 8.907142857142857
+        },
+        "logical_state_bytes": 190054400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 131072,
+        "ticks_per_repeat": 192,
+        "calibration_seconds": 0.03101859998423606,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09098390000872314,
+          0.09221719997003675,
+          0.09163599996827543,
+          0.09211109997704625,
+          0.09131500008516014
+        ],
+        "world_ticks_per_s_repeats": [
+          276596452.75248927,
+          272897290.3989374,
+          274628137.5083205,
+          273211632.5423454,
+          275593538.5920212
+        ],
+        "world_ticks_per_s_median": 274628137.5083205,
+        "world_ticks_per_s_mean": 274585410.35882276,
+        "aggregate_simulated_game_seconds_per_s_median": 2288567.8125693374,
+        "suspension_rays_per_s_median": 2197025100.066564,
+        "coefficient_of_variation": 0.005700244559726484,
+        "stable": true,
+        "wall_time_s": 0.4582632000092417,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 31,
+          "gpu_util_mean_percent": 92.90322580645162,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 109.81290322580647,
+          "process_cpu_max_percent": 540.7,
+          "system_cpu_mean_percent": 10.0
+        },
+        "logical_state_bytes": 380108800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B2",
+        "worlds": 262144,
+        "ticks_per_repeat": 128,
+        "calibration_seconds": 0.058255599928088486,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.11600410006940365,
+          0.11667210003361106,
+          0.11725190002471209,
+          0.11621610005386174,
+          0.11976639996282756
+        ],
+        "world_ticks_per_s_repeats": [
+          289252121.0881757,
+          287596023.3023456,
+          286173887.10057616,
+          288724470.9162396,
+          280165655.896933
+        ],
+        "world_ticks_per_s_median": 287596023.3023456,
+        "world_ticks_per_s_mean": 286382431.660854,
+        "aggregate_simulated_game_seconds_per_s_median": 2396633.5275195464,
+        "suspension_rays_per_s_median": 2300768186.4187646,
+        "coefficient_of_variation": 0.01281613337012827,
+        "stable": true,
+        "wall_time_s": 0.5859106001444161,
+        "average_candidates_per_car_tick": 0.0,
+        "maximum_candidates_per_car_tick": 0,
+        "average_contacts_per_car_tick": 0.0,
+        "maximum_contacts_per_car_tick": 0,
+        "maximum_penetration_uu": 0.0,
+        "narrow_phase_candidates_per_s": 0.0,
+        "solver_contact_passes": 0,
+        "telemetry": {
+          "samples": 39,
+          "gpu_util_mean_percent": 62.46153846153846,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489381415.384615,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 96.01025641025642,
+          "process_cpu_max_percent": 195.0,
+          "system_cpu_mean_percent": 10.771794871794873
+        },
+        "logical_state_bytes": 760217600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      }
+    ],
+    "B3": [
+      {
+        "variant": "B3",
+        "worlds": 1024,
+        "ticks_per_repeat": 384,
+        "calibration_seconds": 0.014385499991476536,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.10305559996049851,
+          0.1013287000823766,
+          0.10032890003640205,
+          0.10178280004765838,
+          0.10183759999927133
+        ],
+        "world_ticks_per_s_repeats": [
+          3815571.4017551765,
+          3880598.4847366,
+          3919269.5211183475,
+          3863285.346992636,
+          3861206.469936581
+        ],
+        "world_ticks_per_s_median": 3863285.346992636,
+        "world_ticks_per_s_mean": 3867986.244907868,
+        "aggregate_simulated_game_seconds_per_s_median": 32194.044558271966,
+        "suspension_rays_per_s_median": 30906282.77594109,
+        "coefficient_of_variation": 0.009677217911637725,
+        "stable": true,
+        "wall_time_s": 0.5083336001262069,
+        "average_candidates_per_car_tick": 0.4830322265625,
+        "maximum_candidates_per_car_tick": 90,
+        "average_contacts_per_car_tick": 0.037109375,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 29.060523986816406,
+        "narrow_phase_candidates_per_s": 747288.7881219873,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 34,
+          "gpu_util_mean_percent": 45.205882352941174,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489495732.705882,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 98.92647058823529,
+          "process_cpu_max_percent": 202.0,
+          "system_cpu_mean_percent": 10.032352941176471
+        },
+        "logical_state_bytes": 2969600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 2048,
+        "ticks_per_repeat": 384,
+        "calibration_seconds": 0.01506919995881617,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.10417639999650419,
+          0.10378330003004521,
+          0.10116110008675605,
+          0.10252119996584952,
+          0.1020294000627473
+        ],
+        "world_ticks_per_s_repeats": [
+          7549041.817785891,
+          7577635.320637601,
+          7774055.435592867,
+          7670920.7487033475,
+          7707895.954659641
+        ],
+        "world_ticks_per_s_median": 7670920.7487033475,
+        "world_ticks_per_s_mean": 7655909.85547587,
+        "aggregate_simulated_game_seconds_per_s_median": 63924.3395725279,
+        "suspension_rays_per_s_median": 61367365.98962678,
+        "coefficient_of_variation": 0.012118993460536999,
+        "stable": true,
+        "wall_time_s": 0.5136714001419023,
+        "average_candidates_per_car_tick": 0.4550743103027344,
+        "maximum_candidates_per_car_tick": 111,
+        "average_contacts_per_car_tick": 0.04001935323079427,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 31.75910758972168,
+        "narrow_phase_candidates_per_s": 1393439.463054139,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 35,
+          "gpu_util_mean_percent": 96.42857142857143,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 142.0257142857143,
+          "process_cpu_max_percent": 1689.6,
+          "system_cpu_mean_percent": 10.077142857142857
+        },
+        "logical_state_bytes": 5939200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 4096,
+        "ticks_per_repeat": 320,
+        "calibration_seconds": 0.016610599937848747,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09243429999332875,
+          0.09186490008141845,
+          0.09215919999405742,
+          0.09159369999542832,
+          0.09241949999704957
+        ],
+        "world_ticks_per_s_repeats": [
+          14180017.591896065,
+          14267908.622752856,
+          14222345.68100111,
+          14310154.520075304,
+          14182288.37033141
+        ],
+        "world_ticks_per_s_median": 14222345.68100111,
+        "world_ticks_per_s_mean": 14232542.95721135,
+        "aggregate_simulated_game_seconds_per_s_median": 118519.54734167592,
+        "suspension_rays_per_s_median": 113778765.44800888,
+        "coefficient_of_variation": 0.003953218134313358,
+        "stable": true,
+        "wall_time_s": 0.4604716000612825,
+        "average_candidates_per_car_tick": 0.4715549468994141,
+        "maximum_candidates_per_car_tick": 114,
+        "average_contacts_per_car_tick": 0.042720794677734375,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 39.919281005859375,
+        "narrow_phase_candidates_per_s": 2684536.896163596,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 31,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 99.56129032258065,
+          "process_cpu_max_percent": 195.2,
+          "system_cpu_mean_percent": 12.080645161290322
+        },
+        "logical_state_bytes": 11878400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 8192,
+        "ticks_per_repeat": 320,
+        "calibration_seconds": 0.017406800063326955,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.10324139997828752,
+          0.10121160000562668,
+          0.10286029998678714,
+          0.10107490001246333,
+          0.10202820005360991
+        ],
+        "world_ticks_per_s_repeats": [
+          25391364.322367862,
+          25900588.468656417,
+          25485439.96407492,
+          25935618.038472023,
+          25693288.704716787
+        ],
+        "world_ticks_per_s_median": 25693288.704716787,
+        "world_ticks_per_s_mean": 25681259.8996576,
+        "aggregate_simulated_game_seconds_per_s_median": 214110.73920597322,
+        "suspension_rays_per_s_median": 205546309.6377343,
+        "coefficient_of_variation": 0.009444843987038914,
+        "stable": true,
+        "wall_time_s": 0.5104164000367746,
+        "average_candidates_per_car_tick": 0.4867877960205078,
+        "maximum_candidates_per_car_tick": 120,
+        "average_contacts_per_car_tick": 0.042775726318359374,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 43.69711685180664,
+        "narrow_phase_candidates_per_s": 5000172.407893087,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 34,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 94.79117647058824,
+          "process_cpu_max_percent": 153.7,
+          "system_cpu_mean_percent": 11.373529411764705
+        },
+        "logical_state_bytes": 23756800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 16384,
+        "ticks_per_repeat": 320,
+        "calibration_seconds": 0.018854000023566186,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.10565349995158613,
+          0.10537120001390576,
+          0.10691720002796501,
+          0.10624440002720803,
+          0.1065453999908641
+        ],
+        "world_ticks_per_s_repeats": [
+          49623344.25648425,
+          49756290.137230106,
+          49036824.74502405,
+          49347353.824364915,
+          49207943.28473645
+        ],
+        "world_ticks_per_s_median": 49347353.824364915,
+        "world_ticks_per_s_mean": 49394351.24956795,
+        "aggregate_simulated_game_seconds_per_s_median": 411227.9485363743,
+        "suspension_rays_per_s_median": 394778830.5949193,
+        "coefficient_of_variation": 0.005973367403927395,
+        "stable": true,
+        "wall_time_s": 0.530731700011529,
+        "average_candidates_per_car_tick": 0.4690999984741211,
+        "maximum_candidates_per_car_tick": 114,
+        "average_contacts_per_car_tick": 0.04234018325805664,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 123.06427764892578,
+        "narrow_phase_candidates_per_s": 9268091.57978155,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 35,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 96.24285714285715,
+          "process_cpu_max_percent": 106.4,
+          "system_cpu_mean_percent": 12.594285714285714
+        },
+        "logical_state_bytes": 47513600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 32768,
+        "ticks_per_repeat": 192,
+        "calibration_seconds": 0.02853110001888126,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09425329999066889,
+          0.09430019999854267,
+          0.09279679995961487,
+          0.09411780000664294,
+          0.0926403000485152
+        ],
+        "world_ticks_per_s_repeats": [
+          66750511.65978121,
+          66717313.43196758,
+          67798199.96743464,
+          66846611.36953841,
+          67912733.4076552
+        ],
+        "world_ticks_per_s_median": 66846611.36953841,
+        "world_ticks_per_s_mean": 67205073.96727541,
+        "aggregate_simulated_game_seconds_per_s_median": 557055.0947461535,
+        "suspension_rays_per_s_median": 534772890.9563073,
+        "coefficient_of_variation": 0.008883186181641462,
+        "stable": true,
+        "wall_time_s": 0.46810840000398457,
+        "average_candidates_per_car_tick": 0.41234580675760907,
+        "maximum_candidates_per_car_tick": 149,
+        "average_contacts_per_car_tick": 0.043468475341796875,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 51.928009033203125,
+        "narrow_phase_candidates_per_s": 11083994.64729929,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 31,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489351168.0,
+          "vram_max_bytes": 4489351168,
+          "process_cpu_mean_percent": 99.81612903225808,
+          "process_cpu_max_percent": 190.0,
+          "system_cpu_mean_percent": 10.548387096774194
+        },
+        "logical_state_bytes": 95027200,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 65536,
+        "ticks_per_repeat": 128,
+        "calibration_seconds": 0.051709000021219254,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.10250700009055436,
+          0.10290389996953309,
+          0.10778560000471771,
+          0.10749950003810227,
+          0.10736869997344911
+        ],
+        "world_ticks_per_s_repeats": [
+          81834489.27965437,
+          81518854.02286626,
+          77826796.89710718,
+          78033925.71153103,
+          78128989.19400528
+        ],
+        "world_ticks_per_s_median": 78128989.19400528,
+        "world_ticks_per_s_mean": 79468611.02103283,
+        "aggregate_simulated_game_seconds_per_s_median": 651074.909950044,
+        "suspension_rays_per_s_median": 625031913.5520422,
+        "coefficient_of_variation": 0.025440431591876433,
+        "stable": true,
+        "wall_time_s": 0.5280647000763565,
+        "average_candidates_per_car_tick": 0.384338915348053,
+        "maximum_candidates_per_car_tick": 128,
+        "average_contacts_per_car_tick": 0.04095757007598877,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 67.93441772460938,
+        "narrow_phase_candidates_per_s": 12210884.384181747,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 35,
+          "gpu_util_mean_percent": 65.34285714285714,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489469132.8,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 95.36285714285714,
+          "process_cpu_max_percent": 195.3,
+          "system_cpu_mean_percent": 13.88857142857143
+        },
+        "logical_state_bytes": 190054400,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 131072,
+        "ticks_per_repeat": 64,
+        "calibration_seconds": 0.09283460001461208,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.09294690005481243,
+          0.09128449996933341,
+          0.09228690003510565,
+          0.09256090002600104,
+          0.09092350001446903
+        ],
+        "world_ticks_per_s_repeats": [
+          90251616.73012322,
+          91895206.77462342,
+          90897061.1951317,
+          90627986.52177732,
+          92260064.7650507
+        ],
+        "world_ticks_per_s_median": 90897061.1951317,
+        "world_ticks_per_s_mean": 91186387.19734128,
+        "aggregate_simulated_game_seconds_per_s_median": 757475.5099594309,
+        "suspension_rays_per_s_median": 727176489.5610536,
+        "coefficient_of_variation": 0.009377081551159686,
+        "stable": true,
+        "wall_time_s": 0.46000270009972155,
+        "average_candidates_per_car_tick": 0.35071372985839844,
+        "maximum_candidates_per_car_tick": 114,
+        "average_contacts_per_car_tick": 0.04405069351196289,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 65.85873413085938,
+        "narrow_phase_candidates_per_s": 12791229.26609874,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 31,
+          "gpu_util_mean_percent": 99.0,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4489370194.580646,
+          "vram_max_bytes": 4489547776,
+          "process_cpu_mean_percent": 92.5516129032258,
+          "process_cpu_max_percent": 104.5,
+          "system_cpu_mean_percent": 12.058064516129033
+        },
+        "logical_state_bytes": 380108800,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      },
+      {
+        "variant": "B3",
+        "worlds": 262144,
+        "ticks_per_repeat": 64,
+        "calibration_seconds": 0.17621230008080602,
+        "ray_backend": "cubql",
+        "repeat_seconds": [
+          0.1692499000346288,
+          0.1705783000215888,
+          0.16998590005096048,
+          0.17081459995824844,
+          0.16943510004784912
+        ],
+        "world_ticks_per_s_repeats": [
+          99126888.68098211,
+          98354925.5554583,
+          98697691.9554523,
+          98218864.2194566,
+          99018538.63374266
+        ],
+        "world_ticks_per_s_median": 98697691.9554523,
+        "world_ticks_per_s_mean": 98683381.8090184,
+        "aggregate_simulated_game_seconds_per_s_median": 822480.7662954357,
+        "suspension_rays_per_s_median": 789581535.6436183,
+        "coefficient_of_variation": 0.00403079988734595,
+        "stable": true,
+        "wall_time_s": 0.8500638001132756,
+        "average_candidates_per_car_tick": 0.3515019714832306,
+        "maximum_candidates_per_car_tick": 132,
+        "average_contacts_per_car_tick": 0.044605106115341187,
+        "maximum_contacts_per_car_tick": 4,
+        "maximum_penetration_uu": 70.62142944335938,
+        "narrow_phase_candidates_per_s": 13874780.926359087,
+        "solver_contact_passes": 1,
+        "telemetry": {
+          "samples": 56,
+          "gpu_util_mean_percent": 72.71428571428571,
+          "gpu_util_max_percent": 99.0,
+          "vram_mean_bytes": 4488171520.0,
+          "vram_max_bytes": 4488171520,
+          "process_cpu_mean_percent": 97.48035714285713,
+          "process_cpu_max_percent": 208.7,
+          "system_cpu_mean_percent": 10.958928571428572
+        },
+        "logical_state_bytes": 760217600,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0,
+        "nan_or_error_count": 0,
+        "verification_readback_outside_timing": true
+      }
+    ]
+  },
+  "frozen_v0_2_b3_comparison": {
+    "available": true,
+    "reference_path": "results\\v0.2\\benchmark.json",
+    "reference_milestone": "v0.2",
+    "equal_batch_points": [
+      {
+        "worlds": 1024,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 35986.950448684656,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 32194.044558271966,
+        "retained_throughput_fraction": 0.8946032980532441,
+        "slowdown_factor": 1.1178138982676575
+      },
+      {
+        "worlds": 2048,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 63859.60035654627,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 63924.3395725279,
+        "retained_throughput_fraction": 1.001013774211241,
+        "slowdown_factor": 0.998987252486071
+      },
+      {
+        "worlds": 4096,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 130798.2392107361,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 118519.54734167592,
+        "retained_throughput_fraction": 0.9061249452351012,
+        "slowdown_factor": 1.1036005633202628
+      },
+      {
+        "worlds": 8192,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 232452.30875216136,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 214110.73920597322,
+        "retained_throughput_fraction": 0.9210953436227481,
+        "slowdown_factor": 1.085663940137742
+      },
+      {
+        "worlds": 16384,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 432619.40843683825,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 411227.9485363743,
+        "retained_throughput_fraction": 0.9505536287015957,
+        "slowdown_factor": 1.0520184972266586
+      },
+      {
+        "worlds": 32768,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 712782.8557304312,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 557055.0947461535,
+        "retained_throughput_fraction": 0.7815214553320111,
+        "slowdown_factor": 1.2795554020652875
+      },
+      {
+        "worlds": 65536,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 966205.975082198,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 651074.909950044,
+        "retained_throughput_fraction": 0.6738469091899946,
+        "slowdown_factor": 1.4840166013405947
+      },
+      {
+        "worlds": 131072,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 1170097.337209566,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 757475.5099594309,
+        "retained_throughput_fraction": 0.6473611090901629,
+        "slowdown_factor": 1.5447328947601677
+      },
+      {
+        "worlds": 262144,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 1350748.1551013975,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+        "retained_throughput_fraction": 0.608907562219616,
+        "slowdown_factor": 1.6422854010135086
+      }
+    ],
+    "selected_worlds_comparison": {
+      "worlds": 262144,
+      "v0_2_aggregate_simulated_game_seconds_per_s": 1350748.1551013975,
+      "v0_2_1_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+      "retained_throughput_fraction": 0.608907562219616,
+      "slowdown_factor": 1.6422854010135086
+    }
+  },
+  "summary": {
+    "best_b3_worlds": 262144,
+    "best_b3_world_ticks_per_s": 98697691.9554523,
+    "best_b3_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+    "best_b3_coefficient_of_variation": 0.00403079988734595,
+    "performance_band": "green_threshold",
+    "parity_gate_pass": true,
+    "hot_loop_gpu_resident": true,
+    "stable_scaling_into_thousands": true,
+    "component_cost_multiplier_vs_b0": {
+      "B0": 1.0,
+      "B1_default": 5.133389875930489,
+      "B1_cubql": 4.173165003252279,
+      "B2": 6.006339825783425,
+      "B3": 17.501923441912773
+    },
+    "verdict": "PASS_GREEN"
+  }
+}

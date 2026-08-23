@@ -1,0 +1,587 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.1",
+  "generated_at_utc": "2026-08-23T15:44:06.102756+00:00",
+  "prototype_status": "bounded_non_exhaustive",
+  "scope": {
+    "description": "Observes triangle and contact-family coverage produced by the existing 35-scenario authoritative local-transition corpus; audits shared-edge metadata across the complete DFH mesh.",
+    "not_claimed": "This does not claim that every DFH triangle has an authoritative RocketSim transition case. A later dedicated breadth milestone must generate and gate the remaining per-triangle states.",
+    "horizons_ticks": [
+      1,
+      4,
+      8,
+      12
+    ],
+    "observed_ticks_per_scenario": 12,
+    "transition_cases": 35,
+    "checkpoint_comparisons": 140
+  },
+  "geometry": {
+    "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "mesh_files": 16,
+    "triangles_exercised": 2,
+    "total_triangles": 8020,
+    "triangle_coverage_fraction": 0.00024937655860349125,
+    "wheel_triangle_faces_exercised": 0,
+    "chassis_triangle_faces_exercised": 2,
+    "shared_edge_capable_triangles_exercised": 2,
+    "shared_edge_capable_triangles_total": 8020,
+    "per_mesh": [
+      {
+        "file": "mesh_0.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 880,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_1.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 880,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_2.cmf",
+        "triangles_exercised": 2,
+        "total_triangles": 880,
+        "coverage_fraction": 0.0022727272727272726
+      },
+      {
+        "file": "mesh_3.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 880,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_4.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 983,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_5.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 983,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_6.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 983,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_7.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 983,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_8.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 16,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_9.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 16,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_10.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 126,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_11.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 126,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_12.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 126,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_13.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 126,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_14.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 16,
+        "coverage_fraction": 0.0
+      },
+      {
+        "file": "mesh_15.cmf",
+        "triangles_exercised": 0,
+        "total_triangles": 16,
+        "coverage_fraction": 0.0
+      }
+    ]
+  },
+  "shared_edge_topology_audit": {
+    "concave_directed_edges": 10296,
+    "convex_directed_edges": 856,
+    "planar_directed_edges": 12024,
+    "shared_directed_edges": 23176
+  },
+  "contact_families": {
+    "scenario_families": {
+      "arena_surfaces": 2,
+      "body_contacts": 0,
+      "boost": 0,
+      "landings": 0,
+      "longitudinal": 0,
+      "powerslide": 0,
+      "settle_and_rest": 0,
+      "steering": 0
+    },
+    "plane_contact_observations": {
+      "chassis:-10": 31,
+      "wheel:-2": 1103,
+      "wheel:-3": 48,
+      "wheel:-5": 38
+    },
+    "scenario_observations": [
+      {
+        "name": "floor_settle",
+        "family": "settle_and_rest",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "floor_rest",
+        "family": "settle_and_rest",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "level_landing",
+        "family": "landings",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "tilted_landing",
+        "family": "landings",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "partial_two_wheel_landing",
+        "family": "landings",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "throttle_forward",
+        "family": "longitudinal",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "throttle_reverse",
+        "family": "longitudinal",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "coast_from_speed",
+        "family": "longitudinal",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "brake_to_reverse",
+        "family": "longitudinal",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "ground_boost",
+        "family": "boost",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_low_partial_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_low_partial_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_low_full_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_low_full_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_medium_partial_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_medium_partial_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_medium_full_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_medium_full_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_high_partial_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_high_partial_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_high_full_right",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "steer_high_full_left",
+        "family": "steering",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "powerslide_initiation",
+        "family": "powerslide",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "powerslide_hold",
+        "family": "powerslide",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "powerslide_release",
+        "family": "powerslide",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "side_wall_transition",
+        "family": "arena_surfaces",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "ramp_transition",
+        "family": "arena_surfaces",
+        "active_contact_ticks_1_to_12": 2,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 2,
+        "unique_triangle_faces": 2
+      },
+      {
+        "name": "back_wall_transition",
+        "family": "arena_surfaces",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "corner_transition",
+        "family": "arena_surfaces",
+        "active_contact_ticks_1_to_12": 0,
+        "wheel_contact_ticks_1_to_12": 0,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "ceiling_contact",
+        "family": "arena_surfaces",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "nose_impact",
+        "family": "body_contacts",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 6,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "side_impact",
+        "family": "body_contacts",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 6,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "roof_impact",
+        "family": "body_contacts",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 1,
+        "chassis_contact_ticks_1_to_12": 12,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "off_center_impact",
+        "family": "body_contacts",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 7,
+        "unique_triangle_faces": 0
+      },
+      {
+        "name": "wall_scrape",
+        "family": "body_contacts",
+        "active_contact_ticks_1_to_12": 12,
+        "wheel_contact_ticks_1_to_12": 12,
+        "chassis_contact_ticks_1_to_12": 0,
+        "unique_triangle_faces": 0
+      }
+    ]
+  },
+  "local_transition_results": {
+    "pass_fail_by_horizon": {
+      "1": {
+        "pass": 35,
+        "fail": 0
+      },
+      "4": {
+        "pass": 35,
+        "fail": 0
+      },
+      "8": {
+        "pass": 35,
+        "fail": 0
+      },
+      "12": {
+        "pass": 35,
+        "fail": 0
+      }
+    },
+    "hard_mismatch_count": 0,
+    "numeric_failure_count": 0,
+    "numeric_error_distributions": {
+      "angular_velocity_rad_per_s": {
+        "max": 5.584122845903039e-05,
+        "p95": 5.9687100929295025e-06,
+        "median": 2.772717095922417e-07
+      },
+      "boost": {
+        "max": 0.0,
+        "p95": 0.0,
+        "median": 0.0
+      },
+      "handbrake_value": {
+        "max": 0.0,
+        "p95": 0.0,
+        "median": 0.0
+      },
+      "linear_velocity_uu_per_s": {
+        "max": 0.0027517382986843586,
+        "p95": 0.0008546698605641723,
+        "median": 7.911005013738759e-05
+      },
+      "orientation_rad": {
+        "max": 0.0003907872989781068,
+        "p95": 0.00034168167176969693,
+        "median": 0.0
+      },
+      "position_uu": {
+        "max": 0.0009784679859876633,
+        "p95": 0.00030691274150740296,
+        "median": 3.814697265625e-06
+      },
+      "world_contact_normal_rad": {
+        "max": 0.0,
+        "p95": 0.0,
+        "median": 0.0
+      }
+    },
+    "worst_local_transition_checks": [
+      {
+        "scenario": "side_impact",
+        "family": "body_contacts",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.0003907872989781068,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.01563149195912427
+      },
+      {
+        "scenario": "steer_high_full_left",
+        "family": "steering",
+        "horizon_ticks": 12,
+        "metric": "orientation_rad",
+        "error": 0.00036098564595617736,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.014439425838247094
+      },
+      {
+        "scenario": "steer_high_full_right",
+        "family": "steering",
+        "horizon_ticks": 12,
+        "metric": "orientation_rad",
+        "error": 0.000360985375309225,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.014439415012369
+      },
+      {
+        "scenario": "floor_rest",
+        "family": "settle_and_rest",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "throttle_forward",
+        "family": "longitudinal",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "throttle_reverse",
+        "family": "longitudinal",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "coast_from_speed",
+        "family": "longitudinal",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "brake_to_reverse",
+        "family": "longitudinal",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "ground_boost",
+        "family": "boost",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      },
+      {
+        "scenario": "steer_low_partial_right",
+        "family": "steering",
+        "horizon_ticks": 1,
+        "metric": "orientation_rad",
+        "error": 0.00034168167176969693,
+        "tolerance": 0.025,
+        "tolerance_fraction": 0.013667266870787877
+      }
+    ],
+    "failure_clustering_by_surface_or_contact_type": {},
+    "failure_clustering_note": "No local-transition failure remained to cluster."
+  }
+}

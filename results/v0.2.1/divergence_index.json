@@ -1,0 +1,753 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.1",
+  "generated_at_utc": "2026-08-23T15:58:29.886631+00:00",
+  "input_boundary": {
+    "frozen_evidence": "results/v0.2/parity.json",
+    "horizons_ticks": [
+      1,
+      4,
+      8,
+      30,
+      60,
+      120,
+      300,
+      600
+    ],
+    "scenario_count": 35,
+    "hard_mismatch_records": 85,
+    "hard_mismatch_fields": 352,
+    "numeric_tolerance_failures": 617,
+    "frozen_tolerances": {
+      "position_uu": 10.0,
+      "linear_velocity_uu_per_s": 25.0,
+      "orientation_rad": 0.025,
+      "angular_velocity_rad_per_s": 0.1,
+      "boost": 0.01,
+      "handbrake_value": 0.0001,
+      "world_contact_normal_rad": 0.05
+    }
+  },
+  "ranking_policy": "Earliest numeric or hard failure horizon, then hard-before-numeric at that horizon, then descending failure count and scenario name.",
+  "scenario_ranking": [
+    {
+      "scenario": "roof_impact",
+      "family": "body_contacts",
+      "first_hard_failure_horizon_ticks": 1,
+      "first_hard_mismatch_fields": [
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 1,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 8,
+      "hard_mismatch_fields": 18,
+      "numeric_tolerance_failures": 30
+    },
+    {
+      "scenario": "wall_scrape",
+      "family": "body_contacts",
+      "first_hard_failure_horizon_ticks": 4,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2"
+      ],
+      "first_numeric_failure_horizon_ticks": 1,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 23,
+      "numeric_tolerance_failures": 28
+    },
+    {
+      "scenario": "off_center_impact",
+      "family": "body_contacts",
+      "first_hard_failure_horizon_ticks": 4,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_3",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 1,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 4,
+      "hard_mismatch_fields": 11,
+      "numeric_tolerance_failures": 30
+    },
+    {
+      "scenario": "side_impact",
+      "family": "body_contacts",
+      "first_hard_failure_horizon_ticks": 4,
+      "first_hard_mismatch_fields": [
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 1,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 4,
+      "hard_mismatch_fields": 11,
+      "numeric_tolerance_failures": 24
+    },
+    {
+      "scenario": "nose_impact",
+      "family": "body_contacts",
+      "first_hard_failure_horizon_ticks": 4,
+      "first_hard_mismatch_fields": [
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 1,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 1,
+      "numeric_tolerance_failures": 22
+    },
+    {
+      "scenario": "powerslide_hold",
+      "family": "powerslide",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 28,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_medium_full_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 27,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_high_full_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 26,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_medium_full_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 25,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_high_full_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 5,
+      "hard_mismatch_fields": 24,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_high_partial_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 60,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 4,
+      "hard_mismatch_fields": 20,
+      "numeric_tolerance_failures": 24
+    },
+    {
+      "scenario": "steer_high_partial_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 60,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 4,
+      "hard_mismatch_fields": 18,
+      "numeric_tolerance_failures": 24
+    },
+    {
+      "scenario": "powerslide_initiation",
+      "family": "powerslide",
+      "first_hard_failure_horizon_ticks": 60,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 3,
+      "hard_mismatch_fields": 15,
+      "numeric_tolerance_failures": 26
+    },
+    {
+      "scenario": "powerslide_release",
+      "family": "powerslide",
+      "first_hard_failure_horizon_ticks": 60,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 4,
+      "hard_mismatch_fields": 16,
+      "numeric_tolerance_failures": 25
+    },
+    {
+      "scenario": "steer_medium_partial_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 300,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_2",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 11,
+      "numeric_tolerance_failures": 20
+    },
+    {
+      "scenario": "steer_low_full_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 300,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "wheel_contact_2",
+        "wheel_contact_3",
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 10,
+      "numeric_tolerance_failures": 20
+    },
+    {
+      "scenario": "steer_low_full_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 300,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "wheel_contact_2",
+        "wheel_contact_3",
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 11,
+      "numeric_tolerance_failures": 18
+    },
+    {
+      "scenario": "ramp_transition",
+      "family": "arena_surfaces",
+      "first_hard_failure_horizon_ticks": 120,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3",
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 3,
+      "hard_mismatch_fields": 6,
+      "numeric_tolerance_failures": 22
+    },
+    {
+      "scenario": "brake_to_reverse",
+      "family": "longitudinal",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_2",
+        "wheel_contact_3"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 6,
+      "numeric_tolerance_failures": 19
+    },
+    {
+      "scenario": "ceiling_contact",
+      "family": "arena_surfaces",
+      "first_hard_failure_horizon_ticks": 30,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 4,
+      "numeric_tolerance_failures": 17
+    },
+    {
+      "scenario": "steer_medium_partial_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 600,
+      "first_hard_mismatch_fields": [
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 1,
+      "numeric_tolerance_failures": 20
+    },
+    {
+      "scenario": "steer_low_partial_left",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 600,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "wheel_contact_2",
+        "wheel_contact_3",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 6,
+      "numeric_tolerance_failures": 14
+    },
+    {
+      "scenario": "ground_boost",
+      "family": "boost",
+      "first_hard_failure_horizon_ticks": 300,
+      "first_hard_mismatch_fields": [
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 1,
+      "numeric_tolerance_failures": 16
+    },
+    {
+      "scenario": "steer_low_partial_right",
+      "family": "steering",
+      "first_hard_failure_horizon_ticks": 600,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "wheel_contact_2",
+        "wheel_contact_3",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 6,
+      "numeric_tolerance_failures": 11
+    },
+    {
+      "scenario": "throttle_forward",
+      "family": "longitudinal",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 12
+    },
+    {
+      "scenario": "throttle_reverse",
+      "family": "longitudinal",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 4,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 8
+    },
+    {
+      "scenario": "side_wall_transition",
+      "family": "arena_surfaces",
+      "first_hard_failure_horizon_ticks": 60,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 30,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 2,
+      "hard_mismatch_fields": 8,
+      "numeric_tolerance_failures": 19
+    },
+    {
+      "scenario": "partial_two_wheel_landing",
+      "family": "landings",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 30,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 6
+    },
+    {
+      "scenario": "tilted_landing",
+      "family": "landings",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 30,
+      "first_numeric_failure_metrics": [
+        "linear_velocity_uu_per_s",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 5
+    },
+    {
+      "scenario": "level_landing",
+      "family": "landings",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 30,
+      "first_numeric_failure_metrics": [
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 3
+    },
+    {
+      "scenario": "corner_transition",
+      "family": "arena_surfaces",
+      "first_hard_failure_horizon_ticks": 120,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_1",
+        "wheel_contact_3",
+        "world_contact"
+      ],
+      "first_numeric_failure_horizon_ticks": 60,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 1,
+      "hard_mismatch_fields": 4,
+      "numeric_tolerance_failures": 14
+    },
+    {
+      "scenario": "back_wall_transition",
+      "family": "arena_surfaces",
+      "first_hard_failure_horizon_ticks": 120,
+      "first_hard_mismatch_fields": [
+        "on_ground",
+        "wheel_contact_0",
+        "wheel_contact_1",
+        "world_contact",
+        "linear_velocity_direction"
+      ],
+      "first_numeric_failure_horizon_ticks": 120,
+      "first_numeric_failure_metrics": [
+        "position_uu",
+        "linear_velocity_uu_per_s",
+        "orientation_rad",
+        "angular_velocity_rad_per_s"
+      ],
+      "hard_failure_records": 3,
+      "hard_mismatch_fields": 15,
+      "numeric_tolerance_failures": 12
+    },
+    {
+      "scenario": "coast_from_speed",
+      "family": "longitudinal",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 600,
+      "first_numeric_failure_metrics": [
+        "orientation_rad"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 1
+    },
+    {
+      "scenario": "floor_rest",
+      "family": "settle_and_rest",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 600,
+      "first_numeric_failure_metrics": [
+        "orientation_rad"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 1
+    },
+    {
+      "scenario": "floor_settle",
+      "family": "settle_and_rest",
+      "first_hard_failure_horizon_ticks": null,
+      "first_hard_mismatch_fields": [],
+      "first_numeric_failure_horizon_ticks": 600,
+      "first_numeric_failure_metrics": [
+        "orientation_rad"
+      ],
+      "hard_failure_records": 0,
+      "hard_mismatch_fields": 0,
+      "numeric_tolerance_failures": 1
+    }
+  ],
+  "representative_causal_findings": [
+    {
+      "representative": "steer_medium_full_left",
+      "families": [
+        "steering",
+        "powerslide",
+        "longitudinal",
+        "boost"
+      ],
+      "first_causal_stage": "wheel friction preparation and two-phase application order",
+      "baseline_observation": "v0.2 applied wheel forces while iterating wheels from a changing rigid-body state. The native trace showed updateVehicleFirst caches every ray, suspension value and friction impulse from one pre-solve state; updateVehicleSecond applies them later.",
+      "correction": "Cache all four wheel transforms, rays, suspension forces, bilateral side impulses and rolling impulses before applying suspension/friction in RocketSim order; mirror the handbrake and ground-boost branches.",
+      "rivalsim_sources": [
+        "rivalsim/kernels/vehicle.py:wheel_pre_tick",
+        "rivalsim/static_world.py:StaticWorldSim._step_impl",
+        "rivalsim/kernels/boost_pad.py"
+      ],
+      "oracle_sources": [
+        "src/Sim/Car/Car.cpp:_PreTickUpdate/_PostTickUpdate",
+        "src/Sim/btVehicleRL/btVehicleRL.cpp:updateVehicleFirst/updateVehicleSecond",
+        "BulletDynamics/ConstraintSolver/btContactConstraint.cpp:resolveSingleBilateral"
+      ]
+    },
+    {
+      "representative": "powerslide_initiation",
+      "families": [
+        "powerslide",
+        "steering"
+      ],
+      "first_causal_stage": "wheel axle/forward friction basis and cached impulse scaling",
+      "baseline_observation": "The diagnostic wheel rows diverged before the car trajectory: lateral and rolling impulses used approximate ordering/scaling, so the v0.2 state exceeded velocity, orientation and angular-velocity tolerances by tick 4.",
+      "correction": "Reproduce RocketSim wheel basis construction, clipped suspension velocity, friction slip limits, extra pushback and powerslide friction scaling in source order.",
+      "rivalsim_sources": [
+        "rivalsim/kernels/vehicle.py:wheel_pre_tick"
+      ],
+      "oracle_sources": [
+        "src/Sim/btVehicleRL/btVehicleRL.cpp"
+      ]
+    },
+    {
+      "representative": "ramp_transition",
+      "families": [
+        "arena_surfaces",
+        "landings"
+      ],
+      "first_causal_stage": "triangle feature selection, BVH visit order and internal-edge normal adjustment",
+      "baseline_observation": "The native manifold selected the RocketSim CMF-local triangle feature and adjusted its normal with Bullet adjacency data. v0.2 used the combined Warp query order and a generic SAT normal, producing a local angular-velocity failure by tick 4.",
+      "correction": "Reproduce per-CMF Bullet quantized-BVH face rank, shared-edge flags/angles, box/triangle SAT plus GJK closest features, exact contact thresholds and callback normal order.",
+      "rivalsim_sources": [
+        "rivalsim/arena.py:build_bullet_bvh_rank",
+        "rivalsim/arena.py:build_internal_edge_data",
+        "rivalsim/kernels/vehicle.py:chassis_contacts_v021"
+      ],
+      "oracle_sources": [
+        "src/RocketSim.cpp:btGenerateInternalEdgeInfo",
+        "src/Sim/Arena/Arena.cpp:btAdjustInternalEdgeContacts",
+        "BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp",
+        "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp"
+      ]
+    },
+    {
+      "representative": "off_center_impact",
+      "families": [
+        "body_contacts",
+        "settle_and_rest"
+      ],
+      "first_causal_stage": "manifold constraint setup and Bullet split/velocity solve",
+      "baseline_observation": "v0.2's one-pass bounded contact response differed on the first impact tick. The native trace exposed box margin/inertia, contact RHS, tangent basis, accumulated impulses and split push/turn velocity as the first causal solver state.",
+      "correction": "Use the native box half extents/margin and inverse inertia; construct every contact row from one unchanged pre-solve state; run ten split-impulse and velocity PGS iterations; then write back transform/velocity and apply deferred caps.",
+      "rivalsim_sources": [
+        "rivalsim/kernels/vehicle.py:chassis_contacts_v021",
+        "rivalsim/vehicle_state.py",
+        "rivalsim/kernels/integrate.py"
+      ],
+      "oracle_sources": [
+        "src/Sim/Arena/Arena.cpp:solver configuration",
+        "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp",
+        "BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp"
+      ]
+    }
+  ],
+  "internal_oracle": {
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+    "source_helper": "tools/rocketsim_diagnostic/trace.cpp",
+    "build_recipe": "tools/rocketsim_diagnostic/CMakeLists.txt",
+    "comparison_wrapper": ".tools/compare_native_v021.py (diagnostic, ignored)",
+    "semantic_isolation": "The helper links the unmodified pinned RocketSimPython and vendored Bullet sources into a separate executable. It reads vehicle, rigid-body and dispatcher state and may manually stage the existing pre/solve/post calls; no upstream source file is patched and no diagnostic code enters RivalSim timing.",
+    "trace_fields": [
+      "pre/post car transform and linear/angular velocity",
+      "wheel ray hit, suspension, axle/forward basis and friction impulses",
+      "Bullet manifolds, triangle identity, point, normal, distance and lifetime",
+      "normal/lateral/push impulses and solver prestate",
+      "box-vs-triangle GJK simplex/support diagnostics"
+    ]
+  },
+  "validation_policy_change": {
+    "authority": "2026-08-23 immediate user steering adjustment",
+    "hard_local_horizons_ticks": [
+      1,
+      4,
+      8,
+      12
+    ],
+    "long_open_loop_horizons_status": "diagnostic_only_non_blocking",
+    "reason": "Local transition accuracy through 100 ms is the milestone requirement; multi-second synchronized open-loop identity is dominated by chaotic floating-point and contact-branch divergence and is not the transfer criterion."
+  },
+  "final_local_resolution": {
+    "evidence": "results/v0.2.1/parity.json",
+    "scenario_count": 35,
+    "checkpoint_comparisons": 140,
+    "hard_mismatch_records": 0,
+    "numeric_tolerance_failures": 0,
+    "parity_gate_pass": true
+  }
+}

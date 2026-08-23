@@ -1,0 +1,1355 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.1",
+  "manifest_created_utc": "2026-08-23T15:58:30.596739+00:00",
+  "verdict": "PASS_GREEN",
+  "repository": {
+    "origin": "https://github.com/Noxoni/RivalSim.git",
+    "branch": "main",
+    "authority_start_commit": "cc45ab0dce85f2c696800b96e1f4af8b7d8bb1f2",
+    "frozen_v0_2_evidence_commit": "2c5d11899eaaad6a963a370fcc3813202b6fa714",
+    "implementation_commit": "9939d0736a92cdfa6ce842d7818634e08260dd65",
+    "evidence_parent_commit": "9939d0736a92cdfa6ce842d7818634e08260dd65",
+    "evidence_package_commit": "the commit containing this self-excluding manifest; verify by remote readback"
+  },
+  "release": {
+    "package": "rivalsim",
+    "version": "0.2.1",
+    "python_requires": ">=3.12",
+    "scope": "static-world local-transition fidelity through 12 ticks"
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3",
+    "numpy": "2.5.2",
+    "warp": "1.16.0",
+    "device": "cuda:0",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "device_total_memory_bytes": 34190458880,
+    "cpu": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 16,
+    "physical_cpu_count": 8,
+    "nvidia_driver": "610.62",
+    "gpu_name": "NVIDIA GeForce RTX 5090"
+  },
+  "dependency_lock": {
+    "path": "requirements-v0.2.txt",
+    "size_bytes": 350,
+    "sha256": "89E0F2FEB58D519EBBDB09B5A31915532D4F1887FC2CF7065E7714F0983FB516",
+    "hash_policy": "canonical_lf_bytes"
+  },
+  "source_custody": {
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+    "diagnostic_helper": [
+      {
+        "path": "tools/rocketsim_diagnostic/CMakeLists.txt",
+        "size_bytes": 1571,
+        "sha256": "5EF978356877AE0AE8E1386B8FCAF98861A2EAE522308D76EB5F4FA61E38FB22",
+        "hash_policy": "canonical_lf_bytes"
+      },
+      {
+        "path": "tools/rocketsim_diagnostic/README.md",
+        "size_bytes": 518,
+        "sha256": "7A22D92A10F9322E0E4B3FD56D42BA9982B2027DCAB1883B48F51A815F279A16",
+        "hash_policy": "canonical_lf_bytes"
+      },
+      {
+        "path": "tools/rocketsim_diagnostic/trace.cpp",
+        "size_bytes": 30974,
+        "sha256": "02C0BF3FA3B0F75AFE305C74F9967C04F17C5167EE31F75376E4EFEEE1A0AEBC",
+        "hash_policy": "canonical_lf_bytes"
+      }
+    ],
+    "diagnostic_build_products_tracked": false
+  },
+  "collision_assets": {
+    "format": "RocketSim CMF",
+    "scale_uu_per_bt": 50.0,
+    "file_count": 16,
+    "vertices": 4468,
+    "triangles": 8020,
+    "bounds_uu": {
+      "min": [
+        -4107.333984375,
+        -5999.9951171875,
+        -13.267789840698242
+      ],
+      "max": [
+        4107.333984375,
+        5999.9951171875,
+        2075.4521484375
+      ]
+    },
+    "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "files": [
+      {
+        "file": "mesh_0.cmf",
+        "size_bytes": 16364,
+        "sha256": "8764D43B87BA134CACF1BE454D59D493630188E79C0D88639258B359BB511C4E",
+        "rocketsim_mesh_hash": "A160BAF9",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_1.cmf",
+        "size_bytes": 16364,
+        "sha256": "9D42E5DB7CDE5C7BE0783C256E15E819BD09351FCB2DEBD3205E3D055073C993",
+        "rocketsim_mesh_hash": "2811EEE8",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_2.cmf",
+        "size_bytes": 16364,
+        "sha256": "762EC145DB3C317D82314AD94AF6F8B591E822C26860ED3C0EE106ABA5591EEE",
+        "rocketsim_mesh_hash": "14B84668",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_3.cmf",
+        "size_bytes": 16364,
+        "sha256": "0DB5C559287BCD255B99E6F5DB341B874EC9A5FCF6137247CF16D913E178DB5C",
+        "rocketsim_mesh_hash": "EC759EBF",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_4.cmf",
+        "size_bytes": 18236,
+        "sha256": "92C3224DA44F1A359140647845A44457DF35541458B92485E7A3232BB596566A",
+        "rocketsim_mesh_hash": "94FB0D5C",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_5.cmf",
+        "size_bytes": 18236,
+        "sha256": "776C24B1231B4F7AB5437AF68E4CC1CC4D5CD7875B8CB386A67487162C3941A3",
+        "rocketsim_mesh_hash": "DEA07102",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_6.cmf",
+        "size_bytes": 18236,
+        "sha256": "A2262BFA2BFACCA3CAF3A8334F02B9B52624056853CC33A1340A23C3A33804E6",
+        "rocketsim_mesh_hash": "BD4FBEA8",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_7.cmf",
+        "size_bytes": 18236,
+        "sha256": "C887DF022D6A2B33E78A3CF8F5DD65D9CD61F4D72009781D40C32091119A06F3",
+        "rocketsim_mesh_hash": "39A47F63",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_8.cmf",
+        "size_bytes": 416,
+        "sha256": "3350567082D9A133F59F8471D941FDE6CCE20EB2B2BC26C2AB0566B7FB7A21E9",
+        "rocketsim_mesh_hash": "3D79D25D",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_9.cmf",
+        "size_bytes": 416,
+        "sha256": "4864911A7F0A3ADD929F41CC8F676CDE416DCC3C07AB08A30742C9893E8A6CE8",
+        "rocketsim_mesh_hash": "D84C7A68",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_10.cmf",
+        "size_bytes": 2480,
+        "sha256": "36CC44E14A0E500AEB6167A4D5FCE449B218B3D941DF3CA46F398D269B01AF3D",
+        "rocketsim_mesh_hash": "B81AC8B9",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_11.cmf",
+        "size_bytes": 2480,
+        "sha256": "7F4468BE0B0835A48996F92D1A2398F1290ACBF1152D39E1C53C2701D1FB6CE3",
+        "rocketsim_mesh_hash": "760358D3",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_12.cmf",
+        "size_bytes": 2480,
+        "sha256": "952A90A0FF27C2733D507E59BDCA8600968276EDDAD9A41B47A689010E805118",
+        "rocketsim_mesh_hash": "73AE4940",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_13.cmf",
+        "size_bytes": 2480,
+        "sha256": "B441F782F07E81C2444ED7A5C4ED618C26EF3E1940AC2C63C362154620631750",
+        "rocketsim_mesh_hash": "918F4A4E",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_14.cmf",
+        "size_bytes": 416,
+        "sha256": "085F7533C53A73DA664C129C3B1C93F5CE08CEB302AA5B993FF5FE95AF5D6AE8",
+        "rocketsim_mesh_hash": "1F8EE550",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_15.cmf",
+        "size_bytes": 416,
+        "sha256": "21C1D1EB450F9E09EE8D7D55E1D41BF563518F9B2DEB2AB5369C47139FAA2E4A",
+        "rocketsim_mesh_hash": "255BA8C1",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      }
+    ],
+    "source_root": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes",
+    "raw_geometry_bytes": 149856,
+    "bvh_allocation_bytes": null,
+    "bvh_allocation_note": "Warp 1.16 does not expose per-Mesh BVH allocation bytes"
+  },
+  "asset_audit": {
+    "tracked_cmf_count": 0,
+    "tracked_cmf_paths": [],
+    "external_collision_root": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes"
+  },
+  "implementation_blobs": [
+    {
+      "path": "CHANGELOG.md",
+      "size_bytes": 9200,
+      "sha256": "6D180F2E1C04E7105638AFF33FEF4268B39F70032FD2379D945022B9953BE2ED"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 6197,
+      "sha256": "48BAD1C0C943BA18701F80C22F4E49B6F69CD8639E0BA90FEB3B312E87D77715"
+    },
+    {
+      "path": "benchmarks/build_v021_divergence_index.py",
+      "size_bytes": 11699,
+      "sha256": "2E9C4B0D2C32B1C865F892EA6C49003E1E4046F7624B436602D9DD7E961CEA1E"
+    },
+    {
+      "path": "benchmarks/build_v021_manifest.py",
+      "size_bytes": 10341,
+      "sha256": "AF0CFFB543FBFBC32D279E3FABE6564A876D984AFBA98C66847B2105D7BDE7DE"
+    },
+    {
+      "path": "benchmarks/run_v021_coverage.py",
+      "size_bytes": 10297,
+      "sha256": "85BDA2E0228F8AFE580A8DF511A21B46477FB2E758BBCDB63E2AF5BCCB1B6E6E"
+    },
+    {
+      "path": "benchmarks/run_v02_benchmark.py",
+      "size_bytes": 27369,
+      "sha256": "AF66FDE2F9CC895F33618104649A206992B4C4419FE95ADF8D6BA06CFFCE429E"
+    },
+    {
+      "path": "benchmarks/run_v02_parity.py",
+      "size_bytes": 10585,
+      "sha256": "72782A1DA1F9444BC43291AAED3DF54999D786897C5A40D7EADED1A24BCBEF22"
+    },
+    {
+      "path": "pyproject.toml",
+      "size_bytes": 878,
+      "sha256": "5586DEB5EB1D0C54B0B5E5429E3E369BE68948DBCFD7528125A4C77E88DA1163"
+    },
+    {
+      "path": "rivalsim/__init__.py",
+      "size_bytes": 416,
+      "sha256": "303E305022277C1169C908690140FA8560B60B278CB47853EEA3F681CDED10C1"
+    },
+    {
+      "path": "rivalsim/arena.py",
+      "size_bytes": 25802,
+      "sha256": "1D4C0C474873A64612458083A31347F0ED44E7B91E87C259F498F50FBF1BA883"
+    },
+    {
+      "path": "rivalsim/constants.py",
+      "size_bytes": 2184,
+      "sha256": "035E656ED97EEF9E2FD1AC7B600B48577FAA7929FF9F7729AE1A28EC36C0AAAA"
+    },
+    {
+      "path": "rivalsim/kernels/boost_pad.py",
+      "size_bytes": 5222,
+      "sha256": "21D148DE7BACA3BDDCE468D477CB7C2CFD8970DF0BC2246C1232B4C54DD92BD1"
+    },
+    {
+      "path": "rivalsim/kernels/integrate.py",
+      "size_bytes": 17352,
+      "sha256": "A67867C75C8853C6BBECAB5924FE8BE8253FA76934825928356EF642D1E963C0"
+    },
+    {
+      "path": "rivalsim/kernels/vehicle.py",
+      "size_bytes": 94773,
+      "sha256": "922A599B12BC961EB83C91D0357FCD07A32D39B01810C224EAFA3EA4A3C9E4F7"
+    },
+    {
+      "path": "rivalsim/simulator.py",
+      "size_bytes": 6093,
+      "sha256": "D7913EB03D56A3FF6961EE76CFCD1B42EE0302998877BDB6163C334AAB3B5D33"
+    },
+    {
+      "path": "rivalsim/state.py",
+      "size_bytes": 10933,
+      "sha256": "D71CE4B29AAF06BF577055259C2925B6F822B183047D1D032AE596BD25DEC2BD"
+    },
+    {
+      "path": "rivalsim/static_world.py",
+      "size_bytes": 18112,
+      "sha256": "95A9AE2B9DDE7D8E67832316C402793266B3B4E6A864796359F0EE73EC7CCD03"
+    },
+    {
+      "path": "rivalsim/vehicle_state.py",
+      "size_bytes": 12295,
+      "sha256": "08AFEFBEDD203B3E70798678143BD9BA43E7CCD347DD25605E6E71D7476C8872"
+    },
+    {
+      "path": "tests/test_static_world.py",
+      "size_bytes": 7346,
+      "sha256": "DFF51C62068F38BF13079A2037F01A201C534174EAA5EBAC36AEA1E4A6371321"
+    },
+    {
+      "path": "tools/rocketsim_diagnostic/CMakeLists.txt",
+      "size_bytes": 1571,
+      "sha256": "5EF978356877AE0AE8E1386B8FCAF98861A2EAE522308D76EB5F4FA61E38FB22"
+    },
+    {
+      "path": "tools/rocketsim_diagnostic/README.md",
+      "size_bytes": 518,
+      "sha256": "7A22D92A10F9322E0E4B3FD56D42BA9982B2027DCAB1883B48F51A815F279A16"
+    },
+    {
+      "path": "tools/rocketsim_diagnostic/trace.cpp",
+      "size_bytes": 30974,
+      "sha256": "02C0BF3FA3B0F75AFE305C74F9967C04F17C5167EE31F75376E4EFEEE1A0AEBC"
+    }
+  ],
+  "tracked_evidence": [
+    {
+      "path": "results/v0.2.1/benchmark.json",
+      "size_bytes": 105016,
+      "sha256": "B026EB3E3B98769247F8E09F8B085F6531525DE7EA494BF9776DFE52EDD6B843",
+      "hash_policy": "canonical_lf_bytes"
+    },
+    {
+      "path": "results/v0.2.1/coverage.json",
+      "size_bytes": 17267,
+      "sha256": "4ECFB5FBDD6717859CA4D37001E0B8FABD2BC1CA91B387D543C1DD9C0B2C1B54",
+      "hash_policy": "canonical_lf_bytes"
+    },
+    {
+      "path": "results/v0.2.1/divergence_index.json",
+      "size_bytes": 24975,
+      "sha256": "48A3340683B603A9EDEB92736BC3C2D3FA9376AB7861B857613E34B7E5FD0386",
+      "hash_policy": "canonical_lf_bytes"
+    },
+    {
+      "path": "results/v0.2.1/parity.json",
+      "size_bytes": 76387,
+      "sha256": "3DD76497CC20C67FFD2D12FD59B2FF239A1A9DE5F9696677D95720362589555C",
+      "hash_policy": "canonical_lf_bytes"
+    },
+    {
+      "path": "docs/V0_2_1_RESULTS.md",
+      "size_bytes": 13225,
+      "sha256": "0B61A1FA0549D4D898D7644403BF0385645507779D86AB53240D39ADF25C0D16",
+      "hash_policy": "canonical_lf_bytes"
+    },
+    {
+      "path": "docs/REPRODUCING_V0_2_1.md",
+      "size_bytes": 8474,
+      "sha256": "5FFBC0EE4876FD7B52F4ACF45175169F4043A380C0E0BAB6D10AA5F81048EA31",
+      "hash_policy": "canonical_lf_bytes"
+    }
+  ],
+  "frozen_evidence": {
+    "reference_commit": "2c5d11899eaaad6a963a370fcc3813202b6fa714",
+    "all_unchanged": true,
+    "records": [
+      {
+        "path": "results/v0.1/benchmark.json",
+        "reference_size_bytes": 32248,
+        "reference_sha256": "FC6918CDF19CD018F476B7E587F2679AE17B772A2B6EEA643FD695DA79450444",
+        "current_sha256": "FC6918CDF19CD018F476B7E587F2679AE17B772A2B6EEA643FD695DA79450444",
+        "worktree_clean": true,
+        "unchanged": true
+      },
+      {
+        "path": "results/v0.1/manifest.json",
+        "reference_size_bytes": 5519,
+        "reference_sha256": "53B9EFC6980643FDA5725118CCB31CD100D661A1BB108A9E17198BE91CC802C0",
+        "current_sha256": "53B9EFC6980643FDA5725118CCB31CD100D661A1BB108A9E17198BE91CC802C0",
+        "worktree_clean": true,
+        "unchanged": true
+      },
+      {
+        "path": "results/v0.1/parity.json",
+        "reference_size_bytes": 258699,
+        "reference_sha256": "58DA4D6CDA0155DDD891DE019F5B49907BCA67D87B55562767FE7CE300FBA4A9",
+        "current_sha256": "58DA4D6CDA0155DDD891DE019F5B49907BCA67D87B55562767FE7CE300FBA4A9",
+        "worktree_clean": true,
+        "unchanged": true
+      },
+      {
+        "path": "results/v0.2/benchmark.json",
+        "reference_size_bytes": 99984,
+        "reference_sha256": "DCE3571C451CDB7F8214BE3E11BE734BD8C5243C8DB4D52B1B2AC8401C596EC3",
+        "current_sha256": "DCE3571C451CDB7F8214BE3E11BE734BD8C5243C8DB4D52B1B2AC8401C596EC3",
+        "worktree_clean": true,
+        "unchanged": true
+      },
+      {
+        "path": "results/v0.2/manifest.json",
+        "reference_size_bytes": 37646,
+        "reference_sha256": "0B9306285E18141FC01387DF728B0267FEF2AE67693743740D41844E5DEB1004",
+        "current_sha256": "0B9306285E18141FC01387DF728B0267FEF2AE67693743740D41844E5DEB1004",
+        "worktree_clean": true,
+        "unchanged": true
+      },
+      {
+        "path": "results/v0.2/parity.json",
+        "reference_size_bytes": 189689,
+        "reference_sha256": "3DB4D51A7C490C7BAA7403E0B5B3D38C0FC5D14763FAAD7F1415D0116BBFD28D",
+        "current_sha256": "3DB4D51A7C490C7BAA7403E0B5B3D38C0FC5D14763FAAD7F1415D0116BBFD28D",
+        "worktree_clean": true,
+        "unchanged": true
+      }
+    ]
+  },
+  "verification": {
+    "static_world_targeted_tests": {
+      "command": "python -m pytest -q tests/test_arena.py tests/test_world_queries.py tests/test_static_world.py",
+      "passed": 15,
+      "failed": 0
+    },
+    "full_tests": {
+      "command": "python -m pytest -q",
+      "passed": 38,
+      "failed": 0
+    },
+    "lint": {
+      "command": "ruff check rivalsim benchmarks tests",
+      "passed": true
+    },
+    "compile": {
+      "command": "python -m compileall -q rivalsim benchmarks tests",
+      "passed": true
+    },
+    "v0_1_live_regression": {
+      "ignored_output_path": ".tools/v0.2.1-final/v0.1-parity.json",
+      "sha256": "11B8C3CBE36E68E8CD2040AC5AF5C973CA4B09E3FE062A614F7522D01519BF56",
+      "scenario_count": 27,
+      "same_equation_pass": true,
+      "rocketsim_pass": true,
+      "axis_sign_pass": true,
+      "basic_parity_pass": true
+    },
+    "stress": {
+      "worlds": 64,
+      "measured_ticks": 2400,
+      "capture_setup_ticks": 8,
+      "seed": 20260823,
+      "runs": [
+        {
+          "finite": true,
+          "max_linear_speed_uu_per_s": 1317.3350830078125,
+          "max_angular_speed_rad_per_s": 5.5,
+          "max_penetration_uu": 33.43895721435547,
+          "hot_loop_host_to_device_bytes": 0,
+          "hot_loop_device_to_host_bytes": 0
+        },
+        {
+          "finite": true,
+          "max_linear_speed_uu_per_s": 1317.3350830078125,
+          "max_angular_speed_rad_per_s": 5.5,
+          "max_penetration_uu": 33.43895721435547,
+          "hot_loop_host_to_device_bytes": 0,
+          "hot_loop_device_to_host_bytes": 0
+        }
+      ],
+      "state_sha256_runs": [
+        "9046E933243ACCF3E1F64158402A628DBDEBFAA1ADD70CA5009CFC648F48A8D4",
+        "9046E933243ACCF3E1F64158402A628DBDEBFAA1ADD70CA5009CFC648F48A8D4"
+      ],
+      "deterministic_equal": true,
+      "finite": true,
+      "bounded_velocity": true,
+      "bounded_penetration": true,
+      "floor_rest_height_uu": 17.031972885131836,
+      "floor_rest_speed_uu_per_s": 3.489796654321253e-05,
+      "floor_rest_stable": true,
+      "hot_loop_gpu_resident": true,
+      "stress_gate_pass": true
+    },
+    "geometry_query": {
+      "corpus_seed": 20260823,
+      "ray_count": 4608,
+      "category_counts": {
+        "boundary_edges": 512,
+        "ceiling": 512,
+        "corners": 512,
+        "floor": 512,
+        "goals_and_back_wall": 512,
+        "misses": 512,
+        "near_surface": 512,
+        "ramps_and_curves": 512,
+        "side_walls": 512
+      },
+      "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+      "backends": {
+        "default": {
+          "hit_mismatch_count": 0,
+          "max_nearest_distance_error_uu": 0.001953125,
+          "max_hit_point_error_uu": 0.001953125,
+          "minimum_normal_dot": 0.9999998807907104,
+          "co_nearest_boundary_edge_tie_count": 1,
+          "unambiguous_face_mismatch_count": 0,
+          "exact_hit_distance_normal_pass": true
+        },
+        "cubql": {
+          "hit_mismatch_count": 0,
+          "max_nearest_distance_error_uu": 0.001953125,
+          "max_hit_point_error_uu": 0.001953125,
+          "minimum_normal_dot": 0.9999998807907104,
+          "co_nearest_boundary_edge_tie_count": 1,
+          "unambiguous_face_mismatch_count": 0,
+          "exact_hit_distance_normal_pass": true
+        }
+      },
+      "selected_ray_backend": "cubql",
+      "selection_reason": "exact query parity and higher measured B1 throughput"
+    }
+  },
+  "validation": {
+    "policy": {
+      "authority": "2026-08-23 immediate user steering adjustment",
+      "hard_gate_kind": "authoritative_local_transition_parity",
+      "hard_gate_horizons_ticks": [
+        1,
+        4,
+        8,
+        12
+      ],
+      "physics_tick_rate_hz": 120,
+      "maximum_hard_gate_duration_ms": 100.0,
+      "long_open_loop_horizons_ticks": [
+        30,
+        60,
+        120,
+        300,
+        600
+      ],
+      "long_open_loop_status": "diagnostic_only_non_blocking",
+      "tolerance_policy": "unchanged_frozen_v0.2_tolerances"
+    },
+    "parity": {
+      "scenario_count": 35,
+      "checkpoint_comparisons": 140,
+      "horizons_ticks": [
+        1,
+        4,
+        8,
+        12
+      ],
+      "frozen_tolerances": {
+        "position_uu": 10.0,
+        "linear_velocity_uu_per_s": 25.0,
+        "orientation_rad": 0.025,
+        "angular_velocity_rad_per_s": 0.1,
+        "boost": 0.01,
+        "handbrake_value": 0.0001,
+        "world_contact_normal_rad": 0.05
+      },
+      "measurement_aggregates": {
+        "angular_velocity_rad_per_s": {
+          "max": 5.584122845903039e-05,
+          "p95": 5.9687100929295025e-06,
+          "median": 2.772717095922417e-07
+        },
+        "boost": {
+          "max": 0.0,
+          "p95": 0.0,
+          "median": 0.0
+        },
+        "handbrake_value": {
+          "max": 0.0,
+          "p95": 0.0,
+          "median": 0.0
+        },
+        "linear_velocity_uu_per_s": {
+          "max": 0.0027517382986843586,
+          "p95": 0.0008546698605641723,
+          "median": 7.911005013738759e-05
+        },
+        "orientation_rad": {
+          "max": 0.0003907872989781068,
+          "p95": 0.00034168167176969693,
+          "median": 0.0
+        },
+        "position_uu": {
+          "max": 0.0009784679859876633,
+          "p95": 0.00030691274150740296,
+          "median": 3.814697265625e-06
+        },
+        "world_contact_normal_rad": {
+          "max": 0.0,
+          "p95": 0.0,
+          "median": 0.0
+        }
+      },
+      "summary": {
+        "hard_mismatch_count": 0,
+        "numeric_failure_count": 0,
+        "hard_mismatch_examples": [],
+        "parity_gate_pass": true
+      }
+    },
+    "causal_divergence": {
+      "baseline": {
+        "frozen_evidence": "results/v0.2/parity.json",
+        "horizons_ticks": [
+          1,
+          4,
+          8,
+          30,
+          60,
+          120,
+          300,
+          600
+        ],
+        "scenario_count": 35,
+        "hard_mismatch_records": 85,
+        "hard_mismatch_fields": 352,
+        "numeric_tolerance_failures": 617,
+        "frozen_tolerances": {
+          "position_uu": 10.0,
+          "linear_velocity_uu_per_s": 25.0,
+          "orientation_rad": 0.025,
+          "angular_velocity_rad_per_s": 0.1,
+          "boost": 0.01,
+          "handbrake_value": 0.0001,
+          "world_contact_normal_rad": 0.05
+        }
+      },
+      "representative_findings": [
+        {
+          "representative": "steer_medium_full_left",
+          "families": [
+            "steering",
+            "powerslide",
+            "longitudinal",
+            "boost"
+          ],
+          "first_causal_stage": "wheel friction preparation and two-phase application order",
+          "baseline_observation": "v0.2 applied wheel forces while iterating wheels from a changing rigid-body state. The native trace showed updateVehicleFirst caches every ray, suspension value and friction impulse from one pre-solve state; updateVehicleSecond applies them later.",
+          "correction": "Cache all four wheel transforms, rays, suspension forces, bilateral side impulses and rolling impulses before applying suspension/friction in RocketSim order; mirror the handbrake and ground-boost branches.",
+          "rivalsim_sources": [
+            "rivalsim/kernels/vehicle.py:wheel_pre_tick",
+            "rivalsim/static_world.py:StaticWorldSim._step_impl",
+            "rivalsim/kernels/boost_pad.py"
+          ],
+          "oracle_sources": [
+            "src/Sim/Car/Car.cpp:_PreTickUpdate/_PostTickUpdate",
+            "src/Sim/btVehicleRL/btVehicleRL.cpp:updateVehicleFirst/updateVehicleSecond",
+            "BulletDynamics/ConstraintSolver/btContactConstraint.cpp:resolveSingleBilateral"
+          ]
+        },
+        {
+          "representative": "powerslide_initiation",
+          "families": [
+            "powerslide",
+            "steering"
+          ],
+          "first_causal_stage": "wheel axle/forward friction basis and cached impulse scaling",
+          "baseline_observation": "The diagnostic wheel rows diverged before the car trajectory: lateral and rolling impulses used approximate ordering/scaling, so the v0.2 state exceeded velocity, orientation and angular-velocity tolerances by tick 4.",
+          "correction": "Reproduce RocketSim wheel basis construction, clipped suspension velocity, friction slip limits, extra pushback and powerslide friction scaling in source order.",
+          "rivalsim_sources": [
+            "rivalsim/kernels/vehicle.py:wheel_pre_tick"
+          ],
+          "oracle_sources": [
+            "src/Sim/btVehicleRL/btVehicleRL.cpp"
+          ]
+        },
+        {
+          "representative": "ramp_transition",
+          "families": [
+            "arena_surfaces",
+            "landings"
+          ],
+          "first_causal_stage": "triangle feature selection, BVH visit order and internal-edge normal adjustment",
+          "baseline_observation": "The native manifold selected the RocketSim CMF-local triangle feature and adjusted its normal with Bullet adjacency data. v0.2 used the combined Warp query order and a generic SAT normal, producing a local angular-velocity failure by tick 4.",
+          "correction": "Reproduce per-CMF Bullet quantized-BVH face rank, shared-edge flags/angles, box/triangle SAT plus GJK closest features, exact contact thresholds and callback normal order.",
+          "rivalsim_sources": [
+            "rivalsim/arena.py:build_bullet_bvh_rank",
+            "rivalsim/arena.py:build_internal_edge_data",
+            "rivalsim/kernels/vehicle.py:chassis_contacts_v021"
+          ],
+          "oracle_sources": [
+            "src/RocketSim.cpp:btGenerateInternalEdgeInfo",
+            "src/Sim/Arena/Arena.cpp:btAdjustInternalEdgeContacts",
+            "BulletCollision/BroadphaseCollision/btQuantizedBvh.cpp",
+            "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.cpp"
+          ]
+        },
+        {
+          "representative": "off_center_impact",
+          "families": [
+            "body_contacts",
+            "settle_and_rest"
+          ],
+          "first_causal_stage": "manifold constraint setup and Bullet split/velocity solve",
+          "baseline_observation": "v0.2's one-pass bounded contact response differed on the first impact tick. The native trace exposed box margin/inertia, contact RHS, tangent basis, accumulated impulses and split push/turn velocity as the first causal solver state.",
+          "correction": "Use the native box half extents/margin and inverse inertia; construct every contact row from one unchanged pre-solve state; run ten split-impulse and velocity PGS iterations; then write back transform/velocity and apply deferred caps.",
+          "rivalsim_sources": [
+            "rivalsim/kernels/vehicle.py:chassis_contacts_v021",
+            "rivalsim/vehicle_state.py",
+            "rivalsim/kernels/integrate.py"
+          ],
+          "oracle_sources": [
+            "src/Sim/Arena/Arena.cpp:solver configuration",
+            "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.cpp",
+            "BulletCollision/CollisionDispatch/btBoxBoxDetector.cpp"
+          ]
+        }
+      ],
+      "final_local_resolution": {
+        "evidence": "results/v0.2.1/parity.json",
+        "scenario_count": 35,
+        "checkpoint_comparisons": 140,
+        "hard_mismatch_records": 0,
+        "numeric_tolerance_failures": 0,
+        "parity_gate_pass": true
+      }
+    },
+    "bounded_dfh_coverage": {
+      "prototype_status": "bounded_non_exhaustive",
+      "scope": {
+        "description": "Observes triangle and contact-family coverage produced by the existing 35-scenario authoritative local-transition corpus; audits shared-edge metadata across the complete DFH mesh.",
+        "not_claimed": "This does not claim that every DFH triangle has an authoritative RocketSim transition case. A later dedicated breadth milestone must generate and gate the remaining per-triangle states.",
+        "horizons_ticks": [
+          1,
+          4,
+          8,
+          12
+        ],
+        "observed_ticks_per_scenario": 12,
+        "transition_cases": 35,
+        "checkpoint_comparisons": 140
+      },
+      "geometry": {
+        "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+        "mesh_files": 16,
+        "triangles_exercised": 2,
+        "total_triangles": 8020,
+        "triangle_coverage_fraction": 0.00024937655860349125,
+        "wheel_triangle_faces_exercised": 0,
+        "chassis_triangle_faces_exercised": 2,
+        "shared_edge_capable_triangles_exercised": 2,
+        "shared_edge_capable_triangles_total": 8020,
+        "per_mesh": [
+          {
+            "file": "mesh_0.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 880,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_1.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 880,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_2.cmf",
+            "triangles_exercised": 2,
+            "total_triangles": 880,
+            "coverage_fraction": 0.0022727272727272726
+          },
+          {
+            "file": "mesh_3.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 880,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_4.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 983,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_5.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 983,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_6.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 983,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_7.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 983,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_8.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 16,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_9.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 16,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_10.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 126,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_11.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 126,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_12.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 126,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_13.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 126,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_14.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 16,
+            "coverage_fraction": 0.0
+          },
+          {
+            "file": "mesh_15.cmf",
+            "triangles_exercised": 0,
+            "total_triangles": 16,
+            "coverage_fraction": 0.0
+          }
+        ]
+      },
+      "shared_edge_topology_audit": {
+        "concave_directed_edges": 10296,
+        "convex_directed_edges": 856,
+        "planar_directed_edges": 12024,
+        "shared_directed_edges": 23176
+      }
+    },
+    "performance": {
+      "best_b3_worlds": 262144,
+      "best_b3_world_ticks_per_s": 98697691.9554523,
+      "best_b3_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+      "best_b3_coefficient_of_variation": 0.00403079988734595,
+      "performance_band": "green_threshold",
+      "parity_gate_pass": true,
+      "hot_loop_gpu_resident": true,
+      "stable_scaling_into_thousands": true,
+      "component_cost_multiplier_vs_b0": {
+        "B0": 1.0,
+        "B1_default": 5.133389875930489,
+        "B1_cubql": 4.173165003252279,
+        "B2": 6.006339825783425,
+        "B3": 17.501923441912773
+      },
+      "verdict": "PASS_GREEN"
+    },
+    "frozen_v0_2_comparison": {
+      "available": true,
+      "reference_path": "results\\v0.2\\benchmark.json",
+      "reference_milestone": "v0.2",
+      "equal_batch_points": [
+        {
+          "worlds": 1024,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 35986.950448684656,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 32194.044558271966,
+          "retained_throughput_fraction": 0.8946032980532441,
+          "slowdown_factor": 1.1178138982676575
+        },
+        {
+          "worlds": 2048,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 63859.60035654627,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 63924.3395725279,
+          "retained_throughput_fraction": 1.001013774211241,
+          "slowdown_factor": 0.998987252486071
+        },
+        {
+          "worlds": 4096,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 130798.2392107361,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 118519.54734167592,
+          "retained_throughput_fraction": 0.9061249452351012,
+          "slowdown_factor": 1.1036005633202628
+        },
+        {
+          "worlds": 8192,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 232452.30875216136,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 214110.73920597322,
+          "retained_throughput_fraction": 0.9210953436227481,
+          "slowdown_factor": 1.085663940137742
+        },
+        {
+          "worlds": 16384,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 432619.40843683825,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 411227.9485363743,
+          "retained_throughput_fraction": 0.9505536287015957,
+          "slowdown_factor": 1.0520184972266586
+        },
+        {
+          "worlds": 32768,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 712782.8557304312,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 557055.0947461535,
+          "retained_throughput_fraction": 0.7815214553320111,
+          "slowdown_factor": 1.2795554020652875
+        },
+        {
+          "worlds": 65536,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 966205.975082198,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 651074.909950044,
+          "retained_throughput_fraction": 0.6738469091899946,
+          "slowdown_factor": 1.4840166013405947
+        },
+        {
+          "worlds": 131072,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 1170097.337209566,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 757475.5099594309,
+          "retained_throughput_fraction": 0.6473611090901629,
+          "slowdown_factor": 1.5447328947601677
+        },
+        {
+          "worlds": 262144,
+          "v0_2_aggregate_simulated_game_seconds_per_s": 1350748.1551013975,
+          "v0_2_1_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+          "retained_throughput_fraction": 0.608907562219616,
+          "slowdown_factor": 1.6422854010135086
+        }
+      ],
+      "selected_worlds_comparison": {
+        "worlds": 262144,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 1350748.1551013975,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+        "retained_throughput_fraction": 0.608907562219616,
+        "slowdown_factor": 1.6422854010135086
+      }
+    }
+  },
+  "scope_boundary": {
+    "v0_2_1_complete": true,
+    "v0_3_begun": false,
+    "dynamic_ball_world_contacts": false,
+    "dynamic_car_ball_contacts": false,
+    "dynamic_car_car_contacts": false,
+    "training_or_policy_integration": false,
+    "next_authority_required": true
+  },
+  "self_hash_policy": "manifest.json intentionally does not hash itself"
+}
