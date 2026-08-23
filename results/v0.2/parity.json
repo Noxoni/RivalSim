@@ -1,0 +1,6094 @@
+{
+  "milestone": "v0.2",
+  "mode": "gate",
+  "generated_at_utc": "2026-08-23T02:42:09.168127+00:00",
+  "implementation": {
+    "python": "3.14.3",
+    "warp": "1.16.0",
+    "device": "cuda:0",
+    "rocketsim_package": "2.2.1",
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8"
+  },
+  "arena": {
+    "source_argument": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes",
+    "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "file_count": 16,
+    "vertices": 4468,
+    "triangles": 8020
+  },
+  "horizons_ticks": [
+    1,
+    4,
+    8,
+    30,
+    60,
+    120,
+    300,
+    600
+  ],
+  "scenario_count": 35,
+  "families": [
+    "arena_surfaces",
+    "body_contacts",
+    "boost",
+    "landings",
+    "longitudinal",
+    "powerslide",
+    "settle_and_rest",
+    "steering"
+  ],
+  "measurement_aggregates": {
+    "angular_velocity_rad_per_s": {
+      "max": 6.324260711669922,
+      "p95": 3.5324373602867163,
+      "median": 0.32072435319423676
+    },
+    "boost": {
+      "max": 88.61107635498047,
+      "p95": 0.0,
+      "median": 0.0
+    },
+    "handbrake_value": {
+      "max": 0.0,
+      "p95": 0.0,
+      "median": 0.0
+    },
+    "linear_velocity_uu_per_s": {
+      "max": 2510.620361328125,
+      "p95": 1190.3098571777343,
+      "median": 28.87343406677246
+    },
+    "orientation_rad": {
+      "max": 3.1347731299050126,
+      "p95": 2.0042833739967665,
+      "median": 0.044249820962418716
+    },
+    "position_uu": {
+      "max": 5061.0361328125,
+      "p95": 1924.5748840332046,
+      "median": 7.298866033554077
+    },
+    "world_contact_normal_rad": {
+      "max": 1.5707963267948966,
+      "p95": 0.0,
+      "median": 0.0
+    }
+  },
+  "frozen_tolerances": {
+    "position_uu": 10.0,
+    "linear_velocity_uu_per_s": 25.0,
+    "orientation_rad": 0.025,
+    "angular_velocity_rad_per_s": 0.1,
+    "boost": 0.01,
+    "handbrake_value": 0.0001,
+    "world_contact_normal_rad": 0.05
+  },
+  "scenarios": [
+    {
+      "name": "floor_settle",
+      "family": "settle_and_rest",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 1.52587890625e-05,
+            "linear_velocity_uu_per_s": 0.0,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 0.0,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 7.62939453125e-06,
+            "linear_velocity_uu_per_s": 0.0,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 7.62939453125e-06,
+            "linear_velocity_uu_per_s": 0.000244140625,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 0.8560342192649841,
+            "linear_velocity_uu_per_s": 6.974684715270996,
+            "orientation_rad": 0.00588479015410922,
+            "angular_velocity_rad_per_s": 0.055414848029613495,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 1.3893955945968628,
+            "linear_velocity_uu_per_s": 1.3909764289855957,
+            "orientation_rad": 0.005587034898751137,
+            "angular_velocity_rad_per_s": 0.008614755235612392,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 3.4095726013183594,
+            "linear_velocity_uu_per_s": 1.3917624950408936,
+            "orientation_rad": 0.018251340981226955,
+            "angular_velocity_rad_per_s": 0.008614658378064632,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 6.870413303375244,
+            "linear_velocity_uu_per_s": 1.3917503356933594,
+            "orientation_rad": 0.03973028648606485,
+            "angular_velocity_rad_per_s": 0.008614840917289257,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "floor_rest",
+      "family": "settle_and_rest",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.09717551618814468,
+            "linear_velocity_uu_per_s": 3.829908847808838,
+            "orientation_rad": 0.0006069318588107326,
+            "angular_velocity_rad_per_s": 0.024390386417508125,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.22302092611789703,
+            "linear_velocity_uu_per_s": 3.499678134918213,
+            "orientation_rad": 0.0013620689984162931,
+            "angular_velocity_rad_per_s": 0.020148122683167458,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.45160427689552307,
+            "linear_velocity_uu_per_s": 1.4047520160675049,
+            "orientation_rad": 0.0027543807688725683,
+            "angular_velocity_rad_per_s": 0.00862275343388319,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 0.7362608313560486,
+            "linear_velocity_uu_per_s": 1.3916124105453491,
+            "orientation_rad": 0.0045319561923199275,
+            "angular_velocity_rad_per_s": 0.008614623919129372,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 1.3983744382858276,
+            "linear_velocity_uu_per_s": 1.391754150390625,
+            "orientation_rad": 0.008619457356680536,
+            "angular_velocity_rad_per_s": 0.00861478503793478,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 3.4651310443878174,
+            "linear_velocity_uu_per_s": 1.3917524814605713,
+            "orientation_rad": 0.02140308065369299,
+            "angular_velocity_rad_per_s": 0.008614704012870789,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 6.9373555183410645,
+            "linear_velocity_uu_per_s": 1.3917609453201294,
+            "orientation_rad": 0.04289428728081882,
+            "angular_velocity_rad_per_s": 0.008614810183644295,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "level_landing",
+      "family": "landings",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 1.52587890625e-05,
+            "linear_velocity_uu_per_s": 7.62939453125e-06,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 3.4119690099032596e-05,
+            "linear_velocity_uu_per_s": 7.62939453125e-06,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 6.291359750321135e-05,
+            "linear_velocity_uu_per_s": 6.151014531496912e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.22220323979854584,
+            "linear_velocity_uu_per_s": 10.404624938964844,
+            "orientation_rad": 0.006113224147299295,
+            "angular_velocity_rad_per_s": 0.33295100927352905,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 3.1340949535369873,
+            "linear_velocity_uu_per_s": 20.603296279907227,
+            "orientation_rad": 0.01890451092129095,
+            "angular_velocity_rad_per_s": 0.1812697798013687,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 1.0855735540390015,
+            "linear_velocity_uu_per_s": 1.392335057258606,
+            "orientation_rad": 0.0025841419669078206,
+            "angular_velocity_rad_per_s": 0.008615068159997463,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 2.7709994316101074,
+            "linear_velocity_uu_per_s": 1.391763687133789,
+            "orientation_rad": 0.014715091879710544,
+            "angular_velocity_rad_per_s": 0.008614642545580864,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 6.163249492645264,
+            "linear_velocity_uu_per_s": 1.3917627334594727,
+            "orientation_rad": 0.03617228117113439,
+            "angular_velocity_rad_per_s": 0.008614763617515564,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "tilted_landing",
+      "family": "landings",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 3.0517578125e-05,
+            "linear_velocity_uu_per_s": 3.814697265625e-06,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 9.406149183632806e-05,
+            "linear_velocity_uu_per_s": 3.814697265625e-06,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.00018625725351739675,
+            "linear_velocity_uu_per_s": 6.115424912422895e-05,
+            "orientation_rad": 7.613503590519067e-05,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.3576992154121399,
+            "linear_velocity_uu_per_s": 39.07544708251953,
+            "orientation_rad": 0.015049192574337443,
+            "angular_velocity_rad_per_s": 1.897106647491455,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 4.042150974273682,
+            "linear_velocity_uu_per_s": 11.018701553344727,
+            "orientation_rad": 0.06648381815034092,
+            "angular_velocity_rad_per_s": 0.278807133436203,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 2.0566091537475586,
+            "linear_velocity_uu_per_s": 1.4006104469299316,
+            "orientation_rad": 0.0030720973633821453,
+            "angular_velocity_rad_per_s": 0.00875201728194952,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1.221177339553833,
+            "linear_velocity_uu_per_s": 1.3917465209960938,
+            "orientation_rad": 0.010666837276588823,
+            "angular_velocity_rad_per_s": 0.00861477293074131,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 4.022342205047607,
+            "linear_velocity_uu_per_s": 1.391756296157837,
+            "orientation_rad": 0.03207961856915237,
+            "angular_velocity_rad_per_s": 0.008614771999418736,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "partial_two_wheel_landing",
+      "family": "landings",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 1.537753632874228e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 7.64428114052862e-06,
+            "linear_velocity_uu_per_s": 3.057712456211448e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 9.5367431640625e-07,
+            "linear_velocity_uu_per_s": 3.057712456211448e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 1.6429221630096436,
+            "linear_velocity_uu_per_s": 32.07476043701172,
+            "orientation_rad": 0.0861767487325183,
+            "angular_velocity_rad_per_s": 0.7179374694824219,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 2.1819920539855957,
+            "linear_velocity_uu_per_s": 16.2659854888916,
+            "orientation_rad": 0.025040265177103595,
+            "angular_velocity_rad_per_s": 0.580599844455719,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 2.038757562637329,
+            "linear_velocity_uu_per_s": 1.4002054929733276,
+            "orientation_rad": 0.0029330474324543135,
+            "angular_velocity_rad_per_s": 0.008631136268377304,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1.8863240480422974,
+            "linear_velocity_uu_per_s": 1.3917571306228638,
+            "orientation_rad": 0.015231856146882961,
+            "angular_velocity_rad_per_s": 0.008614713326096535,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 4.703555583953857,
+            "linear_velocity_uu_per_s": 1.3917568922042847,
+            "orientation_rad": 0.036693165075805854,
+            "angular_velocity_rad_per_s": 0.008614643476903439,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "throttle_forward",
+      "family": "longitudinal",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.11246035248041153,
+            "linear_velocity_uu_per_s": 4.593652248382568,
+            "orientation_rad": 0.005310537865618152,
+            "angular_velocity_rad_per_s": 0.2733226716518402,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.25958263874053955,
+            "linear_velocity_uu_per_s": 4.163809776306152,
+            "orientation_rad": 0.01456182003639771,
+            "angular_velocity_rad_per_s": 0.26000404357910156,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.3584986925125122,
+            "linear_velocity_uu_per_s": 1.8512805700302124,
+            "orientation_rad": 0.022460741473134888,
+            "angular_velocity_rad_per_s": 0.04355307295918465,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 1.371425986289978,
+            "linear_velocity_uu_per_s": 8.856744766235352,
+            "orientation_rad": 0.022735802074691863,
+            "angular_velocity_rad_per_s": 0.03236232325434685,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 10.185543060302734,
+            "linear_velocity_uu_per_s": 26.410968780517578,
+            "orientation_rad": 0.02921320493327686,
+            "angular_velocity_rad_per_s": 0.02125677466392517,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 81.7110595703125,
+            "linear_velocity_uu_per_s": 62.06987380981445,
+            "orientation_rad": 0.04464704192267998,
+            "angular_velocity_rad_per_s": 0.004411072935909033,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 254.13986206054688,
+            "linear_velocity_uu_per_s": 185.78176879882812,
+            "orientation_rad": 0.1423708249163343,
+            "angular_velocity_rad_per_s": 2.274134635925293,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "throttle_reverse",
+      "family": "longitudinal",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.06440740823745728,
+            "linear_velocity_uu_per_s": 1.9726063013076782,
+            "orientation_rad": 0.005905686878351673,
+            "angular_velocity_rad_per_s": 0.29705554246902466,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.11008132994174957,
+            "linear_velocity_uu_per_s": 1.2285709381103516,
+            "orientation_rad": 0.015570843199561594,
+            "angular_velocity_rad_per_s": 0.25374189019203186,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.276451051235199,
+            "linear_velocity_uu_per_s": 1.5839226245880127,
+            "orientation_rad": 0.021138586132701413,
+            "angular_velocity_rad_per_s": 0.0315413735806942,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 1.056504726409912,
+            "linear_velocity_uu_per_s": 6.518432140350342,
+            "orientation_rad": 0.019509475044366592,
+            "angular_velocity_rad_per_s": 0.023769749328494072,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 7.052061080932617,
+            "linear_velocity_uu_per_s": 17.147777557373047,
+            "orientation_rad": 0.020217968492575452,
+            "angular_velocity_rad_per_s": 0.012956319376826286,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 46.18812942504883,
+            "linear_velocity_uu_per_s": 29.31513023376465,
+            "orientation_rad": 0.0212939205777682,
+            "angular_velocity_rad_per_s": 0.003522442188113928,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 150.6974334716797,
+            "linear_velocity_uu_per_s": 95.79529571533203,
+            "orientation_rad": 0.09714522783033314,
+            "angular_velocity_rad_per_s": 0.4266546070575714,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "coast_from_speed",
+      "family": "longitudinal",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.08555754274129868,
+            "linear_velocity_uu_per_s": 3.253201961517334,
+            "orientation_rad": 0.0020952011664561307,
+            "angular_velocity_rad_per_s": 0.09908377379179001,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.18860404193401337,
+            "linear_velocity_uu_per_s": 2.8841750621795654,
+            "orientation_rad": 0.0051870142232296225,
+            "angular_velocity_rad_per_s": 0.07964407652616501,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.4746977984905243,
+            "linear_velocity_uu_per_s": 2.2705211639404297,
+            "orientation_rad": 0.008347827726056238,
+            "angular_velocity_rad_per_s": 0.008948284201323986,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 1.1469871997833252,
+            "linear_velocity_uu_per_s": 3.603121280670166,
+            "orientation_rad": 0.009151180597549543,
+            "angular_velocity_rad_per_s": 0.00865152943879366,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 3.2654147148132324,
+            "linear_velocity_uu_per_s": 4.5760884284973145,
+            "orientation_rad": 0.011783934477312309,
+            "angular_velocity_rad_per_s": 0.008414113894104958,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 6.753382205963135,
+            "linear_velocity_uu_per_s": 1.3917155265808105,
+            "orientation_rad": 0.020663104954360117,
+            "angular_velocity_rad_per_s": 0.008614745922386646,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 9.738631248474121,
+            "linear_velocity_uu_per_s": 1.3917555809020996,
+            "orientation_rad": 0.04215173001029676,
+            "angular_velocity_rad_per_s": 0.008614781312644482,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "brake_to_reverse",
+      "family": "longitudinal",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.03385066241025925,
+            "linear_velocity_uu_per_s": 0.9150577187538147,
+            "orientation_rad": 0.012909240193546995,
+            "angular_velocity_rad_per_s": 0.6704349517822266,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.1794053465127945,
+            "linear_velocity_uu_per_s": 7.965107440948486,
+            "orientation_rad": 0.03977503335164893,
+            "angular_velocity_rad_per_s": 0.8276191353797913,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 7.232613563537598,
+            "linear_velocity_uu_per_s": 68.71936798095703,
+            "orientation_rad": 0.21080010812139857,
+            "angular_velocity_rad_per_s": 1.3019099235534668,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 41.00370788574219,
+            "linear_velocity_uu_per_s": 283.2954406738281,
+            "orientation_rad": 0.33073439432869156,
+            "angular_velocity_rad_per_s": 0.5280135273933411,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 215.67620849609375,
+            "linear_velocity_uu_per_s": 295.1455993652344,
+            "orientation_rad": 0.04411876814981237,
+            "angular_velocity_rad_per_s": 0.02391999587416649,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 446.5412902832031,
+            "linear_velocity_uu_per_s": 94.23587036132812,
+            "orientation_rad": 0.05284342153021191,
+            "angular_velocity_rad_per_s": 0.004069229122251272,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 468.9839172363281,
+            "linear_velocity_uu_per_s": 47.2130241394043,
+            "orientation_rad": 0.04506939533089844,
+            "angular_velocity_rad_per_s": 0.010447046719491482,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "ground_boost",
+      "family": "boost",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.013631454668939114,
+            "linear_velocity_uu_per_s": 1.6359676122665405,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.12181615084409714,
+            "linear_velocity_uu_per_s": 5.12180233001709,
+            "orientation_rad": 0.005285525530421409,
+            "angular_velocity_rad_per_s": 0.2710916996002197,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.3100207448005676,
+            "linear_velocity_uu_per_s": 6.0847272872924805,
+            "orientation_rad": 0.014268062454366551,
+            "angular_velocity_rad_per_s": 0.24710823595523834,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 2.0421829223632812,
+            "linear_velocity_uu_per_s": 15.228137016296387,
+            "orientation_rad": 0.01952654625827937,
+            "angular_velocity_rad_per_s": 0.048773158341646194,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 7.581940174102783,
+            "linear_velocity_uu_per_s": 29.355939865112305,
+            "orientation_rad": 0.017216544792935898,
+            "angular_velocity_rad_per_s": 0.03299732506275177,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 28.037010192871094,
+            "linear_velocity_uu_per_s": 54.671382904052734,
+            "orientation_rad": 0.01882741774977612,
+            "angular_velocity_rad_per_s": 0.00447473581880331,
+            "boost": 12.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "boost"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 84.39884948730469,
+            "linear_velocity_uu_per_s": 789.00634765625,
+            "orientation_rad": 0.1249082934606374,
+            "angular_velocity_rad_per_s": 0.17087729275226593,
+            "boost": 88.61107635498047,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s",
+            "boost"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 2858.725830078125,
+            "linear_velocity_uu_per_s": 1117.6961669921875,
+            "orientation_rad": 0.4335829999469227,
+            "angular_velocity_rad_per_s": 0.6475619077682495,
+            "boost": 5.277525901794434,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s",
+            "boost"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_low_partial_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.17828048765659332,
+            "linear_velocity_uu_per_s": 7.894125938415527,
+            "orientation_rad": 0.006112132003542179,
+            "angular_velocity_rad_per_s": 0.2770081162452698,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.44580209255218506,
+            "linear_velocity_uu_per_s": 8.023816108703613,
+            "orientation_rad": 0.013272209781037266,
+            "angular_velocity_rad_per_s": 0.1805444210767746,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 2.2188403606414795,
+            "linear_velocity_uu_per_s": 11.662251472473145,
+            "orientation_rad": 0.016617507300335198,
+            "angular_velocity_rad_per_s": 0.049423400312662125,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 5.39766263961792,
+            "linear_velocity_uu_per_s": 13.3971529006958,
+            "orientation_rad": 0.016403455497076815,
+            "angular_velocity_rad_per_s": 0.045682862401008606,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 12.7531156539917,
+            "linear_velocity_uu_per_s": 16.612653732299805,
+            "orientation_rad": 0.02946506727061772,
+            "angular_velocity_rad_per_s": 0.02646786905825138,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 50.81023025512695,
+            "linear_velocity_uu_per_s": 46.74320983886719,
+            "orientation_rad": 0.044380873775025066,
+            "angular_velocity_rad_per_s": 0.02415616810321808,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 208.05270385742188,
+            "linear_velocity_uu_per_s": 614.7360229492188,
+            "orientation_rad": 1.629219350136141,
+            "angular_velocity_rad_per_s": 1.695199966430664,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_low_partial_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.1691659837961197,
+            "linear_velocity_uu_per_s": 7.34526252746582,
+            "orientation_rad": 0.007403400898247416,
+            "angular_velocity_rad_per_s": 0.331454873085022,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.4117472767829895,
+            "linear_velocity_uu_per_s": 7.161301136016846,
+            "orientation_rad": 0.016487459411347907,
+            "angular_velocity_rad_per_s": 0.23259961605072021,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 2.30290150642395,
+            "linear_velocity_uu_per_s": 14.733551979064941,
+            "orientation_rad": 0.02798189166028456,
+            "angular_velocity_rad_per_s": 0.026622693985700607,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 7.214932441711426,
+            "linear_velocity_uu_per_s": 24.43726348876953,
+            "orientation_rad": 0.032464649666517416,
+            "angular_velocity_rad_per_s": 0.029609207063913345,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 24.697668075561523,
+            "linear_velocity_uu_per_s": 47.81838607788086,
+            "orientation_rad": 0.04771317998004812,
+            "angular_velocity_rad_per_s": 0.03379477933049202,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 130.0201873779297,
+            "linear_velocity_uu_per_s": 143.56800842285156,
+            "orientation_rad": 0.10573248860728622,
+            "angular_velocity_rad_per_s": 0.05499570444226265,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 400.6759948730469,
+            "linear_velocity_uu_per_s": 867.14013671875,
+            "orientation_rad": 1.1074151886571562,
+            "angular_velocity_rad_per_s": 2.432053327560425,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_low_full_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.2997365891933441,
+            "linear_velocity_uu_per_s": 13.83785343170166,
+            "orientation_rad": 0.011400641193852892,
+            "angular_velocity_rad_per_s": 0.5132227540016174,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.7622814178466797,
+            "linear_velocity_uu_per_s": 13.798523902893066,
+            "orientation_rad": 0.024711749529411665,
+            "angular_velocity_rad_per_s": 0.33125272393226624,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 3.881326198577881,
+            "linear_velocity_uu_per_s": 19.661212921142578,
+            "orientation_rad": 0.027597917585640386,
+            "angular_velocity_rad_per_s": 0.11755606532096863,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 8.863785743713379,
+            "linear_velocity_uu_per_s": 19.194263458251953,
+            "orientation_rad": 0.030635435998884353,
+            "angular_velocity_rad_per_s": 0.12862594425678253,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 20.10159683227539,
+            "linear_velocity_uu_per_s": 33.01960372924805,
+            "orientation_rad": 0.079717764393303,
+            "angular_velocity_rad_per_s": 0.14678500592708588,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 810.9906005859375,
+            "linear_velocity_uu_per_s": 1320.336669921875,
+            "orientation_rad": 1.442131396932212,
+            "angular_velocity_rad_per_s": 2.5533523559570312,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1027.636962890625,
+            "linear_velocity_uu_per_s": 962.7349243164062,
+            "orientation_rad": 1.1427808333575147,
+            "angular_velocity_rad_per_s": 3.1400187015533447,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_low_full_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.2950146496295929,
+            "linear_velocity_uu_per_s": 13.55280590057373,
+            "orientation_rad": 0.01310647748033653,
+            "angular_velocity_rad_per_s": 0.5893981456756592,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.7514360547065735,
+            "linear_velocity_uu_per_s": 13.706181526184082,
+            "orientation_rad": 0.029359691053042567,
+            "angular_velocity_rad_per_s": 0.4177899956703186,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 4.3584394454956055,
+            "linear_velocity_uu_per_s": 25.899341583251953,
+            "orientation_rad": 0.0460245387763951,
+            "angular_velocity_rad_per_s": 0.05113964527845383,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 12.385878562927246,
+            "linear_velocity_uu_per_s": 37.94779968261719,
+            "orientation_rad": 0.046530191845370585,
+            "angular_velocity_rad_per_s": 0.059542544186115265,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 36.008636474609375,
+            "linear_velocity_uu_per_s": 65.04381561279297,
+            "orientation_rad": 0.07692230119734822,
+            "angular_velocity_rad_per_s": 0.22126463055610657,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 806.3399047851562,
+            "linear_velocity_uu_per_s": 1308.17431640625,
+            "orientation_rad": 1.516976284417204,
+            "angular_velocity_rad_per_s": 2.3365559577941895,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 987.7930908203125,
+            "linear_velocity_uu_per_s": 965.7967529296875,
+            "orientation_rad": 1.0431393453794242,
+            "angular_velocity_rad_per_s": 3.0723464488983154,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_medium_partial_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.2959567904472351,
+            "linear_velocity_uu_per_s": 14.33243465423584,
+            "orientation_rad": 0.011123558400371665,
+            "angular_velocity_rad_per_s": 0.5089689493179321,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.9682799577713013,
+            "linear_velocity_uu_per_s": 24.39255142211914,
+            "orientation_rad": 0.026393291350745463,
+            "angular_velocity_rad_per_s": 0.41581112146377563,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 10.98158073425293,
+            "linear_velocity_uu_per_s": 73.03276062011719,
+            "orientation_rad": 0.05798018784146731,
+            "angular_velocity_rad_per_s": 0.03654159978032112,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 31.173357009887695,
+            "linear_velocity_uu_per_s": 86.49588775634766,
+            "orientation_rad": 0.061888803603300575,
+            "angular_velocity_rad_per_s": 0.02557329088449478,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 77.9494857788086,
+            "linear_velocity_uu_per_s": 108.27894592285156,
+            "orientation_rad": 0.07366538756337435,
+            "angular_velocity_rad_per_s": 0.02585524693131447,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 225.31094360351562,
+            "linear_velocity_uu_per_s": 159.62271118164062,
+            "orientation_rad": 0.24270302033687036,
+            "angular_velocity_rad_per_s": 1.004041075706482,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 2700.405517578125,
+            "linear_velocity_uu_per_s": 2132.39892578125,
+            "orientation_rad": 2.224886294663399,
+            "angular_velocity_rad_per_s": 0.17966032028198242,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_medium_partial_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.2817371189594269,
+            "linear_velocity_uu_per_s": 13.5159912109375,
+            "orientation_rad": 0.01223079895353924,
+            "angular_velocity_rad_per_s": 0.5544376969337463,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.9240350723266602,
+            "linear_velocity_uu_per_s": 23.58224105834961,
+            "orientation_rad": 0.02931588783997523,
+            "angular_velocity_rad_per_s": 0.473091721534729,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 11.39645767211914,
+            "linear_velocity_uu_per_s": 79.32237243652344,
+            "orientation_rad": 0.06803078648710752,
+            "angular_velocity_rad_per_s": 0.07092160731554031,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 34.341922760009766,
+            "linear_velocity_uu_per_s": 102.44046020507812,
+            "orientation_rad": 0.07921384342422816,
+            "angular_velocity_rad_per_s": 0.054470404982566833,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 93.09581756591797,
+            "linear_velocity_uu_per_s": 143.4805145263672,
+            "orientation_rad": 0.1042335718015668,
+            "angular_velocity_rad_per_s": 0.056110929697752,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 292.80352783203125,
+            "linear_velocity_uu_per_s": 181.541748046875,
+            "orientation_rad": 1.0588064223689173,
+            "angular_velocity_rad_per_s": 4.467514991760254,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 2890.212890625,
+            "linear_velocity_uu_per_s": 1931.6478271484375,
+            "orientation_rad": 1.996104408774095,
+            "angular_velocity_rad_per_s": 2.4657416343688965,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_medium_full_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5615678429603577,
+            "linear_velocity_uu_per_s": 27.541057586669922,
+            "orientation_rad": 0.022855095042388432,
+            "angular_velocity_rad_per_s": 1.0631526708602905,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.8353626728057861,
+            "linear_velocity_uu_per_s": 45.64667892456055,
+            "orientation_rad": 0.05737902508369398,
+            "angular_velocity_rad_per_s": 1.0046629905700684,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 18.90520477294922,
+            "linear_velocity_uu_per_s": 110.10748291015625,
+            "orientation_rad": 0.3226381227916152,
+            "angular_velocity_rad_per_s": 2.367382764816284,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 34.27317810058594,
+            "linear_velocity_uu_per_s": 160.31356811523438,
+            "orientation_rad": 1.3385023015449593,
+            "angular_velocity_rad_per_s": 3.5163872241973877,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 300.5448913574219,
+            "linear_velocity_uu_per_s": 1121.65478515625,
+            "orientation_rad": 1.4565560057197866,
+            "angular_velocity_rad_per_s": 2.5173990726470947,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1917.7957763671875,
+            "linear_velocity_uu_per_s": 1135.8402099609375,
+            "orientation_rad": 2.47368946447908,
+            "angular_velocity_rad_per_s": 2.9975690841674805,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1708.780029296875,
+            "linear_velocity_uu_per_s": 700.4783935546875,
+            "orientation_rad": 1.193399654099417,
+            "angular_velocity_rad_per_s": 4.391047477722168,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_medium_full_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5532473921775818,
+            "linear_velocity_uu_per_s": 27.168577194213867,
+            "orientation_rad": 0.024288636044380925,
+            "angular_velocity_rad_per_s": 1.1224626302719116,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.8368967771530151,
+            "linear_velocity_uu_per_s": 46.44211959838867,
+            "orientation_rad": 0.061200691022026174,
+            "angular_velocity_rad_per_s": 1.0804219245910645,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 19.81315803527832,
+            "linear_velocity_uu_per_s": 113.58737182617188,
+            "orientation_rad": 0.3535423831294236,
+            "angular_velocity_rad_per_s": 2.49821400642395,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 36.339054107666016,
+            "linear_velocity_uu_per_s": 170.07778930664062,
+            "orientation_rad": 1.3888501442032952,
+            "angular_velocity_rad_per_s": 3.2571539878845215,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 305.426513671875,
+            "linear_velocity_uu_per_s": 1132.8992919921875,
+            "orientation_rad": 1.4339151410146027,
+            "angular_velocity_rad_per_s": 2.538331985473633,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1907.285400390625,
+            "linear_velocity_uu_per_s": 1127.4652099609375,
+            "orientation_rad": 2.445917755784196,
+            "angular_velocity_rad_per_s": 3.2528462409973145,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1675.9068603515625,
+            "linear_velocity_uu_per_s": 722.5760498046875,
+            "orientation_rad": 1.4103099282872817,
+            "angular_velocity_rad_per_s": 3.035118579864502,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_high_partial_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.2713080048561096,
+            "linear_velocity_uu_per_s": 13.98837661743164,
+            "orientation_rad": 0.009530916553304403,
+            "angular_velocity_rad_per_s": 0.45285651087760925,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.0820143222808838,
+            "linear_velocity_uu_per_s": 31.816787719726562,
+            "orientation_rad": 0.0257705322211602,
+            "angular_velocity_rad_per_s": 0.5083777904510498,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 16.252531051635742,
+            "linear_velocity_uu_per_s": 113.8250961303711,
+            "orientation_rad": 0.1506673727821393,
+            "angular_velocity_rad_per_s": 1.0078380107879639,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 42.49431228637695,
+            "linear_velocity_uu_per_s": 90.12904357910156,
+            "orientation_rad": 0.6859675790524036,
+            "angular_velocity_rad_per_s": 3.8373899459838867,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 88.9355697631836,
+            "linear_velocity_uu_per_s": 627.6082153320312,
+            "orientation_rad": 1.6902855355645363,
+            "angular_velocity_rad_per_s": 1.5734316110610962,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 2602.910400390625,
+            "linear_velocity_uu_per_s": 2510.620361328125,
+            "orientation_rad": 2.504447541818662,
+            "angular_velocity_rad_per_s": 1.3596681356430054,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 4409.9072265625,
+            "linear_velocity_uu_per_s": 2183.291748046875,
+            "orientation_rad": 1.9683893333227158,
+            "angular_velocity_rad_per_s": 1.933480978012085,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_high_partial_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.25521335005760193,
+            "linear_velocity_uu_per_s": 13.034177780151367,
+            "orientation_rad": 0.010410607678162407,
+            "angular_velocity_rad_per_s": 0.4870683550834656,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.0245102643966675,
+            "linear_velocity_uu_per_s": 30.580018997192383,
+            "orientation_rad": 0.028179318169157908,
+            "angular_velocity_rad_per_s": 0.5574758052825928,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 16.29915428161621,
+            "linear_velocity_uu_per_s": 115.95486450195312,
+            "orientation_rad": 0.16878853353092008,
+            "angular_velocity_rad_per_s": 1.162851095199585,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 42.9097785949707,
+            "linear_velocity_uu_per_s": 95.72032928466797,
+            "orientation_rad": 0.7802640517449662,
+            "angular_velocity_rad_per_s": 4.1800217628479,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 98.27670288085938,
+            "linear_velocity_uu_per_s": 652.962646484375,
+            "orientation_rad": 1.6773875610039364,
+            "angular_velocity_rad_per_s": 1.5892512798309326,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 2481.27392578125,
+            "linear_velocity_uu_per_s": 2292.339599609375,
+            "orientation_rad": 3.0488592807772616,
+            "angular_velocity_rad_per_s": 0.7827532291412354,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 5061.0361328125,
+            "linear_velocity_uu_per_s": 2093.021728515625,
+            "orientation_rad": 3.090971981650616,
+            "angular_velocity_rad_per_s": 1.0262517929077148,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_high_full_right",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5109044313430786,
+            "linear_velocity_uu_per_s": 26.746973037719727,
+            "orientation_rad": 0.019744660898696677,
+            "angular_velocity_rad_per_s": 0.9481865763664246,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 2.0614657402038574,
+            "linear_velocity_uu_per_s": 60.21476364135742,
+            "orientation_rad": 0.05746893678926803,
+            "angular_velocity_rad_per_s": 1.2839113473892212,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 26.65412139892578,
+            "linear_velocity_uu_per_s": 149.83462524414062,
+            "orientation_rad": 0.6184220083940415,
+            "angular_velocity_rad_per_s": 5.025855541229248,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 33.1189079284668,
+            "linear_velocity_uu_per_s": 435.0201721191406,
+            "orientation_rad": 1.6557465929606032,
+            "angular_velocity_rad_per_s": 2.009585380554199,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 592.8108520507812,
+            "linear_velocity_uu_per_s": 1852.8157958984375,
+            "orientation_rad": 1.4580147504214103,
+            "angular_velocity_rad_per_s": 2.78973650932312,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 3448.326904296875,
+            "linear_velocity_uu_per_s": 1190.0262451171875,
+            "orientation_rad": 2.0201874918298253,
+            "angular_velocity_rad_per_s": 0.9233571887016296,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 3316.6748046875,
+            "linear_velocity_uu_per_s": 231.6511993408203,
+            "orientation_rad": 0.2918908536352881,
+            "angular_velocity_rad_per_s": 1.6600656509399414,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "steer_high_full_left",
+      "family": "steering",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.4957980811595917,
+            "linear_velocity_uu_per_s": 25.951549530029297,
+            "orientation_rad": 0.020726052012315147,
+            "angular_velocity_rad_per_s": 0.9848031401634216,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 2.0324976444244385,
+            "linear_velocity_uu_per_s": 60.18341064453125,
+            "orientation_rad": 0.059805831601494795,
+            "angular_velocity_rad_per_s": 1.3236415386199951,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 27.234006881713867,
+            "linear_velocity_uu_per_s": 153.38600158691406,
+            "orientation_rad": 0.6502223111826451,
+            "angular_velocity_rad_per_s": 5.060171127319336,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 33.19237518310547,
+            "linear_velocity_uu_per_s": 453.92291259765625,
+            "orientation_rad": 1.6528446180691598,
+            "angular_velocity_rad_per_s": 1.9337652921676636,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 603.41357421875,
+            "linear_velocity_uu_per_s": 1867.9913330078125,
+            "orientation_rad": 1.4330096608032845,
+            "angular_velocity_rad_per_s": 2.8231966495513916,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 3430.42626953125,
+            "linear_velocity_uu_per_s": 1124.9815673828125,
+            "orientation_rad": 2.0034463151634476,
+            "angular_velocity_rad_per_s": 0.9035108089447021,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 3411.311279296875,
+            "linear_velocity_uu_per_s": 1014.9837646484375,
+            "orientation_rad": 1.5539953381661331,
+            "angular_velocity_rad_per_s": 3.1920673847198486,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "powerslide_initiation",
+      "family": "powerslide",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5744493007659912,
+            "linear_velocity_uu_per_s": 28.431737899780273,
+            "orientation_rad": 0.025013358900161254,
+            "angular_velocity_rad_per_s": 1.1695950031280518,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.9078254699707031,
+            "linear_velocity_uu_per_s": 47.97699737548828,
+            "orientation_rad": 0.06476280730677113,
+            "angular_velocity_rad_per_s": 1.1757116317749023,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 24.40550994873047,
+            "linear_velocity_uu_per_s": 182.69615173339844,
+            "orientation_rad": 0.2912548354551193,
+            "angular_velocity_rad_per_s": 1.4034790992736816,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 78.68037414550781,
+            "linear_velocity_uu_per_s": 226.37649536132812,
+            "orientation_rad": 0.6833858452899985,
+            "angular_velocity_rad_per_s": 1.485232949256897,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 129.95362854003906,
+            "linear_velocity_uu_per_s": 125.05106353759766,
+            "orientation_rad": 1.3223716748882965,
+            "angular_velocity_rad_per_s": 2.8673150539398193,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 162.5779571533203,
+            "linear_velocity_uu_per_s": 215.37515258789062,
+            "orientation_rad": 1.768692129234144,
+            "angular_velocity_rad_per_s": 2.4729254245758057,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 299.30487060546875,
+            "linear_velocity_uu_per_s": 431.7419738769531,
+            "orientation_rad": 1.9962819838089103,
+            "angular_velocity_rad_per_s": 0.7072488069534302,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "powerslide_hold",
+      "family": "powerslide",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5949205756187439,
+            "linear_velocity_uu_per_s": 30.255048751831055,
+            "orientation_rad": 0.023897933328947636,
+            "angular_velocity_rad_per_s": 1.148105502128601,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 2.147681474685669,
+            "linear_velocity_uu_per_s": 57.97901153564453,
+            "orientation_rad": 0.06668485935331231,
+            "angular_velocity_rad_per_s": 1.3524478673934937,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 31.951061248779297,
+            "linear_velocity_uu_per_s": 222.20635986328125,
+            "orientation_rad": 0.46045093047113883,
+            "angular_velocity_rad_per_s": 2.334759473800659,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 85.98766326904297,
+            "linear_velocity_uu_per_s": 217.77027893066406,
+            "orientation_rad": 1.3057244154217031,
+            "angular_velocity_rad_per_s": 4.101721286773682,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 58.260536193847656,
+            "linear_velocity_uu_per_s": 311.8902282714844,
+            "orientation_rad": 1.6424684481762566,
+            "angular_velocity_rad_per_s": 4.311842918395996,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 389.4787902832031,
+            "linear_velocity_uu_per_s": 419.8043518066406,
+            "orientation_rad": 1.9126537346189025,
+            "angular_velocity_rad_per_s": 5.49274206161499,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1006.26171875,
+            "linear_velocity_uu_per_s": 343.69537353515625,
+            "orientation_rad": 1.3331211918131656,
+            "angular_velocity_rad_per_s": 5.3970136642456055,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "powerslide_release",
+      "family": "powerslide",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.012821197509765625,
+            "linear_velocity_uu_per_s": 1.5387485027313232,
+            "orientation_rad": 0.0002643002262859476,
+            "angular_velocity_rad_per_s": 0.015878871083259583,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.5669671297073364,
+            "linear_velocity_uu_per_s": 28.35334014892578,
+            "orientation_rad": 0.02463561423867013,
+            "angular_velocity_rad_per_s": 1.1586190462112427,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 1.9538917541503906,
+            "linear_velocity_uu_per_s": 50.82210159301758,
+            "orientation_rad": 0.06537388764517578,
+            "angular_velocity_rad_per_s": 1.2352614402770996,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 27.3555908203125,
+            "linear_velocity_uu_per_s": 209.6505584716797,
+            "orientation_rad": 0.3595143541166901,
+            "angular_velocity_rad_per_s": 2.081322193145752,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 78.48260498046875,
+            "linear_velocity_uu_per_s": 214.00103759765625,
+            "orientation_rad": 0.8358038790406126,
+            "angular_velocity_rad_per_s": 2.7961559295654297,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 111.3476333618164,
+            "linear_velocity_uu_per_s": 746.2106323242188,
+            "orientation_rad": 1.9088562195428034,
+            "angular_velocity_rad_per_s": 2.1120517253875732,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1422.9871826171875,
+            "linear_velocity_uu_per_s": 799.7134399414062,
+            "orientation_rad": 1.2803049121447048,
+            "angular_velocity_rad_per_s": 2.481262683868408,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 2053.3779296875,
+            "linear_velocity_uu_per_s": 1942.673583984375,
+            "orientation_rad": 3.093179945087696,
+            "angular_velocity_rad_per_s": 1.6929298639297485,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "side_wall_transition",
+      "family": "arena_surfaces",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 0.0,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.0002460406976751983,
+            "linear_velocity_uu_per_s": 6.151014531496912e-05,
+            "orientation_rad": 0.00010474339002580799,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 4.76837158203125e-07,
+            "linear_velocity_uu_per_s": 0.00012419754057191312,
+            "orientation_rad": 0.00017279815221231553,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 18.067272186279297,
+            "linear_velocity_uu_per_s": 157.66456604003906,
+            "orientation_rad": 0.17484355591828388,
+            "angular_velocity_rad_per_s": 0.7982657551765442,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 43.084381103515625,
+            "linear_velocity_uu_per_s": 179.0364227294922,
+            "orientation_rad": 0.18892476823318258,
+            "angular_velocity_rad_per_s": 0.8620034456253052,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 212.0867156982422,
+            "linear_velocity_uu_per_s": 493.1563415527344,
+            "orientation_rad": 0.37713956046506786,
+            "angular_velocity_rad_per_s": 1.0712136030197144,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 694.841552734375,
+            "linear_velocity_uu_per_s": 290.7028503417969,
+            "orientation_rad": 0.3503285625766379,
+            "angular_velocity_rad_per_s": 0.04806113615632057,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1465.6500244140625,
+            "linear_velocity_uu_per_s": 629.9830322265625,
+            "orientation_rad": 0.4155504238149374,
+            "angular_velocity_rad_per_s": 0.3489435911178589,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "ramp_transition",
+      "family": "arena_surfaces",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 3.474370002746582,
+            "linear_velocity_uu_per_s": 0.0,
+            "orientation_rad": 0.011594415190114263,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 3.4394614696502686,
+            "linear_velocity_uu_per_s": 1.6639484167099,
+            "orientation_rad": 0.020085388141751977,
+            "angular_velocity_rad_per_s": 1.3917127847671509,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 3.3843302726745605,
+            "linear_velocity_uu_per_s": 1.639901041984558,
+            "orientation_rad": 0.061933948241001124,
+            "angular_velocity_rad_per_s": 1.197847604751587,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 3.121624708175659,
+            "linear_velocity_uu_per_s": 1.2843002080917358,
+            "orientation_rad": 0.20967143628606624,
+            "angular_velocity_rad_per_s": 0.5401440858840942,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 16.727092742919922,
+            "linear_velocity_uu_per_s": 184.5919647216797,
+            "orientation_rad": 0.2302750754227918,
+            "angular_velocity_rad_per_s": 3.3928747177124023,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 80.67756652832031,
+            "linear_velocity_uu_per_s": 165.69419860839844,
+            "orientation_rad": 0.584019809358359,
+            "angular_velocity_rad_per_s": 1.3468427658081055,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1027.1416015625,
+            "linear_velocity_uu_per_s": 1086.5518798828125,
+            "orientation_rad": 2.1365775275876104,
+            "angular_velocity_rad_per_s": 1.0856040716171265,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 2515.392578125,
+            "linear_velocity_uu_per_s": 30.39142417907715,
+            "orientation_rad": 1.8056749223417305,
+            "angular_velocity_rad_per_s": 0.3101959824562073,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 1.5707963267948966
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s",
+            "world_contact_normal_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "back_wall_transition",
+      "family": "arena_surfaces",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 8.529922524758149e-06,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 2.320389830856584e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.0004930265713483095,
+            "linear_velocity_uu_per_s": 4.640779661713168e-05,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.0019540784414857626,
+            "linear_velocity_uu_per_s": 0.00018563118646852672,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 0.003906846046447754,
+            "linear_velocity_uu_per_s": 0.0004239637346472591,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 53.00651168823242,
+            "linear_velocity_uu_per_s": 256.3084411621094,
+            "orientation_rad": 0.2700637642662675,
+            "angular_velocity_rad_per_s": 1.9309016466140747,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "world_contact",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 353.53173828125,
+            "linear_velocity_uu_per_s": 877.4451293945312,
+            "orientation_rad": 1.7318870781250923,
+            "angular_velocity_rad_per_s": 0.37461501359939575,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1226.653076171875,
+            "linear_velocity_uu_per_s": 560.13525390625,
+            "orientation_rad": 2.4924034748251116,
+            "angular_velocity_rad_per_s": 6.324260711669922,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "corner_transition",
+      "family": "arena_surfaces",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.0,
+            "linear_velocity_uu_per_s": 4.31583721365314e-05,
+            "orientation_rad": 8.875332007808907e-05,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.0002446169964969158,
+            "linear_velocity_uu_per_s": 0.0001100326917367056,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.0004885196103714406,
+            "linear_velocity_uu_per_s": 0.00023883783433120698,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 1.52587890625e-05,
+            "linear_velocity_uu_per_s": 0.00093465531244874,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.0,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 13.36081314086914,
+            "linear_velocity_uu_per_s": 178.4818572998047,
+            "orientation_rad": 0.3075978017589101,
+            "angular_velocity_rad_per_s": 3.2495861053466797,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 152.351806640625,
+            "linear_velocity_uu_per_s": 449.64703369140625,
+            "orientation_rad": 1.3375901791339713,
+            "angular_velocity_rad_per_s": 0.998450517654419,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 1287.82421875,
+            "linear_velocity_uu_per_s": 967.5182495117188,
+            "orientation_rad": 1.2697258182280338,
+            "angular_velocity_rad_per_s": 0.07425406575202942,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 4074.41357421875,
+            "linear_velocity_uu_per_s": 1195.698486328125,
+            "orientation_rad": 1.396182156727591,
+            "angular_velocity_rad_per_s": 0.08896661549806595,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "ceiling_contact",
+      "family": "arena_surfaces",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.001953125,
+            "linear_velocity_uu_per_s": 0.2136077880859375,
+            "orientation_rad": 0.0,
+            "angular_velocity_rad_per_s": 0.013714338652789593,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [],
+          "pass": true
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 0.01573578082025051,
+            "linear_velocity_uu_per_s": 0.8105528354644775,
+            "orientation_rad": 0.0026439222628486707,
+            "angular_velocity_rad_per_s": 0.14205394685268402,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 0.05445194989442825,
+            "linear_velocity_uu_per_s": 1.9607239961624146,
+            "orientation_rad": 0.00749807693752374,
+            "angular_velocity_rad_per_s": 0.13088391721248627,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 0.9658541083335876,
+            "linear_velocity_uu_per_s": 12.263781547546387,
+            "orientation_rad": 0.17413629433367034,
+            "angular_velocity_rad_per_s": 1.5320860147476196,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1"
+          ],
+          "numeric_failures": [
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 7.365118503570557,
+            "linear_velocity_uu_per_s": 35.060176849365234,
+            "orientation_rad": 0.48208066090458085,
+            "angular_velocity_rad_per_s": 0.9244595766067505,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 23.731725692749023,
+            "linear_velocity_uu_per_s": 32.249168395996094,
+            "orientation_rad": 0.7226014879763614,
+            "angular_velocity_rad_per_s": 0.21562422811985016,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 75.202880859375,
+            "linear_velocity_uu_per_s": 48.353294372558594,
+            "orientation_rad": 0.79483869769242,
+            "angular_velocity_rad_per_s": 0.0027367924340069294,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 731.014892578125,
+            "linear_velocity_uu_per_s": 1345.8385009765625,
+            "orientation_rad": 2.4818766990729957,
+            "angular_velocity_rad_per_s": 0.017231622710824013,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "nose_impact",
+      "family": "body_contacts",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 10.459268569946289,
+            "linear_velocity_uu_per_s": 109.46839141845703,
+            "orientation_rad": 0.03705428435894161,
+            "angular_velocity_rad_per_s": 1.3840172290802002,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 10.50158977508545,
+            "linear_velocity_uu_per_s": 53.46558380126953,
+            "orientation_rad": 0.11957225974148902,
+            "angular_velocity_rad_per_s": 1.7783849239349365,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 11.192400932312012,
+            "linear_velocity_uu_per_s": 55.153873443603516,
+            "orientation_rad": 0.18446164266997048,
+            "angular_velocity_rad_per_s": 2.0342655181884766,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 10.770752906799316,
+            "linear_velocity_uu_per_s": 38.95329666137695,
+            "orientation_rad": 0.009620334017367308,
+            "angular_velocity_rad_per_s": 0.6929353475570679,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 20.1494083404541,
+            "linear_velocity_uu_per_s": 37.68260192871094,
+            "orientation_rad": 0.009719592469037891,
+            "angular_velocity_rad_per_s": 0.011548386886715889,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 39.0020866394043,
+            "linear_velocity_uu_per_s": 37.70163345336914,
+            "orientation_rad": 0.01288606822347012,
+            "angular_velocity_rad_per_s": 0.008315742015838623,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 65.54437255859375,
+            "linear_velocity_uu_per_s": 1.391761064529419,
+            "orientation_rad": 0.022333523623440005,
+            "angular_velocity_rad_per_s": 0.008614729158580303,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 63.57952117919922,
+            "linear_velocity_uu_per_s": 1.3917678594589233,
+            "orientation_rad": 0.04382696150201324,
+            "angular_velocity_rad_per_s": 0.008614647202193737,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "side_impact",
+      "family": "body_contacts",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 10.956461906433105,
+            "linear_velocity_uu_per_s": 23.849815368652344,
+            "orientation_rad": 0.03883179317470678,
+            "angular_velocity_rad_per_s": 0.6713786721229553,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 6.740818023681641,
+            "linear_velocity_uu_per_s": 115.36425018310547,
+            "orientation_rad": 0.07771077383118558,
+            "angular_velocity_rad_per_s": 0.47429245710372925,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 7.473308563232422,
+            "linear_velocity_uu_per_s": 162.61416625976562,
+            "orientation_rad": 0.06640240900974387,
+            "angular_velocity_rad_per_s": 0.5227664113044739,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 43.11832809448242,
+            "linear_velocity_uu_per_s": 154.70703125,
+            "orientation_rad": 0.29662579715628956,
+            "angular_velocity_rad_per_s": 2.3439412117004395,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 56.287967681884766,
+            "linear_velocity_uu_per_s": 14.436850547790527,
+            "orientation_rad": 0.7900409657543999,
+            "angular_velocity_rad_per_s": 0.4547458291053772,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 69.12191009521484,
+            "linear_velocity_uu_per_s": 48.17426300048828,
+            "orientation_rad": 0.5254310663994188,
+            "angular_velocity_rad_per_s": 1.7164736986160278,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 83.25993347167969,
+            "linear_velocity_uu_per_s": 1.3917521238327026,
+            "orientation_rad": 0.19205275163686966,
+            "angular_velocity_rad_per_s": 0.008614771999418736,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 86.26460266113281,
+            "linear_velocity_uu_per_s": 1.391760230064392,
+            "orientation_rad": 0.2135886855360101,
+            "angular_velocity_rad_per_s": 0.008614743128418922,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "roof_impact",
+      "family": "body_contacts",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 12.920047760009766,
+            "linear_velocity_uu_per_s": 496.1802673339844,
+            "orientation_rad": 0.07367109782752956,
+            "angular_velocity_rad_per_s": 4.7763824462890625,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 15.10263442993164,
+            "linear_velocity_uu_per_s": 212.53726196289062,
+            "orientation_rad": 0.0690231879329315,
+            "angular_velocity_rad_per_s": 3.9591152667999268,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 14.276753425598145,
+            "linear_velocity_uu_per_s": 182.43240356445312,
+            "orientation_rad": 0.06391092334387939,
+            "angular_velocity_rad_per_s": 1.240898609161377,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 43.33485794067383,
+            "linear_velocity_uu_per_s": 160.201171875,
+            "orientation_rad": 0.26872798472875004,
+            "angular_velocity_rad_per_s": 1.2781842947006226,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 81.24977111816406,
+            "linear_velocity_uu_per_s": 141.25924682617188,
+            "orientation_rad": 0.5959086635676901,
+            "angular_velocity_rad_per_s": 1.8516104221343994,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 143.10379028320312,
+            "linear_velocity_uu_per_s": 149.70785522460938,
+            "orientation_rad": 1.5178516482840627,
+            "angular_velocity_rad_per_s": 2.4787635803222656,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 211.6621856689453,
+            "linear_velocity_uu_per_s": 10.074588775634766,
+            "orientation_rad": 3.1323512186608835,
+            "angular_velocity_rad_per_s": 0.19008956849575043,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 225.02474975585938,
+            "linear_velocity_uu_per_s": 12.00999927520752,
+            "orientation_rad": 3.1347731299050126,
+            "angular_velocity_rad_per_s": 0.2118503749370575,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "off_center_impact",
+      "family": "body_contacts",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 25.02175521850586,
+            "linear_velocity_uu_per_s": 154.07025146484375,
+            "orientation_rad": 0.06397672567708534,
+            "angular_velocity_rad_per_s": 1.0744627714157104,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 23.636795043945312,
+            "linear_velocity_uu_per_s": 99.32069396972656,
+            "orientation_rad": 0.16296652454501098,
+            "angular_velocity_rad_per_s": 2.5416996479034424,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 19.699819564819336,
+            "linear_velocity_uu_per_s": 96.03712463378906,
+            "orientation_rad": 0.251242822407717,
+            "angular_velocity_rad_per_s": 2.8247740268707275,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 14.195738792419434,
+            "linear_velocity_uu_per_s": 86.67232513427734,
+            "orientation_rad": 0.5162214709963892,
+            "angular_velocity_rad_per_s": 2.905625104904175,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "wheel_contact_0",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 47.373329162597656,
+            "linear_velocity_uu_per_s": 163.62896728515625,
+            "orientation_rad": 0.6882490770444704,
+            "angular_velocity_rad_per_s": 0.6419053077697754,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 97.84447479248047,
+            "linear_velocity_uu_per_s": 28.214597702026367,
+            "orientation_rad": 0.5380767650119526,
+            "angular_velocity_rad_per_s": 0.23141543567180634,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 99.02108001708984,
+            "linear_velocity_uu_per_s": 11.628480911254883,
+            "orientation_rad": 0.5483303342083601,
+            "angular_velocity_rad_per_s": 0.35888051986694336,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 99.17081451416016,
+            "linear_velocity_uu_per_s": 11.599092483520508,
+            "orientation_rad": 0.5673087518343723,
+            "angular_velocity_rad_per_s": 0.357538640499115,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    },
+    {
+      "name": "wall_scrape",
+      "family": "body_contacts",
+      "horizons": [
+        {
+          "horizon_ticks": 1,
+          "errors": {
+            "position_uu": 0.201171875,
+            "linear_velocity_uu_per_s": 24.148059844970703,
+            "orientation_rad": 0.006806512769821478,
+            "angular_velocity_rad_per_s": 0.8189712166786194,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 4,
+          "errors": {
+            "position_uu": 2.4161112308502197,
+            "linear_velocity_uu_per_s": 194.8338165283203,
+            "orientation_rad": 0.025933784808468613,
+            "angular_velocity_rad_per_s": 1.104114294052124,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_2"
+          ],
+          "numeric_failures": [
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 8,
+          "errors": {
+            "position_uu": 10.995774269104004,
+            "linear_velocity_uu_per_s": 284.9562072753906,
+            "orientation_rad": 0.08208406753186281,
+            "angular_velocity_rad_per_s": 1.153684139251709,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 30,
+          "errors": {
+            "position_uu": 48.493492126464844,
+            "linear_velocity_uu_per_s": 85.39574432373047,
+            "orientation_rad": 0.6369632110209084,
+            "angular_velocity_rad_per_s": 2.952816963195801,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_1",
+            "wheel_contact_3"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 60,
+          "errors": {
+            "position_uu": 51.80221939086914,
+            "linear_velocity_uu_per_s": 48.242645263671875,
+            "orientation_rad": 1.1306470455667386,
+            "angular_velocity_rad_per_s": 1.880440592765808,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 120,
+          "errors": {
+            "position_uu": 105.52220153808594,
+            "linear_velocity_uu_per_s": 360.29315185546875,
+            "orientation_rad": 1.5433542714229767,
+            "angular_velocity_rad_per_s": 0.6784902811050415,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "world_contact"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 300,
+          "errors": {
+            "position_uu": 673.463134765625,
+            "linear_velocity_uu_per_s": 309.50164794921875,
+            "orientation_rad": 2.685548964547404,
+            "angular_velocity_rad_per_s": 1.679355502128601,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [
+            "on_ground",
+            "wheel_contact_0",
+            "wheel_contact_1",
+            "wheel_contact_2",
+            "wheel_contact_3",
+            "linear_velocity_direction"
+          ],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        },
+        {
+          "horizon_ticks": 600,
+          "errors": {
+            "position_uu": 1519.006591796875,
+            "linear_velocity_uu_per_s": 1347.182861328125,
+            "orientation_rad": 1.3821712187988062,
+            "angular_velocity_rad_per_s": 5.3868303298950195,
+            "boost": 0.0,
+            "handbrake_value": 0.0,
+            "world_contact_normal_rad": 0.0
+          },
+          "hard_mismatches": [],
+          "numeric_failures": [
+            "position_uu",
+            "linear_velocity_uu_per_s",
+            "orientation_rad",
+            "angular_velocity_rad_per_s"
+          ],
+          "pass": false
+        }
+      ],
+      "pass": false
+    }
+  ],
+  "summary": {
+    "hard_mismatch_count": 85,
+    "numeric_failure_count": 617,
+    "hard_mismatch_examples": [
+      {
+        "scenario": "brake_to_reverse",
+        "family": "longitudinal",
+        "horizon_ticks": 30,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_2",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "brake_to_reverse",
+        "family": "longitudinal",
+        "horizon_ticks": 60,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_2",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "ground_boost",
+        "family": "boost",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_low_partial_right",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_low_partial_left",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_low_full_right",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_low_full_right",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_low_full_left",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_low_full_left",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2"
+        ]
+      },
+      {
+        "scenario": "steer_medium_partial_right",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_medium_partial_left",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_2",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_medium_partial_left",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact",
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_right",
+        "family": "steering",
+        "horizon_ticks": 30,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_1",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_right",
+        "family": "steering",
+        "horizon_ticks": 60,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_right",
+        "family": "steering",
+        "horizon_ticks": 120,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_right",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact",
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_right",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_1",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_left",
+        "family": "steering",
+        "horizon_ticks": 30,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_2"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_left",
+        "family": "steering",
+        "horizon_ticks": 60,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_left",
+        "family": "steering",
+        "horizon_ticks": 120,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_left",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact",
+          "linear_velocity_direction"
+        ]
+      },
+      {
+        "scenario": "steer_medium_full_left",
+        "family": "steering",
+        "horizon_ticks": 600,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_high_partial_right",
+        "family": "steering",
+        "horizon_ticks": 60,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_1",
+          "wheel_contact_3"
+        ]
+      },
+      {
+        "scenario": "steer_high_partial_right",
+        "family": "steering",
+        "horizon_ticks": 120,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact"
+        ]
+      },
+      {
+        "scenario": "steer_high_partial_right",
+        "family": "steering",
+        "horizon_ticks": 300,
+        "mismatches": [
+          "on_ground",
+          "wheel_contact_0",
+          "wheel_contact_1",
+          "wheel_contact_2",
+          "wheel_contact_3",
+          "world_contact",
+          "linear_velocity_direction"
+        ]
+      }
+    ],
+    "parity_gate_pass": false
+  },
+  "invocation_sha256": "C996A47DBD3CCC54F49C034FAA1DF4C684C3A34DB8B001B65DB86F5A8107BF5D"
+}

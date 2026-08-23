@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.2.0 — arena + ground-contact proof implemented (2026-08-23)
+
+- Added a strict little-endian RocketSim `.cmf` parser and deterministic Soccar loader with
+  structural validation, SHA-256 custody, RocketSim internal hashes, bounds, and combined
+  4,468-vertex / 8,020-triangle metadata. Extracted assets remain external and untracked.
+- Added one shared normal Warp mesh for chassis AABB queries and a separately measured cuBQL
+  mesh over the same geometry for suspension rays. Both passed the 4,608-ray independent CPU
+  query corpus; cuBQL delivered the better B1 throughput.
+- Added four explicit Octane-compatible wheel states per car and RocketSim-derived suspension,
+  throttle, reverse, coast, brake, steering, boost-ground interaction, handbrake, powerslide,
+  friction, sticky-force, and extra-pushback behavior.
+- Added conservative OBB bounds, Warp mesh triangle candidate enumeration, 13-axis
+  triangle-vs-OBB SAT, up to four chassis contacts, and bounded impulse/friction/restitution,
+  positional-correction, and angular-response handling.
+- Added a deterministic device-resident action tape, contact-rich state generator, and B0/B1/
+  B2/B3 CUDA-graph benchmark decomposition with explicit variance, transfer, utilization,
+  VRAM, candidate, contact, penetration, and NaN/error accounting.
+- Measured a best stable B3 result of 1,350,748.16 aggregate simulated game-seconds/s at
+  262,144 worlds, with 0.998% CV and zero timed H2D/D2H traffic. All 44 benchmark points were
+  stable below 5% CV.
+- Added a measurement-first RocketSim parity protocol, then froze the tolerance table before
+  a clean 35-scenario gate run across eight horizons. The gate recorded 85 records with hard
+  mismatches and 617 numeric failures; tolerances were not widened to conceal the divergence.
+- Added two identical-hash 64-world, 2,400-tick stress runs with finite state and no hot-loop
+  transfer.
+- Classified v0.2 as `PAUSE_RED`: the standalone performance threshold is green, but required
+  RocketSim transfer fidelity fails. Stopped without beginning v0.3.
+
 ## v0.2 — arena + ground-contact proof handoff (2026-08-22)
 
 - Authorized the next bounded milestone after v0.1's decisive GPU continuation pass.

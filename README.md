@@ -11,41 +11,37 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current milestone — v0.2 arena + ground-contact proof
+## Current boundary — v0.2 measured, `PAUSE_RED`
 
-The v0.1 contact-free GPU proof passed decisively and is frozen at:
+RivalSim v0.2 implemented the bounded arena + ground-contact proof and stopped at its required
+review gate. The complete static-world B3 path reached **1,350,748.16 aggregate simulated
+game-seconds/s** at 262,144 worlds with **0.998% CV**, zero timed host/device transfer, and a
+passing 2,400-tick determinism/stress check. This is a strong performance result for a partial
+static-world transition engine.
 
-`1f7a36cc6165273fb658ba07a8458e8d8e60628a`
+The required RocketSim fidelity gate did not pass. Across 35 scenarios and eight horizons,
+85 scenario/horizon records contained hard state/contact/sign mismatches and 617 numeric
+checks exceeded the prospectively frozen tolerances. Correctness takes precedence over
+throughput, so the v0.2 verdict is **`PAUSE_RED`** and v0.3 is not authorized.
 
-Measured v0.1 best stable point:
+Implemented v0.2 scope includes:
 
-- **131,072 worlds**;
-- **40,919,361.97 aggregate simulated game-seconds/s**;
-- **3,678.02x** best GPU vs same-equation CPU throughput;
-- **27/27** RocketSim parity scenarios passed at 1/4/8/30/60/120 ticks;
-- zero timed H2D/D2H traffic in the published GPU hot loop.
+- the exact external Soccar `.cmf` set as one shared 4,468-vertex / 8,020-triangle GPU asset;
+- independently checked CPU, normal Warp BVH, and cuBQL suspension-ray queries;
+- four wheel/suspension rays per car and eight per 1v1 world per tick;
+- RocketSim-derived suspension, throttle, brake, coast, steering, boost-ground interaction,
+  handbrake, and powerslide preparation;
+- oriented-box broadphase bounds, triangle-vs-OBB SAT narrow phase, and bounded static-contact
+  impulse/friction/correction response;
+- decomposed B0/B1/B2/B3 benchmarks, contact-rich parity, and deterministic stress evidence.
 
-That result is intentionally contact-free and is not a full-simulator speedup claim. Frozen evidence remains under `results/v0.1/` and `docs/V0_1_RESULTS.md`.
+The frozen v0.1 result remains at `1f7a36cc6165273fb658ba07a8458e8d8e60628a`;
+`results/v0.1/` was not modified. See `docs/V0_2_RESULTS.md`,
+`docs/REPRODUCING_V0_2.md`, and `results/v0.2/` for the v0.2 evidence.
 
-v0.2 now asks:
+### Explicitly excluded
 
-> How much of that GPU headroom survives when RivalSim adds the real DFH static collision geometry, eight suspension rays per 1v1 world per physics tick, RocketSim-derived wheel/ground forces, and chassis-vs-arena contact?
-
-### v0.2 scope
-
-- one immutable DFH/Stadium_P triangle mesh shared by all GPU worlds;
-- Warp mesh/BVH acceleration, including measured cuBQL ray-backend evaluation where supported;
-- four wheel raycasts per car;
-- RocketSim-compatible suspension;
-- wheel friction, throttle, brake, coast, steering and powerslide;
-- car hitbox vs static-world contact;
-- floor/ramp/wall/ceiling movement and landings;
-- contact-rich CPU RocketSim parity;
-- decomposed GPU benchmarks for mesh rays, wheel mechanics and complete static-world physics.
-
-### Still excluded
-
-v0.2 does **not** implement:
+RivalSim v0.2 does **not** implement:
 
 - ball-world collision;
 - car-ball collision;
@@ -56,7 +52,8 @@ v0.2 does **not** implement:
 - RLGym observations/rewards/PPO;
 - Rival policy inference.
 
-Those remain later milestones so static-world cost/fidelity can be measured cleanly.
+Those remain later milestones. New authority and a static-world fidelity redesign/review are
+required before any v0.3 work.
 
 ## Architecture
 
@@ -82,13 +79,9 @@ The v0.2 package classifies the complete static-world path as:
 - **PASS_YELLOW:** parity passes and 20,000–<100,000 sim-s/s with no architectural dead end;
 - **PAUSE_RED:** fidelity/architecture failure or <20,000 sim-s/s without a clear optimization path.
 
-## Start here
+## Published v0.2 authority
 
-Give Codex:
-
-`Read CODEX_START_PROMPT.md and execute it completely.`
-
-The active root prompt routes to:
+The root prompt and completed bounded package are preserved at:
 
 `handoff/v0.2/CODEX_START_PROMPT.md`
 
@@ -99,6 +92,14 @@ Package contents:
 - `handoff/v0.2/BENCHMARK_AND_PARITY.md`
 - `handoff/v0.2/CODEX_START_PROMPT.md`
 - `handoff/v0.2/PACKAGE_MANIFEST.md`
+
+The result package is:
+
+- `docs/V0_2_RESULTS.md`;
+- `docs/REPRODUCING_V0_2.md`;
+- `results/v0.2/benchmark.json`;
+- `results/v0.2/parity.json`;
+- `results/v0.2/manifest.json`.
 
 ## Relationship to RocketSim
 

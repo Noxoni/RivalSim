@@ -1,11 +1,11 @@
 # Third-party notices and source custody
 
-RivalSim v0.1 uses source-backed constants, equations, state transitions and operation
-ordering inspected in RocketSim. The reference source was kept outside the tracked RivalSim
-tree under `.reference/`; no RocketSim or Bullet source file was copied wholesale into this
-repository.
+RivalSim v0.1 and v0.2 use source-backed constants, equations, state transitions, vehicle
+parameters, and operation ordering inspected in RocketSim and its modified Bullet vehicle
+path. The reference source was kept outside the tracked RivalSim tree under `.reference/`; no
+RocketSim or Bullet source file was copied wholesale into this repository.
 
-The source revisions used for the v0.1 evidence are:
+The source revisions used for the v0.1 and v0.2 evidence are:
 
 - primary RocketSim source: `ZealanL/RocketSim` commit
   `c2baacb8f4b441dd8505e63c2aeb5a1679b60b02`;
@@ -13,6 +13,12 @@ The source revisions used for the v0.1 evidence are:
   `2da51b1dac7b8127127613a5ff30e490bdd70dd8`, released as `rocketsim==2.2.1`;
 - installed `RocketSim.pyd` SHA-256:
   `E3EE24CA82445B4BFCC754583F6778D7B0D8B7A7F7D64F872BE8C65E621A63D0`.
+
+RivalSim v0.2 also reads external Rocket League Soccar collision files from `Noxoni/Rival`
+commit `36cb14cf645c4f06b668c34d85ce1a500e4b53da`; those files were introduced there by
+`4f2b21c00e2fcb7108ab1006fd950b066fbd0484`. They remain local inputs. No raw, extracted, or
+repacked `.cmf` geometry is distributed by RivalSim; only loader code, hashes, counts, bounds,
+and provenance are committed.
 
 ## RocketSim
 
@@ -40,8 +46,11 @@ SOFTWARE.
 
 ## Bullet Physics
 
-RocketSim uses Bullet, and the v0.1 integrator intentionally follows the relevant Bullet
-semi-implicit and damping order observed through that source lineage.
+RocketSim uses Bullet. The v0.1 integrator follows the relevant semi-implicit and damping
+order observed through that source lineage, while v0.2 derives wheel/suspension ordering and
+parameters from RocketSim's modified `btVehicleRL` path and implements an independently
+written bounded static-contact approximation. RivalSim does not claim solver equivalence;
+the published v0.2 parity evidence records the remaining divergence.
 
 The files in this repository are licensed under the zlib license, except for the files under
 `Extras` and `examples/ThirdPartyLibs`.

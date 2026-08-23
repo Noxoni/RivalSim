@@ -1,150 +1,115 @@
-# RivalSim v0.1 Architecture
+# RivalSim v0.2 Architecture
 
-## Design target
+## Design target and measured boundary
 
-RivalSim is not a line-by-line CUDA translation of RocketSim or Bullet.
+RivalSim is a specialized, batched Soccar 1v1 transition engine. It is not a line-by-line CUDA
+translation of RocketSim or Bullet. The v0.2 proof asks only whether two cars can interact with
+one immutable static Soccar arena at useful GPU throughput and RocketSim fidelity.
 
-The target is a specialized batched Soccar 1v1 transition engine optimized for thousands of homogeneous worlds on one NVIDIA GPU.
+The implementation is complete through that boundary, but its combined verdict is
+`PAUSE_RED`: B3 throughput is well above the performance threshold while contact-rich
+RocketSim parity fails. This document describes the measured implementation, not a claim that
+RivalSim is a complete or drop-in simulator.
 
-Each world has exactly:
+## World and state model
 
-- car 0;
-- car 1;
-- one standard ball;
-- fixed 120 Hz timestep;
-- standard gravity/limits;
-- later: one shared immutable DFH arena mesh and standard boost-pad layout.
+Each environment retains the v0.1 flattened, device-resident two-car/one-free-ball state at a
+fixed 120 Hz timestep. v0.2 adds one shared arena asset per GPU device and structure-of-arrays
+vehicle state for eight wheels per world.
 
-This constraint is intentional. General-purpose game modes, arbitrary car counts and generic rigid-body scenes are out of scope unless Rival later needs them.
+Per-wheel state includes:
 
-## v0.1 backend
+- ray origin, direction, nearest hit point, normal, distance, and face;
+- suspension length, relative velocity, clipped inverse-contact factor, spring force, and
+  extra pushback;
+- engine/brake acceleration, steer angle, and lateral/longitudinal friction terms;
+- contact and static-world-contact flags.
 
-Use NVIDIA Warp as the implementation layer for the proof.
+Per-car additions include handbrake interpolation, wheels-in-contact, broadphase candidate
+and accepted-contact counters/maxima, maximum accumulated penetration, and up to four contact
+points, normals, and depths. Arrays are allocated once and remain on the selected Warp device.
 
-Reasons:
+## Shared Soccar geometry
 
-- CUDA-backed kernels without committing immediately to a large native CUDA/C++ codebase;
-- tensor/GPU interoperability with PyTorch;
-- fast iteration on structure-of-arrays state layouts;
-- straightforward benchmarking across many batch sizes.
+`ArenaGeometry` reads the exact 16 external RocketSim Soccar `.cmf` files in natural numeric
+order. The parser validates little-endian counts, exact file length, finite vertices, triangle
+index bounds, file SHA-256, and RocketSim's internal mesh hash. It scales Bullet-space vertices
+to Unreal units and concatenates the files deterministically.
 
-If the proof succeeds, later versions may keep Warp or replace measured hot kernels with native CUDA C++.
+The measured asset has 4,468 vertices and 8,020 triangles. No mesh byte is duplicated per
+world and no extracted/repacked collision asset is committed to this repository.
 
-## State layout
+`WarpArenaMeshes` creates two acceleration structures over the same immutable point/index
+arrays:
 
-Do not create Python objects per environment.
+- the normal Warp mesh/BVH, used for `mesh_query_aabb` chassis candidates;
+- the Warp 1.16 cuBQL mesh, used for suspension rays after independent query parity and a B1
+  throughput comparison.
 
-Use GPU-resident structure-of-arrays or similarly coalesced tensors. Logical state includes at least:
+RocketSim also adds analytical Soccar floor, ceiling, and X-side planes around the CMFs. The
+CPU reference and GPU wheel/query kernels include those four shapes; a procedural arena does
+not replace the triangle geometry.
 
-### Per car, shape `[num_envs, 2, ...]`
+## Independent geometry-query check
 
-- position xyz;
-- linear velocity xyz;
-- orientation quaternion or 3x3 basis;
-- angular velocity xyz;
-- boost;
-- last controller input;
-- on-ground / airborne state;
-- jumped state;
-- jump-hold elapsed;
-- double-jumped state;
-- dodged/flipping state;
-- dodge elapsed;
-- dodge direction;
-- flip torque timer;
-- supersonic state/timer where needed for parity;
-- demolition fields may be reserved but are not implemented in v0.1.
+The CPU reference performs two-sided Möller-Trumbore intersection directly over the stored
+triangles, plus the four analytical planes. Its deterministic corpus covers floor, ceiling,
+side walls, ramps/curves, goals/back wall, corners, exact shared boundaries, near-surface
+origins, and misses.
 
-### Ball, shape `[num_envs, ...]`
+Normal and cuBQL Warp rays are checked against that independent result before backend
+selection. Co-nearest face ties are classified explicitly so a physically identical boundary
+hit is not mislabeled as a unique-face mismatch.
 
-- position xyz;
-- linear velocity xyz;
-- angular velocity xyz;
+## Vehicle and contact pipeline
 
-The v0.1 ball does not collide with anything. It exists to prove general batched rigid-state integration and speed caps/drag scaffolding.
+`StaticWorldSim` layers v0.2 around the frozen v0.1 transition:
 
-### Controller input
+1. load the current entry from a 64-action device tape, holding each entry for four ticks;
+2. transform the four Octane-compatible wheel connection points for each car;
+3. cast each wheel along the chassis down axis against cuBQL triangles and analytical planes;
+4. compute compression/relaxation, clipped suspension force, pushback, drive/brake/coast,
+   steering, lateral friction, handbrake/powerslide, and wheel impulses;
+5. run the existing v0.1 airborne/jump/boost/gravity/integration transition;
+6. build the true conservative world AABB of the oriented chassis box;
+7. enumerate overlapping mesh triangles with the normal Warp BVH;
+8. reject noncontacts with a 13-axis triangle-vs-OBB SAT and retain at most four contacts;
+9. apply normal/friction/restitution impulses, positional correction, and off-center angular
+   response, including analytical plane contacts;
+10. advance the device tick counter.
 
-Batched continuous/discrete arrays for:
+This ordering preserves the distinction between RocketSim-derived wheel preparation, the
+rigid-body integration path inherited from v0.1, and post-integration static chassis response.
+The small solver intentionally approximates Bullet rather than porting its full manifold and
+constraint system. The measured parity failure shows that this approximation, especially its
+wheel friction/steering and surface-transition response, is not yet faithful enough.
 
-- throttle;
-- steer;
-- pitch;
-- yaw;
-- roll;
-- jump;
-- boost;
-- handbrake.
+## Benchmark decomposition
 
-Only airborne-relevant controls need to affect motion in v0.1. Steer/handbrake may be carried through as state but do not require ground behavior yet.
+The benchmark uses the same deterministic contact-rich state distribution and action-tape
+discipline while selecting progressively larger layers:
 
-## Simulation tick
+| Variant | Included work |
+|---|---|
+| B0 | Frozen v0.1 contact-free transition |
+| B1 | Eight static-world wheel rays only; origins stay fixed |
+| B2 | Rays plus wheel transforms, suspension, and ground forces, then v0.1 integration |
+| B3 | Complete B2 path plus chassis broadphase, SAT narrow phase, and contact response |
 
-Fixed dt:
+CUDA graphs execute eight-tick blocks. Initialization, checkpoint restoration, verification
+readback, telemetry, and synchronization around timing are charged or reported separately;
+full state does not round-trip through the CPU inside the timed loop.
 
-`1 / 120 s`
+## Determinism and numerical mode
 
-One v0.1 tick should logically perform:
+Published parity and performance evidence uses Warp's normal FP32 mode with no separately
+advertised fast-math approximation. Repeats restore identical device checkpoints so timing CV
+is not confounded by different evolving contact states. The stress gate repeats the same
+64-world, 2,400-tick workload and compares full-state digests.
 
-1. clamp/normalize controls;
-2. update jump/double-jump/dodge timers and edge-triggered jump state;
-3. apply sticky force where applicable;
-4. apply first-jump impulse and jump-hold bonus;
-5. apply double-jump or dodge/flip impulse/torque;
-6. apply airborne pitch/yaw/roll torque;
-7. apply airborne throttle acceleration;
-8. apply boost acceleration and consume boost;
-9. apply gravity;
-10. integrate linear/angular velocity and orientation;
-11. clamp car velocity and angular velocity;
-12. integrate ball with gravity/drag scaffolding and speed limits;
-13. update previous controls/state timers.
+## Frozen v0.1 and explicit exclusions
 
-Kernel fusion is allowed and encouraged after correctness. Do not optimize away inspectability before parity tests exist.
-
-## CPU/GPU transfer rule
-
-The benchmark must not copy full world state to CPU every tick.
-
-Allowed CPU traffic:
-
-- initial state/control upload;
-- occasional sampled parity snapshots;
-- aggregate timing/counter readback;
-- final state readback.
-
-The hot loop stays GPU resident.
-
-## Later arena architecture
-
-If v0.1 passes, v0.2 should use the standard DFH/Stadium_P collision geometry as one shared immutable GPU asset.
-
-Preferred order of investigation:
-
-1. use existing extracted collision binaries when provenance/licensing permits;
-2. otherwise follow RLBot's documented map-mesh extraction path;
-3. compile all collision triangles into a GPU-friendly BVH or fixed spatial grid;
-4. compare against `rl_ball_sym`, which already demonstrates mesh + triangle + BVH processing for Rocket League collision data;
-5. use the acceleration structure for wheel rays and car/ball world contacts.
-
-Do not use an SDF as the first fidelity implementation because wall/ceiling mechanics and suspension need accurate surface normals/contact locations.
-
-## Relationship to RocketSim
-
-RocketSim remains the reference implementation.
-
-Study and compare against RocketSim's:
-
-- `Car::_PreTickUpdate` / `_PostTickUpdate` / `_FinishPhysicsTick`;
-- jump, flip, air torque and boost logic;
-- state transitions;
-- velocity limits;
-- later: vehicle suspension and Arena contact callbacks.
-
-Do not attempt to port Bullet wholesale in v0.1.
-
-## Determinism
-
-Given identical GPU initial state, controller sequence, seed and build, RivalSim should be reproducible within the chosen floating-point mode.
-
-Benchmark both normal FP32 and any fast-math option separately. Fidelity results must use the configuration intended for training.
+The v0.1 airborne/contact-free mechanics and evidence remain frozen. v0.2 does not add
+ball-world, car-ball, car-car, boost-pad, scoring/reset, training, or policy-inference paths.
+The free ball remains only the v0.1 integration scaffold. No v0.3 work is authorized by this
+architecture result.

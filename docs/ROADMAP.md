@@ -1,6 +1,6 @@
 # RivalSim Research Roadmap
 
-## v0.1 — GPU physics proof
+## v0.1 — GPU physics proof: complete / PASS
 
 Purpose: determine whether the GPU-native architecture has enough performance headroom to justify the project.
 
@@ -17,11 +17,12 @@ Scope:
 - CPU RocketSim parity harness;
 - batch scaling benchmark.
 
-No arena collision.
+No arena collision. Frozen result boundary:
+`1f7a36cc6165273fb658ba07a8458e8d8e60628a`.
 
-## v0.2 — Arena + ground-contact proof
+## v0.2 — Arena + ground-contact proof: complete / `PAUSE_RED`
 
-Only begin if v0.1 passes.
+v0.1 passed, so this bounded milestone was implemented and measured.
 
 Add:
 
@@ -36,9 +37,17 @@ Add:
 - wall/ceiling driving;
 - GPU vs RocketSim ground/wall parity.
 
-The RLBot map-mesh extraction documentation identifies DFH collision assets and a binary triangle-export path. `rl_ball_sym` is a useful implementation reference for turning those binaries into triangles/BVH structures.
+The implementation used the exact external RocketSim Soccar `.cmf` set as one shared Warp
+geometry, with a normal mesh for chassis AABB queries and a measured cuBQL mesh for suspension
+rays. B3 reached 1,350,748.16 aggregate simulated game-seconds/s at 262,144 worlds, but the
+35-scenario RocketSim parity gate failed. The final classification is therefore `PAUSE_RED`.
 
-## v0.3 — Ball and dynamic contacts
+See `docs/V0_2_RESULTS.md` and `results/v0.2/` for the frozen outcome. A static-world
+wheel-friction/contact-solver redesign requires review and new authority.
+
+## v0.3 — Ball and dynamic contacts: not begun / blocked at v0.2 gate
+
+Do not begin this milestone while the v0.2 `PAUSE_RED` boundary is in force.
 
 Add:
 

@@ -66,6 +66,24 @@ Useful live-validation fields include:
 
 ## Arena collision geometry
 
+### Measured v0.2 asset custody
+
+The completed v0.2 run used the exact local files consumed by the RocketSim Soccar oracle:
+
+- repository: `Noxoni/Rival`;
+- source revision: `36cb14cf645c4f06b668c34d85ce1a500e4b53da`;
+- asset-introducing revision: `4f2b21c00e2fcb7108ab1006fd950b066fbd0484`;
+- source-relative path: `bot/collision_meshes/soccar/mesh_0.cmf` through `mesh_15.cmf`;
+- deterministic combined content SHA-256:
+  `2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538`;
+- combined geometry: 4,468 vertices and 8,020 triangles;
+- bounds in Unreal units: approximately `[-4107.334, -5999.995, -13.26779]` through
+  `[4107.334, 5999.995, 2075.4521]`.
+
+The Rival checkout had unrelated local modifications, so it was treated as read-only input.
+RivalSim records every file's exact byte size, SHA-256, RocketSim internal hash, counts, and
+bounds in `results/v0.2/manifest.json`; it does not track the files themselves.
+
 ### RocketSim collision asset format
 
 Pinned primary source:
@@ -122,7 +140,7 @@ Use as a design reference; respect its license and do not copy code without veri
 
 ## NVIDIA Warp GPU geometry
 
-Pinned v0.1 runtime: NVIDIA Warp `1.16.0`.
+Pinned v0.1/v0.2 runtime: NVIDIA Warp `1.16.0`.
 
 Documentation:
 
@@ -137,7 +155,11 @@ Relevant v0.2 capabilities:
 - Warp 1.16 supports tile variants of mesh/BVH AABB queries;
 - Warp 1.16 includes an experimental `bvh_constructor="cubql"` backend for `warp.Mesh` ray queries. In this version cuBQL mesh support is ray-focused, so a normal mesh/BVH may still be required for chassis AABB queries.
 
-Benchmark normal Warp mesh rays against cuBQL before selecting a suspension-ray backend. Do not replace Warp's BVH with a custom implementation unless profiling proves it is materially limiting.
+The completed query gate compared both backends over the same 4,608-ray corpus. Each had zero
+hit/miss mismatches, 0.001953125 uu maximum distance/hit-point error, and zero unambiguous face
+mismatches against the independent CPU reference. cuBQL was selected for suspension rays
+because its best B1 result was 3.426 billion rays/s versus 2.325 billion rays/s for the normal
+backend. The normal mesh remains the chassis AABB backend.
 
 ## RocketSim CPU oracle
 
@@ -147,7 +169,10 @@ Pinned v0.1/v0.2 source reference unless intentionally updated and revalidated:
 
 `c2baacb8f4b441dd8505e63c2aeb5a1679b60b02`
 
-RocketSim remains the primary CPU implementation oracle.
+RocketSim remains the primary CPU implementation oracle. The completed v0.2 environment used
+`rocketsim==2.2.1`, binding source commit
+`2da51b1dac7b8127127613a5ff30e490bdd70dd8`, and installed `RocketSim.pyd` SHA-256
+`E3EE24CA82445B4BFCC754583F6778D7B0D8B7A7F7D64F872BE8C65E621A63D0`.
 
 Relevant areas:
 
