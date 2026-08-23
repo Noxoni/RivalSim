@@ -1,6 +1,6 @@
 # RivalSim Version Boundary
 
-**Current version:** v0.1 — GPU physics proof
+**Current version:** v0.1.0 — implemented GPU physics proof; continuation gate passed
 
 ## Objective
 
@@ -24,3 +24,12 @@ Do not add arena mesh collision, suspension, wheel driving, dynamic car-ball/car
 - parity/performance measurements against RocketSim.
 
 Do not silently overwrite v0.1 evidence. Preserve all benchmark and parity results by version.
+
+## Measured boundary
+
+The v0.1 proof is complete. The frozen result is documented in `docs/V0_1_RESULTS.md` and
+`results/v0.1/`. It establishes contact-free throughput headroom and bounded RocketSim parity;
+it does not establish arena, ground, suspension or dynamic-contact fidelity.
+
+The next version remains only a recommendation pending review. No v0.2 code belongs in the
+v0.1 release commits.

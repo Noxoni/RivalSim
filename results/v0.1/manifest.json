@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.1",
+  "manifest_created_utc": "2026-08-23T01:28:11.5427476Z",
+  "repository": {
+    "origin": "https://github.com/Noxoni/RivalSim.git",
+    "branch": "main",
+    "implementation_base_commit": "b8cf0ea73d6a4009bb3365ac9cd852ad2d1463a1",
+    "implementation_commit": "5349e18b9e3f97363f80fe3b6074a12178780e0e"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "architecture": "x86_64",
+    "cpu": "AMD Ryzen 7 9800X3D",
+    "physical_cpu_cores": 8,
+    "logical_cpu_cores": 16,
+    "python": "3.14.3",
+    "python_build": "tags/v3.14.3:323c59a, Feb 3 2026, MSC v.1944 64 bit AMD64",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "gpu_arch": "sm_120",
+    "gpu_sm_count": 170,
+    "gpu_total_memory_bytes": 34190917632,
+    "nvidia_driver": "610.62",
+    "cuda_driver_api": "13.3",
+    "installed_cuda_compiler_toolkit": "13.3",
+    "nvcc": "V13.3.73",
+    "warp_bundled_cuda_toolkit": "12.9",
+    "warp_device": "cuda:0",
+    "warp_mempool_enabled": true
+  },
+  "resolved_dependencies": {
+    "cmeel": "0.60.1",
+    "colorama": "0.4.6",
+    "iniconfig": "2.3.0",
+    "numpy": "2.5.2",
+    "nvidia-ml-py": "13.610.43",
+    "packaging": "26.3",
+    "pip": "26.2.1",
+    "pluggy": "1.6.0",
+    "psutil": "7.2.2",
+    "Pygments": "2.21.0",
+    "pytest": "9.1.1",
+    "rocketsim": "2.2.1",
+    "ruff": "0.16.4",
+    "warp-lang": "1.16.0"
+  },
+  "dependency_lock": {
+    "path": "requirements-v0.1.txt",
+    "size_bytes": 350,
+    "sha256": "AA0D5C8DBC61EB86A81FFA02B0C8F77F55FC2DDC882F9F9D7F6EA945054BACC5"
+  },
+  "source_custody": {
+    "rocketsim_primary": {
+      "repository": "https://github.com/ZealanL/RocketSim.git",
+      "commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02"
+    },
+    "rocketsim_python_binding": {
+      "repository": "https://github.com/mtheall/RocketSim.git",
+      "commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+      "package_version": "2.2.1",
+      "wheel_filename": "rocketsim-2.2.1-0-cp36-abi3-win_amd64.whl",
+      "wheel_sha256": "E5A8BCE3883E0F11A75B9BB23600CA7465EF9A455862985DA355857F2CB0D9C3",
+      "installed_extension_sha256": "E3EE24CA82445B4BFCC754583F6778D7B0D8B7A7F7D64F872BE8C65E621A63D0"
+    },
+    "license_notices": "THIRD_PARTY_NOTICES.md"
+  },
+  "tracked_evidence": [
+    {
+      "path": "results/v0.1/benchmark.json",
+      "size_bytes": 32248,
+      "sha256": "FC6918CDF19CD018F476B7E587F2679AE17B772A2B6EEA643FD695DA79450444",
+      "created_utc": "2026-08-23T01:17:24.441572+00:00",
+      "reproduce": ".venv/Scripts/python.exe benchmarks/run_benchmark.py --device cuda:0 --gpu-ticks 6000 --cpu-ticks 360 --gpu-repeats 5 --cpu-repeats 3 --warmup-ticks 120 --graph-block-ticks 8 --max-worlds 1048576 --seed 20260822 --output results/v0.1/benchmark-reproduction.json"
+    },
+    {
+      "path": "results/v0.1/parity.json",
+      "size_bytes": 258699,
+      "sha256": "58DA4D6CDA0155DDD891DE019F5B49907BCA67D87B55562767FE7CE300FBA4A9",
+      "created_utc": "2026-08-23T01:04:22.932717+00:00",
+      "reproduce": ".venv/Scripts/python.exe benchmarks/run_parity.py --device cuda:0 --output results/v0.1/parity-reproduction.json"
+    }
+  ],
+  "ignored_local_raw": [
+    {
+      "path": "results/v0.1/raw/parity_measurement.json",
+      "size_bytes": 259966,
+      "sha256": "87A4CDEA0B0DE4ED68D79A2EBC4CFE1272303486754EAAD1A4C879198455932E",
+      "purpose": "corrected measurement-only corpus generated before tolerances were frozen",
+      "reproduce": "In an uncommitted worktree, make both tolerance dictionaries empty, then run benchmarks/run_parity.py to this path. Restore the frozen v0.1 tolerances before gate evaluation."
+    },
+    {
+      "path": "results/v0.1/raw/benchmark_graph_probe.json",
+      "size_bytes": 23487,
+      "sha256": "422C9A230580548C747ABFC06D07FC05073D581202AB89643A3A758335E792DB",
+      "purpose": "mandatory-batch graph-backed timing stability probe before the full sweep",
+      "reproduce": ".venv/Scripts/python.exe benchmarks/run_benchmark.py --gpu-ticks 6000 --cpu-ticks 1 --gpu-repeats 5 --cpu-repeats 1 --warmup-ticks 120 --graph-block-ticks 8 --max-worlds 16384 --output results/v0.1/raw/benchmark_graph_probe-reproduction.json"
+    },
+    {
+      "path": "results/v0.1/raw/benchmark_smoke.json",
+      "size_bytes": 19409,
+      "sha256": "35D94FDAC70AE335E83CF1D62E913E07E7CCDDC83E185D28DBDF6D5F8D7B1631",
+      "purpose": "pre-graph benchmark harness smoke test; superseded and non-canonical",
+      "reproduce": "This exact schema came from the pre-graph intermediate harness. The current logical smoke equivalent uses --gpu-ticks 10 --cpu-ticks 2 --gpu-repeats 1 --cpu-repeats 1 --warmup-ticks 2 --graph-block-ticks 8 --max-worlds 16384."
+    }
+  ],
+  "validation": {
+    "pytest": "20 passed in 1.83s",
+    "ruff": "passed",
+    "compileall": "passed",
+    "json_parse": "passed",
+    "git_diff_check": "passed",
+    "pip_check": {
+      "status": "known upstream wheel metadata warning",
+      "message": "rocketsim 2.2.1 is not supported on this platform",
+      "explanation": "The downloadable wheel filename is tagged cp36-abi3-win_amd64 and imports on Python 3.14, but its internal WHEEL metadata incorrectly says cp311-cp311-win_amd64. The installed extension imported and all live RocketSim parity tests passed. No installed metadata was modified."
+    }
+  },
+  "gate": {
+    "performance_gate_pass": true,
+    "basic_parity_pass": true,
+    "v0_1_continuation_gate_pass": true
+  },
+  "scope_boundary": "v0.1 complete; no v0.2 implementation begun"
+}

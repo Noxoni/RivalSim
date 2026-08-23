@@ -13,7 +13,8 @@ The project is deliberately narrower than RocketSim. The initial target is stand
 
 ## Current milestone — v0.1 GPU physics proof
 
-RivalSim v0.1 does **not** attempt to replace RocketSim yet.
+RivalSim v0.1 is implemented and has passed its bounded performance/parity gate. It does
+**not** attempt to replace RocketSim yet.
 
 Its job is to answer one question quickly:
 
@@ -36,6 +37,22 @@ v0.1 implements only the physics needed to make that decision:
 **Not in v0.1:** arena triangle collision, suspension/wheels, ground driving, ball/car contacts, car/car contacts, boost pads, goals, demos, or full RLGym integration.
 
 Those are intentionally deferred until the GPU architecture proves it can beat CPU simulation by a large margin.
+
+## v0.1 result
+
+On the measured RTX 5090 workstation, the best stable GPU point advanced 131,072 worlds at
+4.910 billion world ticks/s, or 40.919 million aggregate simulated game-seconds/s. The best
+same-equation NumPy CPU point reached 11,125.38 simulated game-seconds/s, for a measured
+3,678.02x same-equation GPU/CPU ratio. All 27 deterministic RocketSim parity scenarios passed
+at 1/4/8/30/60/120 ticks, including hard axis/sign/state-timing checks.
+
+This is a contact-free kernel result. Its 203,934.02x ratio to the existing 200.65 sim-s/s
+full RocketSim/RLGym system reference is **not apples-to-apples** and must not be presented as
+a full-simulator speedup.
+
+See [`docs/V0_1_RESULTS.md`](docs/V0_1_RESULTS.md) for the protocol, full sweep and limitations,
+and [`docs/REPRODUCING_V0_1.md`](docs/REPRODUCING_V0_1.md) for reproduction commands. The v0.1
+artifacts are frozen under [`results/v0.1/`](results/v0.1/). No v0.2 work is included.
 
 ## Implementation choice
 
@@ -67,6 +84,8 @@ See:
 - `docs/PHYSICS_ORACLES.md`
 - `docs/BENCHMARK_AND_PARITY.md`
 - `docs/ROADMAP.md`
+- `docs/V0_1_RESULTS.md`
+- `docs/REPRODUCING_V0_1.md`
 
 ## Relationship to RocketSim
 
