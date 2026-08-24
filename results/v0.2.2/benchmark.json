@@ -1,0 +1,669 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.2",
+  "evidence_kind": "performance",
+  "generated_at_utc": "2026-08-24T18:41:18.091137+00:00",
+  "source_artifact_sha256": "C25E3D11076F682243FBF7102128645258D637FAA40EE2A0E70F721278D2810D",
+  "configuration": {
+    "mandatory_batches": [
+      1024,
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "maximum_adaptive_batch": 262144,
+    "ticks_per_repeat": 64,
+    "repeats": 5,
+    "warmup_ticks": 16,
+    "cuda_graph_block_ticks": 8,
+    "stability_cv_max": 0.05,
+    "seed": 20260823,
+    "parity_file": ".tools\\v0.2.2\\full-source-rigidbody-v35\\aggregate.json",
+    "action_tape": {
+      "length": 64,
+      "hold_ticks": 4,
+      "device_resident": true
+    },
+    "b3_state_distribution": "16-family deterministic contact-rich mixture"
+  },
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3",
+    "numpy": "2.5.2",
+    "warp": "1.16.0",
+    "device": "cuda:0",
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "device_total_memory_bytes": 34190458880,
+    "cpu": "AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 16,
+    "physical_cpu_count": 8,
+    "nvidia_driver": "610.62",
+    "gpu_name": "NVIDIA GeForce RTX 5090"
+  },
+  "geometry_query_gate": {
+    "corpus_seed": 20260823,
+    "ray_count": 4608,
+    "category_counts": {
+      "boundary_edges": 512,
+      "ceiling": 512,
+      "corners": 512,
+      "floor": 512,
+      "goals_and_back_wall": 512,
+      "misses": 512,
+      "near_surface": 512,
+      "ramps_and_curves": 512,
+      "side_walls": 512
+    },
+    "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+    "backends": {
+      "default": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      },
+      "cubql": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      }
+    },
+    "selected_ray_backend": "cubql",
+    "selection_reason": "exact query parity and higher measured B1 throughput"
+  },
+  "stress_gate": {
+    "worlds": 64,
+    "measured_ticks": 2400,
+    "capture_setup_ticks": 8,
+    "seed": 20260823,
+    "runs": [
+      {
+        "finite": true,
+        "max_linear_speed_uu_per_s": 1345.243896484375,
+        "max_angular_speed_rad_per_s": 5.264930248260498,
+        "max_penetration_uu": 33.438961029052734,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      },
+      {
+        "finite": true,
+        "max_linear_speed_uu_per_s": 1345.243896484375,
+        "max_angular_speed_rad_per_s": 5.264930248260498,
+        "max_penetration_uu": 33.438961029052734,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      }
+    ],
+    "state_sha256_runs": [
+      "DD1E44B3648FE1CB30CFD57D4CF4BFEB4A555794B3E869F444A9BC7FCE0EA67A",
+      "DD1E44B3648FE1CB30CFD57D4CF4BFEB4A555794B3E869F444A9BC7FCE0EA67A"
+    ],
+    "deterministic_equal": true,
+    "finite": true,
+    "bounded_velocity": true,
+    "bounded_penetration": true,
+    "floor_rest_height_uu": 17.031986236572266,
+    "floor_rest_speed_uu_per_s": 3.770574039663188e-05,
+    "floor_rest_stable": true,
+    "hot_loop_gpu_resident": true,
+    "stress_gate_pass": true
+  },
+  "b3_points": [
+    {
+      "variant": "B3",
+      "worlds": 1024,
+      "ticks_per_repeat": 256,
+      "calibration_seconds": 0.02129919989965856,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.11418909998610616,
+        0.11398090003058314,
+        0.11400459997821599,
+        0.11400890001095831,
+        0.11405810003634542
+      ],
+      "world_ticks_per_s_repeats": [
+        2295700.7282822626,
+        2299894.104447868,
+        2299415.9889170304,
+        2299329.2626698725,
+        2298337.4255442265
+      ],
+      "world_ticks_per_s_median": 2299329.2626698725,
+      "world_ticks_per_s_mean": 2298535.501972252,
+      "aggregate_simulated_game_seconds_per_s_median": 19161.077188915606,
+      "suspension_rays_per_s_median": 18394634.10135898,
+      "coefficient_of_variation": 0.0007320868896875504,
+      "stable": true,
+      "wall_time_s": 0.570241600042209,
+      "average_candidates_per_car_tick": 0.5291748046875,
+      "maximum_candidates_per_car_tick": 151,
+      "average_contacts_per_car_tick": 0.07538795471191406,
+      "maximum_contacts_per_car_tick": 6,
+      "maximum_penetration_uu": 29.21649742126465,
+      "narrow_phase_candidates_per_s": 486530.6213707734,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 38,
+        "gpu_util_mean_percent": 99.47368421052632,
+        "gpu_util_max_percent": 100.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 94.9342105263158,
+        "process_cpu_max_percent": 195.1,
+        "system_cpu_mean_percent": 8.755263157894737
+      },
+      "logical_state_bytes": 7147520,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 2048,
+      "ticks_per_repeat": 256,
+      "calibration_seconds": 0.0240522000240162,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.10646970011293888,
+        0.10639679990708828,
+        0.10641070001292974,
+        0.10641040001064539,
+        0.10659320000559092
+      ],
+      "world_ticks_per_s_repeats": [
+        4924293.009596682,
+        4927667.001806803,
+        4927023.315665576,
+        4927037.206396647,
+        4918587.67700473
+      ],
+      "world_ticks_per_s_median": 4927023.315665576,
+      "world_ticks_per_s_mean": 4924921.642094088,
+      "aggregate_simulated_game_seconds_per_s_median": 41058.527630546465,
+      "suspension_rays_per_s_median": 39416186.525324605,
+      "coefficient_of_variation": 0.0007661158068728317,
+      "stable": true,
+      "wall_time_s": 0.5322808000491932,
+      "average_candidates_per_car_tick": 0.4972105026245117,
+      "maximum_candidates_per_car_tick": 114,
+      "average_contacts_per_car_tick": 0.07935142517089844,
+      "maximum_contacts_per_car_tick": 7,
+      "maximum_penetration_uu": 31.737464904785156,
+      "narrow_phase_candidates_per_s": 979488.6457520464,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 35,
+        "gpu_util_mean_percent": 81.17142857142858,
+        "gpu_util_max_percent": 99.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 95.84285714285714,
+        "process_cpu_max_percent": 145.1,
+        "system_cpu_mean_percent": 7.282857142857143
+      },
+      "logical_state_bytes": 14295040,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 4096,
+      "ticks_per_repeat": 192,
+      "calibration_seconds": 0.02780049992725253,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.08502270001918077,
+        0.08489719999488443,
+        0.08486980001907796,
+        0.08491079998202622,
+        0.0848751999437809
+      ],
+      "world_ticks_per_s_repeats": [
+        9249670.968136558,
+        9263344.374695364,
+        9266335.019326277,
+        9261860.683993917,
+        9265745.477134803
+      ],
+      "world_ticks_per_s_median": 9263344.374695364,
+      "world_ticks_per_s_mean": 9261391.304657385,
+      "aggregate_simulated_game_seconds_per_s_median": 77194.5364557947,
+      "suspension_rays_per_s_median": 74106754.99756292,
+      "coefficient_of_variation": 0.0007339137302996747,
+      "stable": true,
+      "wall_time_s": 0.4245756999589503,
+      "average_candidates_per_car_tick": 0.4739189147949219,
+      "maximum_candidates_per_car_tick": 77,
+      "average_contacts_per_car_tick": 0.07402992248535156,
+      "maximum_contacts_per_car_tick": 6,
+      "maximum_penetration_uu": 26.229110717773438,
+      "narrow_phase_candidates_per_s": 1755658.649498945,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 29,
+        "gpu_util_mean_percent": 96.41379310344827,
+        "gpu_util_max_percent": 98.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 98.63793103448276,
+        "process_cpu_max_percent": 142.3,
+        "system_cpu_mean_percent": 7.358620689655172
+      },
+      "logical_state_bytes": 28590080,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 8192,
+      "ticks_per_repeat": 192,
+      "calibration_seconds": 0.028495999984443188,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.0914603000273928,
+        0.09140719997230917,
+        0.09138330002315342,
+        0.09143530006986111,
+        0.09142380009870976
+      ],
+      "world_ticks_per_s_repeats": [
+        17197232.01792384,
+        17207222.193399232,
+        17211722.487604298,
+        17201934.032023232,
+        17204097.820280798
+      ],
+      "world_ticks_per_s_median": 17204097.820280798,
+      "world_ticks_per_s_mean": 17204441.71024628,
+      "aggregate_simulated_game_seconds_per_s_median": 143367.4818356733,
+      "suspension_rays_per_s_median": 137632782.56224638,
+      "coefficient_of_variation": 0.00031720122029559603,
+      "stable": true,
+      "wall_time_s": 0.4571099001914263,
+      "average_candidates_per_car_tick": 0.46769460042317706,
+      "maximum_candidates_per_car_tick": 111,
+      "average_contacts_per_car_tick": 0.0718396504720052,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 27.088224411010742,
+      "narrow_phase_candidates_per_s": 3218569.537399827,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 31,
+        "gpu_util_mean_percent": 98.0,
+        "gpu_util_max_percent": 98.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 92.13870967741936,
+        "process_cpu_max_percent": 104.4,
+        "system_cpu_mean_percent": 8.629032258064516
+      },
+      "logical_state_bytes": 57180160,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 16384,
+      "ticks_per_repeat": 192,
+      "calibration_seconds": 0.03684299997985363,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.1124038000125438,
+        0.11223369999788702,
+        0.11234089999925345,
+        0.11227699997834861,
+        0.11225210002157837
+      ],
+      "world_ticks_per_s_repeats": [
+        27985957.766987856,
+        28028372.940206226,
+        28001627.190283366,
+        28017563.709456246,
+        28023778.614344787
+      ],
+      "world_ticks_per_s_median": 28017563.709456246,
+      "world_ticks_per_s_mean": 28011460.044255696,
+      "aggregate_simulated_game_seconds_per_s_median": 233479.69757880206,
+      "suspension_rays_per_s_median": 224140509.67564997,
+      "coefficient_of_variation": 0.0006240041415595992,
+      "stable": true,
+      "wall_time_s": 0.5615075000096112,
+      "average_candidates_per_car_tick": 0.4744424819946289,
+      "maximum_candidates_per_car_tick": 132,
+      "average_contacts_per_car_tick": 0.07428201039632161,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 28.07727813720703,
+      "narrow_phase_candidates_per_s": 5315928.994624128,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 37,
+        "gpu_util_mean_percent": 99.0,
+        "gpu_util_max_percent": 99.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 95.23513513513512,
+        "process_cpu_max_percent": 195.4,
+        "system_cpu_mean_percent": 9.816216216216215
+      },
+      "logical_state_bytes": 114360320,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 32768,
+      "ticks_per_repeat": 128,
+      "calibration_seconds": 0.053809599950909615,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.10943519999273121,
+        0.10965130000840873,
+        0.10956660006195307,
+        0.10978279996197671,
+        0.10965990007389337
+      ],
+      "world_ticks_per_s_repeats": [
+        38326827.2025691,
+        38251292.9593936,
+        38280862.94206796,
+        38205474.82349419,
+        38248293.105991386
+      ],
+      "world_ticks_per_s_median": 38251292.9593936,
+      "world_ticks_per_s_mean": 38262550.206703246,
+      "aggregate_simulated_game_seconds_per_s_median": 318760.77466161334,
+      "suspension_rays_per_s_median": 306010343.6751488,
+      "coefficient_of_variation": 0.0011727752764396015,
+      "stable": true,
+      "wall_time_s": 0.5480958000989631,
+      "average_candidates_per_car_tick": 0.4384993314743042,
+      "maximum_candidates_per_car_tick": 132,
+      "average_contacts_per_car_tick": 0.0650634765625,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 29.16152572631836,
+      "narrow_phase_candidates_per_s": 6711233.6918761935,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 37,
+        "gpu_util_mean_percent": 99.0,
+        "gpu_util_max_percent": 99.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 94.0027027027027,
+        "process_cpu_max_percent": 104.2,
+        "system_cpu_mean_percent": 8.594594594594595
+      },
+      "logical_state_bytes": 228720640,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 65536,
+      "ticks_per_repeat": 64,
+      "calibration_seconds": 0.08596300007775426,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.08589980006217957,
+        0.08591949997935444,
+        0.08612250001169741,
+        0.08607010007835925,
+        0.0859734999248758
+      ],
+      "world_ticks_per_s_repeats": [
+        48827866.85142346,
+        48816671.43090739,
+        48701605.264946066,
+        48731255.060485065,
+        48786009.685135655
+      ],
+      "world_ticks_per_s_median": 48786009.685135655,
+      "world_ticks_per_s_mean": 48772681.65857953,
+      "aggregate_simulated_game_seconds_per_s_median": 406550.0807094638,
+      "suspension_rays_per_s_median": 390288077.48108524,
+      "coefficient_of_variation": 0.0011195504277081408,
+      "stable": true,
+      "wall_time_s": 0.42998540005646646,
+      "average_candidates_per_car_tick": 0.38522255420684814,
+      "maximum_candidates_per_car_tick": 92,
+      "average_contacts_per_car_tick": 0.06264293193817139,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 50.98070526123047,
+      "narrow_phase_candidates_per_s": 7515327.26361322,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 29,
+        "gpu_util_mean_percent": 12.0,
+        "gpu_util_max_percent": 12.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 100.6896551724138,
+        "process_cpu_max_percent": 263.7,
+        "system_cpu_mean_percent": 9.337931034482759
+      },
+      "logical_state_bytes": 457441280,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 131072,
+      "ticks_per_repeat": 64,
+      "calibration_seconds": 0.14919399993959814,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.14929670002311468,
+        0.14933420007582754,
+        0.14939720008987933,
+        0.14928889996372163,
+        0.1492512000259012
+      ],
+      "world_ticks_per_s_repeats": [
+        56187497.77256459,
+        56173388.25091982,
+        56149700.228339635,
+        56190433.461821325,
+        56204626.82071724
+      ],
+      "world_ticks_per_s_median": 56187497.77256459,
+      "world_ticks_per_s_mean": 56181129.306872524,
+      "aggregate_simulated_game_seconds_per_s_median": 468229.1481047049,
+      "suspension_rays_per_s_median": 449499982.1805167,
+      "coefficient_of_variation": 0.00036984672493133584,
+      "stable": true,
+      "wall_time_s": 0.7465682001784444,
+      "average_candidates_per_car_tick": 0.3870053291320801,
+      "maximum_candidates_per_car_tick": 111,
+      "average_contacts_per_car_tick": 0.06248682737350464,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 30.967330932617188,
+      "narrow_phase_candidates_per_s": 8696957.623493845,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 49,
+        "gpu_util_mean_percent": 98.51020408163265,
+        "gpu_util_max_percent": 100.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 96.94081632653062,
+        "process_cpu_max_percent": 201.2,
+        "system_cpu_mean_percent": 8.761224489795918
+      },
+      "logical_state_bytes": 914882560,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    },
+    {
+      "variant": "B3",
+      "worlds": 262144,
+      "ticks_per_repeat": 64,
+      "calibration_seconds": 0.27315829996950924,
+      "ray_backend": "cubql",
+      "repeat_seconds": [
+        0.27297539997380227,
+        0.27299700002186,
+        0.27312739996705204,
+        0.27353920007590204,
+        0.27339250000659376
+      ],
+      "world_ticks_per_s_repeats": [
+        61460541.871575706,
+        61455678.99521452,
+        61426338.04599565,
+        61333863.64859089,
+        61366774.87347078
+      ],
+      "world_ticks_per_s_median": 61426338.04599565,
+      "world_ticks_per_s_mean": 61408639.48696951,
+      "aggregate_simulated_game_seconds_per_s_median": 511886.1503832971,
+      "suspension_rays_per_s_median": 491410704.3679652,
+      "coefficient_of_variation": 0.000912646269423437,
+      "stable": true,
+      "wall_time_s": 1.3660315000452101,
+      "average_candidates_per_car_tick": 0.38711562752723694,
+      "maximum_candidates_per_car_tick": 126,
+      "average_contacts_per_car_tick": 0.0625922679901123,
+      "maximum_contacts_per_car_tick": 8,
+      "maximum_penetration_uu": 26.299226760864258,
+      "narrow_phase_candidates_per_s": 9508891.266101917,
+      "solver_contact_passes": 1,
+      "telemetry": {
+        "samples": 89,
+        "gpu_util_mean_percent": 90.71910112359551,
+        "gpu_util_max_percent": 100.0,
+        "vram_mean_bytes": 11394043904.0,
+        "vram_max_bytes": 11394043904,
+        "process_cpu_mean_percent": 99.0943820224719,
+        "process_cpu_max_percent": 166.6,
+        "system_cpu_mean_percent": 8.407865168539326
+      },
+      "logical_state_bytes": 1829765120,
+      "hot_loop_host_to_device_bytes": 0,
+      "hot_loop_device_to_host_bytes": 0,
+      "nan_or_error_count": 0,
+      "verification_readback_outside_timing": true
+    }
+  ],
+  "comparison_to_v0_2_1": {
+    "available": true,
+    "reference_path": "results\\v0.2.1\\benchmark.json",
+    "reference_milestone": "v0.2.1",
+    "equal_batch_points": [
+      {
+        "worlds": 1024,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 32194.044558271966,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 19161.077188915606,
+        "retained_throughput_fraction": 0.5951745874686113,
+        "slowdown_factor": 1.6801792634547568
+      },
+      {
+        "worlds": 2048,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 63924.3395725279,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 41058.527630546465,
+        "retained_throughput_fraction": 0.6422988161490801,
+        "slowdown_factor": 1.5569077427162747
+      },
+      {
+        "worlds": 4096,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 118519.54734167592,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 77194.5364557947,
+        "retained_throughput_fraction": 0.6513232474070563,
+        "slowdown_factor": 1.5353359548903556
+      },
+      {
+        "worlds": 8192,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 214110.73920597322,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 143367.4818356733,
+        "retained_throughput_fraction": 0.6695950066183026,
+        "slowdown_factor": 1.4934400497553921
+      },
+      {
+        "worlds": 16384,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 411227.9485363743,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 233479.69757880206,
+        "retained_throughput_fraction": 0.5677622311659347,
+        "slowdown_factor": 1.761300673252672
+      },
+      {
+        "worlds": 32768,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 557055.0947461535,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 318760.77466161334,
+        "retained_throughput_fraction": 0.5722248618996486,
+        "slowdown_factor": 1.7475647539679438
+      },
+      {
+        "worlds": 65536,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 651074.909950044,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 406550.0807094638,
+        "retained_throughput_fraction": 0.6244290395718947,
+        "slowdown_factor": 1.6014629951957309
+      },
+      {
+        "worlds": 131072,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 757475.5099594309,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 468229.1481047049,
+        "retained_throughput_fraction": 0.6181442725848424,
+        "slowdown_factor": 1.61774531343368
+      },
+      {
+        "worlds": 262144,
+        "v0_2_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+        "v0_2_1_aggregate_simulated_game_seconds_per_s": 511886.1503832971,
+        "retained_throughput_fraction": 0.622368535970636,
+        "slowdown_factor": 1.6067650310123986
+      }
+    ],
+    "selected_worlds_comparison": {
+      "worlds": 262144,
+      "v0_2_aggregate_simulated_game_seconds_per_s": 822480.7662954357,
+      "v0_2_1_aggregate_simulated_game_seconds_per_s": 511886.1503832971,
+      "retained_throughput_fraction": 0.622368535970636,
+      "slowdown_factor": 1.6067650310123986
+    }
+  },
+  "summary": {
+    "best_b3_worlds": 262144,
+    "best_b3_world_ticks_per_s": 61426338.04599565,
+    "best_b3_aggregate_simulated_game_seconds_per_s": 511886.1503832971,
+    "best_b3_coefficient_of_variation": 0.000912646269423437,
+    "performance_band": "green_threshold",
+    "parity_gate_pass": true,
+    "hot_loop_gpu_resident": true,
+    "stable_scaling_into_thousands": true,
+    "component_cost_multiplier_vs_b0": {
+      "B0": 1.0,
+      "B1_default": 8.567005690269363,
+      "B1_cubql": 8.116778846123427,
+      "B2": 10.176020870383686,
+      "B3": 31.07700427415513
+    },
+    "verdict": "PASS_GREEN"
+  }
+}

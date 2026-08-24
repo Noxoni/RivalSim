@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rivalsim"
-version = "0.2.1"
+version = "0.2.2"
 description = "Batched GPU Rocket League static-world transition proof"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -39,4 +39,6 @@ target-version = "py312"
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
-"rivalsim/kernels/*.py" = ["SIM"]
+# Kernel modules embed source-ordered native C++ snippets whose expression
+# grouping is part of the RocketSim/Bullet fidelity contract.
+"rivalsim/kernels/*.py" = ["E501", "SIM"]

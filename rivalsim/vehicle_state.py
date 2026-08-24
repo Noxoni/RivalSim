@@ -8,7 +8,16 @@ import numpy as np
 import warp as wp
 
 WHEELS_PER_CAR = 4
-MAX_CONTACTS_PER_CAR = 4
+# A Soccar chassis can overlap two source CMFs at a seam and two of the four
+# analytic boundary planes at a corner. Bullet owns an independent four-point
+# manifold for every CMF body and a one-point manifold for every plane, so the
+# source-backed static-world envelope is 2 * 4 + 2 = 10 contacts. Keep two
+# guard slots and expose overflow counters rather than silently truncating.
+MAX_CONTACTS_PER_CAR = 12
+# The broadphase can return many triangles, but only SAT-overlapping faces need
+# the exact GJK/internal-edge path. This scratch list is sorted into Bullet BVH
+# order before manifold reduction. The breadth gate requires zero overflows.
+MAX_MESH_CANDIDATES_PER_CAR = 128
 
 
 @dataclass(slots=True)
@@ -21,9 +30,13 @@ class VehicleSnapshot:
     solver_angular_velocity: np.ndarray
     auto_roll_acceleration: np.ndarray
     auto_roll_angular_acceleration: np.ndarray
+    total_force_bt: np.ndarray
+    total_torque_bt: np.ndarray
+    inverse_inertia_world: np.ndarray
     wheel_ray_start: np.ndarray
     wheel_direction: np.ndarray
     wheel_hit_point: np.ndarray
+    wheel_hit_point_bt: np.ndarray
     wheel_hit_normal: np.ndarray
     wheel_hit_distance: np.ndarray
     wheel_hit_face: np.ndarray
@@ -32,9 +45,18 @@ class VehicleSnapshot:
     suspension_clipped_factor: np.ndarray
     suspension_force: np.ndarray
     suspension_pushback: np.ndarray
+    suspension_force_bt: np.ndarray
+    suspension_pushback_bt: np.ndarray
+    debug_wheel_ray_from_bt: np.ndarray
+    debug_wheel_ray_to_bt: np.ndarray
+    debug_wheel_ray_fraction: np.ndarray
+    debug_wheel_linear_bt: np.ndarray
+    debug_wheel_angular: np.ndarray
     wheel_axle: np.ndarray
     wheel_forward: np.ndarray
     wheel_friction_impulse: np.ndarray
+    wheel_friction_impulse_bt: np.ndarray
+    wheel_friction_relative_bt: np.ndarray
     side_impulse: np.ndarray
     rolling_impulse: np.ndarray
     engine_acceleration: np.ndarray
@@ -47,6 +69,9 @@ class VehicleSnapshot:
     handbrake_value: np.ndarray
     wheels_with_contact: np.ndarray
     candidate_count: np.ndarray
+    mesh_candidate_count: np.ndarray
+    mesh_candidate_overflow: np.ndarray
+    contact_overflow: np.ndarray
     contact_count: np.ndarray
     world_contact_normal: np.ndarray
     candidate_total: np.ndarray
@@ -55,15 +80,20 @@ class VehicleSnapshot:
     contact_max: np.ndarray
     penetration_max: np.ndarray
     contact_point: np.ndarray
+    contact_local_a: np.ndarray
+    contact_point_b: np.ndarray
     contact_normal: np.ndarray
     contact_tangent: np.ndarray
     contact_face: np.ndarray
+    contact_mesh: np.ndarray
     contact_distance: np.ndarray
+    contact_distance_bt: np.ndarray
     contact_penetration: np.ndarray
     contact_normal_jacobian: np.ndarray
     contact_tangent_jacobian: np.ndarray
     contact_normal_rhs: np.ndarray
     contact_tangent_rhs: np.ndarray
+    contact_push_rhs: np.ndarray
     contact_normal_impulse: np.ndarray
     contact_tangent_impulse: np.ndarray
     contact_push_impulse: np.ndarray
@@ -91,15 +121,27 @@ class VehicleState:
         self.auto_roll_angular_acceleration = wp.zeros(
             car_count, dtype=wp.vec3, device=device
         )
+        self.total_force_bt = wp.zeros(car_count, dtype=wp.vec3, device=device)
+        self.total_torque_bt = wp.zeros(car_count, dtype=wp.vec3, device=device)
+        self.inverse_inertia_world = wp.zeros(
+            car_count, dtype=wp.mat33, device=device
+        )
 
         for name in (
             "wheel_ray_start",
             "wheel_direction",
             "wheel_hit_point",
+            "wheel_hit_point_bt",
             "wheel_hit_normal",
             "wheel_axle",
             "wheel_forward",
             "wheel_friction_impulse",
+            "wheel_friction_impulse_bt",
+            "wheel_friction_relative_bt",
+            "debug_wheel_ray_from_bt",
+            "debug_wheel_ray_to_bt",
+            "debug_wheel_linear_bt",
+            "debug_wheel_angular",
         ):
             setattr(self, name, wp.zeros(self.wheel_count, dtype=wp.vec3, device=device))
         for name in (
@@ -109,6 +151,9 @@ class VehicleState:
             "suspension_clipped_factor",
             "suspension_force",
             "suspension_pushback",
+            "suspension_force_bt",
+            "suspension_pushback_bt",
+            "debug_wheel_ray_fraction",
             "side_impulse",
             "rolling_impulse",
             "engine_acceleration",
@@ -124,6 +169,11 @@ class VehicleState:
         self.handbrake_value = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.wheels_with_contact = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.candidate_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.mesh_candidate_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.mesh_candidate_overflow = wp.zeros(
+            car_count, dtype=wp.int32, device=device
+        )
+        self.contact_overflow = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.contact_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.world_contact_normal = wp.zeros(car_count, dtype=wp.vec3, device=device)
         self.candidate_total = wp.zeros(car_count, dtype=wp.float32, device=device)
@@ -132,18 +182,29 @@ class VehicleState:
         self.contact_max = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.penetration_max = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.contact_point = wp.zeros(self.contact_capacity, dtype=wp.vec3, device=device)
+        self.contact_local_a = wp.zeros(
+            self.contact_capacity, dtype=wp.vec3, device=device
+        )
+        self.contact_point_b = wp.zeros(
+            self.contact_capacity, dtype=wp.vec3, device=device
+        )
         self.contact_normal = wp.zeros(self.contact_capacity, dtype=wp.vec3, device=device)
         self.contact_tangent = wp.zeros(self.contact_capacity, dtype=wp.vec3, device=device)
         self.contact_face = wp.full(
             self.contact_capacity, -1, dtype=wp.int32, device=device
         )
+        self.contact_mesh = wp.full(
+            self.contact_capacity, -1, dtype=wp.int32, device=device
+        )
         for name in (
             "contact_distance",
+            "contact_distance_bt",
             "contact_penetration",
             "contact_normal_jacobian",
             "contact_tangent_jacobian",
             "contact_normal_rhs",
             "contact_tangent_rhs",
+            "contact_push_rhs",
             "contact_normal_impulse",
             "contact_tangent_impulse",
             "contact_push_impulse",
@@ -154,17 +215,43 @@ class VehicleState:
                 wp.zeros(self.contact_capacity, dtype=wp.float32, device=device),
             )
         self.contact_lifetime = wp.zeros(self.contact_capacity, dtype=wp.int32, device=device)
+        self.mesh_candidate_face = wp.full(
+            car_count * MAX_MESH_CANDIDATES_PER_CAR,
+            -1,
+            dtype=wp.int32,
+            device=device,
+        )
         self.plane_support_direction = wp.zeros(
             car_count * 12, dtype=wp.float32, device=device
         )
 
     @property
     def logical_bytes(self) -> int:
-        vec3_count = self.wheel_count * 7 + self.contact_capacity * 3 + self.car_count * 8
+        vec3_count = (
+            self.wheel_count * 14
+            + self.contact_capacity * 5
+            + self.car_count * 10
+        )
         quat_count = self.car_count
-        float_count = self.wheel_count * 14 + self.car_count * 16 + self.contact_capacity * 9
-        int_count = self.wheel_count * 3 + self.car_count * 5 + self.contact_capacity * 2
-        return (vec3_count * 3 + quat_count * 4 + float_count + int_count) * 4
+        float_count = (
+            self.wheel_count * 17
+            + self.car_count * 16
+            + self.contact_capacity * 11
+        )
+        int_count = (
+            self.wheel_count * 3
+            + self.car_count * 8
+            + self.contact_capacity * 3
+            + self.car_count * MAX_MESH_CANDIDATES_PER_CAR
+        )
+        mat33_count = self.car_count
+        return (
+            vec3_count * 3
+            + quat_count * 4
+            + mat33_count * 9
+            + float_count
+            + int_count
+        ) * 4
 
     def snapshot(self) -> VehicleSnapshot:
         car_count = self.car_count
@@ -191,9 +278,15 @@ class VehicleState:
             auto_roll_angular_acceleration=array(
                 "auto_roll_angular_acceleration", np.float32, (car_count, 3)
             ),
+            total_force_bt=array("total_force_bt", np.float32, (car_count, 3)),
+            total_torque_bt=array("total_torque_bt", np.float32, (car_count, 3)),
+            inverse_inertia_world=array(
+                "inverse_inertia_world", np.float32, (car_count, 3, 3)
+            ),
             wheel_ray_start=array("wheel_ray_start", np.float32, wheel_vec_shape),
             wheel_direction=array("wheel_direction", np.float32, wheel_vec_shape),
             wheel_hit_point=array("wheel_hit_point", np.float32, wheel_vec_shape),
+            wheel_hit_point_bt=array("wheel_hit_point_bt", np.float32, wheel_vec_shape),
             wheel_hit_normal=array("wheel_hit_normal", np.float32, wheel_vec_shape),
             wheel_hit_distance=array("wheel_hit_distance", np.float32, wheel_shape),
             wheel_hit_face=array("wheel_hit_face", np.int32, wheel_shape),
@@ -202,10 +295,35 @@ class VehicleState:
             suspension_clipped_factor=array("suspension_clipped_factor", np.float32, wheel_shape),
             suspension_force=array("suspension_force", np.float32, wheel_shape),
             suspension_pushback=array("suspension_pushback", np.float32, wheel_shape),
+            suspension_force_bt=array("suspension_force_bt", np.float32, wheel_shape),
+            suspension_pushback_bt=array(
+                "suspension_pushback_bt", np.float32, wheel_shape
+            ),
+            debug_wheel_ray_from_bt=array(
+                "debug_wheel_ray_from_bt", np.float32, wheel_vec_shape
+            ),
+            debug_wheel_ray_to_bt=array(
+                "debug_wheel_ray_to_bt", np.float32, wheel_vec_shape
+            ),
+            debug_wheel_ray_fraction=array(
+                "debug_wheel_ray_fraction", np.float32, wheel_shape
+            ),
+            debug_wheel_linear_bt=array(
+                "debug_wheel_linear_bt", np.float32, wheel_vec_shape
+            ),
+            debug_wheel_angular=array(
+                "debug_wheel_angular", np.float32, wheel_vec_shape
+            ),
             wheel_axle=array("wheel_axle", np.float32, wheel_vec_shape),
             wheel_forward=array("wheel_forward", np.float32, wheel_vec_shape),
             wheel_friction_impulse=array(
                 "wheel_friction_impulse", np.float32, wheel_vec_shape
+            ),
+            wheel_friction_impulse_bt=array(
+                "wheel_friction_impulse_bt", np.float32, wheel_vec_shape
+            ),
+            wheel_friction_relative_bt=array(
+                "wheel_friction_relative_bt", np.float32, wheel_vec_shape
             ),
             side_impulse=array("side_impulse", np.float32, wheel_shape),
             rolling_impulse=array("rolling_impulse", np.float32, wheel_shape),
@@ -219,6 +337,13 @@ class VehicleState:
             handbrake_value=array("handbrake_value", np.float32, (car_count,)),
             wheels_with_contact=array("wheels_with_contact", np.int32, (car_count,)),
             candidate_count=array("candidate_count", np.int32, (car_count,)),
+            mesh_candidate_count=array(
+                "mesh_candidate_count", np.int32, (car_count,)
+            ),
+            mesh_candidate_overflow=array(
+                "mesh_candidate_overflow", np.int32, (car_count,)
+            ),
+            contact_overflow=array("contact_overflow", np.int32, (car_count,)),
             contact_count=array("contact_count", np.int32, (car_count,)),
             world_contact_normal=array(
                 "world_contact_normal", np.float32, (car_count, 3)
@@ -229,10 +354,18 @@ class VehicleState:
             contact_max=array("contact_max", np.int32, (car_count,)),
             penetration_max=array("penetration_max", np.float32, (car_count,)),
             contact_point=array("contact_point", np.float32, contact_vec_shape),
+            contact_local_a=array(
+                "contact_local_a", np.float32, contact_vec_shape
+            ),
+            contact_point_b=array("contact_point_b", np.float32, contact_vec_shape),
             contact_normal=array("contact_normal", np.float32, contact_vec_shape),
             contact_tangent=array("contact_tangent", np.float32, contact_vec_shape),
             contact_face=array("contact_face", np.int32, contact_shape),
+            contact_mesh=array("contact_mesh", np.int32, contact_shape),
             contact_distance=array("contact_distance", np.float32, contact_shape),
+            contact_distance_bt=array(
+                "contact_distance_bt", np.float32, contact_shape
+            ),
             contact_penetration=array("contact_penetration", np.float32, contact_shape),
             contact_normal_jacobian=array(
                 "contact_normal_jacobian", np.float32, contact_shape
@@ -242,6 +375,7 @@ class VehicleState:
             ),
             contact_normal_rhs=array("contact_normal_rhs", np.float32, contact_shape),
             contact_tangent_rhs=array("contact_tangent_rhs", np.float32, contact_shape),
+            contact_push_rhs=array("contact_push_rhs", np.float32, contact_shape),
             contact_normal_impulse=array(
                 "contact_normal_impulse", np.float32, contact_shape
             ),

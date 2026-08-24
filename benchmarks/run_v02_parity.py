@@ -175,7 +175,7 @@ def _numeric_errors(state, vehicle, reference) -> dict[str, float]:
     )
     cosine = np.clip((np.trace(relative) - 1.0) * 0.5, -1.0, 1.0)
     sim_world_normal = np.zeros(3, dtype=np.float32)
-    if vehicle.contact_count[0] > 0:
+    if np.linalg.norm(vehicle.world_contact_normal[0]) > 0.5:
         sim_world_normal = vehicle.world_contact_normal[0]
     normal_angle = 0.0
     sim_normal_length = float(np.linalg.norm(sim_world_normal))
@@ -208,7 +208,9 @@ def _hard_mismatches(state, vehicle, reference) -> list[str]:
     for index, reference_contact in enumerate(reference.wheel_contacts):
         if bool(vehicle.wheel_contact[0, index]) != reference_contact:
             mismatches.append(f"wheel_contact_{index}")
-    sim_world_contact = bool(vehicle.contact_count[0])
+    sim_world_contact = bool(
+        np.linalg.norm(vehicle.world_contact_normal[0].astype(np.float64)) > 0.5
+    )
     if sim_world_contact != reference.has_world_contact:
         mismatches.append("world_contact")
     sim_velocity = state.car_vel[0, 0].astype(np.float64)

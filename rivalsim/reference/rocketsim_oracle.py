@@ -55,6 +55,22 @@ class StaticWorldOracleFrame:
     world_contact_normal: np.ndarray
 
 
+@dataclass(slots=True)
+class StaticWorldBatchOracleFrame:
+    """Vectorized readback for independent non-colliding cars in one arena."""
+
+    car_pos: np.ndarray
+    car_vel: np.ndarray
+    car_matrix: np.ndarray
+    car_ang_vel: np.ndarray
+    boost: np.ndarray
+    handbrake_value: np.ndarray
+    on_ground: np.ndarray
+    wheel_contacts: np.ndarray
+    has_world_contact: np.ndarray
+    world_contact_normal: np.ndarray
+
+
 class RocketSimOracle:
     """One isolated RocketSim THE_VOID arena for a deterministic scenario."""
 
@@ -258,6 +274,168 @@ class RocketSimStaticWorldOracle:
         self.arena.ball.set_state(ball)
 
 
+class RocketSimStaticWorldBatchOracle:
+    """A batch of isolated one-car Soccar authority arenas.
+
+    Bullet's static constraints are not batch-invariant when many validation
+    cars share one arena, even with car/car and car/ball collision disabled.
+    Each case therefore owns a fresh arena and is stepped independently, which
+    implements the v0.2.2 reset-before-next-case contract literally.
+    """
+
+    def __init__(self, state: StateSnapshot, collision_root: str):
+        global _STATIC_WORLD_INIT_ROOT
+
+        if state.num_envs <= 0:
+            raise ValueError("the batch oracle requires at least one world")
+        self.rs = _import_rocketsim()
+        if _STATIC_WORLD_INIT_ROOT is None:
+            self.rs.init(collision_root)
+            _STATIC_WORLD_INIT_ROOT = collision_root
+        elif collision_root != _STATIC_WORLD_INIT_ROOT:
+            raise RuntimeError(
+                "RocketSim is process-global and was initialized with a different collision root"
+            )
+        self.arenas = []
+        self.cars = []
+        self._initial_car_pos = np.ascontiguousarray(state.car_pos[:, 0], dtype=np.float32)
+        self._initial_car_vel = np.ascontiguousarray(state.car_vel[:, 0], dtype=np.float32)
+        self._initial_car_quat = np.ascontiguousarray(state.car_quat[:, 0], dtype=np.float32)
+        self._initial_car_ang_vel = np.ascontiguousarray(
+            state.car_ang_vel[:, 0], dtype=np.float32
+        )
+        for env_index in range(state.num_envs):
+            config = self.rs.ArenaConfig()
+            config.no_ball_rot = False
+            arena = self.rs.Arena(
+                self.rs.GameMode.SOCCAR,
+                tick_rate=120.0,
+                config=config,
+            )
+            arena.set_car_car_collision(False)
+            arena.set_car_ball_collision(False)
+            car = arena.add_car(self.rs.Team.BLUE, self.rs.CarConfig.OCTANE)
+            self._set_car_state(car, state, env_index)
+            ball = self.rs.BallState()
+            ball.pos = self.rs.Vec(0.0, 0.0, 1500.0)
+            arena.ball.set_state(ball)
+            self.arenas.append(arena)
+            self.cars.append(car)
+        # Preserve the single-arena attribute used by older diagnostics.
+        self.arena = self.arenas[0]
+
+    @property
+    def num_envs(self) -> int:
+        return len(self.cars)
+
+    def set_controls(self, controls: ControlBatch) -> None:
+        if controls.num_envs != self.num_envs:
+            raise ValueError("control batch does not match the batch oracle")
+        for env_index, car in enumerate(self.cars):
+            car.set_controls(_to_controls_at(self.rs, controls, env_index, 0))
+
+    def step(self) -> None:
+        for arena in self.arenas:
+            arena.step(1)
+
+    def authoritative_snapshot(self) -> StateSnapshot:
+        """Return the exact state read back after RocketSim initialization."""
+
+        result = StateSnapshot.empty(self.num_envs)
+        result.car_pos[:, 1] = (0.0, 0.0, 1000.0)
+        result.ball_pos[:] = (0.0, 0.0, 1500.0)
+        for env_index, car in enumerate(self.cars):
+            source = car.get_state()
+            # Preserve the exact source fields supplied to CarState. Immediate
+            # readback converts Bullet-unit position/velocity back to UU and
+            # exposes the transform basis only as RotMat; feeding those lossy
+            # views back into the GPU would no longer reconstruct the rigid
+            # state that RocketSim actually steps.
+            result.car_pos[env_index, 0] = self._initial_car_pos[env_index]
+            result.car_vel[env_index, 0] = self._initial_car_vel[env_index]
+            result.car_quat[env_index, 0] = self._initial_car_quat[env_index]
+            result.car_ang_vel[env_index, 0] = self._initial_car_ang_vel[env_index]
+            result.boost[env_index, 0] = float(source.boost)
+            result.on_ground[env_index, 0] = int(source.is_on_ground)
+            result.has_jumped[env_index, 0] = int(source.has_jumped)
+            result.is_jumping[env_index, 0] = int(source.is_jumping)
+            result.has_double_jumped[env_index, 0] = int(source.has_double_jumped)
+            result.has_flipped[env_index, 0] = int(source.has_flipped)
+            result.is_flipping[env_index, 0] = int(source.is_flipping)
+            result.jump_time[env_index, 0] = float(source.jump_time)
+            result.air_time[env_index, 0] = float(source.air_time)
+            result.air_time_since_jump[env_index, 0] = float(source.air_time_since_jump)
+            result.flip_time[env_index, 0] = float(source.flip_time)
+            result.flip_rel_torque[env_index, 0] = _vec(source.flip_rel_torque)
+            result.is_supersonic[env_index, 0] = int(source.is_supersonic)
+            result.supersonic_time[env_index, 0] = float(source.supersonic_time)
+            result.boosting_time[env_index, 0] = float(source.boosting_time)
+        result.validate()
+        return result
+
+    def frame(self) -> StaticWorldBatchOracleFrame:
+        count = self.num_envs
+        car_pos = np.empty((count, 3), dtype=np.float32)
+        car_vel = np.empty((count, 3), dtype=np.float32)
+        car_matrix = np.empty((count, 3, 3), dtype=np.float32)
+        car_ang_vel = np.empty((count, 3), dtype=np.float32)
+        boost = np.empty(count, dtype=np.float32)
+        handbrake_value = np.empty(count, dtype=np.float32)
+        on_ground = np.empty(count, dtype=np.bool_)
+        wheel_contacts = np.empty((count, 4), dtype=np.bool_)
+        has_world_contact = np.empty(count, dtype=np.bool_)
+        world_contact_normal = np.empty((count, 3), dtype=np.float32)
+        for env_index, car in enumerate(self.cars):
+            source = car.get_state()
+            car_pos[env_index] = _vec(source.pos)
+            car_vel[env_index] = _vec(source.vel)
+            car_matrix[env_index] = _matrix(source.rot_mat)
+            car_ang_vel[env_index] = _vec(source.ang_vel)
+            boost[env_index] = float(source.boost)
+            handbrake_value[env_index] = float(source.handbrake_val)
+            on_ground[env_index] = bool(source.is_on_ground)
+            wheel_contacts[env_index] = tuple(bool(value) for value in source.wheels_with_contact)
+            has_world_contact[env_index] = bool(source.has_world_contact)
+            world_contact_normal[env_index] = _vec(source.world_contact_normal)
+        return StaticWorldBatchOracleFrame(
+            car_pos=car_pos,
+            car_vel=car_vel,
+            car_matrix=car_matrix,
+            car_ang_vel=car_ang_vel,
+            boost=boost,
+            handbrake_value=handbrake_value,
+            on_ground=on_ground,
+            wheel_contacts=wheel_contacts,
+            has_world_contact=has_world_contact,
+            world_contact_normal=world_contact_normal,
+        )
+
+    def _set_car_state(self, car: Any, snapshot: StateSnapshot, env_index: int) -> None:
+        source = self.rs.CarState()
+        source.pos = _to_vec(self.rs, snapshot.car_pos[env_index, 0])
+        source.vel = _to_vec(self.rs, snapshot.car_vel[env_index, 0])
+        source.ang_vel = _to_vec(self.rs, snapshot.car_ang_vel[env_index, 0])
+        source.rot_mat = _to_rot_mat(self.rs, snapshot.car_quat[env_index, 0])
+        source.boost = float(snapshot.boost[env_index, 0])
+        source.is_on_ground = bool(snapshot.on_ground[env_index, 0])
+        source.has_jumped = bool(snapshot.has_jumped[env_index, 0])
+        source.is_jumping = bool(snapshot.is_jumping[env_index, 0])
+        source.has_double_jumped = bool(snapshot.has_double_jumped[env_index, 0])
+        source.has_flipped = bool(snapshot.has_flipped[env_index, 0])
+        source.is_flipping = bool(snapshot.is_flipping[env_index, 0])
+        source.jump_time = float(snapshot.jump_time[env_index, 0])
+        source.air_time = float(snapshot.air_time[env_index, 0])
+        source.air_time_since_jump = float(snapshot.air_time_since_jump[env_index, 0])
+        source.flip_time = float(snapshot.flip_time[env_index, 0])
+        source.flip_rel_torque = _to_vec(self.rs, snapshot.flip_rel_torque[env_index, 0])
+        source.is_supersonic = bool(snapshot.is_supersonic[env_index, 0])
+        source.supersonic_time = float(snapshot.supersonic_time[env_index, 0])
+        source.boosting_time = float(snapshot.boosting_time[env_index, 0])
+        source.handbrake_val = 0.0
+        source.last_controls = _previous_controls_at(self.rs, snapshot, env_index, 0)
+        car.set_state(source)
+
+
 def binding_metadata() -> dict[str, str]:
     from importlib.metadata import version
 
@@ -279,15 +457,32 @@ def _import_rocketsim() -> Any:
 
 
 def _to_controls(rs: Any, controls: ControlBatch, car_index: int) -> Any:
+    return _to_controls_at(rs, controls, 0, car_index)
+
+
+def _to_controls_at(rs: Any, controls: ControlBatch, env_index: int, car_index: int) -> Any:
     return rs.CarControls(
-        throttle=float(controls.throttle[0, car_index]),
-        steer=float(controls.steer[0, car_index]),
-        pitch=float(controls.pitch[0, car_index]),
-        yaw=float(controls.yaw[0, car_index]),
-        roll=float(controls.roll[0, car_index]),
-        jump=bool(controls.jump[0, car_index]),
-        boost=bool(controls.boost[0, car_index]),
-        handbrake=bool(controls.handbrake[0, car_index]),
+        throttle=float(controls.throttle[env_index, car_index]),
+        steer=float(controls.steer[env_index, car_index]),
+        pitch=float(controls.pitch[env_index, car_index]),
+        yaw=float(controls.yaw[env_index, car_index]),
+        roll=float(controls.roll[env_index, car_index]),
+        jump=bool(controls.jump[env_index, car_index]),
+        boost=bool(controls.boost[env_index, car_index]),
+        handbrake=bool(controls.handbrake[env_index, car_index]),
+    )
+
+
+def _previous_controls_at(rs: Any, snapshot: StateSnapshot, env_index: int, car_index: int) -> Any:
+    return rs.CarControls(
+        throttle=float(snapshot.prev_throttle[env_index, car_index]),
+        steer=float(snapshot.prev_steer[env_index, car_index]),
+        pitch=float(snapshot.prev_pitch[env_index, car_index]),
+        yaw=float(snapshot.prev_yaw[env_index, car_index]),
+        roll=float(snapshot.prev_roll[env_index, car_index]),
+        jump=bool(snapshot.prev_jump[env_index, car_index]),
+        boost=bool(snapshot.prev_boost[env_index, car_index]),
+        handbrake=bool(snapshot.prev_handbrake[env_index, car_index]),
     )
 
 

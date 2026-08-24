@@ -225,7 +225,12 @@ def main() -> int:
     parity_pass = False
     if parity_path.exists():
         parity_result = json.loads(parity_path.read_text(encoding="utf-8"))
-        parity_pass = bool(parity_result["summary"]["parity_gate_pass"])
+        if "summary" in parity_result:
+            parity_pass = bool(parity_result["summary"]["parity_gate_pass"])
+        else:
+            parity_pass = bool(
+                parity_result.get("gate", {}).get("complete_v022_gate_pass", False)
+            )
     hot_loop_resident = all(
         point["hot_loop_host_to_device_bytes"] == 0 and point["hot_loop_device_to_host_bytes"] == 0
         for points in results.values()
@@ -470,7 +475,7 @@ def _classify(
     hot_loop_resident: bool,
 ) -> tuple[str, str]:
     infrastructure_pass = stable_scaling and hot_loop_resident
-    if milestone == "v0.2.1":
+    if milestone in {"v0.2.1", "v0.2.2"}:
         if rate >= 500000.0:
             performance_band = "green_threshold"
         elif rate >= 100000.0:

@@ -1,0 +1,1055 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.2.2",
+  "evidence_kind": "cached_complete_static_world_acceptance",
+  "generated_at_utc": "2026-08-24T18:41:18.041020+00:00",
+  "classification": "PASS_GREEN",
+  "implementation": {
+    "python": "3.14.3",
+    "warp": "1.16.0",
+    "device": "cuda:0",
+    "rocketsim_package": "2.2.1",
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8"
+  },
+  "frozen_protocol": {
+    "hard_horizons_ticks": [
+      1,
+      4,
+      8,
+      12
+    ],
+    "long_horizons_status": "diagnostic_only_not_run",
+    "tolerances": {
+      "position_uu": 10.0,
+      "linear_velocity_uu_per_s": 25.0,
+      "orientation_rad": 0.025,
+      "angular_velocity_rad_per_s": 0.1,
+      "boost": 0.01,
+      "handbrake_value": 0.0001,
+      "world_contact_normal_rad": 0.05
+    },
+    "residual_definition": "A checkpoint metric at or above 25% of its frozen tolerance, while that checkpoint has no hard or numeric failure.",
+    "residual_tolerance_fraction": 0.25
+  },
+  "authority": {
+    "identity_sha256": "6B31F9D147D5A19F882F9075C2A9F07C9A7228377A8A118CA2874F67FBD0805B",
+    "corpus_sha256": "B548A2E509FC8EFD8AD48502AB687CFC436F260A4B83DADED82D2D17B0B5FA7B",
+    "oracle_execution": "cached_native_authority_only"
+  },
+  "complete_acceptance": {
+    "aggregate_sha256": "8A45D88EC11609C0FDBF17D7B09FDB9BB41B69CEFDE28F20C87469A0F79E3693",
+    "run_sha256": "835B8A0D930646F32D1FF3BC40747A5E28310FCCADC169B8AFA84C385CC3737B",
+    "chunk_count": 154,
+    "compressed_size_bytes": 4797490,
+    "chunk_set_sha256": "B6E82B2BA0E18545FF0C041582F781138741AFE3A50358A3E3491F530E63B4B8",
+    "run": {
+      "schema_version": 1,
+      "milestone": "v0.2.2",
+      "generator_schema_version": 3,
+      "generator_seed": 20260823,
+      "geometry_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+      "topology_counts": {
+        "concave_directed_edges": 10296,
+        "convex_directed_edges": 856,
+        "planar_directed_edges": 12024,
+        "shared_directed_edges": 23176
+      },
+      "full_case_count": 39236,
+      "selected_case_count": 39236,
+      "selection_kind": "complete",
+      "corpus_sha256": "B548A2E509FC8EFD8AD48502AB687CFC436F260A4B83DADED82D2D17B0B5FA7B",
+      "selection_sha256": "E09604AD9DD09FE1ABCA9CD596032FBE758A627FBB89DC6F40EE4A5AF03D8E50",
+      "oracle_authority_identity_sha256": "6B31F9D147D5A19F882F9075C2A9F07C9A7228377A8A118CA2874F67FBD0805B",
+      "oracle_cache_dir": "G:\\dev\\RivalSim\\.tools\\v0.2.2\\oracle-cache\\6B31F9D147D5A19F882F9075C2A9F07C9A7228377A8A118CA2874F67FBD0805B",
+      "oracle_execution": "cached_native_authority_only",
+      "horizons_ticks": [
+        1,
+        4,
+        8,
+        12
+      ],
+      "residual_tolerance_fraction": 0.25,
+      "edge_observation_distance_uu": 5.01,
+      "chunk_size": 256,
+      "device": "cuda:0"
+    },
+    "counts": {
+      "selected_starting_states": 39236,
+      "full_corpus_starting_states": 39236,
+      "checkpoint_comparisons": 156944,
+      "metric_comparisons": 1098608,
+      "hard_mismatch_events": 0,
+      "hard_mismatch_checkpoints": 0,
+      "hard_mismatch_cases": 0,
+      "numeric_failure_events": 0,
+      "numeric_failure_checkpoints": 0,
+      "numeric_failure_cases": 0,
+      "residual_nonblocking_deviation_events": 5,
+      "residual_nonblocking_checkpoints": 5,
+      "residual_nonblocking_cases": 3,
+      "failed_cases": 0
+    },
+    "pass_fail_by_horizon": {
+      "1": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "4": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "8": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "12": {
+        "pass": 39236,
+        "fail": 0
+      }
+    },
+    "gate": {
+      "selection_complete": true,
+      "selected_run_pass": true,
+      "complete_v022_gate_pass": true,
+      "classification": "PASS_GREEN",
+      "unresolved_hard_or_numeric_failures": 0
+    },
+    "run_seconds": 102.01665040000807
+  },
+  "representative_gate": {
+    "aggregate_sha256": "D1AFE155D1CD0A219E1CDE51BFD5610DAA982D11311D3E281BB87A4008C7E3C8",
+    "run_sha256": "3466FD5D4F2838EFD3D83439F40AE67CF916C7DAD5A0132F5A837F2902BFB9BA",
+    "chunk_count": 5,
+    "compressed_size_bytes": 148808,
+    "chunk_set_sha256": "E499888827ADC9BC0E3D7AB8537402DF045BF8FD0FD9A9AAF33A3C5D69C71167",
+    "run": {
+      "schema_version": 1,
+      "milestone": "v0.2.2",
+      "generator_schema_version": 3,
+      "generator_seed": 20260823,
+      "geometry_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+      "topology_counts": {
+        "concave_directed_edges": 10296,
+        "convex_directed_edges": 856,
+        "planar_directed_edges": 12024,
+        "shared_directed_edges": 23176
+      },
+      "full_case_count": 39236,
+      "selected_case_count": 1043,
+      "selection_kind": "deterministic_pilot",
+      "corpus_sha256": "B548A2E509FC8EFD8AD48502AB687CFC436F260A4B83DADED82D2D17B0B5FA7B",
+      "selection_sha256": "6881EC6B06F5EE21A11182A64D70BD81B72EEA17683CC5057CD5135FBA33178A",
+      "oracle_authority_identity_sha256": "6B31F9D147D5A19F882F9075C2A9F07C9A7228377A8A118CA2874F67FBD0805B",
+      "oracle_cache_dir": "G:\\dev\\RivalSim\\.tools\\v0.2.2\\oracle-cache\\6B31F9D147D5A19F882F9075C2A9F07C9A7228377A8A118CA2874F67FBD0805B",
+      "oracle_execution": "cached_native_authority_only",
+      "horizons_ticks": [
+        1,
+        4,
+        8,
+        12
+      ],
+      "residual_tolerance_fraction": 0.25,
+      "edge_observation_distance_uu": 5.01,
+      "chunk_size": 256,
+      "device": "cuda:0"
+    },
+    "counts": {
+      "selected_starting_states": 1043,
+      "full_corpus_starting_states": 39236,
+      "checkpoint_comparisons": 4172,
+      "metric_comparisons": 29204,
+      "hard_mismatch_events": 0,
+      "hard_mismatch_checkpoints": 0,
+      "hard_mismatch_cases": 0,
+      "numeric_failure_events": 0,
+      "numeric_failure_checkpoints": 0,
+      "numeric_failure_cases": 0,
+      "residual_nonblocking_deviation_events": 0,
+      "residual_nonblocking_checkpoints": 0,
+      "residual_nonblocking_cases": 0,
+      "failed_cases": 0
+    },
+    "pass_fail_by_horizon": {
+      "1": {
+        "pass": 1043,
+        "fail": 0
+      },
+      "4": {
+        "pass": 1043,
+        "fail": 0
+      },
+      "8": {
+        "pass": 1043,
+        "fail": 0
+      },
+      "12": {
+        "pass": 1043,
+        "fail": 0
+      }
+    },
+    "gate": {
+      "selection_complete": false,
+      "selected_run_pass": true,
+      "complete_v022_gate_pass": false,
+      "classification": "PILOT_PASS",
+      "unresolved_hard_or_numeric_failures": 0
+    },
+    "run_seconds": 7.909487400087528
+  },
+  "numeric_error_distributions": {
+    "angular_velocity_rad_per_s": {
+      "p50": 1.5366822481155396e-08,
+      "p95": 4.127897191921666e-05,
+      "p99": 8.965718775580746e-05,
+      "max": 0.028763447257724065,
+      "tolerance": 0.1,
+      "max_tolerance_fraction": 0.2876344725772406
+    },
+    "boost": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.0,
+      "tolerance": 0.01,
+      "max_tolerance_fraction": 0.0
+    },
+    "handbrake_value": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.0,
+      "tolerance": 0.0001,
+      "max_tolerance_fraction": 0.0
+    },
+    "linear_velocity_uu_per_s": {
+      "p50": 1.1587547656108435e-05,
+      "p95": 0.0019988132054017454,
+      "p99": 0.00531782890740399,
+      "max": 1.5951105215284054,
+      "tolerance": 25.0,
+      "max_tolerance_fraction": 0.06380442086113622
+    },
+    "orientation_rad": {
+      "p50": 0.0,
+      "p95": 0.00045786127398980854,
+      "p99": 0.0006244518629359434,
+      "max": 0.0025615239114982922,
+      "tolerance": 0.025,
+      "max_tolerance_fraction": 0.10246095645993168
+    },
+    "position_uu": {
+      "p50": 0.0001220703125,
+      "p95": 0.0009765625,
+      "p99": 0.0010986328125,
+      "max": 0.7013440778329066,
+      "tolerance": 10.0,
+      "max_tolerance_fraction": 0.07013440778329066
+    },
+    "world_contact_normal_rad": {
+      "p50": 0.0,
+      "p95": 1.4901161193847656e-08,
+      "p99": 2.1073424255447017e-08,
+      "max": 0.0028948943152249827,
+      "tolerance": 0.05,
+      "max_tolerance_fraction": 0.05789788630449965
+    }
+  },
+  "worst_local_errors": [
+    {
+      "case_id": "E18441",
+      "family": "edge_planar_chassis",
+      "mode": "approach_from_directed_face",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": "planar",
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.028763447257724065,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.2876344725772406
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.028184445174992506,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.28184445174992506
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 4,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.025848646251173918,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.2584864625117392
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.025779477213590713,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.2577947721359071
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.025590305746499814,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.25590305746499814
+    },
+    {
+      "case_id": "E12172",
+      "family": "edge_concave_wheel",
+      "mode": "wheel_ray_crossing_seam",
+      "mesh_file": "mesh_4.cmf",
+      "edge_class": "concave",
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.020511929761183493,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.20511929761183492
+    },
+    {
+      "case_id": "F05402-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_tangential",
+      "mesh_file": "mesh_5.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.02016797510470305,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.20167975104703048
+    },
+    {
+      "case_id": "F07324-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.018369242241887056,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.18369242241887054
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.017612555442330875,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.17612555442330874
+    },
+    {
+      "case_id": "F01412-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_tangential",
+      "mesh_file": "mesh_1.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.014556485926655918,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.14556485926655918
+    },
+    {
+      "case_id": "F02426-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_tangential",
+      "mesh_file": "mesh_2.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.014556299524705302,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.14556299524705302
+    },
+    {
+      "case_id": "F07062-W",
+      "family": "triangle_wheel",
+      "mode": "front_wheel_compressed",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.013879290673078443,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.13879290673078443
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "orientation_rad",
+      "error": 0.0025615239114982922,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.10246095645993168
+    },
+    {
+      "case_id": "P-right_wall-4",
+      "family": "analytic_right_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 4,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.008630073657280187,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.08630073657280186
+    },
+    {
+      "case_id": "P-left_wall-4",
+      "family": "analytic_left_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 4,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.008627704467419051,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.0862770446741905
+    },
+    {
+      "case_id": "F02598-C",
+      "family": "triangle_chassis",
+      "mode": "normal_impact",
+      "mesh_file": "mesh_2.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.00860696976774532,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.08606969767745319
+    },
+    {
+      "case_id": "E18441",
+      "family": "edge_planar_chassis",
+      "mode": "approach_from_directed_face",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": "planar",
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.008578872542223058,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.08578872542223057
+    },
+    {
+      "case_id": "P-right_wall-4",
+      "family": "analytic_right_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.007340213695958097,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.07340213695958096
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "orientation_rad",
+      "error": 0.0017552452491595744,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.07020980996638297
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "position_uu",
+      "error": 0.7013440778329066,
+      "tolerance": 10.0,
+      "tolerance_fraction": 0.07013440778329066
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "position_uu",
+      "error": 0.6944495623204604,
+      "tolerance": 10.0,
+      "tolerance_fraction": 0.06944495623204604
+    },
+    {
+      "case_id": "E03239",
+      "family": "edge_concave_chassis",
+      "mode": "shallow_breaking_threshold",
+      "mesh_file": "mesh_1.cmf",
+      "edge_class": "concave",
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.006940070525698282,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.06940070525698282
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "orientation_rad",
+      "error": 0.0016197363892041059,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.06478945556816423
+    },
+    {
+      "case_id": "F07062-W",
+      "family": "triangle_wheel",
+      "mode": "front_wheel_compressed",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "linear_velocity_uu_per_s",
+      "error": 1.5951105215284054,
+      "tolerance": 25.0,
+      "tolerance_fraction": 0.06380442086113622
+    },
+    {
+      "case_id": "F03918-W",
+      "family": "triangle_wheel",
+      "mode": "front_wheel_compressed",
+      "mesh_file": "mesh_4.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.006239218465094018,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.06239218465094018
+    },
+    {
+      "case_id": "P-right_wall-4",
+      "family": "analytic_right_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.005831847732858935,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.05831847732858935
+    },
+    {
+      "case_id": "P-left_wall-4",
+      "family": "analytic_left_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 8,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.005819638524400538,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.058196385244005375
+    },
+    {
+      "case_id": "P-left_wall-4",
+      "family": "analytic_left_wall_chassis",
+      "mode": "angled_overlap",
+      "mesh_file": null,
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.005811718635144433,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.058117186351444326
+    },
+    {
+      "case_id": "E23143",
+      "family": "edge_concave_chassis",
+      "mode": "slide_along_seam",
+      "mesh_file": "mesh_14.cmf",
+      "edge_class": "concave",
+      "tick": 4,
+      "metric": "world_contact_normal_rad",
+      "error": 0.0028948943152249827,
+      "tolerance": 0.05,
+      "tolerance_fraction": 0.05789788630449965
+    },
+    {
+      "case_id": "E18441",
+      "family": "edge_planar_chassis",
+      "mode": "approach_from_directed_face",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": "planar",
+      "tick": 8,
+      "metric": "linear_velocity_uu_per_s",
+      "error": 1.3388247645588465,
+      "tolerance": 25.0,
+      "tolerance_fraction": 0.05355299058235386
+    },
+    {
+      "case_id": "F06964-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": null,
+      "tick": 4,
+      "metric": "orientation_rad",
+      "error": 0.001064630572835262,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.04258522291341048
+    },
+    {
+      "case_id": "E14620",
+      "family": "edge_concave_chassis",
+      "mode": "chassis_spanning_both_faces",
+      "mesh_file": "mesh_5.cmf",
+      "edge_class": "concave",
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.004241494759859909,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.04241494759859908
+    },
+    {
+      "case_id": "F05891-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 8,
+      "metric": "orientation_rad",
+      "error": 0.0010324556740195566,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.04129822696078226
+    },
+    {
+      "case_id": "E10719",
+      "family": "edge_planar_chassis",
+      "mode": "shallow_breaking_threshold",
+      "mesh_file": "mesh_4.cmf",
+      "edge_class": "planar",
+      "tick": 4,
+      "metric": "orientation_rad",
+      "error": 0.0009815189065467548,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.039260756261870186
+    },
+    {
+      "case_id": "F01822-C",
+      "family": "triangle_chassis",
+      "mode": "angled_chassis",
+      "mesh_file": "mesh_2.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "orientation_rad",
+      "error": 0.0009664654695994725,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.038658618783978894
+    },
+    {
+      "case_id": "F04825-C",
+      "family": "triangle_chassis",
+      "mode": "shallow_near_margin",
+      "mesh_file": "mesh_5.cmf",
+      "edge_class": null,
+      "tick": 4,
+      "metric": "orientation_rad",
+      "error": 0.0009449284829504212,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03779713931801685
+    },
+    {
+      "case_id": "E10547",
+      "family": "edge_planar_wheel",
+      "mode": "wheel_ray_crossing_seam",
+      "mesh_file": "mesh_4.cmf",
+      "edge_class": "planar",
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.0009326456244679722,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.037305824978718885
+    },
+    {
+      "case_id": "E16772",
+      "family": "edge_planar_wheel",
+      "mode": "wheel_ray_crossing_seam",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": "planar",
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.0009325772147957879,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03730308859183151
+    },
+    {
+      "case_id": "E18997",
+      "family": "edge_planar_wheel",
+      "mode": "wheel_ray_crossing_seam",
+      "mesh_file": "mesh_7.cmf",
+      "edge_class": "planar",
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.0009325772147957879,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03730308859183151
+    },
+    {
+      "case_id": "F05825-C",
+      "family": "triangle_chassis",
+      "mode": "angular_contact",
+      "mesh_file": "mesh_6.cmf",
+      "edge_class": null,
+      "tick": 12,
+      "metric": "angular_velocity_rad_per_s",
+      "error": 0.003696382308405388,
+      "tolerance": 0.1,
+      "tolerance_fraction": 0.036963823084053875
+    },
+    {
+      "case_id": "F02646-W",
+      "family": "triangle_wheel",
+      "mode": "front_wheel_compressed",
+      "mesh_file": "mesh_3.cmf",
+      "edge_class": null,
+      "tick": 4,
+      "metric": "orientation_rad",
+      "error": 0.0009075239305819605,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03630095722327842
+    },
+    {
+      "case_id": "E08611",
+      "family": "edge_planar_chassis",
+      "mode": "approach_from_directed_face",
+      "mesh_file": "mesh_3.cmf",
+      "edge_class": "planar",
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.0009073118601141352,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03629247440456541
+    },
+    {
+      "case_id": "E13974",
+      "family": "edge_planar_chassis",
+      "mode": "shallow_breaking_threshold",
+      "mesh_file": "mesh_5.cmf",
+      "edge_class": "planar",
+      "tick": 8,
+      "metric": "orientation_rad",
+      "error": 0.0009001953080274283,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03600781232109713
+    },
+    {
+      "case_id": "E13996",
+      "family": "edge_planar_chassis",
+      "mode": "approach_from_directed_face",
+      "mesh_file": "mesh_5.cmf",
+      "edge_class": "planar",
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.000894759845150903,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03579039380603612
+    },
+    {
+      "case_id": "E05339",
+      "family": "edge_concave_chassis",
+      "mode": "shallow_breaking_threshold",
+      "mesh_file": "mesh_2.cmf",
+      "edge_class": "concave",
+      "tick": 4,
+      "metric": "orientation_rad",
+      "error": 0.0008840880444484912,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.035363521777939645
+    },
+    {
+      "case_id": "E02618",
+      "family": "edge_planar_chassis",
+      "mode": "slide_along_seam",
+      "mesh_file": "mesh_1.cmf",
+      "edge_class": "planar",
+      "tick": 8,
+      "metric": "orientation_rad",
+      "error": 0.0008830187657513807,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03532075063005522
+    },
+    {
+      "case_id": "E00113",
+      "family": "edge_concave_chassis",
+      "mode": "slide_along_seam",
+      "mesh_file": "mesh_0.cmf",
+      "edge_class": "concave",
+      "tick": 8,
+      "metric": "orientation_rad",
+      "error": 0.0008731941346462916,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03492776538585166
+    },
+    {
+      "case_id": "E01884",
+      "family": "edge_planar_chassis",
+      "mode": "shallow_breaking_threshold",
+      "mesh_file": "mesh_0.cmf",
+      "edge_class": "planar",
+      "tick": 12,
+      "metric": "orientation_rad",
+      "error": 0.0008718937571304462,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.034875750285217846
+    },
+    {
+      "case_id": "E07942",
+      "family": "edge_planar_wheel",
+      "mode": "wheel_ray_crossing_seam",
+      "mesh_file": "mesh_3.cmf",
+      "edge_class": "planar",
+      "tick": 12,
+      "metric": "orientation_rad",
+      "error": 0.0008714614628001929,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.034858458512007716
+    },
+    {
+      "case_id": "F00833-W",
+      "family": "triangle_wheel",
+      "mode": "wheel_angular",
+      "mesh_file": "mesh_0.cmf",
+      "edge_class": null,
+      "tick": 1,
+      "metric": "orientation_rad",
+      "error": 0.0008690981754641803,
+      "tolerance": 0.025,
+      "tolerance_fraction": 0.03476392701856721
+    }
+  ],
+  "failure_clusters": {
+    "blocking": [],
+    "residual_nonblocking": [
+      {
+        "kind": "residual",
+        "metric": "angular_velocity_rad_per_s",
+        "case_kind": "triangle_face",
+        "family": "triangle_chassis",
+        "mode": "angled_chassis",
+        "mesh_file": "mesh_7.cmf",
+        "edge_class": null,
+        "primary_region": "back_wall",
+        "event_count": 3,
+        "case_count": 1,
+        "ticks": {
+          "4": 1,
+          "8": 1,
+          "12": 1
+        },
+        "example_case_ids": [
+          "F06964-C"
+        ]
+      },
+      {
+        "kind": "residual",
+        "metric": "angular_velocity_rad_per_s",
+        "case_kind": "shared_directed_edge",
+        "family": "edge_planar_chassis",
+        "mode": "approach_from_directed_face",
+        "mesh_file": "mesh_6.cmf",
+        "edge_class": "planar",
+        "primary_region": "back_wall",
+        "event_count": 1,
+        "case_count": 1,
+        "ticks": {
+          "8": 1
+        },
+        "example_case_ids": [
+          "E18441"
+        ]
+      },
+      {
+        "kind": "residual",
+        "metric": "angular_velocity_rad_per_s",
+        "case_kind": "triangle_face",
+        "family": "triangle_wheel",
+        "mode": "wheel_angular",
+        "mesh_file": "mesh_6.cmf",
+        "edge_class": null,
+        "primary_region": "back_wall",
+        "event_count": 1,
+        "case_count": 1,
+        "ticks": {
+          "12": 1
+        },
+        "example_case_ids": [
+          "F05891-W"
+        ]
+      }
+    ]
+  },
+  "coverage": {
+    "definitions": {
+      "topology_audited": "source CMF connectivity enumerated without implying contact",
+      "state_generated": "a deterministic starting state targets the topology element",
+      "actual_paired_target_contact": "RivalSim reported the targeted face/edge while RocketSim simultaneously reported the corresponding chassis or wheel semantic contact",
+      "parity_passed": "all 1/4/8/12 checkpoints passed hard and numeric gates",
+      "edge_proximity_uu": 5.01
+    },
+    "topology_audited": {
+      "mesh_files": 16,
+      "vertices": 4468,
+      "triangles": 8020,
+      "concave_directed_edges": 10296,
+      "convex_directed_edges": 856,
+      "planar_directed_edges": 12024,
+      "shared_directed_edges": 23176
+    },
+    "generated": {
+      "triangle_chassis_states": 8020,
+      "triangle_wheel_states": 8020,
+      "unique_triangles_with_any_state": 8020,
+      "shared_directed_edges": 23176,
+      "planar_directed_edges": 12024,
+      "convex_directed_edges": 856,
+      "concave_directed_edges": 10296,
+      "analytic_plane_states": 20
+    },
+    "actual_paired_target_contact": {
+      "chassis_triangles": 3504,
+      "wheel_triangles": 7259,
+      "unique_triangles": 7752,
+      "shared_directed_edges": 8912,
+      "planar_directed_edges": 5735,
+      "convex_directed_edges": 268,
+      "concave_directed_edges": 2909,
+      "observed_chassis_triangles_any_case": 8020,
+      "observed_wheel_triangles_any_case": 7752
+    },
+    "analytic_planes": {
+      "ceiling": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "floor": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "left_wall": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "right_wall": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      }
+    },
+    "important_regions": {
+      "back_wall": {
+        "generated_states": 22888,
+        "paired_target_contacts": 10712,
+        "parity_passed_states": 22888
+      },
+      "ceiling": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "ceiling_transition": {
+        "generated_states": 7296,
+        "paired_target_contacts": 4083,
+        "parity_passed_states": 7296
+      },
+      "corner": {
+        "generated_states": 3504,
+        "paired_target_contacts": 2043,
+        "parity_passed_states": 3504
+      },
+      "curved_wall_floor_transition": {
+        "generated_states": 15112,
+        "paired_target_contacts": 6018,
+        "parity_passed_states": 15112
+      },
+      "floor": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "floor_transition": {
+        "generated_states": 17488,
+        "paired_target_contacts": 7007,
+        "parity_passed_states": 17488
+      },
+      "general_wall_geometry": {
+        "generated_states": 944,
+        "paired_target_contacts": 706,
+        "parity_passed_states": 944
+      },
+      "goal_geometry": {
+        "generated_states": 8128,
+        "paired_target_contacts": 3345,
+        "parity_passed_states": 8128
+      },
+      "left_wall": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "narrow_or_small_triangle": {
+        "generated_states": 9640,
+        "paired_target_contacts": 3224,
+        "parity_passed_states": 9640
+      },
+      "ramp": {
+        "generated_states": 15112,
+        "paired_target_contacts": 6018,
+        "parity_passed_states": 15112
+      },
+      "right_wall": {
+        "generated_states": 5,
+        "paired_target_contacts": 5,
+        "parity_passed_states": 5
+      },
+      "side_wall": {
+        "generated_states": 7920,
+        "paired_target_contacts": 4138,
+        "parity_passed_states": 7920
+      }
+    }
+  },
+  "claim_boundary": "complete frozen v0.2.2 Octane/Soccar static-world corpus only; dynamic bodies, ball physics, game rules, and v0.3 are excluded"
+}

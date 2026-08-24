@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.2.2 — static-world source-parity breadth gate (2026-08-24)
+
+- Froze a deterministic 39,236-case Octane/Soccar authority corpus, hashed against the pinned
+  RocketSim/binding revisions, installed extension, CMFs, generator source/config, seed, and
+  authority settings. Cached 470,832 native frames with no live fallback in the GPU gate.
+- Added complete chassis/wheel states for all 8,020 DFH triangles, all 23,176 shared directed
+  edges, and 20 analytic-plane states, with generated coverage separated from actual paired
+  target contact.
+- Translated the bounded pinned Bullet operation path for box-versus-static-triangle
+  GJK/Voronoi/EPA witnesses, persistent-manifold refresh/four-point reduction, internal-edge
+  adjustment, contact rows, split impulse, and rigid-body integration.
+- Ported RocketSim's exact wheel ray, suspension, friction coefficient/impulse, force/torque,
+  and brake-force float32 order. Kept source-correct internal edges and added no hysteresis,
+  edge/tie tolerance, face-specific rule, or behavioral fitting.
+- Corrected `btGjkPairDetector` internal-valid versus callback-report control flow, preventing
+  false EPA fallback for valid shallow witnesses outside the callback distance.
+- Passed the cached 1,043-case representative gate and complete 39,236-case gate with **0 hard
+  mismatch events, 0 numeric failures, and 0 failed cases** across 156,944 checkpoints.
+- Preserved the v0.1 live RocketSim regression at 27/27 and passed 46/46 repository tests.
+  Deterministic stress, both GPU query backends, and hot-loop residency are green.
+- Measured corrected B3 at **511,886.15 aggregate simulated game-seconds/s** at 262,144 worlds,
+  **0.0913% CV**, zero timed transfers, and `PASS_GREEN`.
+- Added compact authority, source-trace, parity, regression, benchmark, and manifest evidence;
+  retained large oracle/tracing artifacts locally under `.tools/v0.2.2/`.
+- Stopped at the v0.2.2 boundary. Dynamic bodies, ball physics, car-car physics, game rules,
+  training integration, and all v0.3 work remain unstarted.
+
 ## v0.2.1 — static-world fidelity redesign implemented (2026-08-23)
 
 - Replaced v0.2's approximate wheel/contact response with source-backed RocketSim/Bullet

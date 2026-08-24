@@ -1,13 +1,17 @@
-# Active Codex Start Prompt — RivalSim v0.2.1
+# Completed Codex Boundary — RivalSim v0.2.2
 
-RivalSim v0.2 is complete and frozen with final classification `PAUSE_RED`: throughput passed strongly, but static-world RocketSim parity failed.
+RivalSim v0.2.2 is complete with final classification `PASS_GREEN`.
 
-The active implementation package is:
+The complete 39,236-case cached RocketSim authority gate passed with zero hard mismatches and
+zero numeric failures. The source-correct static-world path also passed regression, stress,
+residency, and the >=500,000 sim-s/s performance gate.
 
-`handoff/v0.2.1/CODEX_START_PROMPT.md`
+Read:
 
-Codex: read that file and every document it requires, then execute RivalSim v0.2.1 completely.
+- `docs/V0_2_2_RESULTS.md`;
+- `docs/REPRODUCING_V0_2_2.md`;
+- `docs/V0_2_2_ORACLE_CACHE.md`;
+- `results/v0.2.2/manifest.json`.
 
-Mission: diagnose and replace the demonstrated wheel/contact solver approximations until the exact frozen v0.2 35-scenario parity corpus passes with unchanged tolerances, then measure the corrected B3 throughput.
-
-Do not modify published `results/v0.1/` or `results/v0.2/` evidence. Do not widen tolerances. Do not begin v0.3 dynamic contacts in the same run.
+No implementation milestone is currently authorized. Preserve published v0.1, v0.2, v0.2.1,
+and v0.2.2 evidence. Do not begin v0.3 dynamic contacts without a separate user handoff.

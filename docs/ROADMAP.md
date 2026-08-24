@@ -57,9 +57,22 @@ The bounded breadth prototype audits topology over all 8,020 DFH triangles but o
 mesh triangles in the existing local corpus; exhaustive authoritative per-triangle generation
 remains a future breadth milestone. See `docs/V0_2_1_RESULTS.md` and `results/v0.2.1/`.
 
+## v0.2.2 — Static-world source-parity breadth gate: complete / `PASS_GREEN`
+
+The pinned RocketSim/Bullet box-versus-static-triangle witness, persistent-manifold,
+internal-edge, wheel/suspension, solver, split-impulse, and rigid-body integration paths are
+translated directly for RivalSim's existing Octane/Soccar scope. A content-addressed native
+authority cache freezes 39,236 deterministic cases across all 8,020 triangles, 23,176 shared
+directed edges, and the four analytic planes.
+
+All 156,944 1/4/8/12-tick checkpoints pass with zero hard mismatches, zero numeric failures,
+and unchanged tolerances. Corrected B3 reaches 511,886.15 aggregate simulated game-seconds/s at
+262,144 worlds with zero timed transfers and retains `PASS_GREEN`. See
+`docs/V0_2_2_RESULTS.md` and `results/v0.2.2/`.
+
 ## v0.3 — Ball and dynamic contacts: not begun / separate authority required
 
-Do not begin this milestone without a new handoff even though v0.2.1 passed.
+Do not begin this milestone without a new handoff even though v0.2.2 passed.
 
 Add:
 
