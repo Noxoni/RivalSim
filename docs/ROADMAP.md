@@ -70,20 +70,30 @@ and unchanged tolerances. Corrected B3 reaches 511,886.15 aggregate simulated ga
 262,144 worlds with zero timed transfers and retains `PASS_GREEN`. See
 `docs/V0_2_2_RESULTS.md` and `results/v0.2.2/`.
 
-## v0.3 — Ball and dynamic contacts: not begun / separate authority required
+## v0.3 — Ball and dynamic contacts: authorized / not begun
 
-Do not begin this milestone without a new handoff even though v0.2.2 passed.
+Authorized by the v0.3 handoff in `handoff/v0.3/`.
 
-Add:
+Add, in order:
 
-- ball-world contact;
-- ball friction/restitution/drag;
-- car-ball contact and Rocket League-specific hit behavior;
-- car-car contact;
-- bumps/demolitions where required;
-- dynamic-contact solver validation.
+- ball-world contact and authoritative ball friction/restitution/spin behavior;
+- car-ball dynamic contact and RocketSim-specific hit behavior;
+- car-car dynamic contact;
+- bounded physical bump/demolition classification required by car-car contact;
+- integrated static + dynamic multi-contact validation.
 
-This is likely the hardest fidelity milestone.
+Implementation must be source-first against the same pinned RocketSim/Bullet lineage used by
+v0.2.2. Each phase freezes a content-addressed native authority cache before GPU iteration,
+uses 1/4/8/12-tick blocking checkpoints, and advances only after its representative/full parity
+gate is clean. The complete v0.2.2 39,236-case static corpus remains a mandatory regression.
+
+The final dynamic-contact benchmark is run only after parity. v0.2.2's 511,886.15 sim-s/s is a
+comparison baseline rather than the v0.3 target; the bounded viability floor is 100,000
+aggregate simulated game-seconds/s with GPU residency and zero routine timed transfers.
+
+Game scoring, kickoff/reset/respawn rules, RLGym/training integration, and v0.4+ work remain out
+of scope. See `handoff/v0.3/README.md`, `handoff/v0.3/ACCEPTANCE.md`, and
+`handoff/v0.3/SOURCE_PORT_POLICY.md`.
 
 ## v0.4 — Complete standard 1v1 game transition
 

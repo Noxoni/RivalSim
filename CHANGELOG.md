@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.3 — dynamic contacts handoff (2026-08-24)
+
+- Authorized the bounded standard-Soccar dynamic-contact milestone on top of v0.2.2 `PASS_GREEN`.
+- Froze v0.2.2 release `6dfd44ad9afeb3d1164da7e0e38c097fb74d07b8` and all prior published evidence as mandatory regressions.
+- Sequenced v0.3 as ball-world, car-ball, car-car/bounded bump-demo physical semantics, then integrated static + dynamic multi-contact validation.
+- Required source-first translation of the exact pinned RocketSim/Bullet paths before implementation rather than approximate physics followed by behavioral fitting.
+- Required a new content-addressed native authority cache per phase, isolated native case semantics, complete tick-1-through-12 cached frames, and no live-RocketSim fallback after freeze.
+- Retained ticks 1/4/8/12 as the only blocking local parity horizons; long synchronized open-loop identity remains diagnostic only.
+- Required cached operation-level traces and automatic first-divergence comparison for failures; prohibited face/case exceptions, tie epsilons, hysteresis, tolerance broadening, and downstream compensation.
+- Kept the complete 39,236-case v0.2.2 static gate and 27/27 v0.1 live-RocketSim scenarios as mandatory regressions.
+- Deferred performance work until fidelity is green; set the complete v0.3 dynamic-contact viability floor at 100,000 aggregate simulated game-seconds/s while treating v0.2.2's 511,886.15 sim-s/s only as a comparison baseline.
+- Explicitly excluded scoring, kickoff/reset/respawn game rules, RLGym/PPO/training integration, rendering, other game modes, and v0.4+ work.
+- Added the controlling package under `handoff/v0.3/` and activated `CODEX_START_PROMPT.md`.
+
 ## v0.2.2 — static-world source-parity breadth gate (2026-08-24)
 
 - Froze a deterministic 39,236-case Octane/Soccar authority corpus, hashed against the pinned
