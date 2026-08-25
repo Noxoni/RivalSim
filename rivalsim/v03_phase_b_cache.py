@@ -85,7 +85,10 @@ PHASE_B_AUTHORITY_SETTINGS: dict[str, Any] = {
         "source_state": "exact frozen corpus record",
         "native_readback": "complete car, ball, contact semantic state immediately after SetState",
     },
-    "step_order": "immediate readback, then arena.step(1) and complete frame readback for ticks 1..12",
+    "step_order": (
+        "immediate readback, then arena.step(1) and complete frame readback "
+        "for ticks 1..12"
+    ),
     "captured_ticks": list(PHASE_B_CAPTURE_TICKS),
     "captured_frame_fields": list(PHASE_B_FIELDS),
 }

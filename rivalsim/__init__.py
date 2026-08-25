@@ -8,6 +8,7 @@ from rivalsim.static_world import (
     ActionTape,
     CarCarWorldSim,
     DynamicWorldSim,
+    IntegratedWorldSim,
     StaticWorldSim,
 )
 
@@ -17,8 +18,9 @@ __all__ = [
     "CarCarWorldSim",
     "ControlBatch",
     "DynamicWorldSim",
+    "IntegratedWorldSim",
     "RivalSim",
     "StateSnapshot",
     "StaticWorldSim",
 ]
-__version__ = "0.2.1"
+__version__ = "0.3.0"

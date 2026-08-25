@@ -16,6 +16,10 @@ from rivalsim.vehicle_state import (
 DT = 1.0 / 120.0
 CAR_MASS = 180.0
 INV_MASS = 1.0 / CAR_MASS
+BOOST_MIN_TIME = 0.1
+BOOST_ACCEL_GROUND = 2975.0 / 3.0
+BOOST_ACCEL_AIR = 3175.0 / 3.0
+THROTTLE_AIR_ACCEL = 200.0 / 3.0
 # Bullet's btBoxShape constructor reduces each effective Octane half extent by
 # 0.001341 BT when its safe margin replaces the 0.04 BT default.  These values
 # and inverse inertias are read from the pinned native diagnostic build.
@@ -2451,6 +2455,34 @@ _BULLET_STICKY_FORCE = r"""
 def _bullet_sticky_force(normal_sum: wp.vec3, full_stick: int) -> wp.vec3: ...
 
 
+_ROCKETSIM_SCALED_CENTRAL_FORCE = r"""
+    // RocketSim Vec scalar operators in Car::_UpdateAirTorque,
+    // Car::_UpdateAutoRoll, and Car::_UpdateBoost are evaluated strictly
+    // left-to-right: direction * acceleration * UU_TO_BT * CAR_MASS_BT.
+    auto op_mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    const float x = op_mul(op_mul(op_mul(op_mul(
+        direction[0], first_scale), acceleration), 0.02f), 180.0f);
+    const float y = op_mul(op_mul(op_mul(op_mul(
+        direction[1], first_scale), acceleration), 0.02f), 180.0f);
+    const float z = op_mul(op_mul(op_mul(op_mul(
+        direction[2], first_scale), acceleration), 0.02f), 180.0f);
+    return wp::vec_t<3, wp::float32>(x, y, z);
+"""
+
+
+@wp.func_native(_ROCKETSIM_SCALED_CENTRAL_FORCE)
+def _rocketsim_scaled_central_force(
+    direction: wp.vec3, first_scale: float, acceleration: float
+) -> wp.vec3: ...
+
+
 _BULLET_INTEGRATE_EXTERNAL_VELOCITIES = r"""
     auto op_add = [](float a, float b) -> float {
     #if defined(__CUDA_ARCH__)
@@ -2529,7 +2561,7 @@ def _bullet_integrate_external_velocities(
 
 
 _BULLET_AIR_DAMPING_TORQUE = r"""
-    // Zero-input, four-wheel-miss branch of RocketSim Car::_UpdateAirTorque.
+    // Non-flipping, four-wheel-miss branch of RocketSim Car::_UpdateAirTorque.
     // This is deliberately the fixed Octane/static-world source path only:
     // dirPitch=-right, dirYaw=up, dirRoll=-forward, followed by the pinned
     // Bullet inverse-tensor inverse and matrix/vector operation order.
@@ -2587,6 +2619,12 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
             op_add(op_mul(a.x, b.x), op_mul(a.y, b.y)),
             op_mul(a.z, b.z));
     };
+    auto cross = [&](AirV3 a, AirV3 b) -> AirV3 {
+        return make(
+            op_sub(op_mul(a.y, b.z), op_mul(a.z, b.y)),
+            op_sub(op_mul(a.z, b.x), op_mul(a.x, b.z)),
+            op_sub(op_mul(a.x, b.y), op_mul(a.y, b.x)));
+    };
     const AirV3 forward = make(
         basis.data[0][0], basis.data[1][0], basis.data[2][0]);
     const AirV3 right = make(
@@ -2600,13 +2638,44 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
         angular_velocity_world[0],
         angular_velocity_world[1],
         angular_velocity_world[2]);
-    const float damp_pitch = op_mul(dot(dir_pitch, omega), 30.0f);
-    const float damp_yaw = op_mul(dot(dir_yaw, omega), 20.0f);
+    const AirV3 torque = add(
+        add(
+            scale(scale(scale(dir_pitch, control_pitch), 1.0f), 130.0f),
+            scale(scale(dir_yaw, control_yaw), 95.0f)),
+        scale(scale(dir_roll, control_roll), 400.0f));
+    const float damp_pitch = op_mul(
+        op_mul(dot(dir_pitch, omega), 30.0f),
+        op_sub(1.0f, fabsf(control_pitch)));
+    const float damp_yaw = op_mul(
+        op_mul(dot(dir_yaw, omega), 20.0f),
+        op_sub(1.0f, fabsf(control_yaw)));
     const float damp_roll = op_mul(dot(dir_roll, omega), 50.0f);
     const AirV3 damping = add(
         add(scale(dir_yaw, damp_yaw), scale(dir_pitch, damp_pitch)),
         scale(dir_roll, damp_roll));
-    const AirV3 requested = sub(make(0.0f, 0.0f, 0.0f), damping);
+    const AirV3 requested = sub(torque, damping);
+    const AirV3 ground_up = make(
+        auto_roll_ground_up[0],
+        auto_roll_ground_up[1],
+        auto_roll_ground_up[2]);
+    const AirV3 ground_down = make(-ground_up.x, -ground_up.y, -ground_up.z);
+    const AirV3 cross_right = cross(ground_up, forward);
+    const AirV3 cross_forward = cross(ground_down, cross_right);
+    float right_factor_input = dot(right, cross_right);
+    if (right_factor_input < 0.0f) right_factor_input = 0.0f;
+    if (right_factor_input > 1.0f) right_factor_input = 1.0f;
+    float forward_factor_input = dot(forward, cross_forward);
+    if (forward_factor_input < 0.0f) forward_factor_input = 0.0f;
+    if (forward_factor_input > 1.0f) forward_factor_input = 1.0f;
+    const float right_factor = op_sub(1.0f, right_factor_input);
+    const float forward_factor = op_sub(1.0f, forward_factor_input);
+    const float right_sign = dot(right, ground_up) >= 0.0f ? -1.0f : 1.0f;
+    const float forward_sign = dot(forward, ground_up) >= 0.0f ? 1.0f : -1.0f;
+    const AirV3 torque_dir_right = scale(forward, right_sign);
+    const AirV3 torque_dir_forward = scale(right, forward_sign);
+    const AirV3 torque_right = scale(torque_dir_right, right_factor);
+    const AirV3 torque_forward = scale(torque_dir_forward, forward_factor);
+    const AirV3 auto_roll_direction = add(torque_forward, torque_right);
 
     // btRigidBody::updateInertiaTensor:
     // basis.scaled(invInertiaLocal) * basis.transpose().
@@ -2658,7 +2727,7 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
     inertia_world[2][2] = op_mul(cofac(0, 0, 1, 1), inverse_determinant);
 
     // btMatrix3x3 * btVector3 (dot3): each row is reduced as (x+y)+z.
-    const AirV3 angular_acceleration = make(
+    const AirV3 air_total_torque_unscaled = make(
         op_add(op_add(
             op_mul(inertia_world[0][0], requested.x),
             op_mul(inertia_world[0][1], requested.y)),
@@ -2671,12 +2740,34 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
             op_mul(inertia_world[2][0], requested.x),
             op_mul(inertia_world[2][1], requested.y)),
             op_mul(inertia_world[2][2], requested.z)));
-    // C++ left-associativity makes the source expression
-    // (inertiaWorld * requested) * CAR_TORQUE_SCALE.
+    const AirV3 auto_roll_total_torque_unscaled = make(
+        op_add(op_add(
+            op_mul(inertia_world[0][0], auto_roll_direction.x),
+            op_mul(inertia_world[0][1], auto_roll_direction.y)),
+            op_mul(inertia_world[0][2], auto_roll_direction.z)),
+        op_add(op_add(
+            op_mul(inertia_world[1][0], auto_roll_direction.x),
+            op_mul(inertia_world[1][1], auto_roll_direction.y)),
+            op_mul(inertia_world[1][2], auto_roll_direction.z)),
+        op_add(op_add(
+            op_mul(inertia_world[2][0], auto_roll_direction.x),
+            op_mul(inertia_world[2][1], auto_roll_direction.y)),
+            op_mul(inertia_world[2][2], auto_roll_direction.z)));
+    AirV3 total_torque = make(0.0f, 0.0f, 0.0f);
+    // C++ left-associativity makes the air-control source expression
+    // (inertiaWorld * requested) * CAR_TORQUE_SCALE. Auto-roll's later
+    // applyTorque independently evaluates (inertiaWorld * direction) * 80.
+    if (do_air_control != 0) {
+        total_torque = scale(air_total_torque_unscaled, 0.0958738029f);
+    }
+    if (do_auto_roll != 0) {
+        total_torque = add(
+            total_torque, scale(auto_roll_total_torque_unscaled, 80.0f));
+    }
     return wp::vec_t<3, wp::float32>(
-        op_mul(angular_acceleration.x, 0.0958738029f),
-        op_mul(angular_acceleration.y, 0.0958738029f),
-        op_mul(angular_acceleration.z, 0.0958738029f));
+        total_torque.x,
+        total_torque.y,
+        total_torque.z);
 """
 
 
@@ -2684,6 +2775,12 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
 def _bullet_air_damping_torque(
     basis: wp.mat33,
     angular_velocity_world: wp.vec3,
+    control_pitch: float,
+    control_yaw: float,
+    control_roll: float,
+    auto_roll_ground_up: wp.vec3,
+    do_air_control: int,
+    do_auto_roll: int,
 ) -> wp.vec3: ...
 
 
@@ -3359,8 +3456,13 @@ def wheel_pre_tick(
     on_ground: wp.array(dtype=wp.int32),
     air_control_disabled: wp.array(dtype=wp.int32),
     boost_amount: wp.array(dtype=wp.float32),
+    boosting_time: wp.array(dtype=wp.float32),
+    is_boosting: wp.array(dtype=wp.int32),
     control_throttle: wp.array(dtype=wp.float32),
     control_steer: wp.array(dtype=wp.float32),
+    control_pitch: wp.array(dtype=wp.float32),
+    control_yaw: wp.array(dtype=wp.float32),
+    control_roll: wp.array(dtype=wp.float32),
     control_boost: wp.array(dtype=wp.int32),
     control_handbrake: wp.array(dtype=wp.int32),
     wheel_ray_start: wp.array(dtype=wp.vec3),
@@ -3607,7 +3709,7 @@ def wheel_pre_tick(
         dynamic_ground_origin_bt = ball_position_bt[car // 2]
         dynamic_ground_velocity_bt = ball_velocity_bt[car // 2]
         dynamic_ground_angular = ball_ang_vel[car // 2]
-        if dynamic_ray_mode == 1 and car % 2 == 0:
+        if (dynamic_ray_mode == 1 and car % 2 == 0) or dynamic_ray_mode == 3:
             env = car // 2
             proxy_min_bt = ball_broadphase_proxy_min_bt[env]
             ray_cell_i = wp.int32((source_bt[0] + 112.0) / 7.4)
@@ -3678,14 +3780,22 @@ def wheel_pre_tick(
                 source_valid = wp.int32(1)
                 hit_dynamic = wp.int32(1)
                 hit_face = wp.int32(-6)
-        elif dynamic_body_visible != 0:
+        if dynamic_ray_mode == 2 or dynamic_ray_mode == 3:
             other = car ^ 1
+            other_origin_bt = rigid_position_bt[other]
+            other_velocity_bt = rigid_velocity_bt[other]
+            other_angular = car_ang_vel[other]
+            if tick_counter[0] == 0:
+                other_origin_bt = car_pos[other] * 0.02
+                if car % 2 == first_car:
+                    # The other car has not entered _PreTickUpdate yet on the
+                    # first ordered pass.
+                    other_velocity_bt = car_vel[other] * 0.02
             other_basis = _bullet_quaternion_matrix(car_quat[other])
             if tick_counter[0] == 0:
                 other_basis = _authority_input_quaternion_matrix(car_quat[other])
-            dynamic_ground_basis = other_basis
             child_origin_bt = _bullet_transform_point(
-                dynamic_ground_origin_bt,
+                other_origin_bt,
                 other_basis,
                 GJK_OFFSET_BT,
             )
@@ -3714,6 +3824,11 @@ def wheel_pre_tick(
                 source_valid = wp.int32(1)
                 hit_dynamic = wp.int32(1)
                 hit_face = wp.int32(-7)
+                dynamic_ground_is_octane = wp.int32(1)
+                dynamic_ground_origin_bt = other_origin_bt
+                dynamic_ground_velocity_bt = other_velocity_bt
+                dynamic_ground_angular = other_angular
+                dynamic_ground_basis = other_basis
         if source_valid != 0:
             distance_bt = ray_length_bt * source_fraction
             normal = source_normal
@@ -3807,7 +3922,7 @@ def wheel_pre_tick(
             # float32 multiplication by 52.5 happens in RocketSim's order.
             old_engine = engine_acceleration[wheel_index]
             old_brake = brake_acceleration[wheel_index]
-            if dynamic_ray_mode == 2:
+            if dynamic_ground_is_octane != 0:
                 _bullet_wheel_friction_octane(
                     bullet_basis,
                     dynamic_ground_basis,
@@ -4028,6 +4143,8 @@ def wheel_pre_tick(
             )
             > 0.5
         )
+        auto_roll_ground_up = wp.vec3(0.0, 0.0, 0.0)
+        do_auto_roll = wp.int32(0)
         if control_throttle[car] != 0.0 and (
             (contact_count > 0 and contact_count < 4) or previous_world_contact
         ):
@@ -4036,6 +4153,8 @@ def wheel_pre_tick(
                 ground_up = wp.normalize(normal_sum)
             else:
                 ground_up = previous_world_contact_normal[car]
+            auto_roll_ground_up = ground_up
+            do_auto_roll = wp.int32(1)
             ground_down = -ground_up
             cross_right = wp.cross(ground_up, forward)
             cross_forward = wp.cross(ground_down, cross_right)
@@ -4080,22 +4199,58 @@ def wheel_pre_tick(
                     real_throttle != 0.0 or abs_speed > STOPPING_FORWARD_VEL
                 ),
             )
-        if (
-            auto_roll_acceleration[car][0] != 0.0
-            or auto_roll_acceleration[car][1] != 0.0
-            or auto_roll_acceleration[car][2] != 0.0
-        ):
-            queued_force_bt = (
-                queued_force_bt + auto_roll_acceleration[car] * (0.02 * CAR_MASS)
+        # Car::_UpdateAirTorque follows _UpdateWheels. Its central throttle
+        # force is queued whenever fewer than three wheels touch, even when
+        # one or two wheel contacts disable the controlled torque branch.
+        if contact_count < 3 and control_throttle[car] != 0.0:
+            queued_force_bt = queued_force_bt + _rocketsim_scaled_central_force(
+                forward,
+                control_throttle[car],
+                THROTTLE_AIR_ACCEL,
+            )
+        if do_auto_roll != 0:
+            queued_force_bt = queued_force_bt + _rocketsim_scaled_central_force(
+                auto_roll_ground_up * -1.0,
+                1.0,
+                AUTO_ROLL_ACCELERATION,
+            )
+        # Car::_UpdateBoost is the final source pre-tick operation. Determine
+        # its prospective state from the incoming gameplay state, but leave
+        # the timer/amount mutation to integrate_tick so it occurs only once.
+        source_is_boosting = is_boosting[car] != 0
+        if boost_amount[car] > 0.0:
+            if source_is_boosting:
+                source_is_boosting = (
+                    control_boost[car] != 0
+                    or boosting_time[car] < BOOST_MIN_TIME
+                )
+            elif control_boost[car] != 0:
+                source_is_boosting = True
+        else:
+            source_is_boosting = False
+        if source_is_boosting:
+            boost_accel = BOOST_ACCEL_AIR
+            if contact_count >= 3:
+                boost_accel = BOOST_ACCEL_GROUND
+            queued_force_bt = queued_force_bt + _rocketsim_scaled_central_force(
+                forward,
+                1.0,
+                boost_accel,
             )
         total_force_bt[car] = queued_force_bt
-        if contact_count == 0:
-            # Car::_UpdateAirTorque is called with updateAirControl=true only
-            # when all four suspension rays miss. The frozen static-world
-            # corpus has zero pitch/yaw/roll input, so the source branch is
-            # exactly angular damping with no control torque.
+        if contact_count == 0 or do_auto_roll != 0:
+            # This corpus stays in the non-flipping source branch. Preserve
+            # both source applyTorque calls, their inertia inversion, and the
+            # later auto-roll vector-add order in the queued Bullet torque.
             total_torque_bt[car] = _bullet_air_damping_torque(
-                bullet_basis, ang_vel
+                bullet_basis,
+                ang_vel,
+                control_pitch[car],
+                control_yaw[car],
+                control_roll[car],
+                auto_roll_ground_up,
+                wp.int32(contact_count == 0),
+                do_auto_roll,
             )
         on_ground[car] = wp.int32(contact_count >= 3)
         car_vel[car] = vel
@@ -6246,12 +6401,6 @@ def chassis_contacts_v021(
         # then applies the external impulse in the dynamics-world phase.
         solver_force_vel = solver_pre_force_vel + external_force_impulse
         force_ang_vel = pre_force_ang_vel + external_torque_impulse
-        # Auto-roll torque is retained through the legacy state path until its
-        # inverse-inertia/inertia construction is translated below. It is zero
-        # throughout the frozen no-input static-world corpus.
-        force_ang_vel = (
-            force_ang_vel + auto_roll_angular_acceleration[car] * DT
-        )
 
     # Set up every constraint from the same unchanged rigid-body state, as
     # Bullet does before applying warmstart or iteration deltas.

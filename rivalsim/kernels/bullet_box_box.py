@@ -2,7 +2,6 @@
 
 import warp as wp
 
-
 _BULLET_OCTANE_BOX_BOX = r"""
     // Direct bounded translation of btBoxBoxDetector.cpp::dBoxBox2,
     // intersectRectQuad2, cullPoints2, and dLineClosestApproach from the

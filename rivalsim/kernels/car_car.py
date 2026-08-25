@@ -8,7 +8,9 @@ from rivalsim.car_car_state import (
 )
 from rivalsim.kernels.bullet_box_box import bullet_octane_box_box
 from rivalsim.kernels.car_ball import (
-    CAR_INV_MASS,
+    _BULLET_PAIR_CONTACT_ROW,
+    _BULLET_PAIR_SOLVE_SPLIT_ROW,
+    _BULLET_PAIR_SOLVE_VELOCITY_ROW,
     CAR_MAX_ANGULAR_SPEED,
     CAR_MAX_SPEED_BT,
     CAR_STATIC_FRICTION,
@@ -19,9 +21,6 @@ from rivalsim.kernels.car_ball import (
     RS_EQUAL_ISLAND_PERMUTATION_WIDTH,
     RS_MAX_ISLAND_MANIFOLDS,
     SOLVER_ITERATIONS,
-    _BULLET_PAIR_CONTACT_ROW,
-    _BULLET_PAIR_SOLVE_SPLIT_ROW,
-    _BULLET_PAIR_SOLVE_VELOCITY_ROW,
     _bullet_cap_amd,
     _bullet_pair_refresh_contact,
     _matrix_vector,

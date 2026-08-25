@@ -5,24 +5,22 @@ import warp as wp
 from rivalsim.ball_world_state import MAX_BALL_CONTACTS
 from rivalsim.car_ball_state import MAX_CAR_BALL_CONTACTS
 from rivalsim.kernels.ball_world import (
-    _bullet_ball_special_contact_row,
     _bullet_ball_solve_split_row,
     _bullet_ball_solve_velocity_row,
-    _cap,
+    _bullet_ball_special_contact_row,
 )
-from rivalsim.kernels.bullet_box_triangle import bullet_manifold_replacement
 from rivalsim.kernels.bullet_box_sphere import (
     BALL_RADIUS_BT,
     bullet_box_sphere_closest,
     bullet_box_sphere_penetration,
 )
+from rivalsim.kernels.bullet_box_triangle import bullet_manifold_replacement
 from rivalsim.kernels.vehicle import (
     _authority_input_quaternion_matrix,
     _bullet_apply_impulse,
     _bullet_integrate_external_velocities,
     _bullet_integrate_position,
     _bullet_integrate_quaternion,
-    _bullet_inverse_inertia_world,
     _bullet_inverse_transform_point,
     _bullet_quaternion_matrix,
     _bullet_solve_split_row,
@@ -1088,7 +1086,6 @@ def _refresh_pair_manifold(
                 ball_position, ball_basis, local_b[index]
             )
             contact_normal = normal[index]
-            contact_distance = distance[index]
             refreshed_distance = wp.float32(0.0)
             invalid = wp.int32(0)
             _bullet_pair_refresh_contact(
@@ -1121,6 +1118,7 @@ def _refresh_pair_manifold(
 
 @wp.kernel(enable_backward=False)
 def capture_car_ball_inputs(
+    pair_car_local: int,
     car_position_bt: wp.array(dtype=wp.vec3),
     car_velocity_bt: wp.array(dtype=wp.vec3),
     car_quaternion: wp.array(dtype=wp.quat),
@@ -1139,7 +1137,7 @@ def capture_car_ball_inputs(
     pre_ball_angular_velocity: wp.array(dtype=wp.vec3),
 ):
     env = wp.tid()
-    car = env * 2
+    car = env * 2 + pair_car_local
     pre_car_position_bt[env] = car_position_bt[car]
     pre_car_velocity_bt[env] = car_velocity_bt[car]
     pre_car_quaternion[env] = car_quaternion[car]
@@ -1157,6 +1155,7 @@ def capture_car_ball_inputs(
 )
 def car_ball_tick(
     tick_counter: wp.array(dtype=wp.int32),
+    pair_car_local: int,
     amd_rsqrtss_mantissa: wp.array(dtype=wp.uint16),
     rs_static_cell_mask: wp.array(dtype=wp.uint32),
     rs_static_aabb_min_bt: wp.array(dtype=wp.vec3),
@@ -1240,7 +1239,7 @@ def car_ball_tick(
     manifold_push_impulse: wp.array(dtype=wp.float32),
 ):
     env = wp.tid()
-    car = env * 2
+    car = env * 2 + pair_car_local
     car_position = pre_car_position_bt[env]
     car_quaternion = pre_car_quaternion[env]
     car_basis = _bullet_quaternion_matrix(car_quaternion)
@@ -1462,7 +1461,6 @@ def car_ball_tick(
     ball_force_velocity = ball_pre_velocity + ball_external_linear
     ball_force_angular = ball_pre_angular
 
-    inverse_car_inertia = _bullet_inverse_inertia_world(car_basis)
     car_delta_velocity = wp.vec3(0.0, 0.0, 0.0)
     car_delta_angular = wp.vec3(0.0, 0.0, 0.0)
     ball_delta_velocity = wp.vec3(0.0, 0.0, 0.0)
