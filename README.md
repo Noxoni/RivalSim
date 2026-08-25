@@ -11,43 +11,49 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.3 complete, `PASS_GREEN`
+## Current boundary — v0.4 complete, `PASS_GREEN`
 
-RivalSim v0.3 completes the bounded standard-Soccar dynamic-contact milestone. It adds a fixed
-two-Octane/one-ball integrated world with source-ordered ball/world, car/ball, car/car, wheel,
-static-world, shared-island solver, split-impulse, and rigid-body writeback behavior. The runtime
-remains GPU-resident and carries car `_PreTickUpdate` visitation order as internal per-world
-lifecycle state established by construction or membership change.
+RivalSim v0.4 completes the bounded standard-Soccar 1v1 game-transition milestone. The public
+`CompleteWorldSim` composes the accepted v0.3 two-Octane/one-ball physics with GPU-resident state
+for all 34 boost pads, goals and score attribution, five deterministic standard kickoff layouts,
+demolition disable/timing, four source-valid respawn locations per team, world/episode clocks,
+raw lifecycle events, and deterministic full-world reset.
 
-All frozen native gates pass at ticks 1, 4, 8, and 12:
+Lifecycle choices are explicit state. Kickoff selectors advance modulo five and respawn selectors
+advance modulo four; no host-global RNG, pointer value, allocator layout, case ID, or expected
+output participates in the runtime. Car membership does not change during kickoff, demolition,
+or respawn, so the source-proven per-world v0.3 car visitation order is preserved.
 
-- Phase A ball/world: **31,216 / 31,216** cases;
-- Phase B car/ball: **8,192 / 8,192** cases;
-- Phase C car/car: **8,192 / 8,192** cases against both complete source-valid visitation-order
-  branches;
-- Phase D integrated: **512 / 512** cases across eight simultaneous-contact families and both
-  complete source-valid branches.
+The content-addressed native lifecycle authority passes:
 
-Every phase has zero blocking hard mismatches and zero numeric tolerance failures. Native
-authority is isolated, content-addressed, caches every tick 1–12, and has no live fallback after
-freeze. Phase C/D relational comparison accepts one complete labeled native trajectory and never
-mixes metrics or selects a branch from expected outputs.
+- every one of 34 pads for both cars: **68 / 68 pickup cases**;
+- source float32 recharge boundaries: **1,201 ticks** for large pads and **480 ticks** for small;
+- both visitation-order branches for pad contention;
+- **6 / 6 goal-boundary cases** and both scoring directions;
+- **5 / 5** standard two-car kickoff layouts;
+- both teams at all four respawn locations: **8 / 8 poses**;
+- exact demolition timer and respawn at **tick 360**;
+- deterministic 64-world, 400-tick mixed lifecycle/reset stress with zero timed transfers.
 
-The complete dynamic path reaches **196,614.39 aggregate simulated game-seconds/s**
-(23.59 million world ticks/s) at 131,072 worlds with **1.313% CV**. This is 1.97× the v0.3
-100,000 sim-s/s viability floor and 38.41% of the narrower v0.2.2 static-only reference. The
-timed hot loop records zero host/device transfers. Two independent 64-world, 2,400-tick stress
-runs are finite, bounded, and full-state bit-identical.
+The inherited v0.3 Phase A/B/C/D gates remain 31,216/31,216, 8,192/8,192,
+8,192/8,192 against both branches, and 512/512 across both branches. The v0.2.2 static corpus
+remains 39,236/39,236, v0.1 remains 27/27, both 4,608-ray backends pass, and the configured
+repository suite is 70/70 passing. Published v0.1 through v0.3 evidence is byte-for-byte
+unchanged.
 
-The complete v0.2.2 static corpus remains 39,236/39,236 passing, the v0.1 live RocketSim corpus
-remains 27/27 passing, both ray backends remain green, and the repository suite is 63/63 passing.
-Published v0.1 through v0.2.2 evidence remains byte-for-byte unchanged.
+The complete v0.4 path reaches **191,748.10 aggregate simulated game-seconds/s**
+(23.01 million world ticks/s) at 131,072 worlds with **0.856% CV**, retaining 97.52% of v0.3.
+The reset-heavy path reaches **225,005.06 sim-s/s** and **3.375 million reset transitions/s**
+with **0.723% CV**. Both timed paths record zero host/device transfers.
+
+RocketSim does not define a training episode terminal/truncation policy. v0.4 therefore exports
+policy-neutral raw lifecycle state and keeps `terminated=truncated=0`; v0.5 policy was not begun.
 
 ### Explicitly excluded
 
-RivalSim v0.3 does **not** implement demolition removal/disable/respawn, goals/scoring, kickoff or
-match reset rules, RLGym observations/rewards/PPO, Rival policy inference, arbitrary body counts,
-other game modes, or a generic Bullet API. Those remain v0.4+ work and were not begun.
+RivalSim v0.4 does **not** implement RLGym observations, rewards, training-specific action
+parsing, rollout buffers, tensor interop, PyTorch policy inference, GAE/PPO, Rival training,
+arbitrary body counts, other game modes, rendering, or a generic Bullet API.
 
 ## Architecture
 
@@ -67,11 +73,29 @@ Current full Rival CPU RocketSim/RLGym reference:
 
 RivalSim remains a partial simulator, so this is a system reference rather than an apples-to-apples comparison.
 
-The v0.3 package classifies the complete dynamic-contact path as:
+The v0.4 package classifies the complete game-transition path as:
 
-- **PASS_GREEN:** every fidelity/regression gate passes and throughput is >=100,000 sim-s/s;
+- **PASS_GREEN:** every lifecycle/fidelity/regression gate passes and throughput is >=100,000
+  sim-s/s;
 - **PAUSE_PERF:** local parity passes but throughput is <100,000 sim-s/s;
 - **PAUSE_FIDELITY:** any required local parity failure remains.
+
+## Published v0.4 authority and result
+
+The current result package is:
+
+- `docs/V0_4_RESULTS.md`;
+- `docs/REPRODUCING_V0_4.md`;
+- `docs/V0_4_AUTHORITY.md`;
+- `results/v0.4/boost_pads.json`;
+- `results/v0.4/goals_kickoff.json`;
+- `results/v0.4/demolition_respawn.json`;
+- `results/v0.4/match_lifecycle.json`;
+- `results/v0.4/oracle_data.json`;
+- `results/v0.4/rules_source.json`;
+- `results/v0.4/regression.json`;
+- `results/v0.4/benchmark.json`;
+- `results/v0.4/manifest.json`.
 
 ## Published v0.3 authority and result
 

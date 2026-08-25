@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.4 — complete standard 1v1 game transition (2026-08-25)
+
+- Added `CompleteWorldSim`, a bounded GPU-resident composition of the accepted v0.3 physics with
+  standard-Soccar boost-pad, goal/scoring, kickoff, demolition, respawn, clock, event, and reset
+  lifecycle state.
+- Integrated all 34 source-backed boost pads into the complete path, including both-car pickup,
+  large/small grants, exact float32 cooldown boundaries, reset state, and contention order driven
+  by the persistent per-world car visitation lifecycle.
+- Ported RocketSim's strict scored-ball boundary and team attribution, the binding's first-entry
+  score callback semantics, all five source-valid standard 1v1 kickoff layouts, and source-backed
+  goal-callback-to-kickoff reset composition.
+- Added demolition disable/frozen-public-state behavior, exact three-second float32 timer,
+  tick-360 respawn, all four source-valid respawn poses for both teams, physics re-entry, and
+  preservation of car identity and visitation order because membership does not change.
+- Added deterministic explicit per-world kickoff and respawn selector state. No ambient RNG,
+  pointer/allocator state, case ID, expected output, best-match selection, or hidden table enters
+  the runtime.
+- Exposed world/episode clocks, score counters, goal/pad/demo/respawn/reset events, and
+  policy-neutral terminal/truncation outputs. RocketSim defines no training termination policy,
+  so v0.4 keeps `terminated=truncated=0` and leaves policy to the unstarted v0.5 layer.
+- Froze native lifecycle authority identity
+  `33AA0BA3BC35BC4300E2D2B84A3813CB0AD776479546A50AC3BBC6CE3D3E2562`, binding the pinned
+  RocketSim/binding commits, installed extension, all 16 CMFs and combined asset SHA, generator
+  source/config/seed, authority settings, and bounded selector/event contract. The frozen cache
+  has no live fallback.
+- Passed 68/68 pad pickup cases, six goal-boundary cases, five kickoff layouts, eight team/respawn
+  poses, exact demolition timing, deterministic mixed lifecycle/reset stress, all inherited v0.3
+  A/B/C/D gates, the 39,236-case v0.2.2 gate, the 27-case v0.1 gate, both ray backends, 70/70
+  configured tests, Ruff, compile, and diff checks. All prior evidence bytes remain unchanged.
+- Measured the complete path at **191,748.10 aggregate simulated game-seconds/s** at 131,072
+  worlds with **0.856% CV** and zero timed transfers. The reset-heavy path reached **225,005.06
+  sim-s/s**, **3,375,075.88 reset transitions/s**, **0.723% CV**, and zero timed transfers.
+- Stopped at the v0.4 boundary. Observations, rewards, training action parsing, tensor interop,
+  rollout buffers, PPO, Rival policy training, other modes, arbitrary bodies, and generic Bullet
+  work remain unstarted v0.5+ scope.
+
 ## v0.3 — dynamic contacts implemented (2026-08-25)
 
 - Added source-ordered Soccar ball/world sphere collision, friction, restitution, spin,

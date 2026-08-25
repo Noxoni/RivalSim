@@ -92,42 +92,27 @@ worlds with 1.313% CV and zero timed transfers, clearing the 100,000 sim-s/s flo
 Game scoring, kickoff/match reset, demolition removal/respawn, RLGym/training integration, and
 v0.4+ work were not begun in the completed release.
 
-## v0.4 — Complete standard 1v1 game transition: authorized / not begun
+## v0.4 — Complete standard 1v1 game transition: complete / `PASS_GREEN`
 
-The v0.4 handoff is authorized on top of v0.3 release
-`d6ca3912418a3dd7ca8979415142cd861e0c0ddb`.
+The accepted v0.3 physics is now composed with a complete GPU-resident standard-Soccar 1v1
+lifecycle: all 34 boost pads, strict goal detection and team attribution, scores, five explicit
+kickoff layouts, demolition disable/timing, four explicit respawn locations per team,
+world/episode clocks, raw events, and deterministic full-world resets. Kickoff and respawn
+selection are per-world internal state; car membership and source-proven visitation order are
+preserved across physical lifecycle transitions.
 
-Mission: turn the accepted two-Octane/one-ball physics engine into a complete headless standard
-Soccar 1v1 world transition without beginning the training stack.
+Native lifecycle authority passes 68 pad pickup cases, six goal-boundary cases, five kickoff
+layouts, eight team/respawn poses, exact tick-360 respawn, and deterministic mixed lifecycle/reset
+stress. All v0.3 A/B/C/D, v0.2.2, v0.1, ray, and repository regressions remain green. The complete
+path measures 191,748.10 aggregate simulated game-seconds/s at 131,072 worlds with 0.856% CV and
+zero timed transfers. The reset-heavy path measures 225,005.06 sim-s/s and 3.375 million reset
+transitions/s with 0.723% CV and zero timed transfers.
 
-Add:
+RocketSim has no authoritative training episode termination contract, so v0.4 exposes raw events
+and policy-neutral zero terminal/truncation flags. See `docs/V0_4_RESULTS.md`,
+`docs/REPRODUCING_V0_4.md`, `docs/V0_4_AUTHORITY.md`, and `results/v0.4/`.
 
-- integration/validation of the existing 34-pad pickup/cooldown state in complete lifecycle/reset;
-- goals, goal attribution, and scoring state;
-- deterministic source-correct standard kickoff/reset poses and transitions;
-- demolition disable/removal-from-active-physics and respawn lifecycle;
-- preservation of car identity/visitation semantics across demo, respawn, and physical resets;
-- bounded match/reset/lifecycle event state;
-- generic terminal/truncation outputs needed by the later training layer;
-- deterministic per-world reset/RNG or explicit selector state where lifecycle choices are stochastic;
-- integrated repeated-goal/kickoff/pad/demo/respawn episode validation;
-- steady-state and reset-heavy GPU-resident performance gates.
-
-The existing v0.3 physics is a frozen regression baseline. v0.4 must not compensate for game-rule
-failures by changing accepted collision/solver behavior.
-
-Controlling package:
-
-- `CODEX_START_PROMPT.md`;
-- `handoff/v0.4/README.md`;
-- `handoff/v0.4/ACCEPTANCE.md`;
-- `handoff/v0.4/LIFECYCLE_POLICY.md`.
-
-At completion RivalSim should be capable of running complete headless standard Soccar 1v1 world
-transitions with no routine CPU game-state intervention.
-
-v0.4 explicitly does **not** include observations, rewards, rollout buffers, PyTorch policy
-inference, PPO, or Rival training. Those remain v0.5.
+No v0.5 work was begun.
 
 ## v0.5 — Tensor-native training integration
 

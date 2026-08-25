@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.4",
+  "generated_at_utc": "2026-08-25T20:18:44.752799+00:00",
+  "authority_identity_sha256": "33AA0BA3BC35BC4300E2D2B84A3813CB0AD776479546A50AC3BBC6CE3D3E2562",
+  "status": "PASS_GREEN",
+  "v0_3_physics": {
+    "phase_a": {
+      "classification": "PASS_GREEN",
+      "selection": {
+        "kind": "complete",
+        "selected_case_count": 31216,
+        "full_case_count": 31216,
+        "representative_base_count": null,
+        "corpus_sha256": "7F3712D330720D8F9214FCB1CF4E5D68BBC272052FCA274234386E660A86A14E",
+        "selection_sha256": "CE49E38746210263C5465893439075C006725758FB19A20450DAD65FC0D3C687"
+      },
+      "gate": {
+        "selected_run_pass": true,
+        "selection_complete": true,
+        "phase_a_complete_gate_pass": true,
+        "unresolved_hard_or_numeric_failures": 0
+      },
+      "authority_identity_sha256": "11E307ABD14C8D79C2BFBDEC7F20C6A45716AD361609A901C517DCA98C804ED2",
+      "corpus_sha256": null
+    },
+    "phase_b": {
+      "classification": "PASS_GREEN",
+      "selection": {
+        "kind": "complete",
+        "selected_case_count": 8192,
+        "full_case_count": 8192,
+        "representative_base_count": null,
+        "corpus_sha256": "C68E2888D12057F3AD9BF978B39E8B2ED776562D9322C598908E683A49311A90",
+        "selection_sha256": "ABFEDCC606966D46135FE69B06381B4E89E6CD993F470D2FE216CC2F8E06399D"
+      },
+      "gate": {
+        "selected_run_pass": true,
+        "selection_complete": true,
+        "phase_b_complete_gate_pass": true,
+        "unresolved_hard_or_numeric_failures": 0
+      },
+      "authority_identity_sha256": "AEEF0E721D995393ACFA0632EE934DCC1DFBE8EC223E81F4A10D48EC63F75A9B",
+      "corpus_sha256": null
+    },
+    "phase_c": {
+      "classification": "PASS_GREEN",
+      "selection": {
+        "kind": "complete",
+        "selected_case_count": 8192,
+        "full_case_count": 8192,
+        "selection_sha256": "6E29A92375A98BD3C31FBC056C197D16A2C854DC95A79EACA652FFC276E263B3"
+      },
+      "gate": {
+        "failed_case_count": 0,
+        "relation_failure_count": 0
+      },
+      "authority_identity_sha256": "7A1D369F58CF3FAA0BA06D6D105CCF896A8FD9DE2C994471D2649F852AEC9EC9",
+      "corpus_sha256": "3754CC93FD852BA3AD05B7C1E97CA5BAB6FA2EC5E57886C3D96B471024F4A70C"
+    },
+    "phase_d": {
+      "classification": "PASS_GREEN",
+      "selection": {
+        "case_count": 512
+      },
+      "gate": {
+        "selected_run_pass": true,
+        "selection_complete": true,
+        "phase_d_complete_gate_pass": true,
+        "relation_failure_count": 0
+      },
+      "authority_identity_sha256": "998010324B30E8196429ACF61ACC524780139E5D958543237D121D4886066B08",
+      "corpus_sha256": "82F5156CC001F2B85C4746E753D0A61FDCE2C3FA5116A396CF3647DCB5F01187"
+    }
+  },
+  "v0_2_2_static": {
+    "counts": {
+      "selected_starting_states": 39236,
+      "full_corpus_starting_states": 39236,
+      "checkpoint_comparisons": 156944,
+      "metric_comparisons": 1098608,
+      "hard_mismatch_events": 0,
+      "hard_mismatch_checkpoints": 0,
+      "hard_mismatch_cases": 0,
+      "numeric_failure_events": 0,
+      "numeric_failure_checkpoints": 0,
+      "numeric_failure_cases": 0,
+      "residual_nonblocking_deviation_events": 4,
+      "residual_nonblocking_checkpoints": 4,
+      "residual_nonblocking_cases": 2,
+      "failed_cases": 0
+    },
+    "gate": {
+      "selection_complete": true,
+      "selected_run_pass": true,
+      "complete_v022_gate_pass": true,
+      "classification": "PASS_GREEN",
+      "unresolved_hard_or_numeric_failures": 0
+    }
+  },
+  "v0_1_live_rocketsim": {
+    "scenario_count": 27,
+    "same_equation_pass": true,
+    "rocketsim_pass": true,
+    "axis_sign_pass": true,
+    "basic_parity_pass": true
+  },
+  "arena_query_backends": {
+    "corpus_seed": 20260823,
+    "ray_count": 4608,
+    "category_counts": {
+      "boundary_edges": 512,
+      "ceiling": 512,
+      "corners": 512,
+      "floor": 512,
+      "goals_and_back_wall": 512,
+      "misses": 512,
+      "near_surface": 512,
+      "ramps_and_curves": 512,
+      "side_walls": 512
+    },
+    "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+    "backends": {
+      "default": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      },
+      "cubql": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      }
+    },
+    "selected_ray_backend": "cubql",
+    "selection_reason": "exact query parity and higher measured B1 throughput"
+  },
+  "deterministic_mixed_lifecycle": {
+    "verdict": "PASS_GREEN",
+    "worlds": 64,
+    "ticks": 400,
+    "full_reset_interval_ticks": 97,
+    "same_seed_hash": "b650f689ba630523a6e834ea96e53d73ef2144aed23df849ba2b138bd1e2669f",
+    "same_seed_repeat_equal": true,
+    "timed_h2d_bytes": 0,
+    "timed_d2h_bytes": 0,
+    "raw_event_terminal_contract": true
+  },
+  "repository_checks": {
+    "pytest_passed": 70,
+    "pytest_failed": 0,
+    "ruff_pass": true,
+    "compileall_pass": true,
+    "git_diff_check_pass": true
+  },
+  "prior_published_evidence": {
+    "baseline_commit": "b5875c4b853a8ce844d0904e989b1d2a3854d0ac",
+    "byte_diff_count": 0,
+    "trees": {
+      "results/v0.1": {
+        "file_count": 3,
+        "git_tree_listing_sha256": "D9E2C755C7614AF781C461F00F3DD6DAA51AB46DD7AA0AAEA10284A88CA69A04"
+      },
+      "results/v0.2": {
+        "file_count": 3,
+        "git_tree_listing_sha256": "9AEFD73047AA9CEEC77E1D2A8B8F7E94CB7261B6FD5D62497D01B93246C1C4DF"
+      },
+      "results/v0.2.1": {
+        "file_count": 5,
+        "git_tree_listing_sha256": "5D21CE8851F64148C7795ED3398C79CE74EF1CB7E9CA3DE194B47BB2B0BCFD23"
+      },
+      "results/v0.2.2": {
+        "file_count": 6,
+        "git_tree_listing_sha256": "DCB1B5CAB2A59EC37F1E8B3E687361EB94F46BB519B93ED7BE18CF4BAF84A0E6"
+      },
+      "results/v0.3": {
+        "file_count": 9,
+        "git_tree_listing_sha256": "CC967775E2C322674CE6A81620EB4D32F42F507AC56742539233BC96798389CC"
+      }
+    }
+  }
+}

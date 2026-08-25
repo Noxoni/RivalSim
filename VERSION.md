@@ -1,61 +1,50 @@
 # RivalSim Version Boundary
 
-**Current completed milestone:** v0.3.0 — ball and dynamic contacts: `PASS_GREEN`
+**Current completed milestone:** v0.4.0 — complete standard 1v1 game transition: `PASS_GREEN`
 
-**Active authorized milestone:** v0.4 — complete standard 1v1 game transition
+**Active authorized milestone:** none
 
-## v0.3 result
+## v0.4 result
 
-The fixed standard-Soccar two-Octane/one-ball implementation passes all four frozen native
-authority phases at ticks 1, 4, 8, and 12:
+The fixed standard-Soccar two-Octane/one-ball implementation now provides a complete headless
+world transition with GPU-resident boost-pad, goal, scoring, kickoff, demolition, respawn, clock,
+event, and reset lifecycle state. The v0.4 native authority identity is:
 
-- ball/world: 31,216 / 31,216;
-- car/ball: 8,192 / 8,192;
-- car/car: 8,192 / 8,192 against both complete source-valid visitation branches;
-- integrated static/dynamic contact: 512 / 512 across eight families and both branches.
+`33AA0BA3BC35BC4300E2D2B84A3813CB0AD776479546A50AC3BBC6CE3D3E2562`
 
-Every phase has zero blocking hard mismatches and zero numeric tolerance failures. The complete
-dynamic path reaches 196,614.39 aggregate simulated game-seconds/s at 131,072 worlds with 1.313%
-CV, zero timed transfers, and identical full-state hashes across two independent 64-world,
-2,400-tick stress runs. The v0.2.2 39,236-case static corpus, v0.1 27-scenario live corpus, both
-ray backends, and all 63 repository tests remain green.
+It binds the pinned RocketSim and binding revisions, installed extension, all 16 Soccar CMFs with
+combined SHA-256 `2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538`,
+collector source, corpus/config/seed, authority settings, and the bounded RivalSim selector/event
+contract. The cache is complete and has no live acceptance fallback.
 
-Published v0.3 evidence is under:
+All 34 pads for both cars, both goal directions and strict score boundary, all five standard 1v1
+kickoff layouts, both teams at all four respawn locations, exact 360-tick demolition lifecycle,
+and deterministic mixed lifecycle/reset stress pass. The inherited v0.3 A/B/C/D gates, v0.2.2
+39,236-case gate, v0.1 27-scenario gate, and both 4,608-ray backends remain green. The configured
+repository suite passes 70/70 tests.
 
-- `results/v0.3/`;
-- `docs/V0_3_RESULTS.md`;
-- `docs/REPRODUCING_V0_3.md`;
-- `docs/V0_3_ORACLE_CACHE.md`.
+The complete path reaches 191,748.10 aggregate simulated game-seconds/s at 131,072 worlds with
+0.856% CV and zero timed transfers. The reset-heavy path reaches 225,005.06 sim-s/s and
+3,375,075.88 reset transitions/s with 0.723% CV and zero timed transfers.
 
-v0.3 release commit:
+Published v0.4 evidence is under:
 
-`d6ca3912418a3dd7ca8979415142cd861e0c0ddb`
+- `results/v0.4/`;
+- `docs/V0_4_RESULTS.md`;
+- `docs/REPRODUCING_V0_4.md`;
+- `docs/V0_4_AUTHORITY.md`.
 
-v0.3 implementation commit:
+v0.4 implementation commit:
 
-`a63d317b0de0522e6d3cbe243bf282c6b93a9d58`
+`da34c6d8a9ad4eb6aaced955ef0fe96575e1ec56`
 
-## Authorized v0.4 boundary
-
-v0.4 may add only the bounded standard-Soccar 1v1 lifecycle/rules needed for complete headless game transitions:
-
-- integration of the existing 34-pad pickup/cooldown state into full lifecycle/reset;
-- goals and scoring;
-- standard kickoff/reset transitions;
-- demolition disable/removal-from-active-physics and respawn;
-- match/reset/lifecycle event state;
-- generic terminal/truncation outputs needed by the later training layer;
-- deterministic GPU-resident lifecycle/reset state and validation.
-
-Controlling handoff:
-
-- `CODEX_START_PROMPT.md`;
-- `handoff/v0.4/README.md`;
-- `handoff/v0.4/ACCEPTANCE.md`;
-- `handoff/v0.4/LIFECYCLE_POLICY.md`.
+The release/evidence commit is recorded by `results/v0.4/manifest.json` and the remote branch.
 
 ## Frozen prior versions
 
+- **v0.3.0 — ball and dynamic contacts:** `PASS_GREEN`, release
+  `d6ca3912418a3dd7ca8979415142cd861e0c0ddb`, implementation
+  `a63d317b0de0522e6d3cbe243bf282c6b93a9d58`;
 - **v0.2.2 — static-world source-parity breadth gate:** `PASS_GREEN`, frozen baseline
   `6dfd44ad9afeb3d1164da7e0e38c097fb74d07b8`;
 - **v0.2.1 — static-world fidelity redesign:** `PASS_GREEN`, published at
@@ -65,16 +54,16 @@ Controlling handoff:
 - **v0.1.0 — GPU contact-free physics proof:** `PASS`, published at
   `1f7a36cc6165273fb658ba07a8458e8d8e60628a`.
 
-Published prior result directories remain immutable.
+All published prior result directories remain immutable.
 
 ## Hard stop
 
-Do not begin v0.5 in this authorization. Still excluded:
+v0.5 has not begun and is not authorized by the completed v0.4 handoff. Still excluded:
 
 - observation construction;
 - reward functions;
-- training-specific action parsing/masks beyond existing controls;
+- training-specific action parsing or masks beyond existing controls;
 - rollout buffers, GAE, PPO, or learner logic;
-- PyTorch policy inference/integration;
+- PyTorch policy inference or tensor integration;
 - Rival policy training;
 - arbitrary body counts, other game modes, rendering, or a generic Bullet API.
