@@ -1,6 +1,35 @@
 # Changelog
 
-## v0.3 — dynamic contacts handoff (2026-08-24)
+## v0.3 — dynamic contacts implemented (2026-08-25)
+
+- Added source-ordered Soccar ball/world sphere collision, friction, restitution, spin,
+  persistent contacts, analytic planes, and internal-edge adjustment. The complete 31,216-case
+  Phase A corpus passes all 124,864 blocking checkpoints.
+- Added Octane/ball compound box-sphere GJK/Voronoi/EPA contact, persistent manifold, solver rows,
+  and RocketSim-specific hit callback behavior. The 8,192-case Phase B corpus passes all 32,768
+  checkpoints with exact callback presence counts.
+- Added Octane/Octane compound box-box contact, ordered bump/demo physical classification, queued
+  bump impulse, and generic per-world car visitation lifecycle state. Both source-valid native
+  visitation branches pass all 8,192 Phase C cases without metric mixing or runtime best-match
+  selection.
+- Added the fixed two-car/one-ball integrated world: dynamic suspension-ray candidates,
+  source-lifecycle broadphase pair order, equal-island manifold ordering, one shared three-body
+  constraint solve, split impulse, writeback, and transform integration. All 512 Phase D cases
+  pass across eight simultaneous-contact families and both native-valid branches.
+- Froze isolated content-addressed native authority for all four phases, including every tick
+  1–12, exact source state, immediate post-`SetState` readback, RocketSim/binding revisions,
+  extension and CMF hashes, generator source/config/seed, authority settings, and source-valid
+  branch custody. Cached gates have no live native fallback.
+- Preserved the complete v0.2.2 static gate at 39,236/39,236 and the v0.1 live gate at 27/27;
+  both ray backends, 63/63 tests, lint, compile, deterministic stress, and all prior published
+  evidence remain green.
+- Measured the complete dynamic path at **196,614.39 aggregate simulated game-seconds/s** at
+  131,072 worlds, **1.313% CV**, and zero timed host/device transfers, satisfying the 100,000
+  sim-s/s v0.3 viability floor with `PASS_GREEN`.
+- Stopped at the v0.3 boundary. Demolition removal/respawn, scoring, kickoff/match rules,
+  training integration, arbitrary body counts, other modes, and all v0.4 work remain excluded.
+
+### Handoff authority
 
 - Authorized the bounded standard-Soccar dynamic-contact milestone on top of v0.2.2 `PASS_GREEN`.
 - Froze v0.2.2 release `6dfd44ad9afeb3d1164da7e0e38c097fb74d07b8` and all prior published evidence as mandatory regressions.

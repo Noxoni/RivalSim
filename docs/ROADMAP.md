@@ -70,30 +70,27 @@ and unchanged tolerances. Corrected B3 reaches 511,886.15 aggregate simulated ga
 262,144 worlds with zero timed transfers and retains `PASS_GREEN`. See
 `docs/V0_2_2_RESULTS.md` and `results/v0.2.2/`.
 
-## v0.3 — Ball and dynamic contacts: authorized / not begun
+## v0.3 — Ball and dynamic contacts: complete / `PASS_GREEN`
 
-Authorized by the v0.3 handoff in `handoff/v0.3/`.
+The fixed standard-Soccar two-Octane/one-ball world now includes ball-world, both car-ball pairs,
+car-car physical response, bounded ordered bump/demo classification, suspension rays against
+dynamic bodies, dynamic broadphase lifecycle order, and a single source-ordered three-body island
+solver. Car visitation order is per-world internal lifecycle state established by construction or
+membership change; native pointers, allocator addresses, output fitting, and case tables are not
+part of the runtime.
 
-Add, in order:
+The frozen Phase A/B/C/D corpora pass 31,216/31,216, 8,192/8,192, 8,192/8,192, and 512/512 cases
+respectively at ticks 1/4/8/12 with zero blocking hard or numeric failures. Phase C and D preserve
+both complete source-valid native visitation branches and compare one coherent labeled trajectory
+at a time. The complete v0.2.2 static corpus remains 39,236/39,236 and v0.1 remains 27/27.
 
-- ball-world contact and authoritative ball friction/restitution/spin behavior;
-- car-ball dynamic contact and RocketSim-specific hit behavior;
-- car-car dynamic contact;
-- bounded physical bump/demolition classification required by car-car contact;
-- integrated static + dynamic multi-contact validation.
+The complete dynamic path measures 196,614.39 aggregate simulated game-seconds/s at 131,072
+worlds with 1.313% CV and zero timed transfers, clearing the 100,000 sim-s/s floor. Two independent
+64-world, 2,400-tick stress runs have identical full-state hashes. See `docs/V0_3_RESULTS.md`,
+`docs/REPRODUCING_V0_3.md`, `docs/V0_3_ORACLE_CACHE.md`, and `results/v0.3/`.
 
-Implementation must be source-first against the same pinned RocketSim/Bullet lineage used by
-v0.2.2. Each phase freezes a content-addressed native authority cache before GPU iteration,
-uses 1/4/8/12-tick blocking checkpoints, and advances only after its representative/full parity
-gate is clean. The complete v0.2.2 39,236-case static corpus remains a mandatory regression.
-
-The final dynamic-contact benchmark is run only after parity. v0.2.2's 511,886.15 sim-s/s is a
-comparison baseline rather than the v0.3 target; the bounded viability floor is 100,000
-aggregate simulated game-seconds/s with GPU residency and zero routine timed transfers.
-
-Game scoring, kickoff/reset/respawn rules, RLGym/training integration, and v0.4+ work remain out
-of scope. See `handoff/v0.3/README.md`, `handoff/v0.3/ACCEPTANCE.md`, and
-`handoff/v0.3/SOURCE_PORT_POLICY.md`.
+Game scoring, kickoff/match reset, demolition removal/respawn, RLGym/training integration, and
+v0.4+ work remain out of scope and were not begun.
 
 ## v0.4 — Complete standard 1v1 game transition
 

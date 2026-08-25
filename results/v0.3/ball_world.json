@@ -1,0 +1,605 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.3",
+  "phase": "A_ball_world",
+  "generated_at_utc": "2026-08-25T18:35:34.661468+00:00",
+  "classification": "PASS_GREEN",
+  "selection": {
+    "kind": "complete",
+    "selected_case_count": 31216,
+    "full_case_count": 31216,
+    "representative_base_count": null,
+    "corpus_sha256": "7F3712D330720D8F9214FCB1CF4E5D68BBC272052FCA274234386E660A86A14E",
+    "selection_sha256": "CE49E38746210263C5465893439075C006725758FB19A20450DAD65FC0D3C687"
+  },
+  "authority": {
+    "execution": "cached_native_authority_only_no_live_fallback",
+    "identity_sha256": "11E307ABD14C8D79C2BFBDEC7F20C6A45716AD361609A901C517DCA98C804ED2",
+    "cache_format_version": 2,
+    "source_state": "exact frozen corpus record",
+    "initial_native_readback": "cached immediately after SetState"
+  },
+  "implementation": {
+    "python": "3.14.3",
+    "warp": "1.16.0",
+    "device": "cuda:0"
+  },
+  "frozen_protocol": {
+    "hard_horizons_ticks": [
+      1,
+      4,
+      8,
+      12
+    ],
+    "cached_ticks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "tolerances": {
+      "position_uu": 10.0,
+      "linear_velocity_uu_per_s": 25.0,
+      "orientation_rad": 0.025,
+      "angular_velocity_rad_per_s": 0.1
+    },
+    "long_horizons": "diagnostic_only_not_run"
+  },
+  "initial_state_custody": {
+    "source_state_count": 31216,
+    "native_readback_count": 31216,
+    "all_native_readback_finite": true,
+    "max_source_to_native_readback": {
+      "position_uu": 0.0005593964597210288,
+      "linear_velocity_uu_per_s": 8.63167442730628e-05,
+      "orientation_rad": 0.0,
+      "angular_velocity_rad_per_s": 0.0
+    }
+  },
+  "counts": {
+    "checkpoint_comparisons": 124864,
+    "metric_comparisons": 499456,
+    "hard_mismatch_events": 0,
+    "numeric_failure_events": 0,
+    "failed_cases": 0,
+    "actual_target_contact_cases": 29571,
+    "any_retained_contact_cases": 31216
+  },
+  "pass_fail_by_horizon": {
+    "1": {
+      "pass": 31216,
+      "fail": 0
+    },
+    "4": {
+      "pass": 31216,
+      "fail": 0
+    },
+    "8": {
+      "pass": 31216,
+      "fail": 0
+    },
+    "12": {
+      "pass": 31216,
+      "fail": 0
+    }
+  },
+  "numeric_error_distributions": {
+    "angular_velocity_rad_per_s": {
+      "p50": 0.0,
+      "p95": 1.7478878589322767e-08,
+      "p99": 4.481338704258171e-07,
+      "max": 0.020932787837115,
+      "tolerance": 0.1,
+      "max_tolerance_fraction": 0.20932787837115
+    },
+    "linear_velocity_uu_per_s": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 2.5303839037745665e-05,
+      "max": 2.1777020777670377,
+      "tolerance": 25.0,
+      "max_tolerance_fraction": 0.08710808311068151
+    },
+    "orientation_rad": {
+      "p50": 0.0,
+      "p95": 0.0003109022978950375,
+      "p99": 0.0003441083606682558,
+      "max": 0.0007691620555793267,
+      "tolerance": 0.025,
+      "max_tolerance_fraction": 0.030766482223173068
+    },
+    "position_uu": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.07073598066681155,
+      "tolerance": 10.0,
+      "max_tolerance_fraction": 0.007073598066681156
+    }
+  },
+  "coverage": {
+    "geometry_topology_audited": {
+      "cmf_files": 16,
+      "triangles": 8020,
+      "concave_directed_edges": 10296,
+      "convex_directed_edges": 856,
+      "planar_directed_edges": 12024,
+      "shared_directed_edges": 23176
+    },
+    "starting_states_generated": 31216,
+    "triangle_coverage": {
+      "generated_unique": 8020,
+      "target_contact_unique": 7232,
+      "arena_total": 8020
+    },
+    "shared_edge_coverage": {
+      "concave": {
+        "generated": 10296,
+        "target_contact": 9516,
+        "generated_directed_edges": 10296,
+        "contacted_directed_edges": 9516
+      },
+      "convex": {
+        "generated": 856,
+        "target_contact": 820,
+        "generated_directed_edges": 856,
+        "contacted_directed_edges": 820
+      },
+      "planar": {
+        "generated": 12024,
+        "target_contact": 11983,
+        "generated_directed_edges": 12024,
+        "contacted_directed_edges": 11983
+      }
+    },
+    "analytic_plane_coverage": {
+      "ceiling": {
+        "generated": 5,
+        "target_contact": 5
+      },
+      "floor": {
+        "generated": 5,
+        "target_contact": 5
+      },
+      "negative_x_wall": {
+        "generated": 5,
+        "target_contact": 5
+      },
+      "positive_x_wall": {
+        "generated": 5,
+        "target_contact": 5
+      }
+    },
+    "per_cmf": {
+      "mesh_0.cmf": {
+        "generated": 3436,
+        "target_contact": 3436
+      },
+      "mesh_1.cmf": {
+        "generated": 3436,
+        "target_contact": 3436
+      },
+      "mesh_10.cmf": {
+        "generated": 472,
+        "target_contact": 472
+      },
+      "mesh_11.cmf": {
+        "generated": 472,
+        "target_contact": 472
+      },
+      "mesh_12.cmf": {
+        "generated": 472,
+        "target_contact": 472
+      },
+      "mesh_13.cmf": {
+        "generated": 472,
+        "target_contact": 472
+      },
+      "mesh_14.cmf": {
+        "generated": 46,
+        "target_contact": 46
+      },
+      "mesh_15.cmf": {
+        "generated": 46,
+        "target_contact": 46
+      },
+      "mesh_2.cmf": {
+        "generated": 3436,
+        "target_contact": 3436
+      },
+      "mesh_3.cmf": {
+        "generated": 3436,
+        "target_contact": 3436
+      },
+      "mesh_4.cmf": {
+        "generated": 3845,
+        "target_contact": 3442
+      },
+      "mesh_5.cmf": {
+        "generated": 3845,
+        "target_contact": 3411
+      },
+      "mesh_6.cmf": {
+        "generated": 3845,
+        "target_contact": 3440
+      },
+      "mesh_7.cmf": {
+        "generated": 3845,
+        "target_contact": 3442
+      },
+      "mesh_8.cmf": {
+        "generated": 46,
+        "target_contact": 46
+      },
+      "mesh_9.cmf": {
+        "generated": 46,
+        "target_contact": 46
+      }
+    },
+    "motion_families": {
+      "deep_overlap": {
+        "generated": 1341,
+        "target_contact": 1257
+      },
+      "edge_deep_overlap": {
+        "generated": 4635,
+        "target_contact": 4559
+      },
+      "edge_normal_impact": {
+        "generated": 4636,
+        "target_contact": 4481
+      },
+      "edge_oblique_impact": {
+        "generated": 4635,
+        "target_contact": 4377
+      },
+      "edge_shallow_threshold": {
+        "generated": 4635,
+        "target_contact": 4490
+      },
+      "edge_tangential_spin": {
+        "generated": 4635,
+        "target_contact": 4412
+      },
+      "normal_impact": {
+        "generated": 1341,
+        "target_contact": 1241
+      },
+      "oblique_impact": {
+        "generated": 1336,
+        "target_contact": 1180
+      },
+      "separating_overlap": {
+        "generated": 1340,
+        "target_contact": 1197
+      },
+      "shallow_breaking_threshold": {
+        "generated": 1341,
+        "target_contact": 1181
+      },
+      "tangential_spin": {
+        "generated": 1341,
+        "target_contact": 1196
+      }
+    },
+    "multi_face_or_corner_contact_cases": 29220,
+    "unexercised_target_cases": 1645,
+    "unexercised_target_examples": [
+      {
+        "case_id": "A-F03735",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03737",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03742",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03743",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03745",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03748",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03767",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03778",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03784",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03785",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03967",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03969",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03975",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03981",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03991",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03993",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03995",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03996",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03998",
+        "kind": "triangle_face",
+        "mode": "deep_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F03999",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04000",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04001",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04002",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04013",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04014",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04019",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04025",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04026",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04038",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04045",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04048",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04051",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04052",
+        "kind": "triangle_face",
+        "mode": "deep_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04053",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04057",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04067",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04069",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04071",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04072",
+        "kind": "triangle_face",
+        "mode": "oblique_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04075",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04081",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04085",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04086",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04091",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04098",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04099",
+        "kind": "triangle_face",
+        "mode": "shallow_breaking_threshold",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04101",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04103",
+        "kind": "triangle_face",
+        "mode": "separating_overlap",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04107",
+        "kind": "triangle_face",
+        "mode": "tangential_spin",
+        "reason": "other_contact_observed"
+      },
+      {
+        "case_id": "A-F04110",
+        "kind": "triangle_face",
+        "mode": "normal_impact",
+        "reason": "other_contact_observed"
+      }
+    ]
+  },
+  "failures": [],
+  "gate": {
+    "selected_run_pass": true,
+    "selection_complete": true,
+    "phase_a_complete_gate_pass": true,
+    "unresolved_hard_or_numeric_failures": 0
+  }
+}

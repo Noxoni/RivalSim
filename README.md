@@ -11,62 +11,43 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.2.2 complete, `PASS_GREEN`
+## Current boundary — v0.3 complete, `PASS_GREEN`
 
-RivalSim v0.2.2 completes the bounded static-world source-parity breadth redesign. The frozen
-39,236-case Octane/Soccar corpus passes all **156,944 authoritative local-transition
-checkpoints** at 1, 4, 8, and 12 ticks with **zero hard mismatches, zero numeric tolerance
-failures, and zero failed cases**. Native RocketSim authority is content-addressed and cached;
-the final GPU gate cannot launch a live fallback. The meaningful v0.2 tolerances were not
-widened.
+RivalSim v0.3 completes the bounded standard-Soccar dynamic-contact milestone. It adds a fixed
+two-Octane/one-ball integrated world with source-ordered ball/world, car/ball, car/car, wheel,
+static-world, shared-island solver, split-impulse, and rigid-body writeback behavior. The runtime
+remains GPU-resident and carries car `_PreTickUpdate` visitation order as internal per-world
+lifecycle state established by construction or membership change.
 
-The complete corrected B3 path reaches **511,886.15 aggregate simulated game-seconds/s** at
-262,144 worlds with **0.0913% CV**, stable scaling, and zero timed host/device transfer. Two
-independent 64-world, 2,400-tick stress passes are finite, bounded, and full-state bit-identical.
-The v0.1 live corpus remains 27/27 passing, and the repository suite is 46/46 passing. This
-satisfies the v0.2.2 **`PASS_GREEN`** class: complete parity plus at least 500,000 sim-s/s.
+All frozen native gates pass at ticks 1, 4, 8, and 12:
 
-The validation policy deliberately retires 30–600-tick synchronized open-loop identity as a
-hard requirement. Floating-point contact trajectories become chaotic after local branch choices;
-long behavior should ultimately be assessed closed-loop and by train-in-RivalSim transfer to
-RocketSim/RLBot. Long open-loop trajectories may still diagnose a systematic defect visible in
-the 1–12-tick window, but do not block this release.
+- Phase A ball/world: **31,216 / 31,216** cases;
+- Phase B car/ball: **8,192 / 8,192** cases;
+- Phase C car/car: **8,192 / 8,192** cases against both complete source-valid visitation-order
+  branches;
+- Phase D integrated: **512 / 512** cases across eight simultaneous-contact families and both
+  complete source-valid branches.
 
-Implemented v0.2.2 static-world scope includes:
+Every phase has zero blocking hard mismatches and zero numeric tolerance failures. Native
+authority is isolated, content-addressed, caches every tick 1–12, and has no live fallback after
+freeze. Phase C/D relational comparison accepts one complete labeled native trajectory and never
+mixes metrics or selects a branch from expected outputs.
 
-- the exact external Soccar `.cmf` set as one shared 4,468-vertex / 8,020-triangle GPU asset;
-- independently checked CPU, normal Warp BVH, and cuBQL suspension-ray queries;
-- four wheel/suspension rays per car and eight per 1v1 world per tick;
-- source-ordered two-phase wheel transforms, rays, suspension, bilateral/rolling friction,
-  throttle, brake, coast, steering, powerslide, and grounded boost;
-- direct pinned Bullet operation order for Octane box-versus-static-triangle GJK/Voronoi/EPA,
-  persistent-manifold reduction, internal-edge adjustment, contact rows, ten-iteration velocity
-  and split-impulse solving, rigid-body integration, writeback, and deferred caps;
-- GPU-resident standard Soccar boost-pad pickup, lock, cooldown, and recharge state;
-- decomposed B0/B1/B2/B3 benchmarks, contact-rich parity, and deterministic stress evidence.
+The complete dynamic path reaches **196,614.39 aggregate simulated game-seconds/s**
+(23.59 million world ticks/s) at 131,072 worlds with **1.313% CV**. This is 1.97× the v0.3
+100,000 sim-s/s viability floor and 38.41% of the narrower v0.2.2 static-only reference. The
+timed hot loop records zero host/device transfers. Two independent 64-world, 2,400-tick stress
+runs are finite, bounded, and full-state bit-identical.
 
-The deterministic breadth corpus generates chassis and wheel states for all 8,020 triangles,
-all 23,176 shared directed edges, and 20 analytic-plane cases. It reports generated states and
-actual paired target contact separately: 7,752 unique triangles and 8,912 directed edges had
-paired target contact. Occluded or adjacent-target cases are not mislabeled as target coverage.
-
-Published v0.1, v0.2, and v0.2.1 evidence remains frozen. See `docs/V0_2_2_RESULTS.md`,
-`docs/REPRODUCING_V0_2_2.md`, and `results/v0.2.2/` for the current evidence.
+The complete v0.2.2 static corpus remains 39,236/39,236 passing, the v0.1 live RocketSim corpus
+remains 27/27 passing, both ray backends remain green, and the repository suite is 63/63 passing.
+Published v0.1 through v0.2.2 evidence remains byte-for-byte unchanged.
 
 ### Explicitly excluded
 
-RivalSim v0.2.2 does **not** implement:
-
-- ball-world collision;
-- car-ball collision;
-- car-car collision;
-- bumps/demolitions;
-- scoring/game reset;
-- RLGym observations/rewards/PPO;
-- Rival policy inference.
-
-Those remain later milestones. v0.3 was not begun; new authority is required before dynamic
-contacts or training integration.
+RivalSim v0.3 does **not** implement demolition removal/disable/respawn, goals/scoring, kickoff or
+match reset rules, RLGym observations/rewards/PPO, Rival policy inference, arbitrary body counts,
+other game modes, or a generic Bullet API. Those remain v0.4+ work and were not begun.
 
 ## Architecture
 
@@ -84,18 +65,34 @@ Current full Rival CPU RocketSim/RLGym reference:
 - 12,039 agent-steps/s;
 - 200.65 aggregate simulated game-seconds/s.
 
-v0.2 remains a partial simulator, so this is a system reference rather than an apples-to-apples comparison.
+RivalSim remains a partial simulator, so this is a system reference rather than an apples-to-apples comparison.
 
-The v0.2.2 package classifies the corrected complete static-world path as:
+The v0.3 package classifies the complete dynamic-contact path as:
 
-- **PASS_GREEN:** local parity passes and >=500,000 aggregate sim-s/s;
-- **PASS:** local parity passes and 100,000–<500,000 sim-s/s;
+- **PASS_GREEN:** every fidelity/regression gate passes and throughput is >=100,000 sim-s/s;
 - **PAUSE_PERF:** local parity passes but throughput is <100,000 sim-s/s;
 - **PAUSE_FIDELITY:** any required local parity failure remains.
 
-## Published v0.2.2 authority and result
+## Published v0.3 authority and result
 
 The current result package is:
+
+- `docs/V0_3_RESULTS.md`;
+- `docs/REPRODUCING_V0_3.md`;
+- `docs/V0_3_ORACLE_CACHE.md`;
+- `results/v0.3/ball_world.json`;
+- `results/v0.3/car_ball.json`;
+- `results/v0.3/car_car.json`;
+- `results/v0.3/integrated.json`;
+- `results/v0.3/oracle_data.json`;
+- `results/v0.3/source_port.json`;
+- `results/v0.3/regression.json`;
+- `results/v0.3/benchmark.json`;
+- `results/v0.3/manifest.json`.
+
+## Published v0.2.2 authority and result
+
+The frozen v0.2.2 result package is:
 
 - `docs/V0_2_2_RESULTS.md`;
 - `docs/REPRODUCING_V0_2_2.md`;

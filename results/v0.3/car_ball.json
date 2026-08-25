@@ -1,0 +1,481 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.3",
+  "phase": "B_car_ball",
+  "generated_at_utc": "2026-08-25T18:28:13.879145+00:00",
+  "classification": "PASS_GREEN",
+  "selection": {
+    "kind": "complete",
+    "selected_case_count": 8192,
+    "full_case_count": 8192,
+    "representative_base_count": null,
+    "corpus_sha256": "C68E2888D12057F3AD9BF978B39E8B2ED776562D9322C598908E683A49311A90",
+    "selection_sha256": "ABFEDCC606966D46135FE69B06381B4E89E6CD993F470D2FE216CC2F8E06399D"
+  },
+  "authority": {
+    "execution": "cached_native_authority_only_no_live_fallback",
+    "identity_sha256": "AEEF0E721D995393ACFA0632EE934DCC1DFBE8EC223E81F4A10D48EC63F75A9B",
+    "cache_format_version": 2
+  },
+  "implementation": {
+    "python": "3.14.3",
+    "warp": "1.16.0",
+    "device": "cuda:0"
+  },
+  "frozen_protocol": {
+    "hard_horizons_ticks": [
+      1,
+      4,
+      8,
+      12
+    ],
+    "cached_ticks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "tolerances": {
+      "position_uu": 10.0,
+      "linear_velocity_uu_per_s": 25.0,
+      "orientation_rad": 0.025,
+      "angular_velocity_rad_per_s": 0.1,
+      "boost": 0.01,
+      "handbrake": 0.0001,
+      "world_contact_normal_rad": 0.05
+    }
+  },
+  "initial_state_custody": {
+    "source_state_count": 8192,
+    "car": {
+      "max_position_uu": 0.0006905339541845024,
+      "max_linear_velocity_uu_per_s": 0.0002534980303607881,
+      "max_orientation_rad": 0.0005330319025966183,
+      "max_angular_velocity_rad_per_s": 0.0
+    },
+    "ball": {
+      "max_position_uu": 0.0002516543900128454,
+      "max_linear_velocity_uu_per_s": 0.0001373291015625,
+      "max_orientation_rad": 0.0,
+      "max_angular_velocity_rad_per_s": 0.0
+    }
+  },
+  "counts": {
+    "checkpoint_comparisons": 32768,
+    "hard_mismatch_events": 0,
+    "numeric_failure_events": 0,
+    "failed_cases": 0,
+    "native_callback_frames": 20692,
+    "gpu_callback_frames": 20692,
+    "matched_callback_frames": 20692,
+    "native_actual_contact_cases": 8183,
+    "gpu_actual_contact_cases": 8183
+  },
+  "pass_fail_by_horizon": {
+    "1": {
+      "pass": 8192,
+      "fail": 0
+    },
+    "4": {
+      "pass": 8192,
+      "fail": 0
+    },
+    "8": {
+      "pass": 8192,
+      "fail": 0
+    },
+    "12": {
+      "pass": 8192,
+      "fail": 0
+    }
+  },
+  "pass_fail_by_static_context_horizon": {
+    "1": {
+      "aerial_center": {
+        "pass": 1143
+      },
+      "aerial_high": {
+        "pass": 953
+      },
+      "ball_floor_contact": {
+        "pass": 953
+      },
+      "car_floor_contact": {
+        "pass": 952
+      },
+      "grounded": {
+        "pass": 1143
+      },
+      "negative_x_wall": {
+        "pass": 952
+      },
+      "positive_corner": {
+        "pass": 953
+      },
+      "positive_x_wall": {
+        "pass": 1143
+      }
+    },
+    "4": {
+      "aerial_center": {
+        "pass": 1143
+      },
+      "aerial_high": {
+        "pass": 953
+      },
+      "ball_floor_contact": {
+        "pass": 953
+      },
+      "car_floor_contact": {
+        "pass": 952
+      },
+      "grounded": {
+        "pass": 1143
+      },
+      "negative_x_wall": {
+        "pass": 952
+      },
+      "positive_corner": {
+        "pass": 953
+      },
+      "positive_x_wall": {
+        "pass": 1143
+      }
+    },
+    "8": {
+      "aerial_center": {
+        "pass": 1143
+      },
+      "aerial_high": {
+        "pass": 953
+      },
+      "ball_floor_contact": {
+        "pass": 953
+      },
+      "car_floor_contact": {
+        "pass": 952
+      },
+      "grounded": {
+        "pass": 1143
+      },
+      "negative_x_wall": {
+        "pass": 952
+      },
+      "positive_corner": {
+        "pass": 953
+      },
+      "positive_x_wall": {
+        "pass": 1143
+      }
+    },
+    "12": {
+      "aerial_center": {
+        "pass": 1143
+      },
+      "aerial_high": {
+        "pass": 953
+      },
+      "ball_floor_contact": {
+        "pass": 953
+      },
+      "car_floor_contact": {
+        "pass": 952
+      },
+      "grounded": {
+        "pass": 1143
+      },
+      "negative_x_wall": {
+        "pass": 952
+      },
+      "positive_corner": {
+        "pass": 953
+      },
+      "positive_x_wall": {
+        "pass": 1143
+      }
+    }
+  },
+  "numeric_error_distributions": {
+    "ball_angular_velocity_rad_per_s": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 5.331201499700045e-07,
+      "max": 1.5266237824995157e-06,
+      "tolerance": 0.1,
+      "max_tolerance_fraction": 1.5266237824995157e-05
+    },
+    "ball_linear_velocity_uu_per_s": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.00032868437543545555,
+      "tolerance": 25.0,
+      "max_tolerance_fraction": 1.3147375017418222e-05
+    },
+    "ball_orientation_rad": {
+      "p50": 0.0,
+      "p95": 0.0003062289711822516,
+      "p99": 0.00035595589488780126,
+      "max": 0.00044481457220529543,
+      "tolerance": 0.025,
+      "max_tolerance_fraction": 0.017792582888211818
+    },
+    "ball_position_uu": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 6.823937919616058e-05,
+      "tolerance": 10.0,
+      "max_tolerance_fraction": 6.823937919616058e-06
+    },
+    "car_angular_velocity_rad_per_s": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 4.76837158203125e-07,
+      "max": 0.04865448382126811,
+      "tolerance": 0.1,
+      "max_tolerance_fraction": 0.4865448382126811
+    },
+    "car_boost": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.0,
+      "tolerance": 0.01,
+      "max_tolerance_fraction": 0.0
+    },
+    "car_handbrake": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.0,
+      "tolerance": 0.0001,
+      "max_tolerance_fraction": 0.0
+    },
+    "car_linear_velocity_uu_per_s": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 4.206156147774251,
+      "tolerance": 25.0,
+      "max_tolerance_fraction": 0.16824624591097004
+    },
+    "car_orientation_rad": {
+      "p50": 0.0,
+      "p95": 0.0003501146965832808,
+      "p99": 0.0004971853102485771,
+      "max": 0.004861466104056973,
+      "tolerance": 0.025,
+      "max_tolerance_fraction": 0.19445864416227893
+    },
+    "car_position_uu": {
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 0.3431646513676028,
+      "tolerance": 10.0,
+      "max_tolerance_fraction": 0.03431646513676028
+    }
+  },
+  "callback_diagnostics": {
+    "extra_hit_velocity_uu_per_s": {
+      "count": 20692,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 6.177572151451739e-05
+    },
+    "relative_position_on_ball_uu": {
+      "count": 20692,
+      "p50": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "max": 5.960273739623926e-05
+    }
+  },
+  "coverage": {
+    "contact_region": {
+      "corner": {
+        "generated": 2520,
+        "native_contact": 2517,
+        "gpu_contact": 2517
+      },
+      "edge": {
+        "generated": 3780,
+        "native_contact": 3776,
+        "gpu_contact": 3776
+      },
+      "front": {
+        "generated": 316,
+        "native_contact": 316,
+        "gpu_contact": 316
+      },
+      "left": {
+        "generated": 315,
+        "native_contact": 314,
+        "gpu_contact": 314
+      },
+      "rear": {
+        "generated": 316,
+        "native_contact": 315,
+        "gpu_contact": 315
+      },
+      "right": {
+        "generated": 315,
+        "native_contact": 315,
+        "gpu_contact": 315
+      },
+      "roof": {
+        "generated": 315,
+        "native_contact": 315,
+        "gpu_contact": 315
+      },
+      "underside": {
+        "generated": 315,
+        "native_contact": 315,
+        "gpu_contact": 315
+      }
+    },
+    "motion_mode": {
+      "ball_toward_car": {
+        "generated": 1023,
+        "native_contact": 1023,
+        "gpu_contact": 1023
+      },
+      "central_closing_hard": {
+        "generated": 1024,
+        "native_contact": 1024,
+        "gpu_contact": 1024
+      },
+      "central_closing_low": {
+        "generated": 1025,
+        "native_contact": 1025,
+        "gpu_contact": 1025
+      },
+      "glancing_negative": {
+        "generated": 1025,
+        "native_contact": 1025,
+        "gpu_contact": 1025
+      },
+      "glancing_positive": {
+        "generated": 1024,
+        "native_contact": 1024,
+        "gpu_contact": 1024
+      },
+      "mutual_closing": {
+        "generated": 1023,
+        "native_contact": 1023,
+        "gpu_contact": 1023
+      },
+      "near_rest_dribble": {
+        "generated": 1023,
+        "native_contact": 1014,
+        "gpu_contact": 1014
+      },
+      "same_direction_overtake": {
+        "generated": 1025,
+        "native_contact": 1025,
+        "gpu_contact": 1025
+      }
+    },
+    "orientation_mode": {
+      "compound_rotation": {
+        "generated": 964,
+        "native_contact": 963,
+        "gpu_contact": 963
+      },
+      "identity": {
+        "generated": 1205,
+        "native_contact": 1205,
+        "gpu_contact": 1205
+      },
+      "inverted": {
+        "generated": 964,
+        "native_contact": 958,
+        "gpu_contact": 958
+      },
+      "near_wall_rotation": {
+        "generated": 964,
+        "native_contact": 964,
+        "gpu_contact": 964
+      },
+      "pitched_aerial": {
+        "generated": 964,
+        "native_contact": 962,
+        "gpu_contact": 962
+      },
+      "rolled_aerial": {
+        "generated": 1204,
+        "native_contact": 1204,
+        "gpu_contact": 1204
+      },
+      "yaw_90": {
+        "generated": 963,
+        "native_contact": 963,
+        "gpu_contact": 963
+      },
+      "yaw_oblique": {
+        "generated": 964,
+        "native_contact": 964,
+        "gpu_contact": 964
+      }
+    },
+    "static_context": {
+      "aerial_center": {
+        "generated": 1143,
+        "native_contact": 1143,
+        "gpu_contact": 1143
+      },
+      "aerial_high": {
+        "generated": 953,
+        "native_contact": 953,
+        "gpu_contact": 953
+      },
+      "ball_floor_contact": {
+        "generated": 953,
+        "native_contact": 944,
+        "gpu_contact": 944
+      },
+      "car_floor_contact": {
+        "generated": 952,
+        "native_contact": 952,
+        "gpu_contact": 952
+      },
+      "grounded": {
+        "generated": 1143,
+        "native_contact": 1143,
+        "gpu_contact": 1143
+      },
+      "negative_x_wall": {
+        "generated": 952,
+        "native_contact": 952,
+        "gpu_contact": 952
+      },
+      "positive_corner": {
+        "generated": 953,
+        "native_contact": 953,
+        "gpu_contact": 953
+      },
+      "positive_x_wall": {
+        "generated": 1143,
+        "native_contact": 1143,
+        "gpu_contact": 1143
+      }
+    }
+  },
+  "failures": [],
+  "gate": {
+    "selected_run_pass": true,
+    "selection_complete": true,
+    "phase_b_complete_gate_pass": true,
+    "unresolved_hard_or_numeric_failures": 0
+  }
+}

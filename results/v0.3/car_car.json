@@ -3,14 +3,27 @@
   "milestone": "v0.3",
   "phase": "C_car_car",
   "checkpoint_status": "PASS_GREEN",
-  "generated_at_utc": "2026-08-25T16:12:24.277520+00:00",
+  "generated_at_utc": "2026-08-25T18:29:24.410473+00:00",
   "authority": {
     "identity_sha256": "7A1D369F58CF3FAA0BA06D6D105CCF896A8FD9DE2C994471D2649F852AEC9EC9",
     "cache_format_version": 2,
     "status": "COMPLETE_NATIVE_AUTHORITY",
     "case_count": 8192,
     "native_branch_count": 2,
-    "captured_ticks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "captured_ticks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
     "frame_count": 196608,
     "initial_readback_count": 16384,
     "chunk_count": 64,
@@ -56,7 +69,10 @@
     "native_address_values_published": false
   },
   "native_multi_outcome_relation": {
-    "branches": ["a_then_b", "b_then_a"],
+    "branches": [
+      "a_then_b",
+      "b_then_a"
+    ],
     "branch_cause": "source Arena::_cars visitation order established by construction or membership change",
     "rivalsim_state": "per-world internal lifecycle state retained until membership changes",
     "comparison": "same-labeled complete trajectory only",
@@ -80,46 +96,65 @@
     "corpus_sha256": "3754CC93FD852BA3AD05B7C1E97CA5BAB6FA2EC5E57886C3D96B471024F4A70C",
     "selection_sha256": "6E29A92375A98BD3C31FBC056C197D16A2C854DC95A79EACA652FFC276E263B3",
     "selected_case_count": 8192,
+    "branches": [
+      "a_then_b",
+      "b_then_a"
+    ],
+    "comparison": "same-labeled complete trajectory only",
+    "metric_branch_mixing": false,
+    "runtime_best_match_selection": false,
+    "case_acceptance": "at least one complete native-valid branch",
     "both_branches_complete_count": 8192,
     "one_branch_complete_count": 0,
     "no_branch_complete_count": 0,
     "pass_by_horizon": {
-      "1": 8192,
-      "4": 8192,
-      "8": 8192,
-      "12": 8192
+      "1": {
+        "pass": 8192,
+        "fail": 0
+      },
+      "4": {
+        "pass": 8192,
+        "fail": 0
+      },
+      "8": {
+        "pass": 8192,
+        "fail": 0
+      },
+      "12": {
+        "pass": 8192,
+        "fail": 0
+      }
     },
     "failed_case_count": 0,
-    "hard_mismatch_count": 0,
-    "numeric_failure_count": 0,
+    "relation_failure_count": 0,
     "ordered_bump_demo_events": {
       "a_then_b": {
         "native": 9580,
         "gpu": 9580,
-        "matched": 9580
+        "matched_native_events_in_exact_frames": 9580
       },
       "b_then_a": {
         "native": 9581,
         "gpu": 9581,
-        "matched": 9581
+        "matched_native_events_in_exact_frames": 9581
       }
     },
     "metric_maxima_non_demo": {
       "a_then_b": {
-        "position_uu": 1.1405905495476336,
-        "linear_velocity_uu_per_s": 18.547553756439548,
-        "orientation_rad": 0.003767047423439625,
-        "angular_velocity_rad_per_s": 0.08421780488241751,
-        "boost": 0.0,
-        "handbrake": 0.0
+        "car_angular_velocity_rad_per_s": 0.08421780488241751,
+        "car_boost": 0.0,
+        "car_handbrake": 0.0,
+        "car_linear_velocity_uu_per_s": 18.547553756439548,
+        "car_orientation_rad": 0.003767047423439625,
+        "car_position_uu": 1.1405905495476336
       },
       "b_then_a": {
-        "position_uu": 0.172419846738424,
-        "linear_velocity_uu_per_s": 1.894311347284722,
-        "orientation_rad": 0.00270358800681613,
-        "angular_velocity_rad_per_s": 0.0404438204115122,
-        "boost": 0.0,
-        "handbrake": 0.0
+        "car_angular_velocity_rad_per_s": 0.0404438204115122,
+        "car_boost": 0.0,
+        "car_handbrake": 0.0,
+        "car_linear_velocity_uu_per_s": 1.894311347284722,
+        "car_orientation_rad": 0.00270358800681613,
+        "car_position_uu": 0.172419846738424
       }
     }
   },

@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.3",
+  "generated_at_utc": "2026-08-25T19:00:47.950056+00:00",
+  "status": "PASS_GREEN",
+  "v0_2_2_static_acceptance": {
+    "counts": {
+      "selected_starting_states": 39236,
+      "full_corpus_starting_states": 39236,
+      "checkpoint_comparisons": 156944,
+      "metric_comparisons": 1098608,
+      "hard_mismatch_events": 0,
+      "hard_mismatch_checkpoints": 0,
+      "hard_mismatch_cases": 0,
+      "numeric_failure_events": 0,
+      "numeric_failure_checkpoints": 0,
+      "numeric_failure_cases": 0,
+      "residual_nonblocking_deviation_events": 4,
+      "residual_nonblocking_checkpoints": 4,
+      "residual_nonblocking_cases": 2,
+      "failed_cases": 0
+    },
+    "pass_fail_by_horizon": {
+      "1": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "4": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "8": {
+        "pass": 39236,
+        "fail": 0
+      },
+      "12": {
+        "pass": 39236,
+        "fail": 0
+      }
+    },
+    "gate": {
+      "selection_complete": true,
+      "selected_run_pass": true,
+      "complete_v022_gate_pass": true,
+      "classification": "PASS_GREEN",
+      "unresolved_hard_or_numeric_failures": 0
+    }
+  },
+  "v0_1_live_rocketsim": {
+    "scenario_count": 27,
+    "same_equation_pass": true,
+    "rocketsim_pass": true,
+    "axis_sign_pass": true,
+    "basic_parity_pass": true
+  },
+  "arena_query_backends": {
+    "corpus_seed": 20260823,
+    "ray_count": 4608,
+    "category_counts": {
+      "boundary_edges": 512,
+      "ceiling": 512,
+      "corners": 512,
+      "floor": 512,
+      "goals_and_back_wall": 512,
+      "misses": 512,
+      "near_surface": 512,
+      "ramps_and_curves": 512,
+      "side_walls": 512
+    },
+    "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+    "backends": {
+      "default": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      },
+      "cubql": {
+        "hit_mismatch_count": 0,
+        "max_nearest_distance_error_uu": 0.001953125,
+        "max_hit_point_error_uu": 0.001953125,
+        "minimum_normal_dot": 0.9999998807907104,
+        "co_nearest_boundary_edge_tie_count": 1,
+        "unambiguous_face_mismatch_count": 0,
+        "exact_hit_distance_normal_pass": true
+      }
+    },
+    "selected_ray_backend": "cubql",
+    "selection_reason": "exact query parity and higher measured B1 throughput"
+  },
+  "deterministic_stress": {
+    "worlds": 64,
+    "ticks": 2400,
+    "seed": 20260825,
+    "independent_runs": 2,
+    "initial_family_counts": {
+      "static_ball": 8,
+      "car_ball_car_static": 8,
+      "car_ball_ball_static": 8,
+      "car_ball_wall_edge": 8,
+      "car_car_static": 8,
+      "two_cars_ball": 8,
+      "wheel_car_ball": 8,
+      "three_body_multi_manifold": 8
+    },
+    "coverage_intent": [
+      "ball bounces and wall/corner contacts",
+      "car-ball impacts",
+      "car-car impacts and bump/demo neighborhoods",
+      "wheel/car/ball interactions",
+      "mixed static and dynamic manifolds"
+    ],
+    "runs": [
+      {
+        "full_state_sha256": "D584FC49A1ADED7F81C889C93AF2FB62F08EB5CE9B07BEB4903ADE1DF5564A7B",
+        "hashed_state_bytes": 752028,
+        "hashed_array_count": 263,
+        "finite": true,
+        "max_car_linear_speed_uu_per_s": 292.4162902832031,
+        "max_car_angular_speed_rad_per_s": 0.8878883719444275,
+        "max_ball_linear_speed_uu_per_s": 396.1288757324219,
+        "max_ball_angular_speed_rad_per_s": 5.933538913726807,
+        "max_final_penetration_uu": 102.80303955078125,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      },
+      {
+        "full_state_sha256": "D584FC49A1ADED7F81C889C93AF2FB62F08EB5CE9B07BEB4903ADE1DF5564A7B",
+        "hashed_state_bytes": 752028,
+        "hashed_array_count": 263,
+        "finite": true,
+        "max_car_linear_speed_uu_per_s": 292.4162902832031,
+        "max_car_angular_speed_rad_per_s": 0.8878883719444275,
+        "max_ball_linear_speed_uu_per_s": 396.1288757324219,
+        "max_ball_angular_speed_rad_per_s": 5.933538913726807,
+        "max_final_penetration_uu": 102.80303955078125,
+        "hot_loop_host_to_device_bytes": 0,
+        "hot_loop_device_to_host_bytes": 0
+      }
+    ],
+    "full_state_sha256_runs": [
+      "D584FC49A1ADED7F81C889C93AF2FB62F08EB5CE9B07BEB4903ADE1DF5564A7B",
+      "D584FC49A1ADED7F81C889C93AF2FB62F08EB5CE9B07BEB4903ADE1DF5564A7B"
+    ],
+    "deterministic_equal": true,
+    "finite": true,
+    "bounded_authoritative_speeds": true,
+    "bounded_final_penetration": true,
+    "hot_loop_gpu_resident": true,
+    "stress_gate_pass": true
+  },
+  "repository_checks": {
+    "pytest_passed": 63,
+    "pytest_failed": 0,
+    "ruff_pass": true,
+    "compileall_pass": true,
+    "git_diff_check_pass": true
+  },
+  "prior_published_evidence": {
+    "baseline_commit": "6dfd44ad9afeb3d1164da7e0e38c097fb74d07b8",
+    "v0_1_v0_2_v0_2_1_v0_2_2_byte_diff_count": 0
+  }
+}

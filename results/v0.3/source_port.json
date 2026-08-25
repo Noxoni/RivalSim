@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.3",
+  "status": "SOURCE_PORT_COMPLETE",
+  "pinned_lineage": {
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+    "rocketsim_package": "2.2.1",
+    "bullet_subtree": "RocketSim pinned bullet3-3.24",
+    "soccar_cmf_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538"
+  },
+  "phase_paths": {
+    "ball_world": [
+      "Ball::_BulletSetup/SetState/_FinishPhysicsTick",
+      "SphereTriangleDetector::getClosestPoints/collide/closestPointTriangle",
+      "btConvexPlaneCollisionAlgorithm::processCollision",
+      "btAdjustInternalEdgeContacts",
+      "btPersistentManifold::refreshContactPoints/addManifoldPoint"
+    ],
+    "car_ball": [
+      "btCompoundCollisionAlgorithm child box/sphere dispatch",
+      "btGjkPairDetector::getClosestPointsNonVirtual",
+      "btVoronoiSimplexSolver simplex update/witness recovery",
+      "btGjkEpaPenetrationDepthSolver and EPA witnesses",
+      "Arena::_BtCallback_OnCarBallCollision"
+    ],
+    "car_car": [
+      "btCompoundCollisionAlgorithm child box/box dispatch",
+      "btBoxBoxDetector::dBoxBox2/intersectRectQuad2/cullPoints2",
+      "Arena::_BtCallback_OnCarCarCollision",
+      "Car::_FinishPhysicsTick queued bump impulse and caps"
+    ],
+    "integrated": [
+      "Arena::_cars lifecycle-ordered Car::_PreTickUpdate traversal",
+      "btRSBroadphase dynamic cell handle remove/append pair stream",
+      "btSimulationIslandManager island union and equal-island quicksort",
+      "btSequentialImpulseConstraintSolver normal/special/friction/split ordering",
+      "btSolverBody writeback and btDiscreteDynamicsWorld transform integration"
+    ]
+  },
+  "source_backed_corrections": [
+    "sphere/triangle two-sided face and seven-region closest-point branch order",
+    "sphere/static persistent threshold, material combination, and internal-edge order",
+    "box/sphere support, Voronoi, EPA, retained manifold, and hit callback order",
+    "box/box face/edge candidate order, cull ordering, and compound-root local points",
+    "per-world car visitation lifecycle state retained until membership changes",
+    "dynamic broadphase cell lifecycle and dispatcher manifold insertion order",
+    "one shared three-body solver state, globally ordered rows, split impulse, and writeback",
+    "left-to-right float32 car force/torque and inverse-inertia auto-roll arithmetic"
+  ],
+  "diagnostic_exact_bits": {
+    "case": "D290 tick 2 first-source-divergence proof",
+    "force_xyz": [
+      "C34CB0C4",
+      "4161A6F3",
+      "C0803340"
+    ],
+    "torque_xyz": [
+      "C56988AD",
+      "C6036A54",
+      "4420A24D"
+    ],
+    "normal_impulse": "40C7FDDE",
+    "tangent_impulse": "BFEFFD71",
+    "result": "native and GPU exact through tick 12 after source-order correction"
+  },
+  "prohibited_mechanisms": {
+    "case_ids_or_expected_outputs_in_runtime": false,
+    "runtime_best_match_branch_selection": false,
+    "native_pointer_or_allocator_emulation": false,
+    "tolerance_broadening": false,
+    "tie_epsilons_or_behavioral_stabilizers": false,
+    "generic_bullet_port": false
+  }
+}
