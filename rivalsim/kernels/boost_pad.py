@@ -164,3 +164,82 @@ def boost_pad_tick(
 
         cooldown[index] = current_cooldown
         previous_locked_car[index] = locked_car
+
+
+@wp.kernel
+def boost_pad_tick_lifecycle(
+    pad_positions: wp.array(dtype=wp.vec3),
+    pre_tick_first_car: wp.array(dtype=wp.int32),
+    car_pos: wp.array(dtype=wp.vec3),
+    car_quat: wp.array(dtype=wp.quat),
+    car_boost: wp.array(dtype=wp.float32),
+    cooldown: wp.array(dtype=wp.float32),
+    previous_locked_car: wp.array(dtype=wp.int32),
+):
+    """Source pad path using the persistent Arena::_cars visitation order."""
+
+    env = wp.tid()
+    pad_base = env * PAD_COUNT
+    car_base = env * 2
+    for pad in range(PAD_COUNT):
+        index = pad_base + pad
+        pad_pos = pad_positions[pad]
+        is_big = pad < BIG_PAD_COUNT
+        current_cooldown = cooldown[index]
+        if current_cooldown > 0.0:
+            current_cooldown = wp.max(0.0, current_cooldown - DT)
+        active = current_cooldown == 0.0
+        locked_car = wp.int32(0)
+
+        cylinder_radius = 144.0
+        box_radius = 120.0
+        if is_big:
+            cylinder_radius = 208.0
+            box_radius = 160.0
+
+        for ordinal in range(2):
+            local_car = ordinal
+            if pre_tick_first_car[env] != 0:
+                local_car = 1 - ordinal
+            car = car_base + local_car
+            car_id = wp.int32(local_car + 1)
+            pos = car_pos[car]
+            colliding = False
+            if previous_locked_car[index] == car_id:
+                colliding = _pad_overlap_locked_car(
+                    pos,
+                    car_quat[car],
+                    pad_pos,
+                    box_radius,
+                )
+            else:
+                delta_x = pos[0] - pad_pos[0]
+                delta_y = pos[1] - pad_pos[1]
+                colliding = (
+                    delta_x * delta_x + delta_y * delta_y
+                    < cylinder_radius * cylinder_radius
+                    and wp.abs(pos[2] - pad_pos[2]) < 95.0
+                )
+            if colliding:
+                locked_car = car_id
+
+        if locked_car != 0 and active:
+            car = car_base + locked_car - 1
+            if is_big:
+                car_boost[car] = 100.0
+                current_cooldown = 10.0
+            else:
+                car_boost[car] = wp.min(100.0, car_boost[car] + 12.0)
+                current_cooldown = 4.0
+
+        cooldown[index] = current_cooldown
+        previous_locked_car[index] = locked_car
+
+
+__all__ = [
+    "BIG_PAD_COUNT",
+    "PAD_COUNT",
+    "SOCCAR_PAD_POSITIONS",
+    "boost_pad_tick",
+    "boost_pad_tick_lifecycle",
+]

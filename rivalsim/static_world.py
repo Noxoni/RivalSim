@@ -12,7 +12,12 @@ from rivalsim.ball_world_state import BallWorldState
 from rivalsim.car_ball_state import CarBallState
 from rivalsim.car_car_state import CarCarState
 from rivalsim.kernels.ball_world import ball_world_tick, initialize_ball_world_internal
-from rivalsim.kernels.boost_pad import PAD_COUNT, SOCCAR_PAD_POSITIONS, boost_pad_tick
+from rivalsim.kernels.boost_pad import (
+    PAD_COUNT,
+    SOCCAR_PAD_POSITIONS,
+    boost_pad_tick,
+    boost_pad_tick_lifecycle,
+)
 from rivalsim.kernels.car_ball import capture_car_ball_inputs, car_ball_tick
 from rivalsim.kernels.car_car import (
     capture_car_car_inputs,
@@ -22,6 +27,7 @@ from rivalsim.kernels.integrated import (
     integrated_two_car_ball_tick,
     update_integrated_broadphase_order,
 )
+from rivalsim.kernels.lifecycle import lifecycle_post_tick, lifecycle_pre_tick
 from rivalsim.kernels.rsqrtss_amd import amd_rsqrtss_table
 from rivalsim.kernels.vehicle import (
     chassis_contacts_v021,
@@ -29,6 +35,7 @@ from rivalsim.kernels.vehicle import (
     load_action_tape,
     wheel_pre_tick,
 )
+from rivalsim.lifecycle_state import LifecycleSnapshot, LifecycleState
 from rivalsim.simulator import RivalSim
 from rivalsim.state import StateSnapshot
 from rivalsim.vehicle_state import VehicleSnapshot, VehicleState
@@ -428,19 +435,20 @@ class StaticWorldSim(RivalSim):
                 ],
                 device=self.device,
             )
-            wp.launch(
-                boost_pad_tick,
-                dim=self.num_envs,
-                inputs=[
-                    self.boost_pad_positions,
-                    state.car_pos,
-                    state.car_quat,
-                    state.boost,
-                    self.boost_pad_cooldown,
-                    self.boost_pad_previous_locked_car,
-                ],
-                device=self.device,
-            )
+            if not getattr(self, "defer_boost_pad_tick", False):
+                wp.launch(
+                    boost_pad_tick,
+                    dim=self.num_envs,
+                    inputs=[
+                        self.boost_pad_positions,
+                        state.car_pos,
+                        state.car_quat,
+                        state.boost,
+                        self.boost_pad_cooldown,
+                        self.boost_pad_previous_locked_car,
+                    ],
+                    device=self.device,
+                )
         wp.launch(
             increment_tick_counter,
             dim=1,
@@ -1293,6 +1301,262 @@ class IntegratedWorldSim(DynamicWorldSim):
                 self._dynamic_proxy_move_rank,
                 self._dynamic_proxy_move_counter,
                 self._pair_a_before_b,
+            ],
+            device=self.device,
+        )
+
+
+def make_standard_kickoff_state(
+    num_envs: int, kickoff_selector: int | np.ndarray = 0
+) -> StateSnapshot:
+    """Build the immediate RocketSim readback for standard two-car kickoffs."""
+
+    selector = np.broadcast_to(
+        np.asarray(kickoff_selector, dtype=np.int32), (num_envs,)
+    ).copy()
+    if np.any((selector < 0) | (selector >= 5)):
+        raise ValueError("kickoff selector entries must be in [0, 5)")
+    state = StateSnapshot.empty(num_envs)
+    spawn = np.asarray(
+        (
+            (-2048.0, -2560.0, np.pi / 4.0),
+            (2048.0, -2560.0, 3.0 * np.pi / 4.0),
+            (-256.0, -3840.0, np.pi / 2.0),
+            (256.0, -3840.0, np.pi / 2.0),
+            (0.0, -4608.0, np.pi / 2.0),
+        ),
+        dtype=np.float32,
+    )
+    for env, layout in enumerate(selector):
+        x, y, yaw = spawn[int(layout)]
+        for local_car in range(2):
+            orange = local_car == 1
+            position = np.asarray(
+                ((-x if orange else x), (-y if orange else y), 17.0),
+                dtype=np.float32,
+            )
+            state.car_pos[env, local_car] = (
+                position * np.float32(0.02) * np.float32(50.0)
+            )
+            angle = np.float32(yaw + (np.pi if orange else 0.0))
+            state.car_quat[env, local_car] = np.asarray(
+                (0.0, 0.0, np.sin(angle * 0.5), np.cos(angle * 0.5)),
+                dtype=np.float32,
+            )
+    state.boost.fill(np.float32(100.0 / 3.0))
+    state.on_ground.fill(1)
+    ball_z = np.float32(np.float32(93.15) * np.float32(0.02)) * np.float32(50.0)
+    state.ball_pos[:] = np.asarray((0.0, 0.0, ball_z), dtype=np.float32)
+    return state
+
+
+class CompleteWorldSim(IntegratedWorldSim):
+    """v0.4 complete headless standard two-Octane Soccar transition."""
+
+    def __init__(
+        self,
+        *args,
+        kickoff_selector: int | np.ndarray = 0,
+        respawn_selector: int | np.ndarray = 0,
+        auto_kickoff: bool = True,
+        full_reset_interval_ticks: int = 0,
+        **kwargs,
+    ):
+        self.defer_boost_pad_tick = True
+        self._v04_kickoff_selector = kickoff_selector
+        self._v04_respawn_selector = respawn_selector
+        self._v04_auto_kickoff = bool(auto_kickoff)
+        self._v04_full_reset_interval_ticks = int(full_reset_interval_ticks)
+        if kwargs.get("initial") is None:
+            num_envs = int(args[0]) if args else int(kwargs["num_envs"])
+            kwargs["initial"] = make_standard_kickoff_state(
+                num_envs, kickoff_selector
+            )
+        super().__init__(*args, **kwargs)
+        self.lifecycle = LifecycleState(
+            self.num_envs,
+            self.device,
+            kickoff_selector=kickoff_selector,
+            respawn_selector=respawn_selector,
+            auto_kickoff=auto_kickoff,
+            full_reset_interval_ticks=full_reset_interval_ticks,
+        )
+
+    @property
+    def logical_state_bytes(self) -> int:
+        lifecycle = getattr(self, "lifecycle", None)
+        return super().logical_state_bytes + (
+            0 if lifecycle is None else lifecycle.logical_bytes
+        )
+
+    def reset(self, state: StateSnapshot | None = None, *, seed: int | None = None) -> None:
+        """Full-world reset; physical kickoff resets occur inside the GPU path."""
+
+        if state is None:
+            state = make_standard_kickoff_state(
+                self.num_envs, self._v04_kickoff_selector
+            )
+        super().reset(state, seed=seed)
+        if hasattr(self, "lifecycle"):
+            self.lifecycle = LifecycleState(
+                self.num_envs,
+                self.device,
+                kickoff_selector=self._v04_kickoff_selector,
+                respawn_selector=self._v04_respawn_selector,
+                auto_kickoff=self._v04_auto_kickoff,
+                full_reset_interval_ticks=self._v04_full_reset_interval_ticks,
+            )
+
+    def lifecycle_snapshot(self) -> LifecycleSnapshot:
+        self.synchronize()
+        result = self.lifecycle.snapshot(
+            pad_cooldown=self.boost_pad_cooldown,
+            pad_previous_locked_car=self.boost_pad_previous_locked_car,
+            car_is_demoed=self.car_car.car_is_demoed,
+        )
+        self.device_to_host_bytes += self.lifecycle.logical_bytes
+        return result
+
+    def request_demolition(self, local_car: int | np.ndarray) -> None:
+        """Request RocketSim Car::Demolish at the next post-physics event point.
+
+        ``local_car`` may be scalar 0/1 or one value per world. This is an
+        external lifecycle command, so its small configuration transfer is
+        intentionally outside timed resident stepping.
+        """
+
+        selected = np.broadcast_to(
+            np.asarray(local_car, dtype=np.int32), (self.num_envs,)
+        )
+        if np.any((selected < 0) | (selected > 1)):
+            raise ValueError("local_car entries must be 0 or 1")
+        request = np.zeros((self.num_envs, 2), dtype=np.int32)
+        request[np.arange(self.num_envs), selected] = 1
+        self.lifecycle.demo_request = wp.array(
+            request.reshape(-1), dtype=wp.int32, device=self.device
+        )
+        self.host_to_device_bytes += request.nbytes
+        self._captured_graph = None
+        self._captured_graph_ticks = 0
+
+    def _launch_tick(self) -> None:
+        lifecycle = self.lifecycle
+        state = self.state
+        pair = self.car_car
+        wp.launch(
+            lifecycle_pre_tick,
+            dim=self.num_envs,
+            inputs=[
+                lifecycle.demo_respawn_timer,
+                lifecycle.demo_held_valid,
+                lifecycle.respawn_pending,
+                lifecycle.respawn_event,
+                lifecycle.respawn_location,
+                lifecycle.respawn_selector,
+                pair.car_is_demoed,
+                state.car_pos,
+                state.car_vel,
+                state.car_quat,
+                state.car_ang_vel,
+                self.boost_pad_cooldown,
+                lifecycle.pad_cooldown_before,
+            ],
+            device=self.device,
+        )
+        super()._launch_tick()
+        wp.launch(
+            boost_pad_tick_lifecycle,
+            dim=self.num_envs,
+            inputs=[
+                self.boost_pad_positions,
+                pair.pre_tick_first_car,
+                state.car_pos,
+                state.car_quat,
+                state.boost,
+                self.boost_pad_cooldown,
+                self.boost_pad_previous_locked_car,
+            ],
+            device=self.device,
+        )
+        ball = self.ball_world
+        vehicle = self.vehicle
+        wp.launch(
+            lifecycle_post_tick,
+            dim=self.num_envs,
+            inputs=[
+                lifecycle.world_tick,
+                lifecycle.episode_tick,
+                lifecycle.blue_score,
+                lifecycle.orange_score,
+                lifecycle.goal_scored,
+                lifecycle.scoring_team,
+                lifecycle.kickoff_reset,
+                lifecycle.kickoff_layout,
+                lifecycle.kickoff_selector,
+                lifecycle.full_reset,
+                lifecycle.reset_required,
+                lifecycle.terminated,
+                lifecycle.truncated,
+                lifecycle.ball_scored_last,
+                lifecycle.auto_kickoff,
+                lifecycle.full_reset_interval,
+                lifecycle.pad_cooldown_before,
+                lifecycle.pad_pickup_car,
+                lifecycle.pad_reactivated,
+                lifecycle.demo_respawn_timer,
+                lifecycle.demo_held_valid,
+                lifecycle.demo_request,
+                lifecycle.respawn_pending,
+                lifecycle.respawn_location,
+                lifecycle.held_float,
+                lifecycle.held_int,
+                pair.car_is_demoed,
+                pair.car_contact_id,
+                pair.car_contact_cooldown,
+                state.car_pos,
+                state.car_vel,
+                state.car_quat,
+                state.car_ang_vel,
+                state.boost,
+                state.boosting_time,
+                state.time_since_boosted,
+                state.on_ground,
+                state.has_jumped,
+                state.is_jumping,
+                state.has_double_jumped,
+                state.has_flipped,
+                state.is_flipping,
+                state.sticky_ticks,
+                state.jump_time,
+                state.air_time,
+                state.air_time_since_jump,
+                state.flip_time,
+                state.flip_rel_torque,
+                state.is_boosting,
+                state.is_supersonic,
+                state.supersonic_time,
+                state.prev_throttle,
+                state.prev_steer,
+                state.prev_pitch,
+                state.prev_yaw,
+                state.prev_roll,
+                state.prev_jump,
+                state.prev_boost,
+                state.prev_handbrake,
+                state.ball_pos,
+                state.ball_vel,
+                state.ball_quat,
+                state.ball_ang_vel,
+                ball.position_bt,
+                ball.velocity_bt,
+                vehicle.rigid_position_bt,
+                vehicle.rigid_velocity_bt,
+                vehicle.solver_position,
+                vehicle.solver_orientation,
+                vehicle.solver_velocity,
+                vehicle.solver_angular_velocity,
+                self.boost_pad_cooldown,
+                self.boost_pad_previous_locked_car,
             ],
             device=self.device,
         )
