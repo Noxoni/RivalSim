@@ -27,7 +27,10 @@ RS_BROADPHASE_MIN_BT = np.asarray((-112.0, -120.0, 0.0), dtype=np.float32)
 RS_BROADPHASE_CELL_SIZE_BT = np.float32(7.4)
 RS_BROADPHASE_DIMS = (31, 33, 6)
 RS_STATIC_BODY_COUNT = 20
-RS_CONTACT_AABB_EXPANSION_BT = np.float32(0.08)
+# btCollisionWorld::updateSingleAabb expands every collision-object proxy by
+# gContactBreakingThreshold. RocketSim's separate +0.08 change is implemented
+# inside btSphereShape::getAabb and therefore never enlarges static bodies.
+RS_CONTACT_AABB_EXPANSION_BT = np.float32(0.02)
 RS_MAX_ISLAND_MANIFOLDS = RS_STATIC_BODY_COUNT * 2 + 1
 
 

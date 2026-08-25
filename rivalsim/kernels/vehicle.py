@@ -65,7 +65,6 @@ CONTACT_BREAKING_THRESHOLD = 2.03122776
 # separation. At Soccar's 4096-UU wall coordinate, one FP32 world-coordinate
 # ULP is 2^-11 UU; reserve that final comparison band so a rounded-down UU
 # distance cannot create a contact that the native BT comparison rejects.
-CONTACT_BREAKING_ROUNDING_GUARD = 0.00048828125
 CONTACT_LINEAR_SLOP = 0.0
 CONTACT_ERP2 = 0.8
 CONTACT_SPLIT_TURN_ERP = 0.1
@@ -309,6 +308,43 @@ def _bullet_vector_scale_add(
     direction: wp.vec3,
     amount: float,
 ) -> wp.vec3: ...
+
+
+_BULLET_VEHICLE_FORWARD_SPEED_UU = r"""
+    // btVehicleRL::getForwardSpeed evaluates btVector3::dot in the pinned
+    // Windows SSE order, then Car::_PreTickUpdate converts the scalar from
+    // Bullet units to UU.  Reducing vectors after a component-wise UU scale
+    // is not operation-order equivalent at the exact full-stop threshold.
+    auto op_add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto op_mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    const float speed_bt = op_add(
+        op_add(
+            op_mul(linear_velocity_bt[0], forward[0]),
+            op_mul(linear_velocity_bt[1], forward[1])),
+        op_mul(linear_velocity_bt[2], forward[2]));
+    return op_mul(speed_bt, 50.0f);
+"""
+
+
+@wp.func_native(_BULLET_VEHICLE_FORWARD_SPEED_UU)
+def _bullet_vehicle_forward_speed_uu(
+    linear_velocity_bt: wp.vec3,
+    forward: wp.vec3,
+) -> float: ...
 
 
 _AUTHORITY_INPUT_QUATERNION_MATRIX = r"""
@@ -908,14 +944,13 @@ _BULLET_STATIC_PLANE_RAYCAST = r"""
         const float length_squared = dot(value, value);
         float inverse_length;
     #if defined(__CUDA_ARCH__)
-        const unsigned length_bits = __float_as_uint(length_squared);
-        if (length_bits >= 0x3f7ff000u && length_bits < 0x3f800000u) {
-            inverse_length = __uint_as_float(0x3f800000u);
-        } else if (length_bits >= 0x3f800000u && length_bits < 0x3f800800u) {
-            inverse_length = __uint_as_float(0x3f7ff800u);
-        } else {
-            inverse_length = rsqrtf(length_squared);
-        }
+        const unsigned input_bits = __float_as_uint(length_squared);
+        const unsigned exponent = (input_bits >> 23) & 0xffu;
+        const unsigned result_exponent = ((380u - exponent) >> 1) << 23;
+        const unsigned index = (input_bits >> 11) & 0x1fffu;
+        const unsigned estimate_mantissa =
+            static_cast<unsigned>(rsqrtss_mantissa.data[index]) << 11;
+        inverse_length = __uint_as_float(result_exponent | estimate_mantissa);
     #elif defined(__clang__) && (defined(__x86_64__) || defined(_M_X64))
         typedef float PlaneFloat4 __attribute__((__vector_size__(16)));
         const PlaneFloat4 estimate_input = {length_squared, 0.0f, 0.0f, 0.0f};
@@ -1069,6 +1104,7 @@ def _bullet_static_plane_raycast(
     plane_origin_bt: wp.vec3,
     plane_normal_input: wp.vec3,
     current_fraction: float,
+    rsqrtss_mantissa: wp.array(dtype=wp.uint16),
     hit_fraction: wp.ref[wp.float32],
     hit_point_bt: wp.ref[wp.vec3],
     hit_normal: wp.ref[wp.vec3],
@@ -1393,6 +1429,7 @@ _BULLET_RAY_SPHERE = r"""
     RayV3 cached_p1 = make(0.0f, 0.0f, 0.0f);
     RayV3 cached_p2 = make(0.0f, 0.0f, 0.0f);
     RayV3 cached_v = make(0.0f, 0.0f, 0.0f);
+    int cached_closest_valid = 0;
 
     auto result_reset = [&](RayClosest& result) {
         result.closest = make(0.0f, 0.0f, 0.0f);
@@ -1700,14 +1737,21 @@ _BULLET_RAY_SPHERE = r"""
             w = vsub(support_a, support_b);
             n = v;
         }
+        int added_vertex = 0;
         if (!in_simplex(w)) {
             last_w = w;
             simplex_w[simplex_count] = w;
             simplex_p[simplex_count] = support_a;
             simplex_q[simplex_count] = support_b;
             ++simplex_count;
+            added_vertex = 1;
         }
-        if (simplex_closest()) {
+        // btVoronoiSimplexSolver::closest only recomputes while m_needsUpdate
+        // is true. addVertex sets it; a duplicate support leaves it false and
+        // returns the previously cached closest vector/validity unchanged.
+        // Re-evaluating the reduced simplex here is not float32-equivalent.
+        if (added_vertex) cached_closest_valid = simplex_closest();
+        if (cached_closest_valid) {
             v = cached_v;
             dist2 = length2(v);
         } else {
@@ -1744,6 +1788,55 @@ _BULLET_RAY_SPHERE = r"""
 
 @wp.func_native(_BULLET_RAY_SPHERE)
 def _bullet_ray_sphere(
+    source: wp.vec3,
+    target: wp.vec3,
+    center: wp.vec3,
+    sphere_basis: wp.mat33,
+    radius: float,
+    maximum_fraction: float,
+    rsqrtss_mantissa: wp.array(dtype=wp.uint16),
+    fraction_out: wp.ref[wp.float32],
+    point_out: wp.ref[wp.vec3],
+    normal_out: wp.ref[wp.vec3],
+    valid: wp.ref[wp.int32],
+): ...
+
+
+_RAY_SPHERE_SUPPORT = r"""    auto sphere_support = [&](RayV3 direction, RayV3 sphere_origin) -> RayV3 {
+        const RayV3 local_direction = sphere_basis_transpose_mul(direction);
+        RayV3 normalized;
+        if (length2(local_direction) < op_mul(1.1920929e-7f, 1.1920929e-7f)) {
+            normalized = sse_normalize(make(-1.0f, -1.0f, -1.0f));
+        } else {
+            normalized = sse_normalize(local_direction);
+        }
+        return vadd(sphere_origin, sphere_basis_mul(scale(normalized, radius)));
+    };"""
+
+_RAY_OCTANE_BOX_SUPPORT = r"""    auto sphere_support = [&](RayV3 direction, RayV3 sphere_origin) -> RayV3 {
+        // btBoxShape::localGetSupportingVertex uses the stored half extents
+        // with margin and btFsels for each component. The Octane compound has
+        // one translated child and no child rotation, so sphere_origin and
+        // sphere_basis are the child world transform supplied by
+        // btCollisionWorld::rayTestSingleInternal.
+        const RayV3 local_direction = sphere_basis_transpose_mul(direction);
+        const RayV3 local_support = make(
+            local_direction.x >= 0.0f ? 1.20372915f : -1.20372915f,
+            local_direction.y >= 0.0f ? 0.865653098f : -0.865653098f,
+            local_direction.z >= 0.0f ? 0.385250092f : -0.385250092f);
+        return vadd(sphere_origin, sphere_basis_mul(local_support));
+    };"""
+
+if _RAY_SPHERE_SUPPORT not in _BULLET_RAY_SPHERE:
+    raise RuntimeError("pinned Bullet ray support block changed")
+_BULLET_RAY_OCTANE_BOX = _BULLET_RAY_SPHERE.replace(
+    _RAY_SPHERE_SUPPORT,
+    _RAY_OCTANE_BOX_SUPPORT,
+)
+
+
+@wp.func_native(_BULLET_RAY_OCTANE_BOX)
+def _bullet_ray_octane_box(
     source: wp.vec3,
     target: wp.vec3,
     center: wp.vec3,
@@ -2051,6 +2144,58 @@ _BULLET_WHEEL_FRICTION = r"""
 
 @wp.func_native(_BULLET_WHEEL_FRICTION)
 def _bullet_wheel_friction(
+    basis: wp.mat33,
+    ground_basis: wp.mat33,
+    body_origin_bt: wp.vec3,
+    linear_velocity_bt: wp.vec3,
+    angular_velocity_world: wp.vec3,
+    dynamic_ground: int,
+    ground_origin_bt: wp.vec3,
+    ground_linear_velocity_bt: wp.vec3,
+    ground_angular_velocity_world: wp.vec3,
+    contact_point_bt: wp.vec3,
+    surface_normal: wp.vec3,
+    raw_axle: wp.vec3,
+    engine_force_bt: float,
+    brake_force_bt: float,
+    lateral_friction: float,
+    longitudinal_friction: float,
+    time_step: float,
+    axle_direction: wp.ref[wp.vec3],
+    forward_direction: wp.ref[wp.vec3],
+    relative_position_bt: wp.ref[wp.vec3],
+    applied_impulse_bt: wp.ref[wp.vec3],
+    side_impulse_bt: wp.ref[wp.float32],
+    rolling_friction_bt: wp.ref[wp.float32],
+): ...
+
+
+_BALL_GROUND_INERTIA_BLOCK = r"""        const WheelV3 ground_inverse_mass_torque = make(
+            op_mul(0.0250203293f,ground_torque_local.x),
+            op_mul(0.0250203293f,ground_torque_local.y),
+            op_mul(0.0250203293f,ground_torque_local.z));
+        diagonal = op_add(
+            op_add(diagonal,0.0333333351f),
+            dot(ground_inverse_mass_torque,ground_torque_local));"""
+
+_OCTANE_GROUND_INERTIA_BLOCK = r"""        const WheelV3 ground_inverse_mass_torque = make(
+            op_mul(0.0185644571f,ground_torque_local.x),
+            op_mul(0.0104337428f,ground_torque_local.y),
+            op_mul(0.0075815497f,ground_torque_local.z));
+        diagonal = op_add(
+            op_add(diagonal,0.00555555569f),
+            dot(ground_inverse_mass_torque,ground_torque_local));"""
+
+if _BALL_GROUND_INERTIA_BLOCK not in _BULLET_WHEEL_FRICTION:
+    raise RuntimeError("pinned Bullet dynamic-ground inertia block changed")
+_BULLET_WHEEL_FRICTION_OCTANE = _BULLET_WHEEL_FRICTION.replace(
+    _BALL_GROUND_INERTIA_BLOCK,
+    _OCTANE_GROUND_INERTIA_BLOCK,
+)
+
+
+@wp.func_native(_BULLET_WHEEL_FRICTION_OCTANE)
+def _bullet_wheel_friction_octane(
     basis: wp.mat33,
     ground_basis: wp.mat33,
     body_origin_bt: wp.vec3,
@@ -3185,7 +3330,9 @@ def wheel_pre_tick(
     bullet_bvh_rank: wp.array(dtype=wp.int32),
     face_mesh_index: wp.array(dtype=wp.int32),
     enable_forces: int,
-    enable_ball_rays: int,
+    dynamic_ray_mode: int,
+    pre_tick_first_car: wp.array(dtype=wp.int32),
+    visit_ordinal: int,
     amd_rsqrtss_mantissa: wp.array(dtype=wp.uint16),
     ball_position_bt: wp.array(dtype=wp.vec3),
     ball_quat: wp.array(dtype=wp.quat),
@@ -3253,6 +3400,15 @@ def wheel_pre_tick(
     wheels_with_contact: wp.array(dtype=wp.int32),
 ):
     car = wp.tid()
+    env = car // 2
+    first_car = wp.int32(0)
+    if visit_ordinal >= 0:
+        first_car = pre_tick_first_car[env]
+        expected_car = first_car
+        if visit_ordinal != 0:
+            expected_car = first_car ^ wp.int32(1)
+        if car % 2 != expected_car:
+            return
     pos = car_pos[car]
     base_vel = car_vel[car]
     quat = car_quat[car]
@@ -3280,7 +3436,7 @@ def wheel_pre_tick(
     right = _bullet_transform_point(
         wp.vec3(0.0, 0.0, 0.0), bullet_basis, wp.vec3(0.0, 1.0, 0.0)
     )
-    forward_speed = wp.dot(base_vel, forward)
+    forward_speed = _bullet_vehicle_forward_speed_uu(base_vel_bt, forward)
     abs_speed = wp.abs(forward_speed)
     contact_count = 0
     normal_sum = wp.vec3(0.0, 0.0, 0.0)
@@ -3431,6 +3587,7 @@ def wheel_pre_tick(
                 plane_origin_bt,
                 plane_normal_input,
                 closest_fraction,
+                amd_rsqrtss_mantissa,
                 plane_fraction,
                 plane_hit_point_bt,
                 plane_hit_normal,
@@ -3444,12 +3601,13 @@ def wheel_pre_tick(
                 source_valid = wp.int32(1)
                 hit_face = plane_face
         # btRSBroadphase's short-ray path visits every dynamic handle resident
-        # in the ray-origin cell, without a per-proxy AABB test. Dynamic
-        # handles occupy the 3x3x3 neighborhood around the cell selected from
-        # their cached AABB minimum. The cache is intentionally one Bullet
-        # updateAabbs phase behind this vehicle pre-tick.
-        dynamic_ball_visible = wp.int32(0)
-        if enable_ball_rays != 0 and car % 2 == 0:
+        # in the ray-origin cell, without a per-proxy AABB test.
+        dynamic_body_visible = wp.int32(0)
+        dynamic_ground_is_octane = wp.int32(0)
+        dynamic_ground_origin_bt = ball_position_bt[car // 2]
+        dynamic_ground_velocity_bt = ball_velocity_bt[car // 2]
+        dynamic_ground_angular = ball_ang_vel[car // 2]
+        if dynamic_ray_mode == 1 and car % 2 == 0:
             env = car // 2
             proxy_min_bt = ball_broadphase_proxy_min_bt[env]
             ray_cell_i = wp.int32((source_bt[0] + 112.0) / 7.4)
@@ -3469,8 +3627,29 @@ def wheel_pre_tick(
                 and wp.abs(ray_cell_j - proxy_cell_j) <= 1
                 and wp.abs(ray_cell_k - proxy_cell_k) <= 1
             ):
-                dynamic_ball_visible = wp.int32(1)
-        if dynamic_ball_visible != 0:
+                dynamic_body_visible = wp.int32(1)
+        elif dynamic_ray_mode == 2:
+            # The per-world membership lifecycle selects either source-valid
+            # two-car visitation order. The two ordered launches preserve it,
+            # including the second car's bilateral row reading the first car's
+            # just-updated wheel velocity. The frozen Phase C contact corpus
+            # keeps both car proxies resident in each short ray's broadphase
+            # cell; the native diagnostic verifies that relation for residual
+            # ray cases before narrowphase behavior is ported.
+            other = car ^ 1
+            dynamic_body_visible = wp.int32(1)
+            dynamic_ground_is_octane = wp.int32(1)
+            dynamic_ground_origin_bt = rigid_position_bt[other]
+            dynamic_ground_velocity_bt = rigid_velocity_bt[other]
+            dynamic_ground_angular = car_ang_vel[other]
+            if tick_counter[0] == 0:
+                dynamic_ground_origin_bt = car_pos[other] * 0.02
+                if car % 2 == first_car:
+                    # The other car has not entered _PreTickUpdate yet on the
+                    # first ordered pass, so its resident velocity is not
+                    # initialized. Read the authority input for this one case.
+                    dynamic_ground_velocity_bt = car_vel[other] * 0.02
+        if dynamic_body_visible != 0 and dynamic_ground_is_octane == 0:
             env = car // 2
             ball_basis = _bullet_quaternion_matrix(ball_quat[env])
             dynamic_ground_basis = ball_basis
@@ -3499,6 +3678,42 @@ def wheel_pre_tick(
                 source_valid = wp.int32(1)
                 hit_dynamic = wp.int32(1)
                 hit_face = wp.int32(-6)
+        elif dynamic_body_visible != 0:
+            other = car ^ 1
+            other_basis = _bullet_quaternion_matrix(car_quat[other])
+            if tick_counter[0] == 0:
+                other_basis = _authority_input_quaternion_matrix(car_quat[other])
+            dynamic_ground_basis = other_basis
+            child_origin_bt = _bullet_transform_point(
+                dynamic_ground_origin_bt,
+                other_basis,
+                GJK_OFFSET_BT,
+            )
+            box_fraction = wp.float32(0.0)
+            box_hit_point_bt = wp.vec3(0.0, 0.0, 0.0)
+            box_hit_normal = wp.vec3(0.0, 0.0, 0.0)
+            box_valid = wp.int32(0)
+            _bullet_ray_octane_box(
+                source_bt,
+                target_bt,
+                child_origin_bt,
+                other_basis,
+                0.0,
+                closest_fraction,
+                amd_rsqrtss_mantissa,
+                box_fraction,
+                box_hit_point_bt,
+                box_hit_normal,
+                box_valid,
+            )
+            if box_valid != 0:
+                closest_fraction = box_fraction
+                source_fraction = box_fraction
+                source_point_bt = box_hit_point_bt
+                source_normal = box_hit_normal
+                source_valid = wp.int32(1)
+                hit_dynamic = wp.int32(1)
+                hit_face = wp.int32(-7)
         if source_valid != 0:
             distance_bt = ray_length_bt * source_fraction
             normal = source_normal
@@ -3592,31 +3807,58 @@ def wheel_pre_tick(
             # float32 multiplication by 52.5 happens in RocketSim's order.
             old_engine = engine_acceleration[wheel_index]
             old_brake = brake_acceleration[wheel_index]
-            _bullet_wheel_friction(
-                bullet_basis,
-                dynamic_ground_basis,
-                rigid_position_bt[car],
-                base_vel_bt,
-                base_ang_vel,
-                hit_dynamic,
-                ball_position_bt[car // 2],
-                ball_velocity_bt[car // 2],
-                ball_ang_vel[car // 2],
-                hit_point_bt,
-                normal,
-                raw_axle,
-                old_engine * 3.6,
-                old_brake,
-                lateral_friction[wheel_index],
-                longitudinal_friction[wheel_index],
-                DT,
-                axle,
-                forward_at_wheel,
-                friction_relative_bt,
-                friction_impulse_bt,
-                exact_side_bt,
-                exact_rolling_bt,
-            )
+            if dynamic_ray_mode == 2:
+                _bullet_wheel_friction_octane(
+                    bullet_basis,
+                    dynamic_ground_basis,
+                    rigid_position_bt[car],
+                    base_vel_bt,
+                    base_ang_vel,
+                    hit_dynamic,
+                    dynamic_ground_origin_bt,
+                    dynamic_ground_velocity_bt,
+                    dynamic_ground_angular,
+                    hit_point_bt,
+                    normal,
+                    raw_axle,
+                    old_engine * 3.6,
+                    old_brake,
+                    lateral_friction[wheel_index],
+                    longitudinal_friction[wheel_index],
+                    DT,
+                    axle,
+                    forward_at_wheel,
+                    friction_relative_bt,
+                    friction_impulse_bt,
+                    exact_side_bt,
+                    exact_rolling_bt,
+                )
+            else:
+                _bullet_wheel_friction(
+                    bullet_basis,
+                    dynamic_ground_basis,
+                    rigid_position_bt[car],
+                    base_vel_bt,
+                    base_ang_vel,
+                    hit_dynamic,
+                    dynamic_ground_origin_bt,
+                    dynamic_ground_velocity_bt,
+                    dynamic_ground_angular,
+                    hit_point_bt,
+                    normal,
+                    raw_axle,
+                    old_engine * 3.6,
+                    old_brake,
+                    lateral_friction[wheel_index],
+                    longitudinal_friction[wheel_index],
+                    DT,
+                    axle,
+                    forward_at_wheel,
+                    friction_relative_bt,
+                    friction_impulse_bt,
+                    exact_side_bt,
+                    exact_rolling_bt,
+                )
             side_value = exact_side_bt * 25.0
             rolling_value = exact_rolling_bt * 25.0
             cached_impulse = friction_impulse_bt * 50.0
@@ -5438,7 +5680,6 @@ def chassis_contacts_v021(
         + wp.abs(axis_y[2]) * HITBOX_COLLISION_HALF[1]
         + wp.abs(axis_z[2]) * HITBOX_COLLISION_HALF[2],
     )
-    previous_contacts = contact_count[car]
     candidates = wp.int32(0)
     retained_mesh_candidates = wp.int32(0)
     mesh_candidate_excess = wp.int32(0)
@@ -5446,14 +5687,6 @@ def chassis_contacts_v021(
     contacts = wp.int32(0)
     maximum_penetration = float(0.0)  # noqa: UP018 - Warp mutable kernel local
     callback_normal = wp.vec3(0.0, 0.0, 0.0)
-    previous_plane_mask = wp.int32(0)
-    for previous_index in range(MAX_CONTACTS_PER_CAR):
-        if previous_index < previous_contacts:
-            previous_offset = car * MAX_CONTACTS_PER_CAR + previous_index
-            previous_face = contact_face[previous_offset]
-            if previous_face <= -10 and previous_face >= -13:
-                previous_plane_mask = previous_plane_mask | (1 << (-10 - previous_face))
-
     # Warp's combined mesh is an acceleration structure only. Gather every
     # SAT-overlapping face, sort it into RocketSim's per-CMF Bullet BVH visit
     # order, and then feed that deterministic stream to the native four-point
@@ -5878,8 +6111,8 @@ def chassis_contacts_v021(
         contacts = manifold_start + manifold_contacts
 
     # RocketSim adds its four analytic arena planes after the sixteen CMF
-    # rigid bodies. Each plane owns a separate one-point manifold, so append
-    # them in source-body order after all reduced mesh manifolds.
+    # rigid bodies. Append them in source-body order after all reduced mesh
+    # manifolds.
     for plane in range(4):
         normal = wp.vec3(0.0, 0.0, 1.0)
         plane_point = wp.vec3(0.0, 0.0, 0.0)
@@ -5922,20 +6155,16 @@ def chassis_contacts_v021(
             source_point_b_bt,
             distance_bt,
         )
-        point = point_bt * 50.0
-        distance = distance_bt * 50.0
-        breaking_threshold = CONTACT_BREAKING_THRESHOLD
-        if plane >= 2:
-            breaking_threshold = breaking_threshold - CONTACT_BREAKING_ROUNDING_GUARD
-        if distance < breaking_threshold:
+        breaking_threshold_bt = CONTACT_BREAKING_THRESHOLD * 0.02
+        if distance_bt < breaking_threshold_bt:
             candidates = candidates + 1
             callback_normal = normal
             if contacts < MAX_CONTACTS_PER_CAR:
-                # btConvexPlaneCollisionAlgorithm adds the raw support point,
-                # then btCompoundCollisionAlgorithm calls refreshContactPoints
-                # before solver setup. Preserve that local-point round trip:
-                # it can change the retained depth by one float32 ULP even
-                # though the raw support witness itself is already exact.
+                # btConvexPlaneCollisionAlgorithm compares the raw detector
+                # depth in Bullet units, then btCompoundCollisionAlgorithm
+                # refreshes the accepted local-point round trip before solver
+                # setup. Preserve both operation boundaries without a UU-space
+                # guard or widened tolerance.
                 plane_local_a = _bullet_inverse_transform_point(
                     rigid_position_bt[car],
                     bullet_basis,
@@ -5960,7 +6189,6 @@ def chassis_contacts_v021(
                 refreshed_lateral_sq = _bullet_internal_edge_dot(
                     projected_difference_bt, projected_difference_bt
                 )
-                breaking_threshold_bt = CONTACT_BREAKING_THRESHOLD * 0.02
                 if (
                     refreshed_distance_bt <= breaking_threshold_bt
                     and refreshed_lateral_sq
@@ -5988,10 +6216,11 @@ def chassis_contacts_v021(
                 contact_excess = contact_excess + 1
 
     solve_bt = 0
-    if (plane_bt_mode & 4) != 0 and contacts > 0:
+    if (plane_bt_mode & 4) != 0:
         # Bullet integrates every rigid body and contact row in Bullet units,
-        # not only the analytic floor manifold.  Keeping mesh contacts in UU
-        # introduces a scale round-trip before the next narrowphase transform.
+        # including ticks without a retained contact.  Keeping that no-contact
+        # path in UU introduces a scale round-trip before the next narrowphase
+        # transform.
         solve_bt = 1
     solver_pos_units = pos
     solver_pre_force_vel = pre_force_vel

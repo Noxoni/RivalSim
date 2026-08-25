@@ -143,6 +143,155 @@ def _bullet_ball_solve_velocity_row(
 ): ...
 
 
+_BULLET_SPHERE_PLANE_CONTACT = r"""
+    // Literal fixed-sphere translation of
+    // btConvexPlaneCollisionAlgorithm::processCollision.  Even for an
+    // identity-basis arena plane, Bullet rotates -planeNormal through
+    // planeInConvex, normalizes the sphere support direction with the pinned
+    // host's RSQRTSS path, transforms that support through convexInPlane, and
+    // only then projects the point on B and reconstructs point A.
+    auto add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto sub = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fsub_rn(a, b);
+    #else
+        volatile float value = a - b;
+        return value;
+    #endif
+    };
+    auto mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    struct PlaneSphereV3 { float x; float y; float z; };
+    auto make = [](float x, float y, float z) -> PlaneSphereV3 {
+        PlaneSphereV3 value = {x, y, z};
+        return value;
+    };
+    auto vadd = [&](PlaneSphereV3 a, PlaneSphereV3 b) -> PlaneSphereV3 {
+        return make(add(a.x, b.x), add(a.y, b.y), add(a.z, b.z));
+    };
+    auto vsub = [&](PlaneSphereV3 a, PlaneSphereV3 b) -> PlaneSphereV3 {
+        return make(sub(a.x, b.x), sub(a.y, b.y), sub(a.z, b.z));
+    };
+    auto scale = [&](PlaneSphereV3 value, float amount) -> PlaneSphereV3 {
+        return make(
+            mul(value.x, amount),
+            mul(value.y, amount),
+            mul(value.z, amount));
+    };
+    auto dot = [&](PlaneSphereV3 a, PlaneSphereV3 b) -> float {
+        // btVector3 SSE dot adds X/Y first, then Z.
+        return add(add(mul(a.x, b.x), mul(a.y, b.y)), mul(a.z, b.z));
+    };
+    auto matrix_vector = [&](PlaneSphereV3 value) -> PlaneSphereV3 {
+        return make(
+            add(add(mul(basis.data[0][0], value.x),
+                    mul(basis.data[0][1], value.y)),
+                mul(basis.data[0][2], value.z)),
+            add(add(mul(basis.data[1][0], value.x),
+                    mul(basis.data[1][1], value.y)),
+                mul(basis.data[1][2], value.z)),
+            add(add(mul(basis.data[2][0], value.x),
+                    mul(basis.data[2][1], value.y)),
+                mul(basis.data[2][2], value.z)));
+    };
+    auto transpose_matrix_vector = [&](PlaneSphereV3 value) -> PlaneSphereV3 {
+        return make(
+            add(add(mul(basis.data[0][0], value.x),
+                    mul(basis.data[1][0], value.y)),
+                mul(basis.data[2][0], value.z)),
+            add(add(mul(basis.data[0][1], value.x),
+                    mul(basis.data[1][1], value.y)),
+                mul(basis.data[2][1], value.z)),
+            add(add(mul(basis.data[0][2], value.x),
+                    mul(basis.data[1][2], value.y)),
+                mul(basis.data[2][2], value.z)));
+    };
+    auto sse_normalize = [&](PlaneSphereV3 value) -> PlaneSphereV3 {
+        const float length_squared = dot(value, value);
+        float inverse_length;
+    #if defined(__CUDA_ARCH__)
+        const unsigned input_bits = __float_as_uint(length_squared);
+        const unsigned exponent = (input_bits >> 23) & 0xffu;
+        const unsigned result_exponent = ((380u - exponent) >> 1) << 23;
+        const unsigned index = (input_bits >> 11) & 0x1fffu;
+        const unsigned estimate_mantissa =
+            static_cast<unsigned>(rsqrtss_mantissa.data[index]) << 11;
+        inverse_length = __uint_as_float(result_exponent | estimate_mantissa);
+    #elif defined(__clang__) && (defined(__x86_64__) || defined(_M_X64))
+        typedef float PlaneSphereFloat4 __attribute__((__vector_size__(16)));
+        const PlaneSphereFloat4 estimate_input = {
+            length_squared, 0.0f, 0.0f, 0.0f};
+        const PlaneSphereFloat4 estimate = __builtin_ia32_rsqrtss(estimate_input);
+        inverse_length = estimate[0];
+    #elif defined(_MSC_VER)
+        const __m128 estimate_input = _mm_set_ss(length_squared);
+        inverse_length = _mm_cvtss_f32(_mm_rsqrt_ss(estimate_input));
+    #else
+        inverse_length = 1.0f / sqrtf(length_squared);
+    #endif
+        float correction = mul(mul(length_squared, 0.5f), inverse_length);
+        correction = mul(correction, inverse_length);
+        correction = sub(1.5f, correction);
+        inverse_length = mul(inverse_length, correction);
+        return scale(value, inverse_length);
+    };
+
+    const PlaneSphereV3 center = make(
+        center_bt[0], center_bt[1], center_bt[2]);
+    const PlaneSphereV3 plane_origin = make(
+        plane_origin_bt[0], plane_origin_bt[1], plane_origin_bt[2]);
+    const PlaneSphereV3 normal = make(
+        plane_normal[0], plane_normal[1], plane_normal[2]);
+    const PlaneSphereV3 negative_normal = make(
+        -normal.x, -normal.y, -normal.z);
+    const PlaneSphereV3 local_direction =
+        transpose_matrix_vector(negative_normal);
+    const PlaneSphereV3 local_support = scale(
+        sse_normalize(local_direction), 1.8249999284744263f);
+
+    // planeWorld has identity basis and zero local plane constant for all four
+    // fixed Soccar analytic planes.
+    const PlaneSphereV3 convex_in_plane_origin = vsub(center, plane_origin);
+    const PlaneSphereV3 support_in_plane = vadd(
+        matrix_vector(local_support), convex_in_plane_origin);
+    const float depth = dot(normal, support_in_plane);
+    const PlaneSphereV3 projected_in_plane =
+        vsub(support_in_plane, scale(normal, depth));
+    const PlaneSphereV3 point_b = vadd(projected_in_plane, plane_origin);
+    const PlaneSphereV3 point_a = vadd(point_b, scale(normal, depth));
+
+    point_a_bt = wp::vec_t<3, wp::float32>(point_a.x, point_a.y, point_a.z);
+    point_b_bt = wp::vec_t<3, wp::float32>(point_b.x, point_b.y, point_b.z);
+    distance_bt = depth;
+"""
+
+
+@wp.func_native(_BULLET_SPHERE_PLANE_CONTACT)
+def _bullet_sphere_plane_contact(
+    center_bt: wp.vec3,
+    basis: wp.mat33,
+    rsqrtss_mantissa: wp.array(dtype=wp.uint16),
+    plane_origin_bt: wp.vec3,
+    plane_normal: wp.vec3,
+    point_a_bt: wp.ref[wp.vec3],
+    point_b_bt: wp.ref[wp.vec3],
+    distance_bt: wp.ref[wp.float32],
+): ...
+
+
 @wp.func
 def _sphere_closest_point_triangle(
     point: wp.vec3, a: wp.vec3, b: wp.vec3, c: wp.vec3
@@ -875,8 +1024,10 @@ def ball_world_tick(
     # btDiscreteDynamicsWorld::stepSimulation calls updateAabbs before
     # collision detection and before transform integration. Retain that
     # starting-transform proxy minimum for the following tick's vehicle rays.
+    # The extent is sphere radius 1.825 + RocketSim's 0.08 sphere change +
+    # updateSingleAabb's 0.02 gContactBreakingThreshold expansion.
     broadphase_proxy_min_bt[env] = position_bt - wp.vec3(
-        1.9049999713897705, 1.9049999713897705, 1.9049999713897705
+        1.9249999523162842, 1.9249999523162842, 1.9249999523162842
     )
     quaternion = ball_quat[env]
     basis = _bullet_quaternion_matrix(quaternion)
@@ -1118,14 +1269,24 @@ def ball_world_tick(
             plane_point_bt = wp.vec3(0.0, 0.0, 40.96)
         elif plane == 2:
             normal = wp.vec3(1.0, 0.0, 0.0)
-            plane_point_bt = wp.vec3(-81.92, 0.0, 0.0)
+            plane_point_bt = wp.vec3(-81.92, 0.0, 20.48)
         elif plane == 3:
             normal = wp.vec3(-1.0, 0.0, 0.0)
-            plane_point_bt = wp.vec3(81.92, 0.0, 0.0)
-        distance_bt = wp.dot(position_bt - plane_point_bt, normal) - BALL_RADIUS_BT
+            plane_point_bt = wp.vec3(81.92, 0.0, 20.48)
+        point_a_bt = wp.vec3(0.0, 0.0, 0.0)
+        point_b_bt = wp.vec3(0.0, 0.0, 0.0)
+        distance_bt = wp.float32(0.0)
+        _bullet_sphere_plane_contact(
+            position_bt,
+            basis,
+            rsqrtss_mantissa,
+            plane_point_bt,
+            normal,
+            point_a_bt,
+            point_b_bt,
+            distance_bt,
+        )
         if distance_bt < CONTACT_BREAKING_BT:
-            point_a_bt = position_bt - normal * BALL_RADIUS_BT
-            point_b_bt = point_a_bt - normal * distance_bt
             local_a = _bullet_inverse_transform_point(
                 position_bt, basis, point_a_bt
             )

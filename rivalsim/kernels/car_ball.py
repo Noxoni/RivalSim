@@ -63,6 +63,88 @@ RS_STATIC_BODY_COUNT = 20
 RS_MAX_ISLAND_MANIFOLDS = 41
 RS_EQUAL_ISLAND_PERMUTATION_WIDTH = 41
 RS_CONTACT_AABB_EXPANSION_BT = 0.08
+# btCollisionWorld::updateSingleAabb expands the compound car proxy by
+# gContactBreakingThreshold.  The separate 0.08 RocketSim change applies only
+# to btSphereShape::getAabb and must not enlarge the car proxy.
+RS_CAR_PROXY_AABB_EXPANSION_BT = 0.02
+
+
+_BULLET_SPECIAL_DISTANCE_ACCUMULATE = r"""
+    // convertContact accumulates rel_pos.length() into btSpecialResolveInfo.
+    // btVector3's pinned SSE path multiplies each lane, adds X/Y before Z,
+    // takes the scalar square root, and only then rounds the running sum.
+    auto add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    const float x = relative_position_bt[0];
+    const float y = relative_position_bt[1];
+    const float z = relative_position_bt[2];
+    const float length_squared = add(add(mul(x, x), mul(y, y)), mul(z, z));
+    float length;
+    #if defined(__CUDA_ARCH__)
+        length = __fsqrt_rn(length_squared);
+    #else
+        volatile float result = ::sqrtf(length_squared);
+        length = result;
+    #endif
+    distance_sum = add(distance_sum, length);
+"""
+
+
+@wp.func_native(_BULLET_SPECIAL_DISTANCE_ACCUMULATE)
+def _bullet_special_distance_accumulate(
+    relative_position_bt: wp.vec3,
+    distance_sum: wp.ref[wp.float32],
+): ...
+
+
+_BULLET_SPECIAL_AVERAGE = r"""
+    float inverse_count;
+    #if defined(__CUDA_ARCH__)
+        inverse_count = __fdiv_rn(1.0f, static_cast<float>(contact_count));
+        average_normal = wp::vec_t<3,wp::float32>(
+            __fmul_rn(normal_sum[0], inverse_count),
+            __fmul_rn(normal_sum[1], inverse_count),
+            __fmul_rn(normal_sum[2], inverse_count));
+        // m_totalNormal uses btVector3::operator/ (reciprocal then multiply),
+        // while scalar m_totalDist / count remains a direct DIVSS.
+        average_distance = __fdiv_rn(
+            distance_sum, static_cast<float>(contact_count));
+    #else
+        volatile float count_value = static_cast<float>(contact_count);
+        volatile float reciprocal = 1.0f / count_value;
+        inverse_count = reciprocal;
+        volatile float nx = normal_sum[0] * inverse_count;
+        volatile float ny = normal_sum[1] * inverse_count;
+        volatile float nz = normal_sum[2] * inverse_count;
+        volatile float distance = distance_sum / count_value;
+        average_normal = wp::vec_t<3,wp::float32>(nx, ny, nz);
+        average_distance = distance;
+    #endif
+"""
+
+
+@wp.func_native(_BULLET_SPECIAL_AVERAGE)
+def _bullet_special_average(
+    normal_sum: wp.vec3,
+    distance_sum: float,
+    contact_count: int,
+    average_normal: wp.ref[wp.vec3],
+    average_distance: wp.ref[wp.float32],
+): ...
 
 
 @wp.func
@@ -652,33 +734,133 @@ def _copy_pair_contact(
     push_impulse[destination] = push_impulse[source]
 
 
-@wp.func
-def _pair_child_aabb_overlap(
+_BULLET_CAR_BALL_AABB_OVERLAP = r"""
+    // Literal bounded translation of:
+    //   btCompoundShape::getAabb
+    //   btSphereShape::getAabb (including RocketSim's +0.08f change)
+    //   btCollisionWorld::updateSingleAabb
+    //   TestAabbAgainstAabb2
+    // for the fixed one-child Octane compound and standard sphere. Bullet
+    // unions the current and interpolation-transform bounds after expanding
+    // each by gContactBreakingThreshold, then tests axes in X/Z/Y order.
+    auto op_add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto op_sub = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fsub_rn(a, b);
+    #else
+        volatile float value = a - b;
+        return value;
+    #endif
+    };
+    auto op_mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    auto op_abs = [](float value) -> float {
+    #if defined(__CUDA_ARCH__)
+        return fabsf(value);
+    #else
+        volatile float result = std::fabs(value);
+        return result;
+    #endif
+    };
+    struct AabbV3 { float x; float y; float z; };
+    auto make = [](float x, float y, float z) -> AabbV3 {
+        AabbV3 value = {x, y, z};
+        return value;
+    };
+    auto compound_bounds = [&](const wp::vec_t<3, wp::float32>& position,
+                               const wp::mat_t<3, 3, wp::float32>& basis,
+                               AabbV3& minimum,
+                               AabbV3& maximum) {
+        const float local_center[3] = {0.277513981f, 0.0f, 0.415099978f};
+        const float local_half[3] = {1.20372915f, 0.865653098f, 0.385250092f};
+        float center[3];
+        float extent[3];
+        for (int row = 0; row < 3; ++row) {
+            const float projected_center = op_add(
+                op_add(op_mul(basis.data[row][0], local_center[0]),
+                       op_mul(basis.data[row][1], local_center[1])),
+                op_mul(basis.data[row][2], local_center[2]));
+            center[row] = op_add(projected_center, position[row]);
+            extent[row] = op_add(
+                op_add(op_mul(local_half[0], op_abs(basis.data[row][0])),
+                       op_mul(local_half[1], op_abs(basis.data[row][1]))),
+                op_mul(local_half[2], op_abs(basis.data[row][2])));
+        }
+        const float threshold = 0.02f;
+        minimum = make(
+            op_sub(op_sub(center[0], extent[0]), threshold),
+            op_sub(op_sub(center[1], extent[1]), threshold),
+            op_sub(op_sub(center[2], extent[2]), threshold));
+        maximum = make(
+            op_add(op_add(center[0], extent[0]), threshold),
+            op_add(op_add(center[1], extent[1]), threshold),
+            op_add(op_add(center[2], extent[2]), threshold));
+    };
+    auto sphere_bounds = [&](const wp::vec_t<3, wp::float32>& position,
+                             AabbV3& minimum,
+                             AabbV3& maximum) {
+        const float extent = op_add(1.8249999284744263f, 0.08f);
+        const float threshold = 0.02f;
+        minimum = make(
+            op_sub(op_sub(position[0], extent), threshold),
+            op_sub(op_sub(position[1], extent), threshold),
+            op_sub(op_sub(position[2], extent), threshold));
+        maximum = make(
+            op_add(op_add(position[0], extent), threshold),
+            op_add(op_add(position[1], extent), threshold),
+            op_add(op_add(position[2], extent), threshold));
+    };
+    AabbV3 car_min, car_max, car_predicted_min, car_predicted_max;
+    AabbV3 ball_min, ball_max, ball_predicted_min, ball_predicted_max;
+    compound_bounds(car_position, car_basis, car_min, car_max);
+    compound_bounds(
+        predicted_car_position, predicted_car_basis,
+        car_predicted_min, car_predicted_max);
+    sphere_bounds(ball_position, ball_min, ball_max);
+    sphere_bounds(
+        predicted_ball_position, ball_predicted_min, ball_predicted_max);
+    car_min.x = car_min.x < car_predicted_min.x ? car_min.x : car_predicted_min.x;
+    car_min.y = car_min.y < car_predicted_min.y ? car_min.y : car_predicted_min.y;
+    car_min.z = car_min.z < car_predicted_min.z ? car_min.z : car_predicted_min.z;
+    car_max.x = car_max.x > car_predicted_max.x ? car_max.x : car_predicted_max.x;
+    car_max.y = car_max.y > car_predicted_max.y ? car_max.y : car_predicted_max.y;
+    car_max.z = car_max.z > car_predicted_max.z ? car_max.z : car_predicted_max.z;
+    ball_min.x = ball_min.x < ball_predicted_min.x ? ball_min.x : ball_predicted_min.x;
+    ball_min.y = ball_min.y < ball_predicted_min.y ? ball_min.y : ball_predicted_min.y;
+    ball_min.z = ball_min.z < ball_predicted_min.z ? ball_min.z : ball_predicted_min.z;
+    ball_max.x = ball_max.x > ball_predicted_max.x ? ball_max.x : ball_predicted_max.x;
+    ball_max.y = ball_max.y > ball_predicted_max.y ? ball_max.y : ball_predicted_max.y;
+    ball_max.z = ball_max.z > ball_predicted_max.z ? ball_max.z : ball_predicted_max.z;
+    bool overlap = true;
+    overlap = (car_min.x > ball_max.x || car_max.x < ball_min.x) ? false : overlap;
+    overlap = (car_min.z > ball_max.z || car_max.z < ball_min.z) ? false : overlap;
+    overlap = (car_min.y > ball_max.y || car_max.y < ball_min.y) ? false : overlap;
+    return overlap ? 1 : 0;
+"""
+
+
+@wp.func_native(_BULLET_CAR_BALL_AABB_OVERLAP)
+def _bullet_car_ball_aabb_overlap(
     car_position: wp.vec3,
     car_basis: wp.mat33,
+    predicted_car_position: wp.vec3,
+    predicted_car_basis: wp.mat33,
     ball_position: wp.vec3,
-) -> int:
-    child_center = car_position + _matrix_vector(car_basis, CHILD_OFFSET_BT)
-    half = BOX_HALF_WITH_MARGIN_BT
-    extent = wp.vec3(
-        wp.abs(car_basis[0, 0]) * half[0]
-        + wp.abs(car_basis[0, 1]) * half[1]
-        + wp.abs(car_basis[0, 2]) * half[2],
-        wp.abs(car_basis[1, 0]) * half[0]
-        + wp.abs(car_basis[1, 1]) * half[1]
-        + wp.abs(car_basis[1, 2]) * half[2],
-        wp.abs(car_basis[2, 0]) * half[0]
-        + wp.abs(car_basis[2, 1]) * half[1]
-        + wp.abs(car_basis[2, 2]) * half[2],
-    )
-    delta = ball_position - child_center
-    if wp.abs(delta[0]) > extent[0] + BALL_RADIUS_BT:
-        return 0
-    if wp.abs(delta[1]) > extent[1] + BALL_RADIUS_BT:
-        return 0
-    if wp.abs(delta[2]) > extent[2] + BALL_RADIUS_BT:
-        return 0
-    return 1
+    predicted_ball_position: wp.vec3,
+) -> int: ...
 
 
 @wp.func
@@ -1067,6 +1249,11 @@ def car_ball_tick(
     ball_position = pre_ball_position_bt[env]
     ball_quaternion = pre_ball_quaternion[env]
     ball_basis = _bullet_quaternion_matrix(ball_quaternion)
+    car_pre_velocity = pre_car_velocity_bt[env]
+    car_pre_angular = pre_car_angular_velocity[env]
+    ball_source_velocity = pre_ball_velocity_bt[env]
+    ball_pre_velocity = ball_source_velocity * wp.pow(1.0 - BALL_DAMPING, DT)
+    ball_pre_angular = pre_ball_angular_velocity[env]
     manifold_base = env * MAX_CAR_BALL_CONTACTS
     # btRSBroadphase::calculateOverlappingPairs removes every pair attached to
     # an active dynamic handle before rebuilding the current cell overlaps.
@@ -1076,11 +1263,60 @@ def car_ball_tick(
     # before dispatch. Static-body pairs follow a different lifetime path.
     contacts = wp.int32(0)
     contact_count[env] = 0
-    # The outer dynamic broadphase has selected this newly-created pair. The
-    # frozen authority includes shallow witnesses just beyond the child's
-    # unpredicted AABB because Bullet updates the moving proxy before compound
-    # traversal; do not re-cull using the source transform here.
-    algorithm_active[env] = 1
+    hit_this_tick[env] = 0
+    extra_hit_velocity_uu[env] = wp.vec3(0.0, 0.0, 0.0)
+    normal_impulse[env] = 0.0
+    tangent_impulse[env] = 0.0
+    push_impulse[env] = 0.0
+
+    # predictUnconstraintMotion applies damping, writes the interpolation
+    # transform, and only then does updateSingleAabb build the continuous
+    # current-plus-interpolation proxy.  The pair algorithm exists this tick
+    # only when btRSBroadphase rebuilds an overlap from those proxy bounds.
+    predicted_car_position = car_position
+    _bullet_integrate_position(
+        car_position,
+        wp.vec3(0.0, 0.0, 0.0),
+        car_pre_velocity,
+        DT,
+        0,
+        predicted_car_position,
+    )
+    predicted_car_quaternion = car_quaternion
+    _bullet_integrate_quaternion(
+        car_basis,
+        car_pre_angular,
+        DT,
+        predicted_car_quaternion,
+    )
+    predicted_car_basis = _bullet_quaternion_matrix(predicted_car_quaternion)
+    predicted_ball_position = ball_position
+    _bullet_integrate_position(
+        ball_position,
+        wp.vec3(0.0, 0.0, 0.0),
+        ball_pre_velocity,
+        DT,
+        0,
+        predicted_ball_position,
+    )
+    pair_active = _bullet_car_ball_aabb_overlap(
+        car_position,
+        car_basis,
+        predicted_car_position,
+        predicted_car_basis,
+        ball_position,
+        predicted_ball_position,
+    )
+    algorithm_active[env] = pair_active
+    if pair_active == 0:
+        # car/world and ball/world have already executed as independent
+        # islands.  Leaving their outputs in place is the exact no-pair path.
+        return
+
+    # The outer dynamic broadphase selected a newly-created pair. The frozen
+    # authority includes shallow witnesses just beyond the child's unpredicted
+    # AABB because the moving proxy is continuous; do not re-cull narrowphase
+    # using the source transform here.
 
     point_a = wp.vec3(0.0, 0.0, 0.0)
     point_b = wp.vec3(0.0, 0.0, 0.0)
@@ -1133,11 +1369,6 @@ def car_ball_tick(
     # the manifold breaking threshold, not the sum used by the raw GJK core.
     if distance > CONTACT_BREAKING_THRESHOLD_BT:
         reports_contact = False
-    hit_this_tick[env] = 0
-    extra_hit_velocity_uu[env] = wp.vec3(0.0, 0.0, 0.0)
-    normal_impulse[env] = 0.0
-    tangent_impulse[env] = 0.0
-    push_impulse[env] = 0.0
     if reports_contact:
         hit_this_tick[env] = 1
         contact_point_a_bt[env] = point_a
@@ -1208,8 +1439,6 @@ def car_ball_tick(
     # solver here; returning on an empty pair manifold incorrectly leaves the
     # independently solved car/world result in place.
 
-    car_pre_velocity = pre_car_velocity_bt[env]
-    car_pre_angular = pre_car_angular_velocity[env]
     car_external_linear = wp.vec3(0.0, 0.0, 0.0)
     car_external_angular = wp.vec3(0.0, 0.0, 0.0)
     _bullet_integrate_external_velocities(
@@ -1222,9 +1451,6 @@ def car_ball_tick(
     car_force_velocity = car_pre_velocity + car_external_linear
     car_force_angular = car_pre_angular + car_external_angular
 
-    ball_source_velocity = pre_ball_velocity_bt[env]
-    ball_pre_velocity = ball_source_velocity * wp.pow(1.0 - BALL_DAMPING, DT)
-    ball_pre_angular = pre_ball_angular_velocity[env]
     # Arena::Step marks an exactly motionless ball sleeping before Bullet's
     # applyGravity pass. A contact can wake it later in this tick, but that
     # does not retroactively add the skipped external-force impulse.
@@ -1253,7 +1479,9 @@ def car_ball_tick(
     # car/ball pair is first created while walking the ball's dynamic cell.
     # Reconstruct every dispatcher manifold slot, including zero-contact
     # slots, before applying the island's all-equal quicksort permutation.
-    ball_proxy_half = wp.vec3(1.905, 1.905, 1.905)
+    # btSphereShape::getAabb uses radius + RocketSim's 0.08 addition, then
+    # updateSingleAabb adds gContactBreakingThreshold (0.02).
+    ball_proxy_half = wp.vec3(1.925, 1.925, 1.925)
     ball_proxy_min = ball_position - ball_proxy_half
     ball_proxy_max = ball_position + ball_proxy_half
     ball_static_mask = _rs_static_overlap_mask(
@@ -1284,9 +1512,9 @@ def car_ball_tick(
         + wp.abs(car_basis[2, 1]) * box_half[1]
         + wp.abs(car_basis[2, 2]) * box_half[2],
     ) + wp.vec3(
-        RS_CONTACT_AABB_EXPANSION_BT,
-        RS_CONTACT_AABB_EXPANSION_BT,
-        RS_CONTACT_AABB_EXPANSION_BT,
+        RS_CAR_PROXY_AABB_EXPANSION_BT,
+        RS_CAR_PROXY_AABB_EXPANSION_BT,
+        RS_CAR_PROXY_AABB_EXPANSION_BT,
     )
     car_proxy_min = child_center - car_extent
     car_proxy_max = child_center + car_extent
@@ -1344,9 +1572,8 @@ def car_ball_tick(
                                 ball_special_normal_sum
                                 + ball_static_normal[index]
                             )
-                            ball_special_distance_sum = (
-                                ball_special_distance_sum
-                                + wp.sqrt(wp.dot(rel, rel))
+                            _bullet_special_distance_accumulate(
+                                rel, ball_special_distance_sum
                             )
     ball_special_normal = wp.vec3(0.0, 0.0, 0.0)
     ball_special_rel = wp.vec3(0.0, 0.0, 0.0)
@@ -1358,9 +1585,14 @@ def car_ball_tick(
     ball_special_normal_impulse = wp.float32(0.0)
     ball_special_tangent_impulse = wp.float32(0.0)
     if ball_static_contacts > 0:
-        inverse_contacts = 1.0 / wp.float32(ball_static_contacts)
-        ball_special_normal = ball_special_normal_sum * inverse_contacts
-        ball_special_distance = ball_special_distance_sum * inverse_contacts
+        ball_special_distance = wp.float32(0.0)
+        _bullet_special_average(
+            ball_special_normal_sum,
+            ball_special_distance_sum,
+            ball_static_contacts,
+            ball_special_normal,
+            ball_special_distance,
+        )
         ball_special_rel = ball_special_normal * -ball_special_distance
         ball_special_push_rhs = wp.float32(0.0)
         _bullet_ball_special_contact_row(

@@ -10,9 +10,14 @@ import warp as wp
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
 from rivalsim.ball_world_state import BallWorldState
 from rivalsim.car_ball_state import CarBallState
+from rivalsim.car_car_state import CarCarState
 from rivalsim.kernels.ball_world import ball_world_tick, initialize_ball_world_internal
 from rivalsim.kernels.boost_pad import PAD_COUNT, SOCCAR_PAD_POSITIONS, boost_pad_tick
 from rivalsim.kernels.car_ball import capture_car_ball_inputs, car_ball_tick
+from rivalsim.kernels.car_car import (
+    capture_car_car_inputs,
+    car_car_tick,
+)
 from rivalsim.kernels.rsqrtss_amd import amd_rsqrtss_table
 from rivalsim.kernels.vehicle import (
     chassis_contacts_v021,
@@ -233,10 +238,20 @@ class StaticWorldSim(RivalSim):
                 if ball_world is None
                 else ball_world.broadphase_proxy_min_bt
             )
-            wp.launch(
-                wheel_pre_tick,
-                dim=state.car_count,
-                inputs=[
+            dynamic_ray_mode = int(self.enable_ball_wheel_rays)
+            pair = getattr(self, "car_car", None)
+            # The pinned source visits ``Arena::_cars`` serially. Phase C keeps
+            # the resulting logical A/B order as per-world lifecycle state and
+            # uses two launch boundaries so the second prepass observes the
+            # first prepass's resident rigid-body values. Non-car-car modes do
+            # not read the placeholder array because ``visit_ordinal`` is -1.
+            pre_tick_first_car = (
+                pair.pre_tick_first_car
+                if dynamic_ray_mode == 2
+                else self.tick_counter
+            )
+            visit_ordinal = 0 if dynamic_ray_mode == 2 else -1
+            wheel_inputs = [
                     self.tick_counter,
                     self.ray_mesh.id,
                     self.meshes.points_bt,
@@ -245,7 +260,9 @@ class StaticWorldSim(RivalSim):
                     self.meshes.bullet_bvh_rank,
                     self.meshes.face_mesh_index,
                     int(self.variant_level >= 2),
-                    int(self.enable_ball_wheel_rays),
+                    dynamic_ray_mode,
+                    pre_tick_first_car,
+                    visit_ordinal,
                     self.amd_rsqrtss_mantissa,
                     ball_position_bt,
                     state.ball_quat,
@@ -311,9 +328,22 @@ class StaticWorldSim(RivalSim):
                     vehicle.wheel_world_contact,
                     vehicle.handbrake_value,
                     vehicle.wheels_with_contact,
-                ],
+                ]
+            wp.launch(
+                wheel_pre_tick,
+                dim=state.car_count,
+                inputs=wheel_inputs,
                 device=self.device,
             )
+            if dynamic_ray_mode == 2:
+                # Finish each world's selected native-valid order.
+                wheel_inputs[10] = 1
+                wp.launch(
+                    wheel_pre_tick,
+                    dim=state.car_count,
+                    inputs=wheel_inputs,
+                    device=self.device,
+                )
             self._after_wheel_pre_tick()
         # B1 is intentionally the isolated ray-query component benchmark; the
         # contact-rich origins remain fixed while the device action tape turns.
@@ -622,6 +652,178 @@ class DynamicWorldSim(StaticWorldSim):
                 pair.pre_ball_velocity_bt,
                 pair.pre_ball_quaternion,
                 pair.pre_ball_angular_velocity,
+            ],
+            device=self.device,
+        )
+
+
+class CarCarWorldSim(StaticWorldSim):
+    """v0.3 isolated two-Octane dynamic-contact world."""
+
+    def __init__(
+        self,
+        *args,
+        car_visitation_order: str | int | np.ndarray | None = None,
+        car_lifecycle_seed: int | None = None,
+        **kwargs,
+    ):
+        physical_seed = int(kwargs.get("seed", 0))
+        self._car_lifecycle_seed = (
+            physical_seed if car_lifecycle_seed is None else int(car_lifecycle_seed)
+        )
+        self._initial_car_visitation_order = car_visitation_order
+        super().__init__(*args, **kwargs)
+        self.enable_ball_wheel_rays = 2
+        self.car_car = CarCarState(
+            self.num_envs,
+            self.device,
+            lifecycle_seed=self._car_lifecycle_seed,
+            pre_tick_first_car=self._initial_car_visitation_order,
+        )
+        self.host_to_device_bytes += self.num_envs * 4
+
+    @property
+    def logical_state_bytes(self) -> int:
+        pair = getattr(self, "car_car", None)
+        return super().logical_state_bytes + (0 if pair is None else pair.logical_bytes)
+
+    def reset(self, state: StateSnapshot | None = None, *, seed: int | None = None) -> None:
+        # SetState/kickoff-style physical resets do not mutate Arena::_cars in
+        # the pinned source. Preserve the lifecycle-selected visit order and
+        # epoch while clearing all contact, solver, and event state.
+        lifecycle = (
+            self.car_car.lifecycle_copy_kwargs()
+            if hasattr(self, "car_car")
+            else None
+        )
+        super().reset(state, seed=seed)
+        if lifecycle is not None:
+            self.car_car = CarCarState(self.num_envs, self.device, **lifecycle)
+            self.host_to_device_bytes += self.num_envs * 4
+
+    def car_membership_changed(
+        self,
+        car_visitation_order: str | int | np.ndarray | None = None,
+    ) -> None:
+        """Establish a new per-world order after insertion/removal/reconstruction.
+
+        The selection is internal lifecycle state. An explicit logical order is
+        accepted so source-authority tests can exercise both valid branches;
+        neither path inspects physical state, case identity, or expected output.
+        """
+
+        self.car_car.membership_changed(car_visitation_order)
+        self.host_to_device_bytes += self.num_envs * 4
+        self._captured_graph = None
+        self._captured_graph_ticks = 0
+
+    def reconstruct_car_container(
+        self,
+        car_visitation_order: str | int | np.ndarray | None = None,
+    ) -> None:
+        """Model a new arena/fixed-pair construction lifecycle boundary."""
+
+        self.car_membership_changed(car_visitation_order)
+
+    def _launch_tick(self) -> None:
+        super()._launch_tick()
+        state = self.state
+        vehicle = self.vehicle
+        pair = self.car_car
+        wp.launch(
+            car_car_tick,
+            dim=self.num_envs,
+            inputs=[
+                self.tick_counter,
+                self.amd_rsqrtss_mantissa,
+                self.meshes.rs_static_cell_mask,
+                self.meshes.rs_static_aabb_min_bt,
+                self.meshes.rs_static_aabb_max_bt,
+                self.meshes.rs_equal_island_permutation,
+                vehicle.total_force_bt,
+                vehicle.total_torque_bt,
+                state.car_pos,
+                state.car_vel,
+                state.car_quat,
+                state.car_ang_vel,
+                state.on_ground,
+                state.is_supersonic,
+                state.supersonic_time,
+                vehicle.rigid_position_bt,
+                vehicle.rigid_velocity_bt,
+                vehicle.contact_count,
+                vehicle.contact_local_a,
+                vehicle.contact_normal,
+                vehicle.contact_tangent,
+                vehicle.contact_mesh,
+                vehicle.contact_normal_jacobian,
+                vehicle.contact_tangent_jacobian,
+                vehicle.contact_normal_rhs,
+                vehicle.contact_tangent_rhs,
+                vehicle.contact_push_rhs,
+                vehicle.contact_normal_impulse,
+                vehicle.contact_tangent_impulse,
+                vehicle.contact_push_impulse,
+                pair.pre_position_bt,
+                pair.pre_velocity_bt,
+                pair.pre_quaternion,
+                pair.pre_angular_velocity,
+                pair.pre_on_ground,
+                pair.pre_is_supersonic,
+                pair.pre_supersonic_time,
+                pair.queued_velocity_bt,
+                pair.car_contact_id,
+                pair.car_contact_cooldown,
+                pair.car_is_demoed,
+                pair.contact_count,
+                pair.return_code,
+                pair.algorithm_active,
+                pair.contact_point_b_bt,
+                pair.contact_normal,
+                pair.contact_distance_bt,
+                pair.manifold_local_a_bt,
+                pair.manifold_local_b_bt,
+                pair.manifold_normal,
+                pair.manifold_tangent,
+                pair.manifold_distance_bt,
+                pair.manifold_normal_jacobian,
+                pair.manifold_tangent_jacobian,
+                pair.manifold_normal_rhs,
+                pair.manifold_tangent_rhs,
+                pair.manifold_push_rhs,
+                pair.manifold_normal_impulse,
+                pair.manifold_tangent_impulse,
+                pair.manifold_push_impulse,
+                pair.event_count,
+                pair.event_bumper,
+                pair.event_victim,
+                pair.event_is_demo,
+            ],
+            device=self.device,
+        )
+
+    def _after_wheel_pre_tick(self) -> None:
+        state = self.state
+        vehicle = self.vehicle
+        pair = self.car_car
+        wp.launch(
+            capture_car_car_inputs,
+            dim=state.car_count,
+            inputs=[
+                vehicle.rigid_position_bt,
+                vehicle.rigid_velocity_bt,
+                vehicle.solver_orientation,
+                vehicle.solver_angular_velocity,
+                state.on_ground,
+                state.is_supersonic,
+                state.supersonic_time,
+                pair.pre_position_bt,
+                pair.pre_velocity_bt,
+                pair.pre_quaternion,
+                pair.pre_angular_velocity,
+                pair.pre_on_ground,
+                pair.pre_is_supersonic,
+                pair.pre_supersonic_time,
             ],
             device=self.device,
         )

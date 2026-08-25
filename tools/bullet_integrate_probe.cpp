@@ -48,23 +48,28 @@ void PrintMatrix(const char* name, const btMatrix3x3& value) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    if (argc != 5 && argc != 8) {
+    if (argc != 5 && argc != 8 && argc != 17) {
         std::fprintf(
             stderr,
             "usage: bullet_integrate_probe AX AY AZ DT "
-            "[SPLIT_X SPLIT_Y SPLIT_Z]\n");
+            "[SPLIT_X SPLIT_Y SPLIT_Z]\n"
+            "   or: bullet_integrate_probe M00..M22 AX AY AZ DT "
+            "SPLIT_X SPLIT_Y SPLIT_Z\n");
         return 2;
     }
+    const int angularOffset = argc == 17 ? 10 : 1;
     const btVector3 angular(
-        static_cast<btScalar>(std::strtof(argv[1], nullptr)),
-        static_cast<btScalar>(std::strtof(argv[2], nullptr)),
-        static_cast<btScalar>(std::strtof(argv[3], nullptr)));
-    const btScalar timeStep = static_cast<btScalar>(std::strtof(argv[4], nullptr));
-    const btVector3 split = argc == 8
+        static_cast<btScalar>(std::strtof(argv[angularOffset], nullptr)),
+        static_cast<btScalar>(std::strtof(argv[angularOffset + 1], nullptr)),
+        static_cast<btScalar>(std::strtof(argv[angularOffset + 2], nullptr)));
+    const btScalar timeStep = static_cast<btScalar>(
+        std::strtof(argv[angularOffset + 3], nullptr));
+    const int splitOffset = angularOffset + 4;
+    const btVector3 split = argc == 8 || argc == 17
         ? btVector3(
-              static_cast<btScalar>(std::strtof(argv[5], nullptr)),
-              static_cast<btScalar>(std::strtof(argv[6], nullptr)),
-              static_cast<btScalar>(std::strtof(argv[7], nullptr)))
+              static_cast<btScalar>(std::strtof(argv[splitOffset], nullptr)),
+              static_cast<btScalar>(std::strtof(argv[splitOffset + 1], nullptr)),
+              static_cast<btScalar>(std::strtof(argv[splitOffset + 2], nullptr)))
         : btVector3(btScalar(0.0), btScalar(0.0), btScalar(0.0));
 
     const btScalar angleSquared = angular.length2();
@@ -90,6 +95,18 @@ int main(int argc, char** argv) {
 
     btTransform source;
     source.setIdentity();
+    if (argc == 17) {
+        source.setBasis(btMatrix3x3(
+            static_cast<btScalar>(std::strtof(argv[1], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[2], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[3], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[4], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[5], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[6], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[7], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[8], nullptr)),
+            static_cast<btScalar>(std::strtof(argv[9], nullptr))));
+    }
     btTransform afterSplit;
     btTransformUtil::integrateTransform(
         source,

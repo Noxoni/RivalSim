@@ -1,0 +1,69 @@
+diff --git a/RocketSim.pyi b/RocketSim.pyi
+index 1a03758..69d3764 100644
+--- a/RocketSim.pyi
++++ b/RocketSim.pyi
+@@ -211,6 +211,10 @@ class Arena:
+         """
+         ...
+ 
++    def _get_pre_tick_visit_order(self) -> list[int]:
++        """Read-only authority diagnostic returning logical car IDs in visit order."""
++        ...
++
+     def get_config(self) -> ArenaConfig:
+         """
+         Get the arena configuration.
+diff --git a/python-mtheall/Arena.cpp b/python-mtheall/Arena.cpp
+index a0c0b8c..69754e5 100644
+--- a/python-mtheall/Arena.cpp
++++ b/python-mtheall/Arena.cpp
+@@ -493,6 +493,11 @@ Returns `default` if car doesn't exist)"},
+         .ml_meth  = (PyCFunction)&Arena::GetCars,
+         .ml_flags = METH_NOARGS,
+         .ml_doc   = R"(get_cars(self) -> List[RocketSim.Car])"},
++    {.ml_name     = "_get_pre_tick_visit_order",
++        .ml_meth  = (PyCFunction)&Arena::GetPreTickVisitOrder,
++        .ml_flags = METH_NOARGS,
++        .ml_doc   = R"(_get_pre_tick_visit_order(self) -> List[int]
++Read-only authority diagnostic returning logical car IDs in Arena::_cars order.)"},
+     {.ml_name     = "get_ball_prediction",
+         .ml_meth  = (PyCFunction)&Arena::GetBallPrediction,
+         .ml_flags = METH_VARARGS | METH_KEYWORDS,
+@@ -1946,6 +1951,25 @@ PyObject *Arena::GetCars (Arena *self_) noexcept
+ 	return list.gift ();
+ }
+ 
++PyObject *Arena::GetPreTickVisitOrder (Arena *self_) noexcept
++{
++	auto const &cars = self_->arena->GetCars ();
++	auto list = PyObjectRef::steal (PyList_New (cars.size ()));
++	if (!list)
++		return nullptr;
++
++	unsigned index = 0;
++	for (auto const *car : cars)
++	{
++		// Return only RocketSim's stable logical ID. Pointer values and hash
++		// bucket details are intentionally neither exposed nor serialized.
++		if (PyList_SetItem (list.borrow (), index++, PyLong_FromUnsignedLong (car->id)) < 0)
++			return nullptr;
++	}
++
++	return list.gift ();
++}
++
+ PyObject *Arena::GetConfig (Arena *self_) noexcept
+ {
+ 	return ArenaConfig::NewFromArenaConfig (self_->arena->GetArenaConfig ()).giftObject ();
+diff --git a/python-mtheall/Module.h b/python-mtheall/Module.h
+index 2d21e04..2b2c483 100644
+--- a/python-mtheall/Module.h
++++ b/python-mtheall/Module.h
+@@ -839,6 +839,7 @@ struct Arena
+ 	static PyObject *GetBoostPads (Arena *self_) noexcept;
+ 	static PyObject *GetCarFromId (Arena *self_, PyObject *args_, PyObject *kwds_) noexcept;
+ 	static PyObject *GetCars (Arena *self_) noexcept;
++	static PyObject *GetPreTickVisitOrder (Arena *self_) noexcept;
+ 	static PyObject *GetConfig (Arena *self_) noexcept;
+ 	static PyObject *GetGymState (Arena *self_) noexcept;
+ 	static PyObject *GetMutatorConfig (Arena *self_) noexcept;

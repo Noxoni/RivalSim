@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.3",
+  "phase": "C_car_car",
+  "checkpoint_status": "PASS_GREEN",
+  "generated_at_utc": "2026-08-25T16:12:24.277520+00:00",
+  "authority": {
+    "identity_sha256": "7A1D369F58CF3FAA0BA06D6D105CCF896A8FD9DE2C994471D2649F852AEC9EC9",
+    "cache_format_version": 2,
+    "status": "COMPLETE_NATIVE_AUTHORITY",
+    "case_count": 8192,
+    "native_branch_count": 2,
+    "captured_ticks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "frame_count": 196608,
+    "initial_readback_count": 16384,
+    "chunk_count": 64,
+    "frozen_corpus_artifact_sha256": "9F8D2E4B9A9031BDE086209EDBFD30D2710EA96AEE60DCF4F50655D0BC7CC983",
+    "rocketsim_primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "rocketsim_binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+    "rocketsim_package_version": "2.2.1",
+    "installed_extension_sha256": "E3EE24CA82445B4BFCC754583F6778D7B0D8B7A7F7D64F872BE8C65E621A63D0",
+    "logical_order_diagnostic_extension_sha256": "A92F6680284A7149843AFC1041C70DB574ED4CAEA5176F3EF0F1E0E216763807",
+    "logical_order_patch_sha256": "68A180A6E620153CF34BC2DC748B879656C0A809DE341B6F2194E5ED23C3CBD3",
+    "collision_assets_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "corpus_generator_source_sha256": "1FB9C0856EF7AB40908AE10C6A6B7E2E41771BC21C4177DC6C3A40FBD010F3B2",
+    "corpus_generator_config_sha256": "479C022C0368864057170EA2270E8CB6BBBBA54AC308CD25121C36AC769A7B9F",
+    "corpus_seed": 20260824,
+    "authority_settings_sha256": "4BA2FD6EABD0B16C39007E55A3C1B64767BDB452856F31E2E72E5546B0DB65AF"
+  },
+  "lifecycle_evidence": {
+    "purpose": "native_order_lifecycle_analysis_not_acceptance",
+    "arena_count": 259,
+    "process_count": 67,
+    "tick_count": 1818,
+    "pre_tick_visit_count": 3936,
+    "membership_epoch_count": 171,
+    "membership_event_count": 632,
+    "reset_count": 12,
+    "pre_tick_visit_mismatch_count": 0,
+    "membership_epochs_with_tick_order_change": 0,
+    "reset_order_change_count": 0,
+    "ordinary_ticks_preserve_order": true,
+    "kickoff_resets_preserve_order": true,
+    "demolition_and_respawn_preserve_order_without_membership_change": true,
+    "insertion_or_removal_establishes_or_may_change_order": true,
+    "new_arena_reconstruction_establishes_a_new_order": true,
+    "two_car_order_observations": {
+      "a_then_b": 96,
+      "b_then_a": 36
+    },
+    "identical_physical_state_distinct_native_outcomes": 2,
+    "each_order_internally_deterministic": true,
+    "instrumented_and_clean_build_state_hashes_match": true,
+    "compact_local_trace_sha256": "1AF072337808E79A0E7FBB1AFE025EEF82FBFEC4184D0BA6E0A5A9D8A16A8EAB",
+    "clean_control_sha256": "F0F072C00F56EEDF93871323E805E254A4B3FFE45EE34CA7C8D97F36B6E8C8B3",
+    "native_address_values_published": false
+  },
+  "native_multi_outcome_relation": {
+    "branches": ["a_then_b", "b_then_a"],
+    "branch_cause": "source Arena::_cars visitation order established by construction or membership change",
+    "rivalsim_state": "per-world internal lifecycle state retained until membership changes",
+    "comparison": "same-labeled complete trajectory only",
+    "metric_branch_mixing": false,
+    "runtime_best_match_selection": false,
+    "case_specific_order_tables": false,
+    "native_pointer_or_allocator_emulation": false,
+    "case_acceptance": "at least one complete native-valid branch"
+  },
+  "representative_gate": {
+    "classification": "REPRESENTATIVE_PASS",
+    "selected_case_count": 1031,
+    "selection_sha256": "9FF01A06CBF95B287270C40AF581DF490C0AF751F2B2197A30A915DA4AC7018B",
+    "both_branches_complete_count": 1031,
+    "failed_case_count": 0,
+    "hard_mismatch_count": 0,
+    "numeric_failure_count": 0
+  },
+  "full_gate": {
+    "classification": "PASS_GREEN",
+    "corpus_sha256": "3754CC93FD852BA3AD05B7C1E97CA5BAB6FA2EC5E57886C3D96B471024F4A70C",
+    "selection_sha256": "6E29A92375A98BD3C31FBC056C197D16A2C854DC95A79EACA652FFC276E263B3",
+    "selected_case_count": 8192,
+    "both_branches_complete_count": 8192,
+    "one_branch_complete_count": 0,
+    "no_branch_complete_count": 0,
+    "pass_by_horizon": {
+      "1": 8192,
+      "4": 8192,
+      "8": 8192,
+      "12": 8192
+    },
+    "failed_case_count": 0,
+    "hard_mismatch_count": 0,
+    "numeric_failure_count": 0,
+    "ordered_bump_demo_events": {
+      "a_then_b": {
+        "native": 9580,
+        "gpu": 9580,
+        "matched": 9580
+      },
+      "b_then_a": {
+        "native": 9581,
+        "gpu": 9581,
+        "matched": 9581
+      }
+    },
+    "metric_maxima_non_demo": {
+      "a_then_b": {
+        "position_uu": 1.1405905495476336,
+        "linear_velocity_uu_per_s": 18.547553756439548,
+        "orientation_rad": 0.003767047423439625,
+        "angular_velocity_rad_per_s": 0.08421780488241751,
+        "boost": 0.0,
+        "handbrake": 0.0
+      },
+      "b_then_a": {
+        "position_uu": 0.172419846738424,
+        "linear_velocity_uu_per_s": 1.894311347284722,
+        "orientation_rad": 0.00270358800681613,
+        "angular_velocity_rad_per_s": 0.0404438204115122,
+        "boost": 0.0,
+        "handbrake": 0.0
+      }
+    }
+  },
+  "source_port_corrections": [
+    "pinned box-box edge-axis normalization divides each component in source order",
+    "btVehicleRL forward speed reduces the Bullet-unit vector before multiplying by BT_TO_UU",
+    "wheel prepass, pair constraints, split impulse, integration, bump and demolition predicates retain pinned source ordering"
+  ],
+  "v0_4_boundary": {
+    "demo_predicate_and_ordered_event_are_hard_gates": true,
+    "demo_removal_respawn_not_implemented": true,
+    "numeric_car_frames_masked_at_or_after_native_demo": 30196
+  },
+  "large_artifacts": "local and ignored under .tools/v0.3/phase-c"
+}

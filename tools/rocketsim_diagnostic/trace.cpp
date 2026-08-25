@@ -21,6 +21,14 @@
 
 using namespace RocketSim;
 
+void dLineClosestApproach(
+    const btVector3& pa,
+    const btVector3& ua,
+    const btVector3& pb,
+    const btVector3& ub,
+    btScalar* alpha,
+    btScalar* beta);
+
 extern btScalar gContactBreakingThreshold;
 
 namespace {
@@ -28,7 +36,243 @@ namespace {
 void PrintVec(const btVector3& value);
 void PrintExtraHitReplay(int tick, Car* car, Ball* ball, Arena* arena);
 
+void PrintCarPairTransforms(int tick, Car* carA, Car* carB) {
+    const btTransform childA = carA->_rigidBody.getWorldTransform()
+        * carA->_compoundShape.getChildTransform(0);
+    const btTransform childB = carB->_rigidBody.getWorldTransform()
+        * carB->_compoundShape.getChildTransform(0);
+    std::cout << "{\"record\":\"car_pair_transforms\",\"tick\":" << tick
+              << ",\"root_a\":";
+    PrintVec(carA->_rigidBody.getWorldTransform().getOrigin());
+    std::cout << ",\"child_a\":";
+    PrintVec(childA.getOrigin());
+    std::cout << ",\"root_b\":";
+    PrintVec(carB->_rigidBody.getWorldTransform().getOrigin());
+    std::cout << ",\"child_b\":";
+    PrintVec(childB.getOrigin());
+    std::cout << "}\n";
+}
+
+void PrintCarPairBroadphasePrediction(int tick, Car* carA, Car* carB, btScalar dt) {
+    const auto bounds = [dt](Car* car, btVector3& minimum, btVector3& maximum) {
+        btTransform predicted;
+        car->_rigidBody.predictIntegratedTransform(dt, predicted);
+        btVector3 predictedMinimum;
+        btVector3 predictedMaximum;
+        car->_rigidBody.getCollisionShape()->getAabb(
+            car->_rigidBody.getWorldTransform(), minimum, maximum);
+        car->_rigidBody.getCollisionShape()->getAabb(
+            predicted, predictedMinimum, predictedMaximum);
+        const btVector3 threshold(
+            gContactBreakingThreshold,
+            gContactBreakingThreshold,
+            gContactBreakingThreshold);
+        minimum -= threshold;
+        maximum += threshold;
+        predictedMinimum -= threshold;
+        predictedMaximum += threshold;
+        minimum.setMin(predictedMinimum);
+        maximum.setMax(predictedMaximum);
+    };
+    btVector3 minimumA;
+    btVector3 maximumA;
+    btVector3 minimumB;
+    btVector3 maximumB;
+    bounds(carA, minimumA, maximumA);
+    bounds(carB, minimumB, maximumB);
+    std::cout << "{\"record\":\"car_pair_broadphase_prediction\",\"tick\":"
+              << tick << ",\"minimum_a\":";
+    PrintVec(minimumA);
+    std::cout << ",\"maximum_a\":";
+    PrintVec(maximumA);
+    std::cout << ",\"minimum_b\":";
+    PrintVec(minimumB);
+    std::cout << ",\"maximum_b\":";
+    PrintVec(maximumB);
+    std::cout << ",\"gap_a_to_b\":";
+    PrintVec(minimumB - maximumA);
+    std::cout << ",\"gap_b_to_a\":";
+    PrintVec(minimumA - maximumB);
+    std::cout << "}\n";
+}
+
+void PrintCarPairBroadphaseResident(int tick, Car* carA, Car* carB, Arena* arena) {
+    btVector3 minimumA;
+    btVector3 maximumA;
+    btVector3 minimumB;
+    btVector3 maximumB;
+    auto* broadphase = arena->_bulletWorld.getBroadphase();
+    broadphase->getAabb(carA->_rigidBody.getBroadphaseHandle(), minimumA, maximumA);
+    broadphase->getAabb(carB->_rigidBody.getBroadphaseHandle(), minimumB, maximumB);
+    const bool hasPair = broadphase->getOverlappingPairCache()->findPair(
+        carA->_rigidBody.getBroadphaseHandle(),
+        carB->_rigidBody.getBroadphaseHandle()) != nullptr;
+    const auto* proxyA = static_cast<const btRSBroadphaseProxy*>(
+        carA->_rigidBody.getBroadphaseHandle());
+    const auto* proxyB = static_cast<const btRSBroadphaseProxy*>(
+        carB->_rigidBody.getBroadphaseHandle());
+    std::cout << "{\"record\":\"car_pair_broadphase_resident\",\"tick\":"
+              << tick << ",\"minimum_a\":";
+    PrintVec(minimumA);
+    std::cout << ",\"maximum_a\":";
+    PrintVec(maximumA);
+    std::cout << ",\"minimum_b\":";
+    PrintVec(minimumB);
+    std::cout << ",\"maximum_b\":";
+    PrintVec(maximumB);
+    std::cout << ",\"has_pair\":" << (hasPair ? "true" : "false")
+              << ",\"cell_a\":[" << proxyA->iIdx << ',' << proxyA->jIdx
+              << ',' << proxyA->kIdx << ']'
+              << ",\"cell_b\":[" << proxyB->iIdx << ',' << proxyB->jIdx
+              << ',' << proxyB->kIdx << ']'
+              << "}\n";
+}
+
+void PrintCarPairFaceAxes(int tick, Car* carA, Car* carB) {
+    // Nested compound dispatch reaches btBoxBoxDetector as car B / car A.
+    const btTransform first = carB->_rigidBody.getWorldTransform()
+        * carB->_compoundShape.getChildTransform(0);
+    const btTransform second = carA->_rigidBody.getWorldTransform()
+        * carA->_compoundShape.getChildTransform(0);
+    const btVector3 p = second.getOrigin() - first.getOrigin();
+    const btVector3 half = carA->_childHitboxShape.getHalfExtentsWithMargin();
+    const auto dot = [](const btVector3& a, const btVector3& b) {
+        return (a.x() * b.x() + a.y() * b.y()) + a.z() * b.z();
+    };
+    btScalar relative[3][3];
+    btScalar absolute[3][3];
+    for (int row = 0; row < 3; ++row) {
+        for (int column = 0; column < 3; ++column) {
+            relative[row][column] = dot(
+                first.getBasis().getColumn(row),
+                second.getBasis().getColumn(column));
+            absolute[row][column] = btFabs(relative[row][column]);
+        }
+    }
+    btScalar values[6];
+    for (int axis = 0; axis < 3; ++axis) {
+        const btScalar expression = dot(first.getBasis().getColumn(axis), p);
+        const btScalar radius = half[axis]
+            + half[0] * absolute[axis][0]
+            + half[1] * absolute[axis][1]
+            + half[2] * absolute[axis][2];
+        values[axis] = btFabs(expression) - radius;
+    }
+    for (int axis = 0; axis < 3; ++axis) {
+        const btScalar expression = dot(second.getBasis().getColumn(axis), p);
+        const btScalar radius = half[0] * absolute[0][axis]
+            + half[1] * absolute[1][axis]
+            + half[2] * absolute[2][axis]
+            + half[axis];
+        values[3 + axis] = btFabs(expression) - radius;
+    }
+    std::cout << "{\"record\":\"car_pair_face_axes\",\"tick\":" << tick
+              << ",\"values\":[";
+    for (int index = 0; index < 6; ++index) {
+        if (index) std::cout << ',';
+        std::cout << values[index];
+    }
+    std::cout << "]}\n";
+}
+
+void PrintCarPairEdge13(int tick, Car* carA, Car* carB) {
+    // Replay the selected dBoxBox2 edge-13 branch with the source's padded
+    // matrix layout and expression order. Nested dispatch presents B first.
+    const btTransform first = carB->_rigidBody.getWorldTransform()
+        * carB->_compoundShape.getChildTransform(0);
+    const btTransform second = carA->_rigidBody.getWorldTransform()
+        * carA->_compoundShape.getChildTransform(0);
+    btScalar r1[12] = {};
+    btScalar r2[12] = {};
+    for (int row = 0; row < 3; ++row) {
+        r1[4 * row] = first.getBasis()[row].x();
+        r1[4 * row + 1] = first.getBasis()[row].y();
+        r1[4 * row + 2] = first.getBasis()[row].z();
+        r2[4 * row] = second.getBasis()[row].x();
+        r2[4 * row + 1] = second.getBasis()[row].y();
+        r2[4 * row + 2] = second.getBasis()[row].z();
+    }
+    const auto dot41 = [](const btScalar* matrix, const btVector3& value) {
+        return matrix[0] * value[0] + matrix[4] * value[1]
+            + matrix[8] * value[2];
+    };
+    const auto dot44 = [](const btScalar* a, const btScalar* b) {
+        return a[0] * b[0] + a[4] * b[4] + a[8] * b[8];
+    };
+    const auto dot14 = [](const btVector3& value, const btScalar* matrix) {
+        return value[0] * matrix[0] + value[1] * matrix[4]
+            + value[2] * matrix[8];
+    };
+    const btVector3 p = second.getOrigin() - first.getOrigin();
+    const btVector3 pp(
+        dot41(r1, p), dot41(r1 + 1, p), dot41(r1 + 2, p));
+    const btScalar r11 = dot44(r1, r2);
+    const btScalar r21 = dot44(r1 + 1, r2);
+    const btScalar r32 = dot44(r1 + 2, r2 + 1);
+    const btScalar r33 = dot44(r1 + 2, r2 + 2);
+    const btVector3 half = carA->_childHitboxShape.getHalfExtentsWithMargin();
+    const btScalar expression = pp[1] * r11 - pp[0] * r21;
+    const btScalar radius =
+        half[0] * (btFabs(r21) + btScalar(1.0e-5f))
+        + half[1] * (btFabs(r11) + btScalar(1.0e-5f))
+        + half[1] * (btFabs(r33) + btScalar(1.0e-5f))
+        + half[2] * (btFabs(r32) + btScalar(1.0e-5f));
+    btScalar scaledSeparation = btFabs(expression) - radius;
+    const btScalar length = btSqrt(r21 * r21 + r11 * r11);
+    scaledSeparation /= length;
+    btVector3 normalLocal(-r21 / length, r11 / length, 0);
+    btVector3 normal(
+        r1[0] * normalLocal[0] + r1[1] * normalLocal[1]
+            + r1[2] * normalLocal[2],
+        r1[4] * normalLocal[0] + r1[5] * normalLocal[1]
+            + r1[6] * normalLocal[2],
+        r1[8] * normalLocal[0] + r1[9] * normalLocal[1]
+            + r1[10] * normalLocal[2]);
+    if (expression < 0) normal = -normal;
+    btVector3 pa = first.getOrigin();
+    btVector3 pb = second.getOrigin();
+    for (int axis = 0; axis < 3; ++axis) {
+        const btScalar signA = dot14(normal, r1 + axis) > 0 ? 1.0f : -1.0f;
+        const btScalar signB = dot14(normal, r2 + axis) > 0 ? -1.0f : 1.0f;
+        for (int component = 0; component < 3; ++component) {
+            pa[component] += signA * half[axis] * r1[component * 4 + axis];
+            pb[component] += signB * half[axis] * r2[component * 4 + axis];
+        }
+    }
+    btVector3 ua(r1[2], r1[6], r1[10]);
+    btVector3 ub(r2[0], r2[4], r2[8]);
+    const btVector3 prePa = pa;
+    const btVector3 prePb = pb;
+    btScalar alpha;
+    btScalar beta;
+    dLineClosestApproach(pa, ua, pb, ub, &alpha, &beta);
+    pa += ua * alpha;
+    pb += ub * beta;
+    std::cout << "{\"record\":\"car_pair_edge13\",\"tick\":" << tick
+              << ",\"expression\":" << expression
+              << ",\"radius\":" << radius
+              << ",\"length\":" << length
+              << ",\"scaled_separation\":" << scaledSeparation
+              << ",\"normal\":";
+    PrintVec(normal);
+    std::cout << ",\"pa\":";
+    PrintVec(pa);
+    std::cout << ",\"pb\":";
+    PrintVec(pb);
+    std::cout << ",\"pre_pa\":";
+    PrintVec(prePa);
+    std::cout << ",\"pre_pb\":";
+    PrintVec(prePb);
+    std::cout << ",\"ua\":";
+    PrintVec(ua);
+    std::cout << ",\"ub\":";
+    PrintVec(ub);
+    std::cout << ",\"alpha\":" << alpha << ",\"beta\":" << beta
+              << "}\n";
+}
+
 Car* traceCar = nullptr;
+Car* traceOtherCar = nullptr;
 btRigidBody* traceBody = nullptr;
 btRigidBody* traceBallBody = nullptr;
 Arena* traceArena = nullptr;
@@ -201,7 +445,8 @@ void TracePointSphereCast(
     const btVector3& to,
     const btTransform& sphereTransform,
     const btConvexShape* sphereShape,
-    int wheel) {
+    int wheel,
+    const char* targetKind) {
     btSphereShape pointShape(btScalar(0));
     pointShape.setMargin(btScalar(0));
     btVoronoiSimplexSolver simplex;
@@ -221,7 +466,8 @@ void TracePointSphereCast(
     int remaining = 32;
     int iteration = 0;
     std::cout << "{\"record\":\"ray_sphere_cast\",\"tick\":" << traceTick
-              << ",\"wheel\":" << wheel << ",\"stage\":\"initial\""
+              << ",\"wheel\":" << wheel << ",\"target\":\"" << targetKind
+              << "\",\"stage\":\"initial\""
               << ",\"sphere_origin\":";
     PrintVec(sphereTransform.getOrigin());
     std::cout << ",\"sphere_basis\":[";
@@ -264,7 +510,8 @@ void TracePointSphereCast(
         const bool closest = simplex.closest(v);
         dist2 = closest ? v.length2() : btScalar(0);
         std::cout << "{\"record\":\"ray_sphere_cast\",\"tick\":" << traceTick
-                  << ",\"wheel\":" << wheel << ",\"stage\":\"iteration\""
+                  << ",\"wheel\":" << wheel << ",\"target\":\"" << targetKind
+                  << "\",\"stage\":\"iteration\""
                   << ",\"iteration\":" << iteration++
                   << ",\"lambda_before\":" << lambdaBefore
                   << ",\"lambda_after\":" << lambda
@@ -315,6 +562,7 @@ void TracePointSphereCast(
             boundedP, boundedQ, boundedW);
         std::cout << "{\"record\":\"ray_sphere_native_bounded\",\"tick\":"
                   << traceTick << ",\"wheel\":" << wheel
+                  << ",\"target\":\"" << targetKind << '\"'
                   << ",\"iterations\":" << limit
                   << ",\"hit\":" << (boundedHit ? "true" : "false")
                   << ",\"fraction\":" << boundedResult.m_fraction
@@ -364,6 +612,37 @@ public:
             nextWheel = 0;
         }
         const int wheel = nextWheel++;
+        std::vector<const char*> dynamicCandidates;
+        if (traceArena) {
+            auto* broadphase = static_cast<btRSBroadphase*>(
+                traceArena->_bulletWorld.getBroadphase());
+            const auto& cell = broadphase->cells[broadphase->GetCellIdx(from)];
+            for (const auto* proxy : cell.dynHandles) {
+                const auto* candidate = static_cast<const btCollisionObject*>(
+                    proxy->m_clientObject);
+                dynamicCandidates.push_back(
+                    traceCar && candidate == &traceCar->_rigidBody
+                        ? "car_a"
+                        : traceOtherCar
+                              && candidate == &traceOtherCar->_rigidBody
+                            ? "car_b"
+                            : candidate == &traceArena->ball->_rigidBody
+                                  ? "ball"
+                                  : "other");
+            }
+        }
+        if (traceOtherCar && traceTick <= 3) {
+            const btTransform childTransform =
+                traceOtherCar->_rigidBody.getWorldTransform()
+                * traceOtherCar->_compoundShape.getChildTransform(0);
+            TracePointSphereCast(
+                from,
+                to,
+                childTransform,
+                &traceOtherCar->_childHitboxShape,
+                wheel,
+                "car_b");
+        }
         void* object = btDefaultVehicleRaycaster::castRay(
             from, to, ignoreObject, result);
         if (object && traceArena
@@ -375,7 +654,8 @@ public:
                 traceArena->ball->_rigidBody.getWorldTransform(),
                 static_cast<const btConvexShape*>(
                     traceArena->ball->_rigidBody.getCollisionShape()),
-                wheel);
+                wheel,
+                "ball");
         }
         btScalar realRayLength = btScalar(0);
         btVector3 wheelDirection(0, 0, 0);
@@ -397,8 +677,22 @@ public:
         std::cout << ",\"direction\":";
         PrintVec(wheelDirection);
         std::cout << ",\"real_ray_length_bt\":" << realRayLength;
+        std::cout << ",\"dynamic_candidates\":[";
+        for (int index = 0; index < dynamicCandidates.size(); ++index) {
+            if (index) std::cout << ',';
+            std::cout << '\"' << dynamicCandidates[index] << '\"';
+        }
+        std::cout << ']';
         std::cout << ",\"hit\":" << (object ? "true" : "false");
         if (object) {
+            std::cout << ",\"hit_body\":\""
+                      << (traceOtherCar
+                              && object == &traceOtherCar->_rigidBody
+                              ? "car_b"
+                              : object == &traceArena->ball->_rigidBody
+                                  ? "ball"
+                                  : "static")
+                      << "\"";
             std::cout << ",\"fraction\":" << result.m_distFraction
                       << ",\"point_bt\":";
             PrintVec(result.m_hitPointInWorld);
@@ -449,7 +743,7 @@ bool TraceContactAdded(
              && objectB->getCollisionObject() == traceBallBody)
             || (objectB->getCollisionObject() == traceBody
                 && objectA->getCollisionObject() == traceBallBody));
-    if (carBallPair) {
+    if (carBallPair && !traceOtherCar) {
         PrintExtraHitReplay(traceTick, traceCar, traceArena->ball, traceArena);
     }
     const bool involvesTraceCar = traceBody
@@ -470,6 +764,19 @@ bool TraceContactAdded(
         }
     }
     std::cout << "{\"record\":\"contact_added\",\"tick\":" << traceTick
+              << ",\"object_a\":\""
+              << (objectA->getCollisionObject() == traceBody
+                      ? "car_a"
+                      : objectA->getCollisionObject() == traceBallBody
+                          ? "car_b"
+                          : "static")
+              << "\",\"object_b\":\""
+              << (objectB->getCollisionObject() == traceBody
+                      ? "car_a"
+                      : objectB->getCollisionObject() == traceBallBody
+                          ? "car_b"
+                          : "static")
+              << "\""
               << ",\"world_body_index\":" << worldBodyIndex
               << ",\"face\":" << point.m_index1
               << ",\"raw_distance_bt\":" << rawDistance
@@ -779,6 +1086,41 @@ BallState MakeCarBallCustomBallState(int argc, char** argv) {
     return result;
 }
 
+Scenario MakeCarCarCustomScenario(int argc, char** argv, int carIndex) {
+    constexpr int CAR_VALUE_COUNT = 22;
+    constexpr int EXPECTED_ARGC = 4 + CAR_VALUE_COUNT * 2;
+    if (argc != EXPECTED_ARGC) {
+        throw std::runtime_error(
+            "car_car_custom requires 44 values: for each car, pos3 vel3 "
+            "ang_vel3 forward3 right3 up3 throttle steer handbrake "
+            "on_ground");
+    }
+    int index = 4 + carIndex * CAR_VALUE_COUNT;
+    const auto vector = [&]() {
+        const Vec result(
+            std::stof(argv[index]),
+            std::stof(argv[index + 1]),
+            std::stof(argv[index + 2]));
+        index += 3;
+        return result;
+    };
+    Scenario result = {};
+    result.pos = vector();
+    result.vel = vector();
+    result.angVel = vector();
+    const Vec forward = vector();
+    const Vec right = vector();
+    const Vec up = vector();
+    result.rotMat = RotMat(forward, right, up);
+    result.controls.throttle = std::stof(argv[index++]);
+    result.controls.steer = std::stof(argv[index++]);
+    result.controls.handbrake = std::stoi(argv[index++]) != 0;
+    result.onGround = std::stoi(argv[index++]) != 0;
+    result.boost = 100.0f;
+    result.seedLastControls = true;
+    return result;
+}
+
 void PrintVec(const btVector3& value) {
     std::cout << '[' << value.x() << ',' << value.y() << ',' << value.z() << ']';
 }
@@ -881,6 +1223,7 @@ void PrintMatrix(const btMatrix3x3& value) {
 
 void PrintWheelApplyReplay(
     Car* car,
+    const char* carLabel,
     const btVector3& initialLinear,
     const btVector3& initialAngular,
     btScalar timeStep,
@@ -900,8 +1243,14 @@ void PrintWheelApplyReplay(
     };
 
     std::cout << "{\"record\":\"wheel_apply_replay\",\"tick\":" << tick
+              << ",\"car\":\"" << carLabel << "\""
               << ",\"initial_linear_bt\":";
     PrintVec(initialLinear);
+    const btScalar sourceForwardSpeedBt =
+        initialLinear.dot(car->_bulletVehicle.getForwardVector());
+    std::cout << ",\"source_forward_speed_bt\":" << sourceForwardSpeedBt
+              << ",\"source_forward_speed_uu\":"
+              << sourceForwardSpeedBt * BT_TO_UU;
     std::cout << ",\"initial_angular\":";
     PrintVec(initialAngular);
     std::cout << ",\"stages\":[";
@@ -1302,6 +1651,8 @@ void PrintDispatcherManifolds(int tick, Car* car, Arena* arena) {
             int worldBodyIndex = -1;
             if (body == &car->_rigidBody) {
                 kind = "car";
+            } else if (traceOtherCar && body == &traceOtherCar->_rigidBody) {
+                kind = "car_b";
             } else if (body == &arena->ball->_rigidBody) {
                 kind = "ball";
             } else {
@@ -2203,9 +2554,12 @@ int main(int argc, char** argv) {
         const bool ballCustom = scenarioName == "ball_custom";
         const bool carBallCustom = scenarioName == "car_ball_custom"
             || scenarioName == "car_ball_custom_grounded";
+        const bool carCarAuthority = scenarioName == "car_car_authority";
+        const bool carCarCustom = scenarioName == "car_car_custom";
+        const bool carCarInput = carCarCustom || carCarAuthority;
         const bool customScenario =
             scenarioName == "custom" || scenarioName == "custom_full"
-            || customProbe || carBallCustom;
+            || customProbe || carBallCustom || carCarInput;
         const int ticks = std::stoi(argv[3]);
         if (ticks < 0 || ticks > 600) {
             throw std::runtime_error("ticks must be in [0, 600]");
@@ -2215,7 +2569,7 @@ int main(int argc, char** argv) {
         ArenaConfig config;
         config.noBallRot = false;
         Arena* arena = Arena::Create(GameMode::SOCCAR, config, 120.0f);
-        arena->SetCarCarCollision(false);
+        arena->SetCarCarCollision(carCarInput);
         arena->SetCarBallCollision(carBallCustom);
         Car* car = ballCustom
             ? nullptr
@@ -2225,7 +2579,7 @@ int main(int argc, char** argv) {
             tracingVehicleRaycaster.addedFilterMask =
                 car->_bulletVehicleRaycaster.addedFilterMask;
         }
-        if (customScenario || ballCustom) {
+        if ((customScenario && !carCarAuthority) || ballCustom) {
             if (car) {
                 car->_bulletVehicle.m_vehicleRaycaster = &tracingVehicleRaycaster;
             }
@@ -2247,19 +2601,39 @@ int main(int argc, char** argv) {
         // authority arenas as the Python oracle.  Even with car/car collision
         // disabled, adding an unrelated car changes Bullet's static-constraint
         // ordering on later ticks.
-        Car* remote = customScenario || ballCustom
-            ? nullptr
-            : arena->AddCar(Team::ORANGE, CAR_CONFIG_OCTANE);
+        Car* remote = carCarInput
+            ? arena->AddCar(Team::ORANGE, CAR_CONFIG_OCTANE)
+            : customScenario || ballCustom
+                ? nullptr
+                : arena->AddCar(Team::ORANGE, CAR_CONFIG_OCTANE);
         traceCar = car;
+        traceOtherCar = carCarInput ? remote : nullptr;
         traceBody = ballCustom ? &arena->ball->_rigidBody : &car->_rigidBody;
-        traceBallBody = &arena->ball->_rigidBody;
+        traceBallBody = carCarInput
+            ? &remote->_rigidBody
+            : &arena->ball->_rigidBody;
         traceArena = arena;
+        if (carCarInput) {
+            std::cout << "{\"record\":\"car_iteration_order\",\"cars\":[";
+            bool firstCar = true;
+            for (Car* orderedCar : arena->GetCars()) {
+                if (!firstCar) {
+                    std::cout << ',';
+                }
+                firstCar = false;
+                std::cout << '"' << (orderedCar == car ? "car_a" : "car_b") << '"';
+            }
+            std::cout << "]}\n";
+        }
         priorContactAddedCallback = gContactAddedCallback;
-        gContactAddedCallback = &TraceContactAdded;
+        if (!carCarAuthority)
+            gContactAddedCallback = &TraceContactAdded;
 
         Scenario scenario = {};
         if (!ballCustom) {
-            scenario = customScenario
+            scenario = carCarInput
+                ? MakeCarCarCustomScenario(argc, argv, 0)
+                : customScenario
                 ? MakeCustomScenario(
                     carBallCustom ? 25 : argc, argv)
                 : MakeScenario(scenarioName);
@@ -2281,7 +2655,21 @@ int main(int argc, char** argv) {
             car->controls = scenario.controls;
         }
 
-        if (remote) {
+        if (carCarInput) {
+            const Scenario remoteScenario =
+                MakeCarCarCustomScenario(argc, argv, 1);
+            CarState remoteState;
+            remoteState.pos = remoteScenario.pos;
+            remoteState.vel = remoteScenario.vel;
+            remoteState.angVel = remoteScenario.angVel;
+            remoteState.rotMat = remoteScenario.rotMat;
+            remoteState.isOnGround = remoteScenario.onGround;
+            remoteState.handbrakeVal = 0.0f;
+            remoteState.boost = remoteScenario.boost;
+            remoteState.lastControls = remoteScenario.controls;
+            remote->SetState(remoteState);
+            remote->controls = remoteScenario.controls;
+        } else if (remote) {
             CarState remoteState;
             remoteState.pos = Vec(2500, -2500, 17);
             remoteState.isOnGround = true;
@@ -2293,7 +2681,9 @@ int main(int argc, char** argv) {
             ? MakeCustomBallState(argc, argv)
             : (carBallCustom ? MakeCarBallCustomBallState(argc, argv) : BallState());
         if (!ballCustom && !carBallCustom) {
-            ballState.pos = Vec(0, 0, 1500);
+            ballState.pos = carCarInput
+                ? Vec(-3000, -4000, 1500)
+                : Vec(0, 0, 1500);
         }
         arena->ball->SetState(ballState);
 
@@ -2304,12 +2694,15 @@ int main(int argc, char** argv) {
             PrintShape(car);
             PrintPlaneTransforms(arena);
             PrintState("initial", 0, car, arena);
+            if (carCarInput) {
+                PrintState("initial_car_b", 0, remote, arena);
+            }
             if (carBallCustom) {
                 PrintBallState("initial_ball", 0, arena->ball, arena);
             }
         }
         const bool staged = scenarioName == "custom" || customProbe || ballCustom
-            || carBallCustom
+            || carBallCustom || carCarCustom
             || (argc >= 5 && std::string(argv[4]) == "staged");
         for (int tick = 1; tick <= ticks; ++tick) {
             traceTick = tick;
@@ -2362,6 +2755,12 @@ int main(int argc, char** argv) {
                 }
                 const btVector3 preVehicleLinear = car->_rigidBody.getLinearVelocity();
                 const btVector3 preVehicleAngular = car->_rigidBody.getAngularVelocity();
+                const btVector3 preRemoteLinear = remote
+                    ? remote->_rigidBody.getLinearVelocity()
+                    : btVector3(0, 0, 0);
+                const btVector3 preRemoteAngular = remote
+                    ? remote->_rigidBody.getAngularVelocity()
+                    : btVector3(0, 0, 0);
                 if (customScenario) {
                     PrintAirDampingReplay(tick, car);
                 }
@@ -2374,12 +2773,30 @@ int main(int argc, char** argv) {
                 if (customScenario) {
                     PrintWheelApplyReplay(
                         car,
+                        "car_a",
                         preVehicleLinear,
                         preVehicleAngular,
                         arena->tickTime,
                         tick);
+                    if (remote) {
+                        PrintWheelApplyReplay(
+                            remote,
+                            "car_b",
+                            preRemoteLinear,
+                            preRemoteAngular,
+                            arena->tickTime,
+                            tick);
+                    }
                 }
                 PrintState("after_car_pre", tick, car, arena);
+                if (carCarInput) {
+                    PrintState("after_car_b_pre", tick, remote, arena);
+                    PrintCarPairTransforms(tick, car, remote);
+                    PrintCarPairFaceAxes(tick, car, remote);
+                    PrintCarPairEdge13(tick, car, remote);
+                    PrintCarPairBroadphasePrediction(
+                        tick, car, remote, arena->tickTime);
+                }
                 if (carBallCustom && tick <= 3) {
                     PrintPredictedBroadphaseAabb(
                         "car", car->_rigidBody, arena->tickTime, tick);
@@ -2417,10 +2834,16 @@ int main(int argc, char** argv) {
                     PrintGjkProbe(car, arena, 10, 825, tick);
                 }
                 arena->_bulletWorld.stepSimulation(arena->tickTime, 0, arena->tickTime);
-                if (carBallCustom) {
+                if (carCarInput) {
+                    PrintCarPairBroadphaseResident(tick, car, remote, arena);
+                }
+                if (carBallCustom || carCarCustom) {
                     PrintDispatcherManifolds(tick, car, arena);
                 }
                 PrintState("after_bullet", tick, car, arena);
+                if (carCarInput) {
+                    PrintState("after_bullet_car_b", tick, remote, arena);
+                }
                 if (carBallCustom) {
                     PrintBallState("after_bullet_ball", tick, arena->ball, arena);
                 }
@@ -2441,9 +2864,13 @@ int main(int argc, char** argv) {
                 arena->Step(1);
             }
             PrintState("post", tick, car, arena);
+            if (carCarInput) {
+                PrintState("post_car_b", tick, remote, arena);
+            }
         }
         gContactAddedCallback = priorContactAddedCallback;
         traceCar = nullptr;
+        traceOtherCar = nullptr;
         traceBody = nullptr;
         traceBallBody = nullptr;
         traceArena = nullptr;
