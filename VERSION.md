@@ -2,7 +2,7 @@
 
 **Current completed milestone:** v0.3.0 — ball and dynamic contacts: `PASS_GREEN`
 
-**Active authorized milestone:** none
+**Active authorized milestone:** v0.4 — complete standard 1v1 game transition
 
 ## v0.3 result
 
@@ -27,6 +27,33 @@ Published v0.3 evidence is under:
 - `docs/REPRODUCING_V0_3.md`;
 - `docs/V0_3_ORACLE_CACHE.md`.
 
+v0.3 release commit:
+
+`d6ca3912418a3dd7ca8979415142cd861e0c0ddb`
+
+v0.3 implementation commit:
+
+`a63d317b0de0522e6d3cbe243bf282c6b93a9d58`
+
+## Authorized v0.4 boundary
+
+v0.4 may add only the bounded standard-Soccar 1v1 lifecycle/rules needed for complete headless game transitions:
+
+- integration of the existing 34-pad pickup/cooldown state into full lifecycle/reset;
+- goals and scoring;
+- standard kickoff/reset transitions;
+- demolition disable/removal-from-active-physics and respawn;
+- match/reset/lifecycle event state;
+- generic terminal/truncation outputs needed by the later training layer;
+- deterministic GPU-resident lifecycle/reset state and validation.
+
+Controlling handoff:
+
+- `CODEX_START_PROMPT.md`;
+- `handoff/v0.4/README.md`;
+- `handoff/v0.4/ACCEPTANCE.md`;
+- `handoff/v0.4/LIFECYCLE_POLICY.md`.
+
 ## Frozen prior versions
 
 - **v0.2.2 — static-world source-parity breadth gate:** `PASS_GREEN`, frozen baseline
@@ -42,10 +69,12 @@ Published prior result directories remain immutable.
 
 ## Hard stop
 
-Do not begin v0.4 without a separate user handoff. Still excluded:
+Do not begin v0.5 in this authorization. Still excluded:
 
-- demolition removal, disable, and respawn;
-- kickoff, goals, scoring, match reset, and terminal rules;
-- RLGym observations, rewards, action parsing, PPO, or training integration;
-- Rival policy inference;
-- arbitrary body counts, other game modes, and a generic Bullet API.
+- observation construction;
+- reward functions;
+- training-specific action parsing/masks beyond existing controls;
+- rollout buffers, GAE, PPO, or learner logic;
+- PyTorch policy inference/integration;
+- Rival policy training;
+- arbitrary body counts, other game modes, rendering, or a generic Bullet API.

@@ -1,34 +1,40 @@
-# Active Codex Handoff — RivalSim v0.3 Dynamic Contacts
+# Active Codex Handoff — RivalSim v0.4 Complete Standard 1v1 Game Transition
 
-RivalSim v0.3 is now **authorized**.
+RivalSim v0.4 is now **authorized**.
 
-Start from the current `origin/main`. The completed v0.2.2 release immediately below this handoff is:
+Start from the current `origin/main`. The completed v0.3 release immediately below this handoff is:
 
-`6dfd44ad9afeb3d1164da7e0e38c097fb74d07b8`
+`d6ca3912418a3dd7ca8979415142cd861e0c0ddb`
 
-v0.2.2 is `PASS_GREEN` and its published evidence is frozen. Do not modify prior `results/v0.1/`, `results/v0.2/`, `results/v0.2.1/`, or `results/v0.2.2/` artifacts.
+The v0.3 implementation boundary is:
 
-Before changing physics, read in full:
+`a63d317b0de0522e6d3cbe243bf282c6b93a9d58`
 
-- `handoff/v0.3/README.md`;
-- `handoff/v0.3/ACCEPTANCE.md`;
-- `handoff/v0.3/SOURCE_PORT_POLICY.md`;
-- `docs/V0_2_2_RESULTS.md`;
-- `docs/V0_2_2_ORACLE_CACHE.md`;
-- `results/v0.2.2/manifest.json`.
+v0.3 is `PASS_GREEN`; all published v0.1 through v0.3 evidence is frozen and must remain byte-for-byte unchanged.
+
+Before changing runtime behavior, read in full:
+
+- `handoff/v0.4/README.md`;
+- `handoff/v0.4/ACCEPTANCE.md`;
+- `handoff/v0.4/LIFECYCLE_POLICY.md`;
+- `docs/V0_3_RESULTS.md`;
+- `docs/V0_3_ORACLE_CACHE.md`;
+- `results/v0.3/manifest.json`.
 
 Mission order:
 
-1. ball ↔ arena;
-2. car ↔ ball;
-3. car ↔ car plus the bounded physical bump/demo classification needed by that contact path;
-4. integrated static + dynamic multi-contact validation;
-5. regression, stress/residency, then performance.
+1. freeze the standard-Soccar 1v1 lifecycle/source map and new v0.4 authority;
+2. integrate the existing 34-pad pickup/cooldown state into complete world reset and episode lifecycle;
+3. implement goals/scoring plus deterministic standard kickoff/reset transitions;
+4. implement demolition disable/removal-from-physics and source-correct respawn while preserving car-container visitation semantics;
+5. implement bounded match/reset state and generic terminal/truncation event outputs needed by the later training layer;
+6. validate complete headless two-Octane/one-ball 1v1 episodes, including repeated goals, kickoffs, pad cycles, demos, and respawns;
+7. rerun all v0.3/v0.2.2/v0.1 regressions, deterministic stress/residency, then final performance and reset-heavy throughput gates.
 
-For each phase, map the exact pinned RocketSim/Bullet source path **before** implementation, freeze a content-addressed native authority cache once, and debug GPU failures against cached operation-level truth. Do not use behavioral stabilizers, face/case exceptions, tie epsilons, tolerance broadening, or repeated live-RocketSim runs to fit outcomes.
+Use the exact pinned RocketSim source/build as primary authority for behavior it defines. Where a training-facing lifecycle decision is not defined by RocketSim, do not silently invent or import policy: freeze an explicit v0.4 contract or stop at the decision boundary.
 
-Hard authoritative horizons remain ticks `1, 4, 8, 12`. Long open-loop identity is diagnostic only.
+Do not rebuild the validated v0.3 physics. Do not use case-specific rules, expected-output lookup, hidden tables, tolerance broadening, or host-side fixes. Any randomness used for kickoff/respawn selection must be explicit, deterministic, and per-world/stateful so authority is reproducible.
 
-Do not begin v0.4 game rules or v0.5 training integration in this run.
+Do not begin v0.5 observations, rewards, action parsing, rollout buffers, PyTorch integration, PPO, or Rival policy inference in this run.
 
-Complete and push v0.3 only if every gate in `handoff/v0.3/README.md` and `handoff/v0.3/ACCEPTANCE.md` passes. Otherwise stop at the first genuine scope/performance/correctness boundary with all work preserved and an explicit report.
+Complete and push v0.4 only if every gate in `handoff/v0.4/README.md` and `handoff/v0.4/ACCEPTANCE.md` passes. Otherwise stop at the first genuine source/semantics/performance boundary with all work preserved and an explicit report.

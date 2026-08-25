@@ -90,20 +90,44 @@ worlds with 1.313% CV and zero timed transfers, clearing the 100,000 sim-s/s flo
 `docs/REPRODUCING_V0_3.md`, `docs/V0_3_ORACLE_CACHE.md`, and `results/v0.3/`.
 
 Game scoring, kickoff/match reset, demolition removal/respawn, RLGym/training integration, and
-v0.4+ work remain out of scope and were not begun.
+v0.4+ work were not begun in the completed release.
 
-## v0.4 — Complete standard 1v1 game transition
+## v0.4 — Complete standard 1v1 game transition: authorized / not begun
+
+The v0.4 handoff is authorized on top of v0.3 release
+`d6ca3912418a3dd7ca8979415142cd861e0c0ddb`.
+
+Mission: turn the accepted two-Octane/one-ball physics engine into a complete headless standard
+Soccar 1v1 world transition without beginning the training stack.
 
 Add:
 
-- integration/validation of the existing 34-pad pickup/cooldown state in full episodes;
-- kickoff/respawn positions;
-- goals/scoring;
-- demolish/respawn rules;
-- match/reset state;
-- terminal/truncation events needed by RLGym.
+- integration/validation of the existing 34-pad pickup/cooldown state in complete lifecycle/reset;
+- goals, goal attribution, and scoring state;
+- deterministic source-correct standard kickoff/reset poses and transitions;
+- demolition disable/removal-from-active-physics and respawn lifecycle;
+- preservation of car identity/visitation semantics across demo, respawn, and physical resets;
+- bounded match/reset/lifecycle event state;
+- generic terminal/truncation outputs needed by the later training layer;
+- deterministic per-world reset/RNG or explicit selector state where lifecycle choices are stochastic;
+- integrated repeated-goal/kickoff/pad/demo/respawn episode validation;
+- steady-state and reset-heavy GPU-resident performance gates.
 
-At this point RivalSim should be capable of headless standard Soccar 1v1 episodes.
+The existing v0.3 physics is a frozen regression baseline. v0.4 must not compensate for game-rule
+failures by changing accepted collision/solver behavior.
+
+Controlling package:
+
+- `CODEX_START_PROMPT.md`;
+- `handoff/v0.4/README.md`;
+- `handoff/v0.4/ACCEPTANCE.md`;
+- `handoff/v0.4/LIFECYCLE_POLICY.md`.
+
+At completion RivalSim should be capable of running complete headless standard Soccar 1v1 world
+transitions with no routine CPU game-state intervention.
+
+v0.4 explicitly does **not** include observations, rewards, rollout buffers, PyTorch policy
+inference, PPO, or Rival training. Those remain v0.5.
 
 ## v0.5 — Tensor-native training integration
 
