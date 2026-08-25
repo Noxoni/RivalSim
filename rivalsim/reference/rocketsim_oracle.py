@@ -71,6 +71,41 @@ class StaticWorldBatchOracleFrame:
     world_contact_normal: np.ndarray
 
 
+@dataclass(slots=True)
+class BallWorldBatchOracleFrame:
+    """Vectorized ball readback from independent ball-only Soccar arenas."""
+
+    ball_pos: np.ndarray
+    ball_vel: np.ndarray
+    ball_matrix: np.ndarray
+    ball_ang_vel: np.ndarray
+
+
+@dataclass(slots=True)
+class CarBallBatchOracleFrame:
+    """Complete Phase B readback from isolated one-car Soccar arenas."""
+
+    car_pos: np.ndarray
+    car_vel: np.ndarray
+    car_matrix: np.ndarray
+    car_ang_vel: np.ndarray
+    car_boost: np.ndarray
+    car_handbrake: np.ndarray
+    car_on_ground: np.ndarray
+    car_wheel_contacts: np.ndarray
+    car_world_contact: np.ndarray
+    car_world_contact_normal: np.ndarray
+    ball_pos: np.ndarray
+    ball_vel: np.ndarray
+    ball_matrix: np.ndarray
+    ball_ang_vel: np.ndarray
+    ball_last_hit_car_id: np.ndarray
+    pair_hit_valid: np.ndarray
+    pair_hit_tick: np.ndarray
+    pair_extra_hit_vel: np.ndarray
+    pair_relative_pos_on_ball: np.ndarray
+
+
 class RocketSimOracle:
     """One isolated RocketSim THE_VOID arena for a deterministic scenario."""
 
@@ -408,6 +443,241 @@ class RocketSimStaticWorldBatchOracle:
             wheel_contacts=wheel_contacts,
             has_world_contact=has_world_contact,
             world_contact_normal=world_contact_normal,
+        )
+
+    def _set_car_state(self, car: Any, snapshot: StateSnapshot, env_index: int) -> None:
+        source = self.rs.CarState()
+        source.pos = _to_vec(self.rs, snapshot.car_pos[env_index, 0])
+        source.vel = _to_vec(self.rs, snapshot.car_vel[env_index, 0])
+        source.ang_vel = _to_vec(self.rs, snapshot.car_ang_vel[env_index, 0])
+        source.rot_mat = _to_rot_mat(self.rs, snapshot.car_quat[env_index, 0])
+        source.boost = float(snapshot.boost[env_index, 0])
+        source.is_on_ground = bool(snapshot.on_ground[env_index, 0])
+        source.has_jumped = bool(snapshot.has_jumped[env_index, 0])
+        source.is_jumping = bool(snapshot.is_jumping[env_index, 0])
+        source.has_double_jumped = bool(snapshot.has_double_jumped[env_index, 0])
+        source.has_flipped = bool(snapshot.has_flipped[env_index, 0])
+        source.is_flipping = bool(snapshot.is_flipping[env_index, 0])
+        source.jump_time = float(snapshot.jump_time[env_index, 0])
+        source.air_time = float(snapshot.air_time[env_index, 0])
+        source.air_time_since_jump = float(snapshot.air_time_since_jump[env_index, 0])
+        source.flip_time = float(snapshot.flip_time[env_index, 0])
+        source.flip_rel_torque = _to_vec(self.rs, snapshot.flip_rel_torque[env_index, 0])
+        source.is_supersonic = bool(snapshot.is_supersonic[env_index, 0])
+        source.supersonic_time = float(snapshot.supersonic_time[env_index, 0])
+        source.boosting_time = float(snapshot.boosting_time[env_index, 0])
+        source.handbrake_val = 0.0
+        source.last_controls = _previous_controls_at(self.rs, snapshot, env_index, 0)
+        car.set_state(source)
+
+
+class RocketSimBallWorldBatchOracle:
+    """Independent pinned Soccar ball-world authority for v0.3 Phase A."""
+
+    def __init__(self, state: StateSnapshot, collision_root: str):
+        global _STATIC_WORLD_INIT_ROOT
+
+        if state.num_envs <= 0:
+            raise ValueError("the ball-world batch oracle requires at least one world")
+        self.rs = _import_rocketsim()
+        if _STATIC_WORLD_INIT_ROOT is None:
+            self.rs.init(collision_root)
+            _STATIC_WORLD_INIT_ROOT = collision_root
+        elif collision_root != _STATIC_WORLD_INIT_ROOT:
+            raise RuntimeError(
+                "RocketSim is process-global and was initialized with a different collision root"
+            )
+        self.arenas = []
+        self._initial_ball_pos = np.ascontiguousarray(state.ball_pos, dtype=np.float32)
+        self._initial_ball_vel = np.ascontiguousarray(state.ball_vel, dtype=np.float32)
+        self._initial_ball_quat = np.ascontiguousarray(state.ball_quat, dtype=np.float32)
+        self._initial_ball_ang_vel = np.ascontiguousarray(
+            state.ball_ang_vel, dtype=np.float32
+        )
+        for env_index in range(state.num_envs):
+            config = self.rs.ArenaConfig()
+            config.no_ball_rot = False
+            arena = self.rs.Arena(
+                self.rs.GameMode.SOCCAR,
+                tick_rate=120.0,
+                config=config,
+            )
+            arena.set_car_car_collision(False)
+            arena.set_car_ball_collision(False)
+            ball = self.rs.BallState()
+            ball.pos = _to_vec(self.rs, state.ball_pos[env_index])
+            ball.vel = _to_vec(self.rs, state.ball_vel[env_index])
+            ball.ang_vel = _to_vec(self.rs, state.ball_ang_vel[env_index])
+            ball.rot_mat = _to_rot_mat(self.rs, state.ball_quat[env_index])
+            arena.ball.set_state(ball)
+            self.arenas.append(arena)
+        self.arena = self.arenas[0]
+
+    @property
+    def num_envs(self) -> int:
+        return len(self.arenas)
+
+    def step(self) -> None:
+        for arena in self.arenas:
+            arena.step(1)
+
+    def authoritative_snapshot(self) -> StateSnapshot:
+        result = StateSnapshot.empty(self.num_envs)
+        result.car_pos[:] = (0.0, 0.0, 1500.0)
+        result.ball_pos[:] = self._initial_ball_pos
+        result.ball_vel[:] = self._initial_ball_vel
+        result.ball_quat[:] = self._initial_ball_quat
+        result.ball_ang_vel[:] = self._initial_ball_ang_vel
+        result.validate()
+        return result
+
+    def frame(self) -> BallWorldBatchOracleFrame:
+        count = self.num_envs
+        ball_pos = np.empty((count, 3), dtype=np.float32)
+        ball_vel = np.empty((count, 3), dtype=np.float32)
+        ball_matrix = np.empty((count, 3, 3), dtype=np.float32)
+        ball_ang_vel = np.empty((count, 3), dtype=np.float32)
+        for env_index, arena in enumerate(self.arenas):
+            state = arena.ball.get_state()
+            ball_pos[env_index] = _vec(state.pos)
+            ball_vel[env_index] = _vec(state.vel)
+            ball_matrix[env_index] = _matrix(state.rot_mat)
+            ball_ang_vel[env_index] = _vec(state.ang_vel)
+        return BallWorldBatchOracleFrame(
+            ball_pos=ball_pos,
+            ball_vel=ball_vel,
+            ball_matrix=ball_matrix,
+            ball_ang_vel=ball_ang_vel,
+        )
+
+
+class RocketSimCarBallBatchOracle:
+    """Independent pinned Soccar Octane/ball authority for v0.3 Phase B."""
+
+    def __init__(self, state: StateSnapshot, collision_root: str):
+        global _STATIC_WORLD_INIT_ROOT
+
+        if state.num_envs <= 0:
+            raise ValueError("the car/ball batch oracle requires at least one world")
+        self.rs = _import_rocketsim()
+        if _STATIC_WORLD_INIT_ROOT is None:
+            self.rs.init(collision_root)
+            _STATIC_WORLD_INIT_ROOT = collision_root
+        elif collision_root != _STATIC_WORLD_INIT_ROOT:
+            raise RuntimeError(
+                "RocketSim is process-global and was initialized with a different collision root"
+            )
+        self.arenas = []
+        self.cars = []
+        self._initial_car_pos = np.ascontiguousarray(state.car_pos[:, 0], dtype=np.float32)
+        self._initial_car_vel = np.ascontiguousarray(state.car_vel[:, 0], dtype=np.float32)
+        self._initial_car_quat = np.ascontiguousarray(state.car_quat[:, 0], dtype=np.float32)
+        self._initial_car_ang_vel = np.ascontiguousarray(
+            state.car_ang_vel[:, 0], dtype=np.float32
+        )
+        self._initial_ball_pos = np.ascontiguousarray(state.ball_pos, dtype=np.float32)
+        self._initial_ball_vel = np.ascontiguousarray(state.ball_vel, dtype=np.float32)
+        self._initial_ball_quat = np.ascontiguousarray(state.ball_quat, dtype=np.float32)
+        self._initial_ball_ang_vel = np.ascontiguousarray(
+            state.ball_ang_vel, dtype=np.float32
+        )
+        for env_index in range(state.num_envs):
+            config = self.rs.ArenaConfig()
+            config.no_ball_rot = False
+            arena = self.rs.Arena(
+                self.rs.GameMode.SOCCAR,
+                tick_rate=120.0,
+                config=config,
+            )
+            arena.set_car_car_collision(False)
+            arena.set_car_ball_collision(True)
+            car = arena.add_car(self.rs.Team.BLUE, self.rs.CarConfig.OCTANE)
+            self._set_car_state(car, state, env_index)
+            ball = self.rs.BallState()
+            ball.pos = _to_vec(self.rs, state.ball_pos[env_index])
+            ball.vel = _to_vec(self.rs, state.ball_vel[env_index])
+            ball.ang_vel = _to_vec(self.rs, state.ball_ang_vel[env_index])
+            ball.rot_mat = _to_rot_mat(self.rs, state.ball_quat[env_index])
+            arena.ball.set_state(ball)
+            car.set_controls(self.rs.CarControls())
+            self.arenas.append(arena)
+            self.cars.append(car)
+        self.arena = self.arenas[0]
+
+    @property
+    def num_envs(self) -> int:
+        return len(self.arenas)
+
+    def step(self) -> None:
+        for arena in self.arenas:
+            arena.step(1)
+
+    def frame(self) -> CarBallBatchOracleFrame:
+        count = self.num_envs
+        car_pos = np.empty((count, 3), dtype=np.float32)
+        car_vel = np.empty((count, 3), dtype=np.float32)
+        car_matrix = np.empty((count, 3, 3), dtype=np.float32)
+        car_ang_vel = np.empty((count, 3), dtype=np.float32)
+        car_boost = np.empty(count, dtype=np.float32)
+        car_handbrake = np.empty(count, dtype=np.float32)
+        car_on_ground = np.empty(count, dtype=np.bool_)
+        car_wheel_contacts = np.empty((count, 4), dtype=np.bool_)
+        car_world_contact = np.empty(count, dtype=np.bool_)
+        car_world_contact_normal = np.empty((count, 3), dtype=np.float32)
+        ball_pos = np.empty((count, 3), dtype=np.float32)
+        ball_vel = np.empty((count, 3), dtype=np.float32)
+        ball_matrix = np.empty((count, 3, 3), dtype=np.float32)
+        ball_ang_vel = np.empty((count, 3), dtype=np.float32)
+        ball_last_hit_car_id = np.empty(count, dtype=np.uint32)
+        pair_hit_valid = np.empty(count, dtype=np.bool_)
+        pair_hit_tick = np.empty(count, dtype=np.uint64)
+        pair_extra_hit_vel = np.empty((count, 3), dtype=np.float32)
+        pair_relative_pos_on_ball = np.empty((count, 3), dtype=np.float32)
+        for env_index, (arena, car) in enumerate(zip(self.arenas, self.cars, strict=True)):
+            car_state = car.get_state()
+            ball_state = arena.ball.get_state()
+            hit = car_state.ball_hit_info
+            car_pos[env_index] = _vec(car_state.pos)
+            car_vel[env_index] = _vec(car_state.vel)
+            car_matrix[env_index] = _matrix(car_state.rot_mat)
+            car_ang_vel[env_index] = _vec(car_state.ang_vel)
+            car_boost[env_index] = float(car_state.boost)
+            car_handbrake[env_index] = float(car_state.handbrake_val)
+            car_on_ground[env_index] = bool(car_state.is_on_ground)
+            car_wheel_contacts[env_index] = tuple(
+                bool(value) for value in car_state.wheels_with_contact
+            )
+            car_world_contact[env_index] = bool(car_state.has_world_contact)
+            car_world_contact_normal[env_index] = _vec(car_state.world_contact_normal)
+            ball_pos[env_index] = _vec(ball_state.pos)
+            ball_vel[env_index] = _vec(ball_state.vel)
+            ball_matrix[env_index] = _matrix(ball_state.rot_mat)
+            ball_ang_vel[env_index] = _vec(ball_state.ang_vel)
+            ball_last_hit_car_id[env_index] = int(ball_state.last_hit_car_id)
+            pair_hit_valid[env_index] = bool(hit.is_valid)
+            pair_hit_tick[env_index] = int(hit.tick_count_when_hit)
+            pair_extra_hit_vel[env_index] = _vec(hit.extra_hit_vel)
+            pair_relative_pos_on_ball[env_index] = _vec(hit.relative_pos_on_ball)
+        return CarBallBatchOracleFrame(
+            car_pos=car_pos,
+            car_vel=car_vel,
+            car_matrix=car_matrix,
+            car_ang_vel=car_ang_vel,
+            car_boost=car_boost,
+            car_handbrake=car_handbrake,
+            car_on_ground=car_on_ground,
+            car_wheel_contacts=car_wheel_contacts,
+            car_world_contact=car_world_contact,
+            car_world_contact_normal=car_world_contact_normal,
+            ball_pos=ball_pos,
+            ball_vel=ball_vel,
+            ball_matrix=ball_matrix,
+            ball_ang_vel=ball_ang_vel,
+            ball_last_hit_car_id=ball_last_hit_car_id,
+            pair_hit_valid=pair_hit_valid,
+            pair_hit_tick=pair_hit_tick,
+            pair_extra_hit_vel=pair_extra_hit_vel,
+            pair_relative_pos_on_ball=pair_relative_pos_on_ball,
         )
 
     def _set_car_state(self, car: Any, snapshot: StateSnapshot, env_index: int) -> None:

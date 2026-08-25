@@ -7,13 +7,17 @@
 
 #include "RocketSim.h"
 #include "bullet3-3.24/BulletCollision/CollisionShapes/btConvexPolyhedron.h"
+#include "bullet3-3.24/BulletCollision/CollisionShapes/btSphereShape.h"
 #include "bullet3-3.24/BulletCollision/CollisionShapes/btTriangleShape.h"
+#include "bullet3-3.24/BulletCollision/BroadphaseCollision/btRSBroadphase.h"
 #include "bullet3-3.24/BulletCollision/CollisionDispatch/btManifoldResult.h"
 #include "bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
+#include "bullet3-3.24/BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h"
 #include "bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpa2.h"
 #include "bullet3-3.24/BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h"
 #include "bullet3-3.24/BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.h"
 #include "bullet3-3.24/BulletDynamics/Vehicle/btDefaultVehicleRaycaster.h"
+#include "bullet3-3.24/LinearMath/btTransformUtil.h"
 
 using namespace RocketSim;
 
@@ -22,8 +26,11 @@ extern btScalar gContactBreakingThreshold;
 namespace {
 
 void PrintVec(const btVector3& value);
+void PrintExtraHitReplay(int tick, Car* car, Ball* ball, Arena* arena);
 
 Car* traceCar = nullptr;
+btRigidBody* traceBody = nullptr;
+btRigidBody* traceBallBody = nullptr;
 Arena* traceArena = nullptr;
 ContactAddedCallback priorContactAddedCallback = nullptr;
 std::vector<std::pair<int, int>> customGjkProbes;
@@ -39,17 +46,25 @@ btScalar TraceSolverRow(
     btSolverBody& bodyA,
     btSolverBody& bodyB,
     const btSolverConstraint& constraint) {
-    const bool carIsA = traceCar && bodyA.m_originalBody == &traceCar->_rigidBody;
-    const bool carIsB = traceCar && bodyB.m_originalBody == &traceCar->_rigidBody;
+    const bool carIsA = traceBody && bodyA.m_originalBody == traceBody;
+    const bool carIsB = traceBody && bodyB.m_originalBody == traceBody;
+    const bool ballIsA = traceBallBody && bodyA.m_originalBody == traceBallBody;
+    const bool ballIsB = traceBallBody && bodyB.m_originalBody == traceBallBody;
     const int call = solverRowCall++;
-    if (!carIsA && !carIsB) {
+    if (!carIsA && !carIsB && !ballIsA && !ballIsB) {
         return original(bodyA, bodyB, constraint);
     }
-    btSolverBody& carBody = carIsA ? bodyA : bodyB;
+    const bool tracedIsA = carIsA || (!carIsB && ballIsA);
+    btSolverBody& carBody = tracedIsA ? bodyA : bodyB;
+    btSolverBody& otherBody = tracedIsA ? bodyB : bodyA;
     const btVector3 deltaLinearBefore = carBody.m_deltaLinearVelocity;
     const btVector3 deltaAngularBefore = carBody.m_deltaAngularVelocity;
     const btVector3 pushBefore = carBody.m_pushVelocity;
     const btVector3 turnBefore = carBody.m_turnVelocity;
+    const btVector3 otherDeltaLinearBefore = otherBody.m_deltaLinearVelocity;
+    const btVector3 otherDeltaAngularBefore = otherBody.m_deltaAngularVelocity;
+    const btVector3 otherPushBefore = otherBody.m_pushVelocity;
+    const btVector3 otherTurnBefore = otherBody.m_turnVelocity;
     const btScalar appliedBefore = constraint.m_appliedImpulse;
     const btScalar appliedPushBefore = constraint.m_appliedPushImpulse;
     const btScalar result = original(bodyA, bodyB, constraint);
@@ -61,7 +76,15 @@ btScalar TraceSolverRow(
     std::cout << "{\"record\":\"solver_row\",\"tick\":" << traceTick
               << ",\"call\":" << call << ",\"kind\":\"" << kind
               << "\",\"face\":" << face
-              << ",\"car_side\":\"" << (carIsA ? "a" : "b")
+              << ",\"trace_body\":\""
+              << ((carIsA || carIsB) ? "car" : "ball")
+              << "\",\"trace_side\":\"" << (tracedIsA ? "a" : "b")
+              << "\",\"other_body\":\""
+              << (otherBody.m_originalBody == traceBody
+                      ? "car"
+                      : otherBody.m_originalBody == traceBallBody
+                          ? "ball"
+                          : "static")
               << "\",\"friction_index\":" << constraint.m_frictionIndex
               << ",\"normal_1\":";
     PrintVec(constraint.m_contactNormal1);
@@ -71,6 +94,16 @@ btScalar TraceSolverRow(
     PrintVec(constraint.m_relpos1CrossNormal);
     std::cout << ",\"rel_cross_2\":";
     PrintVec(constraint.m_relpos2CrossNormal);
+    if (constraint.m_originalContactPoint) {
+        const auto* contact = static_cast<const btManifoldPoint*>(
+            constraint.m_originalContactPoint);
+        std::cout << ",\"relative_position_a\":";
+        PrintVec(
+            contact->getPositionWorldOnA() - bodyA.m_worldTransform.getOrigin());
+        std::cout << ",\"relative_position_b\":";
+        PrintVec(
+            contact->getPositionWorldOnB() - bodyB.m_worldTransform.getOrigin());
+    }
     std::cout << ",\"angular_component_a\":";
     PrintVec(constraint.m_angularComponentA);
     std::cout << ",\"angular_component_b\":";
@@ -96,6 +129,14 @@ btScalar TraceSolverRow(
     PrintVec(carBody.m_externalForceImpulse);
     std::cout << ",\"external_torque_impulse\":";
     PrintVec(carBody.m_externalTorqueImpulse);
+    std::cout << ",\"other_base_linear\":";
+    PrintVec(otherBody.m_linearVelocity);
+    std::cout << ",\"other_base_angular\":";
+    PrintVec(otherBody.m_angularVelocity);
+    std::cout << ",\"other_external_force_impulse\":";
+    PrintVec(otherBody.m_externalForceImpulse);
+    std::cout << ",\"other_external_torque_impulse\":";
+    PrintVec(otherBody.m_externalTorqueImpulse);
     std::cout << ",\"delta_linear_before\":";
     PrintVec(deltaLinearBefore);
     std::cout << ",\"delta_linear_after\":";
@@ -112,6 +153,22 @@ btScalar TraceSolverRow(
     PrintVec(turnBefore);
     std::cout << ",\"turn_velocity_after\":";
     PrintVec(carBody.m_turnVelocity);
+    std::cout << ",\"other_delta_linear_before\":";
+    PrintVec(otherDeltaLinearBefore);
+    std::cout << ",\"other_delta_linear_after\":";
+    PrintVec(otherBody.m_deltaLinearVelocity);
+    std::cout << ",\"other_delta_angular_before\":";
+    PrintVec(otherDeltaAngularBefore);
+    std::cout << ",\"other_delta_angular_after\":";
+    PrintVec(otherBody.m_deltaAngularVelocity);
+    std::cout << ",\"other_push_velocity_before\":";
+    PrintVec(otherPushBefore);
+    std::cout << ",\"other_push_velocity_after\":";
+    PrintVec(otherBody.m_pushVelocity);
+    std::cout << ",\"other_turn_velocity_before\":";
+    PrintVec(otherTurnBefore);
+    std::cout << ",\"other_turn_velocity_after\":";
+    PrintVec(otherBody.m_turnVelocity);
     std::cout << "}\n";
     return result;
 }
@@ -139,6 +196,159 @@ btScalar TraceSplitSolverRow(
     return TraceSolverRow("split", priorSplitRowSolver, bodyA, bodyB, constraint);
 }
 
+void TracePointSphereCast(
+    const btVector3& from,
+    const btVector3& to,
+    const btTransform& sphereTransform,
+    const btConvexShape* sphereShape,
+    int wheel) {
+    btSphereShape pointShape(btScalar(0));
+    pointShape.setMargin(btScalar(0));
+    btVoronoiSimplexSolver simplex;
+    simplex.reset();
+    const btTransform fromA(btQuaternion::getIdentity(), from);
+    const btTransform toA(btQuaternion::getIdentity(), to);
+    const btVector3 r = to - from;
+    btTransform interpolatedA = fromA;
+    const btVector3 initialA = fromA(
+        pointShape.localGetSupportingVertex(-r * fromA.getBasis()));
+    const btVector3 initialB = sphereTransform(
+        sphereShape->localGetSupportingVertex(r * sphereTransform.getBasis()));
+    btVector3 v = initialA - initialB;
+    btVector3 n(0, 0, 0);
+    btScalar lambda = 0;
+    btScalar dist2 = v.length2();
+    int remaining = 32;
+    int iteration = 0;
+    std::cout << "{\"record\":\"ray_sphere_cast\",\"tick\":" << traceTick
+              << ",\"wheel\":" << wheel << ",\"stage\":\"initial\""
+              << ",\"sphere_origin\":";
+    PrintVec(sphereTransform.getOrigin());
+    std::cout << ",\"sphere_basis\":[";
+    PrintVec(sphereTransform.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(sphereTransform.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(sphereTransform.getBasis()[2]);
+    std::cout << "],\"r\":";
+    PrintVec(r);
+    std::cout << ",\"support_a\":";
+    PrintVec(initialA);
+    std::cout << ",\"support_b\":";
+    PrintVec(initialB);
+    std::cout << ",\"v\":";
+    PrintVec(v);
+    std::cout << ",\"dist2\":" << dist2 << "}\n";
+    while (dist2 > btScalar(0.0001) && remaining--) {
+        const btVector3 supportA = interpolatedA(
+            pointShape.localGetSupportingVertex(-v * interpolatedA.getBasis()));
+        const btVector3 sphereLocalDirection = v * sphereTransform.getBasis();
+        btVector3 sphereLocalNormalized = sphereLocalDirection;
+        sphereLocalNormalized.normalize();
+        const btVector3 supportB = sphereTransform(
+            sphereShape->localGetSupportingVertex(v * sphereTransform.getBasis()));
+        btVector3 w = supportA - supportB;
+        const btScalar vDotW = v.dot(w);
+        const btScalar vDotR = v.dot(r);
+        const btScalar lambdaBefore = lambda;
+        if (lambda > btScalar(1)) break;
+        if (vDotW > btScalar(0)) {
+            if (vDotR >= -(SIMD_EPSILON * SIMD_EPSILON)) break;
+            lambda = lambda - vDotW / vDotR;
+            interpolatedA.getOrigin().setInterpolate3(from, to, lambda);
+            w = supportA - supportB;
+            n = v;
+        }
+        const bool duplicate = simplex.inSimplex(w);
+        if (!duplicate) simplex.addVertex(w, supportA, supportB);
+        const bool closest = simplex.closest(v);
+        dist2 = closest ? v.length2() : btScalar(0);
+        std::cout << "{\"record\":\"ray_sphere_cast\",\"tick\":" << traceTick
+                  << ",\"wheel\":" << wheel << ",\"stage\":\"iteration\""
+                  << ",\"iteration\":" << iteration++
+                  << ",\"lambda_before\":" << lambdaBefore
+                  << ",\"lambda_after\":" << lambda
+                  << ",\"support_a\":";
+        PrintVec(supportA);
+        std::cout << ",\"support_b\":";
+        PrintVec(supportB);
+        std::cout << ",\"sphere_local_direction\":";
+        PrintVec(sphereLocalDirection);
+        std::cout << ",\"sphere_local_length2\":"
+                  << sphereLocalDirection.length2();
+        std::cout << ",\"sphere_local_normalized\":";
+        PrintVec(sphereLocalNormalized);
+        std::cout << ",\"w\":";
+        PrintVec(w);
+        std::cout << ",\"v_dot_w\":" << vDotW
+                  << ",\"v_dot_r\":" << vDotR
+                  << ",\"duplicate\":" << (duplicate ? "true" : "false")
+                  << ",\"simplex_count\":" << simplex.numVertices()
+                  << ",\"closest\":" << (closest ? "true" : "false")
+                  << ",\"v\":";
+        PrintVec(v);
+        std::cout << ",\"n\":";
+        PrintVec(n);
+        std::cout << ",\"dist2\":" << dist2 << "}\n";
+    }
+    // Re-enter the compiled pinned implementation with an exact iteration
+    // budget. This exposes each native advancement without instrumenting (and
+    // thereby perturbing) btSubsimplexConvexCast::calcTimeOfImpact itself.
+    for (int limit = 1; limit <= MAX_CONVEX_CAST_ITERATIONS; ++limit) {
+        btVoronoiSimplexSolver boundedSimplex;
+        btSubsimplexConvexCast boundedCast(
+            &pointShape, sphereShape, &boundedSimplex);
+        btConvexCast::CastResult boundedResult;
+        boundedResult.m_subSimplexCastMaxIterations = limit;
+        boundedResult.m_subSimplexCastEpsilon = btScalar(0);
+        const bool boundedHit = boundedCast.calcTimeOfImpact(
+            fromA, toA, sphereTransform, sphereTransform, boundedResult);
+        btVector3 boundedPointA;
+        btVector3 boundedPointB;
+        boundedSimplex.compute_points(boundedPointA, boundedPointB);
+        btVector3 boundedCachedV;
+        boundedSimplex.backup_closest(boundedCachedV);
+        btVector3 boundedP[VORONOI_SIMPLEX_MAX_VERTS];
+        btVector3 boundedQ[VORONOI_SIMPLEX_MAX_VERTS];
+        btVector3 boundedW[VORONOI_SIMPLEX_MAX_VERTS];
+        const int boundedCount = boundedSimplex.getSimplex(
+            boundedP, boundedQ, boundedW);
+        std::cout << "{\"record\":\"ray_sphere_native_bounded\",\"tick\":"
+                  << traceTick << ",\"wheel\":" << wheel
+                  << ",\"iterations\":" << limit
+                  << ",\"hit\":" << (boundedHit ? "true" : "false")
+                  << ",\"fraction\":" << boundedResult.m_fraction
+                  << ",\"normal\":";
+        PrintVec(boundedResult.m_normal);
+        std::cout << ",\"closest_a\":";
+        PrintVec(boundedPointA);
+        std::cout << ",\"closest_b\":";
+        PrintVec(boundedPointB);
+        std::cout << ",\"closest_v\":";
+        PrintVec(boundedPointA - boundedPointB);
+        std::cout << ",\"cached_v\":";
+        PrintVec(boundedCachedV);
+        std::cout << ",\"simplex_count\":" << boundedCount
+                  << ",\"simplex_p\":[";
+        for (int vertex = 0; vertex < boundedCount; ++vertex) {
+            if (vertex) std::cout << ',';
+            PrintVec(boundedP[vertex]);
+        }
+        std::cout << "],\"simplex_q\":[";
+        for (int vertex = 0; vertex < boundedCount; ++vertex) {
+            if (vertex) std::cout << ',';
+            PrintVec(boundedQ[vertex]);
+        }
+        std::cout << "],\"simplex_w\":[";
+        for (int vertex = 0; vertex < boundedCount; ++vertex) {
+            if (vertex) std::cout << ',';
+            PrintVec(boundedW[vertex]);
+        }
+        std::cout << ']';
+        std::cout << "}\n";
+    }
+}
+
 class TracingVehicleRaycaster final : public btDefaultVehicleRaycaster {
 public:
     explicit TracingVehicleRaycaster(btDynamicsWorld* world)
@@ -156,6 +366,17 @@ public:
         const int wheel = nextWheel++;
         void* object = btDefaultVehicleRaycaster::castRay(
             from, to, ignoreObject, result);
+        if (object && traceArena
+            && object == &traceArena->ball->_rigidBody
+            && traceTick <= 3) {
+            TracePointSphereCast(
+                from,
+                to,
+                traceArena->ball->_rigidBody.getWorldTransform(),
+                static_cast<const btConvexShape*>(
+                    traceArena->ball->_rigidBody.getCollisionShape()),
+                wheel);
+        }
         btScalar realRayLength = btScalar(0);
         btVector3 wheelDirection(0, 0, 0);
         if (traceCar && wheel < traceCar->_bulletVehicle.getNumWheels()) {
@@ -223,14 +444,22 @@ bool TraceContactAdded(
         ? priorContactAddedCallback(
               point, objectA, partA, indexA, objectB, partB, indexB)
         : true;
-    const bool involvesTraceCar = traceCar
-        && (objectA->getCollisionObject() == &traceCar->_rigidBody
-            || objectB->getCollisionObject() == &traceCar->_rigidBody);
+    const bool carBallPair = traceCar && traceBallBody && traceArena
+        && ((objectA->getCollisionObject() == traceBody
+             && objectB->getCollisionObject() == traceBallBody)
+            || (objectB->getCollisionObject() == traceBody
+                && objectA->getCollisionObject() == traceBallBody));
+    if (carBallPair) {
+        PrintExtraHitReplay(traceTick, traceCar, traceArena->ball, traceArena);
+    }
+    const bool involvesTraceCar = traceBody
+        && (objectA->getCollisionObject() == traceBody
+            || objectB->getCollisionObject() == traceBody);
     if (!involvesTraceCar || !traceArena) {
         return result;
     }
     const btCollisionObject* worldBody =
-        objectA->getCollisionObject() == &traceCar->_rigidBody
+        objectA->getCollisionObject() == traceBody
         ? objectB->getCollisionObject()
         : objectA->getCollisionObject();
     int worldBodyIndex = -1;
@@ -284,9 +513,9 @@ bool TraceContactAdded(
         btPersistentManifold* manifold =
             dispatcher->getManifoldByIndexInternal(manifoldIndex);
         const bool matches =
-            (manifold->getBody0() == &traceCar->_rigidBody
+            (manifold->getBody0() == traceBody
              && manifold->getBody1() == worldBody)
-            || (manifold->getBody1() == &traceCar->_rigidBody
+            || (manifold->getBody1() == traceBody
                 && manifold->getBody0() == worldBody);
         if (!matches) {
             continue;
@@ -490,6 +719,63 @@ Scenario MakeCustomScenario(int argc, char** argv) {
             std::stoi(argv[index]), std::stoi(argv[index + 1]));
         index += 2;
     }
+    return result;
+}
+
+BallState MakeCustomBallState(int argc, char** argv) {
+    constexpr int BALL_VALUE_COUNT = 9;
+    constexpr int BALL_BASE_ARGC = 4 + BALL_VALUE_COUNT;
+    if (argc != BALL_BASE_ARGC) {
+        throw std::runtime_error(
+            "ball_custom requires 9 values: pos3 vel3 ang_vel3");
+    }
+    int index = 4;
+    const auto vector = [&]() {
+        const Vec result(
+            std::stof(argv[index]),
+            std::stof(argv[index + 1]),
+            std::stof(argv[index + 2]));
+        index += 3;
+        return result;
+    };
+    BallState result;
+    result.pos = vector();
+    result.vel = vector();
+    result.angVel = vector();
+    result.rotMat = RotMat(
+        Vec(1.0f, 0.0f, 0.0f),
+        Vec(0.0f, 1.0f, 0.0f),
+        Vec(0.0f, 0.0f, 1.0f));
+    return result;
+}
+
+BallState MakeCarBallCustomBallState(int argc, char** argv) {
+    constexpr int CAR_VALUE_COUNT = 21;
+    constexpr int BALL_VALUE_COUNT = 9;
+    constexpr int EXPECTED_ARGC = 4 + CAR_VALUE_COUNT + BALL_VALUE_COUNT;
+    if (argc != EXPECTED_ARGC) {
+        throw std::runtime_error(
+            "car_ball_custom requires 30 values: car pos3 vel3 ang_vel3 "
+            "forward3 right3 up3 throttle steer handbrake, then ball "
+            "pos3 vel3 ang_vel3");
+    }
+    int index = 4 + CAR_VALUE_COUNT;
+    const auto vector = [&]() {
+        const Vec result(
+            std::stof(argv[index]),
+            std::stof(argv[index + 1]),
+            std::stof(argv[index + 2]));
+        index += 3;
+        return result;
+    };
+    BallState result;
+    result.pos = vector();
+    result.vel = vector();
+    result.angVel = vector();
+    result.rotMat = RotMat(
+        Vec(1.0f, 0.0f, 0.0f),
+        Vec(0.0f, 1.0f, 0.0f),
+        Vec(0.0f, 0.0f, 1.0f));
     return result;
 }
 
@@ -759,6 +1045,8 @@ void PrintState(const char* phase, int tick, Car* car, Arena* arena) {
     PrintVec(car->_rigidBody.getWorldTransform().getOrigin());
     std::cout << ",\"rigid_quat\":";
     PrintQuat(car->_rigidBody.getWorldTransform().getRotation());
+    std::cout << ",\"rigid_basis\":";
+    PrintMatrix(car->_rigidBody.getWorldTransform().getBasis());
     std::cout << ",\"rigid_vel_bt\":";
     PrintVec(car->_rigidBody.getLinearVelocity());
     std::cout << ",\"rigid_ang_vel\":";
@@ -913,6 +1201,135 @@ void PrintState(const char* phase, int tick, Car* car, Arena* arena) {
     std::cout << "]}\n";
 }
 
+void PrintBallState(const char* phase, int tick, Ball* ball, Arena* arena) {
+    const BallState state = ball->GetState();
+    const btRigidBody& body = ball->_rigidBody;
+    std::cout << "{\"record\":\"ball_state\",\"phase\":\"" << phase
+              << "\",\"tick\":" << tick << ",\"pos\":";
+    PrintVec(state.pos);
+    std::cout << ",\"vel\":";
+    PrintVec(state.vel);
+    std::cout << ",\"ang_vel\":";
+    PrintVec(state.angVel);
+    std::cout << ",\"rigid_pos_bt\":";
+    PrintVec(body.getWorldTransform().getOrigin());
+    std::cout << ",\"rigid_quat\":";
+    PrintQuat(body.getWorldTransform().getRotation());
+    std::cout << ",\"rigid_basis\":";
+    PrintMatrix(body.getWorldTransform().getBasis());
+    std::cout << ",\"rigid_vel_bt\":";
+    PrintVec(body.getLinearVelocity());
+    std::cout << ",\"rigid_ang_vel\":";
+    PrintVec(body.getAngularVelocity());
+    std::cout << ",\"total_force_bt\":";
+    PrintVec(body.getTotalForce());
+    std::cout << ",\"total_torque_bt\":";
+    PrintVec(body.getTotalTorque());
+    std::cout << ",\"inv_inertia_world\":";
+    PrintMatrix(body.getInvInertiaTensorWorld());
+    std::cout << ",\"manifolds\":[";
+
+    auto* dispatcher = arena->_bulletWorld.getDispatcher();
+    bool firstPoint = true;
+    for (int manifoldIndex = 0; manifoldIndex < dispatcher->getNumManifolds(); ++manifoldIndex) {
+        btPersistentManifold* manifold = dispatcher->getManifoldByIndexInternal(manifoldIndex);
+        const bool involvesBall = manifold->getBody0() == &body
+            || manifold->getBody1() == &body;
+        if (!involvesBall) {
+            continue;
+        }
+        const btCollisionObject* worldBody = manifold->getBody0() == &body
+            ? manifold->getBody1()
+            : manifold->getBody0();
+        int worldBodyIndex = -1;
+        for (int index = 0; index < arena->_worldCollisionRBs.size(); ++index) {
+            if (arena->_worldCollisionRBs[index] == worldBody) {
+                worldBodyIndex = index;
+                break;
+            }
+        }
+        for (int pointIndex = 0; pointIndex < manifold->getNumContacts(); ++pointIndex) {
+            if (!firstPoint) {
+                std::cout << ',';
+            }
+            firstPoint = false;
+            const btManifoldPoint& point = manifold->getContactPoint(pointIndex);
+            std::cout << "{\"manifold_index\":" << manifoldIndex
+                      << ",\"point_index\":" << pointIndex
+                      << ",\"world_body_index\":" << worldBodyIndex
+                      << ",\"distance_bt\":" << point.getDistance()
+                      << ",\"breaking_threshold_bt\":"
+                      << manifold->getContactBreakingThreshold()
+                      << ",\"lifetime\":" << point.getLifeTime()
+                      << ",\"applied_impulse\":" << point.m_appliedImpulse
+                      << ",\"lateral_impulse_1\":"
+                      << point.m_appliedImpulseLateral1
+                      << ",\"lateral_impulse_2\":"
+                      << point.m_appliedImpulseLateral2
+                      << ",\"friction\":" << point.m_combinedFriction
+                      << ",\"restitution\":" << point.m_combinedRestitution
+                      << ",\"index_1\":" << point.m_index1
+                      << ",\"point_a\":";
+            PrintVec(point.getPositionWorldOnA());
+            std::cout << ",\"point_b\":";
+            PrintVec(point.getPositionWorldOnB());
+            std::cout << ",\"stored_local_a\":";
+            PrintVec(point.m_localPointA);
+            std::cout << ",\"stored_local_b\":";
+            PrintVec(point.m_localPointB);
+            std::cout << ",\"normal_b\":";
+            PrintVec(point.m_normalWorldOnB);
+            std::cout << ",\"friction_dir_1\":";
+            PrintVec(point.m_lateralFrictionDir1);
+            std::cout << '}';
+        }
+    }
+    std::cout << "]}\n";
+}
+
+void PrintDispatcherManifolds(int tick, Car* car, Arena* arena) {
+    auto* dispatcher = arena->_bulletWorld.getDispatcher();
+    std::cout << "{\"record\":\"dispatcher_manifolds\",\"tick\":" << tick
+              << ",\"manifolds\":[";
+    for (int manifoldIndex = 0; manifoldIndex < dispatcher->getNumManifolds(); ++manifoldIndex) {
+        if (manifoldIndex) {
+            std::cout << ',';
+        }
+        btPersistentManifold* manifold =
+            dispatcher->getManifoldByIndexInternal(manifoldIndex);
+        const auto printBody = [&](const btCollisionObject* body) {
+            const char* kind = "other";
+            int worldBodyIndex = -1;
+            if (body == &car->_rigidBody) {
+                kind = "car";
+            } else if (body == &arena->ball->_rigidBody) {
+                kind = "ball";
+            } else {
+                for (int index = 0; index < arena->_worldCollisionRBs.size(); ++index) {
+                    if (body == arena->_worldCollisionRBs[index]) {
+                        kind = "world";
+                        worldBodyIndex = index;
+                        break;
+                    }
+                }
+            }
+            std::cout << "{\"kind\":\"" << kind
+                      << "\",\"world_body_index\":" << worldBodyIndex
+                      << ",\"island_tag\":" << body->getIslandTag()
+                      << ",\"proxy_id\":"
+                      << body->getBroadphaseHandle()->m_uniqueId << '}';
+        };
+        std::cout << "{\"dispatcher_index\":" << manifoldIndex
+                  << ",\"contact_count\":" << manifold->getNumContacts()
+                  << ",\"body_0\":";
+        printBody(static_cast<const btCollisionObject*>(manifold->getBody0()));
+        std::cout << ",\"body_1\":";
+        printBody(static_cast<const btCollisionObject*>(manifold->getBody1()));
+        std::cout << '}';
+    }
+    std::cout << "]}\n";
+}
+
 void PrintAirDampingReplay(int tick, Car* car) {
     using namespace RLConst;
     const btVector3 dirPitch = -car->GetRightDir();
@@ -959,6 +1376,64 @@ void PrintAirDampingReplay(int tick, Car* car) {
     std::cout << "}\n";
 }
 
+void PrintExtraHitReplay(int tick, Car* car, Ball* ball, Arena* arena) {
+    using namespace RLConst;
+    const CarState carState = car->GetState();
+    const BallState ballState = ball->GetState();
+    const Vec carForward = car->GetForwardDir();
+    const Vec relativePosition = ballState.pos - carState.pos;
+    const Vec relativeVelocity = ballState.vel - carState.vel;
+    const float relativeSpeed = RS_MIN(
+        relativeVelocity.Length(), BALL_CAR_EXTRA_IMPULSE_MAXDELTAVEL_UU);
+    Vec firstDirection;
+    float forwardDot = 0.0f;
+    Vec forwardAdjustment;
+    Vec finalDirection;
+    float factor = 0.0f;
+    Vec addedVelocity;
+    if (relativeSpeed > 0.0f) {
+        firstDirection = (
+            relativePosition * Vec(1.0f, 1.0f, BALL_CAR_EXTRA_IMPULSE_Z_SCALE)
+        ).Normalized();
+        forwardDot = firstDirection.Dot(carForward);
+        forwardAdjustment = carForward * forwardDot
+            * (1.0f - BALL_CAR_EXTRA_IMPULSE_FORWARD_SCALE);
+        finalDirection = (firstDirection - forwardAdjustment).Normalized();
+        factor = BALL_CAR_EXTRA_IMPULSE_FACTOR_CURVE.GetOutput(relativeSpeed);
+        addedVelocity = (finalDirection * relativeSpeed) * factor
+            * arena->_mutatorConfig.ballHitExtraForceScale;
+    }
+    std::cout << "{\"record\":\"extra_hit_replay\",\"tick\":" << tick
+              << ",\"car_pos\":";
+    PrintVec(carState.pos);
+    std::cout << ",\"car_vel\":";
+    PrintVec(carState.vel);
+    std::cout << ",\"ball_pos\":";
+    PrintVec(ballState.pos);
+    std::cout << ",\"ball_vel\":";
+    PrintVec(ballState.vel);
+    std::cout << ",\"car_forward\":";
+    PrintVec(carForward);
+    std::cout << ",\"relative_position\":";
+    PrintVec(relativePosition);
+    std::cout << ",\"relative_velocity\":";
+    PrintVec(relativeVelocity);
+    std::cout << ",\"relative_speed\":" << relativeSpeed
+              << ",\"first_direction\":";
+    PrintVec(firstDirection);
+    std::cout << ",\"forward_dot\":" << forwardDot
+              << ",\"forward_adjustment\":";
+    PrintVec(forwardAdjustment);
+    std::cout << ",\"final_direction\":";
+    PrintVec(finalDirection);
+    std::cout << ",\"factor\":" << factor
+              << ",\"force_scale\":"
+              << arena->_mutatorConfig.ballHitExtraForceScale
+              << ",\"added_velocity\":";
+    PrintVec(addedVelocity);
+    std::cout << "}\n";
+}
+
 void PrintShape(Car* car) {
     const btVector3 withMargin = car->_childHitboxShape.getHalfExtentsWithMargin();
     const btVector3 withoutMargin = car->_childHitboxShape.getHalfExtentsWithoutMargin();
@@ -989,6 +1464,193 @@ void PrintShape(Car* car) {
                      gContactBreakingThreshold);
     std::cout << ",\"child_breaking_threshold_bt\":"
               << car->_childHitboxShape.getContactBreakingThreshold(gContactBreakingThreshold);
+    std::cout << "}\n";
+}
+
+void PrintPlaneTransforms(Arena* arena) {
+    for (int index = 0; index < arena->_worldCollisionRBs.size(); ++index) {
+        const btCollisionShape* shape =
+            arena->_worldCollisionRBs[index]->getCollisionShape();
+        if (shape->getShapeType() != STATIC_PLANE_PROXYTYPE) {
+            continue;
+        }
+        const auto* plane = static_cast<const btStaticPlaneShape*>(shape);
+        const btTransform transform =
+            arena->_worldCollisionRBs[index]->getWorldTransform();
+        std::cout << "{\"record\":\"plane_transform\",\"world_body_index\":"
+                  << index << ",\"origin\":";
+        PrintVec(transform.getOrigin());
+        std::cout << ",\"basis\":[";
+        PrintVec(transform.getBasis()[0]);
+        std::cout << ',';
+        PrintVec(transform.getBasis()[1]);
+        std::cout << ',';
+        PrintVec(transform.getBasis()[2]);
+        std::cout << "],\"normal\":";
+        PrintVec(plane->getPlaneNormal());
+        std::cout << ",\"constant\":" << plane->getPlaneConstant()
+                  << "}\n";
+    }
+}
+
+void PrintPredictedBroadphaseAabb(
+    const char* kind,
+    const btRigidBody& body,
+    btScalar timeStep,
+    int tick) {
+    btVector3 minimum;
+    btVector3 maximum;
+    body.getCollisionShape()->getAabb(
+        body.getWorldTransform(), minimum, maximum);
+    const btVector3 threshold(
+        gContactBreakingThreshold,
+        gContactBreakingThreshold,
+        gContactBreakingThreshold);
+    minimum -= threshold;
+    maximum += threshold;
+
+    btVector3 dampedLinear = body.getLinearVelocity();
+    btVector3 dampedAngular = body.getAngularVelocity();
+    dampedLinear *= btPow(
+        btScalar(1) - body.getLinearDamping(), timeStep);
+    dampedAngular *= btPow(
+        btScalar(1) - body.getAngularDamping(), timeStep);
+    btTransform predicted;
+    btTransformUtil::integrateTransform(
+        body.getWorldTransform(),
+        dampedLinear,
+        dampedAngular,
+        timeStep,
+        predicted);
+    btVector3 predictedMinimum;
+    btVector3 predictedMaximum;
+    body.getCollisionShape()->getAabb(
+        predicted, predictedMinimum, predictedMaximum);
+    predictedMinimum -= threshold;
+    predictedMaximum += threshold;
+    minimum.setMin(predictedMinimum);
+    maximum.setMax(predictedMaximum);
+
+    std::cout << "{\"record\":\"predicted_broadphase_aabb\",\"tick\":"
+              << tick << ",\"kind\":\"" << kind << "\",\"minimum\":";
+    PrintVec(minimum);
+    std::cout << ",\"maximum\":";
+    PrintVec(maximum);
+    std::cout << ",\"predicted_origin\":";
+    PrintVec(predicted.getOrigin());
+    std::cout << ",\"predicted_basis\":[";
+    PrintVec(predicted.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(predicted.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(predicted.getBasis()[2]);
+    std::cout << "]}\n";
+}
+
+void PrintPositiveXPlaneSupport(Car* car, Arena* arena, int tick) {
+    const btRigidBody* planeBody = nullptr;
+    const btStaticPlaneShape* planeShape = nullptr;
+    int planeBodyIndex = -1;
+    for (int index = 0; index < arena->_worldCollisionRBs.size(); ++index) {
+        const btCollisionShape* shape =
+            arena->_worldCollisionRBs[index]->getCollisionShape();
+        if (shape->getShapeType() != STATIC_PLANE_PROXYTYPE) {
+            continue;
+        }
+        const auto* candidate = static_cast<const btStaticPlaneShape*>(shape);
+        const btVector3 normal = candidate->getPlaneNormal();
+        if (normal.x() == btScalar(-1) && normal.y() == btScalar(0)
+            && normal.z() == btScalar(0)) {
+            planeBody = arena->_worldCollisionRBs[index];
+            planeShape = candidate;
+            planeBodyIndex = index;
+            break;
+        }
+    }
+    if (!planeBody || !planeShape) {
+        return;
+    }
+
+    // Mirror btConvexPlaneCollisionAlgorithm::processCollision without
+    // mutating the dispatcher.  Keeping each btTransform intermediate intact
+    // makes the native SIMD operation order observable to the GPU port.
+    const btTransform bodyWorld = car->_rigidBody.getWorldTransform();
+    const btTransform childLocal = car->_compoundShape.getChildTransform(0);
+    const btTransform convexWorld = bodyWorld * childLocal;
+    const btTransform planeWorld = planeBody->getWorldTransform();
+    const btTransform planeInConvex = convexWorld.inverse() * planeWorld;
+    const btTransform convexInPlane = planeWorld.inverse() * convexWorld;
+    const btVector3 planeNormal = planeShape->getPlaneNormal();
+    const btScalar planeConstant = planeShape->getPlaneConstant();
+    const btVector3 localDirection =
+        planeInConvex.getBasis() * -planeNormal;
+    const btVector3 localSupport =
+        car->_childHitboxShape.localGetSupportingVertex(localDirection);
+    const btVector3 supportInPlane = convexInPlane(localSupport);
+    const btScalar distance =
+        planeNormal.dot(supportInPlane) - planeConstant;
+    const btVector3 projectedInPlane =
+        supportInPlane - distance * planeNormal;
+    const btVector3 projectedWorld = planeWorld(projectedInPlane);
+
+    std::cout << "{\"record\":\"positive_x_plane_support\",\"tick\":"
+              << tick << ",\"world_body_index\":" << planeBodyIndex
+              << ",\"body_origin\":";
+    PrintVec(bodyWorld.getOrigin());
+    std::cout << ",\"body_basis\":[";
+    PrintVec(bodyWorld.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(bodyWorld.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(bodyWorld.getBasis()[2]);
+    std::cout << "],\"child_local_origin\":";
+    PrintVec(childLocal.getOrigin());
+    std::cout << ",\"convex_world_origin\":";
+    PrintVec(convexWorld.getOrigin());
+    std::cout << ",\"convex_world_basis\":[";
+    PrintVec(convexWorld.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(convexWorld.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(convexWorld.getBasis()[2]);
+    std::cout << "],\"plane_world_origin\":";
+    PrintVec(planeWorld.getOrigin());
+    std::cout << ",\"plane_world_basis\":[";
+    PrintVec(planeWorld.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(planeWorld.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(planeWorld.getBasis()[2]);
+    std::cout << "],\"plane_normal\":";
+    PrintVec(planeNormal);
+    std::cout << ",\"plane_constant\":" << planeConstant
+              << ",\"plane_in_convex_origin\":";
+    PrintVec(planeInConvex.getOrigin());
+    std::cout << ",\"plane_in_convex_basis\":[";
+    PrintVec(planeInConvex.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(planeInConvex.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(planeInConvex.getBasis()[2]);
+    std::cout << "],\"convex_in_plane_origin\":";
+    PrintVec(convexInPlane.getOrigin());
+    std::cout << ",\"convex_in_plane_basis\":[";
+    PrintVec(convexInPlane.getBasis()[0]);
+    std::cout << ',';
+    PrintVec(convexInPlane.getBasis()[1]);
+    std::cout << ',';
+    PrintVec(convexInPlane.getBasis()[2]);
+    std::cout << "],\"local_direction\":";
+    PrintVec(localDirection);
+    std::cout << ",\"local_support\":";
+    PrintVec(localSupport);
+    std::cout << ",\"support_in_plane\":";
+    PrintVec(supportInPlane);
+    std::cout << ",\"distance\":" << distance
+              << ",\"projected_in_plane\":";
+    PrintVec(projectedInPlane);
+    std::cout << ",\"projected_world\":";
+    PrintVec(projectedWorld);
     std::cout << "}\n";
 }
 
@@ -1252,6 +1914,128 @@ void PrintGjkProbe(
     std::cout << "]}\n";
 }
 
+void PrintCarBallGjkProbe(Car* car, Arena* arena, int tick) {
+    const auto* sphere = static_cast<const btConvexShape*>(
+        arena->ball->_rigidBody.getCollisionShape());
+    const btTransform transformA = car->_rigidBody.getWorldTransform()
+        * car->_compoundShape.getChildTransform(0);
+    const btTransform transformB = arena->ball->_rigidBody.getWorldTransform();
+    btVoronoiSimplexSolver simplex;
+    btGjkEpaPenetrationDepthSolver penetrationDepthSolver;
+    btGjkPairDetector detector(
+        &car->_childHitboxShape, sphere, &simplex, &penetrationDepthSolver);
+    btGjkPairDetector::ClosestPointInput input;
+    const btScalar maximumDistance = car->_childHitboxShape.getMargin()
+        + sphere->getMargin()
+        + car->_compoundShape.getContactBreakingThreshold(gContactBreakingThreshold);
+    input.m_maximumDistanceSquared = maximumDistance * maximumDistance;
+    input.m_transformA = transformA;
+    input.m_transformB = transformB;
+    CaptureClosestPoint result;
+    detector.getClosestPoints(input, result);
+
+    btVoronoiSimplexSolver traceSimplex;
+    traceSimplex.reset();
+    btTransform localA = transformA;
+    btTransform localB = transformB;
+    const btVector3 positionOffset =
+        (localA.getOrigin() + localB.getOrigin()) * btScalar(0.5);
+    localA.getOrigin() -= positionOffset;
+    localB.getOrigin() -= positionOffset;
+    btVector3 axis(0, 1, 0);
+    btScalar squaredDistance = BT_LARGE_FLOAT;
+    std::cout << "{\"record\":\"car_ball_gjk_iterations\",\"tick\":" << tick
+              << ",\"position_offset\":";
+    PrintVec(positionOffset);
+    std::cout << ",\"steps\":[";
+    for (int iteration = 0; iteration < 1002; ++iteration) {
+        const btVector3 directionA = (-axis) * transformA.getBasis();
+        const btVector3 directionB = axis * transformB.getBasis();
+        const btVector3 localP =
+            car->_childHitboxShape.localGetSupportVertexWithoutMarginNonVirtual(
+                directionA);
+        const btVector3 localQ =
+            sphere->localGetSupportVertexWithoutMarginNonVirtual(directionB);
+        const btVector3 p = localA(localP);
+        const btVector3 q = localB(localQ);
+        const btVector3 w = p - q;
+        const btScalar delta = axis.dot(w);
+        const bool maximumDistanceExit = delta > btScalar(0.0)
+            && delta * delta > squaredDistance * input.m_maximumDistanceSquared;
+        const bool repeated = traceSimplex.inSimplex(w);
+        const btScalar f0 = squaredDistance - delta;
+        const btScalar f1 = squaredDistance * btScalar(1.0e-6);
+        if (iteration) {
+            std::cout << ',';
+        }
+        std::cout << "{\"iteration\":" << iteration << ",\"axis\":";
+        PrintVec(axis);
+        std::cout << ",\"direction_a\":";
+        PrintVec(directionA);
+        std::cout << ",\"local_p\":";
+        PrintVec(localP);
+        std::cout << ",\"local_q\":";
+        PrintVec(localQ);
+        std::cout << ",\"p\":";
+        PrintVec(p);
+        std::cout << ",\"q\":";
+        PrintVec(q);
+        std::cout << ",\"w\":";
+        PrintVec(w);
+        std::cout << ",\"delta\":" << delta
+                  << ",\"squared_distance_before\":" << squaredDistance;
+        if (maximumDistanceExit || repeated || f0 <= f1) {
+            std::cout << ",\"exit_reason\":\""
+                      << (maximumDistanceExit ? "maximum_distance"
+                          : (repeated ? "in_simplex" : "relative_progress"))
+                      << "\"}";
+            break;
+        }
+        traceSimplex.addVertex(w, p, q);
+        btVector3 nextAxis;
+        const bool closest = traceSimplex.closest(nextAxis);
+        std::cout << ",\"closest\":" << (closest ? "true" : "false")
+                  << ",\"next_axis\":";
+        PrintVec(nextAxis);
+        std::cout << ",\"squared_distance_after\":" << nextAxis.length2()
+                  << ",\"cached_point_a\":";
+        PrintVec(traceSimplex.m_cachedP1);
+        std::cout << ",\"cached_point_b\":";
+        PrintVec(traceSimplex.m_cachedP2);
+        std::cout << ",\"simplex_count\":" << traceSimplex.numVertices()
+                  << ",\"barycentric\":["
+                  << traceSimplex.m_cachedBC.m_barycentricCoords[0] << ','
+                  << traceSimplex.m_cachedBC.m_barycentricCoords[1] << ','
+                  << traceSimplex.m_cachedBC.m_barycentricCoords[2] << ','
+                  << traceSimplex.m_cachedBC.m_barycentricCoords[3] << ']';
+        if (!closest || nextAxis.length2() < btScalar(1.0e-6)
+            || squaredDistance - nextAxis.length2()
+                <= SIMD_EPSILON * squaredDistance
+            || traceSimplex.fullSimplex()) {
+            std::cout << ",\"exit_reason\":\"post_closest\"}";
+            break;
+        }
+        squaredDistance = nextAxis.length2();
+        axis = nextAxis;
+        std::cout << ",\"exit_reason\":null}";
+    }
+    std::cout << "]}\n";
+    std::cout << "{\"record\":\"car_ball_gjk_probe\",\"tick\":" << tick
+              << ",\"margin_a\":" << detector.m_marginA
+              << ",\"margin_b\":" << detector.m_marginB
+              << ",\"iterations\":" << detector.m_curIter
+              << ",\"degenerate\":" << detector.m_degenerateSimplex
+              << ",\"method\":" << detector.m_lastUsedMethod
+              << ",\"axis\":";
+    PrintVec(detector.m_cachedSeparatingAxis);
+    std::cout << ",\"found\":" << (result.found ? "true" : "false")
+              << ",\"normal\":";
+    PrintVec(result.normal);
+    std::cout << ",\"point_b\":";
+    PrintVec(result.point);
+    std::cout << ",\"distance\":" << result.distance << "}\n";
+}
+
 void PrintEpaProbe(
     Car* car,
     Arena* arena,
@@ -1416,9 +2200,12 @@ int main(int argc, char** argv) {
         const std::string collisionRoot = argv[1];
         const std::string scenarioName = argv[2];
         const bool customProbe = scenarioName == "custom_probe";
+        const bool ballCustom = scenarioName == "ball_custom";
+        const bool carBallCustom = scenarioName == "car_ball_custom"
+            || scenarioName == "car_ball_custom_grounded";
         const bool customScenario =
             scenarioName == "custom" || scenarioName == "custom_full"
-            || customProbe;
+            || customProbe || carBallCustom;
         const int ticks = std::stoi(argv[3]);
         if (ticks < 0 || ticks > 600) {
             throw std::runtime_error("ticks must be in [0, 600]");
@@ -1429,13 +2216,19 @@ int main(int argc, char** argv) {
         config.noBallRot = false;
         Arena* arena = Arena::Create(GameMode::SOCCAR, config, 120.0f);
         arena->SetCarCarCollision(false);
-        arena->SetCarBallCollision(false);
-        Car* car = arena->AddCar(Team::BLUE, CAR_CONFIG_OCTANE);
+        arena->SetCarBallCollision(carBallCustom);
+        Car* car = ballCustom
+            ? nullptr
+            : arena->AddCar(Team::BLUE, CAR_CONFIG_OCTANE);
         TracingVehicleRaycaster tracingVehicleRaycaster(&arena->_bulletWorld);
-        tracingVehicleRaycaster.addedFilterMask =
-            car->_bulletVehicleRaycaster.addedFilterMask;
-        if (customScenario) {
-            car->_bulletVehicle.m_vehicleRaycaster = &tracingVehicleRaycaster;
+        if (car) {
+            tracingVehicleRaycaster.addedFilterMask =
+                car->_bulletVehicleRaycaster.addedFilterMask;
+        }
+        if (customScenario || ballCustom) {
+            if (car) {
+                car->_bulletVehicle.m_vehicleRaycaster = &tracingVehicleRaycaster;
+            }
             btSequentialImpulseConstraintSolver* solver =
                 arena->_bulletWorld.getConstraintSolver();
             const int solverMode = arena->_bulletWorld.getSolverInfo().m_solverMode;
@@ -1454,30 +2247,39 @@ int main(int argc, char** argv) {
         // authority arenas as the Python oracle.  Even with car/car collision
         // disabled, adding an unrelated car changes Bullet's static-constraint
         // ordering on later ticks.
-        Car* remote = customScenario
+        Car* remote = customScenario || ballCustom
             ? nullptr
             : arena->AddCar(Team::ORANGE, CAR_CONFIG_OCTANE);
         traceCar = car;
+        traceBody = ballCustom ? &arena->ball->_rigidBody : &car->_rigidBody;
+        traceBallBody = &arena->ball->_rigidBody;
         traceArena = arena;
         priorContactAddedCallback = gContactAddedCallback;
         gContactAddedCallback = &TraceContactAdded;
 
-        const Scenario scenario = customScenario
-            ? MakeCustomScenario(argc, argv)
-            : MakeScenario(scenarioName);
-        CarState state;
-        state.pos = scenario.pos;
-        state.vel = scenario.vel;
-        state.angVel = scenario.angVel;
-        state.rotMat = scenario.rotMat;
-        state.isOnGround = scenario.onGround;
-        state.handbrakeVal = 0.0f;
-        state.boost = scenario.boost;
-        if (scenario.seedLastControls) {
-            state.lastControls = scenario.controls;
+        Scenario scenario = {};
+        if (!ballCustom) {
+            scenario = customScenario
+                ? MakeCustomScenario(
+                    carBallCustom ? 25 : argc, argv)
+                : MakeScenario(scenarioName);
+            if (scenarioName == "car_ball_custom_grounded") {
+                scenario.onGround = true;
+            }
+            CarState state;
+            state.pos = scenario.pos;
+            state.vel = scenario.vel;
+            state.angVel = scenario.angVel;
+            state.rotMat = scenario.rotMat;
+            state.isOnGround = scenario.onGround;
+            state.handbrakeVal = 0.0f;
+            state.boost = scenario.boost;
+            if (scenario.seedLastControls) {
+                state.lastControls = scenario.controls;
+            }
+            car->SetState(state);
+            car->controls = scenario.controls;
         }
-        car->SetState(state);
-        car->controls = scenario.controls;
 
         if (remote) {
             CarState remoteState;
@@ -1487,19 +2289,77 @@ int main(int argc, char** argv) {
         }
 
         BallState ballState;
-        ballState.pos = Vec(0, 0, 1500);
+        ballState = ballCustom
+            ? MakeCustomBallState(argc, argv)
+            : (carBallCustom ? MakeCarBallCustomBallState(argc, argv) : BallState());
+        if (!ballCustom && !carBallCustom) {
+            ballState.pos = Vec(0, 0, 1500);
+        }
         arena->ball->SetState(ballState);
 
         std::cout << std::setprecision(9);
-        PrintShape(car);
-        PrintState("initial", 0, car, arena);
-        const bool staged = scenarioName == "custom" || customProbe
+        if (ballCustom) {
+            PrintBallState("initial", 0, arena->ball, arena);
+        } else {
+            PrintShape(car);
+            PrintPlaneTransforms(arena);
+            PrintState("initial", 0, car, arena);
+            if (carBallCustom) {
+                PrintBallState("initial_ball", 0, arena->ball, arena);
+            }
+        }
+        const bool staged = scenarioName == "custom" || customProbe || ballCustom
+            || carBallCustom
             || (argc >= 5 && std::string(argv[4]) == "staged");
         for (int tick = 1; tick <= ticks; ++tick) {
             traceTick = tick;
             solverRowCall = 0;
             if (staged) {
                 arena->_bulletWorld.setWorldUserInfo(arena);
+                if (carBallCustom) {
+                    btVector3 proxyMinimum;
+                    btVector3 proxyMaximum;
+                    arena->_bulletWorld.getBroadphase()->getAabb(
+                        arena->ball->_rigidBody.getBroadphaseHandle(),
+                        proxyMinimum,
+                        proxyMaximum);
+                    std::cout << "{\"record\":\"ball_broadphase_proxy\",\"tick\":"
+                              << tick << ",\"minimum\":";
+                    PrintVec(proxyMinimum);
+                    std::cout << ",\"maximum\":";
+                    PrintVec(proxyMaximum);
+                    const auto* rsProxy = static_cast<const btRSBroadphaseProxy*>(
+                        arena->ball->_rigidBody.getBroadphaseHandle());
+                    std::cout << ",\"cell_index\":" << rsProxy->cellIdx
+                              << ",\"cell_i\":" << rsProxy->iIdx
+                              << ",\"cell_j\":" << rsProxy->jIdx
+                              << ",\"cell_k\":" << rsProxy->kIdx;
+                    std::cout << ",\"transform_origin\":";
+                    PrintVec(arena->ball->_rigidBody.getWorldTransform().getOrigin());
+                    std::cout << "}\n";
+                }
+                // Arena::Step performs this before every pre-tick hook. Keep
+                // staged car/ball traces on the identical Bullet activation
+                // path so a motionless ball skips applyGravity until contact
+                // wakes it later in the step.
+                if (arena->ball->_rigidBody.m_linearVelocity.length2() == 0
+                    && arena->ball->_rigidBody.m_angularVelocity.length2() == 0) {
+                    arena->ball->_rigidBody.setActivationState(ISLAND_SLEEPING);
+                } else {
+                    arena->ball->_rigidBody.setActivationState(ACTIVE_TAG);
+                }
+                if (ballCustom) {
+                    arena->ball->_PreTickUpdate(
+                        arena->gameMode, arena->tickTime);
+                    PrintBallState("after_ball_pre", tick, arena->ball, arena);
+                    arena->_bulletWorld.stepSimulation(
+                        arena->tickTime, 0, arena->tickTime);
+                    PrintBallState("after_bullet", tick, arena->ball, arena);
+                    arena->ball->_FinishPhysicsTick(arena->_mutatorConfig);
+                    arena->tickCount++;
+                    PrintBallState("post", tick, arena->ball, arena);
+                    continue;
+                }
                 const btVector3 preVehicleLinear = car->_rigidBody.getLinearVelocity();
                 const btVector3 preVehicleAngular = car->_rigidBody.getAngularVelocity();
                 if (customScenario) {
@@ -1520,6 +2380,15 @@ int main(int argc, char** argv) {
                         tick);
                 }
                 PrintState("after_car_pre", tick, car, arena);
+                if (carBallCustom && tick <= 3) {
+                    PrintPredictedBroadphaseAabb(
+                        "car", car->_rigidBody, arena->tickTime, tick);
+                    PrintPredictedBroadphaseAabb(
+                        "ball", arena->ball->_rigidBody, arena->tickTime, tick);
+                }
+                if (carBallCustom && tick <= 3) {
+                    PrintPositiveXPlaneSupport(car, arena, tick);
+                }
                 if (scenarioName == "custom" || customProbe) {
                     if (!customProbe) {
                         PrintBvhTraversal(car, arena, tick);
@@ -1528,6 +2397,9 @@ int main(int argc, char** argv) {
                         PrintGjkProbe(car, arena, bodyIndex, faceIndex, tick);
                         PrintEpaProbe(car, arena, bodyIndex, faceIndex, tick);
                     }
+                }
+                if (carBallCustom) {
+                    PrintCarBallGjkProbe(car, arena, tick);
                 }
                 if (scenarioName == "ramp_transition" && tick == 563) {
                     PrintGjkProbe(car, arena, 10, 371, tick);
@@ -1545,7 +2417,13 @@ int main(int argc, char** argv) {
                     PrintGjkProbe(car, arena, 10, 825, tick);
                 }
                 arena->_bulletWorld.stepSimulation(arena->tickTime, 0, arena->tickTime);
+                if (carBallCustom) {
+                    PrintDispatcherManifolds(tick, car, arena);
+                }
                 PrintState("after_bullet", tick, car, arena);
+                if (carBallCustom) {
+                    PrintBallState("after_bullet_ball", tick, arena->ball, arena);
+                }
                 if (scenarioName == "back_wall_transition" && tick == 440) {
                     PrintGjkProbe(car, arena, 11, 632, tick);
                     PrintGjkProbe(car, arena, 11, 634, tick);
@@ -1566,6 +2444,8 @@ int main(int argc, char** argv) {
         }
         gContactAddedCallback = priorContactAddedCallback;
         traceCar = nullptr;
+        traceBody = nullptr;
+        traceBallBody = nullptr;
         traceArena = nullptr;
         traceTick = 0;
         delete arena;

@@ -26,6 +26,7 @@ class RivalSim:
         self.device = str(wp.get_device(device))
         self.defer_car_angular_cap = False
         self.defer_car_linear_cap = False
+        self.defer_ball_physics = False
         self.num_envs = num_envs
         initial = (
             StateSnapshot.random(num_envs, seed) if randomize else StateSnapshot.empty(num_envs)
@@ -122,6 +123,7 @@ class RivalSim:
             inputs=[
                 int(self.defer_car_linear_cap),
                 int(self.defer_car_angular_cap),
+                int(self.defer_ball_physics),
                 state.car_pos,
                 state.car_vel,
                 state.car_quat,

@@ -8,7 +8,12 @@ import numpy as np
 import warp as wp
 
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
+from rivalsim.ball_world_state import BallWorldState
+from rivalsim.car_ball_state import CarBallState
+from rivalsim.kernels.ball_world import ball_world_tick, initialize_ball_world_internal
 from rivalsim.kernels.boost_pad import PAD_COUNT, SOCCAR_PAD_POSITIONS, boost_pad_tick
+from rivalsim.kernels.car_ball import capture_car_ball_inputs, car_ball_tick
+from rivalsim.kernels.rsqrtss_amd import amd_rsqrtss_table
 from rivalsim.kernels.vehicle import (
     chassis_contacts_v021,
     increment_tick_counter,
@@ -104,6 +109,10 @@ class StaticWorldSim(RivalSim):
             self.reset(initial)
         self.variant = variant
         self.variant_level = VARIANT_LEVEL[variant]
+        self.enable_ball_wheel_rays = False
+        self.amd_rsqrtss_mantissa = wp.array(
+            amd_rsqrtss_table(), dtype=wp.uint16, device=self.device
+        )
         self.defer_car_angular_cap = self.variant_level >= 3
         self.defer_car_linear_cap = self.variant_level >= 3
         self.geometry = geometry or ArenaGeometry.load_soccar(collision_root)
@@ -203,6 +212,27 @@ class StaticWorldSim(RivalSim):
             state = self.state
             controls = self.controls
             vehicle = self.vehicle
+            ball_world = getattr(self, "ball_world", None)
+            # RocketSim's vehicle raycaster and bilateral wheel-friction path
+            # read the ball's btRigidBody transform and velocity directly.
+            # Keep those internal Bullet-unit values resident instead of
+            # round-tripping them through the public UU state, which can move
+            # a dynamic wheel witness by one float32 ULP after integration.
+            ball_position_bt = (
+                state.ball_pos
+                if ball_world is None
+                else ball_world.position_bt
+            )
+            ball_velocity_bt = (
+                state.ball_vel
+                if ball_world is None
+                else ball_world.velocity_bt
+            )
+            ball_proxy_min_bt = (
+                state.ball_pos
+                if ball_world is None
+                else ball_world.broadphase_proxy_min_bt
+            )
             wp.launch(
                 wheel_pre_tick,
                 dim=state.car_count,
@@ -215,6 +245,13 @@ class StaticWorldSim(RivalSim):
                     self.meshes.bullet_bvh_rank,
                     self.meshes.face_mesh_index,
                     int(self.variant_level >= 2),
+                    int(self.enable_ball_wheel_rays),
+                    self.amd_rsqrtss_mantissa,
+                    ball_position_bt,
+                    state.ball_quat,
+                    ball_velocity_bt,
+                    state.ball_ang_vel,
+                    ball_proxy_min_bt,
                     state.car_pos,
                     state.car_vel,
                     state.car_quat,
@@ -277,6 +314,7 @@ class StaticWorldSim(RivalSim):
                 ],
                 device=self.device,
             )
+            self._after_wheel_pre_tick()
         # B1 is intentionally the isolated ray-query component benchmark; the
         # contact-rich origins remain fixed while the device action tape turns.
         if self.variant_level != 1:
@@ -368,6 +406,223 @@ class StaticWorldSim(RivalSim):
             increment_tick_counter,
             dim=1,
             inputs=[self.tick_counter],
+            device=self.device,
+        )
+
+    def _after_wheel_pre_tick(self) -> None:
+        """Extension point after RocketSim wheel impulses and before Bullet solve."""
+
+
+class DynamicWorldSim(StaticWorldSim):
+    """v0.3 resident Soccar world with the bounded dynamic-contact phases."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.enable_ball_wheel_rays = True
+        self.defer_ball_physics = True
+        self.ball_world = BallWorldState(self.num_envs, self.device)
+        self.car_ball = CarBallState(self.num_envs, self.device)
+        self._initialize_ball_world_internal()
+
+    @property
+    def logical_state_bytes(self) -> int:
+        base = super().logical_state_bytes
+        ball_world = getattr(self, "ball_world", None)
+        car_ball = getattr(self, "car_ball", None)
+        return (
+            base
+            + (0 if ball_world is None else ball_world.logical_bytes)
+            + (0 if car_ball is None else car_ball.logical_bytes)
+        )
+
+    def reset(self, state: StateSnapshot | None = None, *, seed: int | None = None) -> None:
+        super().reset(state, seed=seed)
+        if hasattr(self, "ball_world"):
+            self.ball_world = BallWorldState(self.num_envs, self.device)
+            self.car_ball = CarBallState(self.num_envs, self.device)
+            self._initialize_ball_world_internal()
+
+    def _initialize_ball_world_internal(self) -> None:
+        wp.launch(
+            initialize_ball_world_internal,
+            dim=self.num_envs,
+            inputs=[
+                self.state.ball_pos,
+                self.state.ball_vel,
+                self.ball_world.position_bt,
+                self.ball_world.velocity_bt,
+                self.ball_world.broadphase_proxy_min_bt,
+            ],
+            device=self.device,
+        )
+
+    def _launch_tick(self) -> None:
+        super()._launch_tick()
+        state = self.state
+        ball = self.ball_world
+        wp.launch(
+            ball_world_tick,
+            dim=self.num_envs,
+            inputs=[
+                self.meshes.default.id,
+                self.meshes.points_bt,
+                self.meshes.indices,
+                self.amd_rsqrtss_mantissa,
+                self.meshes.internal_edge_face_normals,
+                self.meshes.internal_edge_crosses,
+                self.meshes.internal_edge_normal_bs,
+                self.meshes.internal_edge_angles,
+                self.meshes.internal_edge_flags,
+                self.meshes.bullet_bvh_rank,
+                self.meshes.face_mesh_index,
+                state.ball_pos,
+                state.ball_vel,
+                state.ball_quat,
+                state.ball_ang_vel,
+                ball.position_bt,
+                ball.velocity_bt,
+                ball.broadphase_proxy_min_bt,
+                ball.contact_count,
+                ball.candidate_count,
+                ball.candidate_overflow,
+                ball.contact_overflow,
+                ball.contact_local_a_bt,
+                ball.contact_point_b_bt,
+                ball.contact_normal,
+                ball.contact_distance_bt,
+                ball.contact_face,
+                ball.contact_mesh,
+                ball.contact_lifetime,
+                ball.contact_normal_impulse,
+                ball.contact_tangent_impulse,
+                ball.contact_tangent,
+                ball.contact_normal_jacobian,
+                ball.contact_tangent_jacobian,
+                ball.contact_normal_rhs,
+                ball.contact_tangent_rhs,
+                ball.contact_push_rhs,
+                ball.contact_push_impulse,
+                ball.candidate_face,
+            ],
+            device=self.device,
+        )
+        pair = self.car_ball
+        wp.launch(
+            car_ball_tick,
+            dim=self.num_envs,
+            inputs=[
+                self.tick_counter,
+                self.amd_rsqrtss_mantissa,
+                self.meshes.rs_static_cell_mask,
+                self.meshes.rs_static_aabb_min_bt,
+                self.meshes.rs_static_aabb_max_bt,
+                self.meshes.rs_equal_island_permutation,
+                self.vehicle.total_force_bt,
+                self.vehicle.total_torque_bt,
+                state.car_pos,
+                state.car_vel,
+                state.car_quat,
+                state.car_ang_vel,
+                self.vehicle.rigid_position_bt,
+                self.vehicle.rigid_velocity_bt,
+                state.ball_pos,
+                state.ball_vel,
+                state.ball_quat,
+                state.ball_ang_vel,
+                ball.position_bt,
+                ball.velocity_bt,
+                self.vehicle.contact_count,
+                self.vehicle.contact_local_a,
+                self.vehicle.contact_normal,
+                self.vehicle.contact_tangent,
+                self.vehicle.contact_mesh,
+                self.vehicle.contact_normal_jacobian,
+                self.vehicle.contact_tangent_jacobian,
+                self.vehicle.contact_normal_rhs,
+                self.vehicle.contact_tangent_rhs,
+                self.vehicle.contact_push_rhs,
+                self.vehicle.contact_normal_impulse,
+                self.vehicle.contact_tangent_impulse,
+                self.vehicle.contact_push_impulse,
+                ball.contact_count,
+                ball.contact_local_a_bt,
+                ball.contact_normal,
+                ball.contact_tangent,
+                ball.contact_mesh,
+                ball.contact_normal_jacobian,
+                ball.contact_tangent_jacobian,
+                ball.contact_normal_rhs,
+                ball.contact_tangent_rhs,
+                ball.contact_push_rhs,
+                ball.contact_normal_impulse,
+                ball.contact_tangent_impulse,
+                ball.contact_push_impulse,
+                pair.pre_car_position_bt,
+                pair.pre_car_velocity_bt,
+                pair.pre_car_quaternion,
+                pair.pre_car_angular_velocity,
+                pair.pre_ball_position_bt,
+                pair.pre_ball_velocity_bt,
+                pair.pre_ball_quaternion,
+                pair.pre_ball_angular_velocity,
+                pair.contact_count,
+                pair.hit_this_tick,
+                pair.algorithm_active,
+                pair.contact_point_a_bt,
+                pair.contact_point_b_bt,
+                pair.contact_normal,
+                pair.contact_tangent,
+                pair.contact_distance_bt,
+                pair.normal_impulse,
+                pair.tangent_impulse,
+                pair.push_impulse,
+                pair.extra_hit_velocity_uu,
+                pair.relative_pos_on_ball_uu,
+                pair.last_extra_impulse_tick,
+                pair.manifold_local_a_bt,
+                pair.manifold_local_b_bt,
+                pair.manifold_normal,
+                pair.manifold_tangent,
+                pair.manifold_distance_bt,
+                pair.manifold_lifetime,
+                pair.manifold_normal_jacobian,
+                pair.manifold_tangent_jacobian,
+                pair.manifold_normal_rhs,
+                pair.manifold_tangent_rhs,
+                pair.manifold_push_rhs,
+                pair.manifold_normal_impulse,
+                pair.manifold_tangent_impulse,
+                pair.manifold_push_impulse,
+            ],
+            device=self.device,
+        )
+
+    def _after_wheel_pre_tick(self) -> None:
+        state = self.state
+        vehicle = self.vehicle
+        ball = self.ball_world
+        pair = self.car_ball
+        wp.launch(
+            capture_car_ball_inputs,
+            dim=self.num_envs,
+            inputs=[
+                vehicle.rigid_position_bt,
+                vehicle.rigid_velocity_bt,
+                vehicle.solver_orientation,
+                vehicle.solver_angular_velocity,
+                ball.position_bt,
+                ball.velocity_bt,
+                state.ball_quat,
+                state.ball_ang_vel,
+                pair.pre_car_position_bt,
+                pair.pre_car_velocity_bt,
+                pair.pre_car_quaternion,
+                pair.pre_car_angular_velocity,
+                pair.pre_ball_position_bt,
+                pair.pre_ball_velocity_bt,
+                pair.pre_ball_quaternion,
+                pair.pre_ball_angular_velocity,
+            ],
             device=self.device,
         )
 

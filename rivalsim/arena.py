@@ -23,6 +23,13 @@ SOCCAR_HEIGHT = np.float32(2048.0)
 CMF_HEADER = struct.Struct("<ii")
 MAX_CMF_ELEMENTS = 1_000_000
 
+RS_BROADPHASE_MIN_BT = np.asarray((-112.0, -120.0, 0.0), dtype=np.float32)
+RS_BROADPHASE_CELL_SIZE_BT = np.float32(7.4)
+RS_BROADPHASE_DIMS = (31, 33, 6)
+RS_STATIC_BODY_COUNT = 20
+RS_CONTACT_AABB_EXPANSION_BT = np.float32(0.08)
+RS_MAX_ISLAND_MANIFOLDS = RS_STATIC_BODY_COUNT * 2 + 1
+
 
 _BULLET_FACE_NORMAL = r"""
     // The pinned Windows build uses btVector3::normalize's _mm_rsqrt_ss
@@ -666,6 +673,23 @@ class WarpArenaMeshes:
         self.face_mesh_index = wp.array(
             face_mesh_index, dtype=wp.int32, device=self.device
         )
+        static_cell_mask, static_aabb_min, static_aabb_max = (
+            build_rs_static_broadphase_data(geometry)
+        )
+        self.rs_static_cell_mask = wp.array(
+            static_cell_mask, dtype=wp.uint32, device=self.device
+        )
+        self.rs_static_aabb_min_bt = wp.array(
+            static_aabb_min, dtype=wp.vec3, device=self.device
+        )
+        self.rs_static_aabb_max_bt = wp.array(
+            static_aabb_max, dtype=wp.vec3, device=self.device
+        )
+        self.rs_equal_island_permutation = wp.array(
+            build_equal_island_permutation_table(),
+            dtype=wp.int32,
+            device=self.device,
+        )
         # Keep the conventional mesh for AABB iteration. cuBQL currently does
         # not implement mesh_query_aabb, but is benchmarked for wheel rays.
         self.default = wp.Mesh(self.points, self.indices)
@@ -685,6 +709,182 @@ class WarpArenaMeshes:
         self.cubql.refit()
         self.default_bt.refit()
         self.cubql_bt.refit()
+
+
+def build_rs_static_broadphase_data(
+    geometry: ArenaGeometry,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Build the pinned btRSBroadphase static-cell membership table.
+
+    RocketSim inserts a triangle-mesh proxy into a grid cell only when the
+    mesh BVH reports at least one triangle AABB for that cell, then also
+    inserts it into the 26 neighboring cells. Analytic half-space planes use
+    their source AABBs directly. The returned bit mask preserves the twenty
+    Soccar static-body slots in creation order and is used by the v0.3
+    unified island solver to retain zero-contact manifolds in Bullet's global
+    quicksort operation order.
+    """
+
+    dims = RS_BROADPHASE_DIMS
+    occupancy = np.zeros((RS_STATIC_BODY_COUNT, *dims), dtype=np.bool_)
+    static_min = np.empty((RS_STATIC_BODY_COUNT, 3), dtype=np.float32)
+    static_max = np.empty((RS_STATIC_BODY_COUNT, 3), dtype=np.float32)
+
+    def cell_bounds(axis: int, index: int) -> tuple[np.float32, np.float32]:
+        start = np.float32(
+            RS_BROADPHASE_MIN_BT[axis]
+            + np.float32(index) * RS_BROADPHASE_CELL_SIZE_BT
+        )
+        return start, np.float32(start + RS_BROADPHASE_CELL_SIZE_BT)
+
+    def candidate_indices(
+        axis: int, minimum: np.float32, maximum: np.float32
+    ) -> range:
+        raw_min = int(
+            np.floor(
+                np.float32(minimum - RS_BROADPHASE_MIN_BT[axis])
+                / RS_BROADPHASE_CELL_SIZE_BT
+            )
+        )
+        raw_max = int(
+            np.floor(
+                np.float32(maximum - RS_BROADPHASE_MIN_BT[axis])
+                / RS_BROADPHASE_CELL_SIZE_BT
+            )
+        )
+        return range(max(0, raw_min - 1), min(dims[axis] - 1, raw_max + 1) + 1)
+
+    # The immutable combined mesh is stored in numeric suffix order, but
+    # RocketSim creates its sixteen mesh bodies from Windows directory
+    # iteration order (lexicographic names: mesh_0, mesh_1, mesh_10, ...).
+    # Broadphase manifold slots use that source-body index, exactly like the
+    # per-face ownership table below.
+    body_order = {
+        mesh.path: body_index
+        for body_index, mesh in enumerate(
+            sorted(geometry.meshes, key=lambda value: value.path.name.casefold())
+        )
+    }
+    for mesh in geometry.meshes:
+        mesh_index = body_order[mesh.path]
+        vertices = mesh.vertices_bt
+        mesh_min = vertices.min(axis=0).astype(np.float32)
+        mesh_max = vertices.max(axis=0).astype(np.float32)
+        static_min[mesh_index] = mesh_min - RS_CONTACT_AABB_EXPANSION_BT
+        static_max[mesh_index] = mesh_max + RS_CONTACT_AABB_EXPANSION_BT
+        base = np.zeros(dims, dtype=np.bool_)
+        for triangle_indices in mesh.triangles:
+            triangle = vertices[triangle_indices]
+            triangle_min = triangle.min(axis=0).astype(np.float32)
+            triangle_max = triangle.max(axis=0).astype(np.float32)
+            for i in candidate_indices(0, triangle_min[0], triangle_max[0]):
+                cell_min_x, cell_max_x = cell_bounds(0, i)
+                if cell_max_x < triangle_min[0] or cell_min_x > triangle_max[0]:
+                    continue
+                for j in candidate_indices(1, triangle_min[1], triangle_max[1]):
+                    cell_min_y, cell_max_y = cell_bounds(1, j)
+                    if cell_max_y < triangle_min[1] or cell_min_y > triangle_max[1]:
+                        continue
+                    for k in candidate_indices(2, triangle_min[2], triangle_max[2]):
+                        cell_min_z, cell_max_z = cell_bounds(2, k)
+                        if (
+                            cell_max_z >= triangle_min[2]
+                            and cell_min_z <= triangle_max[2]
+                        ):
+                            base[i, j, k] = True
+        for i, j, k in np.argwhere(base):
+            occupancy[
+                mesh_index,
+                max(0, i - 1) : min(dims[0], i + 2),
+                max(0, j - 1) : min(dims[1], j + 2),
+                max(0, k - 1) : min(dims[2], k + 2),
+            ] = True
+
+    large = np.float32(1.0e18)
+    plane_min = np.full((4, 3), -large, dtype=np.float32)
+    plane_max = np.full((4, 3), large, dtype=np.float32)
+    plane_max[0, 2] = np.float32(0.2)
+    plane_min[1, 2] = np.float32(40.96 - 0.2)
+    plane_max[2, 0] = np.float32(-81.92 + 0.2)
+    plane_min[3, 0] = np.float32(81.92 - 0.2)
+    plane_min -= RS_CONTACT_AABB_EXPANSION_BT
+    plane_max += RS_CONTACT_AABB_EXPANSION_BT
+    for plane in range(4):
+        body = 16 + plane
+        static_min[body] = plane_min[plane]
+        static_max[body] = plane_max[plane]
+        ranges: list[range] = []
+        for axis in range(3):
+            minimum = int(
+                np.float32(plane_min[plane, axis] - RS_BROADPHASE_MIN_BT[axis])
+                / RS_BROADPHASE_CELL_SIZE_BT
+            )
+            maximum = int(
+                np.float32(plane_max[plane, axis] - RS_BROADPHASE_MIN_BT[axis])
+                / RS_BROADPHASE_CELL_SIZE_BT
+            )
+            minimum = max(0, min(dims[axis] - 1, minimum))
+            maximum = max(0, min(dims[axis] - 1, maximum))
+            ranges.append(range(minimum, maximum + 1))
+        for i in ranges[0]:
+            for j in ranges[1]:
+                for k in ranges[2]:
+                    occupancy[
+                        body,
+                        max(0, i - 1) : min(dims[0], i + 2),
+                        max(0, j - 1) : min(dims[1], j + 2),
+                        max(0, k - 1) : min(dims[2], k + 2),
+                    ] = True
+
+    flattened = np.zeros(np.prod(dims), dtype=np.uint32)
+    for body in range(RS_STATIC_BODY_COUNT):
+        flattened |= occupancy[body].reshape(-1).astype(np.uint32) << np.uint32(body)
+    return (
+        np.ascontiguousarray(flattened),
+        np.ascontiguousarray(static_min),
+        np.ascontiguousarray(static_max),
+    )
+
+
+def build_equal_island_permutation_table() -> np.ndarray:
+    """Return Bullet's exact all-equal quicksort permutation for 0..41 slots.
+
+    A car/ball island can contain twenty ball/static manifolds, the dynamic
+    pair manifold, and twenty car/static manifolds. Empty broadphase
+    manifolds remain in ``btSimulationIslandManager::m_islandmanifold`` and
+    therefore participate in ``btAlignedObjectArray::quickSortInternal``.
+    Every entry in this bounded path has the same island id, so neither inner
+    comparison advances; the swaps and recursion below are the literal source
+    operation order.
+    """
+
+    width = RS_MAX_ISLAND_MANIFOLDS
+    result = np.full((width + 1, width), -1, dtype=np.int32)
+
+    def quicksort(values: list[int], low: int, high: int) -> None:
+        i = low
+        j = high
+        # The source copies this pivot value, although an all-equal predicate
+        # never observes it. Keep the read to mirror the pinned algorithm.
+        _pivot = values[(low + high) // 2]
+        while True:
+            if i <= j:
+                values[i], values[j] = values[j], values[i]
+                i += 1
+                j -= 1
+            if i > j:
+                break
+        if low < j:
+            quicksort(values, low, j)
+        if i < high:
+            quicksort(values, i, high)
+
+    for count in range(width + 1):
+        values = list(range(count))
+        if count > 1:
+            quicksort(values, 0, count - 1)
+        result[count, :count] = values
+    return np.ascontiguousarray(result.reshape(-1))
 
 
 def build_face_mesh_index(geometry: ArenaGeometry) -> np.ndarray:

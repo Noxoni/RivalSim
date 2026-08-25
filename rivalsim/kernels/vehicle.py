@@ -548,6 +548,142 @@ def _bullet_transform_point(
 ) -> wp.vec3: ...
 
 
+_BULLET_PLANE_CONTACT_WITNESS = r"""
+    // btConvexPlaneCollisionAlgorithm::processCollision evaluates the box
+    // support in plane-local space, projects it there, transforms the point
+    // on B back to world space, and only then does btManifoldResult reconstruct
+    // point A.  Collapsing the two identity-basis plane transforms is not
+    // float32-equivalent because the plane origin is subtracted and added
+    // around the support transform.
+    auto plane_add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto plane_sub = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fsub_rn(a, b);
+    #else
+        volatile float value = a - b;
+        return value;
+    #endif
+    };
+    auto plane_mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    struct PlaneWitnessV3 { float x; float y; float z; };
+    auto make = [](float x, float y, float z) -> PlaneWitnessV3 {
+        PlaneWitnessV3 value = {x, y, z};
+        return value;
+    };
+    auto add = [&](PlaneWitnessV3 a, PlaneWitnessV3 b) -> PlaneWitnessV3 {
+        return make(
+            plane_add(a.x, b.x),
+            plane_add(a.y, b.y),
+            plane_add(a.z, b.z));
+    };
+    auto sub = [&](PlaneWitnessV3 a, PlaneWitnessV3 b) -> PlaneWitnessV3 {
+        return make(
+            plane_sub(a.x, b.x),
+            plane_sub(a.y, b.y),
+            plane_sub(a.z, b.z));
+    };
+    auto scale = [&](PlaneWitnessV3 value, float amount) -> PlaneWitnessV3 {
+        return make(
+            plane_mul(value.x, amount),
+            plane_mul(value.y, amount),
+            plane_mul(value.z, amount));
+    };
+    auto dot = [&](PlaneWitnessV3 a, PlaneWitnessV3 b) -> float {
+        return plane_add(
+            plane_add(
+                plane_mul(a.x, b.x),
+                plane_mul(a.y, b.y)),
+            plane_mul(a.z, b.z));
+    };
+    auto transform = [&](PlaneWitnessV3 origin, PlaneWitnessV3 point)
+        -> PlaneWitnessV3 {
+        return make(
+            plane_add(
+                plane_add(
+                    plane_add(
+                        plane_mul(basis.data[0][0], point.x),
+                        plane_mul(basis.data[0][1], point.y)),
+                    plane_mul(basis.data[0][2], point.z)),
+                origin.x),
+            plane_add(
+                plane_add(
+                    plane_add(
+                        plane_mul(basis.data[1][0], point.x),
+                        plane_mul(basis.data[1][1], point.y)),
+                    plane_mul(basis.data[1][2], point.z)),
+                origin.y),
+            plane_add(
+                plane_add(
+                    plane_add(
+                        plane_mul(basis.data[2][0], point.x),
+                        plane_mul(basis.data[2][1], point.y)),
+                    plane_mul(basis.data[2][2], point.z)),
+                origin.z));
+    };
+
+    const PlaneWitnessV3 body_origin = make(
+        body_origin_bt[0], body_origin_bt[1], body_origin_bt[2]);
+    const PlaneWitnessV3 plane_origin = make(
+        plane_origin_bt[0], plane_origin_bt[1], plane_origin_bt[2]);
+    const PlaneWitnessV3 child_origin = make(
+        child_origin_bt[0], child_origin_bt[1], child_origin_bt[2]);
+    const PlaneWitnessV3 support = make(
+        local_support_bt[0], local_support_bt[1], local_support_bt[2]);
+    const PlaneWitnessV3 normal = make(
+        plane_normal[0], plane_normal[1], plane_normal[2]);
+
+    // bodyWorld * childTransform, then planeWorld.inverse() * convexWorld.
+    const PlaneWitnessV3 convex_world_origin =
+        transform(body_origin, child_origin);
+    const PlaneWitnessV3 convex_in_plane_origin =
+        sub(convex_world_origin, plane_origin);
+    const PlaneWitnessV3 support_in_plane =
+        transform(convex_in_plane_origin, support);
+    const float depth = dot(normal, support_in_plane);
+
+    // The four RocketSim arena planes have identity bases and zero local
+    // constants. Preserve Bullet's vector multiply/subtract/add boundaries.
+    const PlaneWitnessV3 projected_in_plane =
+        sub(support_in_plane, scale(normal, depth));
+    const PlaneWitnessV3 point_b = add(projected_in_plane, plane_origin);
+    const PlaneWitnessV3 point_a = add(point_b, scale(normal, depth));
+
+    point_a_bt = wp::vec_t<3, wp::float32>(
+        point_a.x, point_a.y, point_a.z);
+    point_b_bt = wp::vec_t<3, wp::float32>(
+        point_b.x, point_b.y, point_b.z);
+    distance_bt = depth;
+"""
+
+
+@wp.func_native(_BULLET_PLANE_CONTACT_WITNESS)
+def _bullet_plane_contact_witness(
+    body_origin_bt: wp.vec3,
+    basis: wp.mat33,
+    plane_origin_bt: wp.vec3,
+    plane_normal: wp.vec3,
+    child_origin_bt: wp.vec3,
+    local_support_bt: wp.vec3,
+    point_a_bt: wp.ref[wp.vec3],
+    point_b_bt: wp.ref[wp.vec3],
+    distance_bt: wp.ref[wp.float32],
+): ...
+
+
 _BULLET_SELECTED_TRIANGLE_RAYCAST = r"""
     // btTriangleRaycastCallback::processTriangle specialized to the face
     // selected by Warp's acceleration structure. Warp finds the candidate;
@@ -1025,7 +1161,7 @@ _BULLET_WHEEL_SUSPENSION = r"""
 
     float pushback = prior_pushback_bt;
     const float push_threshold = op_sub(op_add(rest_length_bt, radius_bt), 0.05f);
-    if (trace_distance < push_threshold) {
+    if (dynamic_ground == 0 && trace_distance < push_threshold) {
         const float distance = op_sub(trace_distance, push_threshold);
         const WheelV3 torque_axis = cross(relative_position, contact_normal);
         const float inverse_local[3] = {0.0185644571f, 0.0104337428f, 0.0075815497f};
@@ -1092,11 +1228,533 @@ def _bullet_wheel_suspension(
     force_scale: float,
     solver_time_step: float,
     prior_pushback_bt: float,
+    dynamic_ground: int,
     suspension_length_bt: wp.ref[wp.float32],
     suspension_relative_velocity_bt: wp.ref[wp.float32],
     suspension_clipped_inverse: wp.ref[wp.float32],
     suspension_force_bt: wp.ref[wp.float32],
     extra_pushback_bt: wp.ref[wp.float32],
+): ...
+
+
+_BULLET_RAY_SPHERE = r"""
+    struct RayV3 {
+        float x;
+        float y;
+        float z;
+    };
+    struct RayClosest {
+        RayV3 closest;
+        float weights[4];
+        int used;
+        int valid;
+        int degenerate;
+    };
+
+    auto op_add = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fadd_rn(a, b);
+    #else
+        volatile float value = a + b;
+        return value;
+    #endif
+    };
+    auto op_sub = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fsub_rn(a, b);
+    #else
+        volatile float value = a - b;
+        return value;
+    #endif
+    };
+    auto op_mul = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fmul_rn(a, b);
+    #else
+        volatile float value = a * b;
+        return value;
+    #endif
+    };
+    auto op_div = [](float a, float b) -> float {
+    #if defined(__CUDA_ARCH__)
+        return __fdiv_rn(a, b);
+    #else
+        volatile float value = a / b;
+        return value;
+    #endif
+    };
+    auto make = [](float x, float y, float z) -> RayV3 {
+        RayV3 value = {x, y, z};
+        return value;
+    };
+    auto vadd = [&](RayV3 a, RayV3 b) -> RayV3 {
+        return make(op_add(a.x, b.x), op_add(a.y, b.y), op_add(a.z, b.z));
+    };
+    auto vsub = [&](RayV3 a, RayV3 b) -> RayV3 {
+        return make(op_sub(a.x, b.x), op_sub(a.y, b.y), op_sub(a.z, b.z));
+    };
+    auto vneg = [&](RayV3 a) -> RayV3 {
+        return make(-a.x, -a.y, -a.z);
+    };
+    auto scale = [&](RayV3 a, float amount) -> RayV3 {
+        return make(op_mul(a.x, amount), op_mul(a.y, amount), op_mul(a.z, amount));
+    };
+    auto dot = [&](RayV3 a, RayV3 b) -> float {
+        return op_add(
+            op_add(op_mul(a.x, b.x), op_mul(a.y, b.y)),
+            op_mul(a.z, b.z));
+    };
+    auto length2 = [&](RayV3 a) -> float { return dot(a, a); };
+    auto cross = [&](RayV3 a, RayV3 b) -> RayV3 {
+        return make(
+            op_sub(op_mul(a.y, b.z), op_mul(a.z, b.y)),
+            op_sub(op_mul(a.z, b.x), op_mul(a.x, b.z)),
+            op_sub(op_mul(a.x, b.y), op_mul(a.y, b.x)));
+    };
+    auto sse_normalize = [&](RayV3 value) -> RayV3 {
+        const float squared = length2(value);
+        float inverse;
+    #if defined(__CUDA_ARCH__)
+        const unsigned input_bits = __float_as_uint(squared);
+        const unsigned exponent = (input_bits >> 23) & 0xffu;
+        const unsigned result_exponent = ((380u - exponent) >> 1) << 23;
+        const unsigned index = (input_bits >> 11) & 0x1fffu;
+        const unsigned estimate_mantissa =
+            static_cast<unsigned>(rsqrtss_mantissa.data[index]) << 11;
+        inverse = __uint_as_float(result_exponent | estimate_mantissa);
+    #elif defined(__clang__) && (defined(__x86_64__) || defined(_M_X64))
+        typedef float RayFloat4 __attribute__((__vector_size__(16)));
+        const RayFloat4 estimate_input = {squared, 0.0f, 0.0f, 0.0f};
+        const RayFloat4 estimate = __builtin_ia32_rsqrtss(estimate_input);
+        inverse = estimate[0];
+    #elif defined(_MSC_VER)
+        const __m128 estimate_input = _mm_set_ss(squared);
+        inverse = _mm_cvtss_f32(_mm_rsqrt_ss(estimate_input));
+    #else
+        inverse = op_div(1.0f, sqrtf(squared));
+    #endif
+        float correction = op_mul(op_mul(squared, 0.5f), inverse);
+        correction = op_mul(correction, inverse);
+        correction = op_sub(1.5f, correction);
+        inverse = op_mul(inverse, correction);
+        return scale(value, inverse);
+    };
+
+    const RayV3 ray_from = make(source[0], source[1], source[2]);
+    const RayV3 ray_to = make(target[0], target[1], target[2]);
+    const RayV3 sphere_center = make(center[0], center[1], center[2]);
+    const RayV3 r = vsub(ray_to, ray_from);
+    auto sphere_basis_transpose_mul = [&](RayV3 value) -> RayV3 {
+        return make(
+            op_add(op_add(
+                op_mul(value.x, sphere_basis.data[0][0]),
+                op_mul(value.y, sphere_basis.data[1][0])),
+                op_mul(value.z, sphere_basis.data[2][0])),
+            op_add(op_add(
+                op_mul(value.x, sphere_basis.data[0][1]),
+                op_mul(value.y, sphere_basis.data[1][1])),
+                op_mul(value.z, sphere_basis.data[2][1])),
+            op_add(op_add(
+                op_mul(value.x, sphere_basis.data[0][2]),
+                op_mul(value.y, sphere_basis.data[1][2])),
+                op_mul(value.z, sphere_basis.data[2][2])));
+    };
+    auto sphere_basis_mul = [&](RayV3 value) -> RayV3 {
+        return make(
+            op_add(op_add(
+                op_mul(sphere_basis.data[0][0], value.x),
+                op_mul(sphere_basis.data[0][1], value.y)),
+                op_mul(sphere_basis.data[0][2], value.z)),
+            op_add(op_add(
+                op_mul(sphere_basis.data[1][0], value.x),
+                op_mul(sphere_basis.data[1][1], value.y)),
+                op_mul(sphere_basis.data[1][2], value.z)),
+            op_add(op_add(
+                op_mul(sphere_basis.data[2][0], value.x),
+                op_mul(sphere_basis.data[2][1], value.y)),
+                op_mul(sphere_basis.data[2][2], value.z)));
+    };
+    auto sphere_support = [&](RayV3 direction, RayV3 sphere_origin) -> RayV3 {
+        const RayV3 local_direction = sphere_basis_transpose_mul(direction);
+        RayV3 normalized;
+        if (length2(local_direction) < op_mul(1.1920929e-7f, 1.1920929e-7f)) {
+            normalized = sse_normalize(make(-1.0f, -1.0f, -1.0f));
+        } else {
+            normalized = sse_normalize(local_direction);
+        }
+        return vadd(sphere_origin, sphere_basis_mul(scale(normalized, radius)));
+    };
+
+    RayV3 simplex_w[5];
+    RayV3 simplex_p[5];
+    RayV3 simplex_q[5];
+    int simplex_count = 0;
+    RayV3 last_w = make(1.0e18f, 1.0e18f, 1.0e18f);
+    RayV3 cached_p1 = make(0.0f, 0.0f, 0.0f);
+    RayV3 cached_p2 = make(0.0f, 0.0f, 0.0f);
+    RayV3 cached_v = make(0.0f, 0.0f, 0.0f);
+
+    auto result_reset = [&](RayClosest& result) {
+        result.closest = make(0.0f, 0.0f, 0.0f);
+        result.weights[0] = 0.0f;
+        result.weights[1] = 0.0f;
+        result.weights[2] = 0.0f;
+        result.weights[3] = 0.0f;
+        result.used = 0;
+        result.valid = 0;
+        result.degenerate = 0;
+    };
+    auto result_valid = [&](RayClosest& result) -> int {
+        return result.weights[0] >= 0.0f && result.weights[1] >= 0.0f
+            && result.weights[2] >= 0.0f && result.weights[3] >= 0.0f;
+    };
+    auto triangle_closest = [&](RayV3 a, RayV3 b, RayV3 c, RayClosest& result) {
+        result_reset(result);
+        const RayV3 ab = vsub(b, a);
+        const RayV3 ac = vsub(c, a);
+        const RayV3 ap = vneg(a);
+        const float d1 = dot(ab, ap);
+        const float d2 = dot(ac, ap);
+        if (d1 <= 0.0f && d2 <= 0.0f) {
+            result.closest = a;
+            result.weights[0] = 1.0f;
+            result.used = 1;
+            result.valid = 1;
+            return;
+        }
+        const RayV3 bp = vneg(b);
+        const float d3 = dot(ab, bp);
+        const float d4 = dot(ac, bp);
+        if (d3 >= 0.0f && d4 <= d3) {
+            result.closest = b;
+            result.weights[1] = 1.0f;
+            result.used = 2;
+            result.valid = 1;
+            return;
+        }
+        const float vc = op_sub(op_mul(d1, d4), op_mul(d3, d2));
+        if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f) {
+            const float amount = op_div(d1, op_sub(d1, d3));
+            result.closest = vadd(a, scale(ab, amount));
+            result.weights[0] = op_sub(1.0f, amount);
+            result.weights[1] = amount;
+            result.used = 3;
+            result.valid = 1;
+            return;
+        }
+        const RayV3 cp = vneg(c);
+        const float d5 = dot(ab, cp);
+        const float d6 = dot(ac, cp);
+        if (d6 >= 0.0f && d5 <= d6) {
+            result.closest = c;
+            result.weights[2] = 1.0f;
+            result.used = 4;
+            result.valid = 1;
+            return;
+        }
+        const float vb = op_sub(op_mul(d5, d2), op_mul(d1, d6));
+        if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f) {
+            const float amount = op_div(d2, op_sub(d2, d6));
+            result.closest = vadd(a, scale(ac, amount));
+            result.weights[0] = op_sub(1.0f, amount);
+            result.weights[2] = amount;
+            result.used = 5;
+            result.valid = 1;
+            return;
+        }
+        const float va = op_sub(op_mul(d3, d6), op_mul(d5, d4));
+        const float d43 = op_sub(d4, d3);
+        const float d56 = op_sub(d5, d6);
+        if (va <= 0.0f && d43 >= 0.0f && d56 >= 0.0f) {
+            const float amount = op_div(d43, op_add(d43, d56));
+            result.closest = vadd(b, scale(vsub(c, b), amount));
+            result.weights[1] = op_sub(1.0f, amount);
+            result.weights[2] = amount;
+            result.used = 6;
+            result.valid = 1;
+            return;
+        }
+        const float inverse = op_div(1.0f, op_add(op_add(va, vb), vc));
+        const float amount_v = op_mul(vb, inverse);
+        const float amount_w = op_mul(vc, inverse);
+        result.closest = vadd(vadd(a, scale(ab, amount_v)), scale(ac, amount_w));
+        result.weights[0] = op_sub(op_sub(1.0f, amount_v), amount_w);
+        result.weights[1] = amount_v;
+        result.weights[2] = amount_w;
+        result.used = 7;
+        result.valid = 1;
+    };
+    auto outside_plane = [&](RayV3 a, RayV3 b, RayV3 c, RayV3 d) -> int {
+        const RayV3 normal = cross(vsub(b, a), vsub(c, a));
+        const float sign_p = dot(vneg(a), normal);
+        const float sign_d = dot(vsub(d, a), normal);
+        if (op_mul(sign_d, sign_d) < op_mul(1.0e-4f, 1.0e-4f)) return -1;
+        return op_mul(sign_p, sign_d) < 0.0f ? 1 : 0;
+    };
+    auto tetrahedron_closest = [&](RayV3 a, RayV3 b, RayV3 c, RayV3 d,
+                                    RayClosest& result) -> int {
+        result_reset(result);
+        result.used = 15;
+        const int abc = outside_plane(a, b, c, d);
+        const int acd = outside_plane(a, c, d, b);
+        const int adb = outside_plane(a, d, b, c);
+        const int bdc = outside_plane(b, d, c, a);
+        if (abc < 0 || acd < 0 || adb < 0 || bdc < 0) {
+            result.degenerate = 1;
+            return 0;
+        }
+        if (!abc && !acd && !adb && !bdc) return 0;
+        float best = 3.402823466e38f;
+        RayClosest temporary;
+        if (abc) {
+            triangle_closest(a, b, c, temporary);
+            const float candidate = length2(temporary.closest);
+            if (candidate < best) {
+                best = candidate;
+                result.closest = temporary.closest;
+                result.used = temporary.used;
+                result.weights[0] = temporary.weights[0];
+                result.weights[1] = temporary.weights[1];
+                result.weights[2] = temporary.weights[2];
+                result.weights[3] = 0.0f;
+            }
+        }
+        if (acd) {
+            triangle_closest(a, c, d, temporary);
+            const float candidate = length2(temporary.closest);
+            if (candidate < best) {
+                best = candidate;
+                result.closest = temporary.closest;
+                result.used = 0;
+                if (temporary.used & 1) result.used |= 1;
+                if (temporary.used & 2) result.used |= 4;
+                if (temporary.used & 4) result.used |= 8;
+                result.weights[0] = temporary.weights[0];
+                result.weights[1] = 0.0f;
+                result.weights[2] = temporary.weights[1];
+                result.weights[3] = temporary.weights[2];
+            }
+        }
+        if (adb) {
+            triangle_closest(a, d, b, temporary);
+            const float candidate = length2(temporary.closest);
+            if (candidate < best) {
+                best = candidate;
+                result.closest = temporary.closest;
+                result.used = 0;
+                if (temporary.used & 1) result.used |= 1;
+                if (temporary.used & 2) result.used |= 8;
+                if (temporary.used & 4) result.used |= 2;
+                result.weights[0] = temporary.weights[0];
+                result.weights[1] = temporary.weights[2];
+                result.weights[2] = 0.0f;
+                result.weights[3] = temporary.weights[1];
+            }
+        }
+        if (bdc) {
+            triangle_closest(b, d, c, temporary);
+            const float candidate = length2(temporary.closest);
+            if (candidate < best) {
+                result.closest = temporary.closest;
+                result.used = 0;
+                if (temporary.used & 1) result.used |= 2;
+                if (temporary.used & 2) result.used |= 8;
+                if (temporary.used & 4) result.used |= 4;
+                result.weights[0] = 0.0f;
+                result.weights[1] = temporary.weights[0];
+                result.weights[2] = temporary.weights[2];
+                result.weights[3] = temporary.weights[1];
+            }
+        }
+        result.valid = result_valid(result);
+        return 1;
+    };
+    auto remove_vertex = [&](int index) {
+        --simplex_count;
+        simplex_w[index] = simplex_w[simplex_count];
+        simplex_p[index] = simplex_p[simplex_count];
+        simplex_q[index] = simplex_q[simplex_count];
+    };
+    auto reduce_vertices = [&](int used) {
+        if (simplex_count >= 4 && !(used & 8)) remove_vertex(3);
+        if (simplex_count >= 3 && !(used & 4)) remove_vertex(2);
+        if (simplex_count >= 2 && !(used & 2)) remove_vertex(1);
+        if (simplex_count >= 1 && !(used & 1)) remove_vertex(0);
+    };
+    auto simplex_closest = [&]() -> int {
+        RayClosest closest;
+        result_reset(closest);
+        if (simplex_count == 1) {
+            cached_p1 = simplex_p[0];
+            cached_p2 = simplex_q[0];
+            cached_v = vsub(cached_p1, cached_p2);
+            return 1;
+        }
+        if (simplex_count == 2) {
+            const RayV3 from = simplex_w[0];
+            const RayV3 to = simplex_w[1];
+            const RayV3 difference = vsub(to, from);
+            float parameter = dot(difference, vneg(from));
+            int used = 0;
+            if (parameter > 0.0f) {
+                const float dot_vv = dot(difference, difference);
+                if (parameter < dot_vv) {
+                    parameter = op_div(parameter, dot_vv);
+                    used = 3;
+                } else {
+                    parameter = 1.0f;
+                    used = 2;
+                }
+            } else {
+                parameter = 0.0f;
+                used = 1;
+            }
+            closest.weights[0] = op_sub(1.0f, parameter);
+            closest.weights[1] = parameter;
+            cached_p1 = vadd(simplex_p[0], scale(vsub(simplex_p[1], simplex_p[0]), parameter));
+            cached_p2 = vadd(simplex_q[0], scale(vsub(simplex_q[1], simplex_q[0]), parameter));
+            cached_v = vsub(cached_p1, cached_p2);
+            reduce_vertices(used);
+            return result_valid(closest);
+        }
+        if (simplex_count == 3) {
+            triangle_closest(simplex_w[0], simplex_w[1], simplex_w[2], closest);
+            cached_p1 = vadd(
+                vadd(scale(simplex_p[0], closest.weights[0]), scale(simplex_p[1], closest.weights[1])),
+                scale(simplex_p[2], closest.weights[2]));
+            cached_p2 = vadd(
+                vadd(scale(simplex_q[0], closest.weights[0]), scale(simplex_q[1], closest.weights[1])),
+                scale(simplex_q[2], closest.weights[2]));
+            cached_v = vsub(cached_p1, cached_p2);
+            reduce_vertices(closest.used);
+            return result_valid(closest);
+        }
+        const int separated = tetrahedron_closest(
+            simplex_w[0], simplex_w[1], simplex_w[2], simplex_w[3], closest);
+        if (separated) {
+            cached_p1 = vadd(vadd(vadd(
+                scale(simplex_p[0], closest.weights[0]),
+                scale(simplex_p[1], closest.weights[1])),
+                scale(simplex_p[2], closest.weights[2])),
+                scale(simplex_p[3], closest.weights[3]));
+            cached_p2 = vadd(vadd(vadd(
+                scale(simplex_q[0], closest.weights[0]),
+                scale(simplex_q[1], closest.weights[1])),
+                scale(simplex_q[2], closest.weights[2])),
+                scale(simplex_q[3], closest.weights[3]));
+            cached_v = vsub(cached_p1, cached_p2);
+            reduce_vertices(closest.used);
+        } else if (closest.degenerate) {
+            return 0;
+        } else {
+            cached_v = make(0.0f, 0.0f, 0.0f);
+            return 1;
+        }
+        return result_valid(closest);
+    };
+    auto in_simplex = [&](RayV3 value) -> int {
+        for (int index = 0; index < simplex_count; ++index) {
+            if (length2(vsub(simplex_w[index], value)) <= 0.0001f) return 1;
+        }
+        return value.x == last_w.x && value.y == last_w.y && value.z == last_w.z;
+    };
+
+    float lambda = 0.0f;
+    RayV3 interpolated_a = ray_from;
+    RayV3 interpolated_b = sphere_center;
+    const RayV3 initial_b = sphere_support(r, sphere_center);
+    RayV3 v = vsub(ray_from, initial_b);
+    RayV3 n = make(0.0f, 0.0f, 0.0f);
+    float dist2 = length2(v);
+    int remaining = 32;
+    int cast_valid = 1;
+    while (dist2 > 0.0001f && remaining--) {
+        const RayV3 support_a = interpolated_a;
+        const RayV3 support_b = sphere_support(v, interpolated_b);
+        RayV3 w = vsub(support_a, support_b);
+        const float v_dot_w = dot(v, w);
+        if (lambda > 1.0f) {
+            cast_valid = 0;
+            break;
+        }
+        if (v_dot_w > 0.0f) {
+            const float v_dot_r = dot(v, r);
+            if (v_dot_r >= -op_mul(1.1920929e-7f, 1.1920929e-7f)) {
+                cast_valid = 0;
+                break;
+            }
+            lambda = op_sub(lambda, op_div(v_dot_w, v_dot_r));
+            // btVector3::setInterpolate3 uses (1-lambda)*from + lambda*to
+            // in the pinned SSE build, rather than from + lambda*(to-from).
+            interpolated_a = vadd(
+                scale(ray_from, op_sub(1.0f, lambda)),
+                scale(ray_to, lambda));
+            // The pinned btSubsimplexConvexCast interpolates both transform
+            // origins after every lambda advance. fromB and toB are the same
+            // rigid sphere transform, but setInterpolate3 still evaluates
+            // (1-lambda)*fromB + lambda*toB and its float32 roundoff feeds the
+            // next support query.
+            interpolated_b = vadd(
+                scale(sphere_center, op_sub(1.0f, lambda)),
+                scale(sphere_center, lambda));
+            w = vsub(support_a, support_b);
+            n = v;
+        }
+        if (!in_simplex(w)) {
+            last_w = w;
+            simplex_w[simplex_count] = w;
+            simplex_p[simplex_count] = support_a;
+            simplex_q[simplex_count] = support_b;
+            ++simplex_count;
+        }
+        if (simplex_closest()) {
+            v = cached_v;
+            dist2 = length2(v);
+        } else {
+            dist2 = 0.0f;
+        }
+    }
+
+    if (cast_valid) {
+        RayV3 normal = make(0.0f, 0.0f, 0.0f);
+        if (length2(n) >= op_mul(1.1920929e-7f, 1.1920929e-7f)) {
+            normal = sse_normalize(n);
+        }
+        if (dot(normal, r) >= 0.0f) cast_valid = 0;
+        if (cast_valid && length2(normal) > 0.0001f && lambda < maximum_fraction) {
+            // rayTestSingleInternal normalizes the cast result a second time,
+            // then btDefaultVehicleRaycaster normalizes the callback normal.
+            normal = sse_normalize(normal);
+            normal = sse_normalize(normal);
+            fraction_out = lambda;
+            const RayV3 point = vadd(
+                scale(ray_from, op_sub(1.0f, lambda)),
+                scale(ray_to, lambda));
+            point_out = wp::vec_t<3, wp::float32>(point.x, point.y, point.z);
+            normal_out = wp::vec_t<3, wp::float32>(normal.x, normal.y, normal.z);
+            valid = 1;
+        } else {
+            valid = 0;
+        }
+    } else {
+        valid = 0;
+    }
+"""
+
+
+@wp.func_native(_BULLET_RAY_SPHERE)
+def _bullet_ray_sphere(
+    source: wp.vec3,
+    target: wp.vec3,
+    center: wp.vec3,
+    sphere_basis: wp.mat33,
+    radius: float,
+    maximum_fraction: float,
+    rsqrtss_mantissa: wp.array(dtype=wp.uint16),
+    fraction_out: wp.ref[wp.float32],
+    point_out: wp.ref[wp.vec3],
+    normal_out: wp.ref[wp.vec3],
+    valid: wp.ref[wp.int32],
 ): ...
 
 
@@ -1296,6 +1954,9 @@ _BULLET_WHEEL_FRICTION = r"""
     const WheelV3 normal = make(surface_normal[0],surface_normal[1],surface_normal[2]);
     const WheelV3 linear = make(linear_velocity_bt[0],linear_velocity_bt[1],linear_velocity_bt[2]);
     const WheelV3 angular = make(angular_velocity_world[0],angular_velocity_world[1],angular_velocity_world[2]);
+    const WheelV3 ground_origin = make(ground_origin_bt[0],ground_origin_bt[1],ground_origin_bt[2]);
+    const WheelV3 ground_linear = make(ground_linear_velocity_bt[0],ground_linear_velocity_bt[1],ground_linear_velocity_bt[2]);
+    const WheelV3 ground_angular = make(ground_angular_velocity_world[0],ground_angular_velocity_world[1],ground_angular_velocity_world[2]);
 
     WheelV3 axle = make(raw_axle[0],raw_axle[1],raw_axle[2]);
     const float projection = dot(axle, normal);
@@ -1304,6 +1965,10 @@ _BULLET_WHEEL_FRICTION = r"""
 
     const WheelV3 relative = sub(point, origin);
     const WheelV3 velocity = add(linear, cross(angular, relative));
+    const WheelV3 ground_relative = sub(point, ground_origin);
+    WheelV3 ground_velocity = make(0.0f,0.0f,0.0f);
+    if (dynamic_ground != 0)
+        ground_velocity = add(ground_linear,cross(ground_angular,ground_relative));
 
     // btJacobianEntry transforms rel_pos.cross(axis) into chassis-local space,
     // applies the diagonal local inverse inertia, then forms its diagonal.
@@ -1316,16 +1981,39 @@ _BULLET_WHEEL_FRICTION = r"""
         op_mul(0.0185644571f,local_torque.x),
         op_mul(0.0104337428f,local_torque.y),
         op_mul(0.0075815497f,local_torque.z));
-    const float diagonal = op_add(0.00555555569f,dot(inverse_mass_torque,local_torque));
+    float diagonal = op_add(0.00555555569f,dot(inverse_mass_torque,local_torque));
+    if (dynamic_ground != 0) {
+        // Two-body btJacobianEntry does not collapse the sphere's isotropic
+        // inertia in world space. It transforms rel_pos.cross(-axis) into the
+        // ball's local basis, multiplies by the stored local inverse inertia,
+        // and accumulates massA + angularA + massB + angularB left-to-right.
+        const WheelV3 ground_torque_world = cross(ground_relative,scale(axle,-1.0f));
+        const WheelV3 ground_torque_local = make(
+            op_add(op_add(op_mul(ground_basis.data[0][0],ground_torque_world.x),op_mul(ground_basis.data[1][0],ground_torque_world.y)),op_mul(ground_basis.data[2][0],ground_torque_world.z)),
+            op_add(op_add(op_mul(ground_basis.data[0][1],ground_torque_world.x),op_mul(ground_basis.data[1][1],ground_torque_world.y)),op_mul(ground_basis.data[2][1],ground_torque_world.z)),
+            op_add(op_add(op_mul(ground_basis.data[0][2],ground_torque_world.x),op_mul(ground_basis.data[1][2],ground_torque_world.y)),op_mul(ground_basis.data[2][2],ground_torque_world.z)));
+        const WheelV3 ground_inverse_mass_torque = make(
+            op_mul(0.0250203293f,ground_torque_local.x),
+            op_mul(0.0250203293f,ground_torque_local.y),
+            op_mul(0.0250203293f,ground_torque_local.z));
+        diagonal = op_add(
+            op_add(diagonal,0.0333333351f),
+            dot(ground_inverse_mass_torque,ground_torque_local));
+    }
     const float inverse_diagonal = op_div(1.0f,diagonal);
-    const float relative_lateral_velocity = dot(axle,velocity);
+    const float relative_lateral_velocity = dot(axle,sub(velocity,ground_velocity));
     const float side = op_mul(
         op_mul(-0.2f,relative_lateral_velocity),inverse_diagonal);
 
     float rolling = 0.0f;
     if (engine_force_bt == 0.0f) {
         if (brake_force_bt != 0.0f) {
-            float relative_forward_velocity = dot(velocity,forward);
+            // RocketSim passes carRelContactPoint to the ground body's
+            // getVelocityInLocalPoint call in this legacy rolling branch.
+            WheelV3 rolling_ground_velocity = make(0.0f,0.0f,0.0f);
+            if (dynamic_ground != 0)
+                rolling_ground_velocity = add(ground_linear,cross(ground_angular,relative));
+            float relative_forward_velocity = dot(sub(velocity,rolling_ground_velocity),forward);
             if (time_step > 0.0125000002f) {
                 const float threshold = op_add(
                     -op_div(1.0f,op_mul(time_step,150.0f)),0.8f);
@@ -1364,9 +2052,14 @@ _BULLET_WHEEL_FRICTION = r"""
 @wp.func_native(_BULLET_WHEEL_FRICTION)
 def _bullet_wheel_friction(
     basis: wp.mat33,
+    ground_basis: wp.mat33,
     body_origin_bt: wp.vec3,
     linear_velocity_bt: wp.vec3,
     angular_velocity_world: wp.vec3,
+    dynamic_ground: int,
+    ground_origin_bt: wp.vec3,
+    ground_linear_velocity_bt: wp.vec3,
+    ground_angular_velocity_world: wp.vec3,
     contact_point_bt: wp.vec3,
     surface_normal: wp.vec3,
     raw_axle: wp.vec3,
@@ -2070,6 +2763,9 @@ def _bullet_contact_row(
 
 
 _BULLET_SOLVE_SPLIT_ROW = r"""
+    // gResolveSplitPenetrationImpulse_sse2 returns before reading or
+    // modifying either solver body when m_rhsPenetration is exactly zero.
+    if (rhs == 0.0f) return;
     auto op_add = [](float a, float b) -> float {
     #if defined(__CUDA_ARCH__)
         return __fadd_rn(a, b);
@@ -2489,6 +3185,13 @@ def wheel_pre_tick(
     bullet_bvh_rank: wp.array(dtype=wp.int32),
     face_mesh_index: wp.array(dtype=wp.int32),
     enable_forces: int,
+    enable_ball_rays: int,
+    amd_rsqrtss_mantissa: wp.array(dtype=wp.uint16),
+    ball_position_bt: wp.array(dtype=wp.vec3),
+    ball_quat: wp.array(dtype=wp.quat),
+    ball_velocity_bt: wp.array(dtype=wp.vec3),
+    ball_ang_vel: wp.array(dtype=wp.vec3),
+    ball_broadphase_proxy_min_bt: wp.array(dtype=wp.vec3),
     car_pos: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
@@ -2581,6 +3284,8 @@ def wheel_pre_tick(
     abs_speed = wp.abs(forward_speed)
     contact_count = 0
     normal_sum = wp.vec3(0.0, 0.0, 0.0)
+    world_contact_count = 0
+    world_normal_sum = wp.vec3(0.0, 0.0, 0.0)
     solver_dt = DT
     if tick_counter[0] == 0:
         # btContactSolverInfo starts at 60 Hz and is changed by the first
@@ -2622,6 +3327,8 @@ def wheel_pre_tick(
         source_point_bt = wp.vec3(0.0, 0.0, 0.0)
         source_normal = wp.vec3(0.0, 0.0, 0.0)
         source_valid = wp.int32(0)
+        hit_dynamic = wp.int32(0)
+        dynamic_ground_basis = bullet_basis
         # Warp's closest-hit ray test can select a different face before the
         # retained face is reconstructed with Bullet arithmetic.  Gather the
         # short ray's AABB candidates, run the pinned
@@ -2736,6 +3443,62 @@ def wheel_pre_tick(
                 source_normal = plane_hit_normal
                 source_valid = wp.int32(1)
                 hit_face = plane_face
+        # btRSBroadphase's short-ray path visits every dynamic handle resident
+        # in the ray-origin cell, without a per-proxy AABB test. Dynamic
+        # handles occupy the 3x3x3 neighborhood around the cell selected from
+        # their cached AABB minimum. The cache is intentionally one Bullet
+        # updateAabbs phase behind this vehicle pre-tick.
+        dynamic_ball_visible = wp.int32(0)
+        if enable_ball_rays != 0 and car % 2 == 0:
+            env = car // 2
+            proxy_min_bt = ball_broadphase_proxy_min_bt[env]
+            ray_cell_i = wp.int32((source_bt[0] + 112.0) / 7.4)
+            ray_cell_j = wp.int32((source_bt[1] + 120.0) / 7.4)
+            ray_cell_k = wp.int32(source_bt[2] / 7.4)
+            proxy_cell_i = wp.int32((proxy_min_bt[0] + 112.0) / 7.4)
+            proxy_cell_j = wp.int32((proxy_min_bt[1] + 120.0) / 7.4)
+            proxy_cell_k = wp.int32(proxy_min_bt[2] / 7.4)
+            ray_cell_i = wp.max(0, wp.min(30, ray_cell_i))
+            ray_cell_j = wp.max(0, wp.min(32, ray_cell_j))
+            ray_cell_k = wp.max(0, wp.min(5, ray_cell_k))
+            proxy_cell_i = wp.max(0, wp.min(30, proxy_cell_i))
+            proxy_cell_j = wp.max(0, wp.min(32, proxy_cell_j))
+            proxy_cell_k = wp.max(0, wp.min(5, proxy_cell_k))
+            if (
+                wp.abs(ray_cell_i - proxy_cell_i) <= 1
+                and wp.abs(ray_cell_j - proxy_cell_j) <= 1
+                and wp.abs(ray_cell_k - proxy_cell_k) <= 1
+            ):
+                dynamic_ball_visible = wp.int32(1)
+        if dynamic_ball_visible != 0:
+            env = car // 2
+            ball_basis = _bullet_quaternion_matrix(ball_quat[env])
+            dynamic_ground_basis = ball_basis
+            ball_fraction = wp.float32(0.0)
+            ball_hit_point_bt = wp.vec3(0.0, 0.0, 0.0)
+            ball_hit_normal = wp.vec3(0.0, 0.0, 0.0)
+            ball_valid = wp.int32(0)
+            _bullet_ray_sphere(
+                source_bt,
+                target_bt,
+                ball_position_bt[env],
+                ball_basis,
+                1.8249999284744263,
+                closest_fraction,
+                amd_rsqrtss_mantissa,
+                ball_fraction,
+                ball_hit_point_bt,
+                ball_hit_normal,
+                ball_valid,
+            )
+            if ball_valid != 0:
+                closest_fraction = ball_fraction
+                source_fraction = ball_fraction
+                source_point_bt = ball_hit_point_bt
+                source_normal = ball_hit_normal
+                source_valid = wp.int32(1)
+                hit_dynamic = wp.int32(1)
+                hit_face = wp.int32(-6)
         if source_valid != 0:
             distance_bt = ray_length_bt * source_fraction
             normal = source_normal
@@ -2762,6 +3525,9 @@ def wheel_pre_tick(
         if hit:
             contact_count = contact_count + 1
             normal_sum = normal_sum + normal
+            if hit_dynamic == 0:
+                world_contact_count = world_contact_count + 1
+                world_normal_sum = world_normal_sum + normal
             sus_length_bt = wp.float32(0.0)
             sus_velocity_bt = wp.float32(0.0)
             force_value_bt = wp.float32(0.0)
@@ -2781,6 +3547,7 @@ def wheel_pre_tick(
                 force_scale,
                 solver_dt,
                 prior_pushback_bt,
+                hit_dynamic,
                 sus_length_bt,
                 sus_velocity_bt,
                 clipped,
@@ -2827,9 +3594,14 @@ def wheel_pre_tick(
             old_brake = brake_acceleration[wheel_index]
             _bullet_wheel_friction(
                 bullet_basis,
+                dynamic_ground_basis,
                 rigid_position_bt[car],
                 base_vel_bt,
                 base_ang_vel,
+                hit_dynamic,
+                ball_position_bt[car // 2],
+                ball_velocity_bt[car // 2],
+                ball_ang_vel[car // 2],
                 hit_point_bt,
                 normal,
                 raw_axle,
@@ -2887,7 +3659,7 @@ def wheel_pre_tick(
             debug_fraction = source_fraction
         debug_wheel_ray_fraction[wheel_index] = debug_fraction
         wheel_contact[wheel_index] = wp.int32(hit)
-        wheel_world_contact[wheel_index] = wp.int32(hit)
+        wheel_world_contact[wheel_index] = wp.int32(hit and hit_dynamic == 0)
 
     if enable_forces != 0:
         air_control_disabled[car] = wp.int32(contact_count > 0)
@@ -3048,7 +3820,13 @@ def wheel_pre_tick(
         solver_angular_velocity[car] = ang_vel
         rigid_velocity_bt[car] = vel_bt
         queued_force_bt = wp.vec3(0.0, 0.0, 0.0)
-        if contact_count > 0:
+        if world_contact_count > 0:
+            # Car::_UpdateWheels gates sticky force on
+            # m_isInContactWithWorld. Once that gate passes,
+            # btVehicleRL::getUpwardsDirFromWheelContacts averages every
+            # m_isInContact wheel normal, including dynamic ball hits.
+            # Dynamic hits alone do not queue sticky force, but they do
+            # participate in its direction when any world wheel is present.
             upwards = wp.normalize(normal_sum)
             sticky_scale = 0.5
             if real_throttle != 0.0 or abs_speed > STOPPING_FORWARD_VEL:
@@ -3085,41 +3863,6 @@ def wheel_pre_tick(
         solver_velocity[car] = base_vel
         solver_angular_velocity[car] = base_ang_vel
     wheels_with_contact[car] = contact_count
-
-
-@wp.func
-def _contact_support_point(
-    pos_bt: wp.vec3,
-    basis: wp.mat33,
-    normal: wp.vec3,
-    plane_support_direction: wp.array(dtype=wp.float32),
-    support_base: int,
-) -> wp.vec3:
-    """Return Bullet's compound-child box support point in BT units."""
-
-    # btConvexPlaneCollisionAlgorithm first transforms the plane direction by
-    # the child-world basis. The child has identity local rotation, so this is
-    # the rigid-body basis transpose with Bullet's SSE dot grouping.
-    local_direction = _bullet_inverse_transform_point(
-        wp.vec3(0.0, 0.0, 0.0), basis, -normal
-    )
-    local_support_bt = GJK_CORE_HALF_BT + wp.vec3(
-        GJK_MARGIN_BT, GJK_MARGIN_BT, GJK_MARGIN_BT
-    )
-    for axis in range(3):
-        direction = local_direction[axis]
-        if direction < 0.0:
-            local_support_bt[axis] = -local_support_bt[axis]
-        plane_support_direction[support_base + axis] = direction
-    # btCompoundCollisionAlgorithm materializes bodyWorld * childTransform,
-    # rounding the child origin before btConvexPlaneCollisionAlgorithm applies
-    # the box support vertex. Do not collapse the two transforms.
-    child_origin_bt = _bullet_transform_point(
-        pos_bt, basis, GJK_OFFSET_BT
-    )
-    return _bullet_transform_point(
-        child_origin_bt, basis, local_support_bt
-    )
 
 
 @wp.func
@@ -3987,6 +4730,63 @@ _BULLET_INTEGRATE_QUATERNION = r"""
         return result;
     #endif
     };
+    auto op_sin = [](float value) -> float {
+    #if defined(__CUDA_ARCH__)
+        // Literal small-positive-domain path from the pinned ucrtbase!sinf
+        // export. Bullet supplies |angle * dt / 2| <= pi/8 here. Preserve
+        // its double operations and FMA order; CUDA sinf and CUDA's general
+        // double sin do not round identically to the authority runtime.
+        const unsigned bits = __float_as_uint(value) & 0x7fffffffu;
+        if (bits < 0x39000000u) return value;
+        const double x = static_cast<double>(value);
+        const double x2 = __dmul_rn(x, x);
+        const double x3 = __dmul_rn(x2, x);
+        if (bits < 0x3c000000u) {
+            return static_cast<float>(__fma_rn(
+                -x3, __longlong_as_double(0x3fc5555555555555ULL), x));
+        }
+        double polynomial = __longlong_as_double(0xbf2a01a01a01a01aULL);
+        polynomial = __fma_rn(
+            x2, __longlong_as_double(0x3ec71de3a556c734ULL), polynomial);
+        polynomial = __fma_rn(
+            polynomial, x2, __longlong_as_double(0x3f81111111111111ULL));
+        polynomial = __fma_rn(
+            polynomial, x2, __longlong_as_double(0xbfc5555555555555ULL));
+        return static_cast<float>(__fma_rn(polynomial, x3, x));
+    #else
+        volatile float result = ::sinf(value);
+        return result;
+    #endif
+    };
+    auto op_cos = [](float value) -> float {
+    #if defined(__CUDA_ARCH__)
+        // Matching small-positive-domain path from ucrtbase!cosf.
+        const unsigned bits = __float_as_uint(value) & 0x7fffffffu;
+        if (bits < 0x39000000u) return 1.0f;
+        const double x = static_cast<double>(value);
+        if (bits < 0x3c000000u) {
+            const double half_x = __dmul_rn(
+                x, __longlong_as_double(0x3fe0000000000000ULL));
+            return static_cast<float>(__fma_rn(-x, half_x, 1.0));
+        }
+        const double x2 = __dmul_rn(x, x);
+        const double half_x2 = __dmul_rn(
+            x2, __longlong_as_double(0x3fe0000000000000ULL));
+        const double base = __dsub_rn(1.0, half_x2);
+        double polynomial = __longlong_as_double(0x3efa01a01a01a019ULL);
+        polynomial = __fma_rn(
+            x2, __longlong_as_double(0xbe927e4fb7789f5cULL), polynomial);
+        polynomial = __fma_rn(
+            polynomial, x2, __longlong_as_double(0xbf56c16c16c16c16ULL));
+        polynomial = __fma_rn(
+            polynomial, x2, __longlong_as_double(0x3fa5555555555555ULL));
+        const double x4 = __dmul_rn(x2, x2);
+        return static_cast<float>(__fma_rn(polynomial, x4, base));
+    #else
+        volatile float result = ::cosf(value);
+        return result;
+    #endif
+    };
 
     float root;
     float qx;
@@ -4065,12 +4865,12 @@ _BULLET_INTEGRATE_QUATERNION = r"""
         axis_scale = op_sub(op_mul(0.5f, time_step), correction);
     } else {
         const float half_angle_step = op_mul(op_mul(0.5f, angle), time_step);
-        axis_scale = op_div(::sinf(half_angle_step), angle);
+        axis_scale = op_div(op_sin(half_angle_step), angle);
     }
     const float dx = op_mul(ax, axis_scale);
     const float dy = op_mul(ay, axis_scale);
     const float dz = op_mul(az, axis_scale);
-    const float dw = ::cosf(op_mul(op_mul(angle, time_step), 0.5f));
+    const float dw = op_cos(op_mul(op_mul(angle, time_step), 0.5f));
 
     // dorn * orn0, following the pinned four-lane SSE grouping.
     float x = op_add(
@@ -5088,22 +5888,41 @@ def chassis_contacts_v021(
             plane_point = wp.vec3(0.0, 0.0, SOCCAR_HEIGHT)
         elif plane == 2:
             normal = wp.vec3(1.0, 0.0, 0.0)
-            plane_point = wp.vec3(-SOCCAR_EXTENT_X, 0.0, 0.0)
+            plane_point = wp.vec3(
+                -SOCCAR_EXTENT_X, 0.0, SOCCAR_HEIGHT * 0.5
+            )
         elif plane == 3:
             normal = wp.vec3(-1.0, 0.0, 0.0)
-            plane_point = wp.vec3(SOCCAR_EXTENT_X, 0.0, 0.0)
-        point_bt = _contact_support_point(
+            plane_point = wp.vec3(
+                SOCCAR_EXTENT_X, 0.0, SOCCAR_HEIGHT * 0.5
+            )
+        plane_point_bt = plane_point * 0.02
+        local_direction = _bullet_inverse_transform_point(
+            wp.vec3(0.0, 0.0, 0.0), bullet_basis, -normal
+        )
+        local_support_bt = GJK_CORE_HALF_BT + wp.vec3(
+            GJK_MARGIN_BT, GJK_MARGIN_BT, GJK_MARGIN_BT
+        )
+        for axis in range(3):
+            direction = local_direction[axis]
+            if direction < 0.0:
+                local_support_bt[axis] = -local_support_bt[axis]
+            plane_support_direction[car * 12 + plane * 3 + axis] = direction
+        point_bt = wp.vec3(0.0, 0.0, 0.0)
+        source_point_b_bt = wp.vec3(0.0, 0.0, 0.0)
+        distance_bt = wp.float32(0.0)
+        _bullet_plane_contact_witness(
             rigid_position_bt[car],
             bullet_basis,
+            plane_point_bt,
             normal,
-            plane_support_direction,
-            car * 12 + plane * 3,
+            GJK_OFFSET_BT,
+            local_support_bt,
+            point_bt,
+            source_point_b_bt,
+            distance_bt,
         )
         point = point_bt * 50.0
-        plane_point_bt = plane_point * 0.02
-        distance_bt = _bullet_internal_edge_dot(
-            point_bt - plane_point_bt, normal
-        )
         distance = distance_bt * 50.0
         breaking_threshold = CONTACT_BREAKING_THRESHOLD
         if plane >= 2:
@@ -5122,12 +5941,7 @@ def chassis_contacts_v021(
                     bullet_basis,
                     point_bt,
                 )
-                raw_point_b_bt = _bullet_vector_scale_add(
-                    point_bt,
-                    normal,
-                    -distance_bt,
-                )
-                plane_local_b = raw_point_b_bt - plane_point_bt
+                plane_local_b = source_point_b_bt - plane_point_bt
                 refreshed_point_a_bt = _bullet_transform_point(
                     rigid_position_bt[car], bullet_basis, plane_local_a
                 )

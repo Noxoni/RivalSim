@@ -101,6 +101,7 @@ def _integrate_quaternion(quat: wp.quat, ang_vel: wp.vec3) -> wp.quat:
 def integrate_tick(
     defer_car_linear_cap: int,
     defer_car_angular_cap: int,
+    defer_ball_physics: int,
     car_pos: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
@@ -438,7 +439,7 @@ def integrate_tick(
     prev_handbrake[tid] = wp.int32(handbrake)
 
     # The even car thread advances its world's one free ball.
-    if tid % 2 == 0:
+    if tid % 2 == 0 and defer_ball_physics == 0:
         bpos = ball_pos[env]
         bvel = ball_vel[env] * BALL_DRAG_FACTOR
         bquat = ball_quat[env]
