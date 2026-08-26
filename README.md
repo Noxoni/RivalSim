@@ -11,7 +11,33 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.5 / Rival 2.0 Campaign 04 complete
+## Current boundary — v0.5 / Rival 2.0 overnight curriculum complete
+
+The uninterrupted overnight curriculum resumed Campaign 04's exact update-120 Reward V2
+checkpoint. Acquisition completed at update 420 after two consecutive 4,096-world held-out
+evaluations reached <=1% no-touch truncation. The explicit reward-only transition to the base
+`RIVAL2_REWARD_V1` preserved learned weights, optimizer, RNG, counters, opponent assignments,
+historical policies, and live runtime state exactly.
+
+Phase B then completed exactly 239 PPO updates / 2,004,877,312 additional Reward V1 samples.
+The user prospectively extended the final timed continuation from three to six hours; Phase C
+stopped at the first completed update crossing 21,600 seconds: update 5,403 /
+**45,323,649,024 cumulative samples** at 21,601.926 seconds. All 5,283 continuation updates
+passed integrity.
+
+The six hourly held-out touch rates were `66.022572`, `75.795357`, `79.884180`, `75.911922`,
+`83.108105`, and `85.483708` per simulated minute. Final goals/minute was `2.496403` and
+no-touch truncation was `0.003418`. This is bounded stochastic self-play evidence, not external
+Rocket League competence.
+
+Complete evidence is in `docs/RIVAL2_OVERNIGHT_RESULTS.md` and
+`results/rival2/overnight/`. The exact final resumable checkpoint is
+`checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt` with SHA-256
+`4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E`.
+
+No preflight/regression/parity/lint/test ceremony or viewer work was run, and v0.6 has not begun.
+
+### Campaign 04 source checkpoint
 
 Rival 2.0 Campaign 04 resumed the exact Campaign 03 checkpoint at update 12 / 100,663,296
 cumulative samples, including optimizer, RNG, counter, opponent-assignment, and historical-policy

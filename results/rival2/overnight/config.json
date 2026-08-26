@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "authority": "Rival 2.0 uninterrupted overnight acquisition-to-base-reward curriculum",
+  "user_steering_override": "Phase C extended prospectively from three to six real elapsed hours before the published run started",
+  "authorized_head": "83b0934fe254f6662cccc6bd45e0e2be4c449499",
+  "campaign04_closeout": "4c121fab8c4bfe38fbf60f1c81a47d2dce898235",
+  "resume_checkpoint": "checkpoints/rival2/campaign04/rival2_campaign04_1b_resume.pt",
+  "resume_checkpoint_sha256": "DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0",
+  "start_iteration": 120,
+  "start_agent_decision_samples": 1006632960,
+  "campaign_seed": 20260826,
+  "worlds": 131072,
+  "rollout_agent_decision_samples": 8388608,
+  "policy_config": {
+    "obs_dim": 182,
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "activation": "silu",
+    "actor_outputs": 13,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "dtype": "float32",
+    "autocast": false,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+  },
+  "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+  "ppo_config": {
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0.0,
+    "max_gradient_norm": 0.5,
+    "learning_rate": 0.0003,
+    "epochs": 2,
+    "rollout_horizon": 32,
+    "minibatch_size": 65536
+  },
+  "ppo_config_hash": "1ED4A47155B538DA16CB7FF5BD19804999E20619792DA4297125F9733B6F603A",
+  "self_play_config": {
+    "historical_chance": 0.2,
+    "historical_pool_bound": 16
+  },
+  "phase_a": {
+    "reward_version": "RIVAL2_REWARD_V2",
+    "reward_contract_hash": "54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32",
+    "evaluation_interval_updates": 30,
+    "no_touch_truncated_fraction_threshold": 0.01,
+    "required_consecutive_passing_evaluations": 2,
+    "sample_cap": null,
+    "stop_rule": "first evaluation checkpoint completing two consecutive ordinary held-out evaluations with no_touch_truncated_fraction <= 0.01"
+  },
+  "reward_transition": {
+    "source_reward_version": "RIVAL2_REWARD_V2",
+    "source_reward_contract_hash": "54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32",
+    "destination_reward_version": "RIVAL2_REWARD_V1",
+    "destination_reward_contract_hash": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "changed_semantics": [
+      "reward_contract"
+    ],
+    "removed_term": "per-agent approach-distance reward",
+    "preserve_all_non_reward_training_and_runtime_state": true
+  },
+  "phase_b": {
+    "reward_version": "RIVAL2_REWARD_V1",
+    "additional_updates": 239,
+    "additional_agent_decision_samples": 2004877312,
+    "evaluation_update_offsets": [
+      60,
+      120,
+      180,
+      239
+    ],
+    "stop_rule": "exactly 239 completed PPO updates after the reward switch"
+  },
+  "phase_c": {
+    "reward_version": "RIVAL2_REWARD_V1",
+    "timer": "time.perf_counter monotonic wall clock",
+    "thresholds_seconds": [
+      3600.0,
+      7200.0,
+      10800.0,
+      14400.0,
+      18000.0,
+      21600.0
+    ],
+    "checkpoint_labels": [
+      "1h",
+      "2h",
+      "3h",
+      "4h",
+      "5h",
+      "6h"
+    ],
+    "checkpoint_and_evaluation_overhead_counts": true,
+    "stop_rule": "first completed PPO update at or after 21600 elapsed seconds from the post-Phase-B boundary",
+    "predetermined_sample_target": null
+  },
+  "evaluation": {
+    "seed": 920260826,
+    "worlds": 4096,
+    "mode": "ordinary stochastic self-play",
+    "episode_scope": "first completed episode per world"
+  },
+  "snapshot_schedule": "continue the established Campaign 04 schedule by adding the current policy to the bounded historical pool at every authorized evaluation checkpoint before saving; when the bounded pool evicts a version, deterministically return live assignments to that unavailable version to current-policy self-play",
+  "prohibited": [
+    "preflight, smoke, parity, regression, lint, compile, or test ceremony",
+    "PPO, model, observation, action, episode, or self-play changes",
+    "reward changes other than the one authorized V2-to-V1 transition",
+    "viewer implementation",
+    "v0.6 work"
+  ]
+}

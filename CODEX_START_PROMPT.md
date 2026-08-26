@@ -1,28 +1,30 @@
-# Active Codex Handoff — Rival 2.0 Overnight Curriculum
+# Closed Codex Handoff — Rival 2.0 Overnight Curriculum Complete
 
-Campaign 04 is complete at update 120 / 1,006,632,960 cumulative samples. This handoff authorizes one uninterrupted overnight curriculum.
+The Rival 2.0 overnight curriculum is complete. The user prospectively extended the final
+Reward V1 wall-clock continuation from three hours to six hours before that final phase
+completed; the clean official lineage therefore stopped at the first completed PPO update
+crossing 21,600 elapsed Phase C seconds.
 
-Start from current `origin/main` and read `handoff/rival2-overnight/README.md` in full. Treat it as controlling.
+Completed boundary:
 
-Required completed Campaign 04 checkpoint:
+- acquisition completed at update 420 / 3,523,215,360 cumulative samples after two consecutive
+  4,096-world held-out evaluations reached no-touch truncation <=1%;
+- the reward-only `RIVAL2_REWARD_V2` -> `RIVAL2_REWARD_V1` transition passed exact state-custody
+  checks;
+- Phase B completed exactly 239 PPO updates / 2,004,877,312 additional base-reward samples;
+- Phase C completed at update 5,403 / 45,323,649,024 cumulative samples after 21,601.926
+  elapsed seconds at update completion;
+- all 5,283 continuation updates passed integrity;
+- the final six-hour held-out evaluation recorded 85.483708 touches/minute, 2.496403
+  goals/minute, and 0.003418 no-touch truncation;
+- the final full resumable checkpoint has SHA-256
+  `4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E` and passed exact reload.
 
-`checkpoints/rival2/campaign04/rival2_campaign04_1b_resume.pt`
+Published evidence:
 
-Expected SHA-256:
+- `docs/RIVAL2_OVERNIGHT_RESULTS.md`;
+- `results/rival2/overnight/`;
+- `checkpoints/rival2/overnight/`.
 
-`DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0`
-
-Mission:
-
-1. resume Reward V2 unchanged from the exact 1B checkpoint;
-2. evaluate every 30 updates until no-touch truncation is <=1% on two consecutive 4,096-world held-out evaluations;
-3. preserve that acquisition-complete checkpoint;
-4. explicitly transition only the reward from `RIVAL2_REWARD_V2` to the existing base `RIVAL2_REWARD_V1`, preserving learned/optimizer/RNG/counter/historical state and recording the authorized reward-only migration;
-5. train 239 additional PPO updates under Reward V1 (2,004,877,312 additional samples), with evaluations at +60/+120/+180/+239 updates;
-6. save the required full resumable 2B-base-reward checkpoint;
-7. immediately continue Reward V1 training for three real elapsed wall-clock hours, checkpoint/evaluate at approximately 1h/2h/3h, and stop after the first completed PPO update at or after 10,800 elapsed seconds;
-8. publish the compact overnight evidence package and final resumable checkpoint.
-
-Do not run preflight, smoke, parity/regression, world-count, pytest, Ruff, compileall, or other release-certification ceremony. Do not build the viewer. Do not alter PPO/model/observation/action/episode/self-play settings. Do not make any reward change other than the single authorized V2 -> V1 approach-removal transition. Do not begin v0.6.
-
-Execute all phases without returning for approval unless a genuine failure makes continued training invalid.
+There is no active continuation authorized by this file. Do not resume training, build the
+viewer, alter the frozen training contracts, or begin v0.6 without a new explicit handoff.

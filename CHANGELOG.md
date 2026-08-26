@@ -1,5 +1,36 @@
 # Changelog
 
+## Rival 2.0 overnight curriculum — acquisition, base reward, and six-hour continuation (2026-08-26)
+
+- Resumed the exact Campaign 04 checkpoint SHA-256
+  `DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0` at update 120 /
+  1,006,632,960 samples with optimizer, RNG, counters, opponent assignments, historical
+  policies, and live state intact.
+- Continued unchanged Reward V2 until the first two consecutive 4,096-world held-out
+  evaluations below the 1% no-touch threshold: updates 390 and 420 at `0.007324` and
+  `0.006104`. Acquisition completed at update 420 / 3,523,215,360 samples.
+- Added an explicit reward-curriculum checkpoint transition that permits only the authorized
+  `RIVAL2_REWARD_V2` -> `RIVAL2_REWARD_V1` contract change. Exact comparisons proved that model,
+  optimizer, RNG, counters, assignments, historical policies, and live runtime state did not
+  reset or drift.
+- Corrected bounded historical-pool eviction lifecycle by deterministically returning live
+  assignments to the current policy when their evicted snapshot leaves the 16-policy pool.
+  The official clean lineage then passed all historical-version eligibility checks.
+- Completed exactly 239 Reward V1 PPO updates / 2,004,877,312 additional Phase B samples. The
+  held-out curve was honestly non-monotonic, including no-touch regression to `0.152588` and
+  `0.139893` at offsets +180 and +239; no setting was retuned in response.
+- Applied the user's prospective extension of Phase C from three to six real elapsed hours.
+  Stopped at the first completed update crossing 21,600 seconds: update 5,403 /
+  45,323,649,024 cumulative samples at 21,601.926 seconds.
+- Published hourly held-out touch rates `66.022572`, `75.795357`, `79.884180`, `75.911922`,
+  `83.108105`, and `85.483708` per simulated minute. The final evaluation recorded `2.496403`
+  goals/minute and `0.003418` no-touch truncation.
+- Passed integrity for all 5,283 continuation updates and exact final-checkpoint reload. Published
+  the 48,720,678-byte full resumable checkpoint with SHA-256
+  `4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E`.
+- Did not run preflight, smoke, parity/regression, pytest, Ruff, compileall, viewer work, or v0.6
+  work.
+
 ## Rival 2.0 Campaign 04 — Reward V2 continuation to 1B (2026-08-25)
 
 - Verified and loaded the exact Campaign 03 checkpoint SHA-256

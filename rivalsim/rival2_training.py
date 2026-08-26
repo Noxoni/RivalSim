@@ -9,6 +9,7 @@ from typing import Any
 
 import torch
 
+from rivalsim.rival2_contracts import contract_hashes_for_reward
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -54,15 +55,17 @@ class HistoricalPolicyPool:
     def _refresh_version_tensor(self) -> None:
         self.version_tensor = torch.as_tensor(self.versions, dtype=torch.int64, device=self.device)
 
-    def add(self, model: Rival2ActorCritic, version: int) -> None:
+    def add(self, model: Rival2ActorCritic, version: int) -> int | None:
         frozen = copy.deepcopy(model).to(self.device).eval()
         frozen.requires_grad_(False)
         self.versions.append(int(version))
         self.policies.append(frozen)
+        evicted_version: int | None = None
         if len(self.versions) > self.bound:
-            self.versions.pop(0)
+            evicted_version = self.versions.pop(0)
             self.policies.pop(0)
         self._refresh_version_tensor()
+        return evicted_version
 
     def clear(self) -> None:
         self.versions.clear()
@@ -120,9 +123,15 @@ class Rival2Trainer:
         self.policy_version = 0
         self.iteration = 0
         self.total_agent_samples = 0
+        self.curriculum_transition: dict[str, Any] | None = None
 
     def add_historical_snapshot(self) -> None:
-        self.opponent_pool.add(self.model, self.policy_version)
+        evicted_version = self.opponent_pool.add(self.model, self.policy_version)
+        if evicted_version is not None:
+            self.opponent_assignment.masked_fill_(
+                self.opponent_assignment == evicted_version,
+                -1,
+            )
 
     def assign_opponents_at_reset(self, reset_mask: torch.Tensor) -> None:
         """Change opponent version only for reset worlds, entirely on CUDA."""
@@ -245,7 +254,7 @@ class Rival2Trainer:
         return deterministic_hybrid_action(actor, self.policy_config), value
 
     def checkpoint_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             "format": "RIVAL2_CHECKPOINT_V1",
             "model": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict(),
@@ -266,6 +275,9 @@ class Rival2Trainer:
             "opponent_assignment": self.opponent_assignment,
             "historical_opponents": self.opponent_pool.checkpoint_state(),
         }
+        if self.curriculum_transition is not None:
+            payload["curriculum_transition"] = copy.deepcopy(self.curriculum_transition)
+        return payload
 
     def save_checkpoint(self, path: str | Path) -> None:
         torch.save(self.checkpoint_payload(), Path(path))
@@ -295,6 +307,75 @@ class Rival2Trainer:
         self.opponent_generator.set_state(payload["opponent_generator_state"].cpu())
         self.opponent_assignment.copy_(payload["opponent_assignment"])
         self.opponent_pool.load_checkpoint_state(payload["historical_opponents"])
+        self.curriculum_transition = copy.deepcopy(payload.get("curriculum_transition"))
+
+    def transition_reward_curriculum(
+        self,
+        *,
+        source_reward_version: str,
+        destination_reward_version: str,
+        transition_record: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Apply one explicit reward-only curriculum transition in place.
+
+        Ordinary checkpoint loading remains contract-strict. This separate path is for an
+        authorized update-boundary curriculum migration where model, optimizer, RNG, counters,
+        opponent assignments, historical policies, and live world state must remain untouched.
+        """
+
+        if self.curriculum_transition is not None:
+            raise ValueError("a Rival 2.0 curriculum transition is already recorded")
+        if source_reward_version == destination_reward_version:
+            raise ValueError("curriculum reward source and destination must differ")
+        source_contracts = contract_hashes_for_reward(source_reward_version)
+        destination_contracts = contract_hashes_for_reward(destination_reward_version)
+        if self.env.reward_version != source_reward_version:
+            raise ValueError("active Rival 2.0 reward does not match the transition source")
+        if self.env.contract_hashes != source_contracts:
+            raise ValueError("active Rival 2.0 contracts do not match the transition source")
+
+        source_shared = {
+            name: digest
+            for name, digest in source_contracts.items()
+            if name != source_reward_version
+        }
+        destination_shared = {
+            name: digest
+            for name, digest in destination_contracts.items()
+            if name != destination_reward_version
+        }
+        if source_shared != destination_shared:
+            raise ValueError("curriculum transition would change a non-reward contract")
+        if not transition_record:
+            raise ValueError("curriculum transition requires an explicit authority record")
+
+        recorded = {
+            **copy.deepcopy(transition_record),
+            "source_reward_version": source_reward_version,
+            "source_contract_hashes": source_contracts,
+            "destination_reward_version": destination_reward_version,
+            "destination_contract_hashes": destination_contracts,
+            "transition_iteration": self.iteration,
+            "transition_policy_version": self.policy_version,
+            "transition_agent_decision_samples": self.total_agent_samples,
+            "changed_semantics": ["reward_contract"],
+            "preserved_runtime_state": [
+                "model",
+                "optimizer",
+                "torch_cpu_rng",
+                "torch_cuda_rng",
+                "policy_generator_rng",
+                "opponent_generator_rng",
+                "policy_and_sample_counters",
+                "opponent_assignment",
+                "historical_policy_pool",
+                "live_world_state",
+            ],
+        }
+        self.env.reward_version = destination_reward_version
+        self.env.contract_hashes = destination_contracts
+        self.curriculum_transition = recorded
+        return copy.deepcopy(recorded)
 
 
 __all__ = [
