@@ -50,15 +50,6 @@ PHASE_A_REQUIRED_CONSECUTIVE = 2
 PHASE_B_UPDATES = 239
 PHASE_B_ADDITIONAL_SAMPLES = 2_004_877_312
 PHASE_B_EVALUATION_OFFSETS = (60, 120, 180, 239)
-PHASE_C_THRESHOLDS = (
-    ("1h", 3_600.0),
-    ("2h", 7_200.0),
-    ("3h", 10_800.0),
-    ("4h", 14_400.0),
-    ("5h", 18_000.0),
-    ("6h", 21_600.0),
-)
-PHASE_C_DURATION_SECONDS = 21_600.0
 SCHEMA_VERSION = 1
 
 
@@ -145,13 +136,13 @@ def frozen_configuration() -> dict[str, Any]:
             "evaluation_update_offsets": list(PHASE_B_EVALUATION_OFFSETS),
         },
         "phase_c": {
-            "duration_seconds": PHASE_C_DURATION_SECONDS,
-            "timer": "time.perf_counter monotonic wall clock",
-            "thresholds": [
-                {"label": label, "seconds": seconds}
-                for label, seconds in PHASE_C_THRESHOLDS
-            ],
-            "evaluation_and_checkpoint_overhead_counts": True,
+            "bound": "one fresh complete standard match per resident world",
+            "worlds": WORLDS,
+            "active_sample_mask": (
+                "transitions after a world's first match completion are excluded from PPO"
+            ),
+            "stop_rule": "every world has completed exactly one counted match",
+            "wall_clock_bound": None,
         },
         "evaluation": {
             "seed": EVALUATION_SEED,
@@ -681,6 +672,88 @@ def _train_one_update(
     return point
 
 
+def _train_one_match_masked_update(
+    *,
+    trainer: Rival2Trainer,
+    active: torch.Tensor,
+    phase_start_iteration: int,
+    device: str,
+    ledger: Path,
+) -> dict[str, Any]:
+    """Train one PPO update using only worlds still in their counted match."""
+
+    active_before = int(active.sum().item())
+    policy_before = trainer.policy_version
+    samples_before = trainer.total_agent_samples
+    trainer.env.reset_transfer_counters()
+    started = time.perf_counter()
+    rollout, metrics = trainer.train_iteration(active)
+    torch.cuda.synchronize(device)
+    seconds = time.perf_counter() - started
+    active_after = int(active.sum().item())
+    sample_delta = trainer.total_agent_samples - samples_before
+    finite_rollout = all(
+        bool(torch.isfinite(getattr(rollout, name)).all().item())
+        for name in (
+            "observations",
+            "actions",
+            "pre_tanh",
+            "old_log_probability",
+            "values",
+            "rewards",
+            "next_values",
+            "advantages",
+            "returns",
+        )
+    )
+    values = {name: float(value.item()) for name, value in metrics.items()}
+    checks = {
+        "finite_rollout": finite_rollout,
+        "finite_metrics": all(np.isfinite(value) for value in values.values()),
+        "policy_increment_exact": trainer.policy_version == policy_before + 1,
+        "iteration_policy_match": trainer.iteration == trainer.policy_version,
+        "positive_counted_samples": sample_delta > 0,
+        "bounded_counted_samples": sample_delta
+        <= trainer.ppo_config.rollout_horizon * trainer.env.num_envs * 2,
+        "active_worlds_monotonic": 0 <= active_after <= active_before,
+        "no_truncations": not bool(rollout.truncated.any().item()),
+        "goal_only_reward_active": (
+            trainer.env.reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION
+        ),
+        "full_match_episode_active": (
+            trainer.env.episode_version == RIVAL2_FULL_MATCH_EPISODE_VERSION
+        ),
+    }
+    point = {
+        "phase": "C_GOAL_ONLY_ONE_MATCH_SET",
+        "phase_update_offset": trainer.iteration - phase_start_iteration,
+        "iteration": trainer.iteration,
+        "policy_version": trainer.policy_version,
+        "agent_decision_samples": trainer.total_agent_samples,
+        "counted_agent_decision_samples_this_update": sample_delta,
+        "active_worlds_before": active_before,
+        "active_worlds_after": active_after,
+        "matches_completed_this_update": active_before - active_after,
+        "wall_seconds": seconds,
+        "metrics": values,
+        "checks": checks,
+        "verdict": "PASS_GREEN" if all(checks.values()) else "FAIL_RED",
+    }
+    _append_jsonl(ledger, point)
+    print(
+        f"full-match phase=C_ONE_MATCH update={trainer.iteration} "
+        f"active={active_after}/{WORLDS} completed={WORLDS - active_after} "
+        f"samples={trainer.total_agent_samples} seconds={seconds:.3f} "
+        f"kl={values['approx_kl']:.6f} verdict={point['verdict']}",
+        flush=True,
+    )
+    if point["verdict"] != "PASS_GREEN":
+        raise RuntimeError(f"one-match-set training integrity failed: {checks}")
+    del rollout, metrics
+    gc.collect()
+    return point
+
+
 def _nested_exact(left: Any, right: Any) -> bool:
     if isinstance(left, torch.Tensor) and isinstance(right, torch.Tensor):
         return left.dtype == right.dtype and left.shape == right.shape and torch.equal(
@@ -1015,58 +1088,44 @@ def run_curriculum(
     }
     _write_json(args.work_dir / "phase_b_summary.json", phase_b_summary)
 
+    # User-steered replacement for the former six-hour continuation: one
+    # prospectively counted complete match per resident world. Worlds that
+    # finish early remain resident but are masked out of every later PPO batch.
+    trainer.env.start_fresh_matches()
     phase_c_started = time.perf_counter()
-    phase_c_start_utc = campaign01._utc_now()
     phase_c_start_iteration = trainer.iteration
     phase_c_start_samples = trainer.total_agent_samples
-    phase_c_checkpoints: list[dict[str, Any]] = []
-    phase_c_evaluations: list[dict[str, Any]] = []
-    threshold_index = 0
-    while threshold_index < len(PHASE_C_THRESHOLDS):
-        point = _train_one_update(
-            phase="C_GOAL_ONLY_SIX_HOURS",
+    active_match_worlds = torch.ones(WORLDS, dtype=torch.bool, device=trainer.device)
+    final_match_ledger = args.work_dir / "final_match_training_curve.jsonl"
+    while bool(active_match_worlds.any().item()):
+        _train_one_match_masked_update(
+            trainer=trainer,
+            active=active_match_worlds,
             phase_start_iteration=phase_c_start_iteration,
-            trainer=trainer,
             device=args.device,
-            ledger=ledger,
-            phase_c_started=phase_c_started,
+            ledger=final_match_ledger,
         )
-        hour_label, threshold = PHASE_C_THRESHOLDS[threshold_index]
-        elapsed = point["phase_c_elapsed_seconds_at_update_completion"]
-        if elapsed < threshold:
-            continue
-        trainer.add_historical_snapshot()
-        label = f"phase_c_{hour_label}"
-        checkpoint = _save_checkpoint(label, trainer, args.work_dir)
-        checkpoint["threshold_seconds"] = threshold
-        checkpoint["elapsed_seconds_at_update_completion"] = elapsed
-        evaluation = _evaluate_and_write(
-            trainer=trainer,
-            collision_dir=args.collision_dir,
-            geometry=geometry,
-            meshes=meshes,
-            device=args.device,
-            phase="C_GOAL_ONLY_SIX_HOURS",
-            label=label,
-            work_dir=args.work_dir,
-        )
-        evaluation["phase_c_threshold_seconds"] = threshold
-        evaluation["phase_c_elapsed_seconds_at_update_completion"] = elapsed
-        evaluation["phase_c_elapsed_seconds_after_evaluation"] = (
-            time.perf_counter() - phase_c_started
-        )
-        _write_json(args.work_dir / f"evaluation_{label}.json", evaluation)
-        phase_c_checkpoints.append(checkpoint)
-        phase_c_evaluations.append(evaluation)
-        threshold_index += 1
 
-    final_checkpoint = phase_c_checkpoints[-1]
+    trainer.add_historical_snapshot()
+    final_checkpoint = _save_checkpoint(
+        "goal_only_final_match_set", trainer, args.work_dir
+    )
+    final_evaluation = _evaluate_and_write(
+        trainer=trainer,
+        collision_dir=args.collision_dir,
+        geometry=geometry,
+        meshes=meshes,
+        device=args.device,
+        phase="C_GOAL_ONLY_ONE_MATCH_SET",
+        label="goal_only_final_match_set",
+        work_dir=args.work_dir,
+    )
     final_audit = _checkpoint_audit(final_checkpoint, trainer)
     if final_audit["verdict"] != "PASS_GREEN":
         raise RuntimeError("final checkpoint audit failed")
     phase_c_summary = {
         "status": "COMPLETE",
-        "timer_started_utc": phase_c_start_utc,
+        "bound": "one fresh complete standard match per resident world",
         "start_iteration": phase_c_start_iteration,
         "start_agent_decision_samples": phase_c_start_samples,
         "final_iteration": trainer.iteration,
@@ -1074,13 +1133,13 @@ def run_curriculum(
         "additional_updates": trainer.iteration - phase_c_start_iteration,
         "additional_agent_decision_samples": trainer.total_agent_samples
         - phase_c_start_samples,
-        "elapsed_seconds_at_final_update": phase_c_checkpoints[-1][
-            "elapsed_seconds_at_update_completion"
-        ],
-        "elapsed_seconds_after_final_evaluation": time.perf_counter()
+        "counted_complete_matches": WORLDS,
+        "remaining_active_worlds": int(active_match_worlds.sum().item()),
+        "wall_seconds_including_final_evaluation": time.perf_counter()
         - phase_c_started,
-        "checkpoints": phase_c_checkpoints,
+        "training_curve": final_match_ledger.resolve().as_posix(),
         "final_checkpoint": final_checkpoint,
+        "final_evaluation_label": final_evaluation["checkpoint_label"],
         "final_checkpoint_audit": final_audit,
     }
     _write_json(args.work_dir / "phase_c_summary.json", phase_c_summary)
@@ -1136,6 +1195,7 @@ def publish_results(
         "phase_c_summary.json",
         "run_summary.json",
         "training_curve.jsonl",
+        "final_match_training_curve.jsonl",
     ):
         shutil.copy2(args.work_dir / name, results / name)
     for evaluation in sorted(args.work_dir.glob("evaluation_*.json")):
@@ -1149,7 +1209,9 @@ def publish_results(
             summary["reward_transition_checkpoint"]["path"]
         ),
         "goal_only_2b": Path(summary["phase_b"]["checkpoints"][-1]["path"]),
-        "goal_only_final_6h": Path(summary["phase_c"]["final_checkpoint"]["path"]),
+        "goal_only_final_match_set": Path(
+            summary["phase_c"]["final_checkpoint"]["path"]
+        ),
     }
     checkpoint_records = []
     checkpoint_dir = Path("checkpoints/rival2/full_match_curriculum")
@@ -1171,6 +1233,7 @@ def publish_results(
         json.loads(path.read_text(encoding="utf-8"))
         for path in sorted(results.glob("evaluation_*.json"))
     ]
+    evaluations.sort(key=lambda item: (item["iteration"], item["checkpoint_label"]))
     curve = [
         {
             "label": item["checkpoint_label"],
@@ -1210,9 +1273,10 @@ Status: **COMPLETE**
   trainer and live full-match state and passed its exact transition audit.
 - Phase B completed exactly `{PHASE_B_UPDATES}` updates / `{PHASE_B_ADDITIONAL_SAMPLES:,}`
   samples.
-- Phase C completed at update `{summary['phase_c']['final_iteration']}` after
-  `{summary['phase_c']['elapsed_seconds_at_final_update']:.3f}` real elapsed
-  seconds at update completion.
+- The final phase trained on exactly one prospectively counted complete match
+  in each of `{WORLDS:,}` worlds and completed at update
+  `{summary['phase_c']['final_iteration']}`. Samples after an individual
+  world's match completion were excluded from PPO.
 - Final held-out complete-match evaluation: touches/min
   `{final['touches_per_simulated_minute']:.6f}`, goals/min
   `{final['goals_per_simulated_minute']:.6f}`, counterfactual no-touch fraction

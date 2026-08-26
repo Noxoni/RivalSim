@@ -186,10 +186,26 @@ class Rival2Trainer:
             value[:, 1].index_copy_(0, indices, historical_value)
         return actor, value, acting_version, train_mask
 
-    def collect_rollout(self) -> Rival2RolloutBuffer:
+    def collect_rollout(
+        self, active_world_mask: torch.Tensor | None = None
+    ) -> Rival2RolloutBuffer:
+        """Collect one rollout, optionally training only unfinished match worlds.
+
+        The optional mask is mutated in place as complete matches terminate.
+        Worlds that have already completed still occupy resident simulator lanes,
+        but receive neutral controls and contribute no PPO samples.
+        """
+
         config = self.ppo_config
+        if active_world_mask is not None and (
+            active_world_mask.shape != (self.env.num_envs,)
+            or active_world_mask.dtype != torch.bool
+            or active_world_mask.device != self.device
+        ):
+            raise ValueError("active world mask shape/dtype/device mismatch")
         rollout = Rival2RolloutBuffer(config.rollout_horizon, self.env.num_envs, self.device)
         observation = self.env.observation
+        active_agent_samples = torch.zeros((), dtype=torch.int64, device=self.device)
         self.model.eval()
         for _ in range(config.rollout_horizon):
             with torch.no_grad():
@@ -197,7 +213,16 @@ class Rival2Trainer:
                 sample = sample_hybrid_action(
                     actor, generator=self.policy_generator, config=self.policy_config
                 )
-                transition = self.env.step(sample.action)
+                action = sample.action
+                if active_world_mask is not None:
+                    train_mask = train_mask & active_world_mask[:, None]
+                    action = torch.where(
+                        active_world_mask[:, None, None],
+                        action,
+                        torch.zeros_like(action),
+                    )
+                    active_agent_samples += active_world_mask.sum() * 2
+                transition = self.env.step(action)
                 _, transition_value = self.model(
                     transition.transition_observation.reshape(-1, self.policy_config.obs_dim)
                 )
@@ -222,9 +247,14 @@ class Rival2Trainer:
                     train_mask=train_mask,
                 )
                 self.assign_opponents_at_reset(transition.reset_mask)
+                if active_world_mask is not None:
+                    active_world_mask.logical_and_(~transition.terminated)
                 observation = transition.observation
         self.env.observation = observation
-        self.total_agent_samples += config.rollout_horizon * self.env.num_envs * 2
+        if active_world_mask is None:
+            self.total_agent_samples += config.rollout_horizon * self.env.num_envs * 2
+        else:
+            self.total_agent_samples += int(active_agent_samples.item())
         return rollout
 
     def update(self, rollout: Rival2RolloutBuffer) -> dict[str, torch.Tensor]:
@@ -241,8 +271,10 @@ class Rival2Trainer:
         self.iteration += 1
         return metrics
 
-    def train_iteration(self) -> tuple[Rival2RolloutBuffer, dict[str, torch.Tensor]]:
-        rollout = self.collect_rollout()
+    def train_iteration(
+        self, active_world_mask: torch.Tensor | None = None
+    ) -> tuple[Rival2RolloutBuffer, dict[str, torch.Tensor]]:
+        rollout = self.collect_rollout(active_world_mask)
         return rollout, self.update(rollout)
 
     @torch.no_grad()

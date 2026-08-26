@@ -88,14 +88,16 @@ Follow the original post-acquisition curriculum shape with the goal-only reward:
 1. complete exactly 239 additional PPO updates
    (`2,004,877,312` agent decision samples), with checkpoints/evaluations at
    offsets `60`, `120`, `180`, and `239`;
-2. from that exact boundary, continue the same state for six real elapsed
-   wall-clock hours, checkpointing/evaluating at the first completed update at
-   or after each hourly boundary;
-3. save and verify the final resumable checkpoint, publish the complete
+2. from that exact boundary, start one fresh standard match in each of the
+   `131072` resident worlds and continue goal-only PPO only for samples from
+   those matches; as each world completes, mask its later resident transitions
+   out of PPO while the remaining overtime matches finish;
+3. stop when every world has completed that one match, then save and verify the
+   final resumable checkpoint and publish the complete
    acquisition and scoring curves, and stop.
 
-Checkpoint/evaluation overhead counts inside the six-hour interval. Every Phase
-B training rollout and every evaluation uses the full-match episode contract.
+The final bound is match-based, not time- or sample-based. Every Phase B
+training rollout and every evaluation uses the full-match episode contract.
 
 ## Required evaluation evidence
 
@@ -117,7 +119,7 @@ reuse old short-episode evaluation results as full-match results.
 
 ## Stop boundary
 
-Stop after the final six-hour goal-only checkpoint, its single scheduled
+Stop after the final one-match-set goal-only checkpoint, its single scheduled
 full-match evaluation, compact evidence publication, and push to `origin/main`.
 Do not begin v0.6, change the model/PPO/action/observation contracts, add reward
 terms, train against Nexto, or build the viewer.

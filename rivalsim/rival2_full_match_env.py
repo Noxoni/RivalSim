@@ -294,6 +294,15 @@ class Rival2FullMatchEnv(Rival2Env):
         )
         self.world.reward_mode = reward_mode
 
+    def start_fresh_matches(self) -> None:
+        """Start one new standard match in every lane at an explicit phase boundary."""
+
+        state = self.world.rival2
+        state.physics_reset_mask.fill_(1)
+        state.reset_mask.fill_(1)
+        self.world.apply_interval_resets()
+        self.observation = self.bridge.observation()
+
 
 __all__ = [
     "Rival2FullMatchEnv",

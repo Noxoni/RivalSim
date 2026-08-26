@@ -149,3 +149,31 @@ def test_full_match_env_runs_real_ppo_and_reward_transition(arena_assets) -> Non
         torch.equal(before[name], value)
         for name, value in trainer.model.state_dict().items()
     )
+
+
+def test_masked_training_counts_only_first_match_samples(arena_assets) -> None:
+    env = _env(arena_assets, count=2, reward_version=RIVAL2_REWARD_GOAL_ONLY_VERSION)
+    trainer = Rival2Trainer(
+        env,
+        ppo_config=Rival2PPOConfig(rollout_horizon=2, minibatch_size=4, epochs=1),
+        seed=20260827,
+    )
+    active = torch.tensor((True, False), device=env.device)
+    rollout, metrics = trainer.train_iteration(active)
+    assert trainer.total_agent_samples == 4
+    assert not rollout.train_mask[:, 1].any().item()
+    assert all(torch.isfinite(value).item() for value in metrics.values())
+
+
+def test_explicit_phase_boundary_starts_fresh_complete_matches(arena_assets) -> None:
+    env = _env(arena_assets, count=2)
+    env.full_match_views["blue_score"].fill_(3)
+    env.full_match_views["regulation_ticks_remaining"].fill_(17)
+    env.full_match_views["completed_matches"].fill_(5)
+    env.start_fresh_matches()
+    torch.cuda.synchronize()
+    assert torch.all(env.full_match_views["blue_score"] == 0).item()
+    assert torch.all(
+        env.full_match_views["regulation_ticks_remaining"] == REGULATION_TICKS
+    ).item()
+    assert torch.all(env.full_match_views["completed_matches"] == 5).item()
