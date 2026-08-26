@@ -413,7 +413,9 @@ def _run_suite(
 
 def _side_line(summary: dict[str, Any]) -> str:
     return (
-        f"{summary['total_wins']}-{summary['total_losses']}, "
+        f"{summary['total_wins']}-{summary['total_losses']} "
+        f"({summary['regulation_wins']} regulation, {summary['overtime_wins']} OT wins), "
+        f"win rate {100.0 * summary['win_rate']['fraction']:.4f}%, "
         f"goals {summary['goals']}-{summary['goals_conceded']}, "
         f"GD mean {summary['goal_differential']['mean']:.3f}, "
         f"median {summary['goal_differential']['median']:.3f}"
@@ -462,6 +464,12 @@ def _write_document(
         "",
         "This suite samples Rival's ordinary hybrid policy distribution with a fixed seed. Nexto remains deterministic. It is a robustness measurement, not the headline deployment matchup.",
         "",
+        "## Observed Blue/Orange asymmetry",
+        "",
+        f"In the deterministic matrix, Rival-as-Orange scored {co['goals_per_match'] - cb['goals_per_match']:.3f} more goals per match and conceded {cb['goals_conceded_per_match'] - co['goals_conceded_per_match']:.3f} fewer than Rival-as-Blue; mean goal differential was {co['goal_differential']['mean'] - cb['goal_differential']['mean']:.3f} higher as Orange.",
+        f"In the stochastic suite, Rival-as-Orange scored {so['goals_per_match'] - sb['goals_per_match']:.3f} more goals per match and conceded {sb['goals_conceded_per_match'] - so['goals_conceded_per_match']:.3f} fewer; mean goal differential was {so['goal_differential']['mean'] - sb['goal_differential']['mean']:.3f} higher as Orange.",
+        "This is a descriptive benchmark finding, not a causal diagnosis. No simulator, observation, policy, reward, or controller behavior was changed in response to it.",
+        "",
         "## Side-separated behavior",
         "",
         "| Suite / Rival side | Touches | Touch share | Kickoff first touches | Kickoff goals | Same next touch | Opponent handoff | Demos |",
@@ -490,6 +498,8 @@ def _write_document(
         f"- Action table: `{fidelity['action_table']['count']}` actions, SHA-256 `{fidelity['action_table']['float32_sha256']}`.",
         f"- Stock kickoff: `{fidelity['kickoff_sequence']['physics_ticks']}` controls at 120 Hz, SHA-256 `{fidelity['kickoff_sequence']['float32_sha256']}`.",
         f"- Fidelity hot-path H2D/D2H events: `{fidelity['hot_path']['profiled_h2d_d2h_event_count']}`.",
+        f"- Nexto observation throughput at fidelity batch {fidelity['performance']['batch_size']}: `{fidelity['performance']['observation_worlds_per_second']:.2f}` worlds/s.",
+        f"- Nexto model throughput at fidelity batch {fidelity['performance']['batch_size']}: `{fidelity['performance']['model_inferences_per_second']:.2f}` inferences/s.",
         f"- Canonical match throughput: `{canonical['performance']['long_timed_blocks_world_ticks_per_second']:.2f}` world-ticks/s; peak CUDA `{canonical['performance']['peak_cuda_bytes'] / 2**30:.3f}` GiB.",
         f"- Stochastic match throughput: `{stochastic['performance']['long_timed_blocks_world_ticks_per_second']:.2f}` world-ticks/s; peak CUDA `{stochastic['performance']['peak_cuda_bytes'] / 2**30:.3f}` GiB.",
         f"- Timed match-loop transfer profiler events: canonical `{canonical['performance']['profiled_h2d_d2h_event_count']}`, stochastic `{stochastic['performance']['profiled_h2d_d2h_event_count']}`.",
