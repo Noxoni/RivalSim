@@ -1,0 +1,140 @@
+{
+  "verdict": "PASS_GREEN",
+  "identity": {
+    "primary_commit": "c2baacb8f4b441dd8505e63c2aeb5a1679b60b02",
+    "binding_commit": "2da51b1dac7b8127127613a5ff30e490bdd70dd8",
+    "package": "rocketsim==2.2.1",
+    "extension_path": "G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\RocketSim.pyd",
+    "extension_sha256": "E3EE24CA82445B4BFCC754583F6778D7B0D8B7A7F7D64F872BE8C65E621A63D0",
+    "checkpoint_sha256": "4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E",
+    "pass": true
+  },
+  "corpus": {
+    "states": 2048,
+    "seed": 2026082801,
+    "blue": 2048,
+    "orange": 2048,
+    "coverage": {
+      "all_five_kickoff_layouts_both_teams": true,
+      "ground_states": 69,
+      "air_states": 4027,
+      "jumped_states": 1389,
+      "double_jumped_states": 372,
+      "flipped_states": 313,
+      "demoed_states": 132,
+      "wall_corner_backboard_adjacent_states": 512,
+      "pad_inactive_samples": 17355
+    }
+  },
+  "observation_parity": {
+    "overall_max_abs_error": 3.5762786865234375e-07,
+    "overall_exact_fields": 130,
+    "fields": 182,
+    "blocks": {
+      "ball": {
+        "max_abs_error": 5.960464477539063e-08,
+        "exact_fields": 3,
+        "fields": 9
+      },
+      "self_car": {
+        "max_abs_error": 3.5762786865234375e-07,
+        "exact_fields": 20,
+        "fields": 39
+      },
+      "opponent_car": {
+        "max_abs_error": 3.5762786865234375e-07,
+        "exact_fields": 20,
+        "fields": 39
+      },
+      "relative": {
+        "max_abs_error": 1.1920928955078125e-07,
+        "exact_fields": 6,
+        "fields": 12
+      },
+      "boost_pads": {
+        "max_abs_error": 0.0,
+        "exact_fields": 68,
+        "fields": 68
+      },
+      "previous_action": {
+        "max_abs_error": 0.0,
+        "exact_fields": 8,
+        "fields": 8
+      },
+      "lifecycle": {
+        "max_abs_error": 5.960464477539063e-08,
+        "exact_fields": 5,
+        "fields": 7
+      },
+      "all": {
+        "max_abs_error": 3.5762786865234375e-07,
+        "exact_fields": 130,
+        "fields": 182
+      },
+      "team_sensitive_named_fields": {
+        "max_abs_error": 0.0,
+        "exact_fields": 15,
+        "fields": 15
+      }
+    },
+    "by_side": {
+      "Blue": {
+        "max_abs_error": 3.5762786865234375e-07,
+        "exact_fields": 130
+      },
+      "Orange": {
+        "max_abs_error": 3.5762786865234375e-07,
+        "exact_fields": 130
+      }
+    }
+  },
+  "deterministic_action_agreement": {
+    "definition": "all three binary buttons exact and each continuous analog channel within 1e-5",
+    "analog_max_abs_error": 2.3990869522094727e-06,
+    "binary_button_exact_fraction": 1.0,
+    "overall": {
+      "count": 4096,
+      "denominator": 4096,
+      "fraction": 1.0
+    },
+    "Blue": {
+      "count": 2048,
+      "denominator": 2048,
+      "fraction": 1.0
+    },
+    "Orange": {
+      "count": 2048,
+      "denominator": 2048,
+      "fraction": 1.0
+    }
+  },
+  "team_mirror_symmetry": {
+    "blue_to_mirrored_orange_max_abs_error": 0.0,
+    "orange_to_mirrored_blue_max_abs_error": 0.0,
+    "deterministic_action_agreement": {
+      "count": 4096,
+      "denominator": 4096,
+      "fraction": 1.0
+    }
+  },
+  "semantic_mismatches": [
+    {
+      "field": "self/opponent.time_since_boosted",
+      "classification": "adapter-maintained exact during evaluated trajectories; public binding omits the literal internal field",
+      "effect": "captured/restored as adapter memory; parity corpus supplies equivalent authoritative auxiliary value"
+    },
+    {
+      "field": "self/opponent.sticky_ticks",
+      "classification": "adapter-maintained from authoritative jump transition/control because public binding omits RivalSim's three-tick memory",
+      "effect": "captured/restored as adapter memory"
+    }
+  ],
+  "wall_seconds": 2.5441527001094073,
+  "gates": {
+    "identity_exact": true,
+    "corpus_exact": true,
+    "adapter_action_agreement_100_percent": true,
+    "mirror_observation_max_abs_le_1e6": true,
+    "mirror_action_agreement_100_percent": true
+  }
+}
