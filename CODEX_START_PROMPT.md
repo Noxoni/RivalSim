@@ -1,42 +1,46 @@
-# Closed Codex Boundary — Rival 2.0 Campaign 01 Complete
+# Active Codex Handoff — Rival 2.0 Campaign 02
 
-RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 01 has also completed its
-exact bounded execution and is now closed.
+RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 01 completed correctly but produced a `DEGRADED` behavioral result. This handoff authorizes one controlled follow-up campaign to test the identified entropy-pressure failure mode.
 
-Campaign 01 used the frozen v0.5 trainer and contracts from a fresh seed-`20260826`
-initialization. The preferred 131,072-world, horizon-32 capacity passed preflight. Training
-stopped at update 12 with 100,663,296 agent decision samples, the first completed PPO update at
-or beyond 100,000,000. Initialization plus the first 10M/25M/50M/100M threshold checkpoints and
-fixed evaluations were preserved and published.
+Start from current `origin/main`. Required starting HEAD:
 
-Independent closeout statuses:
+`1ce5932cadd66b14032e61750836763499567bc9`
 
-- execution status: `COMPLETE`;
-- behavioral result: `DEGRADED`;
-- frozen v0.5 trainer status: unchanged (`PASS_GREEN`).
+Do not modify or reinterpret Campaign 01 evidence. All published `results/v0.1/` through `results/v0.5/`, all Campaign 01 artifacts, and the four frozen Rival 2.0 environment/action contracts remain immutable.
 
-The final full resumable checkpoint is published at
-`checkpoints/rival2/campaign01/rival2_campaign01_100m_resume.pt`. Its SHA-256 is
-`704F2B887BF50E767C86B7080C1E881644480D41A3302D245E833BDE65752B4A` and its exact size is
-21,126,324 bytes. It passes the frozen v0.5 loader/config/contract checks and reproduces the next
-stochastic sample exactly.
+Read in full before starting:
 
-Read the completed evidence in:
-
+- `handoff/rival2-c02/README.md`;
+- `handoff/rival2-c02/DIAGNOSIS.md`;
+- `handoff/rival2-c02/CAMPAIGN.md`;
+- `handoff/rival2-c02/ACCEPTANCE.md`;
+- `docs/RIVAL2_TRAINING_CONTRACT.md`;
 - `docs/RIVAL2_CAMPAIGN01_RESULTS.md`;
-- `results/rival2/campaign01/summary.json`;
-- `results/rival2/campaign01/config.json`;
-- `results/rival2/campaign01/checkpoints.json`;
-- `results/rival2/campaign01/evaluation_000m.json` through `evaluation_100m.json`;
 - `results/rival2/campaign01/training_curve.json`;
-- `handoff/rival2-c01/README.md`;
-- `handoff/rival2-c01/CAMPAIGN.md`;
-- `handoff/rival2-c01/ACCEPTANCE.md`.
+- `results/rival2/campaign01/evaluation_000m.json`;
+- `results/rival2/campaign01/evaluation_100m.json`.
 
-All published `results/v0.1/` through `results/v0.5/` remain byte-for-byte unchanged. Do not
-reinterpret the negative behavioral outcome by changing the frozen campaign after the fact.
+## Controlling change
 
-No further work is authorized by this prompt. Do not resume Campaign 01 training, begin v0.6,
-build RocketSim/RLBot deployment or transfer validation, tune rewards, add curricula, or alter
-the frozen v0.5 contracts. A new explicit controlling handoff is required for any subsequent
-milestone.
+Campaign 02 changes exactly one learning hyperparameter from Campaign 01:
+
+`entropy_coefficient: 0.01 -> 0.0`
+
+Everything else remains the same unless this handoff explicitly says otherwise. In particular, preserve the same model architecture, initialization procedure, observation/action/reward/episode contracts, gamma, GAE lambda, PPO clip range, value coefficient, gradient limit, Adam learning rate, epochs, horizon, minibatch target, self-play rules, historical-opponent rules, world count, campaign seed, evaluation seed, and evaluation protocol.
+
+Do not edit the frozen v0.5 PPO or policy implementation merely to change this value. Instantiate a Campaign 02 PPO configuration with `entropy_coefficient=0.0` at the campaign layer. The existing entropy metric may continue to be logged diagnostically but must contribute zero weight to the Campaign 02 optimization loss.
+
+## Mission
+
+1. prove the Campaign 02 initialization is the same model initialization used by Campaign 01 and rerun the unchanged initialization evaluation;
+2. run the same 131,072-world, horizon-32 training configuration from scratch with entropy coefficient exactly zero;
+3. train through the first completed update crossing 100,000,000 agent decision samples;
+4. preserve checkpoints/evaluations at initialization and the first completed updates crossing 10M, 25M, 50M, and 100M samples;
+5. use the exact Campaign 01 held-out evaluation protocol and seeds so the campaigns are directly comparable;
+6. publish per-update PPO metrics including approximate KL, clip fraction, policy/value loss, gradient norm, diagnostic entropy, and analog policy standard deviations;
+7. publish a direct Campaign 01 vs Campaign 02 comparison and an independent Campaign 02 behavioral classification;
+8. preserve the final full resumable checkpoint and stop.
+
+Do not change reward shaping, add curricula, add action masks, change the continuous-control distribution, change the model, tune learning rate, introduce KL early stopping, or perform a hyperparameter search in this run. If a non-finite/correctness/integrity failure occurs, stop with evidence. Otherwise complete the bounded 100M campaign even if behavior is poor.
+
+Do not begin v0.6 RocketSim/RLBot transfer work.
