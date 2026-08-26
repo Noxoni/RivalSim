@@ -43,6 +43,8 @@ class Rival2FullMatchState(Rival2EpisodeState):
         "winner",
         "pending_kickoff_reset",
         "match_goal_count",
+        "match_blue_touches",
+        "match_orange_touches",
         "kickoff_segment_active",
         "kickoff_segment_ticks",
         "kickoff_segments_total",
@@ -50,6 +52,11 @@ class Rival2FullMatchState(Rival2EpisodeState):
         "completed_matches",
         "completed_blue_wins",
         "completed_orange_wins",
+        "completed_overtime_matches",
+        "completed_blue_goals",
+        "completed_orange_goals",
+        "completed_blue_touches",
+        "completed_orange_touches",
         "completed_match_goals",
         "completed_match_ticks",
     )
@@ -69,12 +76,19 @@ class Rival2FullMatchState(Rival2EpisodeState):
             "match_done",
             "pending_kickoff_reset",
             "match_goal_count",
+            "match_blue_touches",
+            "match_orange_touches",
             "kickoff_segment_ticks",
             "kickoff_segments_total",
             "no_touch_segments_total",
             "completed_matches",
             "completed_blue_wins",
             "completed_orange_wins",
+            "completed_overtime_matches",
+            "completed_blue_goals",
+            "completed_orange_goals",
+            "completed_blue_touches",
+            "completed_orange_touches",
             "completed_match_goals",
             "completed_match_ticks",
         ):
@@ -86,7 +100,7 @@ class Rival2FullMatchState(Rival2EpisodeState):
 
     @property
     def logical_bytes(self) -> int:
-        return super().logical_bytes + self.num_envs * 18 * 4
+        return super().logical_bytes + self.num_envs * 25 * 4
 
     def torch_views(self) -> dict[str, torch.Tensor]:
         return {
@@ -170,6 +184,8 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.winner,
                 state.pending_kickoff_reset,
                 state.match_goal_count,
+                state.match_blue_touches,
+                state.match_orange_touches,
                 state.kickoff_segment_active,
                 state.kickoff_segment_ticks,
                 state.kickoff_segments_total,
@@ -177,6 +193,11 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.completed_matches,
                 state.completed_blue_wins,
                 state.completed_orange_wins,
+                state.completed_overtime_matches,
+                state.completed_blue_goals,
+                state.completed_orange_goals,
+                state.completed_blue_touches,
+                state.completed_orange_touches,
                 state.completed_match_goals,
                 state.completed_match_ticks,
             ],
@@ -208,6 +229,8 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.winner,
                 state.pending_kickoff_reset,
                 state.match_goal_count,
+                state.match_blue_touches,
+                state.match_orange_touches,
                 state.kickoff_segment_active,
                 state.kickoff_segment_ticks,
                 self.lifecycle.blue_score,

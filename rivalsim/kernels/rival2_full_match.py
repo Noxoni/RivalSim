@@ -51,6 +51,8 @@ def rival2_full_match_accumulate_tick(
     winner: wp.array(dtype=wp.int32),
     pending_kickoff_reset: wp.array(dtype=wp.int32),
     match_goal_count: wp.array(dtype=wp.int32),
+    match_blue_touches: wp.array(dtype=wp.int32),
+    match_orange_touches: wp.array(dtype=wp.int32),
     kickoff_segment_active: wp.array(dtype=wp.int32),
     kickoff_segment_ticks: wp.array(dtype=wp.int32),
     kickoff_segments_total: wp.array(dtype=wp.int32),
@@ -58,6 +60,11 @@ def rival2_full_match_accumulate_tick(
     completed_matches: wp.array(dtype=wp.int32),
     completed_blue_wins: wp.array(dtype=wp.int32),
     completed_orange_wins: wp.array(dtype=wp.int32),
+    completed_overtime_matches: wp.array(dtype=wp.int32),
+    completed_blue_goals: wp.array(dtype=wp.int32),
+    completed_orange_goals: wp.array(dtype=wp.int32),
+    completed_blue_touches: wp.array(dtype=wp.int32),
+    completed_orange_touches: wp.array(dtype=wp.int32),
     completed_match_goals: wp.array(dtype=wp.int32),
     completed_match_ticks: wp.array(dtype=wp.int32),
 ):
@@ -82,8 +89,10 @@ def rival2_full_match_accumulate_tick(
         touch_contact_latched[car_base + 1] = reports_b
         if touched_a != 0:
             touch_count[car_base] = touch_count[car_base] + 1
+            match_blue_touches[env] = match_blue_touches[env] + 1
         if touched_b != 0:
             touch_count[car_base + 1] = touch_count[car_base + 1] + 1
+            match_orange_touches[env] = match_orange_touches[env] + 1
         touched = touched_a != 0 or touched_b != 0
         if touched:
             no_touch_ticks[env] = 0
@@ -154,6 +163,20 @@ def rival2_full_match_accumulate_tick(
                 completed_blue_wins[env] = completed_blue_wins[env] + 1
             else:
                 completed_orange_wins[env] = completed_orange_wins[env] + 1
+            if overtime[env] != 0:
+                completed_overtime_matches[env] = (
+                    completed_overtime_matches[env] + 1
+                )
+            completed_blue_goals[env] = completed_blue_goals[env] + blue_score[env]
+            completed_orange_goals[env] = (
+                completed_orange_goals[env] + orange_score[env]
+            )
+            completed_blue_touches[env] = (
+                completed_blue_touches[env] + match_blue_touches[env]
+            )
+            completed_orange_touches[env] = (
+                completed_orange_touches[env] + match_orange_touches[env]
+            )
             completed_match_goals[env] = (
                 completed_match_goals[env] + match_goal_count[env]
             )
@@ -214,6 +237,8 @@ def rival2_full_match_after_reset(
     winner: wp.array(dtype=wp.int32),
     pending_kickoff_reset: wp.array(dtype=wp.int32),
     match_goal_count: wp.array(dtype=wp.int32),
+    match_blue_touches: wp.array(dtype=wp.int32),
+    match_orange_touches: wp.array(dtype=wp.int32),
     kickoff_segment_active: wp.array(dtype=wp.int32),
     kickoff_segment_ticks: wp.array(dtype=wp.int32),
     lifecycle_blue_score: wp.array(dtype=wp.int32),
@@ -250,6 +275,8 @@ def rival2_full_match_after_reset(
         match_done[env] = 0
         winner[env] = -1
         match_goal_count[env] = 0
+        match_blue_touches[env] = 0
+        match_orange_touches[env] = 0
         lifecycle_blue_score[env] = 0
         lifecycle_orange_score[env] = 0
 
