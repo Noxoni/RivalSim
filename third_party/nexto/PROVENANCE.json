@@ -1,0 +1,34 @@
+{
+  "component": "Nexto public RLBot policy",
+  "upstream_repository": "https://github.com/Rolv-Arild/Necto",
+  "upstream_commit": "2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca",
+  "license": "CC BY-NC-SA 4.0",
+  "license_file": "LICENSE",
+  "attribution": "Rolv-Arild/Necto contributors",
+  "noncommercial_notice": "This third-party material is licensed for noncommercial use under CC BY-NC-SA 4.0.",
+  "modifications": "RivalSim adds a CUDA-native 1v1 tensor adapter, retargets the pinned TorchScript graph's stale explicit CPU action-table device literal at runtime, and leaves four immutable attention shape/scaling scalar constants on CPU to prevent D2H scalar synchronization; model weights and policy arithmetic are unchanged.",
+  "files": {
+    "nexto-model.pt": {
+      "upstream_path": "rlbot-support/Nexto/nexto-model.pt",
+      "git_blob_sha1": "1eb5de5660a1fe00860289cb6a17938985094196",
+      "sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+      "size_bytes": 1852625
+    },
+    "upstream/agent.py": {
+      "upstream_path": "rlbot-support/Nexto/agent.py",
+      "git_blob_sha1": "44b0abbbf7e43820aadf474179c3507a2c48efe5"
+    },
+    "upstream/nexto_obs.py": {
+      "upstream_path": "rlbot-support/Nexto/nexto_obs.py",
+      "git_blob_sha1": "9e92de91e77ca23ed47bf1f8e99d5a861ee93203"
+    },
+    "upstream/bot.py": {
+      "upstream_path": "rlbot-support/Nexto/bot.py",
+      "git_blob_sha1": "f0ccdd03e0139ad636642079c69cf972a83c2d1e"
+    },
+    "LICENSE": {
+      "upstream_path": "LICENSE",
+      "git_blob_sha1": "cbe5ad1670406e4402217edfb82d2c56af7e8631"
+    }
+  }
+}

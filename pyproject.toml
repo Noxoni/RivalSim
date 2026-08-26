@@ -26,7 +26,10 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["rivalsim*"]
+include = ["rivalsim*", "third_party.nexto*"]
+
+[tool.setuptools.package-data]
+"third_party.nexto" = ["LICENSE", "PROVENANCE.json", "nexto-model.pt", "upstream/*.py"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
