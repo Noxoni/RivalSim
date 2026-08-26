@@ -1,20 +1,27 @@
-# Active Codex Handoff — Rival vs Nexto Kickoff-Free Open Play
+# Active Codex Handoff — RocketSim Reciprocal Validation v2
 
-The behavioral telemetry, GPU-native public-Nexto port, and full-match Rival-vs-Nexto benchmark are complete in the current lineage. Do not repeat them.
+The last completed execution is the RivalSim kickoff-free Rival-vs-Nexto benchmark at commit:
 
-The kickoff-free RivalSim open-play benchmark remains the **active authorized work and must run first**. The later RocketSim reciprocal-validation/Rival-adapter handoff has been written and queued, but it does **not** replace, defer, interrupt, or supersede this active open-play test.
+`9807da8b3c404beb63a5426959132de549332128`
 
-Start from current `origin/main` and read:
+Do **not** repeat that benchmark. Its implementation and evidence are complete and are now reference evidence for the next objective.
 
-`handoff/rival2-nexto-open-play/README.md`
+## Active objective
 
-in full. Treat that file as the controlling requirement for the current execution.
+Build and validate the adapter required to run the frozen final-45B Rival policy inside the pinned RocketSim/RLGym-style environment, while keeping public Nexto on its native/source RocketSim semantics.
 
-## Current mission
+Then execute **both** authorized RocketSim comparisons:
 
-Reuse the frozen final-45B Rival policy and the already-validated pinned public Nexto GPU port, harvest the specified 4,096 physically continuous ordinary open-play states, construct the required four-way role/side/mirror pairing, then run exactly 16,384 deterministic first-goal open-play duels with a 60-second maximum and no kickoff or goal reset anywhere in the duel.
+1. **Normal 1v1 full matches** — standard 5:00 regulation, ordinary kickoffs from all standard layouts, goal scoring and kickoff resets, and overtime when tied. This is the primary gameplay benchmark. Rival must play its normal frozen policy, including its own kickoff behavior; do not substitute a scripted Rival kickoff. Nexto must retain its stock source kickoff controller.
+2. **Kickoff-free open play** — the paired restored-state benchmark used to isolate ordinary play from kickoff advantage and to compare the Blue/Orange asymmetry against RivalSim.
 
-Publish overall, side-separated, source-separated, role-separated and paired-family outcome evidence plus open-play touch/possession/trajectory telemetry.
+Read and execute the controlling handoff:
+
+`handoff/rival2-rocketsim-crosscheck/README.md`
+
+Required adapter flow:
+
+`RocketSim state -> RIVAL2_OBS_V1 adapter -> frozen Rival policy -> native 8 controls -> RocketSim`
 
 Frozen Rival checkpoint SHA-256:
 
@@ -24,16 +31,28 @@ Pinned Nexto upstream:
 
 `Rolv-Arild/Necto@2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca`
 
-Do not train Rival against Nexto yet. Do not change Rival rewards, PPO, architecture, observation/action contracts, controller behavior, or simulator physics. Do not begin fake-kickoff training; retain that as future curriculum work only. Do not build the viewer or begin v0.6. Avoid unrelated release/lint/regression ceremony; only the targeted integrity checks specified by the open-play handoff are authorized.
+Pinned Nexto model SHA-256:
 
-When complete, commit and push implementation/evidence to `origin/main`, return the final commit SHA and the kickoff-free open-play results, then stop for review.
+`BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA`
 
-## Queued next milestone — do not execute during this run
+Pinned RocketSim reference physics:
 
-After the RivalSim kickoff-free open-play benchmark is complete and reviewed, the next intended milestone is the reciprocal RocketSim simulator-validation experiment defined in:
+`ZealanL/RocketSim@c2baacb8f4b441dd8505e63c2aeb5a1679b60b02`
 
-`handoff/rival2-rocketsim-crosscheck/README.md`
+## Critical side-asymmetry target
 
-That later milestone will build a RocketSim -> `RIVAL2_OBS_V1` adapter for the same frozen Rival checkpoint, keep public Nexto in the RocketSim/RLGym-style environment it was built around, reproduce the Rival-vs-Nexto matchup there, and compare performance between RivalSim and RocketSim as a simulator-validation cross-check.
+The completed RivalSim kickoff-free benchmark found:
 
-Do **not** begin that RocketSim adapter/cross-check until the current RivalSim open-play benchmark has finished and the user has reviewed its result.
+- Rival as Blue: `46.948%` decisive win rate;
+- Rival as Orange: `62.545%` decisive win rate;
+- Orange-minus-Blue difference: approximately `15.597` percentage points;
+- original states: `55.158%`;
+- mirrored states: `54.384%`;
+- Rival inheriting original Blue car: `54.678%`;
+- Rival inheriting original Orange car: `54.866%`.
+
+Adapter parity must therefore be checked separately for Blue and Orange and with exact team/mirror pairs before official gameplay. Both normal-match and kickoff-free results must preserve Blue/Orange as explicit dimensions; never hide them inside an aggregate-only result.
+
+No training is authorized. Do not change Rival or Nexto weights, rewards, PPO, policy architecture, observation/action contracts, controller behavior, or either simulator's physics. Do not begin fake-kickoff curriculum work, viewer work, or v0.6.
+
+When the complete reciprocal-validation handoff is finished, commit and push implementation/evidence to `origin/main` and stop for review.

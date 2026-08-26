@@ -1,31 +1,65 @@
-# Active Handoff — Rival 2.0 RocketSim Reciprocal Cross-Validation
+# Active Handoff v2 — Rival 2.0 RocketSim Reciprocal Cross-Validation
 
-## Purpose
+## Authority and version boundary
 
-This milestone is an **inverse-environment validation** of RivalSim, not a training milestone.
+This is the controlling `v2` handoff for the next RivalSim objective.
 
-Rival and public Nexto have already been run inside RivalSim. The published RivalSim full-match benchmark at commit `15d6119f2fc860a81c64c81f9eec722b6b99f1ad` showed final-45B Rival overwhelmingly beating pinned public Nexto, but most Rival scoring came directly from kickoff.
+The prior RocketSim handoff remains recoverable in Git history. This version updates it after completion of the RivalSim kickoff-free benchmark at:
 
-The user now wants the reciprocal experiment:
+`9807da8b3c404beb63a5426959132de549332128`
 
-> Keep Nexto in the RocketSim/RLGym-style environment it was built and trained around, adapt only frozen Rival into that environment, and compare the matchup behavior/results against the already-published RivalSim benchmark.
+Do **not** repeat the completed RivalSim open-play benchmark. Its result is now reference evidence.
 
-The goal is to answer two separate questions:
-
-1. **Simulator cross-validation:** Does the same frozen Rival-vs-Nexto matchup produce broadly similar performance in RocketSim and RivalSim?
-2. **Open-play skill:** When kickoff is removed inside RocketSim, how does frozen Rival perform against frozen Nexto in ordinary 1v1 play?
-
-This milestone supersedes the previously active RivalSim-only kickoff-free open-play handoff for now. Do **not** execute `handoff/rival2-nexto-open-play/README.md` during this milestone unless a later explicit authorization reactivates it.
+The immediate implementation objective is to build and validate the adapter required to run frozen final-45B Rival inside pinned RocketSim. Once the adapter passes the gates below, continue through both the **normal full-match benchmark with kickoffs** and the **kickoff-free open-play benchmark**, then publish the cross-simulator comparison.
 
 No learning is authorized.
 
 ---
 
-## Frozen identities
+## 1. Purpose
+
+Keep public Nexto in the RocketSim/RLGym-style environment and semantics it was built around. Adapt only frozen Rival into that environment:
+
+`RocketSim state -> RIVAL2_OBS_V1 adapter -> frozen Rival policy -> native 8 controls -> RocketSim`
+
+The milestone must answer three questions:
+
+1. **Adapter fidelity:** Can RocketSim state reproduce frozen Rival's accepted `RIVAL2_OBS_V1` semantics and deterministic action behavior without redefining the policy contract?
+2. **Normal-match transfer:** In ordinary 5-minute RocketSim 1v1 matches with real kickoffs and goal resets, how does frozen Rival perform against native/source public Nexto?
+3. **Side-asymmetry localization:** Does the large Rival Blue/Orange split observed in RivalSim persist in RocketSim, both in normal matches and after kickoff is removed?
+
+### Completed RivalSim reference evidence
+
+Full-match reference:
+
+- `docs/RIVAL2_NEXTO_RESULTS.md`;
+- `results/rival2/nexto/`;
+- completion commit `15d6119f2fc860a81c64c81f9eec722b6b99f1ad`.
+
+Kickoff-free reference:
+
+- `docs/RIVAL2_NEXTO_OPEN_PLAY_RESULTS.md`;
+- `results/rival2/nexto_open_play/`;
+- completion commit `9807da8b3c404beb63a5426959132de549332128`.
+
+Completed RivalSim kickoff-free result:
+
+- overall decisive Rival win rate: `54.772%`;
+- Rival as Blue: `46.948%`;
+- Rival as Orange: `62.545%`;
+- Orange-minus-Blue difference: approximately `15.597` percentage points;
+- original vs exact mirrored states: `55.158% / 54.384%`;
+- Rival inheriting original Blue vs original Orange physical car: `54.678% / 54.866%`.
+
+Blue/Orange must remain an explicit diagnostic dimension throughout this milestone.
+
+---
+
+## 2. Frozen identities
 
 ### Rival
 
-Use the final Rival 2.0 checkpoint exactly:
+Use exactly:
 
 `checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt`
 
@@ -37,342 +71,290 @@ Expected policy version / cumulative samples:
 
 `5403 / 45,323,649,024`
 
-Rival remains:
+Preserve:
 
-- `RIVAL2_OBS_V1`;
-- native hybrid 8-controller action;
-- deterministic deployment action for canonical testing;
-- ordinary stochastic hybrid sampling only where the robustness protocol explicitly requests it;
-- policy cadence: 30 Hz / one action every 4 physics ticks.
+- `RIVAL2_OBS_V1` unchanged;
+- `RIVAL2_ACTION_V1` / native hybrid 8-controller output unchanged;
+- deterministic deployment action for canonical tests;
+- stochastic hybrid sampling only where the robustness protocol explicitly requests it;
+- 30 Hz policy cadence / one action every four 120-Hz physics ticks.
 
-Do not change or retrain the policy.
+Rival's normal policy handles its own kickoff play. Do not add or substitute a scripted Rival kickoff controller.
 
 ### Nexto
 
-Use the exact already-pinned public Nexto:
+Use the exact pinned public Nexto:
 
 `Rolv-Arild/Necto@2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca`
 
-Expected public model SHA-256:
+Expected model SHA-256:
 
 `BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA`
 
-Use the upstream/source Nexto semantics in the RocketSim harness rather than depending on the RivalSim GPU port for the official reciprocal result:
+For the official RocketSim result, exercise source/reference Nexto semantics as directly as practical:
 
-- upstream `nexto_obs.py` observation semantics;
+- upstream `nexto_obs.py` semantics;
 - upstream TorchScript model;
 - exact 90-action lookup table;
-- deterministic `beta=1` policy selection;
-- 15 Hz / 8-tick neural cadence;
+- deterministic `beta=1` selection;
+- 15 Hz / one neural decision every eight physics ticks;
 - exact stock hard-coded kickoff controls at 120 Hz.
 
-The already-published GPU-port fidelity evidence may be used as supporting evidence, but the official RocketSim result should exercise the source/reference Nexto path as directly as practical.
+The RivalSim GPU Nexto port is prior/supporting fidelity evidence only, not the official RocketSim Nexto implementation.
 
 Preserve upstream provenance and CC BY-NC-SA 4.0 attribution.
 
-### RocketSim reference physics
+### RocketSim
 
-Use the exact RocketSim physics lineage RivalSim was ported against:
+Reference physics lineage:
 
 `ZealanL/RocketSim@c2baacb8f4b441dd8505e63c2aeb5a1679b60b02`
 
-Use the accepted Python/binding path already used by the RivalSim project if available (historically `rocketsim==2.2.1`), but record the exact runtime package/version/source identity in the evidence.
+Use the accepted Python/binding path corresponding to that lineage if demonstrable. Historically `rocketsim==2.2.1` was used by the project, but record the exact package/source identity actually executed.
 
-Do not silently substitute another RocketSim physics revision. If the available Python binding cannot be demonstrated to correspond to the accepted reference physics, build/use an appropriate binding from the pinned source or stop with a clear identity failure rather than comparing against an unknown physics build.
+Do not silently substitute an unknown physics revision. If the installed binding cannot be tied to the accepted reference lineage, resolve the identity from the pinned source or stop with a clear identity failure.
 
 Physics rate: 120 Hz.
 
 ---
 
-## Phase 1 — Build a RocketSim -> Rival adapter
+## 3. Phase 1 — Build the RocketSim -> Rival adapter
 
-Do **not** port RivalSim into RocketSim. Build only the policy adapter needed to run frozen Rival from RocketSim/RLGym state.
+Do **not** port RivalSim into RocketSim and do not change `RIVAL2_OBS_V1` to make integration easier.
 
-Required flow:
-
-`RocketSim state -> RIVAL2_OBS_V1 adapter -> frozen Rival policy -> native 8 controls -> RocketSim`
-
-The adapter must reconstruct Rival's existing observation contract without redefining it.
+Build only the state/lifecycle adapter required to reconstruct Rival's existing observation contract and maintain its runtime memory fields.
 
 At minimum, faithfully derive or maintain:
 
-- ball position, linear velocity, angular velocity;
-- self/opponent car position, velocity, quaternion/orientation basis, angular velocity;
+- ball position, linear velocity and angular velocity;
+- self/opponent car position, velocity, quaternion/orientation basis and angular velocity;
 - boost amount;
-- grounded/jump/double-jump/flip state and derived jump/dodge availability;
-- demo state/timer semantics available from the RocketSim/RLGym state;
-- wheel/on-ground information required by the frozen observation contract;
-- all 34 boost-pad availability/cooldown fields with the exact Blue/Orange pad ordering/remap used by `RIVAL2_OBS_V1`;
+- grounded/wheel state;
+- jump, double-jump, dodge/flip availability and lifecycle semantics;
+- demo state and timer/respawn semantics available from RocketSim;
+- all 34 boost-pad availability/cooldown fields with exact `RIVAL2_OBS_V1` Blue/Orange ordering/remap;
 - relative ball/self/opponent features;
-- exact 180-degree Orange canonicalization;
-- previous Rival action state;
+- exact Orange 180-degree canonicalization;
+- Rival previous-action state;
 - kickoff indicator;
-- episode-age and no-touch-age fields maintained by the adapter/runtime with the same scaling expected by the frozen policy.
+- episode age and no-touch age with the scaling expected by the frozen policy.
 
-Do not change `RIVAL2_OBS_V1` to make RocketSim integration easier.
+Where RocketSim does not expose a field literally, derive it only from authoritative RocketSim state/lifecycle data when semantics are equivalent. Name and quantify any unavoidable semantic mismatch.
 
-If a RocketSim API does not expose an observation field literally, derive it from authoritative RocketSim state/lifecycle data when the semantics are equivalent. Document any field whose semantics cannot be represented exactly and quantify the difference rather than hiding it.
+### 3.1 Adapter parity corpus
 
-### Adapter parity gate
+Before official gameplay, construct at least **2,048 broad physically valid reference states** spanning both teams, all five kickoff layouts, ground/air states, jump/flip combinations, demos/respawns if representable, broad boost/pad states, broad ball states, and wall/corner/backboard-adjacent situations.
 
-Before any official matchup, prove that the RocketSim adapter reproduces Rival's accepted observation semantics.
-
-Construct at least **2,048 broad physically valid reference states** covering:
-
-- both teams;
-- all five kickoff layouts;
-- ground and airborne cars;
-- jump/flip availability combinations;
-- demos/respawn states if representable;
-- broad boost values and pad cooldown patterns;
-- broad ball positions/heights/velocities;
-- wall/corner/backboard-adjacent states.
-
-For each state, compare the RocketSim-built `RIVAL2_OBS_V1` against the accepted RivalSim observation builder for the same physical/lifecycle state.
+Compare RocketSim-built `RIVAL2_OBS_V1` against the accepted RivalSim observation builder for equivalent physical/lifecycle states.
 
 Publish:
 
-- max absolute error overall;
-- max error by observation block;
-- count of exact/non-exact fields;
+- max absolute error overall and by observation block;
+- exact/non-exact field counts;
 - deterministic Rival action agreement;
-- any known semantic mismatch.
+- all metrics separately for Rival-as-Blue and Rival-as-Orange;
+- every known semantic mismatch.
 
-Target: observation differences should be limited to unavoidable numeric representation noise. Deterministic action agreement should be 100% across the parity set. If deterministic actions disagree, do not proceed to the official benchmark until the adapter is corrected or the mismatch is explicitly shown to be an unavoidable environment-semantic difference and reported for review.
+Target: only unavoidable numeric representation noise and **100% deterministic action agreement**.
+
+### 3.2 Mandatory team/mirror symmetry diagnostic
+
+Create broad exact 180-degree/team-swapped physical-state pairs. For every pair, build both canonical observations and compare every block expected to be team-symmetric, then run frozen deterministic Rival on both.
+
+Publish observation error by block and deterministic native-action agreement. Expected action agreement is **100%** for canonical-equivalent pairs.
+
+If this fails, do not bury it in gameplay averages. Correct an adapter implementation error if one exists; otherwise stop before official benchmarking with the unresolved semantic difference documented.
 
 ---
 
-## Phase 2 — Reciprocal full-match benchmark in RocketSim
+## 4. Phase 2 — Normal 5-minute RocketSim matches with kickoffs
 
-Reproduce the already-published RivalSim matchup protocol as closely as the reference RocketSim environment permits.
+This is the **primary gameplay benchmark**. These are ordinary matches, not kickoff-free duels.
 
-### Match semantics
+### Match lifecycle
 
+- standard 1v1 Soccar;
 - 120 Hz RocketSim physics;
-- 5:00 active regulation = exactly 36,000 physics ticks;
-- goals preserve score and reset to kickoff;
-- tied regulation enters fresh-kickoff, next-goal-wins overtime;
-- preserve the same authorized simplification as the RivalSim benchmark: no Rocket League zero-second airborne continuation;
-- Rival native 30 Hz cadence;
-- Nexto native 15 Hz neural cadence;
-- Nexto exact stock hard-coded kickoff controller at 120 Hz;
-- standard Soccar boost, demos and respawns;
-- no Rival training-specific 15-second no-touch or 45-second episode truncation;
+- exactly 5:00 active regulation / 36,000 physics ticks;
+- every match begins from a standard kickoff;
+- every goal updates score and resets both players/ball to a standard kickoff;
+- kickoff layouts follow the normal five-layout set and are controlled/balanced for comparison;
+- tied regulation enters a fresh standard kickoff and next-goal-wins overtime;
+- Rival uses its frozen policy during kickoff and open play;
+- Nexto uses its exact stock source kickoff controller during kickoff and its neural policy during open play;
+- standard boost pads, demolition and respawn behavior continue throughout;
+- no Rival training no-touch/hard episode truncations;
 - no reward affects match outcome.
 
-### Canonical deterministic suite
+For apples-to-apples comparison with the already-published RivalSim full-match benchmark, retain its previously authorized omission of Rocket League's zero-second airborne continuation rule. Do not otherwise simplify kickoff or match lifecycle.
 
-Run exactly the same canonical matrix as the RivalSim benchmark:
+### 4.1 Canonical deterministic suite
 
-- all five starting kickoff layouts;
-- Rival as Blue and Rival as Orange;
-- 10 deterministic full matches total.
-
-Use frozen deterministic Rival and deterministic Nexto.
+Run exactly all five starting kickoff layouts with Rival as Blue and Rival as Orange: **10 deterministic full matches**.
 
 Publish every exact scoreline.
 
-### Stochastic Rival robustness suite
+### 4.2 Stochastic Rival robustness suite
 
-Run **4,096 full matches** if practical under RocketSim throughput:
+Target **4,096 complete 5-minute matches**:
 
-- 2,048 Rival as Blue;
-- 2,048 Rival as Orange;
-- Rival sampled from its ordinary stochastic hybrid action distribution using a fixed published seed;
-- Nexto remains deterministic;
-- kickoff layouts distributed evenly/deterministically.
+- 2,048 Rival Blue;
+- 2,048 Rival Orange;
+- fixed published Rival stochastic seed;
+- Nexto deterministic;
+- kickoff layouts evenly/deterministically distributed.
 
-If 4,096 is materially impractical in the reference CPU RocketSim runtime, do not silently shrink the suite. Publish measured throughput from a small targeted probe and choose the largest power-of-two count that is practical while preserving exact 50/50 Rival side balance and even kickoff distribution. The reason and final count must be explicit.
+If reference CPU RocketSim throughput makes 4,096 materially impractical, first publish a targeted throughput probe and then choose the largest practical power-of-two count while preserving exact 50/50 side balance and even kickoff distribution. Never silently shrink the suite.
 
-### Required full-match metrics
+### 4.3 Required normal-match output
 
-At minimum, publish separately for Rival as Blue and Rival as Orange:
+Report separately for Rival Blue and Rival Orange:
 
 - wins/losses;
 - regulation/OT wins;
 - win rate;
-- goals for/against;
-- goals per match;
+- goals for/against and goals per match;
 - mean/median goal differential;
-- exact deterministic scorelines;
-- touch count/share if available faithfully;
-- kickoff first-touch count;
-- direct kickoff goals using the same definition as the RivalSim benchmark (goal before more than one accepted touch after kickoff);
-- possession next-touch retention/opponent handoff if available;
+- exact canonical deterministic scorelines;
+- total kickoffs;
+- kickoff first-touch count/rate;
+- direct kickoff goals under the same definition used by the RivalSim benchmark;
+- touch count/share where faithful;
+- same-next-touch retention/opponent handoff where faithful;
 - demos;
-- goal-entry placement if practical.
+- goal-entry placement where practical.
 
-Do not hide Blue/Orange results inside only an aggregate.
+Also report physical Blue-team and Orange-team scoring/win totals regardless of policy assignment.
 
 ---
 
-## Phase 3 — Cross-simulator comparison
+## 5. Phase 3 — Cross-simulator normal-match comparison
 
-Compare the RocketSim result directly against the already-published RivalSim evidence at:
+Compare RocketSim directly against the completed RivalSim full-match evidence:
 
 - `docs/RIVAL2_NEXTO_RESULTS.md`;
 - `results/rival2/nexto/summary.json`;
 - `results/rival2/nexto/canonical_deterministic.json`;
 - `results/rival2/nexto/stochastic_robustness.json`.
 
-The purpose is not to require bit-identical trajectories. Small physics differences and chaotic divergence make that unrealistic.
+Do not require bit-identical trajectories. Compare distributions and qualitative ordering.
 
-Instead, compare **behavioral/performance distributions**.
+For every comparable metric publish RivalSim value, RocketSim value, absolute delta, and relative delta where meaningful.
 
-Publish a cross-simulator table containing at least:
+At minimum compare by side:
 
-- Rival win rate by side;
-- Rival goals/match by side;
-- Nexto goals/match by side;
-- mean goal differential by side;
+- Rival win rate;
+- Rival/Nexto goals per match;
+- mean goal differential;
 - kickoff first-touch rate;
-- kickoff-goal rate;
+- direct kickoff-goal rate;
 - touch share if available;
 - physical Blue-vs-Orange scoring totals;
-- deterministic 10-match result direction and score-range comparison.
+- deterministic result direction and score range.
 
-For every comparable metric report:
-
-- RivalSim value;
-- RocketSim value;
-- absolute delta;
-- relative delta where meaningful.
-
-### Cross-validation interpretation
-
-Do not manufacture a single pass/fail tolerance after seeing the results.
-
-Classify the evidence descriptively:
-
-- **STRONG_AGREEMENT** — same qualitative matchup dominance and similar major rates/distributions;
-- **PARTIAL_AGREEMENT** — same winner/qualitative ordering but material rate differences;
-- **DISAGREEMENT** — matchup ordering or core behavior changes materially between simulators.
-
-Explain which metrics drive the classification.
-
-Do not tune RivalSim or the policies during this milestone.
+Classify the normal-match evidence as `STRONG_AGREEMENT`, `PARTIAL_AGREEMENT`, or `DISAGREEMENT` and explain which metrics drive it. Do not tune either policy or simulator after seeing results.
 
 ---
 
-## Phase 4 — Kickoff-free open-play benchmark in RocketSim
+## 6. Phase 4 — Kickoff-free open-play benchmark in RocketSim
 
-After the reciprocal full-match benchmark is complete, use RocketSim to answer the separate open-play question.
-
-This phase is **inside RocketSim only**. It does not require the deferred RivalSim-only open-play handoff.
-
-### Open-play state bank
+After the normal-match comparison is complete, reproduce the controlled open-play question inside RocketSim.
 
 Harvest exactly **4,096 physically continuous RocketSim open-play states**:
 
-- 2,048 from frozen Rival stochastic self-play in RocketSim;
-- 2,048 from deterministic pinned-Nexto self-play in RocketSim.
+- 2,048 from frozen Rival stochastic self-play;
+- 2,048 from deterministic native/source Nexto self-play.
 
-Eligibility:
+Capture only ordinary continuous play at least 600 physics ticks after kickoff/reset, after at least one accepted touch, with both cars active, no pending goal/reset, and the ball inside the scoring plane. Preserve all RocketSim physical/lifecycle state necessary for faithful continuation.
 
-- at least 5.0 active simulated seconds since kickoff/reset;
-- at least one accepted ball touch since kickoff;
-- no goal/reset pending;
-- ball not beyond scoring plane;
-- both cars active/not demolished at capture;
-- ordinary continuous play, not kickoff control.
+Initialize only policy previous-action memory neutrally at restored start; do not erase real physical timers/state.
 
-Preserve all RocketSim state necessary for faithful continuation, including car/ball state, boost/pad state, and relevant lifecycle state.
+For each base state run four deterministic duels:
 
-At restored starts initialize policy previous-action memory neutrally to zero for both policies while preserving real physical/lifecycle state.
-
-### Four-way paired replay
-
-For each of 4,096 base states run four deterministic duels:
-
-1. original state — Rival Blue / Nexto Orange;
-2. original state — Nexto Blue / Rival Orange;
+1. original — Rival Blue / Nexto Orange;
+2. original — Nexto Blue / Rival Orange;
 3. exact 180-degree/team-swapped mirror — Rival Blue / Nexto Orange;
 4. exact mirror — Nexto Blue / Rival Orange.
 
-Total: **16,384 kickoff-free open-play duels**.
+Total: **16,384 duels**.
 
-Each duel:
+Each duel begins directly in open play, has no kickoff at start, ends on first goal, has no goal reset, and draws at exactly 60 simulated seconds if unresolved.
 
-- starts directly from restored open play;
-- has no kickoff at start;
-- first goal wins;
-- no goal reset/kickoff after scoring;
-- maximum 60 simulated seconds;
-- unresolved at 60 seconds = draw;
-- standard RocketSim physics/boost/demos/respawns continue.
+Publish overall and side-separated wins/losses/draws, decisive win rate, all-duel win fraction, time-to-goal, source distribution, original/mirror split, inherited physical role, closest-to-ball, field third/height, boost advantage, and four-duel family outcomes.
 
-### Required open-play output
-
-Publish overall and stratified:
-
-- Rival wins;
-- Nexto wins;
-- draws;
-- decisive-duel Rival win rate;
-- all-duel Rival win fraction;
-- time-to-goal by winner;
-- Rival-as-Blue vs Rival-as-Orange;
-- source state distribution;
-- original vs mirrored;
-- closest-to-ball at start;
-- initial ball third/height;
-- paired-family result: Rival wins 4/4, 3/4, 2/4, 1/4, 0/4, plus draw-incomplete families.
-
-Reuse touch/possession/trajectory telemetry where practical, but do not let telemetry complexity block the core outcome benchmark.
-
-This phase answers whether Rival's apparent Nexto dominance exists without kickoff inside the reference RocketSim environment.
+Where practical, reuse touch/possession/trajectory telemetry from the RivalSim protocol.
 
 ---
 
-## Integrity checks
+## 7. Phase 5 — Side-asymmetry localization
 
-This is a targeted validation milestone, not general release ceremony.
+Compare the RocketSim Blue/Orange split against both completed RivalSim protocols.
 
-Required checks only:
+Explicitly answer:
+
+- Does normal RocketSim play show the same Orange advantage seen in RivalSim full matches?
+- Does RocketSim kickoff-free play reproduce the RivalSim `46.948%` Blue vs `62.545%` Orange split?
+- Are original/mirror and inherited-physical-role controls close while team assignment remains separated?
+- Did the adapter parity/symmetry corpus show any team-dependent observation or action discrepancy?
+
+Interpretation guide:
+
+- asymmetry present in both simulators with clean adapter symmetry -> policy/contract/game-side semantics become more likely than RivalSim-specific physics;
+- asymmetry large in RivalSim but absent/reduced in RocketSim with clean adapter symmetry -> RivalSim simulator/lifecycle asymmetry becomes more likely;
+- asymmetry appears only after adapter introduction or parity differs by team -> adapter/canonicalization defect becomes the first suspect.
+
+Do not claim causality beyond what the evidence supports.
+
+---
+
+## 8. Integrity checks
+
+Required targeted checks:
 
 - frozen Rival checkpoint identity exact;
 - pinned Nexto source/model identity exact;
 - pinned RocketSim reference identity exact;
-- Rival adapter parity gate;
-- deterministic Rival action agreement on parity states;
-- Nexto source path identity/semantics preserved;
-- exact match counts/side assignment;
-- full-match and open-play termination semantics correct;
-- no policy/reward/PPO/simulator tuning during the run;
-- no telemetry buffer overflow if telemetry is used;
-- state capture/restore integrity for the RocketSim open-play bank;
-- mirror involution check for open-play state transforms.
+- adapter parity corpus complete;
+- deterministic Rival action agreement reported overall and by side;
+- team/mirror symmetry diagnostic complete;
+- Nexto source semantics preserved;
+- normal full-match counts, side balance, kickoff lifecycle and score/reset behavior exact;
+- RocketSim open-play state capture/restore integrity;
+- open-play mirror involution;
+- exact duel assignment counts and termination semantics;
+- no training/tuning during evaluation;
+- no telemetry overflow if telemetry is used.
 
-Do not run unrelated Ruff/pytest/compileall/regression/parity suites unless a changed implementation path actually requires a small targeted check to establish correctness.
+Avoid unrelated release/lint/regression ceremony unless a changed implementation path requires a small targeted correctness check.
 
 ---
 
-## Published evidence
+## 9. Published evidence
 
 Publish at minimum:
 
-- human-readable report: `docs/RIVAL2_ROCKETSIM_CROSSCHECK.md`;
-- machine summary: `results/rival2/rocketsim_crosscheck/summary.json`;
-- Rival adapter parity evidence;
+- `docs/RIVAL2_ROCKETSIM_CROSSCHECK.md`;
+- `results/rival2/rocketsim_crosscheck/summary.json`;
 - RocketSim runtime/provenance identity;
-- canonical full-match ledger;
-- stochastic full-match summary/ledger;
-- cross-simulator metric comparison;
-- RocketSim open-play state-bank description;
-- RocketSim open-play per-duel ledger;
-- RocketSim open-play paired-family summary.
-
-Record implementation entrypoints and exact artifact hashes where appropriate.
+- Rival adapter parity + team/mirror symmetry evidence;
+- canonical normal-match ledger;
+- stochastic normal-match summary/ledger;
+- normal-match RivalSim-vs-RocketSim comparison;
+- RocketSim kickoff-free state-bank description;
+- RocketSim kickoff-free per-duel ledger;
+- paired-family summary;
+- side-asymmetry localization summary;
+- relevant implementation entrypoints and artifact hashes.
 
 ---
 
-## Explicitly deferred work
+## 10. Explicitly deferred work
 
 Do **not** train Rival against Nexto during this milestone.
 
-Do **not** begin fake-kickoff curriculum training yet. The user's planned future fake-kickoff curriculum remains recorded: opponents may intentionally backflip/retreat to boost, concede first contact, and receive Rival's kickoff hit. That becomes useful after the simulator/open-play validation is understood.
+Do **not** begin fake-kickoff curriculum training yet. Retreat/backflip-to-boost opponents that intentionally concede first contact remain future curriculum work.
 
-Do not change Rival's reward, PPO, architecture, observation/action contracts, or physics.
+Do not change Rival's reward, PPO, architecture, observation/action contracts, controller semantics, or either simulator's physics.
 
 Do not build the viewer or begin v0.6.
 
@@ -380,11 +362,12 @@ Do not build the viewer or begin v0.6.
 
 ## Stop boundary
 
-When:
+When all of the following are complete:
 
-1. the RocketSim Rival adapter passes its targeted parity gate;
-2. the reciprocal RocketSim full-match benchmark is complete;
-3. the cross-simulator RivalSim-vs-RocketSim comparison is published; and
-4. the RocketSim kickoff-free open-play benchmark is complete,
+1. RocketSim -> Rival adapter passes targeted parity and team/mirror symmetry gates;
+2. normal 5-minute RocketSim Rival-vs-Nexto matches with kickoffs are complete;
+3. normal-match RivalSim-vs-RocketSim comparison is published;
+4. RocketSim kickoff-free open-play benchmark is complete;
+5. Blue/Orange asymmetry localization is published;
 
 commit and push all implementation/evidence to `origin/main` and stop for review.
