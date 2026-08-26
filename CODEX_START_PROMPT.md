@@ -1,60 +1,22 @@
-# Closed Codex Boundary — Rival 2.0 Campaign 02 Complete
+# Active Codex Handoff — Rival 2.0 Campaign 03
 
-RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 02 has completed its exact
-controlled entropy-off execution and is now closed.
+Campaign 02 is complete at commit `816c66b455d253b0f563bb378e53316a09ffd48e` with behavioral result `IMPROVED`. Campaign 03 is now authorized as a **direct training run**, not another preflight/validation exercise.
 
-Campaign 02 reproduced Campaign 01's seed-`20260826` initialization model SHA-256 and every
-substantive initialization-evaluation value exactly. It changed only the campaign-layer PPO
-entropy coefficient from `0.01` to `0.0`; every other model, contract, PPO, self-play, seed,
-world-count, rollout, checkpoint, and evaluation semantic remained fixed.
+Read `handoff/rival2-c03/README.md` in full and execute it as the controlling specification.
 
-The 131,072-world, horizon-32 run stopped at update 12 with 100,663,296 agent decision samples,
-the first completed update crossing 100M. Initialization plus the first 10M/25M/50M/100M
-threshold checkpoints and evaluations were preserved and published.
+## Mission
 
-Independent closeout statuses:
+1. Preserve all published v0.1-v0.5 and Campaign 01/02 evidence unchanged.
+2. Preserve `RIVAL2_REWARD_V1` and introduce Campaign 03 `RIVAL2_REWARD_V2` by adding one per-agent dense term:
 
-- execution status: `COMPLETE`;
-- behavioral result under the prospectively fixed rule: `IMPROVED`;
-- initialization control: `PASS_GREEN`;
-- final exact checkpoint continuation: `PASS_GREEN`;
-- frozen v0.5 trainer: unchanged (`PASS_GREEN`).
+   `approach = (car_ball_distance_before - car_ball_distance_after) / 4096.0`
 
-Campaign 02 improved two of the three primary metrics relative to initialization and was not
-worse than Campaign 01 final on any of them. Ordinary self-play touches/minute reached `0.291182`
-versus `0.272091` at initialization and `0.175624` at Campaign 01 final. Stochastic touch
-differential versus initialization reached `+35` versus `+15` initially and `-46` at Campaign 01
-final. Stochastic goal differential was `-3`, slightly worse than the initialization value `-2`
-but better than Campaign 01 final `-16`.
+   Distance is true 3D Euclidean distance in unreal units across one four-tick/30-Hz decision interval, measured before physics and at the final pre-reset transition state. Each agent receives its own approach term; it is intentionally not forced to zero-sum.
+3. Keep the Campaign 02 PPO baseline, especially `entropy_coefficient=0.0`. Do not change any other PPO/model/observation/action/episode/self-play setting.
+4. Run only the tiny targeted GPU reward-sign/reset-leakage smoke described in the handoff. **Do not run capacity preflight, initialization evaluation, inherited parity/regression gates, world-count sweeps, or repeated held-out evaluations before training.**
+5. Immediately train from scratch at 131,072 worlds / horizon 32 through the first completed update crossing 100,000,000 agent decision samples.
+6. Save resumable checkpoints at the first updates crossing 25M, 50M, and 100M.
+7. After training, run one 4,096-world ordinary stochastic self-play evaluation using evaluation seed `920260826`. Compare final touch rate, goal rate, goal termination, and no-touch truncation directly with Campaign 02 final.
+8. Publish compact Campaign 03 evidence and the final resumable checkpoint, then stop.
 
-No Campaign 02 update crossed the diagnostic instability thresholds. Maximum approximate KL was
-`0.008194` at update 2 and maximum clip fraction was `0.087534` at update 6. Representative final
-analog standard deviation was approximately `1.015`, far below the `exp(1)` ceiling; the
-Campaign 01 update-4 instability did not recur. This is controlled behavioral improvement, not a
-claim of learned Rocket League competence or external transfer.
-
-The full resumable final checkpoint is published at
-`checkpoints/rival2/campaign02/rival2_campaign02_100m_resume.pt`. Its SHA-256 is
-`4A9B366CD3A04222D639252EB2E3EBAD194AF2154D9DBFF213B1AF89A3909FA0` and its exact size is
-21,126,324 bytes.
-
-Read the completed evidence in:
-
-- `docs/RIVAL2_CAMPAIGN02_RESULTS.md`;
-- `results/rival2/campaign02/summary.json`;
-- `results/rival2/campaign02/comparison_campaign01.json`;
-- `results/rival2/campaign02/optimizer_diagnosis.json`;
-- `results/rival2/campaign02/initialization_control.json`;
-- `results/rival2/campaign02/evaluation_000m.json` through `evaluation_100m.json`;
-- `results/rival2/campaign02/training_curve.json`;
-- `handoff/rival2-c02/README.md`;
-- `handoff/rival2-c02/DIAGNOSIS.md`;
-- `handoff/rival2-c02/CAMPAIGN.md`;
-- `handoff/rival2-c02/ACCEPTANCE.md`.
-
-Tracked v0.1-v0.5 results, Campaign 01 artifacts, the four Rival 2.0 contracts, and the frozen
-v0.5 training implementation remain byte-for-byte unchanged.
-
-No further work is authorized by this prompt. Do not continue Campaign 02 training, tune another
-hyperparameter, change rewards, begin a curriculum, or begin v0.6 RocketSim/RLBot transfer. A new
-explicit controlling handoff is required for any subsequent work.
+The point of this run is to see whether a dense car-to-ball approach signal materially reduces the roughly 99% no-touch timeout rate. Do not add curricula, another reward term, action masks, hyperparameter tuning, or v0.6 RocketSim/RLBot work in this run.
