@@ -1,0 +1,644 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T12:46:13.905450+00:00",
+  "authority": "handoff/rival2-behavioral-eval/README.md",
+  "authorized_head": "df295da1bcaec07170465f22fdc512b66fdd7538",
+  "evaluated_head": "df295da1bcaec07170465f22fdc512b66fdd7538",
+  "evaluation_kind": "ordinary stochastic current-policy self-play",
+  "execution_provenance": {
+    "independent_stochastic_evaluations_published": 1,
+    "process_attempts": 2,
+    "rejected_attempts": 1,
+    "rejected_attempt_detail": "the identical frozen rollout completed, but publication was rejected because the initial telemetry-only surface transition buffer and 30 Hz touch cross-check were specified incorrectly; no metrics or raw events from that recorder attempt were retained or selected",
+    "restart_policy": "same checkpoint, seed, kickoff assignment, stochastic generator seed, policy, and simulator; only the read-only recorder was corrected before the published replay"
+  },
+  "worlds": 16384,
+  "seed": 920260826,
+  "policy_sampling_seed": 920260826,
+  "maximum_decisions": 1350,
+  "policy_hz": 30,
+  "physics_hz": 120,
+  "physics_ticks_per_decision": 4,
+  "episode_scope": "first completed episode per world",
+  "opponent": "same final checkpoint controlling both cars; no historical opponent",
+  "kickoff_layout_assignment": "(world_index + evaluation_seed) modulo 5",
+  "kickoff_layout_counts": {
+    "0": 3276,
+    "1": 3277,
+    "2": 3277,
+    "3": 3277,
+    "4": 3277
+  },
+  "canonicalization": "180-degree field-plane rotation for orange touches: canonical X/Y and X/Y velocity are multiplied by +1 for blue, -1 for orange; canonical +Y is the toucher's opponent-goal direction; Z is unchanged",
+  "direction_threshold": {
+    "quantity": "immediate canonical post-touch longitudinal velocity",
+    "symmetric_threshold_uu_per_s": 100.0,
+    "forward": "> +100",
+    "lateral_neutral": "between -100 and +100, inclusive",
+    "backward": "< -100",
+    "authority_note": "classification is descriptive; continuous values remain primary"
+  },
+  "goal_geometry": {
+    "scoring_plane_center_y_uu": 5215.5,
+    "scoring_plane_source": "rivalsim/kernels/lifecycle.py: GOAL_BASE_THRESHOLD_Y + BALL_RADIUS",
+    "opponent_goal_center_y_uu": 5120.0,
+    "goal_center_z_uu": 321.3875,
+    "goal_half_width_uu": 892.755,
+    "goal_height_uu": 642.775,
+    "mouth_bounds_for_ball_center_projection": {
+      "x_uu": [
+        -892.755,
+        892.755
+      ],
+      "z_uu": [
+        0.0,
+        642.775
+      ]
+    },
+    "mouth_geometry_source": "docs/PHYSICS_ORACLES.md RLBot/RLGym arena values; used descriptively, not as a collision substitute or an episode rule"
+  },
+  "surface_classification": {
+    "source": "retained ball-world contact normals from the actual static CMF collision path",
+    "rule": "dominant absolute normal axis: +Z ground, -Z ceiling, X side wall, Y backboard/goal structure",
+    "curved_surface_note": "ramps and curved transitions inherit the category of their dominant normal axis",
+    "sequence_rule": "record category contact onsets; persistent contacts do not repeat, and simultaneous new categories use the declared ground, side-wall, backboard, ceiling order"
+  },
+  "touch_sequence_end": "next accepted player touch, scoring event, or first-episode termination/truncation",
+  "simultaneous_touch_order": "the existing per-world source-backed car _PreTickUpdate visitation order",
+  "telemetry_capacity": {
+    "touches_per_world": 256,
+    "surface_transitions_since_final_touch": 128,
+    "overflow_is_fatal": true
+  },
+  "checkpoint": {
+    "path": "G:/dev/RivalSim/checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt",
+    "sha256": "4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E",
+    "size_bytes": 48720678,
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "reward_version": "RIVAL2_REWARD_V1",
+    "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+    "iteration": 5403,
+    "policy_version": 5403,
+    "total_agent_samples": 45323649024,
+    "checks": {
+      "format_exact": true,
+      "reward_v1_exact": true,
+      "policy_config_exact": true,
+      "policy_config_hash_exact": true,
+      "sha256_exact": true
+    }
+  },
+  "collision_geometry": {
+    "format": "RocketSim CMF",
+    "scale_uu_per_bt": 50.0,
+    "file_count": 16,
+    "vertices": 4468,
+    "triangles": 8020,
+    "bounds_uu": {
+      "min": [
+        -4107.333984375,
+        -5999.9951171875,
+        -13.267789840698242
+      ],
+      "max": [
+        4107.333984375,
+        5999.9951171875,
+        2075.4521484375
+      ]
+    },
+    "combined_content_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+    "files": [
+      {
+        "file": "mesh_0.cmf",
+        "size_bytes": 16364,
+        "sha256": "8764D43B87BA134CACF1BE454D59D493630188E79C0D88639258B359BB511C4E",
+        "rocketsim_mesh_hash": "A160BAF9",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_1.cmf",
+        "size_bytes": 16364,
+        "sha256": "9D42E5DB7CDE5C7BE0783C256E15E819BD09351FCB2DEBD3205E3D055073C993",
+        "rocketsim_mesh_hash": "2811EEE8",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            -102.5067138671875,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            -66.52424621582031,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            -5125.3359375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            -3326.21240234375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_2.cmf",
+        "size_bytes": 16364,
+        "sha256": "762EC145DB3C317D82314AD94AF6F8B591E822C26860ED3C0EE106ABA5591EEE",
+        "rocketsim_mesh_hash": "14B84668",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            48.52716827392578,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            82.13823699951172,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            2426.3583984375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            4106.91162109375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_3.cmf",
+        "size_bytes": 16364,
+        "sha256": "0DB5C559287BCD255B99E6F5DB341B874EC9A5FCF6137247CF16D913E178DB5C",
+        "rocketsim_mesh_hash": "EC759EBF",
+        "vertices": 483,
+        "triangles": 880,
+        "bounds_bt": {
+          "min": [
+            -82.13823699951172,
+            66.52424621582031,
+            -0.26535579562187195
+          ],
+          "max": [
+            -48.52716827392578,
+            102.5067138671875,
+            41.418357849121094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4106.91162109375,
+            3326.21240234375,
+            -13.267789840698242
+          ],
+          "max": [
+            -2426.3583984375,
+            5125.3359375,
+            2070.91796875
+          ]
+        }
+      },
+      {
+        "file": "mesh_4.cmf",
+        "size_bytes": 18236,
+        "sha256": "92C3224DA44F1A359140647845A44457DF35541458B92485E7A3232BB596566A",
+        "rocketsim_mesh_hash": "94FB0D5C",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_5.cmf",
+        "size_bytes": 18236,
+        "sha256": "776C24B1231B4F7AB5437AF68E4CC1CC4D5CD7875B8CB386A67487162C3941A3",
+        "rocketsim_mesh_hash": "DEA07102",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            86.72172546386719,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            119.9999008178711,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            4336.08642578125,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            5999.9951171875,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_6.cmf",
+        "size_bytes": 18236,
+        "sha256": "A2262BFA2BFACCA3CAF3A8334F02B9B52624056853CC33A1340A23C3A33804E6",
+        "rocketsim_mesh_hash": "BD4FBEA8",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -53.7599983215332,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            0.0008691400289535522,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -2688.0,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            0.04345700144767761,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_7.cmf",
+        "size_bytes": 18236,
+        "sha256": "C887DF022D6A2B33E78A3CF8F5DD65D9CD61F4D72009781D40C32091119A06F3",
+        "rocketsim_mesh_hash": "39A47F63",
+        "vertices": 536,
+        "triangles": 983,
+        "bounds_bt": {
+          "min": [
+            -0.0008691400289535522,
+            -119.9999008178711,
+            -0.17157359421253204
+          ],
+          "max": [
+            53.7599983215332,
+            -86.72172546386719,
+            41.50904083251953
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -0.04345700144767761,
+            -5999.9951171875,
+            -8.578680038452148
+          ],
+          "max": [
+            2688.0,
+            -4336.08642578125,
+            2075.4521484375
+          ]
+        }
+      },
+      {
+        "file": "mesh_8.cmf",
+        "size_bytes": 416,
+        "sha256": "3350567082D9A133F59F8471D941FDE6CCE20EB2B2BC26C2AB0566B7FB7A21E9",
+        "rocketsim_mesh_hash": "3D79D25D",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_9.cmf",
+        "size_bytes": 416,
+        "sha256": "4864911A7F0A3ADD929F41CC8F676CDE416DCC3C07AB08A30742C9893E8A6CE8",
+        "rocketsim_mesh_hash": "D84C7A68",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            69.43444061279297,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            82.14667510986328,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3471.721923828125,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            4107.333984375,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_10.cmf",
+        "size_bytes": 2480,
+        "sha256": "36CC44E14A0E500AEB6167A4D5FCE449B218B3D941DF3CA46F398D269B01AF3D",
+        "rocketsim_mesh_hash": "B81AC8B9",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_11.cmf",
+        "size_bytes": 2480,
+        "sha256": "7F4468BE0B0835A48996F92D1A2398F1290ACBF1152D39E1C53C2701D1FB6CE3",
+        "rocketsim_mesh_hash": "760358D3",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            74.2527847290039,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            82.11994934082031,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            3712.63916015625,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            4105.99755859375,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_12.cmf",
+        "size_bytes": 2480,
+        "sha256": "952A90A0FF27C2733D507E59BDCA8600968276EDDAD9A41B47A689010E805118",
+        "rocketsim_mesh_hash": "73AE4940",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -4.189986668734491e-08,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            76.79999542236328,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -2.094993305945536e-06,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            3839.999755859375,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_13.cmf",
+        "size_bytes": 2480,
+        "sha256": "B441F782F07E81C2444ED7A5C4ED618C26EF3E1940AC2C63C362154620631750",
+        "rocketsim_mesh_hash": "918F4A4E",
+        "vertices": 80,
+        "triangles": 126,
+        "bounds_bt": {
+          "min": [
+            -82.11994934082031,
+            -76.79999542236328,
+            -0.2571917772293091
+          ],
+          "max": [
+            -74.2527847290039,
+            4.189986668734491e-08,
+            7.100258827209473
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4105.99755859375,
+            -3839.999755859375,
+            -12.859588623046875
+          ],
+          "max": [
+            -3712.63916015625,
+            2.094993305945536e-06,
+            355.012939453125
+          ]
+        }
+      },
+      {
+        "file": "mesh_14.cmf",
+        "size_bytes": 416,
+        "sha256": "085F7533C53A73DA664C129C3B1C93F5CE08CEB302AA5B993FF5FE95AF5D6AE8",
+        "rocketsim_mesh_hash": "1F8EE550",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            -76.80001068115234,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            -4.639201506506652e-06,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            -3840.00048828125,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            -0.00023196007532533258,
+            2059.33349609375
+          ]
+        }
+      },
+      {
+        "file": "mesh_15.cmf",
+        "size_bytes": 416,
+        "sha256": "21C1D1EB450F9E09EE8D7D55E1D41BF563518F9B2DEB2AB5369C47139FAA2E4A",
+        "rocketsim_mesh_hash": "255BA8C1",
+        "vertices": 18,
+        "triangles": 16,
+        "bounds_bt": {
+          "min": [
+            -82.14667510986328,
+            4.639201506506652e-06,
+            28.47520637512207
+          ],
+          "max": [
+            -69.43444061279297,
+            76.80001068115234,
+            41.186668395996094
+          ]
+        },
+        "bounds_uu": {
+          "min": [
+            -4107.333984375,
+            0.00023196007532533258,
+            1423.7603759765625
+          ],
+          "max": [
+            -3471.721923828125,
+            3840.00048828125,
+            2059.33349609375
+          ]
+        }
+      }
+    ]
+  },
+  "device": "cuda:0",
+  "platform": {
+    "python": "3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)]",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "os": "Windows-11-10.0.26200-SP0",
+    "gpu": "NVIDIA GeForce RTX 5090"
+  },
+  "evaluator_sources": {
+    "benchmarks/run_rival2_behavioral_telemetry.py": "432A2D62852DA2A44B76539FD0664D8B51D7736A9008D41E7530FC1CFE26AC7A",
+    "rivalsim/behavioral_telemetry.py": "F90B2BCA1D220B748510B566BD3AB6DA95B8DC3688501C1AB66F8DC4E6481B99"
+  },
+  "non_interference": {
+    "training_updates": 0,
+    "checkpoint_mutated": false,
+    "reward_model_ppo_observation_action_episode_simulator_semantics_changed": false,
+    "telemetry_feedback_to_policy_or_simulator": false,
+    "telemetry_collection": "post-physics read-only Warp kernel at 120 Hz"
+  }
+}

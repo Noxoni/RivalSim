@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T12:46:48.411491+00:00",
+  "verdict": "PASS_GREEN",
+  "scope": "single authorized final-45B-checkpoint behavioral evaluation",
+  "configuration_path": "results/rival2/behavioral_telemetry/configuration.json",
+  "evaluation": {
+    "schema_version": 1,
+    "verdict": "PASS_GREEN",
+    "worlds": 16384,
+    "completed_episodes": 16384,
+    "decisions_executed": 1350,
+    "world_decisions": 11081878,
+    "simulated_seconds": 369395.93333333335,
+    "wall_clock_seconds": 29.523748599924147,
+    "goal_terminated_episodes": 15140,
+    "no_touch_truncated_episodes": 46,
+    "hard_truncated_episodes": 1198,
+    "mean_episode_duration_seconds": 22.54613850911459,
+    "accepted_touch_entries": 530968,
+    "thirty_hz_car_intervals_with_touch_presence": 528772,
+    "touch_cross_check_note": "the 30 Hz observation is boolean touch presence per car/decision interval; the 120 Hz telemetry counts distinct accepted entries, so it must be greater than or equal",
+    "mean_absolute_analog_action": {
+      "throttle": 0.5896249394750178,
+      "steer": 0.4260776121624975,
+      "pitch": 0.27035645281084125,
+      "yaw": 0.27581830832992504,
+      "roll": 0.29893559357286115
+    },
+    "button_activation_rate": {
+      "jump": 0.7751645073154568,
+      "boost": 0.3259904593788165,
+      "handbrake": 0.04432890345842103
+    },
+    "integrity": {
+      "observations_finite": true,
+      "actor_outputs_finite": true,
+      "values_finite": true,
+      "actions_finite": true,
+      "analog_bounds": true,
+      "buttons_exact_binary": true,
+      "exclusive_done_kind": true,
+      "all_worlds_completed": true,
+      "zero_hot_h2d": true,
+      "zero_hot_d2h": true,
+      "telemetry_all_first_episodes_closed": true,
+      "telemetry_touch_capacity_not_exceeded": true,
+      "telemetry_surface_sequence_capacity_not_exceeded": true,
+      "telemetry_goal_count_matches_episode_terminations": true,
+      "telemetry_touch_count_not_below_interval_touch_presence": true
+    },
+    "hot_path_transfer_bytes": {
+      "h2d": 0,
+      "d2h": 0
+    }
+  },
+  "headline": {
+    "touches": 530968,
+    "goals": 15140,
+    "direction": {
+      "backward": {
+        "count": 93999,
+        "denominator": 530968,
+        "fraction": 0.17703326754154675
+      },
+      "lateral_neutral": {
+        "count": 32692,
+        "denominator": 530968,
+        "fraction": 0.061570565457805364
+      },
+      "forward": {
+        "count": 404277,
+        "denominator": 530968,
+        "fraction": 0.7613961670006478
+      }
+    },
+    "same_player_next_touch": {
+      "count": 368220,
+      "denominator": 530968,
+      "fraction": 0.6934881198113634
+    },
+    "opponent_next_touch": {
+      "count": 146364,
+      "denominator": 530968,
+      "fraction": 0.2756550300583086
+    },
+    "surface_continuation": {
+      "ground": {
+        "count": 127705,
+        "denominator": 530968,
+        "fraction": 0.24051355260580676
+      },
+      "side_wall": {
+        "count": 20077,
+        "denominator": 530968,
+        "fraction": 0.03781207153726778
+      },
+      "backboard_goal_structure": {
+        "count": 15028,
+        "denominator": 530968,
+        "fraction": 0.028303023911045486
+      },
+      "ceiling": {
+        "count": 11108,
+        "denominator": 530968,
+        "fraction": 0.020920281448222867
+      }
+    },
+    "touch_to_goal": {
+      "within_1s": {
+        "any_goal": {
+          "count": 34500,
+          "denominator": 530968,
+          "fraction": 0.06497566708351539
+        },
+        "toucher_side_scored": {
+          "count": 32083,
+          "denominator": 530968,
+          "fraction": 0.060423603682331135
+        },
+        "opposite_side_scored": {
+          "count": 2417,
+          "denominator": 530968,
+          "fraction": 0.004552063401184252
+        }
+      },
+      "within_3s": {
+        "any_goal": {
+          "count": 132052,
+          "denominator": 530968,
+          "fraction": 0.2487004866583297
+        },
+        "toucher_side_scored": {
+          "count": 124379,
+          "denominator": 530968,
+          "fraction": 0.23424952162842205
+        },
+        "opposite_side_scored": {
+          "count": 7673,
+          "denominator": 530968,
+          "fraction": 0.01445096502990764
+        }
+      },
+      "within_5s": {
+        "any_goal": {
+          "count": 198946,
+          "denominator": 530968,
+          "fraction": 0.3746854801042624
+        },
+        "toucher_side_scored": {
+          "count": 183987,
+          "denominator": 530968,
+          "fraction": 0.34651240752738394
+        },
+        "opposite_side_scored": {
+          "count": 14959,
+          "denominator": 530968,
+          "fraction": 0.028173072576878455
+        }
+      }
+    },
+    "final_touch_before_goal": {
+      "touch_denominator": {
+        "count": 15140,
+        "denominator": 530968,
+        "fraction": 0.028513959409983275
+      },
+      "time_to_goal_seconds": {
+        "count": 15140,
+        "min": 0.0,
+        "max": 14.141666412353516,
+        "mean": 0.7857276527514334,
+        "std": 0.8424385330229404,
+        "quantiles": {
+          "p00": 0.0,
+          "p01": 0.008333333767950535,
+          "p05": 0.06666667014360428,
+          "p25": 0.2750000059604645,
+          "p50": 0.5416666865348816,
+          "p75": 0.9750000238418579,
+          "p95": 2.2750000953674316,
+          "p99": 4.230083160400396,
+          "p100": 14.141666412353516
+        }
+      }
+    },
+    "goal_mouth": {
+      "valid_crossing": {
+        "count": 15140,
+        "denominator": 15140,
+        "fraction": 1.0
+      },
+      "inside_mouth": {
+        "count": 15140,
+        "denominator": 15140,
+        "fraction": 1.0
+      }
+    }
+  },
+  "raw_artifact": {
+    "kind": "deterministic_representative_touch_sample_plus_all_goal_events",
+    "path": "results/rival2/behavioral_telemetry/raw_events_representative_sample.npz",
+    "sha256": "CD2D37FB87C25C8ED4F4F6C49E1B1D806850C9F8D7B732B55FAEF1F50047404C",
+    "size_bytes": 2304130,
+    "representative_sample": true,
+    "representative_touch_count": 8192,
+    "representative_sample_rule": "first 8192 events in deterministic world/accepted-touch order",
+    "full_raw_path": "G:/dev/RivalSim/.tools/rival2-behavioral-telemetry/raw_events_full.npz",
+    "full_raw_sha256": "B598CD3D0A3C059E4B1952A9D7CCB6BCCBD54BFD1BAF6C06CFC7F884342C2138",
+    "full_raw_size_bytes": 82064114
+  },
+  "boundary": {
+    "training_updates": 0,
+    "reward_or_model_or_ppo_or_simulator_changes": 0,
+    "viewer_built": false,
+    "v0_6_started": false,
+    "stopped_for_review": true
+  },
+  "execution_provenance": {
+    "independent_stochastic_evaluations_published": 1,
+    "process_attempts": 2,
+    "rejected_attempts": 1,
+    "rejected_attempt_detail": "the identical frozen rollout completed, but publication was rejected because the initial telemetry-only surface transition buffer and 30 Hz touch cross-check were specified incorrectly; no metrics or raw events from that recorder attempt were retained or selected",
+    "restart_policy": "same checkpoint, seed, kickoff assignment, stochastic generator seed, policy, and simulator; only the read-only recorder was corrected before the published replay"
+  }
+}
