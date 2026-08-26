@@ -4,91 +4,48 @@
 
 **Latest completed execution:** Rival 2.0 Campaign 02 — `COMPLETE` / `IMPROVED`
 
-**Active authorized work:** none
+**Active authorized work:** Rival 2.0 Campaign 03 — direct reward-density training
 
-## Completed v0.5 result
+## Stable training baseline
 
-RivalSim v0.5 provides the complete bounded Rival 2.0 GPU-native training path:
+Campaign 02 established the current PPO baseline:
 
-`RivalSim CUDA -> RIVAL2_OBS_V1 -> actor/critic -> hybrid native action -> RivalSim x4 -> reward/done -> rollout -> GAE/PPO`
+- 131,072 worlds;
+- horizon 32;
+- entropy coefficient `0.0`;
+- gamma `0.995`;
+- GAE lambda `0.95`;
+- PPO clip `0.20`;
+- value coefficient `0.50`;
+- max gradient norm `0.50`;
+- Adam `3e-4`;
+- two epochs;
+- minibatch target 65,536;
+- unchanged 182-value observation, native hybrid controller, episode semantics, model, and self-play system.
 
-The frozen contracts remain:
+Campaign 02 stopped at 100,663,296 samples. Its optimizer remained stable: maximum KL `0.008194`, maximum clip fraction `0.087534`, and final analog standard deviation remained near one rather than escalating toward the clamp. Final ordinary stochastic self-play reached `0.291182` touches/minute and `0.040362` goals/minute, but `0.989746` of episodes still ended on the 15-second no-touch truncation.
 
-- `RIVAL2_OBS_V1`: 182 float32 values with proper team rotation and canonical pads;
-- `RIVAL2_ACTION_V1`: five tanh-Gaussian controls plus three Bernoulli buttons;
-- `RIVAL2_REWARD_V1`: exactly zero-sum goal, ball-progress, touch, and demo terms;
-- `RIVAL2_EPISODE_V1`: goal termination and 15-second/45-second truncation policy.
+Completed Campaign 02 commit:
 
-v0.5 release/evidence commit:
+`816c66b455d253b0f563bb378e53316a09ffd48e`
 
-`cc3aa34e0bac4531c2750e0d05e2b4980621c642`
+## Authorized Campaign 03
 
-v0.5 implementation commit:
+Campaign 03 addresses reward density while keeping the stable Campaign 02 optimizer baseline.
 
-`676ef6bd3ca48376d706a2dbccbdec26fce3e4fb`
+Preserve the frozen `RIVAL2_REWARD_V1` authority. Campaign 03 introduces `RIVAL2_REWARD_V2` for this training line by adding one per-agent potential-difference term once per 30-Hz decision:
 
-Campaign 02 does not modify those frozen contracts or rewrite the v0.5 implementation.
+`approach(agent) = (distance_before - distance_after) / 4096.0`
 
-## Completed Campaign 01
+where distance is true 3D Euclidean car-center to ball-center distance in unreal units, measured before the four physics ticks and at the final pre-reset transition state. Each agent receives its own term; the approach shaping is intentionally not forced to zero-sum.
 
-Campaign 01 used the frozen v0.5 defaults from a fresh seed-`20260826` initialization and stopped at update 12 / 100,663,296 agent decision samples. Execution was complete and numerically correct, but behavior was `DEGRADED`.
+No capacity preflight, initialization-control evaluation, inherited parity suite, world-count sweep, or repeated checkpoint evaluation is authorized. After a tiny GPU reward-sign/reset-leakage smoke, training starts immediately at the known-good 131,072-world / horizon-32 configuration.
 
-Key final evidence versus initialization:
+Train from scratch through the first completed update crossing 100,000,000 agent decision samples. Save resumable checkpoints at the first updates crossing 25M, 50M, and 100M. Run one 4,096-world ordinary stochastic self-play evaluation only after the final checkpoint, using evaluation seed `920260826`, and compare with Campaign 02 final metrics.
 
-- ordinary stochastic self-play touches/minute: `0.272091 -> 0.175624`;
-- goal-terminated fraction: `0.006348 -> 0.003418`;
-- no-touch truncation fraction: `0.993652 -> 0.996582`;
-- stochastic head-to-head: `7-23`, touch differential `-46`;
-- deterministic head-to-head: `0-819`, touch differential `-819`;
-- analog policy standard deviations rose from approximately `1.0` to approximately `2.64-2.65`, close to the configured `exp(1)` ceiling.
+Controlling specification:
 
-Campaign 01 update 4 also recorded approximate KL about `1.085` and clip fraction about `0.617`.
+- `handoff/rival2-c03/README.md`;
+- root `CODEX_START_PROMPT.md`.
 
-The closed Campaign 01 result is published under `results/rival2/campaign01/` and `docs/RIVAL2_CAMPAIGN01_RESULTS.md`.
-
-## Completed Campaign 02
-
-Campaign 02 completed the one-variable A/B rerun intended to isolate the Campaign 01
-entropy-pressure failure mode.
-
-The only authorized learning change is:
-
-`entropy_coefficient: 0.01 -> 0.0`
-
-Everything else matched Campaign 01, including fresh initialization procedure, campaign seed
-`20260826`, evaluation seed `920260826`, 131,072 worlds, horizon 32, model,
-observation/action/reward/episode contracts, gamma, GAE lambda, PPO clipping, value coefficient,
-gradient limit, Adam learning rate, two epochs, minibatch target, self-play, historical opponents,
-evaluation protocol, 100M stop boundary, and checkpoint thresholds.
-
-The Campaign 01 initialization model and substantive initialization evaluation reproduced exactly.
-Campaign 02 then stopped at update 12 / 100,663,296 samples. All 12 updates, five fixed
-evaluations, and final exact checkpoint continuation passed.
-
-The prospectively defined behavioral result is `IMPROVED`: two of three primary metrics improved
-versus initialization, and all three were no worse than Campaign 01 final. The final policy did
-not show the Campaign 01 analog-standard-deviation or KL/clip instability, although stochastic
-goal differential remained slightly below initialization. This is bounded controlled evidence,
-not an external-transfer or competence claim.
-
-Controlling Campaign 02 documents:
-
-- `handoff/rival2-c02/README.md`;
-- `handoff/rival2-c02/DIAGNOSIS.md`;
-- `handoff/rival2-c02/CAMPAIGN.md`;
-- `handoff/rival2-c02/ACCEPTANCE.md`.
-
-## Hard stop before v0.6
-
-No v0.6 work is authorized or begun. Still excluded:
-
-- RLBot/CPU RocketSim deployment loader;
-- Rocket League transfer validation;
-- reward redesign or mechanics curricula;
-- action masks or legacy Rival/Wisp compatibility;
-- model/hyperparameter searches outside the single Campaign 02 entropy change;
-- distributed multi-GPU training;
-- arbitrary body counts, other modes, rendering, or generic Bullet work.
-
-Campaign 02 stopped after its bounded 100M closeout. A new controlling handoff is required before
-any further campaign or v0.6 work.
+Do not add curricula, another reward term, another PPO/model change, action masks, legacy Rival compatibility, or v0.6 RocketSim/RLBot transfer work during Campaign 03.
