@@ -1,5 +1,29 @@
 # Changelog
 
+## Rival 2.0 Campaign 02 — controlled entropy-off rerun (2026-08-25)
+
+- Reproduced Campaign 01's seed-`20260826` initialization model SHA-256 and every substantive
+  4,096-world initialization-evaluation metric exactly.
+- Changed exactly one learning value at the campaign layer: PPO entropy coefficient `0.01 -> 0.0`.
+  The diagnostic entropy metric remained logged but contributed zero to every optimization loss.
+- Trained at the unchanged 131,072 worlds / horizon 32 for exactly 12 updates and stopped at
+  100,663,296 samples. Preserved initialization and first-crossing 10M/25M/50M/100M checkpoints
+  and evaluations.
+- Passed every finite-state, loss/gradient/optimizer, action-bound, button, done/reset,
+  historical-policy, version/sample-age, zero-transfer, checkpoint, and exact-continuation gate.
+- Applied the prospective classification unchanged and obtained `IMPROVED`: ordinary self-play
+  touches/minute was `0.291182` versus `0.272091` initially and `0.175624` at Campaign 01 final;
+  stochastic touch differential was `+35` versus `+15` initially and `-46` at C01 final. Final
+  stochastic goal differential `-3` was slightly worse than initialization `-2` but better than
+  C01 final `-16`.
+- Prevented the diagnosed standard-deviation escalation under the controlled A/B: final
+  representative analog standard deviation was approximately `1.015`, maximum KL was `0.008194`,
+  maximum clip fraction was `0.087534`, and no diagnostic instability threshold was crossed.
+- Published the full 21,126,324-byte final resume checkpoint with SHA-256
+  `4A9B366CD3A04222D639252EB2E3EBAD194AF2154D9DBFF213B1AF89A3909FA0`.
+- Left v0.1-v0.5 results, Campaign 01 artifacts, the four frozen contracts, and v0.5 training
+  implementation byte-for-byte unchanged. No reward/curriculum/second-parameter/v0.6 work began.
+
 ## Rival 2.0 Campaign 01 — bounded first training run (2026-08-25)
 
 - Froze campaign seed `20260826`, the normal v0.5 PPO/self-play defaults, and one 4,096-world

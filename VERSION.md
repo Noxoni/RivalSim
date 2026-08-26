@@ -2,9 +2,9 @@
 
 **Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Latest completed execution:** Rival 2.0 Campaign 01 — `COMPLETE` / `DEGRADED`
+**Latest completed execution:** Rival 2.0 Campaign 02 — `COMPLETE` / `IMPROVED`
 
-**Active authorized work:** Rival 2.0 Campaign 02 — controlled entropy-off rerun
+**Active authorized work:** none
 
 ## Completed v0.5 result
 
@@ -46,17 +46,30 @@ Campaign 01 update 4 also recorded approximate KL about `1.085` and clip fractio
 
 The closed Campaign 01 result is published under `results/rival2/campaign01/` and `docs/RIVAL2_CAMPAIGN01_RESULTS.md`.
 
-## Authorized Campaign 02
+## Completed Campaign 02
 
-Campaign 02 is a one-variable A/B rerun intended to isolate the Campaign 01 entropy-pressure failure mode.
+Campaign 02 completed the one-variable A/B rerun intended to isolate the Campaign 01
+entropy-pressure failure mode.
 
 The only authorized learning change is:
 
 `entropy_coefficient: 0.01 -> 0.0`
 
-Everything else remains matched to Campaign 01, including fresh initialization procedure, campaign seed `20260826`, evaluation seed `920260826`, 131,072 worlds, horizon 32, model, observation/action/reward/episode contracts, gamma, GAE lambda, PPO clipping, value coefficient, gradient limit, Adam learning rate, two epochs, minibatch target, self-play, historical opponents, evaluation protocol, 100M stop boundary, and checkpoint thresholds.
+Everything else matched Campaign 01, including fresh initialization procedure, campaign seed
+`20260826`, evaluation seed `920260826`, 131,072 worlds, horizon 32, model,
+observation/action/reward/episode contracts, gamma, GAE lambda, PPO clipping, value coefficient,
+gradient limit, Adam learning rate, two epochs, minibatch target, self-play, historical opponents,
+evaluation protocol, 100M stop boundary, and checkpoint thresholds.
 
-Campaign 02 must be implemented at the campaign/configuration layer. Do not change the frozen v0.5 PPO default merely to conduct this run.
+The Campaign 01 initialization model and substantive initialization evaluation reproduced exactly.
+Campaign 02 then stopped at update 12 / 100,663,296 samples. All 12 updates, five fixed
+evaluations, and final exact checkpoint continuation passed.
+
+The prospectively defined behavioral result is `IMPROVED`: two of three primary metrics improved
+versus initialization, and all three were no worse than Campaign 01 final. The final policy did
+not show the Campaign 01 analog-standard-deviation or KL/clip instability, although stochastic
+goal differential remained slightly below initialization. This is bounded controlled evidence,
+not an external-transfer or competence claim.
 
 Controlling Campaign 02 documents:
 
@@ -77,4 +90,5 @@ No v0.6 work is authorized or begun. Still excluded:
 - distributed multi-GPU training;
 - arbitrary body counts, other modes, rendering, or generic Bullet work.
 
-Campaign 02 must stop after its bounded 100M closeout and return for review.
+Campaign 02 stopped after its bounded 100M closeout. A new controlling handoff is required before
+any further campaign or v0.6 work.

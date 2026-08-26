@@ -1,0 +1,2169 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T01:54:07.211394+00:00",
+  "controlled_variable": {
+    "name": "entropy_coefficient",
+    "campaign01": 0.01,
+    "campaign02": 0.0,
+    "diagnostic_entropy_still_logged": true,
+    "optimization_entropy_contribution": 0.0
+  },
+  "initialization_model_sha256_exact": true,
+  "initialization_evaluation_semantic_metrics_exact": true,
+  "evaluation_checkpoints": {
+    "000m": {
+      "agent_decision_samples": 0,
+      "campaign01": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00634765625,
+          "no_touch_truncated_fraction": 0.99365234375,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.272090675526261,
+          "goals_per_simulated_minute": 0.02499772990700631,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.23575846354167,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5554689995493407,
+            "steer": 0.5557313211425232,
+            "pitch": 0.5569086616582702,
+            "yaw": 0.555650061918516,
+            "roll": 0.5562218672101372
+          },
+          "button_activation_rate": {
+            "jump": 0.5008970873371542,
+            "boost": 0.500022166790409,
+            "handbrake": 0.4993966894032059
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9989095857466779,
+            "steer": 0.9994395672906637,
+            "pitch": 1.00318598225671,
+            "yaw": 0.9990342284103794,
+            "roll": 1.0014590565521435
+          },
+          "mean_button_probability": {
+            "jump": 0.5002673928622593,
+            "boost": 0.49996527152432124,
+            "handbrake": 0.49937080653920773
+          },
+          "mean_button_entropy": {
+            "jump": 0.6931470132573484,
+            "boost": 0.6931471779589359,
+            "handbrake": 0.6931463568406986
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 1.5394158114356604,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 15.5865234375,
+            "mean_absolute_analog_action": {
+              "throttle": 0.0013132585711399,
+              "steer": 0.0018607065932997049,
+              "pitch": 0.0021678521864522036,
+              "yaw": 0.0005548698733134033,
+              "roll": 0.0010164004956207185
+            },
+            "button_activation_rate": {
+              "jump": 0.8144143495023162,
+              "boost": 0.9692085510569778,
+              "handbrake": 0.0
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9987131098084363,
+              "steer": 1.0000869678127189,
+              "pitch": 1.0029899281328007,
+              "yaw": 0.9990480409581266,
+              "roll": 1.0006086530822018
+            },
+            "mean_button_probability": {
+              "jump": 0.5002958989105429,
+              "boost": 0.5002000316512495,
+              "handbrake": 0.49936657676016244
+            },
+            "mean_button_entropy": {
+              "jump": 0.6931469034576299,
+              "boost": 0.6931470990610684,
+              "handbrake": 0.6931463404842921
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 819,
+            "initialization_touches": 819,
+            "touch_differential": 0,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.009765625,
+            "no_touch_truncated_fraction": 0.990234375,
+            "touches_per_simulated_minute": 0.29921140317213263,
+            "goals_per_simulated_minute": 0.03848378175847365,
+            "mean_episode_duration_seconds": 15.22556966145833,
+            "mean_absolute_analog_action": {
+              "throttle": 0.55561707951561,
+              "steer": 0.555916883728293,
+              "pitch": 0.5567580380131479,
+              "yaw": 0.5556896075560837,
+              "roll": 0.5563391288720311
+            },
+            "button_activation_rate": {
+              "jump": 0.500462607126555,
+              "boost": 0.4995149440007526,
+              "handbrake": 0.4989141694077453
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.99891922750013,
+              "steer": 0.9994372693740395,
+              "pitch": 1.003191591101464,
+              "yaw": 0.999033609834073,
+              "roll": 1.0014598700772614
+            },
+            "mean_button_probability": {
+              "jump": 0.5002674475039859,
+              "boost": 0.4999654076200276,
+              "handbrake": 0.4993711525127274
+            },
+            "mean_button_entropy": {
+              "jump": 0.6931470142746792,
+              "boost": 0.6931471892480712,
+              "handbrake": 0.6931463662235916
+            }
+          },
+          "outcome": {
+            "current_goals": 19,
+            "initialization_goals": 21,
+            "score_differential": -2,
+            "goal_differential": -2,
+            "current_touches": 163,
+            "initialization_touches": 148,
+            "touch_differential": 15,
+            "current_wins": 19,
+            "initialization_wins": 21,
+            "draws": 4056
+          }
+        }
+      },
+      "campaign02": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00634765625,
+          "no_touch_truncated_fraction": 0.99365234375,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.272090675526261,
+          "goals_per_simulated_minute": 0.02499772990700631,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.23575846354167,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5554689995493407,
+            "steer": 0.5557313211425232,
+            "pitch": 0.5569086616582702,
+            "yaw": 0.555650061918516,
+            "roll": 0.5562218672101372
+          },
+          "button_activation_rate": {
+            "jump": 0.5008970873371542,
+            "boost": 0.500022166790409,
+            "handbrake": 0.4993966894032059
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9989095857466779,
+            "steer": 0.9994395672906637,
+            "pitch": 1.00318598225671,
+            "yaw": 0.9990342284103794,
+            "roll": 1.0014590565521435
+          },
+          "mean_button_probability": {
+            "jump": 0.5002673928622593,
+            "boost": 0.49996527152432124,
+            "handbrake": 0.49937080653920773
+          },
+          "mean_button_entropy": {
+            "jump": 0.6931470132573484,
+            "boost": 0.6931471779589359,
+            "handbrake": 0.6931463568406986
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 1.5394158114356604,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 15.5865234375,
+            "mean_absolute_analog_action": {
+              "throttle": 0.0013132585711399,
+              "steer": 0.0018607065932997049,
+              "pitch": 0.0021678521864522036,
+              "yaw": 0.0005548698733134033,
+              "roll": 0.0010164004956207185
+            },
+            "button_activation_rate": {
+              "jump": 0.8144143495023162,
+              "boost": 0.9692085510569778,
+              "handbrake": 0.0
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9987131098084363,
+              "steer": 1.0000869678127189,
+              "pitch": 1.0029899281328007,
+              "yaw": 0.9990480409581266,
+              "roll": 1.0006086530822018
+            },
+            "mean_button_probability": {
+              "jump": 0.5002958989105429,
+              "boost": 0.5002000316512495,
+              "handbrake": 0.49936657676016244
+            },
+            "mean_button_entropy": {
+              "jump": 0.6931469034576299,
+              "boost": 0.6931470990610684,
+              "handbrake": 0.6931463404842921
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 819,
+            "initialization_touches": 819,
+            "touch_differential": 0,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.009765625,
+            "no_touch_truncated_fraction": 0.990234375,
+            "touches_per_simulated_minute": 0.29921140317213263,
+            "goals_per_simulated_minute": 0.03848378175847365,
+            "mean_episode_duration_seconds": 15.22556966145833,
+            "mean_absolute_analog_action": {
+              "throttle": 0.55561707951561,
+              "steer": 0.555916883728293,
+              "pitch": 0.5567580380131479,
+              "yaw": 0.5556896075560837,
+              "roll": 0.5563391288720311
+            },
+            "button_activation_rate": {
+              "jump": 0.500462607126555,
+              "boost": 0.4995149440007526,
+              "handbrake": 0.4989141694077453
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.99891922750013,
+              "steer": 0.9994372693740395,
+              "pitch": 1.003191591101464,
+              "yaw": 0.999033609834073,
+              "roll": 1.0014598700772614
+            },
+            "mean_button_probability": {
+              "jump": 0.5002674475039859,
+              "boost": 0.4999654076200276,
+              "handbrake": 0.4993711525127274
+            },
+            "mean_button_entropy": {
+              "jump": 0.6931470142746792,
+              "boost": 0.6931471892480712,
+              "handbrake": 0.6931463662235916
+            }
+          },
+          "outcome": {
+            "current_goals": 19,
+            "initialization_goals": 21,
+            "score_differential": -2,
+            "goal_differential": -2,
+            "current_touches": 163,
+            "initialization_touches": 148,
+            "touch_differential": 15,
+            "current_wins": 19,
+            "initialization_wins": 21,
+            "draws": 4056
+          }
+        }
+      },
+      "campaign02_minus_campaign01": {
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "goal_terminated_fraction": 0.0,
+            "goals_per_simulated_minute": 0.0,
+            "mean_absolute_analog_action": {
+              "pitch": 0.0,
+              "roll": 0.0,
+              "steer": 0.0,
+              "throttle": 0.0,
+              "yaw": 0.0
+            },
+            "mean_analog_policy_std": {
+              "pitch": 0.0,
+              "roll": 0.0,
+              "steer": 0.0,
+              "throttle": 0.0,
+              "yaw": 0.0
+            },
+            "mean_button_entropy": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "mean_button_probability": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "mean_episode_duration_seconds": 0.0,
+            "no_touch_truncated_fraction": 0.0,
+            "touches_per_simulated_minute": 0.0
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 0.0,
+            "goal_differential": 0.0,
+            "initialization_goals": 0.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": 0.0,
+            "score_differential": 0.0,
+            "touch_differential": 0.0
+          }
+        },
+        "ordinary_stochastic_self_play": {
+          "button_activation_rate": {
+            "boost": 0.0,
+            "handbrake": 0.0,
+            "jump": 0.0
+          },
+          "demolitions_per_simulated_minute": 0.0,
+          "goal_terminated_fraction": 0.0,
+          "goals_per_simulated_minute": 0.0,
+          "hard_truncated_fraction": 0.0,
+          "mean_absolute_analog_action": {
+            "pitch": 0.0,
+            "roll": 0.0,
+            "steer": 0.0,
+            "throttle": 0.0,
+            "yaw": 0.0
+          },
+          "mean_analog_policy_std": {
+            "pitch": 0.0,
+            "roll": 0.0,
+            "steer": 0.0,
+            "throttle": 0.0,
+            "yaw": 0.0
+          },
+          "mean_button_entropy": {
+            "boost": 0.0,
+            "handbrake": 0.0,
+            "jump": 0.0
+          },
+          "mean_button_probability": {
+            "boost": 0.0,
+            "handbrake": 0.0,
+            "jump": 0.0
+          },
+          "mean_episode_duration_seconds": 0.0,
+          "no_touch_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.0
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "goal_terminated_fraction": 0.0,
+            "goals_per_simulated_minute": 0.0,
+            "mean_absolute_analog_action": {
+              "pitch": 0.0,
+              "roll": 0.0,
+              "steer": 0.0,
+              "throttle": 0.0,
+              "yaw": 0.0
+            },
+            "mean_analog_policy_std": {
+              "pitch": 0.0,
+              "roll": 0.0,
+              "steer": 0.0,
+              "throttle": 0.0,
+              "yaw": 0.0
+            },
+            "mean_button_entropy": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "mean_button_probability": {
+              "boost": 0.0,
+              "handbrake": 0.0,
+              "jump": 0.0
+            },
+            "mean_episode_duration_seconds": 0.0,
+            "no_touch_truncated_fraction": 0.0,
+            "touches_per_simulated_minute": 0.0
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 0.0,
+            "goal_differential": 0.0,
+            "initialization_goals": 0.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": 0.0,
+            "score_differential": 0.0,
+            "touch_differential": 0.0
+          }
+        }
+      }
+    },
+    "010m": {
+      "agent_decision_samples": 16777216,
+      "campaign01": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.002685546875,
+          "no_touch_truncated_fraction": 0.997314453125,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.2224504863095047,
+          "goals_per_simulated_minute": 0.010592880300452604,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.211425781250002,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5572513427032144,
+            "steer": 0.5622197050276424,
+            "pitch": 0.5612876699097173,
+            "yaw": 0.5608510195160552,
+            "roll": 0.5569043066651915
+          },
+          "button_activation_rate": {
+            "jump": 0.5522220973902995,
+            "boost": 0.5422409826768958,
+            "handbrake": 0.48025899057340654
+          },
+          "mean_analog_policy_std": {
+            "throttle": 1.0030981926338738,
+            "steer": 1.0208901088282967,
+            "pitch": 1.0114174849788635,
+            "yaw": 1.0149198371786308,
+            "roll": 1.0036136206228101
+          },
+          "mean_button_probability": {
+            "jump": 0.5516711312854686,
+            "boost": 0.5419784204357809,
+            "handbrake": 0.4803681095351736
+          },
+          "mean_button_entropy": {
+            "jump": 0.6867520312926763,
+            "boost": 0.6890823916079896,
+            "handbrake": 0.692257557708698
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.199951171875,
+            "no_touch_truncated_fraction": 0.800048828125,
+            "touches_per_simulated_minute": 0.9242384061119355,
+            "goals_per_simulated_minute": 0.9242384061119355,
+            "mean_episode_duration_seconds": 12.9804931640625,
+            "mean_absolute_analog_action": {
+              "throttle": 0.034977478581361576,
+              "steer": 0.012149307215523554,
+              "pitch": 0.06334940361898134,
+              "yaw": 0.03250843967360345,
+              "roll": 0.00802662692968706
+            },
+            "button_activation_rate": {
+              "jump": 0.9799745210630685,
+              "boost": 0.9532727330861926,
+              "handbrake": 0.012066445857572492
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.0009601758250501,
+              "steer": 1.0119626933279582,
+              "pitch": 1.0124260424461813,
+              "yaw": 1.0094010722607185,
+              "roll": 1.0008894202690577
+            },
+            "mean_button_probability": {
+              "jump": 0.5221800537831063,
+              "boost": 0.5254646148346148,
+              "handbrake": 0.4904246295018085
+            },
+            "mean_button_entropy": {
+              "jump": 0.6910227310302626,
+              "boost": 0.6901793496968518,
+              "handbrake": 0.6926791010750278
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 819,
+            "score_differential": -819,
+            "goal_differential": -819,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 819,
+            "draws": 3277
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.00732421875,
+            "no_touch_truncated_fraction": 0.99267578125,
+            "touches_per_simulated_minute": 0.2493959023536404,
+            "goals_per_simulated_minute": 0.028887556257178426,
+            "mean_episode_duration_seconds": 15.212540690104166,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5565669137332637,
+              "steer": 0.5591635655926946,
+              "pitch": 0.5590205759848556,
+              "yaw": 0.5582909901756471,
+              "roll": 0.556606509261202
+            },
+            "button_activation_rate": {
+              "jump": 0.5260985696914969,
+              "boost": 0.5209391986484904,
+              "handbrake": 0.4893701817294766
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.0010150411155212,
+              "steer": 1.0102811658086905,
+              "pitch": 1.0073947413678888,
+              "yaw": 1.0069510582701828,
+              "roll": 1.0023321742223492
+            },
+            "mean_button_probability": {
+              "jump": 0.5258425248527413,
+              "boost": 0.5213550195583647,
+              "handbrake": 0.4897793875224916
+            },
+            "mean_button_entropy": {
+              "jump": 0.6899724864070588,
+              "boost": 0.6910380717431417,
+              "handbrake": 0.692696629702173
+            }
+          },
+          "outcome": {
+            "current_goals": 10,
+            "initialization_goals": 20,
+            "score_differential": -10,
+            "goal_differential": -10,
+            "current_touches": 112,
+            "initialization_touches": 147,
+            "touch_differential": -35,
+            "current_wins": 10,
+            "initialization_wins": 20,
+            "draws": 4066
+          }
+        }
+      },
+      "campaign02": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00439453125,
+          "no_touch_truncated_fraction": 0.99560546875,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.2015756334602692,
+          "goals_per_simulated_minute": 0.017360580872176293,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.187963867187502,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5566305708827374,
+            "steer": 0.5626856532284286,
+            "pitch": 0.5632242754133883,
+            "yaw": 0.5549628516894668,
+            "roll": 0.5547439973220307
+          },
+          "button_activation_rate": {
+            "jump": 0.39999635642129844,
+            "boost": 0.5633101269519267,
+            "handbrake": 0.48556044402364684
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9988509444665936,
+            "steer": 1.019972403949655,
+            "pitch": 0.9818700305241975,
+            "yaw": 0.9965149397030388,
+            "roll": 0.9945291244049447
+          },
+          "mean_button_probability": {
+            "jump": 0.39964408251926264,
+            "boost": 0.563000591647406,
+            "handbrake": 0.485704554627375
+          },
+          "mean_button_entropy": {
+            "jump": 0.6636697636436016,
+            "boost": 0.6843353244609321,
+            "handbrake": 0.6920676615813935
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.7414884996853879,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 16.1797119140625,
+            "mean_absolute_analog_action": {
+              "throttle": 0.046253756783895296,
+              "steer": 0.0373285435978633,
+              "pitch": 0.14680655543789778,
+              "yaw": 0.006870103267299858,
+              "roll": 0.03597392410765157
+            },
+            "button_activation_rate": {
+              "jump": 0.5571575368820363,
+              "boost": 0.9260556101285458,
+              "handbrake": 0.08931586595264071
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9986676097622942,
+              "steer": 1.0161619830659163,
+              "pitch": 1.0000758565497632,
+              "yaw": 0.9989396377285625,
+              "roll": 0.9990846634215248
+            },
+            "mean_button_probability": {
+              "jump": 0.4347222672027952,
+              "boost": 0.5372075342637077,
+              "handbrake": 0.49154686055132635
+            },
+            "mean_button_entropy": {
+              "jump": 0.6697900733560425,
+              "boost": 0.6870087271980643,
+              "handbrake": 0.6924246309865997
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.00927734375,
+            "no_touch_truncated_fraction": 0.99072265625,
+            "touches_per_simulated_minute": 0.24875008971929377,
+            "goals_per_simulated_minute": 0.03663761011369443,
+            "mean_episode_duration_seconds": 15.19314778645833,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5562060946386037,
+              "steer": 0.5594750411146152,
+              "pitch": 0.5604050678002398,
+              "yaw": 0.5554107669028256,
+              "roll": 0.5557035040241548
+            },
+            "button_activation_rate": {
+              "jump": 0.44988146340470525,
+              "boost": 0.5312247246019409,
+              "handbrake": 0.4913470427985135
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9987806874010394,
+              "steer": 1.0099845697402408,
+              "pitch": 0.9936355302681976,
+              "yaw": 0.9979721636084598,
+              "roll": 0.9982591189140899
+            },
+            "mean_button_probability": {
+              "jump": 0.44966698993489146,
+              "boost": 0.5315869636220399,
+              "handbrake": 0.49177514096937747
+            },
+            "mean_button_entropy": {
+              "jump": 0.6782243561490338,
+              "boost": 0.6887069769801175,
+              "handbrake": 0.6925708928869223
+            }
+          },
+          "outcome": {
+            "current_goals": 18,
+            "initialization_goals": 20,
+            "score_differential": -2,
+            "goal_differential": -2,
+            "current_touches": 111,
+            "initialization_touches": 147,
+            "touch_differential": -36,
+            "current_wins": 18,
+            "initialization_wins": 20,
+            "draws": 4058
+          }
+        }
+      },
+      "campaign02_minus_campaign01": {
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": -0.02721712295764689,
+              "handbrake": 0.07724942009506822,
+              "jump": -0.4228169841810322
+            },
+            "goal_terminated_fraction": -0.199951171875,
+            "goals_per_simulated_minute": -0.9242384061119355,
+            "mean_absolute_analog_action": {
+              "pitch": 0.08345715181891644,
+              "roll": 0.027947297177964514,
+              "steer": 0.025179236382339744,
+              "throttle": 0.01127627820253372,
+              "yaw": -0.025638336406303593
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.01235018589641812,
+              "roll": -0.0018047568475328957,
+              "steer": 0.004199289737958134,
+              "throttle": -0.002292566062755963,
+              "yaw": -0.010461434532155978
+            },
+            "mean_button_entropy": {
+              "boost": -0.003170622498787523,
+              "handbrake": -0.0002544700884281603,
+              "jump": -0.021232657674220112
+            },
+            "mean_button_probability": {
+              "boost": 0.01174291942909289,
+              "handbrake": 0.0011222310495178633,
+              "jump": -0.08745778658031106
+            },
+            "mean_episode_duration_seconds": 3.1992187500000018,
+            "no_touch_truncated_fraction": 0.199951171875,
+            "touches_per_simulated_minute": -0.18274990642654765
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 819.0,
+            "goal_differential": 819.0,
+            "initialization_goals": -819.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": -819.0,
+            "score_differential": 819.0,
+            "touch_differential": 0.0
+          }
+        },
+        "ordinary_stochastic_self_play": {
+          "button_activation_rate": {
+            "boost": 0.021069144275030927,
+            "handbrake": 0.005301453450240301,
+            "jump": -0.15222574096900104
+          },
+          "demolitions_per_simulated_minute": 0.0,
+          "goal_terminated_fraction": 0.001708984375,
+          "goals_per_simulated_minute": 0.006767700571723689,
+          "hard_truncated_fraction": 0.0,
+          "mean_absolute_analog_action": {
+            "pitch": 0.0019366055036709184,
+            "roll": -0.0021603093431608045,
+            "steer": 0.0004659482007861593,
+            "throttle": -0.0006207718204770396,
+            "yaw": -0.0058881678265884085
+          },
+          "mean_analog_policy_std": {
+            "pitch": -0.029547454454666,
+            "roll": -0.009084496217865445,
+            "steer": -0.0009177048786417341,
+            "throttle": -0.004247248167280171,
+            "yaw": -0.01840489747559193
+          },
+          "mean_button_entropy": {
+            "boost": -0.0047470671470574155,
+            "handbrake": -0.00018989612730446748,
+            "jump": -0.023082267649074617
+          },
+          "mean_button_probability": {
+            "boost": 0.021022171211625085,
+            "handbrake": 0.005336445092201381,
+            "jump": -0.15202704876620599
+          },
+          "mean_episode_duration_seconds": -0.023461914062499645,
+          "no_touch_truncated_fraction": -0.001708984375,
+          "touches_per_simulated_minute": -0.020874852849235515
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.010285525953450558,
+              "handbrake": 0.0019768610690368837,
+              "jump": -0.07621710628679168
+            },
+            "goal_terminated_fraction": 0.001953125,
+            "goals_per_simulated_minute": 0.007750053856516004,
+            "mean_absolute_analog_action": {
+              "pitch": 0.0013844918153842478,
+              "roll": -0.0009030052370472275,
+              "steer": 0.0003114755219205678,
+              "throttle": -0.00036081909466001427,
+              "yaw": -0.002880223272821447
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.013759211099691138,
+              "roll": -0.004073055308259299,
+              "steer": -0.0002965960684497837,
+              "throttle": -0.0022343537144817738,
+              "yaw": -0.00897889466172308
+            },
+            "mean_button_entropy": {
+              "boost": -0.0023310947630241774,
+              "handbrake": -0.0001257368152507432,
+              "jump": -0.011748130258025014
+            },
+            "mean_button_probability": {
+              "boost": 0.010231944063675225,
+              "handbrake": 0.0019957534468858507,
+              "jump": -0.07617553491784984
+            },
+            "mean_episode_duration_seconds": -0.019392903645837123,
+            "no_touch_truncated_fraction": -0.001953125,
+            "touches_per_simulated_minute": -0.0006458126343466264
+          },
+          "outcome": {
+            "current_goals": 8.0,
+            "current_touches": -1.0,
+            "current_wins": 8.0,
+            "draws": -8.0,
+            "goal_differential": 8.0,
+            "initialization_goals": 0.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": 0.0,
+            "score_differential": 8.0,
+            "touch_differential": -1.0
+          }
+        }
+      }
+    },
+    "025m": {
+      "agent_decision_samples": 25165824,
+      "campaign01": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.005126953125,
+          "no_touch_truncated_fraction": 0.994873046875,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.20367330544399762,
+          "goals_per_simulated_minute": 0.020270802911487914,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.175382486979169,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5807983705210767,
+            "steer": 0.5853290673141736,
+            "pitch": 0.5820204764678565,
+            "yaw": 0.5863069874632023,
+            "roll": 0.5816112909391331
+          },
+          "button_activation_rate": {
+            "jump": 0.500505429411219,
+            "boost": 0.533535040335144,
+            "handbrake": 0.4835838672294585
+          },
+          "mean_analog_policy_std": {
+            "throttle": 1.0869580072300775,
+            "steer": 1.1048981044102215,
+            "pitch": 1.0862671435136453,
+            "yaw": 1.1069931131471538,
+            "roll": 1.0924136045046857
+          },
+          "mean_button_probability": {
+            "jump": 0.4998800743293602,
+            "boost": 0.5332463928849943,
+            "handbrake": 0.48368341888858496
+          },
+          "mean_button_entropy": {
+            "jump": 0.6924660414532804,
+            "boost": 0.6904822713588415,
+            "handbrake": 0.692540508113267
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.770696591149693,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 15.5665283203125,
+            "mean_absolute_analog_action": {
+              "throttle": 0.04559779599473847,
+              "steer": 0.012019326974578292,
+              "pitch": 0.0640035175348385,
+              "yaw": 0.04407728750214757,
+              "roll": 0.0075603683161683125
+            },
+            "button_activation_rate": {
+              "jump": 0.6026359057201036,
+              "boost": 0.900563305913013,
+              "handbrake": 0.004602640610827498
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.0486907393485068,
+              "steer": 1.060689488516689,
+              "pitch": 1.0573157790338108,
+              "yaw": 1.0683828179895472,
+              "roll": 1.0518077669330566
+            },
+            "mean_button_probability": {
+              "jump": 0.49120086278962344,
+              "boost": 0.5225263187924378,
+              "handbrake": 0.49238700654407636
+            },
+            "mean_button_entropy": {
+              "jump": 0.6922792714834509,
+              "boost": 0.6907571044671074,
+              "handbrake": 0.6928868985342671
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0068359375,
+            "no_touch_truncated_fraction": 0.9931640625,
+            "touches_per_simulated_minute": 0.24558140729382127,
+            "goals_per_simulated_minute": 0.026965801585203907,
+            "mean_episode_duration_seconds": 15.210237630208326,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5679875591626958,
+              "steer": 0.570338187727575,
+              "pitch": 0.5690081195216495,
+              "yaw": 0.5705234612244623,
+              "roll": 0.5685773620057378
+            },
+            "button_activation_rate": {
+              "jump": 0.5006685271642999,
+              "boost": 0.516423457251179,
+              "handbrake": 0.49090546239394256
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.0416741202075843,
+              "steer": 1.050857783802541,
+              "pitch": 1.043452477084366,
+              "yaw": 1.0512722698356278,
+              "roll": 1.0453268785607983
+            },
+            "mean_button_probability": {
+              "jump": 0.5003960067144345,
+              "boost": 0.5168948892590636,
+              "handbrake": 0.49130886363573195
+            },
+            "mean_button_entropy": {
+              "jump": 0.692808369580645,
+              "boost": 0.6917688820655324,
+              "handbrake": 0.6928306764814238
+            }
+          },
+          "outcome": {
+            "current_goals": 6,
+            "initialization_goals": 22,
+            "score_differential": -16,
+            "goal_differential": -16,
+            "current_touches": 109,
+            "initialization_touches": 146,
+            "touch_differential": -37,
+            "current_wins": 6,
+            "initialization_wins": 22,
+            "draws": 4068
+          }
+        }
+      },
+      "campaign02": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.0078125,
+          "no_touch_truncated_fraction": 0.9921875,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.24654658221590164,
+          "goals_per_simulated_minute": 0.030818322776987706,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.210107421875005,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5580040115157152,
+            "steer": 0.5632053662797231,
+            "pitch": 0.5586761923305582,
+            "yaw": 0.5562253279109548,
+            "roll": 0.5533997415693742
+          },
+          "button_activation_rate": {
+            "jump": 0.32906317649161215,
+            "boost": 0.5696657282059349,
+            "handbrake": 0.500853389319953
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9997206526330118,
+            "steer": 1.021324783310496,
+            "pitch": 0.9610530472066108,
+            "yaw": 1.000784667869544,
+            "roll": 0.9885139570546769
+          },
+          "mean_button_probability": {
+            "jump": 0.3287009972879453,
+            "boost": 0.5693589218154563,
+            "handbrake": 0.5008838916320532
+          },
+          "mean_button_entropy": {
+            "jump": 0.620642966663825,
+            "boost": 0.6823651703607159,
+            "handbrake": 0.6925658734310831
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.7439401577807148,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 16.1263916015625,
+            "mean_absolute_analog_action": {
+              "throttle": 0.06122803133262373,
+              "steer": 0.04117361730255987,
+              "pitch": 0.1464150261445314,
+              "yaw": 0.005173899940529587,
+              "roll": 0.04365741074001286
+            },
+            "button_activation_rate": {
+              "jump": 0.4588461105635768,
+              "boost": 0.9692091434696315,
+              "handbrake": 0.17372329887147375
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9997112629316343,
+              "steer": 1.0144158202768696,
+              "pitch": 0.9891517145766378,
+              "yaw": 1.0038148119831147,
+              "roll": 0.9971296420324861
+            },
+            "mean_button_probability": {
+              "jump": 0.4046196205140242,
+              "boost": 0.5400571181612145,
+              "handbrake": 0.49625444893613885
+            },
+            "mean_button_entropy": {
+              "jump": 0.6480612119726623,
+              "boost": 0.6859437852248021,
+              "handbrake": 0.6927214946280609
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.009033203125,
+            "no_touch_truncated_fraction": 0.990966796875,
+            "touches_per_simulated_minute": 0.2695981543224768,
+            "goals_per_simulated_minute": 0.035625470392613004,
+            "mean_episode_duration_seconds": 15.21361490885417,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5569915373287824,
+              "steer": 0.55960574582885,
+              "pitch": 0.5578061142385803,
+              "yaw": 0.5560491189298581,
+              "roll": 0.5550983922927277
+            },
+            "button_activation_rate": {
+              "jump": 0.41538710069116624,
+              "boost": 0.5337920424681283,
+              "handbrake": 0.4986362291776882
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9994995875949088,
+              "steer": 1.0101876086462194,
+              "pitch": 0.9827735239747895,
+              "yaw": 1.0002705479624094,
+              "roll": 0.9954195642788887
+            },
+            "mean_button_probability": {
+              "jump": 0.41528167848411235,
+              "boost": 0.5342177816000289,
+              "handbrake": 0.499066751502105
+            },
+            "mean_button_entropy": {
+              "jump": 0.6575344487003714,
+              "boost": 0.6878914039734412,
+              "handbrake": 0.6928669954658974
+            }
+          },
+          "outcome": {
+            "current_goals": 16,
+            "initialization_goals": 21,
+            "score_differential": -5,
+            "goal_differential": -5,
+            "current_touches": 136,
+            "initialization_touches": 144,
+            "touch_differential": -8,
+            "current_wins": 16,
+            "initialization_wins": 21,
+            "draws": 4059
+          }
+        }
+      },
+      "campaign02_minus_campaign01": {
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.06864583755661846,
+              "handbrake": 0.16912065826064626,
+              "jump": -0.1437897951565268
+            },
+            "goal_terminated_fraction": 0.0,
+            "goals_per_simulated_minute": 0.0,
+            "mean_absolute_analog_action": {
+              "pitch": 0.08241150860969289,
+              "roll": 0.036097042423844546,
+              "steer": 0.02915429032798158,
+              "throttle": 0.01563023533788526,
+              "yaw": -0.038903387561617986
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.06816406445717305,
+              "roll": -0.054678124900570446,
+              "steer": -0.04627366823981949,
+              "throttle": -0.0489794764168725,
+              "yaw": -0.06456800600643242
+            },
+            "mean_button_entropy": {
+              "boost": -0.004813319242305214,
+              "handbrake": -0.00016540390620622958,
+              "jump": -0.04421805951078861
+            },
+            "mean_button_probability": {
+              "boost": 0.01753079936877666,
+              "handbrake": 0.0038674423920624923,
+              "jump": -0.08658124227559921
+            },
+            "mean_episode_duration_seconds": 0.5598632812499993,
+            "no_touch_truncated_fraction": 0.0,
+            "touches_per_simulated_minute": -0.02675643336897826
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 0.0,
+            "goal_differential": 0.0,
+            "initialization_goals": 0.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": 0.0,
+            "score_differential": 0.0,
+            "touch_differential": 0.0
+          }
+        },
+        "ordinary_stochastic_self_play": {
+          "button_activation_rate": {
+            "boost": 0.03613068787079088,
+            "handbrake": 0.017269522090494538,
+            "jump": -0.17144225291960685
+          },
+          "demolitions_per_simulated_minute": 0.0,
+          "goal_terminated_fraction": 0.002685546875,
+          "goals_per_simulated_minute": 0.010547519865499792,
+          "hard_truncated_fraction": 0.0,
+          "mean_absolute_analog_action": {
+            "pitch": -0.023344284137298277,
+            "roll": -0.028211549369758893,
+            "steer": -0.022123701034450494,
+            "throttle": -0.02279435900536153,
+            "yaw": -0.03008165955224751
+          },
+          "mean_analog_policy_std": {
+            "pitch": -0.1252140963070345,
+            "roll": -0.10389964745000879,
+            "steer": -0.0835733210997256,
+            "throttle": -0.08723735459706572,
+            "yaw": -0.10620844527760975
+          },
+          "mean_button_entropy": {
+            "boost": -0.008117100998125681,
+            "handbrake": 2.5365317816161692e-05,
+            "jump": -0.07182307478945538
+          },
+          "mean_button_probability": {
+            "boost": 0.03611252893046202,
+            "handbrake": 0.017200472743468198,
+            "jump": -0.17117907704141494
+          },
+          "mean_episode_duration_seconds": 0.03472493489583606,
+          "no_touch_truncated_fraction": -0.002685546875,
+          "touches_per_simulated_minute": 0.04287327677190403
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.017368585216949284,
+              "handbrake": 0.007730766783745624,
+              "jump": -0.08528142647313364
+            },
+            "goal_terminated_fraction": 0.002197265625,
+            "goals_per_simulated_minute": 0.008659668807409097,
+            "mean_absolute_analog_action": {
+              "pitch": -0.01120200528306925,
+              "roll": -0.013478969713010103,
+              "steer": -0.01073244189872502,
+              "throttle": -0.01099602183391346,
+              "yaw": -0.014474342294604203
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.060678953109576605,
+              "roll": -0.04990731428190964,
+              "steer": -0.04067017515632165,
+              "throttle": -0.042174532612675564,
+              "yaw": -0.051001721873218386
+            },
+            "mean_button_entropy": {
+              "boost": -0.003877478092091269,
+              "handbrake": 3.6318984473537874e-05,
+              "jump": -0.03527392088027359
+            },
+            "mean_button_probability": {
+              "boost": 0.01732289234096529,
+              "handbrake": 0.007757887866373048,
+              "jump": -0.08511432823032217
+            },
+            "mean_episode_duration_seconds": 0.0033772786458445836,
+            "no_touch_truncated_fraction": -0.002197265625,
+            "touches_per_simulated_minute": 0.024016747028655527
+          },
+          "outcome": {
+            "current_goals": 10.0,
+            "current_touches": 27.0,
+            "current_wins": 10.0,
+            "draws": -9.0,
+            "goal_differential": 11.0,
+            "initialization_goals": -1.0,
+            "initialization_touches": -2.0,
+            "initialization_wins": -1.0,
+            "score_differential": 11.0,
+            "touch_differential": 29.0
+          }
+        }
+      }
+    },
+    "050m": {
+      "agent_decision_samples": 50331648,
+      "campaign01": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00341796875,
+          "no_touch_truncated_fraction": 0.99658203125,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.20925276923962965,
+          "goals_per_simulated_minute": 0.013438251235572546,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.260774739583344,
+          "mean_absolute_analog_action": {
+            "throttle": 0.7846422728685445,
+            "steer": 0.7895764182159495,
+            "pitch": 0.7802591047658305,
+            "yaw": 0.7817798812118674,
+            "roll": 0.7854205579569002
+          },
+          "button_activation_rate": {
+            "jump": 0.4529143940735179,
+            "boost": 0.48214019082316756,
+            "handbrake": 0.5183384135611152
+          },
+          "mean_analog_policy_std": {
+            "throttle": 2.548519404957992,
+            "steer": 2.5513137536898682,
+            "pitch": 2.526577645771645,
+            "yaw": 2.5394847099739097,
+            "roll": 2.539079563354135
+          },
+          "mean_button_probability": {
+            "jump": 0.4525736744012169,
+            "boost": 0.48202478091905887,
+            "handbrake": 0.518197891008461
+          },
+          "mean_button_entropy": {
+            "jump": 0.6840820704820124,
+            "boost": 0.6893922463172739,
+            "handbrake": 0.6919897733385121
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.770696591149693,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 15.5665283203125,
+            "mean_absolute_analog_action": {
+              "throttle": 0.07926918051702343,
+              "steer": 0.1568117617754352,
+              "pitch": 0.05867317050075867,
+              "yaw": 0.015629943764414816,
+              "roll": 0.13754198414351368
+            },
+            "button_activation_rate": {
+              "jump": 0.5732747286067915,
+              "boost": 0.8911353162747051,
+              "handbrake": 0.29739572305737877
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.5890070639649445,
+              "steer": 1.5968882538551044,
+              "pitch": 1.554416562573313,
+              "yaw": 1.5719576989249564,
+              "roll": 1.5632815332203045
+            },
+            "mean_button_probability": {
+              "jump": 0.4877291213016406,
+              "boost": 0.5149063495527667,
+              "handbrake": 0.5023450355955466
+            },
+            "mean_button_entropy": {
+              "jump": 0.6913095231822929,
+              "boost": 0.69108936993864,
+              "handbrake": 0.6929449310000799
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.007080078125,
+            "no_touch_truncated_fraction": 0.992919921875,
+            "touches_per_simulated_minute": 0.2536797442703184,
+            "goals_per_simulated_minute": 0.02786633554484558,
+            "mean_episode_duration_seconds": 15.24436848958333,
+            "mean_absolute_analog_action": {
+              "throttle": 0.6689969275553762,
+              "steer": 0.6712938079261538,
+              "pitch": 0.6670753159401615,
+              "yaw": 0.6675691411699368,
+              "roll": 0.6694403925728399
+            },
+            "button_activation_rate": {
+              "jump": 0.4817326027584469,
+              "boost": 0.4930689163305268,
+              "handbrake": 0.5065016111226183
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.7654477545339378,
+              "steer": 1.7670020022599038,
+              "pitch": 1.7556734419252225,
+              "yaw": 1.7604363195006971,
+              "roll": 1.7615699869473609
+            },
+            "mean_button_probability": {
+              "jump": 0.48154426625966257,
+              "boost": 0.49344327472672783,
+              "handbrake": 0.5069448143227498
+            },
+            "mean_button_entropy": {
+              "jump": 0.6901395784639258,
+              "boost": 0.691741462052158,
+              "handbrake": 0.692750920149351
+            }
+          },
+          "outcome": {
+            "current_goals": 7,
+            "initialization_goals": 22,
+            "score_differential": -15,
+            "goal_differential": -15,
+            "current_touches": 117,
+            "initialization_touches": 147,
+            "touch_differential": -30,
+            "current_wins": 7,
+            "initialization_wins": 22,
+            "draws": 4067
+          }
+        }
+      },
+      "campaign02": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00634765625,
+          "no_touch_truncated_fraction": 0.99365234375,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.24469270513886793,
+          "goals_per_simulated_minute": 0.025047284777994356,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.205615234375008,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5499713489178426,
+            "steer": 0.5554980703638397,
+            "pitch": 0.5517202104751691,
+            "yaw": 0.553092995038337,
+            "roll": 0.5528793350404635
+          },
+          "button_activation_rate": {
+            "jump": 0.3333285165477991,
+            "boost": 0.5539501387769432,
+            "handbrake": 0.5157765782197803
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9779943581810027,
+            "steer": 0.9978971640009421,
+            "pitch": 0.9464823620055854,
+            "yaw": 0.9864725873759318,
+            "roll": 0.9856385285297592
+          },
+          "mean_button_probability": {
+            "jump": 0.3330694820292216,
+            "boost": 0.5536206757065439,
+            "handbrake": 0.5157520374304945
+          },
+          "mean_button_entropy": {
+            "jump": 0.624966414746803,
+            "boost": 0.6865792448070205,
+            "handbrake": 0.6921561109726431
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.7687217536992975,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 15.6065185546875,
+            "mean_absolute_analog_action": {
+              "throttle": 0.053400470513088896,
+              "steer": 0.0223800793852756,
+              "pitch": 0.14322888398908343,
+              "yaw": 0.03598705698203991,
+              "roll": 0.04978161863274131
+            },
+            "button_activation_rate": {
+              "jump": 0.48750683751458107,
+              "boost": 0.9908180457197029,
+              "handbrake": 0.46899979089850546
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9960392754589014,
+              "steer": 0.9976143127185487,
+              "pitch": 0.975237908156774,
+              "yaw": 1.0048637980623114,
+              "roll": 1.0067969803326677
+            },
+            "mean_button_probability": {
+              "jump": 0.3926926544322473,
+              "boost": 0.5352864056854589,
+              "handbrake": 0.5059590208412437
+            },
+            "mean_button_entropy": {
+              "jump": 0.6373249167216675,
+              "boost": 0.6875034506922906,
+              "handbrake": 0.6927823935711565
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.010986328125,
+            "no_touch_truncated_fraction": 0.989013671875,
+            "touches_per_simulated_minute": 0.24508082789289987,
+            "goals_per_simulated_minute": 0.043419831713309036,
+            "mean_episode_duration_seconds": 15.181534830729172,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5530857699268131,
+              "steer": 0.5557062589422472,
+              "pitch": 0.5538705006999218,
+              "yaw": 0.5546244541845082,
+              "roll": 0.5547264069412188
+            },
+            "button_activation_rate": {
+              "jump": 0.4178711202906234,
+              "boost": 0.5258913528601072,
+              "handbrake": 0.5062406627260042
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9889449739710161,
+              "steer": 0.9983534938258841,
+              "pitch": 0.9752668424371128,
+              "yaw": 0.9937426983590519,
+              "roll": 0.9936874140879425
+            },
+            "mean_button_probability": {
+              "jump": 0.41771507749123377,
+              "boost": 0.526272102939919,
+              "handbrake": 0.5067026772359348
+            },
+            "mean_button_entropy": {
+              "jump": 0.6598594496196919,
+              "boost": 0.6899789755805392,
+              "handbrake": 0.6927095454943499
+            }
+          },
+          "outcome": {
+            "current_goals": 22,
+            "initialization_goals": 23,
+            "score_differential": -1,
+            "goal_differential": -1,
+            "current_touches": 112,
+            "initialization_touches": 142,
+            "touch_differential": -30,
+            "current_wins": 22,
+            "initialization_wins": 23,
+            "draws": 4051
+          }
+        }
+      },
+      "campaign02_minus_campaign01": {
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.09968272944499779,
+              "handbrake": 0.1716040678411267,
+              "jump": -0.08576789109221045
+            },
+            "goal_terminated_fraction": 0.0,
+            "goals_per_simulated_minute": 0.0,
+            "mean_absolute_analog_action": {
+              "pitch": 0.08455571348832476,
+              "roll": -0.08776036551077238,
+              "steer": -0.13443168239015962,
+              "throttle": -0.025868710003934536,
+              "yaw": 0.020357113217625095
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.579178654416539,
+              "roll": -0.5564845528876368,
+              "steer": -0.5992739411365556,
+              "throttle": -0.5929677885060431,
+              "yaw": -0.567093900862645
+            },
+            "mean_button_entropy": {
+              "boost": -0.003585919246349434,
+              "handbrake": -0.00016253742892347045,
+              "jump": -0.05398460646062542
+            },
+            "mean_button_probability": {
+              "boost": 0.020380056132692226,
+              "handbrake": 0.0036139852456971155,
+              "jump": -0.09503646686939327
+            },
+            "mean_episode_duration_seconds": 0.03999023437500071,
+            "no_touch_truncated_fraction": 0.0,
+            "touches_per_simulated_minute": -0.0019748374503955057
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 0.0,
+            "goal_differential": 0.0,
+            "initialization_goals": 0.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": 0.0,
+            "score_differential": 0.0,
+            "touch_differential": 0.0
+          }
+        },
+        "ordinary_stochastic_self_play": {
+          "button_activation_rate": {
+            "boost": 0.07180994795377565,
+            "handbrake": -0.002561835341334917,
+            "jump": -0.11958587752571881
+          },
+          "demolitions_per_simulated_minute": 0.0,
+          "goal_terminated_fraction": 0.0029296875,
+          "goals_per_simulated_minute": 0.01160903354242181,
+          "hard_truncated_fraction": 0.0,
+          "mean_absolute_analog_action": {
+            "pitch": -0.22853889429066143,
+            "roll": -0.23254122291643675,
+            "steer": -0.2340783478521098,
+            "throttle": -0.23467092395070188,
+            "yaw": -0.2286868861735304
+          },
+          "mean_analog_policy_std": {
+            "pitch": -1.5800952837660596,
+            "roll": -1.5534410348243757,
+            "steer": -1.553416589688926,
+            "throttle": -1.5705250467769891,
+            "yaw": -1.5530121225979778
+          },
+          "mean_button_entropy": {
+            "boost": -0.0028130015102534323,
+            "handbrake": 0.00016633763413098634,
+            "jump": -0.05911565573520938
+          },
+          "mean_button_probability": {
+            "boost": 0.07159589478748507,
+            "handbrake": -0.0024458535779665613,
+            "jump": -0.11950419237199528
+          },
+          "mean_episode_duration_seconds": -0.05515950520833535,
+          "no_touch_truncated_fraction": -0.0029296875,
+          "touches_per_simulated_minute": 0.03543993589923827
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.032822436529580445,
+              "handbrake": -0.000260948396614058,
+              "jump": -0.06386148246782353
+            },
+            "goal_terminated_fraction": 0.00390625,
+            "goals_per_simulated_minute": 0.015553496168463455,
+            "mean_absolute_analog_action": {
+              "pitch": -0.11320481524023962,
+              "roll": -0.11471398563162116,
+              "steer": -0.11558754898390655,
+              "throttle": -0.11591115762856308,
+              "yaw": -0.11294468698542859
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.7804065994881096,
+              "roll": -0.7678825728594184,
+              "steer": -0.7686485084340197,
+              "throttle": -0.7765027805629217,
+              "yaw": -0.7666936211416452
+            },
+            "mean_button_entropy": {
+              "boost": -0.0017624864716188071,
+              "handbrake": -4.137465500109183e-05,
+              "jump": -0.030280128844233922
+            },
+            "mean_button_probability": {
+              "boost": 0.032828828213191164,
+              "handbrake": -0.00024213708681508628,
+              "jump": -0.0638291887684288
+            },
+            "mean_episode_duration_seconds": -0.06283365885415826,
+            "no_touch_truncated_fraction": -0.00390625,
+            "touches_per_simulated_minute": -0.008598916377418553
+          },
+          "outcome": {
+            "current_goals": 15.0,
+            "current_touches": -5.0,
+            "current_wins": 15.0,
+            "draws": -16.0,
+            "goal_differential": 14.0,
+            "initialization_goals": 1.0,
+            "initialization_touches": -5.0,
+            "initialization_wins": 1.0,
+            "score_differential": 14.0,
+            "touch_differential": 0.0
+          }
+        }
+      }
+    },
+    "100m": {
+      "agent_decision_samples": 100663296,
+      "campaign01": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.00341796875,
+          "no_touch_truncated_fraction": 0.99658203125,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.1756243483109023,
+          "goals_per_simulated_minute": 0.013509565254684792,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.18021647135416,
+          "mean_absolute_analog_action": {
+            "throttle": 0.7985142146752365,
+            "steer": 0.8110098523280618,
+            "pitch": 0.7978801069473694,
+            "yaw": 0.7971937891460757,
+            "roll": 0.8022451826298745
+          },
+          "button_activation_rate": {
+            "jump": 0.5050108693029975,
+            "boost": 0.5229748384347132,
+            "handbrake": 0.5291691349321439
+          },
+          "mean_analog_policy_std": {
+            "throttle": 2.643977518820613,
+            "steer": 2.6521727515224174,
+            "pitch": 2.6406100079592694,
+            "yaw": 2.6521052861172207,
+            "roll": 2.645849094979993
+          },
+          "mean_button_probability": {
+            "jump": 0.5044279153491529,
+            "boost": 0.5227527305167516,
+            "handbrake": 0.5291473631959557
+          },
+          "mean_button_entropy": {
+            "jump": 0.6927615061926161,
+            "boost": 0.6917147577731273,
+            "handbrake": 0.6911572404938078
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.199951171875,
+            "no_touch_truncated_fraction": 0.800048828125,
+            "touches_per_simulated_minute": 0.9261405720812154,
+            "goals_per_simulated_minute": 0.9261405720812154,
+            "mean_episode_duration_seconds": 12.9538330078125,
+            "mean_absolute_analog_action": {
+              "throttle": 0.16823916717260867,
+              "steer": 0.25705705397738976,
+              "pitch": 0.08112379445268092,
+              "yaw": 0.04036736386145798,
+              "roll": 0.202931074082772
+            },
+            "button_activation_rate": {
+              "jump": 0.7650752277186297,
+              "boost": 0.9700201097271146,
+              "handbrake": 0.4992282161899323
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.7910500842356913,
+              "steer": 1.808571548969832,
+              "pitch": 1.786292144324711,
+              "yaw": 1.805049685325137,
+              "roll": 1.7981974324882544
+            },
+            "mean_button_probability": {
+              "jump": 0.5006809041903196,
+              "boost": 0.5156850252830021,
+              "handbrake": 0.5158377276888132
+            },
+            "mean_button_entropy": {
+              "jump": 0.6929800885870369,
+              "boost": 0.691999832152678,
+              "handbrake": 0.691892603759837
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 819,
+            "score_differential": -819,
+            "goal_differential": -819,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 819,
+            "draws": 3277
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.00732421875,
+            "no_touch_truncated_fraction": 0.99267578125,
+            "touches_per_simulated_minute": 0.24451891491790004,
+            "goals_per_simulated_minute": 0.028880186801326774,
+            "mean_episode_duration_seconds": 15.216422526041658,
+            "mean_absolute_analog_action": {
+              "throttle": 0.6763554129251412,
+              "steer": 0.6808567919506668,
+              "pitch": 0.6764013571020813,
+              "yaw": 0.6760172918674049,
+              "roll": 0.6781515850169395
+            },
+            "button_activation_rate": {
+              "jump": 0.5013707392365149,
+              "boost": 0.5115389716728153,
+              "handbrake": 0.5122591044788891
+            },
+            "mean_analog_policy_std": {
+              "throttle": 1.8186332010233432,
+              "steer": 1.8225116422505883,
+              "pitch": 1.8191800855304785,
+              "yaw": 1.82303305131398,
+              "roll": 1.8207589975107463
+            },
+            "mean_button_probability": {
+              "jump": 0.5012425462463691,
+              "boost": 0.512079149329454,
+              "handbrake": 0.5127019260790333
+            },
+            "mean_button_entropy": {
+              "jump": 0.6929762506394593,
+              "boost": 0.6923805547668983,
+              "handbrake": 0.6923187933561643
+            }
+          },
+          "outcome": {
+            "current_goals": 7,
+            "initialization_goals": 23,
+            "score_differential": -16,
+            "goal_differential": -16,
+            "current_touches": 104,
+            "initialization_touches": 150,
+            "touch_differential": -46,
+            "current_wins": 7,
+            "initialization_wins": 23,
+            "draws": 4066
+          }
+        }
+      },
+      "campaign02": {
+        "ordinary_stochastic_self_play": {
+          "goal_terminated_fraction": 0.01025390625,
+          "no_touch_truncated_fraction": 0.98974609375,
+          "hard_truncated_fraction": 0.0,
+          "touches_per_simulated_minute": 0.2911822083079292,
+          "goals_per_simulated_minute": 0.04036189026050503,
+          "demolitions_per_simulated_minute": 0.0,
+          "mean_episode_duration_seconds": 15.242952473958331,
+          "mean_absolute_analog_action": {
+            "throttle": 0.5496354016580444,
+            "steer": 0.5587178288546821,
+            "pitch": 0.5728411396886034,
+            "yaw": 0.5755301554648694,
+            "roll": 0.562902835291126
+          },
+          "button_activation_rate": {
+            "jump": 0.34494814351321423,
+            "boost": 0.6054969584432697,
+            "handbrake": 0.5219539853095533
+          },
+          "mean_analog_policy_std": {
+            "throttle": 0.9792379844420763,
+            "steer": 1.0086712398296034,
+            "pitch": 0.9765081562657878,
+            "yaw": 1.0604990035848587,
+            "roll": 1.0169334219090596
+          },
+          "mean_button_probability": {
+            "jump": 0.34463548724560694,
+            "boost": 0.6053737360924091,
+            "handbrake": 0.5218751571978208
+          },
+          "mean_button_entropy": {
+            "jump": 0.637076935340678,
+            "boost": 0.6686319534783295,
+            "handbrake": 0.6911334182835573
+          }
+        },
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.0,
+            "no_touch_truncated_fraction": 1.0,
+            "touches_per_simulated_minute": 0.7454806939615154,
+            "goals_per_simulated_minute": 0.0,
+            "mean_episode_duration_seconds": 16.09306640625,
+            "mean_absolute_analog_action": {
+              "throttle": 0.03649574979978507,
+              "steer": 0.022408713748111635,
+              "pitch": 0.19619286228086943,
+              "yaw": 0.07406816723499687,
+              "roll": 0.0809319541820827
+            },
+            "button_activation_rate": {
+              "jump": 0.49917143527536567,
+              "boost": 0.9633456821588295,
+              "handbrake": 0.4430434444019669
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9833937846679599,
+              "steer": 1.0146382564553404,
+              "pitch": 0.989066608881252,
+              "yaw": 1.0350880808716632,
+              "roll": 1.02418080663157
+            },
+            "mean_button_probability": {
+              "jump": 0.3946470415355718,
+              "boost": 0.574016468350823,
+              "handbrake": 0.5189033159484985
+            },
+            "mean_button_entropy": {
+              "jump": 0.6413558908849231,
+              "boost": 0.6688885361279848,
+              "handbrake": 0.690889527060282
+            }
+          },
+          "outcome": {
+            "current_goals": 0,
+            "initialization_goals": 0,
+            "score_differential": 0,
+            "goal_differential": 0,
+            "current_touches": 0,
+            "initialization_touches": 819,
+            "touch_differential": -819,
+            "current_wins": 0,
+            "initialization_wins": 0,
+            "draws": 4096
+          }
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "goal_terminated_fraction": 0.010009765625,
+            "no_touch_truncated_fraction": 0.989990234375,
+            "touches_per_simulated_minute": 0.3235344943453467,
+            "goals_per_simulated_minute": 0.039361763407000636,
+            "mean_episode_duration_seconds": 15.25810546875,
+            "mean_absolute_analog_action": {
+              "throttle": 0.5529317340970815,
+              "steer": 0.5572282283495985,
+              "pitch": 0.5639584415402875,
+              "yaw": 0.5652310848867405,
+              "roll": 0.5590471328128375
+            },
+            "button_activation_rate": {
+              "jump": 0.42584174437681477,
+              "boost": 0.5502587849268981,
+              "handbrake": 0.5097887052006597
+            },
+            "mean_analog_policy_std": {
+              "throttle": 0.9897517192090951,
+              "steer": 1.0034709370991568,
+              "pitch": 0.9891456954464274,
+              "yaw": 1.0284972734457845,
+              "roll": 1.006895191501549
+            },
+            "mean_button_probability": {
+              "jump": 0.42557529548677314,
+              "boost": 0.5506695523666723,
+              "handbrake": 0.5102485914765664
+            },
+            "mean_button_entropy": {
+              "jump": 0.6671804961255308,
+              "boost": 0.6817783691713,
+              "handbrake": 0.6921846815618455
+            }
+          },
+          "outcome": {
+            "current_goals": 19,
+            "initialization_goals": 22,
+            "score_differential": -3,
+            "goal_differential": -3,
+            "current_touches": 186,
+            "initialization_touches": 151,
+            "touch_differential": 35,
+            "current_wins": 19,
+            "initialization_wins": 22,
+            "draws": 4055
+          }
+        }
+      },
+      "campaign02_minus_campaign01": {
+        "deterministic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": -0.0066744275682850684,
+              "handbrake": -0.05618477178796538,
+              "jump": -0.265903792443264
+            },
+            "goal_terminated_fraction": -0.199951171875,
+            "goals_per_simulated_minute": -0.9261405720812154,
+            "mean_absolute_analog_action": {
+              "pitch": 0.11506906782818851,
+              "roll": -0.1219991199006893,
+              "steer": -0.23464834022927814,
+              "throttle": -0.1317434173728236,
+              "yaw": 0.033700803373538896
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.7972255354434591,
+              "roll": -0.7740166258566843,
+              "steer": -0.7939332925144915,
+              "throttle": -0.8076562995677314,
+              "yaw": -0.7699616044534738
+            },
+            "mean_button_entropy": {
+              "boost": -0.023111296024693195,
+              "handbrake": -0.0010030766995550167,
+              "jump": -0.051624197702113794
+            },
+            "mean_button_probability": {
+              "boost": 0.0583314430678209,
+              "handbrake": 0.0030655882596852813,
+              "jump": -0.10603386265474785
+            },
+            "mean_episode_duration_seconds": 3.139233398437499,
+            "no_touch_truncated_fraction": 0.199951171875,
+            "touches_per_simulated_minute": -0.18065987811969997
+          },
+          "outcome": {
+            "current_goals": 0.0,
+            "current_touches": 0.0,
+            "current_wins": 0.0,
+            "draws": 819.0,
+            "goal_differential": 819.0,
+            "initialization_goals": -819.0,
+            "initialization_touches": 0.0,
+            "initialization_wins": -819.0,
+            "score_differential": 819.0,
+            "touch_differential": 0.0
+          }
+        },
+        "ordinary_stochastic_self_play": {
+          "button_activation_rate": {
+            "boost": 0.08252212000855652,
+            "handbrake": -0.007215149622590622,
+            "jump": -0.1600627257897833
+          },
+          "demolitions_per_simulated_minute": 0.0,
+          "goal_terminated_fraction": 0.0068359375,
+          "goals_per_simulated_minute": 0.02685232500582024,
+          "hard_truncated_fraction": 0.0,
+          "mean_absolute_analog_action": {
+            "pitch": -0.22503896725876604,
+            "roll": -0.2393423473387486,
+            "steer": -0.25229202347337965,
+            "throttle": -0.24887881301719217,
+            "yaw": -0.22166363368120634
+          },
+          "mean_analog_policy_std": {
+            "pitch": -1.6641018516934816,
+            "roll": -1.6289156730709333,
+            "steer": -1.643501511692814,
+            "throttle": -1.664739534378537,
+            "yaw": -1.591606282532362
+          },
+          "mean_button_entropy": {
+            "boost": -0.02308280429479781,
+            "handbrake": -2.382221025043485e-05,
+            "jump": -0.05568457085193812
+          },
+          "mean_button_probability": {
+            "boost": 0.08262100557565744,
+            "handbrake": -0.007272205998134829,
+            "jump": -0.15979242810354594
+          },
+          "mean_episode_duration_seconds": 0.06273600260417034,
+          "no_touch_truncated_fraction": -0.0068359375,
+          "touches_per_simulated_minute": 0.11555785999702689
+        },
+        "stochastic_vs_initialization": {
+          "metrics": {
+            "button_activation_rate": {
+              "boost": 0.0387198132540828,
+              "handbrake": -0.0024703992782294515,
+              "jump": -0.0755289948597001
+            },
+            "goal_terminated_fraction": 0.002685546875,
+            "goals_per_simulated_minute": 0.010481576605673861,
+            "mean_absolute_analog_action": {
+              "pitch": -0.11244291556179375,
+              "roll": -0.11910445220410204,
+              "steer": -0.12362856360106833,
+              "throttle": -0.12342367882805971,
+              "yaw": -0.11078620698066444
+            },
+            "mean_analog_policy_std": {
+              "pitch": -0.8300343900840511,
+              "roll": -0.8138638060091974,
+              "steer": -0.8190407051514315,
+              "throttle": -0.8288814818142481,
+              "yaw": -0.7945357778681956
+            },
+            "mean_button_entropy": {
+              "boost": -0.010602185595598335,
+              "handbrake": -0.00013411179431876974,
+              "jump": -0.02579575451392857
+            },
+            "mean_button_probability": {
+              "boost": 0.03859040303721828,
+              "handbrake": -0.0024533346024668834,
+              "jump": -0.07566725075959596
+            },
+            "mean_episode_duration_seconds": 0.041682942708341386,
+            "no_touch_truncated_fraction": -0.002685546875,
+            "touches_per_simulated_minute": 0.07901557942744666
+          },
+          "outcome": {
+            "current_goals": 12.0,
+            "current_touches": 82.0,
+            "current_wins": 12.0,
+            "draws": -11.0,
+            "goal_differential": 13.0,
+            "initialization_goals": -1.0,
+            "initialization_touches": 1.0,
+            "initialization_wins": -1.0,
+            "score_differential": 13.0,
+            "touch_differential": 81.0
+          }
+        }
+      }
+    }
+  },
+  "behavioral_classification": {
+    "behavioral_result": "IMPROVED",
+    "primary_metrics": {
+      "ordinary_self_play_touches_per_simulated_minute": {
+        "initialization": 0.272090675526261,
+        "campaign01_final": 0.1756243483109023,
+        "campaign02_final": 0.2911822083079292,
+        "campaign02_minus_initialization": 0.019091532781668197,
+        "campaign02_minus_campaign01": 0.11555785999702689,
+        "improved_vs_initialization": true,
+        "worse_vs_initialization": false,
+        "not_worse_than_campaign01": true
+      },
+      "stochastic_vs_initialization_goal_differential": {
+        "initialization": -2.0,
+        "campaign01_final": -16.0,
+        "campaign02_final": -3.0,
+        "campaign02_minus_initialization": -1.0,
+        "campaign02_minus_campaign01": 13.0,
+        "improved_vs_initialization": false,
+        "worse_vs_initialization": true,
+        "not_worse_than_campaign01": true
+      },
+      "stochastic_vs_initialization_touch_differential": {
+        "initialization": 15.0,
+        "campaign01_final": -46.0,
+        "campaign02_final": 35.0,
+        "campaign02_minus_initialization": 20.0,
+        "campaign02_minus_campaign01": 81.0,
+        "improved_vs_initialization": true,
+        "worse_vs_initialization": false,
+        "not_worse_than_campaign01": true
+      }
+    },
+    "improved_vs_initialization_count": 2,
+    "worse_vs_initialization_count": 1,
+    "not_worse_than_campaign01_on_all_three": true,
+    "prospective_rule": "IMPROVED iff at least two primary final metrics improve vs initialization and none is worse than Campaign 01; DEGRADED iff at least two are worse vs initialization; otherwise INCONCLUSIVE"
+  }
+}

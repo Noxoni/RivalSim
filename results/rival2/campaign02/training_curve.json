@@ -1,0 +1,1606 @@
+[
+  {
+    "iteration": 1,
+    "policy_version": 1,
+    "agent_decision_samples": 8388608,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.030997700057924,
+    "agent_decisions_per_second": 2081025.2508651789,
+    "torch_peak_allocated_bytes": 17868409344,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.004746910184621811,
+        "value_loss": 1.5998750768630998e-06,
+        "entropy": 9.16635513305664,
+        "total_loss": -0.004746110178530216,
+        "approx_kl": 0.006711690686643124,
+        "clip_fraction": 0.07411068677902222,
+        "gradient_norm": 0.040214963257312775,
+        "post_clip_gradient_norm": 0.040214963257312775,
+        "old_value_mean": -0.0011990044731646776
+      },
+      "observed_opponent_versions": [
+        0
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.0022426950745284557,
+        "steer": -0.00919729471206665,
+        "pitch": 0.01592528074979782,
+        "yaw": 0.005345070734620094,
+        "roll": 0.0016169212758541107
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9977604150772095,
+        "steer": 0.990845799446106,
+        "pitch": 1.0160555839538574,
+        "yaw": 1.005359411239624,
+        "roll": 1.001619577407837
+      },
+      "mean_button_probability": {
+        "jump": 0.4737662374973297,
+        "boost": 0.5286402702331543,
+        "handbrake": 0.4874695837497711
+      },
+      "actor_output_sha256": "0A3CEBFFB7C5284DD4EDD062DC33DBABC3819756929D2953B06BA66D07453540",
+      "value_output_sha256": "147AC34DFDE3E78945225E64474B2EA1E718F1E321CFCCB1A76BDC9549F429D2",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.16635513305664,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.004746110247083379,
+      "reported_total_loss": -0.004746110178530216,
+      "loss_identity_absolute_error": 6.855316314613447e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 2,
+    "policy_version": 2,
+    "agent_decision_samples": 16777216,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.7566279000602663,
+    "agent_decisions_per_second": 2233015.412536713,
+    "torch_peak_allocated_bytes": 17868409344,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.005086676683276892,
+        "value_loss": 2.1440177633280655e-08,
+        "entropy": 9.143535614013672,
+        "total_loss": -0.005086665973067284,
+        "approx_kl": 0.00819435529410839,
+        "clip_fraction": 0.06349581480026245,
+        "gradient_norm": 0.04349261522293091,
+        "post_clip_gradient_norm": 0.04349261522293091,
+        "old_value_mean": -0.0009530289098620415
+      },
+      "observed_opponent_versions": [
+        1
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.006885882001370192,
+        "steer": -0.015477646142244339,
+        "pitch": 0.0005973738734610379,
+        "yaw": -6.471948290709406e-05,
+        "roll": -0.005024123005568981
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.99314284324646,
+        "steer": 0.9846546649932861,
+        "pitch": 1.0005980730056763,
+        "yaw": 0.999935507774353,
+        "roll": 0.994990885257721
+      },
+      "mean_button_probability": {
+        "jump": 0.5007621049880981,
+        "boost": 0.5328549146652222,
+        "handbrake": 0.49012959003448486
+      },
+      "actor_output_sha256": "A0CDD31DBBAB45D30478487A7627F9668F0ABE44B8B9742FFEF464BD463DFF4E",
+      "value_output_sha256": "6C9D8BED588BDD7FAFB5B4CD71C2B7540E1E4994A7E6F8EC60CA1D07AE7B85E2",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.143535614013672,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.005086665963188075,
+      "reported_total_loss": -0.005086665973067284,
+      "loss_identity_absolute_error": 9.879208562324493e-12,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 3,
+    "policy_version": 3,
+    "agent_decision_samples": 25165824,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.937066499958746,
+    "agent_decisions_per_second": 2130674.7041453067,
+    "torch_peak_allocated_bytes": 17870915072,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0002638546284288168,
+        "value_loss": 4.993994480173569e-06,
+        "entropy": 9.112283706665039,
+        "total_loss": -0.00026135763619095087,
+        "approx_kl": 0.006492821499705315,
+        "clip_fraction": 0.0691651701927185,
+        "gradient_norm": 0.05204344540834427,
+        "post_clip_gradient_norm": 0.05204344540834427,
+        "old_value_mean": -0.001192155061289668
+      },
+      "observed_opponent_versions": [
+        2
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.006264306604862213,
+        "steer": -0.007287574931979179,
+        "pitch": -0.01226841751486063,
+        "yaw": 0.007169232703745365,
+        "roll": -0.02256960980594158
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9937558174133301,
+        "steer": 0.9927471876144409,
+        "pitch": 0.9878079891204834,
+        "yaw": 1.007194995880127,
+        "roll": 0.9776865243911743
+      },
+      "mean_button_probability": {
+        "jump": 0.46198368072509766,
+        "boost": 0.5287925004959106,
+        "handbrake": 0.5111536979675293
+      },
+      "actor_output_sha256": "8F5E91AE112BBE6C03C5D18BC9D3317A363C726AE56D38145C3D24F590663D7C",
+      "value_output_sha256": "E02880FD3CB4EC94D6C6E40888D45A4D9542D0F1F48F44AC19AE5504E91E89D1",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.112283706665039,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.00026135763118873,
+      "reported_total_loss": -0.00026135763619095087,
+      "loss_identity_absolute_error": 5.002220859751105e-12,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 4,
+    "policy_version": 4,
+    "agent_decision_samples": 33554432,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.9446331000654027,
+    "agent_decisions_per_second": 2126587.6412842846,
+    "torch_peak_allocated_bytes": 17873420800,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.00013321629376150668,
+        "value_loss": 2.108386979671195e-05,
+        "entropy": 9.050990104675293,
+        "total_loss": -0.00012267439160495996,
+        "approx_kl": 0.005091484636068344,
+        "clip_fraction": 0.04652225971221924,
+        "gradient_norm": 0.05106858164072037,
+        "post_clip_gradient_norm": 0.05106858164072037,
+        "old_value_mean": -0.0011546555906534195
+      },
+      "observed_opponent_versions": [
+        3
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.0007650655461475253,
+        "steer": 0.001408121665008366,
+        "pitch": -0.02505066990852356,
+        "yaw": 0.0012720527593046427,
+        "roll": -0.029079735279083252
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9992360472679138,
+        "steer": 1.0014286041259766,
+        "pitch": 0.9752610921859741,
+        "yaw": 1.001273274421692,
+        "roll": 0.9713614583015442
+      },
+      "mean_button_probability": {
+        "jump": 0.4627975821495056,
+        "boost": 0.5337451696395874,
+        "handbrake": 0.5389177799224854
+      },
+      "actor_output_sha256": "2C0538C8FF360305D506023F2A065F58DBAA5AB9676D4ED71A6FFCE66727F249",
+      "value_output_sha256": "FE3CFFD14941CC0D87105F02B1A42196E4420D52E72FDFD762A691F579D73AD6",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.050990104675293,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.0001226743588631507,
+      "reported_total_loss": -0.00012267439160495996,
+      "loss_identity_absolute_error": 3.2741809263825417e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 5,
+    "policy_version": 5,
+    "agent_decision_samples": 41943040,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.823915100074373,
+    "agent_decisions_per_second": 2193722.3448911943,
+    "torch_peak_allocated_bytes": 17873420800,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.000148535065818578,
+        "value_loss": 0.00012276545749045908,
+        "entropy": 8.992380142211914,
+        "total_loss": -8.715233707334846e-05,
+        "approx_kl": 0.005466935224831104,
+        "clip_fraction": 0.05488473176956177,
+        "gradient_norm": 0.03289490193128586,
+        "post_clip_gradient_norm": 0.03289490193128586,
+        "old_value_mean": 7.489930430892855e-05
+      },
+      "observed_opponent_versions": [
+        4
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": 0.008524322882294655,
+        "steer": 0.008677425794303417,
+        "pitch": -0.02192305400967598,
+        "yaw": 0.0022542888764292,
+        "roll": -0.012355854734778404
+      },
+      "mean_analog_policy_std": {
+        "throttle": 1.008561134338379,
+        "steer": 1.0087252855300903,
+        "pitch": 0.9783190488815308,
+        "yaw": 1.0022597312927246,
+        "roll": 0.9877249598503113
+      },
+      "mean_button_probability": {
+        "jump": 0.4492185115814209,
+        "boost": 0.5140172243118286,
+        "handbrake": 0.5454671382904053
+      },
+      "actor_output_sha256": "9D67514B3EF00FF1AF50AE38DA96DF3C8C5DECA4196DC80A5E38C20D0FFA367B",
+      "value_output_sha256": "942C056013BA6A5E51EFB3608D5D833F75BCF430F37847C685E03F64B03950F0",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 8.992380142211914,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -8.715233707334846e-05,
+      "reported_total_loss": -8.715233707334846e-05,
+      "loss_identity_absolute_error": 0.0,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 6,
+    "policy_version": 6,
+    "agent_decision_samples": 50331648,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.886447799974121,
+    "agent_decisions_per_second": 2158425.490767136,
+    "torch_peak_allocated_bytes": 17873420800,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": 2.056113225989975e-05,
+        "value_loss": 0.0019221731927245855,
+        "entropy": 8.998739242553711,
+        "total_loss": 0.0009816477540880442,
+        "approx_kl": 0.00708931777626276,
+        "clip_fraction": 0.0875341072678566,
+        "gradient_norm": 0.04656551033258438,
+        "post_clip_gradient_norm": 0.04656551033258438,
+        "old_value_mean": 5.902927296119742e-05
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        5
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        }
+      ],
+      "trainable_samples": 8388534,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.016238674521446228,
+        "steer": 0.006403758190572262,
+        "pitch": -0.022033341228961945,
+        "yaw": -0.005059755872935057,
+        "roll": -0.014377055689692497
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.983895480632782,
+        "steer": 1.006428837776184,
+        "pitch": 0.9782156348228455,
+        "yaw": 0.9949654340744019,
+        "roll": 0.9857379198074341
+      },
+      "mean_button_probability": {
+        "jump": 0.4561244547367096,
+        "boost": 0.5163748860359192,
+        "handbrake": 0.5085420608520508
+      },
+      "actor_output_sha256": "821890D9DF3B9EA6B93F30A7969007CF8B58DA58FF8283C72276EEAE47A8D857",
+      "value_output_sha256": "960ACFF1553BBB5326AFB6383E613784A5A87CE9E1EF6FE87E25226ECB3E755C",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 8.998739242553711,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0009816477286221925,
+      "reported_total_loss": 0.0009816477540880442,
+      "loss_identity_absolute_error": 2.546585164964199e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 7,
+    "policy_version": 7,
+    "agent_decision_samples": 58720256,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.0664859000826254,
+    "agent_decisions_per_second": 2062864.1549770418,
+    "torch_peak_allocated_bytes": 17875926528,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -8.743052603676915e-05,
+        "value_loss": 0.0034353137016296387,
+        "entropy": 8.984861373901367,
+        "total_loss": 0.001630226382985711,
+        "approx_kl": 0.0069720568135380745,
+        "clip_fraction": 0.08454884588718414,
+        "gradient_norm": 0.04857628047466278,
+        "post_clip_gradient_norm": 0.04857628047466278,
+        "old_value_mean": -0.0069089182652533054
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8388325,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": 0.005284119863063097,
+        "steer": 0.0005099292611703277,
+        "pitch": -0.029254429042339325,
+        "yaw": 0.011104811914265156,
+        "roll": -0.006004038266837597
+      },
+      "mean_analog_policy_std": {
+        "throttle": 1.00529944896698,
+        "steer": 1.000521183013916,
+        "pitch": 0.9711704850196838,
+        "yaw": 1.0112032890319824,
+        "roll": 0.994030237197876
+      },
+      "mean_button_probability": {
+        "jump": 0.42247843742370605,
+        "boost": 0.5442030429840088,
+        "handbrake": 0.5183507204055786
+      },
+      "actor_output_sha256": "DFE140F78D69ECBDDD2974EC9FAD22FB532E951A97A1F5B9B92C80E462A50127",
+      "value_output_sha256": "99D702E71A46B7E4E5BAFF3588A07CEE258BB8247CBAE0299618820FD97F1253",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 8.984861373901367,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0016302263247780502,
+      "reported_total_loss": 0.001630226382985711,
+      "loss_identity_absolute_error": 5.820766091346741e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 8,
+    "policy_version": 8,
+    "agent_decision_samples": 67108864,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.056411100085825,
+    "agent_decisions_per_second": 2067987.635627591,
+    "torch_peak_allocated_bytes": 17875926528,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.00023901843815110624,
+        "value_loss": 0.003235423704609275,
+        "entropy": 8.988533020019531,
+        "total_loss": 0.0013786935014650226,
+        "approx_kl": 0.006793116219341755,
+        "clip_fraction": 0.08145211637020111,
+        "gradient_norm": 0.05072806030511856,
+        "post_clip_gradient_norm": 0.05072806030511856,
+        "old_value_mean": -0.002767337253317237
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        7
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8388060,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": 0.0013981035444885492,
+        "steer": 0.007989943027496338,
+        "pitch": -0.027887975797057152,
+        "yaw": 0.02764502726495266,
+        "roll": 0.005462450906634331
+      },
+      "mean_analog_policy_std": {
+        "throttle": 1.0014011859893799,
+        "steer": 1.0080628395080566,
+        "pitch": 0.97250896692276,
+        "yaw": 1.0280663967132568,
+        "roll": 1.005516767501831
+      },
+      "mean_button_probability": {
+        "jump": 0.4106697738170624,
+        "boost": 0.5458418130874634,
+        "handbrake": 0.5057699680328369
+      },
+      "actor_output_sha256": "555EADE8FF6E8ABC5561BEDC5ED46B5CD6A3E518A918D6548A68EBCC5479FF74",
+      "value_output_sha256": "7F6E44C65F640F8E4CB7F6620175F12FA17BCD2EE7EB57668609AA904AECCB14",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 8.988533020019531,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0013786934141535312,
+      "reported_total_loss": 0.0013786935014650226,
+      "loss_identity_absolute_error": 8.731149137020111e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 9,
+    "policy_version": 9,
+    "agent_decision_samples": 75497472,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.0819231000496075,
+    "agent_decisions_per_second": 2055062.7227392043,
+    "torch_peak_allocated_bytes": 17875926528,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0003319328825455159,
+        "value_loss": 0.0033322786912322044,
+        "entropy": 9.01020622253418,
+        "total_loss": 0.0013342064339667559,
+        "approx_kl": 0.006980184931308031,
+        "clip_fraction": 0.0831293985247612,
+        "gradient_norm": 0.05248545855283737,
+        "post_clip_gradient_norm": 0.05248545855283737,
+        "old_value_mean": -0.016389092430472374
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        8
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8387892,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.015028167515993118,
+        "steer": 0.006244204007089138,
+        "pitch": -0.019173627719283104,
+        "yaw": 0.03854408487677574,
+        "roll": 0.008103624917566776
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9851025342941284,
+        "steer": 1.00632643699646,
+        "pitch": 0.981036901473999,
+        "yaw": 1.0393584966659546,
+        "roll": 1.0082073211669922
+      },
+      "mean_button_probability": {
+        "jump": 0.4015132784843445,
+        "boost": 0.5616427659988403,
+        "handbrake": 0.4892510175704956
+      },
+      "actor_output_sha256": "888152EEB912AF17C1BE501BCE00C35C72851C81703F2D5B87BE0D10CCD79D4B",
+      "value_output_sha256": "B48C31D70DA05118E970DEBAA129CDD32C1B65AD8956E7D89159E2A7E0139FE8",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.01020622253418,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0013342064630705863,
+      "reported_total_loss": 0.0013342064339667559,
+      "loss_identity_absolute_error": 2.9103830456733704e-11,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 10,
+    "policy_version": 10,
+    "agent_decision_samples": 83886080,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.055314199998975,
+    "agent_decisions_per_second": 2068546.9944602863,
+    "torch_peak_allocated_bytes": 17875926528,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -1.2653283192776144e-05,
+        "value_loss": 0.004636127036064863,
+        "entropy": 9.035633087158203,
+        "total_loss": 0.002305410336703062,
+        "approx_kl": 0.005687244236469269,
+        "clip_fraction": 0.060878440737724304,
+        "gradient_norm": 0.051839135587215424,
+        "post_clip_gradient_norm": 0.05183913931250572,
+        "old_value_mean": -0.014172885566949844
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        9
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8387666,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.014774337410926819,
+        "steer": 0.014103638008236885,
+        "pitch": 0.00025867941440083086,
+        "yaw": 0.039231859147548676,
+        "roll": 0.020754795521497726
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9853464365005493,
+        "steer": 1.0142720937728882,
+        "pitch": 1.000279188156128,
+        "yaw": 1.040067195892334,
+        "roll": 1.0210124254226685
+      },
+      "mean_button_probability": {
+        "jump": 0.4106404483318329,
+        "boost": 0.5630480051040649,
+        "handbrake": 0.5009052157402039
+      },
+      "actor_output_sha256": "FAB2465BA0F311D8FAF03AF154CC17088FD67D4F4263C1BF4320BFD9A5947112",
+      "value_output_sha256": "443980E438821640A260D2F63BCD378D6C5A9D32B2D840D1978825CE19904033",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.035633087158203,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0023054102348396555,
+      "reported_total_loss": 0.002305410336703062,
+      "loss_identity_absolute_error": 1.0186340659856796e-10,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 11,
+    "policy_version": 11,
+    "agent_decision_samples": 92274688,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.1286536999978125,
+    "agent_decisions_per_second": 2031802.2797611833,
+    "torch_peak_allocated_bytes": 17876975104,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.00021177413873374462,
+        "value_loss": 0.0068765366449952126,
+        "entropy": 9.123773574829102,
+        "total_loss": 0.003226493950933218,
+        "approx_kl": 0.0063602980226278305,
+        "clip_fraction": 0.07364800572395325,
+        "gradient_norm": 0.04626186192035675,
+        "post_clip_gradient_norm": 0.04626186192035675,
+        "old_value_mean": -0.005741228349506855
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        10
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8387282,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": -0.004270968958735466,
+        "steer": 0.010943101719021797,
+        "pitch": 0.009008372202515602,
+        "yaw": 0.06297694146633148,
+        "roll": 0.013385572470724583
+      },
+      "mean_analog_policy_std": {
+        "throttle": 0.9957492351531982,
+        "steer": 1.0110148191452026,
+        "pitch": 1.0090742111206055,
+        "yaw": 1.0650418996810913,
+        "roll": 1.0135325193405151
+      },
+      "mean_button_probability": {
+        "jump": 0.40955638885498047,
+        "boost": 0.5578750371932983,
+        "handbrake": 0.4962836802005768
+      },
+      "actor_output_sha256": "6A8CE6E95EC5893A0080148F1BA9179FDD3A884D52814FEB34B38C13041C1CC2",
+      "value_output_sha256": "337A0FDE8FFF71C9BDF4CC73B0940B8373040C8427F8FB6E9170F90012A0B704",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.123773574829102,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0032264941837638617,
+      "reported_total_loss": 0.003226493950933218,
+      "loss_identity_absolute_error": 2.3283064365386963e-10,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  },
+  {
+    "iteration": 12,
+    "policy_version": 12,
+    "agent_decision_samples": 100663296,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.163824600051157,
+    "agent_decisions_per_second": 2014640.0979275007,
+    "torch_peak_allocated_bytes": 17876975104,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "entropy_coefficient_exact_zero": true,
+        "entropy_optimization_contribution_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -9.256006160285324e-05,
+        "value_loss": 0.006848841439932585,
+        "entropy": 9.15102767944336,
+        "total_loss": 0.003331860527396202,
+        "approx_kl": 0.005678548943251371,
+        "clip_fraction": 0.058526162058115005,
+        "gradient_norm": 0.04485013708472252,
+        "post_clip_gradient_norm": 0.04485013708472252,
+        "old_value_mean": -0.007229018956422806
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        11
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "6F08DB14B400602AF41051B6B6C631D2E045CC9D8D9D2617729C06121BA43D10"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "9556F5DF3F177413BE418EC321CD362EC2951FC18B6CC6A01A971B8CBEFB276C"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1D4D837125CC9CE4B6A4BF05AC91AF3B021FED9E332527C282CDF78356BC4772"
+        }
+      ],
+      "trainable_samples": 8386679,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "policy_distribution_on_frozen_observations": {
+      "observation_worlds": 4096,
+      "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+      "mean_log_std": {
+        "throttle": 0.0037131127901375294,
+        "steer": 0.0017208459321409464,
+        "pitch": 0.007893634960055351,
+        "yaw": 0.060953766107559204,
+        "roll": -0.0003189416602253914
+      },
+      "mean_analog_policy_std": {
+        "throttle": 1.003738284111023,
+        "steer": 1.0017322301864624,
+        "pitch": 1.0079283714294434,
+        "yaw": 1.0628571510314941,
+        "roll": 0.9997143745422363
+      },
+      "mean_button_probability": {
+        "jump": 0.42525410652160645,
+        "boost": 0.5648691654205322,
+        "handbrake": 0.4896888732910156
+      },
+      "actor_output_sha256": "49B836DDBB4CD0F41E401E6E7A42C10AEBDB0B6A15049308B168EEB20C918373",
+      "value_output_sha256": "92D8CC2D2632BDE17F2BE524DF8F047074F8844C451896272F68D7447AE0334C",
+      "finite": true
+    },
+    "optimizer_diagnosis": {
+      "entropy_coefficient": 0.0,
+      "diagnostic_entropy": 9.15102767944336,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.003331860658363439,
+      "reported_total_loss": 0.003331860527396202,
+      "loss_identity_absolute_error": 1.3096723705530167e-10,
+      "flags": {
+        "approximate_kl_ge_0_1": false,
+        "clip_fraction_ge_0_3": false
+      }
+    }
+  }
+]

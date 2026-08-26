@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T01:49:12.536538+00:00",
+  "verdict": "PASS_GREEN",
+  "campaign_seed": 20260826,
+  "evaluation_seed": 920260826,
+  "expected_model_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848",
+  "actual_model_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848",
+  "model_sha256_exact": true,
+  "evaluation_control": {
+    "verdict": "PASS_GREEN",
+    "semantic_metrics_exact": true,
+    "semantic_difference_count": 0,
+    "semantic_differences": [],
+    "non_semantic_metadata": {
+      "campaign01_created_utc": "2026-08-26T01:14:46.841018+00:00",
+      "campaign02_created_utc": "2026-08-26T01:49:12.535340+00:00",
+      "campaign01_wall_seconds": 68.31854870007373,
+      "campaign02_wall_seconds": 40.81510230002459
+    }
+  },
+  "policy_distribution": {
+    "observation_worlds": 4096,
+    "observation_sha256": "0C08CC8BF0125DC2A24E30EE10734C32ECD9E7C2955B81F5DFE40E9886C27F79",
+    "mean_log_std": {
+      "throttle": 0.0002778530470095575,
+      "steer": 0.00011988195910817012,
+      "pitch": 0.0036994214169681072,
+      "yaw": -0.000584579014685005,
+      "roll": 0.001415899838320911
+    },
+    "mean_analog_policy_std": {
+      "throttle": 1.0002778768539429,
+      "steer": 1.000119924545288,
+      "pitch": 1.0037063360214233,
+      "yaw": 0.9994155764579773,
+      "roll": 1.001416802406311
+    },
+    "mean_button_probability": {
+      "jump": 0.499971866607666,
+      "boost": 0.500319242477417,
+      "handbrake": 0.4996097683906555
+    },
+    "actor_output_sha256": "4C9435E6145ABC17A95C1DB46DA3F7977A35B2465894CAE1C77858A4924DC98D",
+    "value_output_sha256": "3E1C420FED07D7FB36D52661A86DC871085C965B45C31B7417201A001E1F8060",
+    "finite": true
+  },
+  "controlled_variable_proof": {
+    "verdict": "PASS_GREEN",
+    "checks": {
+      "campaign01_invariant_campaign_seed": true,
+      "campaign01_invariant_target_agent_decision_samples": true,
+      "campaign01_invariant_policy_config": true,
+      "campaign01_invariant_policy_config_hash": true,
+      "campaign01_invariant_self_play_config": true,
+      "campaign01_invariant_contract_hashes": true,
+      "campaign01_invariant_thresholds": true,
+      "campaign01_invariant_evaluation": true,
+      "only_ppo_difference_is_entropy_coefficient": true,
+      "campaign01_entropy_is_0_01": true,
+      "campaign02_entropy_is_zero": true,
+      "world_count_unchanged": true
+    },
+    "ppo_configuration_differences": {
+      "entropy_coefficient": {
+        "campaign01": 0.01,
+        "campaign02": 0.0
+      }
+    }
+  }
+}

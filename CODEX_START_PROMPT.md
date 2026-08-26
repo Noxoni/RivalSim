@@ -1,46 +1,60 @@
-# Active Codex Handoff — Rival 2.0 Campaign 02
+# Closed Codex Boundary — Rival 2.0 Campaign 02 Complete
 
-RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 01 completed correctly but produced a `DEGRADED` behavioral result. This handoff authorizes one controlled follow-up campaign to test the identified entropy-pressure failure mode.
+RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 02 has completed its exact
+controlled entropy-off execution and is now closed.
 
-Start from current `origin/main`. Required starting HEAD:
+Campaign 02 reproduced Campaign 01's seed-`20260826` initialization model SHA-256 and every
+substantive initialization-evaluation value exactly. It changed only the campaign-layer PPO
+entropy coefficient from `0.01` to `0.0`; every other model, contract, PPO, self-play, seed,
+world-count, rollout, checkpoint, and evaluation semantic remained fixed.
 
-`1ce5932cadd66b14032e61750836763499567bc9`
+The 131,072-world, horizon-32 run stopped at update 12 with 100,663,296 agent decision samples,
+the first completed update crossing 100M. Initialization plus the first 10M/25M/50M/100M
+threshold checkpoints and evaluations were preserved and published.
 
-Do not modify or reinterpret Campaign 01 evidence. All published `results/v0.1/` through `results/v0.5/`, all Campaign 01 artifacts, and the four frozen Rival 2.0 environment/action contracts remain immutable.
+Independent closeout statuses:
 
-Read in full before starting:
+- execution status: `COMPLETE`;
+- behavioral result under the prospectively fixed rule: `IMPROVED`;
+- initialization control: `PASS_GREEN`;
+- final exact checkpoint continuation: `PASS_GREEN`;
+- frozen v0.5 trainer: unchanged (`PASS_GREEN`).
 
+Campaign 02 improved two of the three primary metrics relative to initialization and was not
+worse than Campaign 01 final on any of them. Ordinary self-play touches/minute reached `0.291182`
+versus `0.272091` at initialization and `0.175624` at Campaign 01 final. Stochastic touch
+differential versus initialization reached `+35` versus `+15` initially and `-46` at Campaign 01
+final. Stochastic goal differential was `-3`, slightly worse than the initialization value `-2`
+but better than Campaign 01 final `-16`.
+
+No Campaign 02 update crossed the diagnostic instability thresholds. Maximum approximate KL was
+`0.008194` at update 2 and maximum clip fraction was `0.087534` at update 6. Representative final
+analog standard deviation was approximately `1.015`, far below the `exp(1)` ceiling; the
+Campaign 01 update-4 instability did not recur. This is controlled behavioral improvement, not a
+claim of learned Rocket League competence or external transfer.
+
+The full resumable final checkpoint is published at
+`checkpoints/rival2/campaign02/rival2_campaign02_100m_resume.pt`. Its SHA-256 is
+`4A9B366CD3A04222D639252EB2E3EBAD194AF2154D9DBFF213B1AF89A3909FA0` and its exact size is
+21,126,324 bytes.
+
+Read the completed evidence in:
+
+- `docs/RIVAL2_CAMPAIGN02_RESULTS.md`;
+- `results/rival2/campaign02/summary.json`;
+- `results/rival2/campaign02/comparison_campaign01.json`;
+- `results/rival2/campaign02/optimizer_diagnosis.json`;
+- `results/rival2/campaign02/initialization_control.json`;
+- `results/rival2/campaign02/evaluation_000m.json` through `evaluation_100m.json`;
+- `results/rival2/campaign02/training_curve.json`;
 - `handoff/rival2-c02/README.md`;
 - `handoff/rival2-c02/DIAGNOSIS.md`;
 - `handoff/rival2-c02/CAMPAIGN.md`;
-- `handoff/rival2-c02/ACCEPTANCE.md`;
-- `docs/RIVAL2_TRAINING_CONTRACT.md`;
-- `docs/RIVAL2_CAMPAIGN01_RESULTS.md`;
-- `results/rival2/campaign01/training_curve.json`;
-- `results/rival2/campaign01/evaluation_000m.json`;
-- `results/rival2/campaign01/evaluation_100m.json`.
+- `handoff/rival2-c02/ACCEPTANCE.md`.
 
-## Controlling change
+Tracked v0.1-v0.5 results, Campaign 01 artifacts, the four Rival 2.0 contracts, and the frozen
+v0.5 training implementation remain byte-for-byte unchanged.
 
-Campaign 02 changes exactly one learning hyperparameter from Campaign 01:
-
-`entropy_coefficient: 0.01 -> 0.0`
-
-Everything else remains the same unless this handoff explicitly says otherwise. In particular, preserve the same model architecture, initialization procedure, observation/action/reward/episode contracts, gamma, GAE lambda, PPO clip range, value coefficient, gradient limit, Adam learning rate, epochs, horizon, minibatch target, self-play rules, historical-opponent rules, world count, campaign seed, evaluation seed, and evaluation protocol.
-
-Do not edit the frozen v0.5 PPO or policy implementation merely to change this value. Instantiate a Campaign 02 PPO configuration with `entropy_coefficient=0.0` at the campaign layer. The existing entropy metric may continue to be logged diagnostically but must contribute zero weight to the Campaign 02 optimization loss.
-
-## Mission
-
-1. prove the Campaign 02 initialization is the same model initialization used by Campaign 01 and rerun the unchanged initialization evaluation;
-2. run the same 131,072-world, horizon-32 training configuration from scratch with entropy coefficient exactly zero;
-3. train through the first completed update crossing 100,000,000 agent decision samples;
-4. preserve checkpoints/evaluations at initialization and the first completed updates crossing 10M, 25M, 50M, and 100M samples;
-5. use the exact Campaign 01 held-out evaluation protocol and seeds so the campaigns are directly comparable;
-6. publish per-update PPO metrics including approximate KL, clip fraction, policy/value loss, gradient norm, diagnostic entropy, and analog policy standard deviations;
-7. publish a direct Campaign 01 vs Campaign 02 comparison and an independent Campaign 02 behavioral classification;
-8. preserve the final full resumable checkpoint and stop.
-
-Do not change reward shaping, add curricula, add action masks, change the continuous-control distribution, change the model, tune learning rate, introduce KL early stopping, or perform a hyperparameter search in this run. If a non-finite/correctness/integrity failure occurs, stop with evidence. Otherwise complete the bounded 100M campaign even if behavior is poor.
-
-Do not begin v0.6 RocketSim/RLBot transfer work.
+No further work is authorized by this prompt. Do not continue Campaign 02 training, tune another
+hyperparameter, change rewards, begin a curriculum, or begin v0.6 RocketSim/RLBot transfer. A new
+explicit controlling handoff is required for any subsequent work.
