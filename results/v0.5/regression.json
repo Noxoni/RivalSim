@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "prior_published_evidence": {
+    "v0_4_release_commit": "8a422a86c69f16f0d62073992e515575f88733b5",
+    "v0_5_handoff_parent": "dbc4b2bebe802bed58c9e143c1f9bcdb61189ac4",
+    "byte_diff_count": 0,
+    "trees": {
+      "results/v0.1": {
+        "file_count": 3,
+        "git_tree_listing_sha256": "D9E2C755C7614AF781C461F00F3DD6DAA51AB46DD7AA0AAEA10284A88CA69A04"
+      },
+      "results/v0.2": {
+        "file_count": 3,
+        "git_tree_listing_sha256": "9AEFD73047AA9CEEC77E1D2A8B8F7E94CB7261B6FD5D62497D01B93246C1C4DF"
+      },
+      "results/v0.2.1": {
+        "file_count": 5,
+        "git_tree_listing_sha256": "5D21CE8851F64148C7795ED3398C79CE74EF1CB7E9CA3DE194B47BB2B0BCFD23"
+      },
+      "results/v0.2.2": {
+        "file_count": 6,
+        "git_tree_listing_sha256": "DCB1B5CAB2A59EC37F1E8B3E687361EB94F46BB519B93ED7BE18CF4BAF84A0E6"
+      },
+      "results/v0.3": {
+        "file_count": 9,
+        "git_tree_listing_sha256": "CC967775E2C322674CE6A81620EB4D32F42F507AC56742539233BC96798389CC"
+      },
+      "results/v0.4": {
+        "file_count": 9,
+        "git_tree_listing_sha256": "17372863E919E8A2943B2EB73607621F9C65DE923E59196CDB62F8002AB0A8C0"
+      }
+    }
+  },
+  "v0_4": {
+    "implementation_commit": "da34c6d8a9ad4eb6aaced955ef0fe96575e1ec56",
+    "release_commit": "8a422a86c69f16f0d62073992e515575f88733b5",
+    "authority_identity_sha256": "33AA0BA3BC35BC4300E2D2B84A3813CB0AD776479546A50AC3BBC6CE3D3E2562",
+    "lifecycle_verdict": "PASS_GREEN",
+    "mixed_lifecycle_stress": {
+      "verdict": "PASS_GREEN",
+      "worlds": 64,
+      "ticks": 400,
+      "full_reset_interval_ticks": 97,
+      "same_seed_hash": "b650f689ba630523a6e834ea96e53d73ef2144aed23df849ba2b138bd1e2669f",
+      "same_seed_repeat_equal": true,
+      "timed_h2d_bytes": 0,
+      "timed_d2h_bytes": 0,
+      "raw_event_terminal_contract": true
+    },
+    "complete_path": {
+      "best_worlds": 131072,
+      "best_world_ticks_per_s": 23603113.763163015,
+      "best_aggregate_simulated_game_seconds_per_s": 196692.61469302513,
+      "best_coefficient_of_variation": 0.022065131232321785,
+      "reset_heavy_sim_s_per_s": 213562.0940041271,
+      "reset_transitions_per_s": 3203431.4100619066,
+      "authority_and_regression_pass": true,
+      "arena_query_pass": true,
+      "hot_loop_gpu_resident": true,
+      "performance_gate_pass": true,
+      "verdict": "PASS_GREEN"
+    },
+    "ray_backends": {
+      "corpus_seed": 20260823,
+      "ray_count": 4608,
+      "category_counts": {
+        "boundary_edges": 512,
+        "ceiling": 512,
+        "corners": 512,
+        "floor": 512,
+        "goals_and_back_wall": 512,
+        "misses": 512,
+        "near_surface": 512,
+        "ramps_and_curves": 512,
+        "side_walls": 512
+      },
+      "cpu_reference": "two-sided exact-triangle Moller-Trumbore plus RocketSim Soccar planes",
+      "backends": {
+        "default": {
+          "hit_mismatch_count": 0,
+          "max_nearest_distance_error_uu": 0.001953125,
+          "max_hit_point_error_uu": 0.001953125,
+          "minimum_normal_dot": 0.9999998807907104,
+          "co_nearest_boundary_edge_tie_count": 1,
+          "unambiguous_face_mismatch_count": 0,
+          "exact_hit_distance_normal_pass": true
+        },
+        "cubql": {
+          "hit_mismatch_count": 0,
+          "max_nearest_distance_error_uu": 0.001953125,
+          "max_hit_point_error_uu": 0.001953125,
+          "minimum_normal_dot": 0.9999998807907104,
+          "co_nearest_boundary_edge_tie_count": 1,
+          "unambiguous_face_mismatch_count": 0,
+          "exact_hit_distance_normal_pass": true
+        }
+      },
+      "selected_ray_backend": "cubql",
+      "selection_reason": "exact query parity and higher measured B1 throughput"
+    },
+    "source_lifecycle_sha256": "A9A3E5918939D7B73B158973ECC4D73215AA0CE2B2DCBD9B43C8D07C604AB9F7",
+    "source_benchmark_sha256": "E25DD4D163D0C8C7AEECB145D99C71E197939087FE341710AB7643AF93F1DEE8"
+  },
+  "v0_3": {
+    "phase_a": {
+      "verdict": "PASS_GREEN",
+      "cases": 31216,
+      "failed_cases": 0,
+      "authority_identity_sha256": "11E307ABD14C8D79C2BFBDEC7F20C6A45716AD361609A901C517DCA98C804ED2",
+      "source_sha256": "1CD1F8A450E4E594DA04540E1F664898CA44B1421EEED5C8D5969083C84E8E74"
+    },
+    "phase_b": {
+      "verdict": "PASS_GREEN",
+      "cases": 8192,
+      "failed_cases": 0,
+      "authority_identity_sha256": "AEEF0E721D995393ACFA0632EE934DCC1DFBE8EC223E81F4A10D48EC63F75A9B",
+      "source_sha256": "77A8B1916421297DF558B7FF52B043095C514679B8AFDABF5BD86DDAF5DBD51D"
+    },
+    "phase_c": {
+      "verdict": "PASS_GREEN",
+      "cases": 8192,
+      "failed_cases": 0,
+      "authority_identity_sha256": "7A1D369F58CF3FAA0BA06D6D105CCF896A8FD9DE2C994471D2649F852AEC9EC9",
+      "source_sha256": "70F7C88207A2FB271BF085D9FAA84728C53289A2CBCDCA5346EA47D00C24E4F1"
+    },
+    "phase_d": {
+      "verdict": "PASS_GREEN",
+      "cases": 512,
+      "failed_cases": 0,
+      "authority_identity_sha256": "998010324B30E8196429ACF61ACC524780139E5D958543237D121D4886066B08",
+      "source_sha256": "6AF48C5B4E7862DDD34A6DB0E38B05A6F39B8CC3910FE6F930F7087484F13AD3"
+    }
+  },
+  "v0_2_2": {
+    "verdict": "PASS_GREEN",
+    "cases": 39236,
+    "hard_mismatch_events": 0,
+    "numeric_failure_events": 0,
+    "failed_cases": 0,
+    "source_sha256": "A589CF2F7BDEA0B68F838DED9F41348F161B278174645B10BC07866BBF3A0901"
+  },
+  "v0_1": {
+    "verdict": "PASS_GREEN",
+    "scenarios": 27,
+    "basic_parity_pass": true,
+    "source_sha256": "7DACE43CC0EF3DF5AF677B84501B1BF253E386B0C9A0EE5ACE501E8BFA6828CE"
+  },
+  "repository": {
+    "pytest_passed": 78,
+    "ruff_pass": true,
+    "compileall_pass": true,
+    "git_diff_check_pass": true
+  },
+  "v0_6_begun": false
+}

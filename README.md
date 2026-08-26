@@ -11,7 +11,26 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.4 complete, `PASS_GREEN`
+## Current boundary — v0.5 / Rival 2.0 complete, `PASS_GREEN`
+
+RivalSim v0.5 adds a clean-slate GPU-native reinforcement-learning system directly to the
+accepted standard-Soccar transition engine. It freezes a 182-value symmetric float32 observation,
+five tanh-Gaussian analog controls, three Bernoulli buttons, compact zero-sum reward and episode
+contracts, four-tick/30-Hz cadence, CUDA rollout storage, GAE/PPO, exact checkpoint continuation,
+current-policy self-play, and a bounded GPU historical-opponent pool.
+
+The ordinary path remains device resident through 48 proven Warp/PyTorch CUDA aliases. The
+selected 131,072-world complete rollout+GAE+PPO point reaches **2,233,901.63 agent samples/s** and
+**89,505.78 simulated game-seconds/s** with **0.588% CV**, 14,414,032,896 peak observed VRAM bytes,
+and zero timed H2D/D2H traffic. The bounded fixed-seed smoke improves its prospectively declared
+held-out clipped PPO objective by 4.226 standard errors. This proves integrated learning is not a
+no-op; it is not a skill or external-transfer claim.
+
+All v0.4/v0.3/v0.2.2/v0.1 regression gates remain green and all published prior evidence is
+unchanged. Exact contracts and evidence are in `docs/RIVAL2_TRAINING_CONTRACT.md`,
+`docs/V0_5_RESULTS.md`, and `results/v0.5/manifest.json`.
+
+### Frozen v0.4 simulator baseline
 
 RivalSim v0.4 completes the bounded standard-Soccar 1v1 game-transition milestone. The public
 `CompleteWorldSim` composes the accepted v0.3 two-Octane/one-ball physics with GPU-resident state
@@ -46,14 +65,15 @@ The complete v0.4 path reaches **191,748.10 aggregate simulated game-seconds/s**
 The reset-heavy path reaches **225,005.06 sim-s/s** and **3.375 million reset transitions/s**
 with **0.723% CV**. Both timed paths record zero host/device transfers.
 
-RocketSim does not define a training episode terminal/truncation policy. v0.4 therefore exports
-policy-neutral raw lifecycle state and keeps `terminated=truncated=0`; v0.5 policy was not begun.
+RocketSim does not define a training episode terminal/truncation policy. The frozen v0.4 layer
+therefore exports policy-neutral raw lifecycle state and keeps `terminated=truncated=0`; v0.5
+adds its separately hashed trainer-owned episode policy without changing v0.4 authority.
 
-### Explicitly excluded
+### Explicitly excluded from the completed v0.5 boundary
 
-RivalSim v0.4 does **not** implement RLGym observations, rewards, training-specific action
-parsing, rollout buffers, tensor interop, PyTorch policy inference, GAE/PPO, Rival training,
-arbitrary body counts, other game modes, rendering, or a generic Bullet API.
+RivalSim v0.5 does **not** implement RLBot/CPU RocketSim deployment, Rocket League transfer
+validation, legacy Rival/Wisp compatibility, mechanics curricula, multi-GPU training, arbitrary
+body counts, other game modes, rendering, or a generic Bullet API. v0.6 has not begun.
 
 ## Architecture
 
@@ -79,6 +99,26 @@ The v0.4 package classifies the complete game-transition path as:
   sim-s/s;
 - **PAUSE_PERF:** local parity passes but throughput is <100,000 sim-s/s;
 - **PAUSE_FIDELITY:** any required local parity failure remains.
+
+## Published v0.5 result
+
+The current result package is:
+
+- `docs/V0_5_RESULTS.md`;
+- `docs/REPRODUCING_V0_5.md`;
+- `docs/RIVAL2_TRAINING_CONTRACT.md`;
+- `results/v0.5/tensor_bridge.json`;
+- `results/v0.5/observation.json`;
+- `results/v0.5/action_distribution.json`;
+- `results/v0.5/reward_episode.json`;
+- `results/v0.5/rollout_gae.json`;
+- `results/v0.5/ppo.json`;
+- `results/v0.5/checkpoint_resume.json`;
+- `results/v0.5/self_play.json`;
+- `results/v0.5/learning_smoke.json`;
+- `results/v0.5/benchmark.json`;
+- `results/v0.5/regression.json`;
+- `results/v0.5/manifest.json`.
 
 ## Published v0.4 authority and result
 

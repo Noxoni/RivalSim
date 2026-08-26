@@ -1,25 +1,48 @@
 # RivalSim Version Boundary
 
-**Current completed milestone:** v0.4.0 — complete standard 1v1 game transition: `PASS_GREEN`
+**Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Active authorized milestone:** v0.5 — Rival 2.0 GPU-native training
+**Active authorized milestone:** none
 
-## Frozen v0.4 result
+## Completed v0.5 result
 
-The fixed standard-Soccar two-Octane/one-ball implementation provides a complete headless
-world transition with GPU-resident boost-pad, goal, scoring, kickoff, demolition, respawn, clock,
-event, and reset lifecycle state. The v0.4 native authority identity is:
+RivalSim v0.5 provides the complete bounded Rival 2.0 GPU-native training path:
+
+`RivalSim CUDA -> RIVAL2_OBS_V1 -> actor/critic -> hybrid native action -> RivalSim x4 -> reward/done -> rollout -> GAE/PPO`
+
+The frozen contracts are:
+
+- `RIVAL2_OBS_V1`: 182 float32 values with proper team rotation and canonical pads;
+- `RIVAL2_ACTION_V1`: five tanh-Gaussian controls plus three Bernoulli buttons;
+- `RIVAL2_REWARD_V1`: exactly zero-sum goal, ball-progress, touch, and demo terms;
+- `RIVAL2_EPISODE_V1`: goal termination and 15-second/45-second truncation policy.
+
+The implementation uses 48 proven zero-copy Warp/PyTorch CUDA aliases. World state,
+observations, controls, rewards, masks, rollout storage, GAE/returns, model execution, and PPO
+remain on the GPU in the ordinary loop. The selected 131,072-world training point reaches
+2,233,901.63 complete agent samples/s and 89,505.78 simulated game-seconds/s with 0.588% wall CV,
+14,414,032,896 peak observed VRAM bytes, and zero timed hot-loop H2D/D2H traffic.
+
+The fixed-seed learning smoke improves its prospectively declared held-out clipped PPO objective
+by `5.304016e-4`, or 4.226 standard errors, while changing both actor and critic parameters.
+This proves non-no-op learning integration, not learned bot skill or Rocket League transfer.
+
+All mandatory inherited gates remain green: v0.4 lifecycle and both ray backends; v0.3 Phase
+A/B/C/D; all 39,236 v0.2.2 cases; and all 27 v0.1 live scenarios. Published v0.1 through v0.4
+evidence remains byte-for-byte unchanged.
+
+v0.5 starts from authorized handoff parent:
+
+`dbc4b2bebe802bed58c9e143c1f9bcdb61189ac4`
+
+The v0.5 implementation and release/evidence commits are recorded in
+`results/v0.5/manifest.json`.
+
+## Frozen v0.4 parent
+
+v0.4 native lifecycle authority remains:
 
 `33AA0BA3BC35BC4300E2D2B84A3813CB0AD776479546A50AC3BBC6CE3D3E2562`
-
-All 34 pads for both cars, both goal directions and strict score boundary, all five standard 1v1
-kickoff layouts, both teams at all four respawn locations, exact 360-tick demolition lifecycle,
-and deterministic mixed lifecycle/reset stress pass. The inherited v0.3 A/B/C/D gates, v0.2.2
-39,236-case gate, v0.1 27-scenario gate, and both 4,608-ray backends remain green.
-
-The complete path reaches 191,748.10 aggregate simulated game-seconds/s at 131,072 worlds with
-0.856% CV and zero timed transfers. The reset-heavy path reaches 225,005.06 sim-s/s and
-3,375,075.88 reset transitions/s with 0.723% CV and zero timed transfers.
 
 v0.4 implementation commit:
 
@@ -29,49 +52,15 @@ v0.4 release/evidence commit:
 
 `8a422a86c69f16f0d62073992e515575f88733b5`
 
-All published prior result directories remain immutable.
+## Hard stop before v0.6
 
-## Active v0.5 authorization
+No v0.6 work is authorized or begun. Still excluded:
 
-v0.5 creates **Rival 2.0** as a clean-slate GPU-native policy/training system directly on RivalSim.
-
-The old `Noxoni/Rival` training implementation, Wisp-derived weights, 432-value observation,
-90/158-action lookup tables, and legacy training schemas are not v0.5 dependencies and do not
-constrain Rival 2.0.
-
-The fixed Rival 2.0 controller is:
-
-- five continuous analog controls: throttle, steer, pitch, yaw, roll;
-- three Bernoulli buttons: jump, boost, handbrake;
-- 13 actor outputs total: five means, five log standard deviations, three button logits;
-- 30-Hz decisions, each held for four 120-Hz physics ticks.
-
-Authorized v0.5 scope:
-
-- zero-copy RivalSim/PyTorch CUDA tensor bridge;
-- new `RIVAL2_OBS_V1` observation contract;
-- new `RIVAL2_REWARD_V1` and trainer-owned episode policy;
-- GPU-resident rollout storage;
-- GPU-native GAE and PPO;
-- checkpoint/save/resume;
-- current-policy self-play and bounded historical Rival 2.0 opponents;
-- end-to-end learning sanity and performance sweeps.
-
-Controlling documents:
-
-- `handoff/v0.5/README.md`;
-- `handoff/v0.5/ACCEPTANCE.md`;
-- `handoff/v0.5/RIVAL2_CONTRACT.md`;
-- root `CODEX_START_PROMPT.md`.
-
-## Hard stop after v0.5
-
-Do not begin v0.6 without a separate handoff. Still excluded from v0.5:
-
-- RLBot deployment;
-- CPU RocketSim transfer evaluation;
-- actual Rocket League transfer validation;
-- compatibility work for legacy Rival/Wisp weights or action tables;
-- distributed multi-GPU training;
+- RLBot/CPU RocketSim deployment adapter;
+- Rocket League observation/action/behavior transfer validation;
+- legacy Rival/Wisp weights, observations, action tables, or training compatibility;
 - mechanics-specific curricula;
-- arbitrary body counts, other game modes, rendering, or generic Bullet work.
+- distributed multi-GPU training;
+- arbitrary body counts, other modes, rendering, or generic Bullet work.
+
+A separate controlling handoff is required before any v0.6 work begins.

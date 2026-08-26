@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "reward_episode_gate": {
+    "verdict": "PASS_GREEN",
+    "reward_contract_hash": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "episode_contract_hash": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "reward_contract": {
+      "version": "RIVAL2_REWARD_V1",
+      "cadence_hz": 30,
+      "zero_sum": true,
+      "goal": 10.0,
+      "progress_coefficient": 0.5,
+      "progress_y_scale": 5120.0,
+      "unique_touch": 0.05,
+      "unique_demolition": 0.1,
+      "other_shaping": []
+    },
+    "episode_contract": {
+      "version": "RIVAL2_EPISODE_V1",
+      "goal": "terminated",
+      "no_touch_timeout_seconds": 15.0,
+      "hard_limit_seconds": 45.0,
+      "timeout": "truncated with final pre-reset bootstrap",
+      "reset": "accepted deterministic standard kickoff lifecycle"
+    },
+    "zero_sum_max_abs_error": 0.0,
+    "goal_reward_blue": 10.0,
+    "goal_terminated": true,
+    "goal_reset_once": true,
+    "progress_gpu": 0.0019518861081451178,
+    "progress_reference": 0.0019518861547112465,
+    "progress_max_abs_error": 4.656612877414201e-11,
+    "touch_case": "B-00000",
+    "touch_reward_blue": 0.04985973984003067,
+    "persistent_next_interval_touch_count": 0,
+    "demolition_case": "C-00001",
+    "demolition_reward_blue": 0.10000000149011612,
+    "hard_limit_truncated": true,
+    "no_touch_truncated": true,
+    "truncation_final_observation_preserved": true
+  },
+  "mechanics4_cadence_gate": {
+    "verdict": "PASS_GREEN",
+    "physics_rate_hz": 120,
+    "policy_rate_hz": 30,
+    "physics_ticks_per_decision": 4,
+    "ordinary_decisions": 2,
+    "ordinary_physics_ticks": 8,
+    "first_action_exact_for_interval": true,
+    "jump_release_exact_for_next_interval": true,
+    "previous_action_updated_at_decision_boundary": true,
+    "control_families": [
+      "ground throttle/steer",
+      "jump press/release",
+      "boost toggle",
+      "powerslide",
+      "simultaneous pitch/yaw/roll"
+    ],
+    "goal_boundary_physics_ticks": 4,
+    "goal_terminated_and_reset_once": true,
+    "post_reset_action_and_interval_history_clean": true,
+    "demolition_case": "C-00001",
+    "demolition_observed": true,
+    "respawn_observed": true,
+    "respawn_detection": "accepted car disabled-state transition at 30 Hz boundary",
+    "respawn_decision_interval": 91,
+    "demolition_through_respawn_physics_ticks": 364,
+    "policy_inference_inside_environment_step": false
+  }
+}

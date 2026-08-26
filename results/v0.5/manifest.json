@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "policy_generation": "Rival 2.0",
+  "created_utc": "2026-08-26T00:34:22.592011+00:00",
+  "verdict": "PASS_GREEN",
+  "authorized_handoff_parent": "dbc4b2bebe802bed58c9e143c1f9bcdb61189ac4",
+  "v0_4_release_commit": "8a422a86c69f16f0d62073992e515575f88733b5",
+  "v0_4_implementation_commit": "da34c6d8a9ad4eb6aaced955ef0fe96575e1ec56",
+  "v0_5_implementation_commit": "676ef6bd3ca48376d706a2dbccbdec26fce3e4fb",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "policy": {
+    "architecture": {
+      "obs_dim": 182,
+      "hidden_dim": 512,
+      "hidden_layers": 3,
+      "activation": "silu",
+      "actor_outputs": 13,
+      "log_std_min": -5.0,
+      "log_std_max": 1.0,
+      "dtype": "float32",
+      "autocast": false,
+      "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+    },
+    "config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+    "parameter_count": 626190
+  },
+  "selected_performance_point": {
+    "worlds": 131072,
+    "complete_iteration_agent_samples_per_s_median": 2233901.628528755,
+    "simulated_game_seconds_per_s_median": 89505.78459763562,
+    "wall_time_cv": 0.005879481093014649,
+    "vram_peak_observed_bytes": 14414032896
+  },
+  "zero_copy_residency": {
+    "verdict": "PASS_GREEN",
+    "alias_count": 48,
+    "all_aliases": true,
+    "hot_loop_h2d_bytes": 0,
+    "hot_loop_d2h_bytes": 0
+  },
+  "learning_smoke": {
+    "verdict": "PASS_GREEN",
+    "declared_metric": "held-out clipped hybrid PPO policy objective",
+    "objective_improvement": 0.0005304016085574403,
+    "improvement_standard_errors": 4.2261481181822305
+  },
+  "inherited_regressions": {
+    "verdict": "PASS_GREEN",
+    "v0_4": "PASS_GREEN",
+    "v0_3": {
+      "phase_a": "PASS_GREEN",
+      "phase_b": "PASS_GREEN",
+      "phase_c": "PASS_GREEN",
+      "phase_d": "PASS_GREEN"
+    },
+    "v0_2_2": "PASS_GREEN",
+    "v0_1": "PASS_GREEN",
+    "repository": {
+      "pytest_passed": 78,
+      "ruff_pass": true,
+      "compileall_pass": true,
+      "git_diff_check_pass": true
+    }
+  },
+  "release_files": [
+    {
+      "path": "CODEX_START_PROMPT.md",
+      "size_bytes": 1369,
+      "sha256": "AEF15CCFD738796A6F2970AC89B611C0114DC41FAD79D96D2C30140DCE8564F7"
+    },
+    {
+      "path": "VERSION.md",
+      "size_bytes": 2666,
+      "sha256": "8EBB833A67F9B2FFCF527279456819F42F93E83B01943E8980AA283BDC3B5768"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 8916,
+      "sha256": "99CB3F1FA0653BDA2C0D81C140CEEB15E0EE6EC602D965E78F16B4652136D6F1"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "size_bytes": 20881,
+      "sha256": "4940E4B33AC073A54DE3A9A5B70626EE9C878FB6642C79283D783E98E5DAE9B9"
+    },
+    {
+      "path": "pyproject.toml",
+      "size_bytes": 1060,
+      "sha256": "CBE8DF253AB7C510FA6ABF2287A7B0CE4CA625AF216CFDD3FB2AD3D9F8AFC08A"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "size_bytes": 6734,
+      "sha256": "6F62211CA1176C3F2A1433F1100F9E606BAF2DC01436774F5D5DCC7A887F0693"
+    },
+    {
+      "path": "docs/V0_5_RESULTS.md",
+      "size_bytes": 8540,
+      "sha256": "1B602E3FAF96E4C80E7C4FF91226CBF596FD1EDA1916ADA0AF0D2BB8DE64D3C2"
+    },
+    {
+      "path": "docs/REPRODUCING_V0_5.md",
+      "size_bytes": 7573,
+      "sha256": "5A40B939DC99BEF2E1B00ED122947B9644AC5AF53CB611FEDCD63104D34E7102"
+    },
+    {
+      "path": "docs/RIVAL2_TRAINING_CONTRACT.md",
+      "size_bytes": 7904,
+      "sha256": "EED81F24AF8DA5154C35881AB9D344B92EE86773922370CCB9B58C5E29578743"
+    },
+    {
+      "path": "results/v0.5/tensor_bridge.json",
+      "size_bytes": 2537,
+      "sha256": "85306F57BA3D9AA52FA11AC648E6474A748F50E9DD19319FF9AF058232EE7E17"
+    },
+    {
+      "path": "results/v0.5/observation.json",
+      "size_bytes": 8961,
+      "sha256": "18CCF5AC92F50B78FD6E7EB13107F0F2CEBA255E32D541CDFBA3AB328B80DA1E"
+    },
+    {
+      "path": "results/v0.5/action_distribution.json",
+      "size_bytes": 2124,
+      "sha256": "C5AF14822F10989F6D2DB9FD210BDD754AEF095D9A1FE43B929AAD21438D24A8"
+    },
+    {
+      "path": "results/v0.5/reward_episode.json",
+      "size_bytes": 3066,
+      "sha256": "CFBAF8D85C7AD621FFB0F8ACF5676E619AC71B3D830970F83F664D61BC8AF2D5"
+    },
+    {
+      "path": "results/v0.5/rollout_gae.json",
+      "size_bytes": 1907,
+      "sha256": "CB7F898101FC0933C6CBED0939E852E0C072F90BD6C6E7BA2CBB91D40925E29B"
+    },
+    {
+      "path": "results/v0.5/ppo.json",
+      "size_bytes": 3439,
+      "sha256": "7644D61B7685B7D552229C1C30AB7C314B7F77C9A3F55D55D6B4D3B6AC7A206C"
+    },
+    {
+      "path": "results/v0.5/checkpoint_resume.json",
+      "size_bytes": 1003,
+      "sha256": "E1A7D8D20AA3F052FFD42A3484AF876CFCBB8206E938EA2141AAA7A74CD33AFA"
+    },
+    {
+      "path": "results/v0.5/self_play.json",
+      "size_bytes": 983,
+      "sha256": "F238536B23D4C80594458AFA45CBC00DC9A6A6212E66DC17D22B36E1D938F1D6"
+    },
+    {
+      "path": "results/v0.5/learning_smoke.json",
+      "size_bytes": 2596,
+      "sha256": "6C2868641B35A017C8A177EF446460E5ED3FE34E4CF21302E3F8BC26D3C6F6DB"
+    },
+    {
+      "path": "results/v0.5/benchmark.json",
+      "size_bytes": 46842,
+      "sha256": "EF05A44A03AC59A15EB6392CEBFE2B1AA6F3013F6AA7BFFFDE5315B8A00C09B3"
+    },
+    {
+      "path": "results/v0.5/regression.json",
+      "size_bytes": 6341,
+      "sha256": "63502DFC4403BB74C149B92E850CFCFCEB26B4FBDFE411651BC22FC92A437C31"
+    }
+  ],
+  "implementation_files": [
+    {
+      "path": "benchmarks/build_v05_evidence.py",
+      "size_bytes": 9151,
+      "sha256": "7E7D81865D35A7C5609600FF5F85207CF20BDBD8AE6ED3A3D7197B4A9B7A770C"
+    },
+    {
+      "path": "benchmarks/build_v05_manifest.py",
+      "size_bytes": 6966,
+      "sha256": "43344CE2D5ABF8B5C4AAAC9DDC3279DF03876826EC8BC4383B04C3C8A4BA145B"
+    },
+    {
+      "path": "benchmarks/run_v05_acceptance.py",
+      "size_bytes": 44504,
+      "sha256": "CC06F58757F9BC1B5DAE6F21345CA97BD3DB2E1A1CFFA09DE0B7729B859B85C1"
+    },
+    {
+      "path": "benchmarks/run_v05_benchmark.py",
+      "size_bytes": 9614,
+      "sha256": "0412D2B38EBABB2235594405045097E4E90337D3625A1E63ABD6CDFB9C58F86E"
+    },
+    {
+      "path": "pyproject.toml",
+      "size_bytes": 1060,
+      "sha256": "CBE8DF253AB7C510FA6ABF2287A7B0CE4CA625AF216CFDD3FB2AD3D9F8AFC08A"
+    },
+    {
+      "path": "rivalsim/__init__.py",
+      "size_bytes": 1271,
+      "sha256": "5FC2984177295B224F6AEBD7FC32130368BABC509077E51DE11FDA95045FD633"
+    },
+    {
+      "path": "rivalsim/kernels/rival2.py",
+      "size_bytes": 12243,
+      "sha256": "F862FD90CE22CF5CAC065A919A361CF331ACAD4FD31F100CBC4C02C99AC57DF2"
+    },
+    {
+      "path": "rivalsim/rival2_contracts.py",
+      "size_bytes": 7131,
+      "sha256": "9138B815047FE4DFC40198D83E95379C72AEBCBD86294F6778C60835FAD1724C"
+    },
+    {
+      "path": "rivalsim/rival2_env.py",
+      "size_bytes": 24166,
+      "sha256": "FB92996D42C56335CC426D9A2BA0337C3DFDFD31FF9C82A33DEE994D147921EC"
+    },
+    {
+      "path": "rivalsim/rival2_policy.py",
+      "size_bytes": 6589,
+      "sha256": "C30BBCEF43A72CC2C92AC249B2EEEF99682472ED60ADBD92749926CF2741196C"
+    },
+    {
+      "path": "rivalsim/rival2_ppo.py",
+      "size_bytes": 13047,
+      "sha256": "E56902A4FCA453285663BF4D8E51E472AF2D533A23A16C7AFD81EAEBA9B0A77F"
+    },
+    {
+      "path": "rivalsim/rival2_training.py",
+      "size_bytes": 12698,
+      "sha256": "C62F4E22F82710C7BCC59B22CBF47733A6ECA4EC3F5CBBD2FE340DBB63E37AC0"
+    },
+    {
+      "path": "tests/test_v05_rival2.py",
+      "size_bytes": 11161,
+      "sha256": "45B125BEE8A4E7C79192ED19CCE54DE5079C153D994CF0ED2A96C679CB0258E1"
+    }
+  ],
+  "prior_evidence_manifests": [
+    {
+      "path": "results/v0.1/manifest.json",
+      "size_bytes": 5519,
+      "sha256": "53B9EFC6980643FDA5725118CCB31CD100D661A1BB108A9E17198BE91CC802C0"
+    },
+    {
+      "path": "results/v0.2/manifest.json",
+      "size_bytes": 37646,
+      "sha256": "0B9306285E18141FC01387DF728B0267FEF2AE67693743740D41844E5DEB1004"
+    },
+    {
+      "path": "results/v0.2.1/manifest.json",
+      "size_bytes": 43712,
+      "sha256": "A2560D403525A0439AF2F06F14539FE5DF5B79620816ABB9C863FFCD66FBBC1E"
+    },
+    {
+      "path": "results/v0.2.2/manifest.json",
+      "size_bytes": 15286,
+      "sha256": "C7923C1811A867073E3D2FB307037E91DB49E5176110E10AEBA87CB556186B40"
+    },
+    {
+      "path": "results/v0.3/manifest.json",
+      "size_bytes": 14003,
+      "sha256": "7D883EC5ED579A1CEDE1DCA0BFAF8469A3CE7AD519861DB76E90307E9BC15706"
+    },
+    {
+      "path": "results/v0.4/manifest.json",
+      "size_bytes": 12294,
+      "sha256": "AB31B936071F63C133E7968360FA20A172CE80982BCABB123C9F39EFE810B2A5"
+    }
+  ],
+  "prior_evidence_trees": {
+    "results/v0.1": {
+      "file_count": 3,
+      "git_tree_listing_sha256": "D9E2C755C7614AF781C461F00F3DD6DAA51AB46DD7AA0AAEA10284A88CA69A04"
+    },
+    "results/v0.2": {
+      "file_count": 3,
+      "git_tree_listing_sha256": "9AEFD73047AA9CEEC77E1D2A8B8F7E94CB7261B6FD5D62497D01B93246C1C4DF"
+    },
+    "results/v0.2.1": {
+      "file_count": 5,
+      "git_tree_listing_sha256": "5D21CE8851F64148C7795ED3398C79CE74EF1CB7E9CA3DE194B47BB2B0BCFD23"
+    },
+    "results/v0.2.2": {
+      "file_count": 6,
+      "git_tree_listing_sha256": "DCB1B5CAB2A59EC37F1E8B3E687361EB94F46BB519B93ED7BE18CF4BAF84A0E6"
+    },
+    "results/v0.3": {
+      "file_count": 9,
+      "git_tree_listing_sha256": "CC967775E2C322674CE6A81620EB4D32F42F507AC56742539233BC96798389CC"
+    },
+    "results/v0.4": {
+      "file_count": 9,
+      "git_tree_listing_sha256": "17372863E919E8A2943B2EB73607621F9C65DE923E59196CDB62F8002AB0A8C0"
+    }
+  },
+  "prior_evidence_byte_diff_count": 0,
+  "v0_6_begun": false
+}

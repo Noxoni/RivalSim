@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "policy_config": {
+    "obs_dim": 182,
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "activation": "silu",
+    "actor_outputs": 13,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "dtype": "float32",
+    "autocast": false,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+  },
+  "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+  "parameter_count": 626190,
+  "gate": {
+    "verdict": "PASS_GREEN",
+    "config": {
+      "gamma": 0.995,
+      "gae_lambda": 0.95,
+      "clip_range": 0.2,
+      "value_loss_coefficient": 0.5,
+      "entropy_coefficient": 0.0,
+      "max_gradient_norm": 0.5,
+      "learning_rate": 0.0003,
+      "epochs": 1,
+      "rollout_horizon": 2,
+      "minibatch_size": 16
+    },
+    "config_hash": "18AE999665887905439AB62A251C9DFB9272AA26B27F9AC7685D7CAC13525A83",
+    "finite_metrics": {
+      "policy_loss": 2.9802322387695312e-08,
+      "value_loss": 4.611671045040566e-08,
+      "entropy": 9.173077583312988,
+      "total_loss": 5.2860677612898144e-08,
+      "approx_kl": 0.0,
+      "clip_fraction": 0.0,
+      "gradient_norm": 3.469727039337158,
+      "post_clip_gradient_norm": 0.4999998211860657,
+      "old_value_mean": 0.0015516795683652163
+    },
+    "actor_max_parameter_delta": 0.00029999998514540493,
+    "critic_max_parameter_delta": 0.0002995770482812077,
+    "post_clip_gradient_norm": 0.4999998211860657,
+    "gradient_clip_threshold": 0.5,
+    "optimizer_state_finite": true,
+    "rollout_device": "cuda:0",
+    "rollout_bytes": 13168,
+    "autograd_graph_retained_by_buffer": false,
+    "independent_objective_reference": {
+      "verdict": "PASS_GREEN",
+      "sample_count": 257,
+      "independent_reference": "NumPy float64 closed-form hybrid distribution and PPO objective",
+      "actual": {
+        "policy_loss": -0.045119509100914,
+        "value_loss": 0.32470643520355225,
+        "entropy": 8.976150512695312,
+        "total_loss": 0.027472205460071564,
+        "approx_kl": 0.020703574642539024,
+        "clip_fraction": 0.42412450909614563
+      },
+      "reference": {
+        "policy_loss": -0.045119191919080544,
+        "value_loss": 0.3247064128197889,
+        "entropy": 8.976150196717477,
+        "total_loss": 0.02747251252363915,
+        "approx_kl": 0.020703556930376225,
+        "clip_fraction": 0.42412451361867703
+      },
+      "absolute_errors": {
+        "policy_loss": 3.1718183345769146e-07,
+        "value_loss": 2.2383763342848084e-08,
+        "entropy": 3.1597783589631945e-07,
+        "total_loss": 3.0706356758669617e-07,
+        "approx_kl": 1.7712162798944053e-08,
+        "clip_fraction": 4.522531404926866e-09
+      },
+      "log_probability_max_abs_error": 2.0728068705011538e-05,
+      "maximum_abs_error": 2.0728068705011538e-05,
+      "threshold": 3e-05
+    }
+  }
+}

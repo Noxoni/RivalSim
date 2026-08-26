@@ -1,5 +1,43 @@
 # Changelog
 
+## v0.5 — Rival 2.0 GPU-native training (2026-08-25)
+
+- Added 48 persistent zero-copy Warp/PyTorch CUDA aliases and direct `[world,agent,182]`
+  `RIVAL2_OBS_V1` construction with proper orange 180-degree Z rotation, exact canonical boost-pad
+  remap, fixed physical normalization, previous action, and accepted lifecycle/mechanic state.
+- Froze `RIVAL2_ACTION_V1`: five pre-tanh Gaussian analog controls plus three Bernoulli buttons,
+  correct tanh Jacobian log probability, deterministic native controls, configurable `[-5,+1]`
+  log-standard-deviation clamp, and exactly four 120-Hz ticks per 30-Hz decision. No lookup table
+  or legacy Rival/Wisp action vocabulary participates.
+- Added `RIVAL2_REWARD_V1` and `RIVAL2_EPISODE_V1`: exactly zero-sum goal, canonical ball
+  progress, unique contact-entry touch, and unique demolition rewards; goal termination;
+  15-second no-touch and 45-second hard truncation; final-state truncation bootstrap; and accepted
+  selective standard-kickoff reset.
+- Added bounded CUDA rollout storage, mixed terminal/truncation GAE, clipped hybrid PPO,
+  advantage normalization, GPU shuffling/gathers, entropy/value terms, gradient clipping, and a
+  shared 3x512 SiLU actor/critic with 626,190 parameters.
+- Added exact checkpoints for weights, optimizer, counters, configs and contract hashes, sampling
+  RNG, assignments, and historical metadata/weights. The next stochastic sample reproduces
+  exactly and incompatible contract hashes are refused.
+- Added current-policy two-sided self-play and reset-only bounded historical-opponent selection.
+  Frozen opponents remain GPU resident, receive no gradients, and are bounded to 16 snapshots
+  with 20% default eligibility after snapshots exist.
+- Passed deterministic observation/action/reward/cadence/rollout gates, independent float64
+  hybrid-action and PPO objectives, independent GAE, finite optimizer stress, exact checkpoint
+  resume, and the fixed-seed learning sanity gate. The held-out clipped PPO objective improved by
+  `5.304016e-4`, or 4.226 standard errors, after one official update.
+- Preserved two failed development return metrics as negative evidence and did not change the
+  reward contract after observing them. The successful bounded gate is an integration sanity
+  result, not a learned-skill or external-transfer claim.
+- Swept five practical points with five repeats each. Selected 131,072 worlds at **2,233,901.63
+  complete agent samples/s**, **89,505.78 simulated game-seconds/s**, **0.588% CV**,
+  14,414,032,896 peak observed VRAM bytes, and zero timed hot-loop H2D/D2H.
+- Reran all inherited v0.4 lifecycle/ray/performance gates, v0.3 Phase A/B/C/D, all 39,236 v0.2.2
+  cases, all 27 v0.1 scenarios, and repository quality checks. All remain green and published
+  v0.1–v0.4 evidence is byte-for-byte unchanged.
+- Stopped at the v0.5 boundary. RLBot/CPU RocketSim deployment, Rocket League transfer,
+  curricula, legacy Rival compatibility, other modes, and v0.6 work remain unstarted.
+
 ## v0.4 — complete standard 1v1 game transition (2026-08-25)
 
 - Added `CompleteWorldSim`, a bounded GPU-resident composition of the accepted v0.3 physics with

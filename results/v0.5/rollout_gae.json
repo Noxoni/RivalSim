@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "rollout_buffer_gate": {
+    "verdict": "PASS_GREEN",
+    "layout": "time,world,agent,field",
+    "shape": [
+      3,
+      4,
+      2
+    ],
+    "device": "cuda:0",
+    "all_storage_cuda": true,
+    "finite_float_storage": true,
+    "exact_time_world_agent_indexing": true,
+    "selective_reset_row_refreshed": true,
+    "cross_world_contamination_detected": false,
+    "content_sha256": "823F93C4AF55AED099FCC5DCD1714D67A0777EBDE67043CC3C166B558A404456",
+    "repeated_content_sha256": "823F93C4AF55AED099FCC5DCD1714D67A0777EBDE67043CC3C166B558A404456",
+    "reproducible_hash_exact": true,
+    "logical_bytes": 19752,
+    "buffer_position": 3,
+    "autograd_graph_retained": false,
+    "fields": [
+      "observation",
+      "emitted_action",
+      "pre_tanh",
+      "old_log_probability",
+      "value",
+      "reward",
+      "terminated",
+      "truncated",
+      "next_value",
+      "policy_version",
+      "opponent_version",
+      "train_mask"
+    ]
+  },
+  "gae_gate": {
+    "verdict": "PASS_GREEN",
+    "reference_shape": [
+      9,
+      7,
+      2
+    ],
+    "covers_terminal": true,
+    "covers_truncation_bootstrap": true,
+    "covers_rollout_end_mid_episode": true,
+    "advantage_max_abs_error": 9.5367431640625e-07,
+    "return_max_abs_error": 9.5367431640625e-07
+  }
+}

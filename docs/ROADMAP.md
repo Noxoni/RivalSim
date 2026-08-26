@@ -48,13 +48,13 @@ The complete path measures 191,748.10 aggregate simulated game-seconds/s at 131,
 
 RocketSim has no authoritative training episode termination contract, so v0.4 exports raw lifecycle state and leaves training policy to v0.5.
 
-## v0.5 — Rival 2.0 GPU-native training: authorized
+## v0.5 — Rival 2.0 GPU-native training: complete / `PASS_GREEN`
 
 v0.5 creates **Rival 2.0** as a clean-slate policy/training system directly on RivalSim.
 
 The old `Noxoni/Rival` training stack is not an implementation dependency. Rival 2.0 does not preserve Wisp-derived weights, the legacy 432-value observation, the 90/158-action tables, or old training schemas.
 
-Add GPU-native:
+Completed GPU-native scope:
 
 - persistent zero-copy RivalSim/PyTorch CUDA tensor views;
 - new symmetric `RIVAL2_OBS_V1` observation construction;
@@ -76,9 +76,19 @@ Target hot path:
 
 Only configuration, logging, metrics snapshots, checkpoint serialization, and explicit offline diagnostics should routinely leave the device.
 
-The first v0.5 reward intentionally avoids mechanics-specific shaping. The first episode contract uses accepted kickoff resets rather than a hand-built curriculum. Build a correct trainer first; curriculum changes require a later explicit contract.
+The first reward intentionally avoids mechanics-specific shaping, and the episode contract uses
+accepted kickoff resets rather than a hand-built curriculum. All deterministic contract/math,
+residency, checkpoint, self-play, and fixed-seed learning-sanity gates pass.
+
+The selected 131,072-world complete rollout+GAE+PPO point measures 2,233,901.63 agent samples/s
+and 89,505.78 simulated game-seconds/s with 0.588% CV, 14,414,032,896 peak observed VRAM bytes,
+and zero timed H2D/D2H. The prospectively declared held-out clipped PPO objective improves by
+4.226 standard errors in the bounded smoke. This proves non-no-op learning integration, not bot
+skill or external transfer. All v0.4/v0.3/v0.2.2/v0.1 regressions remain green.
 
 ## v0.6 — Rival 2.0 transfer gate
+
+Status: **not authorized / not begun**.
 
 Train a bounded Rival 2.0 policy using RivalSim, then implement a deployment adapter that reproduces `RIVAL2_OBS_V1`, 30-Hz cadence, and the hybrid deterministic controller in CPU RocketSim/RLBot/Rocket League.
 

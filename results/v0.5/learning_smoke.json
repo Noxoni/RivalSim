@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "gate": {
+    "verdict": "PASS_GREEN",
+    "declared_metric": "held-out clipped hybrid PPO policy objective",
+    "metric_declared_before_official_update": true,
+    "training_seed": 111,
+    "held_out_seed": 222,
+    "worlds": 8192,
+    "warmup_rollouts_without_updates": 2,
+    "training_updates": 1,
+    "rollout_horizon": 32,
+    "training_reward_abs_sum": 29.943912506103516,
+    "held_out_reward_abs_sum": 28.003406524658203,
+    "objective_before": 3.4779077395796776e-09,
+    "objective_after": 0.0005304050864651799,
+    "objective_improvement": 0.0005304016085574403,
+    "change_from_behavior": 0.0005304011865518987,
+    "change_standard_error": 0.00012550463725347072,
+    "required_improvement_standard_errors": 3.0,
+    "improvement_standard_errors": 4.2261481181822305,
+    "actor_max_parameter_delta": 0.00413392623886466,
+    "critic_max_parameter_delta": 0.002017202554270625,
+    "critic_value_variance_after": 6.722311240991985e-07,
+    "finite_metrics": {
+      "policy_loss": -0.0005453186458908021,
+      "value_loss": 3.694211773108691e-05,
+      "entropy": 9.132278442382812,
+      "total_loss": -0.0005268476088531315,
+      "approx_kl": 0.0040962062776088715,
+      "clip_fraction": 0.02994537353515625,
+      "gradient_norm": 0.049769263714551926,
+      "post_clip_gradient_norm": 0.049769263714551926,
+      "old_value_mean": -0.0020443524699658155
+    },
+    "negative_development_trials": [
+      {
+        "metric": "fixed-seed stochastic blue return vs frozen initial",
+        "worlds": 512,
+        "updates": 50,
+        "before": 0.026763146743178368,
+        "after": -0.01488388329744339,
+        "verdict": "FAIL_RED"
+      },
+      {
+        "metric": "fixed-seed stochastic blue return vs frozen initial",
+        "worlds": 2048,
+        "updates": 20,
+        "before": 0.002706887200474739,
+        "after": -0.0164957195520401,
+        "verdict": "FAIL_RED"
+      }
+    ],
+    "reward_contract_changed_after_trials": false
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "milestone": "v0.5",
+  "created_utc": "2026-08-26T00:32:25.864953+00:00",
+  "verdict": "PASS_GREEN",
+  "contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V1": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "source_acceptance_sha256": "AD94377B216D61AC2E921A5FDA9892AD1295C09D224FC12EE7A9132682B0313F",
+  "gate": {
+    "verdict": "PASS_GREEN",
+    "contract_hash": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "contract": {
+      "version": "RIVAL2_ACTION_V1",
+      "physics_hz": 120,
+      "policy_hz": 30,
+      "hold_ticks": 4,
+      "external_order": [
+        "throttle",
+        "steer",
+        "pitch",
+        "yaw",
+        "roll",
+        "jump",
+        "boost",
+        "handbrake"
+      ],
+      "actor_output_order": [
+        "mu.throttle",
+        "mu.steer",
+        "mu.pitch",
+        "mu.yaw",
+        "mu.roll",
+        "log_std.throttle",
+        "log_std.steer",
+        "log_std.pitch",
+        "log_std.yaw",
+        "log_std.roll",
+        "logit.jump",
+        "logit.boost",
+        "logit.handbrake"
+      ],
+      "analog_distribution": "Normal pre-tanh with tanh change-of-variables correction",
+      "button_distribution": "Bernoulli(sigmoid(logit))",
+      "log_std_clamp": [
+        -5.0,
+        1.0
+      ],
+      "deterministic": "tanh(mu), sigmoid(logit)>=0.5",
+      "fixed_lookup_table": false
+    },
+    "reference_cases": 257,
+    "log_probability_max_abs_error": 2.635652631965968e-05,
+    "log_probability_float32_tolerance": 3e-05,
+    "same_rng_exact": true,
+    "analog_min": -0.9999957084655762,
+    "analog_max": 0.9999984502792358,
+    "buttons_exact_binary": true,
+    "entropy_finite": true,
+    "deterministic_sha256": "360A3A2653B8A29AA6B8306FF142C37B6D7402A5159BED188DBE7F025679CD46",
+    "fixed_action_table": false
+  }
+}
