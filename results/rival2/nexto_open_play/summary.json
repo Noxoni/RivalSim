@@ -1,0 +1,296 @@
+{
+  "verdict": "PASS_GREEN",
+  "scope": "authorized kickoff-free open-play evaluation only; no policy training or policy/reward/PPO/physics change",
+  "identity": {
+    "authorized_start_head": "0bcfc1864b4d8db75a39c6bc9deee8ed5dc5a32a",
+    "rival_checkpoint": {
+      "path": "checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt",
+      "sha256": "4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E",
+      "size_bytes": 48720678,
+      "policy_version": 5403,
+      "iteration": 5403,
+      "total_agent_samples": 45323649024,
+      "reward_version": "RIVAL2_REWARD_V1",
+      "policy_config": {
+        "obs_dim": 182,
+        "hidden_dim": 512,
+        "hidden_layers": 3,
+        "activation": "silu",
+        "actor_outputs": 13,
+        "log_std_min": -5.0,
+        "log_std_max": 1.0,
+        "dtype": "float32",
+        "autocast": false,
+        "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+      },
+      "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136"
+    },
+    "nexto_upstream_commit": "2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca",
+    "nexto_model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+    "nexto_fidelity_evidence": "results/rival2/nexto/fidelity.json"
+  },
+  "state_bank": {
+    "states": 4096,
+    "continuation_fields": 295,
+    "artifact_sha256": "E11BBE510F3C9C2709DA56EB1371733C605278C7C969B53FBFF278F2B8EA3C62",
+    "capture_rule": "For each seeded source world and episode, prospectively choose age 600 + ((world_index*1103515245 + reset_count*12345 + seed) & 0x7fffffff) % 601; capture the first subsequent 30 Hz boundary satisfying every eligibility condition. The rule never observes policy advantage or duel outcome."
+  },
+  "duel_contract": {
+    "duels": 16384,
+    "physics_hz": 120,
+    "maximum_ticks": 7200,
+    "maximum_simulated_seconds": 60.0,
+    "first_goal_wins": true,
+    "kickoff_at_start": false,
+    "goal_reset": false,
+    "rival_action_mode": "deterministic deployment at 30 Hz",
+    "nexto_action_mode": "deterministic beta=1 argmax at 15 Hz; kickoff controller disabled for all duel ticks"
+  },
+  "headline_outcomes": {
+    "overall": {
+      "duels": 16384,
+      "rival_wins": 8786,
+      "nexto_wins": 7255,
+      "draws": 343,
+      "decisive_duel_rival_win_rate": {
+        "count": 8786,
+        "denominator": 16041,
+        "fraction": 0.5477214637491428
+      },
+      "all_duel_rival_win_fraction": {
+        "count": 8786,
+        "denominator": 16384,
+        "fraction": 0.5362548828125
+      },
+      "time_to_goal_seconds_by_winner": {
+        "Rival": {
+          "count": 8786,
+          "min": 0.008333333333333333,
+          "p25": 5.925,
+          "median": 9.916666666666666,
+          "mean": 13.361658699446087,
+          "p75": 17.3,
+          "max": 59.791666666666664
+        },
+        "Nexto": {
+          "count": 7255,
+          "min": 0.008333333333333333,
+          "p25": 9.1125,
+          "median": 16.083333333333332,
+          "mean": 18.6985607626924,
+          "p75": 25.416666666666668,
+          "max": 60.0
+        }
+      }
+    },
+    "rival_as_blue": {
+      "duels": 8192,
+      "rival_wins": 3753,
+      "nexto_wins": 4241,
+      "draws": 198,
+      "decisive_duel_rival_win_rate": {
+        "count": 3753,
+        "denominator": 7994,
+        "fraction": 0.46947710783087315
+      },
+      "all_duel_rival_win_fraction": {
+        "count": 3753,
+        "denominator": 8192,
+        "fraction": 0.4581298828125
+      },
+      "time_to_goal_seconds_by_winner": {
+        "Rival": {
+          "count": 3753,
+          "min": 0.008333333333333333,
+          "p25": 5.875,
+          "median": 9.758333333333333,
+          "mean": 13.290367705835331,
+          "p75": 17.425,
+          "max": 59.791666666666664
+        },
+        "Nexto": {
+          "count": 4241,
+          "min": 0.008333333333333333,
+          "p25": 8.575,
+          "median": 15.858333333333333,
+          "mean": 18.717344572820874,
+          "p75": 25.808333333333334,
+          "max": 60.0
+        }
+      }
+    },
+    "rival_as_orange": {
+      "duels": 8192,
+      "rival_wins": 5033,
+      "nexto_wins": 3014,
+      "draws": 145,
+      "decisive_duel_rival_win_rate": {
+        "count": 5033,
+        "denominator": 8047,
+        "fraction": 0.6254504784391699
+      },
+      "all_duel_rival_win_fraction": {
+        "count": 5033,
+        "denominator": 8192,
+        "fraction": 0.6143798828125
+      },
+      "time_to_goal_seconds_by_winner": {
+        "Rival": {
+          "count": 5033,
+          "min": 0.008333333333333333,
+          "p25": 5.95,
+          "median": 10.025,
+          "mean": 13.414818862176304,
+          "p75": 17.258333333333333,
+          "max": 59.733333333333334
+        },
+        "Nexto": {
+          "count": 3014,
+          "min": 0.008333333333333333,
+          "p25": 9.483333333333333,
+          "median": 16.425,
+          "mean": 18.6721300597213,
+          "p75": 25.02916666666667,
+          "max": 59.65833333333333
+        }
+      }
+    }
+  },
+  "integrity": {
+    "identity": {
+      "rival_checkpoint_sha_exact": true,
+      "nexto_fidelity_green": true,
+      "nexto_upstream_commit_exact": true,
+      "nexto_model_sha_exact": true,
+      "accepted_rival_policy_runtime_unchanged": true,
+      "accepted_nexto_adapter_unchanged": true,
+      "accepted_physics_unchanged": true
+    },
+    "capture": {
+      "all_episode_age_at_least_600": true,
+      "all_inside_scoring_plane": true,
+      "both_cars_active": true,
+      "no_goal_pending": true,
+      "no_reset_pending": true,
+      "not_training_kickoff_indicator": true,
+      "source_counts_exact": true
+    },
+    "mirror_map": {
+      "triangle_count": 8020,
+      "mapped_triangle_count": 8020,
+      "bijection": true,
+      "involutive": true,
+      "mesh_map": [
+        9,
+        8,
+        5,
+        4,
+        3,
+        2,
+        15,
+        14,
+        1,
+        0,
+        12,
+        13,
+        10,
+        11,
+        7,
+        6,
+        16,
+        17,
+        19,
+        18
+      ],
+      "face_map_sha256": "0CD98306D9A22828EFC78F5261146825FFA20E3D8D59B69F1E0B8848B8016DC2"
+    },
+    "mirror_involution": {
+      "fields_checked": 295,
+      "maximum_numeric_error_quaternion_sign_equivalent": 0.0,
+      "failed_fields": [],
+      "pass": true
+    },
+    "restore_fidelity": {
+      "fields_exactly_checked": 270,
+      "excluded_neutral_boundary_fields": [
+        "lifecycle.auto_kickoff",
+        "lifecycle.ball_scored_last",
+        "lifecycle.full_reset",
+        "lifecycle.goal_scored",
+        "lifecycle.kickoff_reset",
+        "lifecycle.reset_required",
+        "lifecycle.scoring_team",
+        "lifecycle.terminated",
+        "lifecycle.truncated",
+        "rival2.ball_y_after",
+        "rival2.ball_y_before",
+        "rival2.demo_by_count",
+        "rival2.demoed_event",
+        "rival2.goal_latched",
+        "rival2.interval_tick",
+        "rival2.kickoff_indicator",
+        "rival2.previous_action",
+        "rival2.reset_mask",
+        "rival2.reward",
+        "rival2.scoring_team_latched",
+        "rival2.terminated",
+        "rival2.touch_contact_latched",
+        "rival2.touch_count",
+        "rival2.truncated"
+      ],
+      "dynamic_proxy_cell_excluded_reason": "recomputed from restored rigid state by the exact source broadphase kernel",
+      "maximum_float_abs_error": 0.0,
+      "failed_fields": [],
+      "neutral_rival_previous_action_exact_zero": true,
+      "neutral_nexto_previous_action_exact_zero": true,
+      "pass": true
+    },
+    "four_way_assignment_counts": {
+      "duels": 16384,
+      "base_states": 4096,
+      "original_rival_blue": 4096,
+      "original_rival_orange": 4096,
+      "mirror_rival_blue": 4096,
+      "mirror_rival_orange": 4096,
+      "rival_as_blue": 8192,
+      "rival_as_orange": 8192
+    },
+    "four_way_assignment_exact": true,
+    "no_duel_begins_in_kickoff_control": true,
+    "kickoff_event_total": 0,
+    "reset_event_total": 0,
+    "no_kickoff_or_reset_after_start": true,
+    "every_duel_classified": true,
+    "goal_duels_end_at_first_goal": true,
+    "draws_reach_exact_limit": true,
+    "all_goal_times_within_limit": true,
+    "telemetry_capacity_model": "aggregate counters plus one terminal goal per duel",
+    "telemetry_overflow_count": 0,
+    "timed_hot_path_host_transfers_zero": true
+  },
+  "performance": {
+    "profile_ticks": 8,
+    "profile_seconds": 1.3290055999532342,
+    "profile_world_ticks_per_second": 98624.11415317756,
+    "profiled_h2d_d2h_event_count": 0,
+    "profiled_h2d_d2h_event_names": [],
+    "long_ticks": 7192,
+    "long_seconds": 48.18260119995102,
+    "long_world_ticks_per_second": 2445565.9317977997,
+    "peak_cuda_bytes": 1777917440,
+    "world_h2d_bytes_after_initialization": 0,
+    "world_d2h_bytes_before_final_export": 0,
+    "nexto_timed_h2d_bytes": 0,
+    "nexto_timed_d2h_bytes": 0,
+    "nexto_inference_calls": 900
+  },
+  "environment": {
+    "python": "3.14.3",
+    "torch": "2.13.0+cu130",
+    "warp": "1.16.0",
+    "cuda_device": "NVIDIA GeForce RTX 5090",
+    "collision_root": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes"
+  },
+  "wall_seconds": 80.80302519979887,
+  "future_work_not_executed": "fake-kickoff/backflip-to-boost opponent curriculum"
+}
