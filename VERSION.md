@@ -2,15 +2,13 @@
 
 **Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Latest completed execution:** Rival 2.0 overnight curriculum — `COMPLETE`
+**Latest completed executions:** final-45B behavioral telemetry and GPU-native public-Nexto full-match benchmark — `COMPLETE`
 
-**Active authorized work:** final-45B behavioral trajectory evaluation followed by GPU-native Nexto port and full-match Rival-vs-Nexto benchmark
+**Active authorized work:** kickoff-free Rival-vs-Nexto open-play evaluation only
 
 ## Stable trained checkpoint
 
-The completed overnight curriculum ended at update 5,403 / 45,323,649,024 cumulative agent decision samples under the preserved base `RIVAL2_REWARD_V1` after acquisition shaping had been removed.
-
-Final resumable checkpoint:
+Final-45B Rival checkpoint:
 
 `checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt`
 
@@ -18,42 +16,47 @@ SHA-256:
 
 `4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E`
 
-The final held-out evaluation recorded 85.483708 touches/minute, 2.496403 goals/minute, and 0.003418 no-touch truncation. The full overnight evidence remains under `docs/RIVAL2_OVERNIGHT_RESULTS.md` and `results/rival2/overnight/`.
+Policy version / cumulative agent-decision samples:
 
-## Active sequence
+`5403 / 45,323,649,024`
 
-### 1. Behavioral trajectory evaluation
+Reward remains the frozen base `RIVAL2_REWARD_V1`.
 
-Complete `handoff/rival2-behavioral-eval/README.md` first if it is still pending. This is descriptive evaluation of the final 45B checkpoint only: touch trajectories, next-touch possession, wall/backboard continuation, touch-to-goal timing, and exact goal-entry X/Z placement. It does not authorize a reward change.
+## Completed evidence
 
-### 2. Nexto port + full-match runtime
+Behavioral telemetry is complete under `docs/RIVAL2_BEHAVIORAL_TELEMETRY.md` and `results/rival2/behavioral_telemetry/`.
 
-Then execute `handoff/rival2-nexto-port/README.md` without returning for a new approval.
+The GPU-native public Nexto port and full-match benchmark are complete under `docs/RIVAL2_NEXTO_RESULTS.md` and `results/rival2/nexto/`.
 
-The Nexto milestone pins the public opponent at:
+Pinned Nexto:
 
 `Rolv-Arild/Necto@2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca`
 
-Required implementation:
+model SHA-256:
 
-- faithful batched GPU-native Nexto observation adapter;
-- pinned public TorchScript model with provenance/license retained;
-- exact Nexto discrete action table;
-- native 15 Hz Nexto neural cadence;
-- exact stock hard-coded kickoff controller at 120 Hz;
-- targeted observation/model/action/kickoff parity validation;
-- reusable 120 Hz mixed-policy full-match scheduler;
-- five-minute regulation with goal kickoffs and next-goal overtime;
-- training-specific 15-second no-touch and 45-second episode truncations disabled only in the separate match runtime;
-- frozen final-45B Rival policy unchanged.
+`BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA`
 
-Official first matchup:
+The full-match benchmark showed final Rival winning essentially every match, but direct kickoff goals accounted for most Rival scoring. The full-match result therefore does not by itself establish the size of Rival's open-play advantage over Nexto.
 
-- primary: 10 deterministic full matches = all five starting kickoff layouts with Rival on both sides;
-- secondary: large batched stochastic-Rival versus deterministic stock-Nexto robustness suite, target 4,096 matches if practical.
+## Active evaluation
 
-Publish match outcome, touch/possession, kickoff, ball-trajectory, goal-placement, throughput, VRAM, provenance, and hot-path transfer evidence.
+The only authorized work is:
+
+`handoff/rival2-nexto-open-play/README.md`
+
+It requires a kickoff-free, first-goal open-play benchmark built from 4,096 physically continuous harvested mid-play states:
+
+- 2,048 from final-Rival stochastic self-play;
+- 2,048 from deterministic pinned-Nexto self-play.
+
+Every base state is replayed four ways: original and exact 180-degree/team-swapped mirror, with Rival and Nexto swapping physical car roles. Total official duels: **16,384**.
+
+Each duel begins directly in open play, has no kickoff and no goal reset, ends on the first goal, and draws at 60 simulated seconds if still unresolved. Results must remain separated by Rival side, source distribution, mirror status, role assignment, initial state characteristics, and four-duel paired family.
+
+## Future curriculum note — not active
+
+The user intends to train later against fake-kickoff behavior, including an opponent immediately backflipping/retreating to boost and conceding first contact so Rival's kickoff hit is received by the defender. This is deliberately deferred until after open-play skill is measured.
 
 ## Boundaries
 
-Do not train Rival against Nexto yet. Do not alter Rival rewards, PPO, architecture, `RIVAL2_OBS_V1`, `RIVAL2_ACTION_V1`, or simulator physics. Do not build the viewer or begin v0.6. General release/lint/regression ceremony remains out of scope; only targeted fidelity validation needed to prove the Nexto port is faithful is authorized.
+No training is authorized. Do not change Rival rewards, PPO, policy architecture, `RIVAL2_OBS_V1`, `RIVAL2_ACTION_V1`, controller semantics, or simulator physics. Do not begin fake-kickoff curriculum work, build the viewer, or begin v0.6. General release/lint/regression ceremony remains out of scope; perform only the targeted integrity checks required by the active handoff.
