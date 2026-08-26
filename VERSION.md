@@ -2,7 +2,9 @@
 
 **Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Active authorized work:** Rival 2.0 Campaign 01 — first bounded real training run
+**Latest completed execution:** Rival 2.0 Campaign 01 — `COMPLETE` / `DEGRADED`
+
+**Active authorized work:** none
 
 ## Completed v0.5 result
 
@@ -31,12 +33,13 @@ v0.5 implementation commit:
 
 `676ef6bd3ca48376d706a2dbccbdec26fce3e4fb`
 
-## Active Campaign 01
+## Completed Campaign 01
 
-Campaign 01 does not change the v0.5 milestone or contract identities. It executes the frozen
-trainer from a fresh initialization for a bounded 100,000,000 agent decision samples and captures
-fixed evaluation snapshots at initialization and the first completed updates crossing 10M, 25M,
-50M, and 100M samples.
+Campaign 01 did not change the v0.5 milestone or contract identities. It executed the frozen
+trainer from a fresh seed-`20260826` initialization through update 12 and stopped at 100,663,296
+agent decision samples, the first completed update crossing 100M. The preferred 131,072-world
+horizon-32 preflight passed. Initialization and the first completed updates crossing 10M, 25M,
+50M, and 100M all have checkpoints and fixed evaluations.
 
 Controlling campaign documents:
 
@@ -44,9 +47,10 @@ Controlling campaign documents:
 - `handoff/rival2-c01/CAMPAIGN.md`;
 - `handoff/rival2-c01/ACCEPTANCE.md`.
 
-Campaign 01 must use the normal frozen v0.5 PPO defaults, must not tune rewards or add curricula,
-and must publish negative or flat behavior as observed rather than modifying the training contract
-mid-run.
+Execution completed with all 12 updates finite, zero ordinary hot-path state transfers, and exact
+final checkpoint continuation. The independent behavioral result is `DEGRADED`: the final policy
+lost to initialization in both fixed head-to-head modes and ordinary self-play contact rate fell.
+This negative result is published without changing the v0.5 `PASS_GREEN` verdict.
 
 ## Frozen v0.4 parent
 
@@ -73,5 +77,5 @@ No v0.6 work is authorized or begun. Still excluded:
 - distributed multi-GPU training;
 - arbitrary body counts, other modes, rendering, or generic Bullet work.
 
-Campaign 01 must stop after its 100M checkpoint/evaluation/evidence closeout. A separate controlling
+Campaign 01 stopped after its 100M checkpoint/evaluation/evidence closeout. A separate controlling
 handoff is required before v0.6 begins.

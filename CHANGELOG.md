@@ -1,5 +1,27 @@
 # Changelog
 
+## Rival 2.0 Campaign 01 — bounded first training run (2026-08-25)
+
+- Froze campaign seed `20260826`, the normal v0.5 PPO/self-play defaults, and one 4,096-world
+  held-out evaluation protocol before the first training update.
+- Passed the ordered capacity preflight at the preferred 131,072 worlds with horizon 32: one real
+  finite rollout/GAE/PPO update, zero hot-path H2D/D2H state traffic, successful checkpoint and
+  inference allocation, and 4,515,647,488 bytes of observed VRAM margin.
+- Trained a fresh policy for exactly 12 completed PPO updates and stopped at 100,663,296 agent
+  decision samples, the first update crossing 100M. Preserved initialization and first-crossing
+  10M/25M/50M/100M resume checkpoints and fixed evaluations.
+- Passed every per-update finite-state, bounded/binary-action, selective-done/reset,
+  frozen-historical-policy, version/sample-age, parameter/gradient/optimizer, and zero-transfer
+  integrity condition. The final checkpoint reload reproduces the next stochastic sample exactly.
+- Published execution status `COMPLETE` separately from behavioral result `DEGRADED`. Final
+  ordinary self-play touch rate fell from 0.272091 to 0.175624 per simulated minute; the final
+  stochastic checkpoint lost 7–23 to initialization with a -46 touch differential, deterministic
+  play lost 0–819, and analog policy standard deviations rose near the frozen ceiling.
+- Committed the exact 21,126,324-byte full resumable final checkpoint with SHA-256
+  `704F2B887BF50E767C86B7080C1E881644480D41A3302D245E833BDE65752B4A`.
+- Left the frozen v0.5 `PASS_GREEN` verdict and all `results/v0.1/` through `results/v0.5/` bytes
+  unchanged. No reward/model/contract/curriculum setting was altered and no v0.6 work began.
+
 ## v0.5 — Rival 2.0 GPU-native training (2026-08-25)
 
 - Added 48 persistent zero-copy Warp/PyTorch CUDA aliases and direct `[world,agent,182]`

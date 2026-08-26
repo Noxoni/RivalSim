@@ -13,6 +13,19 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 
 ## Current boundary — v0.5 / Rival 2.0 complete, `PASS_GREEN`
 
+Rival 2.0 Campaign 01 is also closed. Using the unchanged frozen v0.5 stack, a fresh policy trained
+for exactly 12 PPO updates and stopped at **100,663,296 agent decision samples**, the first update
+crossing the bounded 100M target. The 131,072-world horizon-32 capacity passed preflight; all 12
+updates and five fixed evaluations passed numerical/state integrity, zero-transfer, checkpoint,
+and exact-continuation gates.
+
+Campaign execution is **`COMPLETE`**, while the independent behavioral result is honestly
+**`DEGRADED`**. Final ordinary self-play touch rate fell from 0.272091 to 0.175624 per simulated
+minute. Against frozen initialization, the final stochastic checkpoint lost 7–23 with a -46 touch
+differential, and deterministic play lost 0–819. No setting was retuned in response. Complete
+evidence is in `docs/RIVAL2_CAMPAIGN01_RESULTS.md` and `results/rival2/campaign01/`. The final full
+resume checkpoint is published under `checkpoints/rival2/campaign01/`.
+
 RivalSim v0.5 adds a clean-slate GPU-native reinforcement-learning system directly to the
 accepted standard-Soccar transition engine. It freezes a 182-value symmetric float32 observation,
 five tanh-Gaussian analog controls, three Bernoulli buttons, compact zero-sum reward and episode
@@ -119,6 +132,23 @@ The current result package is:
 - `results/v0.5/benchmark.json`;
 - `results/v0.5/regression.json`;
 - `results/v0.5/manifest.json`.
+
+## Published Rival 2.0 Campaign 01 result
+
+The completed bounded campaign package is:
+
+- `docs/RIVAL2_CAMPAIGN01_RESULTS.md`;
+- `results/rival2/campaign01/config.json`;
+- `results/rival2/campaign01/preflight.json`;
+- `results/rival2/campaign01/checkpoints.json`;
+- `results/rival2/campaign01/evaluation_000m.json`;
+- `results/rival2/campaign01/evaluation_010m.json`;
+- `results/rival2/campaign01/evaluation_025m.json`;
+- `results/rival2/campaign01/evaluation_050m.json`;
+- `results/rival2/campaign01/evaluation_100m.json`;
+- `results/rival2/campaign01/training_curve.json`;
+- `results/rival2/campaign01/summary.json`;
+- `checkpoints/rival2/campaign01/rival2_campaign01_100m_resume.pt`.
 
 ## Published v0.4 authority and result
 

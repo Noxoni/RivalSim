@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T01:13:35.076391+00:00",
+  "ordered_capacity_candidates": [
+    131072,
+    65536,
+    32768
+  ],
+  "attempts": [
+    {
+      "schema_version": 1,
+      "worlds": 131072,
+      "horizon": 32,
+      "started_utc": "2026-08-26T01:13:26.599776+00:00",
+      "status": "PASS",
+      "checks": {
+        "update_completed": true,
+        "integrity_pass": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true,
+        "checkpoint_and_evaluation_safe": true,
+        "vram_margin_adequate": true
+      },
+      "integrity": {
+        "verdict": "PASS_GREEN",
+        "checks": {
+          "finite_rollout_fields": true,
+          "finite_metrics": true,
+          "analog_bounds": true,
+          "buttons_exact_binary": true,
+          "termination_team_consistent": true,
+          "truncation_team_consistent": true,
+          "termination_and_truncation_exclusive": true,
+          "post_reset_observation_finite": true,
+          "policy_version_increment_exact": true,
+          "iteration_matches_policy_version": true,
+          "sample_increment_exact": true,
+          "behavior_policy_version_exact": true,
+          "opponent_versions_eligible": true,
+          "blue_always_trainable": true,
+          "historical_frozen_gradient_free": true,
+          "historical_parameters_finite": true,
+          "parameters_finite": true,
+          "gradients_finite": true,
+          "optimizer_finite": true
+        },
+        "finite_fields": {
+          "observations": true,
+          "actions": true,
+          "pre_tanh": true,
+          "old_log_probability": true,
+          "values": true,
+          "rewards": true,
+          "next_values": true,
+          "advantages": true,
+          "returns": true
+        },
+        "metrics": {
+          "policy_loss": -0.006160367280244827,
+          "value_loss": 1.158516397481435e-06,
+          "entropy": 9.201894760131836,
+          "total_loss": -0.09817874431610107,
+          "approx_kl": 0.009118201211094856,
+          "clip_fraction": 0.10579299926757812,
+          "gradient_norm": 0.047536686062812805,
+          "post_clip_gradient_norm": 0.047536686062812805,
+          "old_value_mean": 0.0001826049410738051
+        },
+        "observed_opponent_versions": [
+          0
+        ],
+        "historical_policies": [],
+        "trainable_samples": 8388608,
+        "total_samples": 8388608,
+        "sample_age_policy_versions": 0
+      },
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      },
+      "update_seconds": 4.301178600057028,
+      "agent_decision_samples": 8388608,
+      "agent_decisions_per_second": 1950304.5048835631,
+      "rollout_logical_bytes": 6903824384,
+      "torch_peak_allocated_bytes": 17859939328,
+      "vram_total_bytes": 34190917632,
+      "vram_peak_observed_bytes": 29675270144,
+      "vram_margin_bytes": 4515647488,
+      "vram_margin_required_bytes": 4294967296,
+      "checkpoint_probe": {
+        "sha256": "44F70EAD812C4D76A2BA5440B768526EEE83D268B9A864BFC82657E6B8F06FA1",
+        "size_bytes": 8583847,
+        "load_and_evaluation_allocation_safe": true
+      },
+      "runtime": {
+        "created_utc": "2026-08-26T01:13:34.279761+00:00",
+        "hostname": "Brick",
+        "platform": "Windows-11-10.0.26200-SP0",
+        "python": "3.14.3",
+        "numpy": "2.5.2",
+        "torch": "2.13.0+cu130",
+        "warp": "1.16.0",
+        "cuda_device": "NVIDIA GeForce RTX 5090",
+        "cuda_capability": [
+          12,
+          0
+        ],
+        "cuda_total_memory_bytes": 34190917632,
+        "cuda_used_memory_bytes_at_identity": 29675270144,
+        "nvidia_driver": "610.62"
+      },
+      "wall_seconds": 7.701135900104418,
+      "finished_utc": "2026-08-26T01:13:34.300909+00:00",
+      "process_exit_code": 0
+    }
+  ],
+  "selected_worlds": 131072,
+  "selection_reason": "first authorized horizon-32 capacity with a finite real PPO update, zero hot-path state transfers, successful checkpoint/evaluation probe, and at least 4 GiB VRAM margin",
+  "verdict": "PASS_GREEN"
+}

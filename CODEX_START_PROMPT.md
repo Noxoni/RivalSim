@@ -1,38 +1,42 @@
-# Active Codex Handoff — Rival 2.0 Campaign 01
+# Closed Codex Boundary — Rival 2.0 Campaign 01 Complete
 
-RivalSim v0.5 is complete with `PASS_GREEN`. This handoff authorizes a bounded **Rival 2.0 first real training campaign** on top of the frozen v0.5 implementation.
+RivalSim v0.5 remains complete with `PASS_GREEN`. Rival 2.0 Campaign 01 has also completed its
+exact bounded execution and is now closed.
 
-Start from current `origin/main`. Required starting release:
+Campaign 01 used the frozen v0.5 trainer and contracts from a fresh seed-`20260826`
+initialization. The preferred 131,072-world, horizon-32 capacity passed preflight. Training
+stopped at update 12 with 100,663,296 agent decision samples, the first completed PPO update at
+or beyond 100,000,000. Initialization plus the first 10M/25M/50M/100M threshold checkpoints and
+fixed evaluations were preserved and published.
 
-`cc3aa34e0bac4531c2750e0d05e2b4980621c642`
+Independent closeout statuses:
 
-v0.5 implementation commit:
+- execution status: `COMPLETE`;
+- behavioral result: `DEGRADED`;
+- frozen v0.5 trainer status: unchanged (`PASS_GREEN`).
 
-`676ef6bd3ca48376d706a2dbccbdec26fce3e4fb`
+The final full resumable checkpoint is published at
+`checkpoints/rival2/campaign01/rival2_campaign01_100m_resume.pt`. Its SHA-256 is
+`704F2B887BF50E767C86B7080C1E881644480D41A3302D245E833BDE65752B4A` and its exact size is
+21,126,324 bytes. It passes the frozen v0.5 loader/config/contract checks and reproduces the next
+stochastic sample exactly.
 
-All v0.1-v0.5 published evidence and all four Rival 2.0 contract identities are frozen. Do not change the observation, action, reward, episode, model, PPO, or simulator contracts for this campaign.
+Read the completed evidence in:
 
-Read in full before starting:
-
+- `docs/RIVAL2_CAMPAIGN01_RESULTS.md`;
+- `results/rival2/campaign01/summary.json`;
+- `results/rival2/campaign01/config.json`;
+- `results/rival2/campaign01/checkpoints.json`;
+- `results/rival2/campaign01/evaluation_000m.json` through `evaluation_100m.json`;
+- `results/rival2/campaign01/training_curve.json`;
 - `handoff/rival2-c01/README.md`;
 - `handoff/rival2-c01/CAMPAIGN.md`;
-- `handoff/rival2-c01/ACCEPTANCE.md`;
-- `docs/RIVAL2_TRAINING_CONTRACT.md`;
-- `docs/V0_5_RESULTS.md`;
-- `results/v0.5/manifest.json`.
+- `handoff/rival2-c01/ACCEPTANCE.md`.
 
-Mission:
+All published `results/v0.1/` through `results/v0.5/` remain byte-for-byte unchanged. Do not
+reinterpret the negative behavioral outcome by changing the frozen campaign after the fact.
 
-1. create a fresh Rival 2.0 initialization using the frozen v0.5 model and default PPO settings;
-2. run a capacity preflight for the standard 32-decision rollout horizon, preferring 131,072 worlds and falling back only if VRAM/stability requires it;
-3. train from scratch to a bounded target of **100,000,000 agent decision samples**;
-4. preserve checkpoints and fixed-seed evaluation snapshots when cumulative samples first cross 10M, 25M, 50M, and 100M, plus the initialization checkpoint;
-5. evaluate every checkpoint under the exact same held-out campaign protocol and report whether recognizable non-random behavior emerges;
-6. preserve the final checkpoint and enough checkpoint state to resume the campaign exactly;
-7. publish Campaign 01 metrics/evidence and stop.
-
-Use the frozen default PPO configuration from `docs/RIVAL2_TRAINING_CONTRACT.md`, including entropy coefficient `0.01`, gamma `0.995`, GAE lambda `0.95`, clip `0.20`, value coefficient `0.50`, max gradient norm `0.50`, Adam `3e-4`, two epochs, horizon `32`, and CUDA minibatches initially targeted at 65,536.
-
-Do not tune the reward, add a curriculum, add action masks, change the model, change observation fields, change episode semantics, or run hyperparameter searches in Campaign 01. The point is to observe what the frozen v0.5 system learns as-is.
-
-Do not begin v0.6 RocketSim/RLBot transfer work. Do not implement rendering or legacy Rival compatibility. Complete the campaign, publish what happened even if gameplay remains poor, and stop at the Campaign 01 boundary.
+No further work is authorized by this prompt. Do not resume Campaign 01 training, begin v0.6,
+build RocketSim/RLBot deployment or transfer validation, tune rewards, add curricula, or alter
+the frozen v0.5 contracts. A new explicit controlling handoff is required for any subsequent
+milestone.
