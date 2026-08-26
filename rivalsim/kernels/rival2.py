@@ -218,6 +218,9 @@ def rival2_interval_reset(
     air_time_since_jump: wp.array(dtype=wp.float32),
     flip_time: wp.array(dtype=wp.float32),
     flip_rel_torque: wp.array(dtype=wp.vec3),
+    auto_flip_timer: wp.array(dtype=wp.float32),
+    auto_flip_torque_scale: wp.array(dtype=wp.float32),
+    is_auto_flipping: wp.array(dtype=wp.int32),
     is_boosting: wp.array(dtype=wp.int32),
     is_supersonic: wp.array(dtype=wp.int32),
     supersonic_time: wp.array(dtype=wp.float32),
@@ -285,6 +288,9 @@ def rival2_interval_reset(
         air_time_since_jump[car] = 0.0
         flip_time[car] = 0.0
         flip_rel_torque[car] = wp.vec3(0.0)
+        auto_flip_timer[car] = 0.0
+        auto_flip_torque_scale[car] = 0.0
+        is_auto_flipping[car] = 0
         is_boosting[car] = 0
         is_supersonic[car] = 0
         supersonic_time[car] = 0.0

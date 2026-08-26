@@ -938,8 +938,8 @@ def main() -> int:
     del rival_values, nexto_values
     gc.collect(); torch.cuda.empty_cache()
 
-    if len(values) != 295:
-        raise RuntimeError(f"continuation schema changed: expected 295 arrays, got {len(values)}")
+    if len(values) != 299:
+        raise RuntimeError(f"continuation schema changed: expected 299 arrays, got {len(values)}")
     capture_integrity = {
         "all_episode_age_at_least_600": bool(np.all(values["rival2.episode_ticks"].reshape(-1) >= MIN_CAPTURE_TICKS)),
         "all_inside_scoring_plane": bool(np.all(np.abs(values["state.ball_pos"].reshape(-1, 3)[:, 1]) < GOAL_SCORING_PLANE_Y_UU)),

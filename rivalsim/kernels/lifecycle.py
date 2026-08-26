@@ -81,6 +81,8 @@ def _save_held_float(
     air_time_since_jump: float,
     flip_time: float,
     flip_rel_torque: wp.vec3,
+    auto_flip_timer: float,
+    auto_flip_torque_scale: float,
     supersonic_time: float,
     prev_throttle: float,
     prev_steer: float,
@@ -111,12 +113,14 @@ def _save_held_float(
     held[car, 20] = flip_rel_torque[0]
     held[car, 21] = flip_rel_torque[1]
     held[car, 22] = flip_rel_torque[2]
-    held[car, 23] = supersonic_time
-    held[car, 24] = prev_throttle
-    held[car, 25] = prev_steer
-    held[car, 26] = prev_pitch
-    held[car, 27] = prev_yaw
-    held[car, 28] = prev_roll
+    held[car, 23] = auto_flip_timer
+    held[car, 24] = auto_flip_torque_scale
+    held[car, 25] = supersonic_time
+    held[car, 26] = prev_throttle
+    held[car, 27] = prev_steer
+    held[car, 28] = prev_pitch
+    held[car, 29] = prev_yaw
+    held[car, 30] = prev_roll
 
 
 @wp.func
@@ -129,6 +133,7 @@ def _save_held_int(
     has_double_jumped: int,
     has_flipped: int,
     is_flipping: int,
+    is_auto_flipping: int,
     is_boosting: int,
     sticky_ticks: int,
     is_supersonic: int,
@@ -142,12 +147,13 @@ def _save_held_int(
     held[car, 3] = has_double_jumped
     held[car, 4] = has_flipped
     held[car, 5] = is_flipping
-    held[car, 6] = is_boosting
-    held[car, 7] = sticky_ticks
-    held[car, 8] = is_supersonic
-    held[car, 9] = prev_jump
-    held[car, 10] = prev_boost
-    held[car, 11] = prev_handbrake
+    held[car, 6] = is_auto_flipping
+    held[car, 7] = is_boosting
+    held[car, 8] = sticky_ticks
+    held[car, 9] = is_supersonic
+    held[car, 10] = prev_jump
+    held[car, 11] = prev_boost
+    held[car, 12] = prev_handbrake
 
 
 @wp.kernel(enable_backward=False)
@@ -245,6 +251,9 @@ def lifecycle_post_tick(
     air_time_since_jump: wp.array(dtype=wp.float32),
     flip_time: wp.array(dtype=wp.float32),
     flip_rel_torque: wp.array(dtype=wp.vec3),
+    auto_flip_timer: wp.array(dtype=wp.float32),
+    auto_flip_torque_scale: wp.array(dtype=wp.float32),
+    is_auto_flipping: wp.array(dtype=wp.int32),
     is_boosting: wp.array(dtype=wp.int32),
     is_supersonic: wp.array(dtype=wp.int32),
     supersonic_time: wp.array(dtype=wp.float32),
@@ -306,6 +315,9 @@ def lifecycle_post_tick(
             air_time_since_jump[car] = 0.0
             flip_time[car] = 0.0
             flip_rel_torque[car] = wp.vec3(0.0)
+            auto_flip_timer[car] = 0.0
+            auto_flip_torque_scale[car] = 0.0
+            is_auto_flipping[car] = 0
             is_boosting[car] = 0
             is_supersonic[car] = 0
             supersonic_time[car] = 0.0
@@ -348,6 +360,8 @@ def lifecycle_post_tick(
                     air_time_since_jump[car],
                     flip_time[car],
                     flip_rel_torque[car],
+                    auto_flip_timer[car],
+                    auto_flip_torque_scale[car],
                     supersonic_time[car],
                     prev_throttle[car],
                     prev_steer[car],
@@ -364,6 +378,7 @@ def lifecycle_post_tick(
                     has_double_jumped[car],
                     has_flipped[car],
                     is_flipping[car],
+                    is_auto_flipping[car],
                     is_boosting[car],
                     sticky_ticks[car],
                     is_supersonic[car],
@@ -393,24 +408,27 @@ def lifecycle_post_tick(
             flip_rel_torque[car] = wp.vec3(
                 held_float[car, 20], held_float[car, 21], held_float[car, 22]
             )
-            supersonic_time[car] = held_float[car, 23]
-            prev_throttle[car] = held_float[car, 24]
-            prev_steer[car] = held_float[car, 25]
-            prev_pitch[car] = held_float[car, 26]
-            prev_yaw[car] = held_float[car, 27]
-            prev_roll[car] = held_float[car, 28]
+            auto_flip_timer[car] = held_float[car, 23]
+            auto_flip_torque_scale[car] = held_float[car, 24]
+            supersonic_time[car] = held_float[car, 25]
+            prev_throttle[car] = held_float[car, 26]
+            prev_steer[car] = held_float[car, 27]
+            prev_pitch[car] = held_float[car, 28]
+            prev_yaw[car] = held_float[car, 29]
+            prev_roll[car] = held_float[car, 30]
             on_ground[car] = held_int[car, 0]
             has_jumped[car] = held_int[car, 1]
             is_jumping[car] = held_int[car, 2]
             has_double_jumped[car] = held_int[car, 3]
             has_flipped[car] = held_int[car, 4]
             is_flipping[car] = held_int[car, 5]
-            is_boosting[car] = held_int[car, 6]
-            sticky_ticks[car] = held_int[car, 7]
-            is_supersonic[car] = held_int[car, 8]
-            prev_jump[car] = held_int[car, 9]
-            prev_boost[car] = held_int[car, 10]
-            prev_handbrake[car] = held_int[car, 11]
+            is_auto_flipping[car] = held_int[car, 6]
+            is_boosting[car] = held_int[car, 7]
+            sticky_ticks[car] = held_int[car, 8]
+            is_supersonic[car] = held_int[car, 9]
+            prev_jump[car] = held_int[car, 10]
+            prev_boost[car] = held_int[car, 11]
+            prev_handbrake[car] = held_int[car, 12]
             rigid_position_bt[car] = car_pos[car] * 0.02
             rigid_velocity_bt[car] = car_vel[car] * 0.02
 
@@ -494,6 +512,9 @@ def lifecycle_post_tick(
             air_time_since_jump[car] = 0.0
             flip_time[car] = 0.0
             flip_rel_torque[car] = wp.vec3(0.0)
+            auto_flip_timer[car] = 0.0
+            auto_flip_torque_scale[car] = 0.0
+            is_auto_flipping[car] = 0
             is_boosting[car] = 0
             is_supersonic[car] = 0
             supersonic_time[car] = 0.0

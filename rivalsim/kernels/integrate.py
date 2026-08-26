@@ -102,6 +102,7 @@ def integrate_tick(
     defer_car_linear_cap: int,
     defer_car_angular_cap: int,
     defer_ball_physics: int,
+    resident_full_world_mechanics: int,
     car_pos: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
@@ -122,6 +123,7 @@ def integrate_tick(
     air_time_since_jump: wp.array(dtype=wp.float32),
     flip_time: wp.array(dtype=wp.float32),
     flip_rel_torque: wp.array(dtype=wp.vec3),
+    is_auto_flipping: wp.array(dtype=wp.int32),
     is_boosting: wp.array(dtype=wp.int32),
     is_supersonic: wp.array(dtype=wp.int32),
     supersonic_time: wp.array(dtype=wp.float32),
@@ -254,7 +256,8 @@ def integrate_tick(
         car_is_jumping = 1
         car_jump_time = 0.0
         vel = vel + up * JUMP_IMMEDIATE_FORCE
-        car_sticky_ticks = JUMP_STICKY_TICKS
+        if resident_full_world_mechanics == 0:
+            car_sticky_ticks = JUMP_STICKY_TICKS
 
     started_jump = on_ground_for_tick and jump_pressed and car_is_jumping != 0
     if car_is_jumping != 0:
@@ -264,7 +267,7 @@ def integrate_tick(
             jump_scale = JUMP_PRE_MIN_ACCEL_SCALE
         acceleration = acceleration + up * JUMP_ACCEL * jump_scale
 
-    if car_sticky_ticks > 0:
+    if resident_full_world_mechanics == 0 and car_sticky_ticks > 0:
         acceleration = acceleration - up * JUMP_STICKY_ACCEL
         car_sticky_ticks = car_sticky_ticks - 1
 
@@ -290,6 +293,7 @@ def integrate_tick(
             and car_air_since_jump < DOUBLEJUMP_MAX_DELAY
             and car_has_double_jumped == 0
             and car_has_flipped == 0
+            and is_auto_flipping[tid] == 0
         )
         if eligible:
             input_magnitude = wp.abs(yaw) + wp.abs(pitch) + wp.abs(roll)
@@ -353,7 +357,7 @@ def integrate_tick(
     elif car_has_flipped != 0:
         car_flip_time = car_flip_time + DT
 
-    if started_jump:
+    if started_jump and resident_full_world_mechanics == 0:
         car_on_ground = 0
 
     # RocketSim _UpdateBoost, using the v0.1 airborne acceleration.
@@ -387,20 +391,21 @@ def integrate_tick(
     pos = pos + vel * DT
     quat = _integrate_quaternion(quat, ang_vel)
 
-    speed_sq = wp.dot(vel, vel)
-    if car_is_supersonic != 0 and car_supersonic_time < SUPERSONIC_MAINTAIN_MAX_TIME:
-        if speed_sq >= SUPERSONIC_MAINTAIN_MIN_SPEED * SUPERSONIC_MAINTAIN_MIN_SPEED:
+    if resident_full_world_mechanics == 0:
+        speed_sq = wp.dot(vel, vel)
+        if car_is_supersonic != 0 and car_supersonic_time < SUPERSONIC_MAINTAIN_MAX_TIME:
+            if speed_sq >= SUPERSONIC_MAINTAIN_MIN_SPEED * SUPERSONIC_MAINTAIN_MIN_SPEED:
+                car_is_supersonic = 1
+            else:
+                car_is_supersonic = 0
+        elif speed_sq >= SUPERSONIC_START_SPEED * SUPERSONIC_START_SPEED:
             car_is_supersonic = 1
         else:
             car_is_supersonic = 0
-    elif speed_sq >= SUPERSONIC_START_SPEED * SUPERSONIC_START_SPEED:
-        car_is_supersonic = 1
-    else:
-        car_is_supersonic = 0
-    if car_is_supersonic != 0:
-        car_supersonic_time = car_supersonic_time + DT
-    else:
-        car_supersonic_time = 0.0
+        if car_is_supersonic != 0:
+            car_supersonic_time = car_supersonic_time + DT
+        else:
+            car_supersonic_time = 0.0
 
     if defer_car_linear_cap == 0:
         vel = _cap_vector(vel, CAR_MAX_SPEED)

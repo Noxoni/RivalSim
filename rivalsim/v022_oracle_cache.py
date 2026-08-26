@@ -275,12 +275,12 @@ def validate_authority_chunk(
                 CACHE_CAPTURE_TICKS
             ):
                 raise RuntimeError("captured tick mismatch")
-            initial = StateSnapshot(
-                **{
-                    field.name: np.asarray(data[f"initial__{field.name}"])
-                    for field in fields(StateSnapshot)
-                }
-            )
+            count = int(np.asarray(data["initial__car_pos"]).shape[0])
+            initial = StateSnapshot.empty(count)
+            for field in fields(StateSnapshot):
+                key = f"initial__{field.name}"
+                if key in data:
+                    getattr(initial, field.name)[...] = np.asarray(data[key])
             frames = {name: np.asarray(data[f"frame__{name}"]) for name in FRAME_FIELDS}
             _validate_authority_arrays(initial, frames, len(expected_case_ids))
     except (KeyError, OSError, ValueError) as error:
@@ -398,9 +398,9 @@ class RocketSimAuthorityCache:
                     source = corpus_index - start
                     target = destination[corpus_index]
                     for field in fields(StateSnapshot):
-                        getattr(initial, field.name)[target] = data[f"initial__{field.name}"][
-                            source
-                        ]
+                        key = f"initial__{field.name}"
+                        if key in data:
+                            getattr(initial, field.name)[target] = data[key][source]
                     for name in FRAME_FIELDS:
                         frames_out[name][:, target] = data[f"frame__{name}"][:, source]
                     loaded.add(corpus_index)

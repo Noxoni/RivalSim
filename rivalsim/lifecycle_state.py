@@ -9,8 +9,8 @@ import warp as wp
 
 from rivalsim.kernels.boost_pad import PAD_COUNT
 
-HELD_FLOAT_FIELDS = 29
-HELD_INT_FIELDS = 12
+HELD_FLOAT_FIELDS = 31
+HELD_INT_FIELDS = 13
 
 
 def _selector_array(value: int | np.ndarray, count: int, modulo: int) -> np.ndarray:

@@ -263,6 +263,7 @@ class Rival2Trainer:
             "self_play_config": asdict(self.self_play_config),
             "contract_hashes": dict(self.env.contract_hashes),
             "reward_version": self.env.reward_version,
+            "episode_version": self.env.episode_version,
             "policy_config_hash": self.policy_config.content_hash,
             "ppo_config_hash": self.ppo_config.content_hash,
             "policy_version": self.policy_version,
@@ -290,6 +291,8 @@ class Rival2Trainer:
             raise ValueError("Rival 2.0 checkpoint contract hashes are incompatible")
         if payload.get("reward_version", self.env.reward_version) != self.env.reward_version:
             raise ValueError("Rival 2.0 checkpoint reward version is incompatible")
+        if payload.get("episode_version", "RIVAL2_EPISODE_V1") != self.env.episode_version:
+            raise ValueError("Rival 2.0 checkpoint episode version is incompatible")
         if payload["policy_config_hash"] != self.policy_config.content_hash:
             raise ValueError("Rival 2.0 checkpoint policy configuration is incompatible")
         if payload["ppo_config_hash"] != self.ppo_config.content_hash:
@@ -327,8 +330,12 @@ class Rival2Trainer:
             raise ValueError("a Rival 2.0 curriculum transition is already recorded")
         if source_reward_version == destination_reward_version:
             raise ValueError("curriculum reward source and destination must differ")
-        source_contracts = contract_hashes_for_reward(source_reward_version)
-        destination_contracts = contract_hashes_for_reward(destination_reward_version)
+        source_contracts = contract_hashes_for_reward(
+            source_reward_version, self.env.episode_version
+        )
+        destination_contracts = contract_hashes_for_reward(
+            destination_reward_version, self.env.episode_version
+        )
         if self.env.reward_version != source_reward_version:
             raise ValueError("active Rival 2.0 reward does not match the transition source")
         if self.env.contract_hashes != source_contracts:
@@ -372,8 +379,14 @@ class Rival2Trainer:
                 "live_world_state",
             ],
         }
-        self.env.reward_version = destination_reward_version
-        self.env.contract_hashes = destination_contracts
+        set_reward_version = getattr(self.env, "set_reward_version", None)
+        if set_reward_version is None:
+            self.env.reward_version = destination_reward_version
+            self.env.contract_hashes = destination_contracts
+        else:
+            set_reward_version(destination_reward_version)
+            if self.env.contract_hashes != destination_contracts:
+                raise RuntimeError("reward transition installed unexpected contracts")
         self.curriculum_transition = recorded
         return copy.deepcopy(recorded)
 

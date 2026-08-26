@@ -27,6 +27,7 @@ class RivalSim:
         self.defer_car_angular_cap = False
         self.defer_car_linear_cap = False
         self.defer_ball_physics = False
+        self.resident_full_world_mechanics = False
         self.num_envs = num_envs
         initial = (
             StateSnapshot.random(num_envs, seed) if randomize else StateSnapshot.empty(num_envs)
@@ -124,6 +125,7 @@ class RivalSim:
                 int(self.defer_car_linear_cap),
                 int(self.defer_car_angular_cap),
                 int(self.defer_ball_physics),
+                int(self.resident_full_world_mechanics),
                 state.car_pos,
                 state.car_vel,
                 state.car_quat,
@@ -144,6 +146,7 @@ class RivalSim:
                 state.air_time_since_jump,
                 state.flip_time,
                 state.flip_rel_torque,
+                state.is_auto_flipping,
                 state.is_boosting,
                 state.is_supersonic,
                 state.supersonic_time,

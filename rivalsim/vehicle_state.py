@@ -33,6 +33,7 @@ class VehicleSnapshot:
     total_force_bt: np.ndarray
     total_torque_bt: np.ndarray
     inverse_inertia_world: np.ndarray
+    pre_tick_forward_speed: np.ndarray
     wheel_ray_start: np.ndarray
     wheel_direction: np.ndarray
     wheel_hit_point: np.ndarray
@@ -125,6 +126,9 @@ class VehicleState:
         self.total_torque_bt = wp.zeros(car_count, dtype=wp.vec3, device=device)
         self.inverse_inertia_world = wp.zeros(
             car_count, dtype=wp.mat33, device=device
+        )
+        self.pre_tick_forward_speed = wp.zeros(
+            car_count, dtype=wp.float32, device=device
         )
 
         for name in (
@@ -235,7 +239,7 @@ class VehicleState:
         quat_count = self.car_count
         float_count = (
             self.wheel_count * 17
-            + self.car_count * 16
+            + self.car_count * 17
             + self.contact_capacity * 11
         )
         int_count = (
@@ -282,6 +286,9 @@ class VehicleState:
             total_torque_bt=array("total_torque_bt", np.float32, (car_count, 3)),
             inverse_inertia_world=array(
                 "inverse_inertia_world", np.float32, (car_count, 3, 3)
+            ),
+            pre_tick_forward_speed=array(
+                "pre_tick_forward_speed", np.float32, (car_count,)
             ),
             wheel_ray_start=array("wheel_ray_start", np.float32, wheel_vec_shape),
             wheel_direction=array("wheel_direction", np.float32, wheel_vec_shape),

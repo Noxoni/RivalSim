@@ -33,6 +33,7 @@ from rivalsim.rival2_contracts import (
     OBS_FIELD_NAMES,
     ORANGE_PAD_REMAP,
     POSITION_SCALE,
+    RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     RIVAL2_REWARD_VERSION,
     STICKY_TICK_SCALE,
@@ -152,15 +153,14 @@ class Rival2WorldSim(CompleteWorldSim):
             device=self.device,
         )
 
-    def apply_interval_resets(self) -> None:
-        """Reset only completed worlds, without advancing physics or the clock."""
+    def _launch_physical_resets(self, mask: wp.array) -> None:
+        """Apply the shared standard-kickoff physical reset relation."""
 
         lifecycle = self.lifecycle
         state = self.state
         pair = self.car_car
         ball = self.ball_world
         vehicle = self.vehicle
-        mask = self.rival2.reset_mask
         wp.launch(
             rival2_interval_reset,
             dim=self.num_envs,
@@ -199,6 +199,9 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.air_time_since_jump,
                 state.flip_time,
                 state.flip_rel_torque,
+                state.auto_flip_timer,
+                state.auto_flip_torque_scale,
+                state.is_auto_flipping,
                 state.is_boosting,
                 state.is_supersonic,
                 state.supersonic_time,
@@ -227,6 +230,12 @@ class Rival2WorldSim(CompleteWorldSim):
             ],
             device=self.device,
         )
+
+    def apply_interval_resets(self) -> None:
+        """Reset only completed worlds, without advancing physics or the clock."""
+
+        mask = self.rival2.reset_mask
+        self._launch_physical_resets(mask)
         wp.launch(
             rival2_after_interval_reset,
             dim=self.num_envs,
@@ -576,10 +585,14 @@ class Rival2Env:
         device: str = "cuda:0",
         seed: int = 0,
         reward_version: str = RIVAL2_REWARD_VERSION,
+        episode_version: str = RIVAL2_EPISODE_VERSION,
         **world_kwargs: Any,
     ):
         self.reward_version = reward_version
-        self.contract_hashes = contract_hashes_for_reward(reward_version)
+        self.episode_version = episode_version
+        self.contract_hashes = contract_hashes_for_reward(
+            reward_version, episode_version
+        )
         self.world = Rival2WorldSim(
             num_envs,
             collision_root,

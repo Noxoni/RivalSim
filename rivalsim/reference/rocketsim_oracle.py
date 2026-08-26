@@ -35,6 +35,9 @@ class OracleFrame:
     air_time_since_jump: float
     flip_time: float
     flip_rel_torque: np.ndarray
+    auto_flip_timer: float
+    auto_flip_torque_scale: float
+    is_auto_flipping: bool
     ball_pos: np.ndarray
     ball_vel: np.ndarray
     ball_matrix: np.ndarray
@@ -53,6 +56,22 @@ class StaticWorldOracleFrame:
     wheel_contacts: tuple[bool, bool, bool, bool]
     has_world_contact: bool
     world_contact_normal: np.ndarray
+    has_jumped: bool
+    is_jumping: bool
+    has_double_jumped: bool
+    has_flipped: bool
+    is_flipping: bool
+    jump_time: float
+    air_time: float
+    air_time_since_jump: float
+    flip_time: float
+    flip_rel_torque: np.ndarray
+    auto_flip_timer: float
+    auto_flip_torque_scale: float
+    is_auto_flipping: bool
+    boosting_time: float
+    is_supersonic: bool
+    supersonic_time: float
 
 
 @dataclass(slots=True)
@@ -69,6 +88,25 @@ class StaticWorldBatchOracleFrame:
     wheel_contacts: np.ndarray
     has_world_contact: np.ndarray
     world_contact_normal: np.ndarray
+    # The v0.2.2 frozen cache predates mechanics telemetry. Live source frames
+    # populate these fields; old immutable cache frames intentionally leave
+    # them absent rather than invalidating collision authority.
+    has_jumped: np.ndarray | None = None
+    is_jumping: np.ndarray | None = None
+    has_double_jumped: np.ndarray | None = None
+    has_flipped: np.ndarray | None = None
+    is_flipping: np.ndarray | None = None
+    jump_time: np.ndarray | None = None
+    air_time: np.ndarray | None = None
+    air_time_since_jump: np.ndarray | None = None
+    flip_time: np.ndarray | None = None
+    flip_rel_torque: np.ndarray | None = None
+    auto_flip_timer: np.ndarray | None = None
+    auto_flip_torque_scale: np.ndarray | None = None
+    is_auto_flipping: np.ndarray | None = None
+    boosting_time: np.ndarray | None = None
+    is_supersonic: np.ndarray | None = None
+    supersonic_time: np.ndarray | None = None
 
 
 @dataclass(slots=True)
@@ -160,6 +198,9 @@ class RocketSimOracle:
             air_time_since_jump=float(car.air_time_since_jump),
             flip_time=float(car.flip_time),
             flip_rel_torque=_vec(car.flip_rel_torque),
+            auto_flip_timer=float(car.auto_flip_timer),
+            auto_flip_torque_scale=float(car.auto_flip_torque_scale),
+            is_auto_flipping=bool(car.is_auto_flipping),
             ball_pos=_vec(ball.pos),
             ball_vel=_vec(ball.vel),
             ball_matrix=_matrix(ball.rot_mat),
@@ -185,6 +226,11 @@ class RocketSimOracle:
             source.air_time_since_jump = float(snapshot.air_time_since_jump[0, index])
             source.flip_time = float(snapshot.flip_time[0, index])
             source.flip_rel_torque = _to_vec(self.rs, snapshot.flip_rel_torque[0, index])
+            source.auto_flip_timer = float(snapshot.auto_flip_timer[0, index])
+            source.auto_flip_torque_scale = float(
+                snapshot.auto_flip_torque_scale[0, index]
+            )
+            source.is_auto_flipping = bool(snapshot.is_auto_flipping[0, index])
             source.is_supersonic = bool(snapshot.is_supersonic[0, index])
             source.supersonic_time = float(snapshot.supersonic_time[0, index])
             source.boosting_time = float(snapshot.boosting_time[0, index])
@@ -263,6 +309,22 @@ class RocketSimStaticWorldOracle:
             wheel_contacts=(contacts[0], contacts[1], contacts[2], contacts[3]),
             has_world_contact=bool(state.has_world_contact),
             world_contact_normal=_vec(state.world_contact_normal),
+            has_jumped=bool(state.has_jumped),
+            is_jumping=bool(state.is_jumping),
+            has_double_jumped=bool(state.has_double_jumped),
+            has_flipped=bool(state.has_flipped),
+            is_flipping=bool(state.is_flipping),
+            jump_time=float(state.jump_time),
+            air_time=float(state.air_time),
+            air_time_since_jump=float(state.air_time_since_jump),
+            flip_time=float(state.flip_time),
+            flip_rel_torque=_vec(state.flip_rel_torque),
+            auto_flip_timer=float(state.auto_flip_timer),
+            auto_flip_torque_scale=float(state.auto_flip_torque_scale),
+            is_auto_flipping=bool(state.is_auto_flipping),
+            boosting_time=float(state.boosting_time),
+            is_supersonic=bool(state.is_supersonic),
+            supersonic_time=float(state.supersonic_time),
         )
 
     def _set_state(self, snapshot: StateSnapshot) -> None:
@@ -284,6 +346,11 @@ class RocketSimStaticWorldOracle:
             source.air_time_since_jump = float(snapshot.air_time_since_jump[0, index])
             source.flip_time = float(snapshot.flip_time[0, index])
             source.flip_rel_torque = _to_vec(self.rs, snapshot.flip_rel_torque[0, index])
+            source.auto_flip_timer = float(snapshot.auto_flip_timer[0, index])
+            source.auto_flip_torque_scale = float(
+                snapshot.auto_flip_torque_scale[0, index]
+            )
+            source.is_auto_flipping = bool(snapshot.is_auto_flipping[0, index])
             source.is_supersonic = bool(snapshot.is_supersonic[0, index])
             source.supersonic_time = float(snapshot.supersonic_time[0, index])
             source.boosting_time = float(snapshot.boosting_time[0, index])
@@ -402,6 +469,11 @@ class RocketSimStaticWorldBatchOracle:
             result.air_time_since_jump[env_index, 0] = float(source.air_time_since_jump)
             result.flip_time[env_index, 0] = float(source.flip_time)
             result.flip_rel_torque[env_index, 0] = _vec(source.flip_rel_torque)
+            result.auto_flip_timer[env_index, 0] = float(source.auto_flip_timer)
+            result.auto_flip_torque_scale[env_index, 0] = float(
+                source.auto_flip_torque_scale
+            )
+            result.is_auto_flipping[env_index, 0] = int(source.is_auto_flipping)
             result.is_supersonic[env_index, 0] = int(source.is_supersonic)
             result.supersonic_time[env_index, 0] = float(source.supersonic_time)
             result.boosting_time[env_index, 0] = float(source.boosting_time)
@@ -420,6 +492,22 @@ class RocketSimStaticWorldBatchOracle:
         wheel_contacts = np.empty((count, 4), dtype=np.bool_)
         has_world_contact = np.empty(count, dtype=np.bool_)
         world_contact_normal = np.empty((count, 3), dtype=np.float32)
+        has_jumped = np.empty(count, dtype=np.bool_)
+        is_jumping = np.empty(count, dtype=np.bool_)
+        has_double_jumped = np.empty(count, dtype=np.bool_)
+        has_flipped = np.empty(count, dtype=np.bool_)
+        is_flipping = np.empty(count, dtype=np.bool_)
+        jump_time = np.empty(count, dtype=np.float32)
+        air_time = np.empty(count, dtype=np.float32)
+        air_time_since_jump = np.empty(count, dtype=np.float32)
+        flip_time = np.empty(count, dtype=np.float32)
+        flip_rel_torque = np.empty((count, 3), dtype=np.float32)
+        auto_flip_timer = np.empty(count, dtype=np.float32)
+        auto_flip_torque_scale = np.empty(count, dtype=np.float32)
+        is_auto_flipping = np.empty(count, dtype=np.bool_)
+        boosting_time = np.empty(count, dtype=np.float32)
+        is_supersonic = np.empty(count, dtype=np.bool_)
+        supersonic_time = np.empty(count, dtype=np.float32)
         for env_index, car in enumerate(self.cars):
             source = car.get_state()
             car_pos[env_index] = _vec(source.pos)
@@ -432,6 +520,22 @@ class RocketSimStaticWorldBatchOracle:
             wheel_contacts[env_index] = tuple(bool(value) for value in source.wheels_with_contact)
             has_world_contact[env_index] = bool(source.has_world_contact)
             world_contact_normal[env_index] = _vec(source.world_contact_normal)
+            has_jumped[env_index] = bool(source.has_jumped)
+            is_jumping[env_index] = bool(source.is_jumping)
+            has_double_jumped[env_index] = bool(source.has_double_jumped)
+            has_flipped[env_index] = bool(source.has_flipped)
+            is_flipping[env_index] = bool(source.is_flipping)
+            jump_time[env_index] = float(source.jump_time)
+            air_time[env_index] = float(source.air_time)
+            air_time_since_jump[env_index] = float(source.air_time_since_jump)
+            flip_time[env_index] = float(source.flip_time)
+            flip_rel_torque[env_index] = _vec(source.flip_rel_torque)
+            auto_flip_timer[env_index] = float(source.auto_flip_timer)
+            auto_flip_torque_scale[env_index] = float(source.auto_flip_torque_scale)
+            is_auto_flipping[env_index] = bool(source.is_auto_flipping)
+            boosting_time[env_index] = float(source.boosting_time)
+            is_supersonic[env_index] = bool(source.is_supersonic)
+            supersonic_time[env_index] = float(source.supersonic_time)
         return StaticWorldBatchOracleFrame(
             car_pos=car_pos,
             car_vel=car_vel,
@@ -443,6 +547,22 @@ class RocketSimStaticWorldBatchOracle:
             wheel_contacts=wheel_contacts,
             has_world_contact=has_world_contact,
             world_contact_normal=world_contact_normal,
+            has_jumped=has_jumped,
+            is_jumping=is_jumping,
+            has_double_jumped=has_double_jumped,
+            has_flipped=has_flipped,
+            is_flipping=is_flipping,
+            jump_time=jump_time,
+            air_time=air_time,
+            air_time_since_jump=air_time_since_jump,
+            flip_time=flip_time,
+            flip_rel_torque=flip_rel_torque,
+            auto_flip_timer=auto_flip_timer,
+            auto_flip_torque_scale=auto_flip_torque_scale,
+            is_auto_flipping=is_auto_flipping,
+            boosting_time=boosting_time,
+            is_supersonic=is_supersonic,
+            supersonic_time=supersonic_time,
         )
 
     def _set_car_state(self, car: Any, snapshot: StateSnapshot, env_index: int) -> None:
@@ -463,6 +583,11 @@ class RocketSimStaticWorldBatchOracle:
         source.air_time_since_jump = float(snapshot.air_time_since_jump[env_index, 0])
         source.flip_time = float(snapshot.flip_time[env_index, 0])
         source.flip_rel_torque = _to_vec(self.rs, snapshot.flip_rel_torque[env_index, 0])
+        source.auto_flip_timer = float(snapshot.auto_flip_timer[env_index, 0])
+        source.auto_flip_torque_scale = float(
+            snapshot.auto_flip_torque_scale[env_index, 0]
+        )
+        source.is_auto_flipping = bool(snapshot.is_auto_flipping[env_index, 0])
         source.is_supersonic = bool(snapshot.is_supersonic[env_index, 0])
         source.supersonic_time = float(snapshot.supersonic_time[env_index, 0])
         source.boosting_time = float(snapshot.boosting_time[env_index, 0])

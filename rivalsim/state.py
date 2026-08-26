@@ -18,6 +18,8 @@ CAR_FLOAT_FIELDS = (
     "air_time",
     "air_time_since_jump",
     "flip_time",
+    "auto_flip_timer",
+    "auto_flip_torque_scale",
     "supersonic_time",
     "prev_throttle",
     "prev_steer",
@@ -32,6 +34,7 @@ CAR_INT_FIELDS = (
     "has_double_jumped",
     "has_flipped",
     "is_flipping",
+    "is_auto_flipping",
     "is_boosting",
     "sticky_ticks",
     "is_supersonic",
@@ -62,6 +65,9 @@ class StateSnapshot:
     air_time_since_jump: np.ndarray
     flip_time: np.ndarray
     flip_rel_torque: np.ndarray
+    auto_flip_timer: np.ndarray
+    auto_flip_torque_scale: np.ndarray
+    is_auto_flipping: np.ndarray
     is_boosting: np.ndarray
     is_supersonic: np.ndarray
     supersonic_time: np.ndarray
@@ -117,6 +123,9 @@ class StateSnapshot:
             air_time_since_jump=float_car(),
             flip_time=float_car(),
             flip_rel_torque=np.zeros(car_vec, dtype=np.float32),
+            auto_flip_timer=float_car(),
+            auto_flip_torque_scale=float_car(),
+            is_auto_flipping=int_car(),
             is_boosting=int_car(),
             is_supersonic=int_car(),
             supersonic_time=float_car(),

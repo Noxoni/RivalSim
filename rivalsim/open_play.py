@@ -25,6 +25,7 @@ from rivalsim.behavioral_telemetry import (
     _surface_category,
 )
 from rivalsim.kernels.integrated import update_integrated_broadphase_order
+from rivalsim.lifecycle_state import HELD_FLOAT_FIELDS, HELD_INT_FIELDS
 from rivalsim.rival2_contracts import ORANGE_PAD_REMAP, RIVAL2_REWARD_VERSION
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
 from rivalsim.rival2_policy import (
@@ -396,14 +397,16 @@ def _mirror_lifecycle_field(field: str, value: np.ndarray) -> np.ndarray:
             result[valid] = location_map[result[valid]]
         return result
     if field == "held_float":
-        result = _swap_cars(value, 29).reshape(value.shape[0], 2, 29)
+        result = _swap_cars(value, HELD_FLOAT_FIELDS).reshape(
+            value.shape[0], 2, HELD_FLOAT_FIELDS
+        )
         for start in (0, 3, 10):
             result[..., start] *= np.float32(-1.0)
             result[..., start + 1] *= np.float32(-1.0)
         result[..., 6:10] = _rotate_quaternions(result[..., 6:10].reshape(value.shape[0], -1)).reshape(value.shape[0], 2, 4)
         return result.reshape(value.shape)
     if field == "held_int":
-        return _swap_cars(value, 12)
+        return _swap_cars(value, HELD_INT_FIELDS)
     if field in {"blue_score", "orange_score"}:
         other = "orange_score" if field == "blue_score" else "blue_score"
         # The caller replaces this from the complete bank after dispatch.
@@ -521,9 +524,9 @@ def mirror_involution_report(
             # columns 6:10.  q and -q are the identical stored rotation, just
             # as in the unpacked quaternion fields above.  All other packed
             # scalars must remain numerically exact.
-            shaped_source = source.reshape(source.shape[0], 2, 29)
-            shaped_actual = actual.reshape(actual.shape[0], 2, 29)
-            scalar_columns = np.r_[0:6, 10:29]
+            shaped_source = source.reshape(source.shape[0], 2, HELD_FLOAT_FIELDS)
+            shaped_actual = actual.reshape(actual.shape[0], 2, HELD_FLOAT_FIELDS)
+            scalar_columns = np.r_[0:6, 10:HELD_FLOAT_FIELDS]
             scalar_error = float(
                 np.max(
                     np.abs(

@@ -30,6 +30,7 @@ from rivalsim.kernels.integrated import (
 from rivalsim.kernels.lifecycle import lifecycle_post_tick, lifecycle_pre_tick
 from rivalsim.kernels.rsqrtss_amd import amd_rsqrtss_table
 from rivalsim.kernels.vehicle import (
+    apply_resident_mechanics_pre_solve,
     chassis_contacts_v021,
     increment_tick_counter,
     load_action_tape,
@@ -295,6 +296,7 @@ class StaticWorldSim(RivalSim):
                     vehicle.total_force_bt,
                     vehicle.total_torque_bt,
                     vehicle.inverse_inertia_world,
+                    vehicle.pre_tick_forward_speed,
                     vehicle.contact_count,
                     vehicle.world_contact_normal,
                     state.on_ground,
@@ -302,6 +304,11 @@ class StaticWorldSim(RivalSim):
                     state.boost,
                     state.boosting_time,
                     state.is_boosting,
+                    state.has_flipped,
+                    state.is_flipping,
+                    state.flip_time,
+                    state.flip_rel_torque,
+                    state.is_auto_flipping,
                     controls.throttle,
                     controls.steer,
                     controls.pitch,
@@ -360,6 +367,40 @@ class StaticWorldSim(RivalSim):
                     inputs=wheel_inputs,
                     device=self.device,
                 )
+            wp.launch(
+                apply_resident_mechanics_pre_solve,
+                dim=state.car_count,
+                inputs=[
+                    int(self.resident_full_world_mechanics),
+                    self.tick_counter,
+                    vehicle.pre_tick_forward_speed,
+                    vehicle.contact_count,
+                    vehicle.world_contact_normal,
+                    state.car_quat,
+                    state.on_ground,
+                    state.has_jumped,
+                    state.is_jumping,
+                    state.has_double_jumped,
+                    state.has_flipped,
+                    state.is_flipping,
+                    state.jump_time,
+                    state.air_time_since_jump,
+                    state.flip_time,
+                    state.auto_flip_timer,
+                    state.auto_flip_torque_scale,
+                    state.is_auto_flipping,
+                    state.prev_jump,
+                    controls.pitch,
+                    controls.yaw,
+                    controls.roll,
+                    controls.jump,
+                    vehicle.solver_velocity,
+                    vehicle.solver_angular_velocity,
+                    vehicle.rigid_velocity_bt,
+                    vehicle.total_force_bt,
+                ],
+                device=self.device,
+            )
             self._after_wheel_pre_tick()
         # B1 is intentionally the isolated ray-query component benchmark; the
         # contact-rich origins remain fixed while the device action tape turns.
@@ -1373,6 +1414,7 @@ class CompleteWorldSim(IntegratedWorldSim):
                 num_envs, kickoff_selector
             )
         super().__init__(*args, **kwargs)
+        self.resident_full_world_mechanics = True
         self.lifecycle = LifecycleState(
             self.num_envs,
             self.device,
@@ -1532,6 +1574,9 @@ class CompleteWorldSim(IntegratedWorldSim):
                 state.air_time_since_jump,
                 state.flip_time,
                 state.flip_rel_torque,
+                state.auto_flip_timer,
+                state.auto_flip_torque_scale,
+                state.is_auto_flipping,
                 state.is_boosting,
                 state.is_supersonic,
                 state.supersonic_time,

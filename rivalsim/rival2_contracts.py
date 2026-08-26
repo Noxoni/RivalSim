@@ -10,7 +10,9 @@ RIVAL2_OBS_VERSION: Final = "RIVAL2_OBS_V1"
 RIVAL2_ACTION_VERSION: Final = "RIVAL2_ACTION_V1"
 RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
 RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
+RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
+RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
 ANALOG_ACTION_NAMES: Final = ("throttle", "steer", "pitch", "yaw", "roll")
 BUTTON_ACTION_NAMES: Final = ("jump", "boost", "handbrake")
@@ -241,6 +243,17 @@ REWARD_V2_CONTRACT: Final = {
     "other_changes_from_v1": [],
 }
 
+REWARD_GOAL_ONLY_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_GOAL_ONLY_VERSION,
+    "cadence_hz": 30,
+    "zero_sum": True,
+    "goal": 10.0,
+    "progress_coefficient": 0.0,
+    "unique_touch": 0.0,
+    "unique_demolition": 0.0,
+    "other_shaping": [],
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -250,11 +263,29 @@ EPISODE_CONTRACT: Final = {
     "reset": "accepted deterministic standard kickoff lifecycle",
 }
 
+FULL_MATCH_EPISODE_CONTRACT: Final = {
+    "version": RIVAL2_FULL_MATCH_EPISODE_VERSION,
+    "mode": "standard 1v1 Soccar",
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "regulation_seconds": 300.0,
+    "goal": "score persists; standard kickoff reset at the next policy boundary",
+    "regulation_end": "terminate on a non-tied score",
+    "tied_regulation_end": "standard kickoff into unbounded sudden-death overtime",
+    "overtime_goal": "terminate with the scoring side as winner",
+    "truncation": None,
+    "no_touch_timeout_seconds": 15.0,
+    "no_touch_timeout_effect": "diagnostic counter only; never resets or truncates the match",
+    "reset": "new five-minute match with the next standard kickoff layout",
+}
+
 OBSERVATION_SCHEMA_HASH: Final = _canonical_hash(OBSERVATION_SCHEMA)
 ACTION_CONTRACT_HASH: Final = _canonical_hash(ACTION_CONTRACT)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
 REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
+REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
+FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
 CONTRACT_HASHES: Final = {
     RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
@@ -264,17 +295,39 @@ CONTRACT_HASHES: Final = {
 }
 
 
-def contract_hashes_for_reward(reward_version: str) -> dict[str, str]:
+def contract_hashes_for_reward(
+    reward_version: str,
+    episode_version: str = RIVAL2_EPISODE_VERSION,
+) -> dict[str, str]:
     """Return the frozen contract identity for one explicitly selected reward."""
 
+    if episode_version == RIVAL2_EPISODE_VERSION:
+        episode_hash = EPISODE_CONTRACT_HASH
+    elif episode_version == RIVAL2_FULL_MATCH_EPISODE_VERSION:
+        episode_hash = FULL_MATCH_EPISODE_CONTRACT_HASH
+    else:
+        raise ValueError(f"unsupported Rival 2.0 episode version: {episode_version}")
+
     if reward_version == RIVAL2_REWARD_VERSION:
-        return dict(CONTRACT_HASHES)
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_VERSION: REWARD_CONTRACT_HASH,
+            episode_version: episode_hash,
+        }
     if reward_version == RIVAL2_REWARD_V2_VERSION:
         return {
             RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
             RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
             RIVAL2_REWARD_V2_VERSION: REWARD_V2_CONTRACT_HASH,
-            RIVAL2_EPISODE_VERSION: EPISODE_CONTRACT_HASH,
+            episode_version: episode_hash,
+        }
+    if reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_GOAL_ONLY_VERSION: REWARD_GOAL_ONLY_CONTRACT_HASH,
+            episode_version: episode_hash,
         }
     raise ValueError(f"unsupported Rival 2.0 reward version: {reward_version}")
 
@@ -289,6 +342,8 @@ __all__ = [
     "CONTRACT_HASHES",
     "EPISODE_CONTRACT",
     "EPISODE_CONTRACT_HASH",
+    "FULL_MATCH_EPISODE_CONTRACT",
+    "FULL_MATCH_EPISODE_CONTRACT_HASH",
     "OBSERVATION_SCHEMA",
     "OBSERVATION_SCHEMA_HASH",
     "OBS_DIM",
@@ -296,8 +351,12 @@ __all__ = [
     "ORANGE_PAD_REMAP",
     "REWARD_CONTRACT",
     "REWARD_CONTRACT_HASH",
+    "REWARD_GOAL_ONLY_CONTRACT",
+    "REWARD_GOAL_ONLY_CONTRACT_HASH",
     "REWARD_V2_CONTRACT",
     "REWARD_V2_CONTRACT_HASH",
+    "RIVAL2_FULL_MATCH_EPISODE_VERSION",
+    "RIVAL2_REWARD_GOAL_ONLY_VERSION",
     "RIVAL2_REWARD_V2_VERSION",
     "contract_hashes_for_reward",
 ]

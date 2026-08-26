@@ -88,6 +88,32 @@ BILATERAL_CONTACT_DAMPING = 0.2
 ROLLING_FRICTION_SCALE_MAGIC = 113.73963
 SOLVER_ERP = 0.2
 SOLVER_INITIAL_DT = 1.0 / 60.0
+JUMP_ACCEL = 4375.0 / 3.0
+JUMP_IMMEDIATE_FORCE = 875.0 / 3.0
+JUMP_MIN_TIME = 0.025
+JUMP_RESET_TIME_PAD = 1.0 / 40.0
+JUMP_MAX_TIME = 0.2
+JUMP_PRE_MIN_ACCEL_SCALE = 0.62
+DOUBLEJUMP_MAX_DELAY = 1.25
+DODGE_DEADZONE = 0.5
+FLIP_Z_DAMP_120 = 0.35
+FLIP_Z_DAMP_START = 0.15
+FLIP_Z_DAMP_END = 0.21
+FLIP_TORQUE_TIME = 0.65
+FLIP_INITIAL_VEL_SCALE = 500.0
+FLIP_FORWARD_IMPULSE_MAX_SPEED_SCALE = 1.0
+FLIP_SIDE_IMPULSE_MAX_SPEED_SCALE = 1.9
+FLIP_BACKWARD_IMPULSE_MAX_SPEED_SCALE = 2.5
+FLIP_BACKWARD_IMPULSE_SCALE_X = 16.0 / 15.0
+CAR_AUTOFLIP_IMPULSE = 200.0
+CAR_AUTOFLIP_TORQUE = 50.0
+CAR_AUTOFLIP_TIME = 0.4
+CAR_AUTOFLIP_NORMZ_THRESH = 0.7071067811865476
+CAR_AUTOFLIP_ROLL_THRESH = 2.8
+CAR_MAX_SPEED = 2300.0
+SUPERSONIC_START_SPEED = 2200.0
+SUPERSONIC_MAINTAIN_MIN_SPEED = 2100.0
+SUPERSONIC_MAINTAIN_MAX_TIME = 1.0
 
 
 @wp.func
@@ -2561,7 +2587,8 @@ def _bullet_integrate_external_velocities(
 
 
 _BULLET_AIR_DAMPING_TORQUE = r"""
-    // Non-flipping, four-wheel-miss branch of RocketSim Car::_UpdateAirTorque.
+    // Fixed-Octane RocketSim Car::_UpdateAirTorque, including active-flip
+    // torque, flip cancel, stall control, and post-flip pitch lock.
     // This is deliberately the fixed Octane/static-world source path only:
     // dirPitch=-right, dirYaw=up, dirRoll=-forward, followed by the pinned
     // Bullet inverse-tensor inverse and matrix/vector operation order.
@@ -2638,14 +2665,50 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
         angular_velocity_world[0],
         angular_velocity_world[1],
         angular_velocity_world[2]);
+
+    bool active_flipping = is_flipping != 0;
+    if (active_flipping)
+        active_flipping = has_flipped != 0 && flip_time < 0.65f;
+    const AirV3 source_rel_dodge = make(
+        flip_rel_torque[0], flip_rel_torque[1], flip_rel_torque[2]);
+    AirV3 rel_dodge = source_rel_dodge;
+    const bool rel_dodge_nonzero =
+        source_rel_dodge.x != 0.0f || source_rel_dodge.y != 0.0f ||
+        source_rel_dodge.z != 0.0f;
+    bool do_air_control = false;
+    if (active_flipping) {
+        if (rel_dodge_nonzero) {
+            if (rel_dodge.y != 0.0f && control_pitch != 0.0f &&
+                ((rel_dodge.y > 0.0f && control_pitch > 0.0f) ||
+                 (rel_dodge.y < 0.0f && control_pitch < 0.0f))) {
+                rel_dodge.y = op_mul(
+                    rel_dodge.y, op_sub(1.0f, fminf(fabsf(control_pitch), 1.0f)));
+                do_air_control = true;
+            }
+        } else {
+            // A zero-torque stall retains normal air control.
+            do_air_control = true;
+        }
+    } else {
+        do_air_control = true;
+    }
+    do_air_control =
+        do_air_control && is_auto_flipping == 0 && update_air_control != 0;
+
+    float pitch_torque_scale = 1.0f;
+    if (active_flipping) {
+        pitch_torque_scale = 0.0f;
+    } else if (has_flipped != 0 && flip_time < 0.95f) {
+        pitch_torque_scale = 0.0f;
+    }
     const AirV3 torque = add(
         add(
-            scale(scale(scale(dir_pitch, control_pitch), 1.0f), 130.0f),
+            scale(scale(scale(dir_pitch, control_pitch), pitch_torque_scale), 130.0f),
             scale(scale(dir_yaw, control_yaw), 95.0f)),
         scale(scale(dir_roll, control_roll), 400.0f));
     const float damp_pitch = op_mul(
         op_mul(dot(dir_pitch, omega), 30.0f),
-        op_sub(1.0f, fabsf(control_pitch)));
+        op_sub(1.0f, fabsf(op_mul(control_pitch, pitch_torque_scale))));
     const float damp_yaw = op_mul(
         op_mul(dot(dir_yaw, omega), 20.0f),
         op_sub(1.0f, fabsf(control_yaw)));
@@ -2753,12 +2816,46 @@ _BULLET_AIR_DAMPING_TORQUE = r"""
             op_mul(inertia_world[2][0], auto_roll_direction.x),
             op_mul(inertia_world[2][1], auto_roll_direction.y)),
             op_mul(inertia_world[2][2], auto_roll_direction.z)));
+
+    // The source expression is left associative:
+    // (invInertiaTensorWorld.inverse() * basis) * dodgeTorque.
+    float flip_tensor[3][3];
+    for (int row = 0; row < 3; ++row) {
+        for (int column = 0; column < 3; ++column) {
+            flip_tensor[row][column] = op_add(
+                op_add(
+                    op_mul(inertia_world[row][0], basis.data[0][column]),
+                    op_mul(inertia_world[row][1], basis.data[1][column])),
+                op_mul(inertia_world[row][2], basis.data[2][column]));
+        }
+    }
+    const AirV3 dodge_torque = make(
+        op_mul(rel_dodge.x, 260.0f),
+        op_mul(rel_dodge.y, 224.0f),
+        0.0f);
+    const AirV3 flip_total_torque = make(
+        op_add(op_add(
+            op_mul(flip_tensor[0][0], dodge_torque.x),
+            op_mul(flip_tensor[0][1], dodge_torque.y)),
+            op_mul(flip_tensor[0][2], dodge_torque.z)),
+        op_add(op_add(
+            op_mul(flip_tensor[1][0], dodge_torque.x),
+            op_mul(flip_tensor[1][1], dodge_torque.y)),
+            op_mul(flip_tensor[1][2], dodge_torque.z)),
+        op_add(op_add(
+            op_mul(flip_tensor[2][0], dodge_torque.x),
+            op_mul(flip_tensor[2][1], dodge_torque.y)),
+            op_mul(flip_tensor[2][2], dodge_torque.z)));
     AirV3 total_torque = make(0.0f, 0.0f, 0.0f);
-    // C++ left-associativity makes the air-control source expression
-    // (inertiaWorld * requested) * CAR_TORQUE_SCALE. Auto-roll's later
-    // applyTorque independently evaluates (inertiaWorld * direction) * 80.
-    if (do_air_control != 0) {
+    // applyTorque accumulates flip, air-control, then auto-roll torque in
+    // source visitation order.
+    if (active_flipping && rel_dodge_nonzero) {
+        total_torque = flip_total_torque;
+    }
+    if (do_air_control) {
         total_torque = scale(air_total_torque_unscaled, 0.0958738029f);
+        if (active_flipping && rel_dodge_nonzero)
+            total_torque = add(flip_total_torque, total_torque);
     }
     if (do_auto_roll != 0) {
         total_torque = add(
@@ -2779,8 +2876,13 @@ def _bullet_air_damping_torque(
     control_yaw: float,
     control_roll: float,
     auto_roll_ground_up: wp.vec3,
-    do_air_control: int,
+    update_air_control: int,
     do_auto_roll: int,
+    is_flipping: int,
+    has_flipped: int,
+    flip_time: float,
+    flip_rel_torque: wp.vec3,
+    is_auto_flipping: int,
 ) -> wp.vec3: ...
 
 
@@ -3418,6 +3520,234 @@ def increment_tick_counter(tick_counter: wp.array(dtype=wp.int32)):
 
 
 @wp.kernel(enable_backward=False)
+def apply_resident_mechanics_pre_solve(
+    enabled: int,
+    tick_counter: wp.array(dtype=wp.int32),
+    pre_tick_forward_speed: wp.array(dtype=wp.float32),
+    previous_contact_count: wp.array(dtype=wp.int32),
+    previous_world_contact_normal: wp.array(dtype=wp.vec3),
+    car_quat: wp.array(dtype=wp.quat),
+    on_ground: wp.array(dtype=wp.int32),
+    has_jumped: wp.array(dtype=wp.int32),
+    is_jumping: wp.array(dtype=wp.int32),
+    has_double_jumped: wp.array(dtype=wp.int32),
+    has_flipped: wp.array(dtype=wp.int32),
+    is_flipping: wp.array(dtype=wp.int32),
+    jump_time: wp.array(dtype=wp.float32),
+    air_time_since_jump: wp.array(dtype=wp.float32),
+    flip_time: wp.array(dtype=wp.float32),
+    auto_flip_timer: wp.array(dtype=wp.float32),
+    auto_flip_torque_scale: wp.array(dtype=wp.float32),
+    is_auto_flipping: wp.array(dtype=wp.int32),
+    prev_jump: wp.array(dtype=wp.int32),
+    control_pitch: wp.array(dtype=wp.float32),
+    control_yaw: wp.array(dtype=wp.float32),
+    control_roll: wp.array(dtype=wp.float32),
+    control_jump: wp.array(dtype=wp.int32),
+    solver_velocity: wp.array(dtype=wp.vec3),
+    solver_angular_velocity: wp.array(dtype=wp.vec3),
+    rigid_velocity_bt: wp.array(dtype=wp.vec3),
+    total_force_bt: wp.array(dtype=wp.vec3),
+):
+    """Apply source pre-tick jump/dodge operations to the resident rigid body.
+
+    ``integrate_tick`` owns the corresponding public mechanic state transition.
+    This kernel mirrors the same pre-transition branches without mutating them,
+    so Bullet constraint setup observes RocketSim's direct impulses and jump
+    force rather than the stale velocity cached by the wheel prepass.
+    """
+
+    car = wp.tid()
+    if enabled == 0:
+        return
+
+    quat = car_quat[car]
+    bullet_basis = _bullet_quaternion_matrix(quat)
+    if tick_counter[0] == 0:
+        bullet_basis = _authority_input_quaternion_matrix(quat)
+    up = _bullet_transform_point(
+        wp.vec3(0.0), bullet_basis, wp.vec3(0.0, 0.0, 1.0)
+    )
+    forward = _bullet_transform_point(
+        wp.vec3(0.0), bullet_basis, wp.vec3(1.0, 0.0, 0.0)
+    )
+    velocity_bt = rigid_velocity_bt[car]
+    angular_velocity = solver_angular_velocity[car]
+    grounded = on_ground[car] != 0
+    jump = control_jump[car] != 0
+    jump_pressed = jump and prev_jump[car] == 0
+
+    local_has_jumped = has_jumped[car]
+    local_is_jumping = is_jumping[car]
+    local_has_double = has_double_jumped[car]
+    local_has_flipped = has_flipped[car]
+    local_is_flipping = is_flipping[car]
+    local_jump_time = jump_time[car]
+    local_air_since_jump = air_time_since_jump[car]
+    local_flip_time = flip_time[car]
+    local_auto_flip_timer = auto_flip_timer[car]
+    local_auto_flip_torque_scale = auto_flip_torque_scale[car]
+    local_is_auto_flipping = is_auto_flipping[car]
+
+    # Car::_UpdateAirTorque first refreshes the active-flip predicate.  Its
+    # ordinary air-control force/torque is already queued by wheel_pre_tick;
+    # the flip-specific torque path is added by the companion source-port gate.
+    if local_is_flipping != 0:
+        if local_has_flipped != 0 and local_flip_time < FLIP_TORQUE_TIME:
+            local_is_flipping = 1
+        else:
+            local_is_flipping = 0
+
+    # Car::_UpdateJump.
+    if grounded and local_is_jumping == 0:
+        if not (
+            local_has_jumped != 0
+            and local_jump_time < JUMP_MIN_TIME + JUMP_RESET_TIME_PAD
+        ):
+            local_has_jumped = 0
+            local_jump_time = 0.0
+
+    if local_is_jumping != 0:
+        if not (
+            local_jump_time < JUMP_MIN_TIME
+            or (jump and local_jump_time < JUMP_MAX_TIME)
+        ):
+            local_is_jumping = 0
+    elif grounded and jump_pressed:
+        local_is_jumping = 1
+        local_jump_time = 0.0
+        velocity_bt = velocity_bt + up * (JUMP_IMMEDIATE_FORCE * 0.02)
+
+    if local_is_jumping != 0:
+        local_has_jumped = 1
+        jump_scale = 1.0
+        if local_jump_time < JUMP_MIN_TIME:
+            jump_scale = JUMP_PRE_MIN_ACCEL_SCALE
+        total_force_bt[car] = total_force_bt[car] + _rocketsim_scaled_central_force(
+            up,
+            jump_scale,
+            JUMP_ACCEL,
+        )
+
+    # Car::_UpdateAutoFlip follows jump and directly mutates both linear and
+    # angular rigid-body velocity before the double-jump/flip branch.
+    if (
+        jump_pressed
+        and previous_contact_count[car] > 0
+        and previous_world_contact_normal[car][2] > CAR_AUTOFLIP_NORMZ_THRESH
+    ):
+        # Angle::FromRotMat delegates to btMatrix3x3::getEulerYPR and then
+        # negates roll. The trigger lies near +/-pi, away from its singular
+        # pitch branch.
+        roll = -wp.atan2(bullet_basis[2, 1], bullet_basis[2, 2])
+        abs_roll = wp.abs(roll)
+        if abs_roll > CAR_AUTOFLIP_ROLL_THRESH:
+            local_auto_flip_timer = CAR_AUTOFLIP_TIME * (abs_roll / wp.pi)
+            local_auto_flip_torque_scale = -1.0
+            if roll > 0.0:
+                local_auto_flip_torque_scale = 1.0
+            local_is_auto_flipping = 1
+            velocity_bt = velocity_bt - up * (CAR_AUTOFLIP_IMPULSE * 0.02)
+
+    if local_is_auto_flipping != 0:
+        if local_auto_flip_timer <= 0.0:
+            local_is_auto_flipping = 0
+            local_auto_flip_timer = 0.0
+        else:
+            angular_velocity = angular_velocity + forward * (
+                CAR_AUTOFLIP_TORQUE * local_auto_flip_torque_scale * DT
+            )
+            local_auto_flip_timer = local_auto_flip_timer - DT
+
+    # Car::_UpdateDoubleJumpOrFlip reads the state resulting from UpdateJump.
+    if grounded:
+        local_has_double = 0
+        local_has_flipped = 0
+        local_air_since_jump = 0.0
+        local_flip_time = 0.0
+    else:
+        if local_has_jumped != 0 and local_is_jumping == 0:
+            local_air_since_jump = local_air_since_jump + DT
+        else:
+            local_air_since_jump = 0.0
+
+        if (
+            jump_pressed
+            and local_air_since_jump < DOUBLEJUMP_MAX_DELAY
+            and local_has_double == 0
+            and local_has_flipped == 0
+            and local_is_auto_flipping == 0
+        ):
+            pitch = wp.clamp(control_pitch[car], -1.0, 1.0)
+            yaw = wp.clamp(control_yaw[car], -1.0, 1.0)
+            roll = wp.clamp(control_roll[car], -1.0, 1.0)
+            input_magnitude = wp.abs(yaw) + wp.abs(pitch) + wp.abs(roll)
+            if input_magnitude >= DODGE_DEADZONE:
+                local_flip_time = 0.0
+                local_has_flipped = 1
+                local_is_flipping = 1
+                dodge_dir = wp.vec3(-pitch, yaw + roll, 0.0)
+                if wp.abs(yaw + roll) < 0.1 and wp.abs(pitch) < 0.1:
+                    dodge_dir = wp.vec3(0.0, 0.0, 0.0)
+                else:
+                    length_squared = wp.dot(dodge_dir, dodge_dir)
+                    if length_squared > 1.0e-20:
+                        dodge_dir = dodge_dir / wp.sqrt(length_squared)
+
+                impulse_dir = dodge_dir
+                if wp.abs(impulse_dir[0]) < 0.1:
+                    impulse_dir[0] = 0.0
+                if wp.abs(impulse_dir[1]) < 0.1:
+                    impulse_dir[1] = 0.0
+                if wp.dot(impulse_dir, impulse_dir) > 1.0e-20:
+                    source_forward_speed = pre_tick_forward_speed[car]
+                    backwards = False
+                    if wp.abs(source_forward_speed) < 100.0:
+                        backwards = impulse_dir[0] < 0.0
+                    else:
+                        backwards = (impulse_dir[0] >= 0.0) != (
+                            source_forward_speed >= 0.0
+                        )
+                    ratio = wp.abs(source_forward_speed) / CAR_MAX_SPEED
+                    max_x = FLIP_FORWARD_IMPULSE_MAX_SPEED_SCALE
+                    if backwards:
+                        max_x = FLIP_BACKWARD_IMPULSE_MAX_SPEED_SCALE
+                    initial_x = impulse_dir[0] * FLIP_INITIAL_VEL_SCALE
+                    initial_y = impulse_dir[1] * FLIP_INITIAL_VEL_SCALE
+                    initial_x = initial_x * ((max_x - 1.0) * ratio + 1.0)
+                    initial_y = initial_y * (
+                        (FLIP_SIDE_IMPULSE_MAX_SPEED_SCALE - 1.0) * ratio + 1.0
+                    )
+                    if backwards:
+                        initial_x = initial_x * FLIP_BACKWARD_IMPULSE_SCALE_X
+                    forward_2d = wp.vec3(forward[0], forward[1], 0.0)
+                    forward_length = wp.sqrt(wp.dot(forward_2d, forward_2d))
+                    if forward_length > 1.0e-20:
+                        forward_2d = forward_2d / forward_length
+                        right_2d = wp.vec3(-forward_2d[1], forward_2d[0], 0.0)
+                        delta_uu = forward_2d * initial_x + right_2d * initial_y
+                        velocity_bt = velocity_bt + delta_uu * 0.02
+            else:
+                velocity_bt = velocity_bt + up * (JUMP_IMMEDIATE_FORCE * 0.02)
+                local_has_double = 1
+
+    if local_is_flipping != 0:
+        local_flip_time = local_flip_time + DT
+        if local_flip_time <= FLIP_TORQUE_TIME:
+            if local_flip_time >= FLIP_Z_DAMP_START and (
+                velocity_bt[2] < 0.0 or local_flip_time < FLIP_Z_DAMP_END
+            ):
+                velocity_bt[2] = velocity_bt[2] * (1.0 - FLIP_Z_DAMP_120)
+
+    rigid_velocity_bt[car] = velocity_bt
+    solver_velocity[car] = velocity_bt * 50.0
+    solver_angular_velocity[car] = angular_velocity
+    auto_flip_timer[car] = local_auto_flip_timer
+    auto_flip_torque_scale[car] = local_auto_flip_torque_scale
+    is_auto_flipping[car] = local_is_auto_flipping
+
+
+@wp.kernel(enable_backward=False)
 def wheel_pre_tick(
     tick_counter: wp.array(dtype=wp.int32),
     ray_mesh_id: wp.uint64,
@@ -3451,6 +3781,7 @@ def wheel_pre_tick(
     total_force_bt: wp.array(dtype=wp.vec3),
     total_torque_bt: wp.array(dtype=wp.vec3),
     inverse_inertia_world: wp.array(dtype=wp.mat33),
+    pre_tick_forward_speed: wp.array(dtype=wp.float32),
     previous_contact_count: wp.array(dtype=wp.int32),
     previous_world_contact_normal: wp.array(dtype=wp.vec3),
     on_ground: wp.array(dtype=wp.int32),
@@ -3458,6 +3789,11 @@ def wheel_pre_tick(
     boost_amount: wp.array(dtype=wp.float32),
     boosting_time: wp.array(dtype=wp.float32),
     is_boosting: wp.array(dtype=wp.int32),
+    has_flipped: wp.array(dtype=wp.int32),
+    is_flipping: wp.array(dtype=wp.int32),
+    flip_time: wp.array(dtype=wp.float32),
+    flip_rel_torque: wp.array(dtype=wp.vec3),
+    is_auto_flipping: wp.array(dtype=wp.int32),
     control_throttle: wp.array(dtype=wp.float32),
     control_steer: wp.array(dtype=wp.float32),
     control_pitch: wp.array(dtype=wp.float32),
@@ -3539,6 +3875,7 @@ def wheel_pre_tick(
         wp.vec3(0.0, 0.0, 0.0), bullet_basis, wp.vec3(0.0, 1.0, 0.0)
     )
     forward_speed = _bullet_vehicle_forward_speed_uu(base_vel_bt, forward)
+    pre_tick_forward_speed[car] = forward_speed
     abs_speed = wp.abs(forward_speed)
     contact_count = 0
     normal_sum = wp.vec3(0.0, 0.0, 0.0)
@@ -4239,9 +4576,8 @@ def wheel_pre_tick(
             )
         total_force_bt[car] = queued_force_bt
         if contact_count == 0 or do_auto_roll != 0:
-            # This corpus stays in the non-flipping source branch. Preserve
-            # both source applyTorque calls, their inertia inversion, and the
-            # later auto-roll vector-add order in the queued Bullet torque.
+            # Preserve each source applyTorque call, its inertia inversion,
+            # and the flip -> air-control -> auto-roll accumulation order.
             total_torque_bt[car] = _bullet_air_damping_torque(
                 bullet_basis,
                 ang_vel,
@@ -4251,6 +4587,11 @@ def wheel_pre_tick(
                 auto_roll_ground_up,
                 wp.int32(contact_count == 0),
                 do_auto_roll,
+                is_flipping[car],
+                has_flipped[car],
+                flip_time[car],
+                flip_rel_torque[car],
+                is_auto_flipping[car],
             )
         on_ground[car] = wp.int32(contact_count >= 3)
         car_vel[car] = vel
