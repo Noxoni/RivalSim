@@ -2,9 +2,9 @@
 
 **Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Latest completed execution:** Rival 2.0 Campaign 03 — `COMPLETE`
+**Latest completed execution:** Rival 2.0 Campaign 04 — `COMPLETE` / `CONTINUING`
 
-**Active authorized work:** Rival 2.0 Campaign 04 — Reward V2 long-run continuation to 1B cumulative samples
+**Active authorized work:** none
 
 ## Stable training baseline
 
@@ -54,25 +54,34 @@ Completed Campaign 03 commit:
 
 `67b51452df98696a54f4465ea83924c6b9e75b4d`
 
-## Authorized Campaign 04
+## Completed Campaign 04
 
-Campaign 04 does not change the policy, reward, optimizer, simulator, or training semantics. It resumes the exact Campaign 03 100M checkpoint and asks one question: how far does the existing Reward V2 training line improve with substantially more samples?
+Campaign 04 changed no policy, reward, optimizer, simulator, or training semantic. It resumed
+the exact Campaign 03 100M checkpoint and continued Reward V2 through update 120 / 1,006,632,960
+cumulative samples without running update 121.
 
-Continue from update 12 through the first completed update crossing 1,000,000,000 cumulative agent decision samples. With the unchanged batch geometry, the authorized final boundary is update 120 / `1,006,632,960` cumulative samples.
+All 108 continuation updates passed integrity. The required update-30/60/90/120 checkpoints and
+four 4,096-world stochastic self-play evaluations completed exactly, and the final checkpoint
+passed exact reload/continuation.
 
-Save and run the same lightweight 4,096-world ordinary stochastic self-play evaluation at:
+The published behavioral curve is:
 
-- update 30 / 251,658,240 samples;
-- update 60 / 503,316,480 samples;
-- update 90 / 754,974,720 samples;
-- update 120 / 1,006,632,960 samples.
+- 100M: `1.308672` touches/minute, `0.936279` no-touch truncation;
+- 250M: `3.202896` touches/minute, `0.867676` no-touch truncation;
+- 500M: `6.453265` touches/minute, `0.869873` no-touch truncation;
+- 750M: `8.712013` touches/minute, `0.770752` no-touch truncation;
+- 1B: `16.661451` touches/minute, `0.550293` no-touch truncation.
 
-Use the published Campaign 03 100M result as the starting baseline; do not rerun it.
+The prospectively frozen touch/no-touch trend classification is `CONTINUING`. Secondary goal
+metrics were non-monotonic: goal rate declined from `0.426426` at 750M to `0.311649` at 1B.
 
-No capacity preflight, reward smoke, initialization-control evaluation, world-count sweep, inherited simulator regression/parity suite, or post-run lint/test ceremony is authorized. Viewer work is explicitly deferred until after the 1B result is reviewed.
+Final Campaign 04 checkpoint:
 
-Controlling handoff:
+`checkpoints/rival2/campaign04/rival2_campaign04_1b_resume.pt`
 
-- `handoff/rival2-c04/README.md`.
+SHA-256:
 
-No v0.6 RocketSim/RLBot transfer work is authorized.
+`DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0`
+
+Campaign 04 is closed. No preflight/regression/lint ceremony, extra evaluation, viewer work, or
+v0.6 work was performed. A new explicit handoff is required for any continuation.

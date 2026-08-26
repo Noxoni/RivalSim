@@ -11,7 +11,23 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.5 / Rival 2.0 Campaign 03 complete
+## Current boundary — v0.5 / Rival 2.0 Campaign 04 complete
+
+Rival 2.0 Campaign 04 resumed the exact Campaign 03 checkpoint at update 12 / 100,663,296
+cumulative samples, including optimizer, RNG, counter, opponent-assignment, and historical-policy
+state. The unchanged Reward V2 line completed 108 more green updates and stopped exactly at
+update 120 / **1,006,632,960 cumulative samples**. Update 121 did not run.
+
+The authorized stochastic self-play curve increased touches/minute from `1.308672` at 100M to
+`3.202896` at 250M, `6.453265` at 500M, `8.712013` at 750M, and `16.661451` at 1B. No-touch
+truncation fell from `0.936279` at 100M to `0.550293` at 1B. The frozen primary-axis trend is
+`CONTINUING`, although goal rate was non-monotonic and declined from `0.426426` at 750M to
+`0.311649` at 1B. This remains bounded self-play evidence, not external Rocket League competence.
+
+Complete evidence is in `docs/RIVAL2_CAMPAIGN04_RESULTS.md` and
+`results/rival2/campaign04/`. The exact final resume checkpoint is under
+`checkpoints/rival2/campaign04/` with SHA-256
+`DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0`.
 
 Rival 2.0 Campaign 03 is closed at update 12 / **100,663,296 agent decision samples**. It
 preserved Reward V1 and introduced `RIVAL2_REWARD_V2` with one per-agent 30-Hz true-distance

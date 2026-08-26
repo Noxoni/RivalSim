@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "authority": "Rival 2.0 Campaign 04 Reward V2 long-run continuation",
+  "authorized_head": "d8ffef9de46c96a41b9c1a4a73ebd7606d94e7f4",
+  "campaign03_closeout": "67b51452df98696a54f4465ea83924c6b9e75b4d",
+  "resume_checkpoint": "checkpoints/rival2/campaign03/rival2_campaign03_100m_resume.pt",
+  "resume_checkpoint_sha256": "A0F2E554448B31A373BD73254125AC0ADFDB541EE3B695AD9D040B2CCFA68991",
+  "start_iteration": 12,
+  "start_agent_decision_samples": 100663296,
+  "target_iteration": 120,
+  "target_agent_decision_samples": 1006632960,
+  "stop_rule": "stop after update 120; never run update 121",
+  "campaign_seed": 20260826,
+  "worlds": 131072,
+  "policy_config": {
+    "obs_dim": 182,
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "activation": "silu",
+    "actor_outputs": 13,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "dtype": "float32",
+    "autocast": false,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+  },
+  "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+  "ppo_config": {
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0.0,
+    "max_gradient_norm": 0.5,
+    "learning_rate": 0.0003,
+    "epochs": 2,
+    "rollout_horizon": 32,
+    "minibatch_size": 65536
+  },
+  "ppo_config_hash": "1ED4A47155B538DA16CB7FF5BD19804999E20619792DA4297125F9733B6F603A",
+  "self_play_config": {
+    "historical_chance": 0.2,
+    "historical_pool_bound": 16
+  },
+  "reward_version": "RIVAL2_REWARD_V2",
+  "reward_v2_contract_hash": "54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32",
+  "active_contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_REWARD_V2": "54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+  },
+  "checkpoint_thresholds": [
+    {
+      "label": "250m",
+      "iteration": 30,
+      "samples": 251658240
+    },
+    {
+      "label": "500m",
+      "iteration": 60,
+      "samples": 503316480
+    },
+    {
+      "label": "750m",
+      "iteration": 90,
+      "samples": 754974720
+    },
+    {
+      "label": "1b",
+      "iteration": 120,
+      "samples": 1006632960
+    }
+  ],
+  "evaluation": {
+    "seed": 920260826,
+    "worlds": 4096,
+    "mode": "ordinary stochastic self-play",
+    "episode_scope": "first completed episode per world",
+    "labels": [
+      "250m",
+      "500m",
+      "750m",
+      "1b"
+    ],
+    "campaign03_100m_baseline": "reuse published result; do not rerun"
+  },
+  "behavioral_trend_rule_frozen_before_continuation": {
+    "axes": {
+      "touches_per_simulated_minute": "higher is better",
+      "no_touch_truncated_fraction": "lower is better"
+    },
+    "continuing": "both 1B axes improve versus 750M",
+    "degrading": "both 1B axes worsen versus 750M",
+    "flattening": "the two 1B axes are mixed or unchanged versus 750M",
+    "no_numeric_success_threshold": true
+  },
+  "prohibited": [
+    "preflight or capacity checks",
+    "reward smoke or initialization evaluation",
+    "world-count sweep",
+    "inherited parity or regression suites",
+    "extra checkpoint or evaluation",
+    "post-run pytest, Ruff, or compileall ceremony",
+    "viewer implementation",
+    "v0.6 RocketSim or RLBot transfer work"
+  ]
+}

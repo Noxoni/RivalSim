@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T02:52:21.134344+00:00",
+  "protocol": {
+    "seed": 920260826,
+    "worlds": 4096,
+    "mode": "ordinary stochastic self-play",
+    "episode_scope": "first completed episode per world",
+    "labels": [
+      "250m",
+      "500m",
+      "750m",
+      "1b"
+    ],
+    "campaign03_100m_baseline": "reuse published result; do not rerun"
+  },
+  "frozen_trend_rule": {
+    "axes": {
+      "touches_per_simulated_minute": "higher is better",
+      "no_touch_truncated_fraction": "lower is better"
+    },
+    "continuing": "both 1B axes improve versus 750M",
+    "degrading": "both 1B axes worsen versus 750M",
+    "flattening": "the two 1B axes are mixed or unchanged versus 750M",
+    "no_numeric_success_threshold": true
+  },
+  "trend": {
+    "classification": "CONTINUING",
+    "rule": "frozen before continuation in Campaign 04 config",
+    "comparison": "1B versus 750M",
+    "touches_axis_improved": true,
+    "no_touch_axis_improved": true,
+    "touches_axis_worsened": false,
+    "no_touch_axis_worsened": false,
+    "no_numeric_success_threshold": true
+  },
+  "points": [
+    {
+      "label": "100m",
+      "iteration": 12,
+      "agent_decision_samples": 100663296,
+      "source": "published Campaign 03 final; not rerun",
+      "metrics": {
+        "touches_per_simulated_minute": 1.3086717536969537,
+        "goals_per_simulated_minute": 0.24379966289429328,
+        "goal_terminated_fraction": 0.063720703125,
+        "no_touch_truncated_fraction": 0.936279296875,
+        "mean_episode_duration_seconds": 15.681901041666661,
+        "mean_absolute_analog_action": {
+          "throttle": 0.5714901277148394,
+          "steer": 0.5561117509098422,
+          "pitch": 0.5613262503841918,
+          "yaw": 0.5654558350754728,
+          "roll": 0.5618058267705358
+        },
+        "button_activation_rate": {
+          "jump": 0.5272694437755839,
+          "boost": 0.5058241030580304,
+          "handbrake": 0.5535617169142373
+        },
+        "mean_analog_policy_std": {
+          "throttle": 0.9676590752025235,
+          "steer": 0.9891756434282075,
+          "pitch": 1.0170457363929168,
+          "yaw": 1.0327469445225883,
+          "roll": 1.0158842414064113
+        },
+        "mean_button_probability": {
+          "jump": 0.5267898430458939,
+          "boost": 0.5055628836850153,
+          "handbrake": 0.5537244874906976
+        },
+        "mean_button_entropy": {
+          "jump": 0.6907420852823745,
+          "boost": 0.6899872514935016,
+          "handbrake": 0.6823759544496175
+        }
+      },
+      "delta_from_100m": {
+        "touches_per_simulated_minute": 0.0,
+        "goals_per_simulated_minute": 0.0,
+        "goal_terminated_fraction": 0.0,
+        "no_touch_truncated_fraction": 0.0,
+        "mean_episode_duration_seconds": 0.0
+      },
+      "delta_from_previous": null
+    },
+    {
+      "label": "250m",
+      "iteration": 30,
+      "agent_decision_samples": 251658240,
+      "source": "Campaign 04 authorized evaluation",
+      "metrics": {
+        "touches_per_simulated_minute": 3.2028960507006583,
+        "goals_per_simulated_minute": 0.4777653275628482,
+        "goal_terminated_fraction": 0.131103515625,
+        "no_touch_truncated_fraction": 0.86767578125,
+        "mean_episode_duration_seconds": 16.464591471354154,
+        "mean_absolute_analog_action": {
+          "throttle": 0.555745641110151,
+          "steer": 0.5285353150754462,
+          "pitch": 0.5573390938406207,
+          "yaw": 0.5507340334167564,
+          "roll": 0.5579314886717037
+        },
+        "button_activation_rate": {
+          "jump": 0.49810371748479737,
+          "boost": 0.5295291693378061,
+          "handbrake": 0.5543745974755445
+        },
+        "mean_analog_policy_std": {
+          "throttle": 0.8524012739296177,
+          "steer": 0.8760419197971497,
+          "pitch": 1.00145450440798,
+          "yaw": 0.9815175229873162,
+          "roll": 1.005483239648463
+        },
+        "mean_button_probability": {
+          "jump": 0.49776669887726904,
+          "boost": 0.5294342579910913,
+          "handbrake": 0.5543519751382785
+        },
+        "mean_button_entropy": {
+          "jump": 0.688512140443996,
+          "boost": 0.6802188765610712,
+          "handbrake": 0.6629321060300281
+        }
+      },
+      "delta_from_100m": {
+        "touches_per_simulated_minute": 1.8942242970037046,
+        "goals_per_simulated_minute": 0.2339656646685549,
+        "goal_terminated_fraction": 0.0673828125,
+        "no_touch_truncated_fraction": -0.068603515625,
+        "mean_episode_duration_seconds": 0.7826904296874932
+      },
+      "delta_from_previous": {
+        "touches_per_simulated_minute": 1.8942242970037046,
+        "goals_per_simulated_minute": 0.2339656646685549,
+        "goal_terminated_fraction": 0.0673828125,
+        "no_touch_truncated_fraction": -0.068603515625,
+        "mean_episode_duration_seconds": 0.7826904296874932
+      }
+    },
+    {
+      "label": "500m",
+      "iteration": 60,
+      "agent_decision_samples": 503316480,
+      "source": "Campaign 04 authorized evaluation",
+      "metrics": {
+        "touches_per_simulated_minute": 6.45326504481434,
+        "goals_per_simulated_minute": 0.32401017676305766,
+        "goal_terminated_fraction": 0.105712890625,
+        "no_touch_truncated_fraction": 0.869873046875,
+        "mean_episode_duration_seconds": 19.575846354166647,
+        "mean_absolute_analog_action": {
+          "throttle": 0.5218629158678839,
+          "steer": 0.47390452901503155,
+          "pitch": 0.5261289657977053,
+          "yaw": 0.5077584248568207,
+          "roll": 0.5263998395740062
+        },
+        "button_activation_rate": {
+          "jump": 0.4955320767580691,
+          "boost": 0.6127068194289705,
+          "handbrake": 0.5616554700101435
+        },
+        "mean_analog_policy_std": {
+          "throttle": 0.6115618079613805,
+          "steer": 0.6754400433986075,
+          "pitch": 0.9039556383121231,
+          "yaw": 0.8482448962287554,
+          "roll": 0.9056146991394237
+        },
+        "mean_button_probability": {
+          "jump": 0.4949619293323899,
+          "boost": 0.6128392322876544,
+          "handbrake": 0.561627189645682
+        },
+        "mean_button_entropy": {
+          "jump": 0.6783930817879731,
+          "boost": 0.6196026672159216,
+          "handbrake": 0.6125364951022355
+        }
+      },
+      "delta_from_100m": {
+        "touches_per_simulated_minute": 5.144593291117387,
+        "goals_per_simulated_minute": 0.08021051386876438,
+        "goal_terminated_fraction": 0.0419921875,
+        "no_touch_truncated_fraction": -0.06640625,
+        "mean_episode_duration_seconds": 3.8939453124999854
+      },
+      "delta_from_previous": {
+        "touches_per_simulated_minute": 3.2503689941136815,
+        "goals_per_simulated_minute": -0.15375515079979052,
+        "goal_terminated_fraction": -0.025390625,
+        "no_touch_truncated_fraction": 0.002197265625,
+        "mean_episode_duration_seconds": 3.111254882812492
+      }
+    },
+    {
+      "label": "750m",
+      "iteration": 90,
+      "agent_decision_samples": 754974720,
+      "source": "Campaign 04 authorized evaluation",
+      "metrics": {
+        "touches_per_simulated_minute": 8.712012511967597,
+        "goals_per_simulated_minute": 0.4264256180432382,
+        "goal_terminated_fraction": 0.159423828125,
+        "no_touch_truncated_fraction": 0.770751953125,
+        "mean_episode_duration_seconds": 22.43164876302084,
+        "mean_absolute_analog_action": {
+          "throttle": 0.4927363311410621,
+          "steer": 0.43894416259577057,
+          "pitch": 0.4839294440413813,
+          "yaw": 0.47374100186435397,
+          "roll": 0.4949842592543658
+        },
+        "button_activation_rate": {
+          "jump": 0.5130409182118276,
+          "boost": 0.5889447870610989,
+          "handbrake": 0.5082036322001044
+        },
+        "mean_analog_policy_std": {
+          "throttle": 0.5103114720314089,
+          "steer": 0.5671828672608268,
+          "pitch": 0.773779288281278,
+          "yaw": 0.7502387817938116,
+          "roll": 0.8066612049825824
+        },
+        "mean_button_probability": {
+          "jump": 0.5125915483046556,
+          "boost": 0.5891472739029886,
+          "handbrake": 0.5082080023453367
+        },
+        "mean_button_entropy": {
+          "jump": 0.6688936444288545,
+          "boost": 0.6043963115034813,
+          "handbrake": 0.587293952399409
+        }
+      },
+      "delta_from_100m": {
+        "touches_per_simulated_minute": 7.403340758270643,
+        "goals_per_simulated_minute": 0.18262595514894492,
+        "goal_terminated_fraction": 0.095703125,
+        "no_touch_truncated_fraction": -0.16552734375,
+        "mean_episode_duration_seconds": 6.749747721354177
+      },
+      "delta_from_previous": {
+        "touches_per_simulated_minute": 2.258747467153257,
+        "goals_per_simulated_minute": 0.10241544128018054,
+        "goal_terminated_fraction": 0.0537109375,
+        "no_touch_truncated_fraction": -0.09912109375,
+        "mean_episode_duration_seconds": 2.855802408854192
+      }
+    },
+    {
+      "label": "1b",
+      "iteration": 120,
+      "agent_decision_samples": 1006632960,
+      "source": "Campaign 04 authorized evaluation",
+      "metrics": {
+        "touches_per_simulated_minute": 16.66145121477416,
+        "goals_per_simulated_minute": 0.31164872569743,
+        "goal_terminated_fraction": 0.152099609375,
+        "no_touch_truncated_fraction": 0.55029296875,
+        "mean_episode_duration_seconds": 29.28289388020833,
+        "mean_absolute_analog_action": {
+          "throttle": 0.4986813587148857,
+          "steer": 0.42160607391944266,
+          "pitch": 0.47395112679068635,
+          "yaw": 0.470139081360916,
+          "roll": 0.47843815096169506
+        },
+        "button_activation_rate": {
+          "jump": 0.49008915921542556,
+          "boost": 0.5613820706659456,
+          "handbrake": 0.5003233487536553
+        },
+        "mean_analog_policy_std": {
+          "throttle": 0.4494312774007173,
+          "steer": 0.507752306733827,
+          "pitch": 0.7420555456506852,
+          "yaw": 0.7288059041967643,
+          "roll": 0.7556160462078728
+        },
+        "mean_button_probability": {
+          "jump": 0.4896891666095521,
+          "boost": 0.5615387275760338,
+          "handbrake": 0.5004433471821051
+        },
+        "mean_button_entropy": {
+          "jump": 0.6681709847928654,
+          "boost": 0.5750558616088349,
+          "handbrake": 0.5597691097789519
+        }
+      },
+      "delta_from_100m": {
+        "touches_per_simulated_minute": 15.352779461077207,
+        "goals_per_simulated_minute": 0.06784906280313674,
+        "goal_terminated_fraction": 0.08837890625,
+        "no_touch_truncated_fraction": -0.385986328125,
+        "mean_episode_duration_seconds": 13.60099283854167
+      },
+      "delta_from_previous": {
+        "touches_per_simulated_minute": 7.949438702806564,
+        "goals_per_simulated_minute": -0.11477689234580818,
+        "goal_terminated_fraction": -0.00732421875,
+        "no_touch_truncated_fraction": -0.220458984375,
+        "mean_episode_duration_seconds": 6.851245117187492
+      }
+    }
+  ]
+}

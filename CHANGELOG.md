@@ -1,5 +1,26 @@
 # Changelog
 
+## Rival 2.0 Campaign 04 — Reward V2 continuation to 1B (2026-08-25)
+
+- Verified and loaded the exact Campaign 03 checkpoint SHA-256
+  `A0F2E554448B31A373BD73254125AC0ADFDB541EE3B695AD9D040B2CCFA68991`, preserving optimizer,
+  Torch/CUDA and policy/opponent RNG state, update/sample counters, opponent assignments, and
+  historical policy versions `[0, 2, 3, 6, 12]`.
+- Continued the unchanged Reward V2 / entropy-off 131,072-world, horizon-32 training line for
+  108 updates. All updates 13–120 passed integrity; the run stopped at exactly 1,006,632,960
+  cumulative samples and did not run update 121.
+- Saved and evaluated only the authorized update-30/60/90/120 checkpoints. All four 4,096-world
+  stochastic self-play evaluations passed with no extra baseline or checkpoint evaluation.
+- Recorded the five-point touch curve `1.308672 -> 3.202896 -> 6.453265 -> 8.712013 ->
+  16.661451` per simulated minute from 100M through 1B, while no-touch truncation changed
+  `0.936279 -> 0.867676 -> 0.869873 -> 0.770752 -> 0.550293`.
+- Classified the frozen touch/no-touch 750M-to-1B trend as `CONTINUING`. Reported the
+  non-monotonic secondary goal rate honestly: `0.426426` at 750M to `0.311649` at 1B.
+- Published the 31,159,541-byte final resumable checkpoint with SHA-256
+  `DB5AA09B2CAD40D4C1F5DB1014FDE245C58994A6948458212751724F782BE6B0` and passed exact reload.
+- Did not run preflight, reward smoke, regression/parity, post-run test/lint/compile ceremony,
+  extra evaluation, viewer work, reward/PPO/model/simulator changes, or v0.6 work.
+
 ## Rival 2.0 Campaign 03 — direct Reward V2 training (2026-08-25)
 
 - Preserved `RIVAL2_REWARD_V1` and added `RIVAL2_REWARD_V2` with exactly one per-agent dense
