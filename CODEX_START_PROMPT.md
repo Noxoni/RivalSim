@@ -1,30 +1,38 @@
-# RivalSim Completed Boundary — v0.5 / Rival 2.0
+# Active Codex Handoff — Rival 2.0 Campaign 01
 
-RivalSim v0.5 is **COMPLETE / PASS_GREEN**.
+RivalSim v0.5 is complete with `PASS_GREEN`. This handoff authorizes a bounded **Rival 2.0 first real training campaign** on top of the frozen v0.5 implementation.
 
-The completed milestone provides the bounded Rival 2.0 GPU-native training stack on top of the
-frozen v0.4 standard-Soccar 1v1 transition engine:
+Start from current `origin/main`. Required starting release:
 
-- zero-copy Warp/PyTorch CUDA state views;
-- frozen `RIVAL2_OBS_V1`, hybrid native-action, reward, and episode contracts;
-- exact four-tick/30-Hz control cadence;
-- GPU-resident rewards, resets, rollout storage, GAE, and PPO;
-- exact checkpoint/resume and deterministic evaluation;
-- current-policy self-play and bounded GPU historical opponents;
-- fixed-seed learning sanity and practical world-count performance evidence;
-- all inherited v0.4/v0.3/v0.2.2/v0.1 regressions green.
+`cc3aa34e0bac4531c2750e0d05e2b4980621c642`
 
-Read the completed result package before proposing further work:
+v0.5 implementation commit:
 
-- `VERSION.md`;
-- `docs/V0_5_RESULTS.md`;
-- `docs/REPRODUCING_V0_5.md`;
+`676ef6bd3ca48376d706a2dbccbdec26fce3e4fb`
+
+All v0.1-v0.5 published evidence and all four Rival 2.0 contract identities are frozen. Do not change the observation, action, reward, episode, model, PPO, or simulator contracts for this campaign.
+
+Read in full before starting:
+
+- `handoff/rival2-c01/README.md`;
+- `handoff/rival2-c01/CAMPAIGN.md`;
+- `handoff/rival2-c01/ACCEPTANCE.md`;
 - `docs/RIVAL2_TRAINING_CONTRACT.md`;
+- `docs/V0_5_RESULTS.md`;
 - `results/v0.5/manifest.json`.
 
-The controlling implementation handoff remains archived under `handoff/v0.5/`. Published
-`results/v0.1/` through `results/v0.4/` are frozen and byte-for-byte unchanged.
+Mission:
 
-There is no active next milestone authorization. Do not begin v0.6 deployment, CPU RocketSim or
-RLBot integration, Rocket League transfer evaluation, curricula, legacy Rival/Wisp compatibility,
-or broader simulator work without a new explicit controlling handoff.
+1. create a fresh Rival 2.0 initialization using the frozen v0.5 model and default PPO settings;
+2. run a capacity preflight for the standard 32-decision rollout horizon, preferring 131,072 worlds and falling back only if VRAM/stability requires it;
+3. train from scratch to a bounded target of **100,000,000 agent decision samples**;
+4. preserve checkpoints and fixed-seed evaluation snapshots when cumulative samples first cross 10M, 25M, 50M, and 100M, plus the initialization checkpoint;
+5. evaluate every checkpoint under the exact same held-out campaign protocol and report whether recognizable non-random behavior emerges;
+6. preserve the final checkpoint and enough checkpoint state to resume the campaign exactly;
+7. publish Campaign 01 metrics/evidence and stop.
+
+Use the frozen default PPO configuration from `docs/RIVAL2_TRAINING_CONTRACT.md`, including entropy coefficient `0.01`, gamma `0.995`, GAE lambda `0.95`, clip `0.20`, value coefficient `0.50`, max gradient norm `0.50`, Adam `3e-4`, two epochs, horizon `32`, and CUDA minibatches initially targeted at 65,536.
+
+Do not tune the reward, add a curriculum, add action masks, change the model, change observation fields, change episode semantics, or run hyperparameter searches in Campaign 01. The point is to observe what the frozen v0.5 system learns as-is.
+
+Do not begin v0.6 RocketSim/RLBot transfer work. Do not implement rendering or legacy Rival compatibility. Complete the campaign, publish what happened even if gameplay remains poor, and stop at the Campaign 01 boundary.
