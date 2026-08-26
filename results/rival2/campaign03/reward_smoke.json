@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T02:16:57.622006+00:00",
+  "gate": "Campaign 03 targeted GPU reward-sign/reset-leakage smoke",
+  "reward_version": "RIVAL2_REWARD_V2",
+  "reward_v2_contract_hash": "54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32",
+  "device": "cuda:0",
+  "approach_scale": 4096.0,
+  "synthetic_approach": [
+    [
+      0.244140625,
+      0.244140625
+    ],
+    [
+      -0.244140625,
+      -0.244140625
+    ],
+    [
+      0.0,
+      0.0
+    ]
+  ],
+  "reset_case": {
+    "pre_reset_expected": [
+      [
+        8.821487426757812e-06,
+        8.821487426757812e-06
+      ]
+    ],
+    "integrated_reward_minus_v1": [
+      [
+        8.821487426757812e-06,
+        8.821487426757812e-06
+      ]
+    ],
+    "post_reset_contaminated_delta": [
+      [
+        0.0,
+        0.0
+      ]
+    ]
+  },
+  "checks": {
+    "decreasing_distance_positive": true,
+    "increasing_distance_negative": true,
+    "unchanged_distance_zero": true,
+    "reset_transition_triggered": true,
+    "reset_case_has_no_v1_event_terms": true,
+    "integrated_reward_uses_pre_reset_delta": true,
+    "post_reset_motion_would_change_delta": true,
+    "tensors_finite": true,
+    "tensors_device_resident": true
+  },
+  "verdict": "PASS_GREEN"
+}

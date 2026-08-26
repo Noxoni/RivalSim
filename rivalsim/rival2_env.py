@@ -19,6 +19,7 @@ from rivalsim.kernels.rival2 import (
 from rivalsim.rival2_contracts import (
     AIR_TIME_SCALE,
     ANGULAR_SPEED_SCALE,
+    APPROACH_DISTANCE_SCALE,
     BALL_LINEAR_SPEED_SCALE,
     BOOST_SCALE,
     BOOSTING_TIME_SCALE,
@@ -29,13 +30,19 @@ from rivalsim.rival2_contracts import (
     JUMP_TIME_SCALE,
     NO_TOUCH_AGE_SCALE_TICKS,
     OBS_DIM,
+    OBS_FIELD_NAMES,
     ORANGE_PAD_REMAP,
     POSITION_SCALE,
+    RIVAL2_REWARD_V2_VERSION,
+    RIVAL2_REWARD_VERSION,
     STICKY_TICK_SCALE,
     SUPERSONIC_TIME_SCALE,
     TIME_SINCE_BOOSTED_SCALE,
+    contract_hashes_for_reward,
 )
 from rivalsim.static_world import CompleteWorldSim
+
+_RELATIVE_BALL_POSITION_START = OBS_FIELD_NAMES.index("relative.ball_position.x")
 
 
 class Rival2EpisodeState:
@@ -531,6 +538,32 @@ class Rival2TensorBridge:
             raise RuntimeError(f"observation schema mismatch: {result.shape}")
         return result
 
+    def approach_reward(
+        self,
+        decision_observation: torch.Tensor,
+        transition_observation: torch.Tensor,
+    ) -> torch.Tensor:
+        """Compute Reward V2's per-agent true-distance delta entirely on device."""
+
+        if decision_observation.shape != transition_observation.shape:
+            raise ValueError("approach observations must have identical shapes")
+        if decision_observation.shape[-1] != OBS_DIM:
+            raise ValueError("approach observations must use RIVAL2_OBS_V1")
+        if (
+            decision_observation.device != self.device
+            or transition_observation.device != self.device
+        ):
+            raise ValueError("approach observations must remain on the RivalSim CUDA device")
+        relative_slice = slice(
+            _RELATIVE_BALL_POSITION_START,
+            _RELATIVE_BALL_POSITION_START + 3,
+        )
+        before_relative = decision_observation[..., relative_slice] * self.position_scale
+        after_relative = transition_observation[..., relative_slice] * self.position_scale
+        distance_before = torch.linalg.vector_norm(before_relative, dim=-1)
+        distance_after = torch.linalg.vector_norm(after_relative, dim=-1)
+        return (distance_before - distance_after) / APPROACH_DISTANCE_SCALE
+
 
 class Rival2Env:
     """30 Hz Rival 2.0 environment with no host data path."""
@@ -542,8 +575,11 @@ class Rival2Env:
         *,
         device: str = "cuda:0",
         seed: int = 0,
+        reward_version: str = RIVAL2_REWARD_VERSION,
         **world_kwargs: Any,
     ):
+        self.reward_version = reward_version
+        self.contract_hashes = contract_hashes_for_reward(reward_version)
         self.world = Rival2WorldSim(
             num_envs,
             collision_root,
@@ -573,6 +609,7 @@ class Rival2Env:
         self._activate_torch_stream()
         if markers is not None:
             markers[0].record()
+        decision_observation = self.observation
         self.world.begin_decision()
         emitted = self.bridge.set_actions(action)
         self.world.step(PHYSICS_TICKS_PER_DECISION)
@@ -580,6 +617,10 @@ class Rival2Env:
             markers[1].record()
         transition_observation = self.bridge.observation().clone()
         reward = self.bridge.views["rival2.reward"].reshape(self.num_envs, 2).clone()
+        if self.reward_version == RIVAL2_REWARD_V2_VERSION:
+            reward.add_(
+                self.bridge.approach_reward(decision_observation, transition_observation)
+            )
         terminated = self.bridge.views["rival2.terminated"].to(torch.bool).clone()
         truncated = self.bridge.views["rival2.truncated"].to(torch.bool).clone()
         reset_mask = self.bridge.views["rival2.reset_mask"].to(torch.bool).clone()

@@ -2,9 +2,9 @@
 
 **Current completed milestone:** v0.5.0 — Rival 2.0 GPU-native training: `PASS_GREEN`
 
-**Latest completed execution:** Rival 2.0 Campaign 02 — `COMPLETE` / `IMPROVED`
+**Latest completed execution:** Rival 2.0 Campaign 03 — `COMPLETE`
 
-**Active authorized work:** Rival 2.0 Campaign 03 — direct reward-density training
+**Active authorized work:** none
 
 ## Stable training baseline
 
@@ -29,9 +29,9 @@ Completed Campaign 02 commit:
 
 `816c66b455d253b0f563bb378e53316a09ffd48e`
 
-## Authorized Campaign 03
+## Completed Campaign 03
 
-Campaign 03 addresses reward density while keeping the stable Campaign 02 optimizer baseline.
+Campaign 03 addressed reward density while keeping the stable Campaign 02 optimizer baseline.
 
 Preserve the frozen `RIVAL2_REWARD_V1` authority. Campaign 03 introduces `RIVAL2_REWARD_V2` for this training line by adding one per-agent potential-difference term once per 30-Hz decision:
 
@@ -39,13 +39,21 @@ Preserve the frozen `RIVAL2_REWARD_V1` authority. Campaign 03 introduces `RIVAL2
 
 where distance is true 3D Euclidean car-center to ball-center distance in unreal units, measured before the four physics ticks and at the final pre-reset transition state. Each agent receives its own term; the approach shaping is intentionally not forced to zero-sum.
 
-No capacity preflight, initialization-control evaluation, inherited parity suite, world-count sweep, or repeated checkpoint evaluation is authorized. After a tiny GPU reward-sign/reset-leakage smoke, training starts immediately at the known-good 131,072-world / horizon-32 configuration.
+The targeted GPU reward-sign/reset-leakage smoke passed, and training began immediately at the
+known-good 131,072-world / horizon-32 configuration. No capacity preflight,
+initialization-control evaluation, inherited parity suite, world-count sweep, or intermediate
+checkpoint evaluation was run.
 
-Train from scratch through the first completed update crossing 100,000,000 agent decision samples. Save resumable checkpoints at the first updates crossing 25M, 50M, and 100M. Run one 4,096-world ordinary stochastic self-play evaluation only after the final checkpoint, using evaluation seed `920260826`, and compare with Campaign 02 final metrics.
+The run trained from scratch to update 12 / 100,663,296 agent decision samples. It saved the
+required first-crossing 25M/50M/100M checkpoints, then ran exactly one 4,096-world ordinary
+stochastic self-play evaluation using seed `920260826`. Touches/minute rose from `0.291182` to
+`1.308672`, goals/minute rose from `0.040362` to `0.243800`, and no-touch truncation fell from
+`0.989746` to `0.936279`.
 
-Controlling specification:
+Completed evidence:
 
-- `handoff/rival2-c03/README.md`;
-- root `CODEX_START_PROMPT.md`.
+- `docs/RIVAL2_CAMPAIGN03_RESULTS.md`;
+- `results/rival2/campaign03/`;
+- `checkpoints/rival2/campaign03/rival2_campaign03_100m_resume.pt`.
 
-Do not add curricula, another reward term, another PPO/model change, action masks, legacy Rival compatibility, or v0.6 RocketSim/RLBot transfer work during Campaign 03.
+Campaign 03 is closed. Do not continue it or begin v0.6 without a new explicit handoff.

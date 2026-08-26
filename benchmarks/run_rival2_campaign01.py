@@ -27,6 +27,7 @@ from rivalsim.rival2_contracts import (
     BUTTON_ACTION_NAMES,
     CONTRACT_HASHES,
     OBS_DIM,
+    RIVAL2_REWARD_VERSION,
 )
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_policy import (
@@ -579,6 +580,7 @@ def _evaluate_mode(
     geometry: ArenaGeometry,
     meshes: WarpArenaMeshes,
     device: str,
+    reward_version: str = RIVAL2_REWARD_VERSION,
 ) -> dict[str, Any]:
     mode_ordinal = EVALUATION_MODES.index(mode)
     kickoff_selector = (
@@ -589,6 +591,7 @@ def _evaluate_mode(
         collision_dir,
         device=device,
         seed=EVALUATION_SEED + mode_ordinal,
+        reward_version=reward_version,
         geometry=geometry,
         meshes=meshes,
         kickoff_selector=kickoff_selector,

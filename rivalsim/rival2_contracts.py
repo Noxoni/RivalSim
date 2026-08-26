@@ -9,6 +9,7 @@ from typing import Final
 RIVAL2_OBS_VERSION: Final = "RIVAL2_OBS_V1"
 RIVAL2_ACTION_VERSION: Final = "RIVAL2_ACTION_V1"
 RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
+RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 
 ANALOG_ACTION_NAMES: Final = ("throttle", "steer", "pitch", "yaw", "roll")
@@ -70,6 +71,7 @@ STICKY_TICK_SCALE: Final = 3.0
 EPISODE_AGE_SCALE_TICKS: Final = 45 * 120
 NO_TOUCH_AGE_SCALE_TICKS: Final = 15 * 120
 PROGRESS_Y_SCALE: Final = 5120.0
+APPROACH_DISTANCE_SCALE: Final = 4096.0
 
 _CAR_FIELDS = (
     "position.x",
@@ -220,6 +222,25 @@ REWARD_CONTRACT: Final = {
     "other_shaping": [],
 }
 
+REWARD_V2_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_V2_VERSION,
+    "base_reward_version": RIVAL2_REWARD_VERSION,
+    "cadence_hz": 30,
+    "zero_sum": False,
+    "base_reward": REWARD_CONTRACT,
+    "approach": {
+        "coefficient": 1.0,
+        "distance_scale": APPROACH_DISTANCE_SCALE,
+        "distance": "true 3D Euclidean car-center to ball-center distance in unreal units",
+        "before": "start of four-tick decision interval",
+        "after": "final pre-reset transition state after four physics ticks",
+        "composition": "(distance_before - distance_after) / distance_scale per agent",
+        "reset_motion_excluded": True,
+        "zero_sum": False,
+    },
+    "other_changes_from_v1": [],
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -232,6 +253,7 @@ EPISODE_CONTRACT: Final = {
 OBSERVATION_SCHEMA_HASH: Final = _canonical_hash(OBSERVATION_SCHEMA)
 ACTION_CONTRACT_HASH: Final = _canonical_hash(ACTION_CONTRACT)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
+REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 
 CONTRACT_HASHES: Final = {
@@ -242,11 +264,27 @@ CONTRACT_HASHES: Final = {
 }
 
 
+def contract_hashes_for_reward(reward_version: str) -> dict[str, str]:
+    """Return the frozen contract identity for one explicitly selected reward."""
+
+    if reward_version == RIVAL2_REWARD_VERSION:
+        return dict(CONTRACT_HASHES)
+    if reward_version == RIVAL2_REWARD_V2_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_V2_VERSION: REWARD_V2_CONTRACT_HASH,
+            RIVAL2_EPISODE_VERSION: EPISODE_CONTRACT_HASH,
+        }
+    raise ValueError(f"unsupported Rival 2.0 reward version: {reward_version}")
+
+
 __all__ = [
     "ACTION_CONTRACT",
     "ACTION_CONTRACT_HASH",
     "ACTION_NAMES",
     "ANALOG_ACTION_NAMES",
+    "APPROACH_DISTANCE_SCALE",
     "BUTTON_ACTION_NAMES",
     "CONTRACT_HASHES",
     "EPISODE_CONTRACT",
@@ -258,4 +296,8 @@ __all__ = [
     "ORANGE_PAD_REMAP",
     "REWARD_CONTRACT",
     "REWARD_CONTRACT_HASH",
+    "REWARD_V2_CONTRACT",
+    "REWARD_V2_CONTRACT_HASH",
+    "RIVAL2_REWARD_V2_VERSION",
+    "contract_hashes_for_reward",
 ]

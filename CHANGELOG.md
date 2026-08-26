@@ -1,5 +1,26 @@
 # Changelog
 
+## Rival 2.0 Campaign 03 — direct Reward V2 training (2026-08-25)
+
+- Preserved `RIVAL2_REWARD_V1` and added `RIVAL2_REWARD_V2` with exactly one per-agent dense
+  approach term: true 3D car-ball distance decrease over the final pre-reset four-tick transition,
+  divided by 4096. The active Reward V2 contract hash is
+  `54CD5AC582133D9BA77CF7DF7976C549B3E659920BA407C9ACCE8A9FD5F50B32`.
+- Passed the sole authorized targeted CUDA smoke for positive closing reward, negative opening
+  reward, zero unchanged reward, reset-leakage exclusion, finite tensors, and device residence.
+- Immediately trained from scratch with the unchanged Campaign 02 entropy-off PPO/model/self-play
+  baseline at 131,072 worlds / horizon 32. Stopped at update 12 / 100,663,296 samples, the first
+  completed update crossing 100M; all 12 update-integrity records passed.
+- Saved resumable checkpoints at the first 25M/50M/100M crossings. Published the final
+  21,126,388-byte checkpoint with SHA-256
+  `A0F2E554448B31A373BD73254125AC0ADFDB541EE3B695AD9D040B2CCFA68991` and passed exact reload.
+- Ran exactly one final 4,096-world stochastic self-play evaluation at seed `920260826`.
+  Touches/minute increased `0.291182 -> 1.308672`, goals/minute increased
+  `0.040362 -> 0.243800`, and no-touch truncation decreased `0.989746 -> 0.936279` versus
+  Campaign 02 final.
+- Did not run the old preflight/regression/evaluation ceremony, add a curriculum or another
+  reward/PPO/model change, continue beyond the bounded stop, or begin v0.6.
+
 ## Rival 2.0 Campaign 02 — controlled entropy-off rerun (2026-08-25)
 
 - Reproduced Campaign 01's seed-`20260826` initialization model SHA-256 and every substantive

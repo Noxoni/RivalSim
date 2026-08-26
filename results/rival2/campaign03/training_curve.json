@@ -1,0 +1,1295 @@
+[
+  {
+    "iteration": 1,
+    "policy_version": 1,
+    "agent_decision_samples": 8388608,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.204104700009339,
+    "agent_decisions_per_second": 1995337.5566458576,
+    "torch_peak_allocated_bytes": 17862445568,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.02222328633069992,
+        "value_loss": 0.00015878764679655433,
+        "entropy": 9.157342910766602,
+        "total_loss": -0.02214389108121395,
+        "approx_kl": 0.018967457115650177,
+        "clip_fraction": 0.25845909118652344,
+        "gradient_norm": 0.49306660890579224,
+        "post_clip_gradient_norm": 0.4358689785003662,
+        "old_value_mean": -0.0011990044731646776
+      },
+      "observed_opponent_versions": [
+        0
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.022143892507301643,
+      "reported_total_loss": -0.02214389108121395,
+      "loss_identity_absolute_error": 1.4260876923799515e-09,
+      "approximate_kl": 0.018967457115650177,
+      "clip_fraction": 0.25845909118652344,
+      "gradient_norm": 0.49306660890579224,
+      "post_clip_gradient_norm": 0.4358689785003662
+    }
+  },
+  {
+    "iteration": 2,
+    "policy_version": 2,
+    "agent_decision_samples": 16777216,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.824194799992256,
+    "agent_decisions_per_second": 2193561.8970082244,
+    "torch_peak_allocated_bytes": 17862445568,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.004865758586674929,
+        "value_loss": 0.00042336780461482704,
+        "entropy": 9.118315696716309,
+        "total_loss": -0.004654074553400278,
+        "approx_kl": 0.012430593371391296,
+        "clip_fraction": 0.1629834771156311,
+        "gradient_norm": 0.12185264378786087,
+        "post_clip_gradient_norm": 0.12185264378786087,
+        "old_value_mean": 0.03058953583240509
+      },
+      "observed_opponent_versions": [
+        1
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.004654074684367515,
+      "reported_total_loss": -0.004654074553400278,
+      "loss_identity_absolute_error": 1.3096723705530167e-10,
+      "approximate_kl": 0.012430593371391296,
+      "clip_fraction": 0.1629834771156311,
+      "gradient_norm": 0.12185264378786087,
+      "post_clip_gradient_norm": 0.12185264378786087
+    }
+  },
+  {
+    "iteration": 3,
+    "policy_version": 3,
+    "agent_decision_samples": 25165824,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.8326904999557883,
+    "agent_decisions_per_second": 2188699.557164025,
+    "torch_peak_allocated_bytes": 17864951296,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.005233097821474075,
+        "value_loss": 0.0003822394064627588,
+        "entropy": 9.195600509643555,
+        "total_loss": -0.005041978321969509,
+        "approx_kl": 0.008509272709488869,
+        "clip_fraction": 0.09059488773345947,
+        "gradient_norm": 0.08571234345436096,
+        "post_clip_gradient_norm": 0.08571234345436096,
+        "old_value_mean": -0.011063056997954845
+      },
+      "observed_opponent_versions": [
+        2
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.005041978118242696,
+      "reported_total_loss": -0.005041978321969509,
+      "loss_identity_absolute_error": 2.0372681319713593e-10,
+      "approximate_kl": 0.008509272709488869,
+      "clip_fraction": 0.09059488773345947,
+      "gradient_norm": 0.08571234345436096,
+      "post_clip_gradient_norm": 0.08571234345436096
+    }
+  },
+  {
+    "iteration": 4,
+    "policy_version": 4,
+    "agent_decision_samples": 33554432,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.8748135999776423,
+    "agent_decisions_per_second": 2164906.203500577,
+    "torch_peak_allocated_bytes": 17867457024,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.004838255234062672,
+        "value_loss": 0.0005595493130385876,
+        "entropy": 9.240683555603027,
+        "total_loss": -0.004558480344712734,
+        "approx_kl": 0.011042362079024315,
+        "clip_fraction": 0.12203264236450195,
+        "gradient_norm": 0.07890433073043823,
+        "post_clip_gradient_norm": 0.07890433818101883,
+        "old_value_mean": -0.07653534412384033
+      },
+      "observed_opponent_versions": [
+        3
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.004558480577543378,
+      "reported_total_loss": -0.004558480344712734,
+      "loss_identity_absolute_error": 2.3283064365386963e-10,
+      "approximate_kl": 0.011042362079024315,
+      "clip_fraction": 0.12203264236450195,
+      "gradient_norm": 0.07890433073043823,
+      "post_clip_gradient_norm": 0.07890433818101883
+    }
+  },
+  {
+    "iteration": 5,
+    "policy_version": 5,
+    "agent_decision_samples": 41943040,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.8621689999708906,
+    "agent_decisions_per_second": 2171994.027206791,
+    "torch_peak_allocated_bytes": 17867457024,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.004427655600011349,
+        "value_loss": 0.00039629254024475813,
+        "entropy": 9.221050262451172,
+        "total_loss": -0.004229509271681309,
+        "approx_kl": 0.010104672983288765,
+        "clip_fraction": 0.10951954126358032,
+        "gradient_norm": 0.08116773515939713,
+        "post_clip_gradient_norm": 0.08116773515939713,
+        "old_value_mean": -0.11510499566793442
+      },
+      "observed_opponent_versions": [
+        4
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        }
+      ],
+      "trainable_samples": 8388608,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": -0.00422950932988897,
+      "reported_total_loss": -0.004229509271681309,
+      "loss_identity_absolute_error": 5.820766091346741e-11,
+      "approximate_kl": 0.010104672983288765,
+      "clip_fraction": 0.10951954126358032,
+      "gradient_norm": 0.08116773515939713,
+      "post_clip_gradient_norm": 0.08116773515939713
+    }
+  },
+  {
+    "iteration": 6,
+    "policy_version": 6,
+    "agent_decision_samples": 50331648,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 3.903026200016029,
+    "agent_decisions_per_second": 2149257.414660847,
+    "torch_peak_allocated_bytes": 17867457024,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0008933782810345292,
+        "value_loss": 0.006541321519762278,
+        "entropy": 9.175212860107422,
+        "total_loss": 0.0023772823624312878,
+        "approx_kl": 0.008372526615858078,
+        "clip_fraction": 0.08849403262138367,
+        "gradient_norm": 0.06805288791656494,
+        "post_clip_gradient_norm": 0.06805288791656494,
+        "old_value_mean": -0.12713636457920074
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        5
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        }
+      ],
+      "trainable_samples": 8388450,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0023772824788466096,
+      "reported_total_loss": 0.0023772823624312878,
+      "loss_identity_absolute_error": 1.1641532182693481e-10,
+      "approximate_kl": 0.008372526615858078,
+      "clip_fraction": 0.08849403262138367,
+      "gradient_norm": 0.06805288791656494,
+      "post_clip_gradient_norm": 0.06805288791656494
+    }
+  },
+  {
+    "iteration": 7,
+    "policy_version": 7,
+    "agent_decision_samples": 58720256,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.0262913999613374,
+    "agent_decisions_per_second": 2083457.7447823454,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0005400876398198307,
+        "value_loss": 0.009888063184916973,
+        "entropy": 9.152181625366211,
+        "total_loss": 0.004403944127261639,
+        "approx_kl": 0.008250325918197632,
+        "clip_fraction": 0.09366045892238617,
+        "gradient_norm": 0.07221430540084839,
+        "post_clip_gradient_norm": 0.07221430540084839,
+        "old_value_mean": -0.13526414334774017
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8387785,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.004403943952638656,
+      "reported_total_loss": 0.004403944127261639,
+      "loss_identity_absolute_error": 1.7462298274040222e-10,
+      "approximate_kl": 0.008250325918197632,
+      "clip_fraction": 0.09366045892238617,
+      "gradient_norm": 0.07221430540084839,
+      "post_clip_gradient_norm": 0.07221430540084839
+    }
+  },
+  {
+    "iteration": 8,
+    "policy_version": 8,
+    "agent_decision_samples": 67108864,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.1456544999964535,
+    "agent_decisions_per_second": 2023470.1179288279,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0005574874812737107,
+        "value_loss": 0.008418140932917595,
+        "entropy": 9.141709327697754,
+        "total_loss": 0.003651583334431052,
+        "approx_kl": 0.007212978787720203,
+        "clip_fraction": 0.0818307176232338,
+        "gradient_norm": 0.06867294013500214,
+        "post_clip_gradient_norm": 0.06867294013500214,
+        "old_value_mean": -0.14043454825878143
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        7
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8387307,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0036515829851850867,
+      "reported_total_loss": 0.003651583334431052,
+      "loss_identity_absolute_error": 3.4924596548080444e-10,
+      "approximate_kl": 0.007212978787720203,
+      "clip_fraction": 0.0818307176232338,
+      "gradient_norm": 0.06867294013500214,
+      "post_clip_gradient_norm": 0.06867294013500214
+    }
+  },
+  {
+    "iteration": 9,
+    "policy_version": 9,
+    "agent_decision_samples": 75497472,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.137915499974042,
+    "agent_decisions_per_second": 2027254.5439974845,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0005906806909479201,
+        "value_loss": 0.010361027903854847,
+        "entropy": 9.150903701782227,
+        "total_loss": 0.004589833319187164,
+        "approx_kl": 0.008160712197422981,
+        "clip_fraction": 0.09970227628946304,
+        "gradient_norm": 0.0753222107887268,
+        "post_clip_gradient_norm": 0.0753222107887268,
+        "old_value_mean": -0.1539449691772461
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        8
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8386653,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.004589833260979503,
+      "reported_total_loss": 0.004589833319187164,
+      "loss_identity_absolute_error": 5.820766091346741e-11,
+      "approximate_kl": 0.008160712197422981,
+      "clip_fraction": 0.09970227628946304,
+      "gradient_norm": 0.0753222107887268,
+      "post_clip_gradient_norm": 0.0753222107887268
+    }
+  },
+  {
+    "iteration": 10,
+    "policy_version": 10,
+    "agent_decision_samples": 83886080,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.13103049993515,
+    "agent_decisions_per_second": 2030633.2766440932,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0004523600800894201,
+        "value_loss": 0.01309054996818304,
+        "entropy": 9.139450073242188,
+        "total_loss": 0.006092914380133152,
+        "approx_kl": 0.008217236027121544,
+        "clip_fraction": 0.1004880890250206,
+        "gradient_norm": 0.07650946080684662,
+        "post_clip_gradient_norm": 0.07650946080684662,
+        "old_value_mean": -0.15021924674510956
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        9
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8385538,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.0060929149040021,
+      "reported_total_loss": 0.006092914380133152,
+      "loss_identity_absolute_error": 5.238689482212067e-10,
+      "approximate_kl": 0.008217236027121544,
+      "clip_fraction": 0.1004880890250206,
+      "gradient_norm": 0.07650946080684662,
+      "post_clip_gradient_norm": 0.07650946080684662
+    }
+  },
+  {
+    "iteration": 11,
+    "policy_version": 11,
+    "agent_decision_samples": 92274688,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.180451399995945,
+    "agent_decisions_per_second": 2006627.3225920377,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -0.0001976658240891993,
+        "value_loss": 0.016296325251460075,
+        "entropy": 9.15841007232666,
+        "total_loss": 0.0079504968598485,
+        "approx_kl": 0.007653260603547096,
+        "clip_fraction": 0.09048369526863098,
+        "gradient_norm": 0.07823638617992401,
+        "post_clip_gradient_norm": 0.07823638617992401,
+        "old_value_mean": -0.16512547433376312
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        10
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8384005,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.007950496801640838,
+      "reported_total_loss": 0.0079504968598485,
+      "loss_identity_absolute_error": 5.820766091346741e-11,
+      "approximate_kl": 0.007653260603547096,
+      "clip_fraction": 0.09048369526863098,
+      "gradient_norm": 0.07823638617992401,
+      "post_clip_gradient_norm": 0.07823638617992401
+    }
+  },
+  {
+    "iteration": 12,
+    "policy_version": 12,
+    "agent_decision_samples": 100663296,
+    "iteration_agent_decision_samples": 8388608,
+    "wall_seconds": 4.20539449993521,
+    "agent_decisions_per_second": 1994725.5840395566,
+    "torch_peak_allocated_bytes": 17869962752,
+    "integrity": {
+      "verdict": "PASS_GREEN",
+      "checks": {
+        "finite_rollout_fields": true,
+        "finite_metrics": true,
+        "analog_bounds": true,
+        "buttons_exact_binary": true,
+        "termination_team_consistent": true,
+        "truncation_team_consistent": true,
+        "termination_and_truncation_exclusive": true,
+        "post_reset_observation_finite": true,
+        "policy_version_increment_exact": true,
+        "iteration_matches_policy_version": true,
+        "sample_increment_exact": true,
+        "behavior_policy_version_exact": true,
+        "opponent_versions_eligible": true,
+        "blue_always_trainable": true,
+        "historical_frozen_gradient_free": true,
+        "historical_parameters_finite": true,
+        "parameters_finite": true,
+        "gradients_finite": true,
+        "optimizer_finite": true,
+        "reward_v2_active": true,
+        "reward_v2_contract_exact": true,
+        "entropy_coefficient_exact_zero": true,
+        "total_loss_excludes_entropy": true,
+        "zero_hot_h2d": true,
+        "zero_hot_d2h": true
+      },
+      "finite_fields": {
+        "observations": true,
+        "actions": true,
+        "pre_tanh": true,
+        "old_log_probability": true,
+        "values": true,
+        "rewards": true,
+        "next_values": true,
+        "advantages": true,
+        "returns": true
+      },
+      "metrics": {
+        "policy_loss": -9.67953383224085e-05,
+        "value_loss": 0.019423484802246094,
+        "entropy": 9.129940032958984,
+        "total_loss": 0.009614946320652962,
+        "approx_kl": 0.0076998090371489525,
+        "clip_fraction": 0.0929042398929596,
+        "gradient_norm": 0.08383607864379883,
+        "post_clip_gradient_norm": 0.08383607864379883,
+        "old_value_mean": -0.14695745706558228
+      },
+      "observed_opponent_versions": [
+        0,
+        2,
+        3,
+        6,
+        11
+      ],
+      "historical_policies": [
+        {
+          "version": 0,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "890F224879DB6E458472985B226A664D8AE49B8303C21CFB0FD83A485CF42848"
+        },
+        {
+          "version": 2,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "CD1669DCE3108B5DB4EF1C7E49A4C0005506B4ED6C828F2B89D9B0FC590575D2"
+        },
+        {
+          "version": 3,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "376D163C0250C8FA958FC909F01C456FADC442EB75083C9D1CA3439BB171ABB6"
+        },
+        {
+          "version": 6,
+          "requires_grad": false,
+          "has_gradient": false,
+          "parameters_finite": true,
+          "state_sha256": "1AA6F129A914F96290D7E7D86A8DDEC25F839D99DA2B98595ACD937776728F91"
+        }
+      ],
+      "trainable_samples": 8382215,
+      "total_samples": 8388608,
+      "sample_age_policy_versions": 0,
+      "hot_path_transfer_bytes": {
+        "h2d": 0,
+        "d2h": 0
+      }
+    },
+    "ppo_stability": {
+      "entropy_coefficient": 0.0,
+      "entropy_optimization_contribution": 0.0,
+      "loss_without_entropy": 0.009614947062800638,
+      "reported_total_loss": 0.009614946320652962,
+      "loss_identity_absolute_error": 7.421476766467094e-10,
+      "approximate_kl": 0.0076998090371489525,
+      "clip_fraction": 0.0929042398929596,
+      "gradient_norm": 0.08383607864379883,
+      "post_clip_gradient_norm": 0.08383607864379883
+    }
+  }
+]

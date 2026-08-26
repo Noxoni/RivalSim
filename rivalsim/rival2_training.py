@@ -9,7 +9,6 @@ from typing import Any
 
 import torch
 
-from rivalsim.rival2_contracts import CONTRACT_HASHES
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -253,7 +252,8 @@ class Rival2Trainer:
             "policy_config": asdict(self.policy_config),
             "ppo_config": asdict(self.ppo_config),
             "self_play_config": asdict(self.self_play_config),
-            "contract_hashes": dict(CONTRACT_HASHES),
+            "contract_hashes": dict(self.env.contract_hashes),
+            "reward_version": self.env.reward_version,
             "policy_config_hash": self.policy_config.content_hash,
             "ppo_config_hash": self.ppo_config.content_hash,
             "policy_version": self.policy_version,
@@ -274,8 +274,10 @@ class Rival2Trainer:
         payload = torch.load(Path(path), map_location=self.device, weights_only=False)
         if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
             raise ValueError("unsupported Rival 2.0 checkpoint format")
-        if payload["contract_hashes"] != CONTRACT_HASHES:
+        if payload["contract_hashes"] != self.env.contract_hashes:
             raise ValueError("Rival 2.0 checkpoint contract hashes are incompatible")
+        if payload.get("reward_version", self.env.reward_version) != self.env.reward_version:
+            raise ValueError("Rival 2.0 checkpoint reward version is incompatible")
         if payload["policy_config_hash"] != self.policy_config.content_hash:
             raise ValueError("Rival 2.0 checkpoint policy configuration is incompatible")
         if payload["ppo_config_hash"] != self.ppo_config.content_hash:

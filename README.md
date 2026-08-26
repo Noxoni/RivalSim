@@ -11,7 +11,20 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
-## Current boundary — v0.5 / Rival 2.0 complete, `PASS_GREEN`
+## Current boundary — v0.5 / Rival 2.0 Campaign 03 complete
+
+Rival 2.0 Campaign 03 is closed at update 12 / **100,663,296 agent decision samples**. It
+preserved Reward V1 and introduced `RIVAL2_REWARD_V2` with one per-agent 30-Hz true-distance
+approach delta, `(distance_before - distance_after) / 4096.0`, measured from decision start to
+the final pre-reset transition state. The targeted GPU reward sign/reset-leakage smoke passed,
+all 12 training updates stayed green, and the final checkpoint passed exact reload.
+
+The single authorized final 4,096-world stochastic self-play evaluation increased touches per
+simulated minute from Campaign 02's `0.291182` to `1.308672`, increased goals/minute from
+`0.040362` to `0.243800`, and reduced no-touch truncation from `0.989746` to `0.936279`. This is
+bounded training evidence, not external Rocket League competence. Exact results are in
+`docs/RIVAL2_CAMPAIGN03_RESULTS.md` and `results/rival2/campaign03/`; the final full resume
+checkpoint is under `checkpoints/rival2/campaign03/`.
 
 Rival 2.0 Campaign 02 is closed with execution **`COMPLETE`** and the independently classified
 behavioral result **`IMPROVED`**. It reproduced Campaign 01's initialization exactly, changed only
