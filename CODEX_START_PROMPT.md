@@ -1,6 +1,6 @@
-# Active Codex Handoff — Rival 2.0 Behavioral Trajectory Evaluation
+# Active Codex Handoff — Behavioral Evaluation -> Nexto Port -> Full-Match Benchmark
 
-The Rival 2.0 overnight curriculum is complete at commit `fe057b12253d4e416a30c187853b03f2ec8f4d26` with final checkpoint:
+The Rival 2.0 overnight curriculum is complete with final checkpoint:
 
 `checkpoints/rival2/overnight/rival2_overnight_final_6h_resume.pt`
 
@@ -8,10 +8,27 @@ Expected SHA-256:
 
 `4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E`
 
-Start from current `origin/main` and read `handoff/rival2-behavioral-eval/README.md` in full. Treat that file as the controlling requirement.
+Start from the current `origin/main` and read both controlling handoffs in order:
 
-Mission: run one evaluation-only, large held-out stochastic current-policy self-play analysis of the final 45B checkpoint that records what the ball actually does after every accepted touch and where every scored ball enters the goal. Publish touch-trajectory, possession/next-touch, wall/backboard continuation, touch-to-goal, and goal-mouth X/Z placement evidence.
+1. `handoff/rival2-behavioral-eval/README.md`
+2. `handoff/rival2-nexto-port/README.md`
 
-Do not train. Do not change or remove the current ball-progress reward or any other reward based on the result. Do not alter model/PPO/observation/action/episode/self-play behavior. Do not build the viewer and do not begin v0.6. No preflight/regression/parity/pytest/Ruff/compileall ceremony is authorized.
+The user has now explicitly authorized continuation into the Nexto work without returning for another approval.
 
-Implement only the telemetry/evaluator needed for this analysis, run it once, publish the evidence, and stop for review.
+## Phase 1 — finish the existing final-45B behavioral evaluation
+
+If it has not already been completed in the current lineage, implement and run the single authorized behavioral trajectory / goal-placement evaluation exactly as defined by `handoff/rival2-behavioral-eval/README.md`. Publish its evidence.
+
+Do not change Rival's reward or training based on that result.
+
+## Phase 2 — port public Nexto into RivalSim
+
+Follow `handoff/rival2-nexto-port/README.md` exactly. Pin `Rolv-Arild/Necto@2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca`, implement a faithful batched GPU-native Nexto observation/model/action adapter, preserve its 15 Hz neural cadence and exact stock 120 Hz hard-coded kickoff controller, and pass the targeted observation/action/kickoff parity gates.
+
+## Phase 3 — build and run the full-match benchmark
+
+Build the separate 120 Hz full-match RivalSim runtime defined by the handoff. The frozen Rival training episode semantics must remain unchanged. Run the canonical deterministic 10-match side/layout matrix and the secondary batched stochastic-Rival robustness suite against deterministic stock Nexto, publish the complete evidence, and stop.
+
+Do not train Rival against Nexto yet. Do not change rewards, PPO, model architecture, Rival observation/action contracts, simulator physics, or begin v0.6. Do not build the viewer. Avoid unrelated release/lint/regression ceremony; only the targeted adapter fidelity checks required by the handoff are authorized.
+
+When finished, commit and push all implementation/evidence to `origin/main` and return the final commit SHA plus the behavioral-evaluation summary and Rival-vs-Nexto match results.
