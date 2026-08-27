@@ -1,0 +1,37 @@
+{
+  "arena_geometry_sha256": "2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538",
+  "artifacts": {
+    "case_results.jsonl": "77E8AD166DF882136AE731178502E43130456DC90267036222C89184A59B026D",
+    "heldout_summary.json": "CCEC015D52D72934C29984F3606042FD7CBC52223821617D69F4A098937E04EF",
+    "shadow_event_evidence.json": "DDED155F758F838EE1A890FEF5A653892530D7F1601762ACF715A2A6D9BFAC56",
+    "shadow_gate_summary.json": "A137726417FDFAB5E1CF84D143D00489E3CC11E4FBCC2BA1C8256F6CF976CEC8",
+    "source_exact_regression.json": "B2721B6BC1036955B0951A24682BB5BEC71D9A7E8BB179DC6F06484BD8F1DC8A",
+    "thresholds.json": "46F2F34E71B4AA2A21EDC7CBE8974227132F7B0E02DBF8C07C5F61EA90761E3C"
+  },
+  "calibration_seed": 2026082701,
+  "case_count": 648,
+  "cases_per_detector": 72,
+  "checkpoint": {
+    "path": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+    "sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21"
+  },
+  "collision_root": "G:\\dev\\RLBot-Rival\\bot\\collision_meshes",
+  "commands": [
+    ".venv/Scripts/python.exe -m pytest -q tests/test_rival2_mechanics_calibration.py",
+    ".venv/Scripts/python.exe benchmarks/run_rival2_mechanics_calibration.py --collision-root <pinned collision root>"
+  ],
+  "contract_source_sha256": {
+    "rivalsim/rival2_contracts.py": "0E2E784B8C72C8445953B87F41143DDBA254D199ABEE284BF31A08C507987888",
+    "rivalsim/rival2_env.py": "917A6B6246EBC04013AD14D72DBDCFE3F59095CCA80CDE13F9D4B93D2D65097A"
+  },
+  "derivation_per_detector": 48,
+  "elapsed_seconds": 224.91283988952637,
+  "format": "RIVAL2_MECHANICS_CALIBRATION_MANIFEST_V1",
+  "handoff_source_commit": "1da8557f32a94e6a8e96d1acbb0103656e203e27",
+  "heldout_per_detector": 24,
+  "reward_enabled": false,
+  "shadow_episodes": 256,
+  "shadow_seed": 2026082702,
+  "source_head": "b07fece6ebc21d3f752dc7f8213880c4b7f3c0b1",
+  "training_started": false
+}
