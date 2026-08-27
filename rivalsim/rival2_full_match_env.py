@@ -137,6 +137,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.small_pad_pickup_count,
                 state.big_pad_pickup_count,
                 state.save_count,
+                state.strict_double_dash_count,
                 state.boost_gained_amount,
                 state.v1_goal_component,
                 state.v1_progress_component,
@@ -147,6 +148,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.boost_use_component,
                 state.boost_pickup_component,
                 state.save_component,
+                state.strict_double_dash_component,
             ],
             device=self.device,
         )
