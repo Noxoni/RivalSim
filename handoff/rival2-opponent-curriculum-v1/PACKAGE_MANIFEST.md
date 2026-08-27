@@ -55,9 +55,11 @@ SHA-256:
 - upstream commit:
   `58d4ab18fd0c92529b5ae6582ecf1713a6b1887a`
 - policy Git blob:
-  `5bcff2f1df61a55b0133a05f8d40e2c97e51259a`
+  `2262095fbeb41846f0c68934aeefac5c56984f4a`
+  - size: `7,689,613` bytes
 - shared-head Git blob:
-  `0d2e9e57e5774138a6f656e79b87abd65a8e283b`
+  `201917fac35badb7c9846688416b706082a3002a`
+  - size: `5,995,907` bytes
 - implementation must compute and freeze byte SHA-256 identities before
   training.
 
