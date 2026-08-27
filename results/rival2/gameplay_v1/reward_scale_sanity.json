@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-27T12:42:06.861402+00:00",
+  "theoretical": {
+    "goal_event": 10.0,
+    "save_event": 0.75,
+    "v1_ball_progress_max_at_6000_uu_per_s_one_decision": 0.01953125,
+    "v1_touch_event": 0.05,
+    "v1_demo_event": 0.1,
+    "speed_max_per_player_decision": 0.0001,
+    "supersonic_per_player_decision": 0.0002,
+    "boost_use_per_player_decision": 5e-05,
+    "small_pad_positive_gain_event": 0.001,
+    "large_pad_positive_gain_event": 0.005,
+    "speed_max_one_player_45_seconds": 0.135,
+    "supersonic_max_one_player_45_seconds": 0.27,
+    "boost_use_max_one_player_45_seconds": 0.0675
+  },
+  "observed_source_mean_absolute_competitive_component_per_decision": {
+    "v1_progress_component": 0.0015904714178289247,
+    "v1_goal_component": 0.0073054809210869615,
+    "v1_touch_component": 0.0009366936555270743,
+    "v1_demo_component": 4.2597557025930673e-07,
+    "speed_component": 1.4144524723084851e-05,
+    "supersonic_component": 3.331661295080134e-06,
+    "boost_use_component": 6.678058681952076e-06,
+    "boost_pickup_component": 1.1324826736055046e-05,
+    "save_component": 0.0002477979725693036
+  },
+  "observed_source_incidental_mean_absolute_per_decision": 3.5479071436172106e-05,
+  "ordering": "goal > save > normal V1 event shaping > incidental movement/resource unit shaping",
+  "checks": {
+    "goal_greater_than_save": true,
+    "save_greater_than_v1_demo": true,
+    "v1_touch_greater_than_any_incidental_unit": true,
+    "observed_incidental_mean_abs_below_one_v1_touch_per_decision": true,
+    "historical_v1_hash_unchanged": true,
+    "zero_sum_evaluation": true
+  },
+  "verdict": "PASS_GREEN"
+}

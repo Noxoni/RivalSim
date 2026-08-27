@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-27T13:12:30.9803159Z",
+  "verdict": "PASS_GREEN",
+  "implementation_commit": "1507D3FD32F585997F29CD19CBEC2D1869618DA4",
+  "authority": "handoff/rival2-gameplay-v1/README.md",
+  "contracts": {
+    "historical_v1_sha256": "E3C97C7B3EA97D15F6AFB3AF21C40BAFBD206F0ED1124BAD6EA2C5A2ED14786F",
+    "gameplay_v1_sha256": "48AAC000B97D2652507F677184A3FE4F0A3A86CED136B680C933EFF33CD9F072",
+    "historical_v1_unchanged": true,
+    "reward_zero_sum_exact_in_all_evaluations": true,
+    "maximum_per_interval_component_identity_error": 0.0
+  },
+  "source": {
+    "commit": "61307571D86508F3026402C4948F759F310FF36C",
+    "checkpoint": "checkpoints/rival2/acquisition_v1/rival2_acquisition_resume.pt",
+    "expected_sha256": "4FB7A3B134B25D595374E3968E2EDFA150A9CD6F8910B903BF892B59D7F8BC9A",
+    "actual_sha256": "4FB7A3B134B25D595374E3968E2EDFA150A9CD6F8910B903BF892B59D7F8BC9A",
+    "hash_match": true,
+    "transition_gate": "PASS_GREEN"
+  },
+  "targeted_validation": {
+    "pytest": {
+      "passed": 26,
+      "failed": 0,
+      "seconds": 13.30,
+      "scope": [
+        "Gameplay V1 reward and authoritative event semantics",
+        "transactional KL rejection and exact rollback",
+        "pinned campaign runner configuration and arithmetic",
+        "Rival 2.0 observation/action/trainer contracts",
+        "historical acquisition and Scoring V1 reward regressions",
+        "boost-pad cooldown/reset and persistent visitation-order contention"
+      ]
+    },
+    "ruff_targeted": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "training_ledger": {
+    "points": 239,
+    "sequential_offsets": true,
+    "first_iteration": 121,
+    "last_iteration": 359,
+    "all_update_integrity_verdicts": "PASS_GREEN",
+    "additional_agent_decision_samples": 2004877312,
+    "final_cumulative_agent_decision_samples": 3011510272,
+    "kl_guard_rejections": 0,
+    "maximum_completed_update_mean_kl": {
+      "value": 0.027896350249648094,
+      "iteration": 335,
+      "limit": 0.05
+    },
+    "maximum_post_step_minibatch_kl": {
+      "value": 0.0874955952167511,
+      "iteration": 121,
+      "limit": 0.10
+    },
+    "maximum_value_loss": {
+      "value": 0.21721431612968445,
+      "iteration": 298
+    },
+    "maximum_update_mean_raw_gradient_norm": {
+      "value": 3.374753713607788,
+      "iteration": 121
+    },
+    "maximum_update_mean_post_clip_gradient_norm": 0.49999988079071045,
+    "maximum_training_throttle_saturation_fraction": {
+      "value": 0.09345871210098267,
+      "iteration": 356
+    }
+  },
+  "checkpoints": [
+    {
+      "label": "plus_060",
+      "iteration": 180,
+      "samples": 1509949440,
+      "sha256": "939F6C66D72C394DAB2AC640EBC181D1337B163A1D390456F39D7FBF15DB7627",
+      "file_hash_verified": true,
+      "audit": "PASS_GREEN"
+    },
+    {
+      "label": "plus_120",
+      "iteration": 240,
+      "samples": 2013265920,
+      "sha256": "F98D557217477040EEFB63218C3D56D78587044B56E848A6E6DFF939DE691386",
+      "file_hash_verified": true,
+      "audit": "PASS_GREEN"
+    },
+    {
+      "label": "plus_180",
+      "iteration": 300,
+      "samples": 2516582400,
+      "sha256": "FEC1C289E7F7EB8D69876FB75C5325D56063A7A674A46F6FD20C5C270542511B",
+      "file_hash_verified": true,
+      "audit": "PASS_GREEN"
+    },
+    {
+      "label": "plus_239",
+      "iteration": 359,
+      "samples": 3011510272,
+      "sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+      "file_hash_verified": true,
+      "audit": "PASS_GREEN"
+    }
+  ],
+  "final_checkpoint": {
+    "path": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+    "sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+    "repository_copy_matches_manifest": true,
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "finite_model": true,
+    "curriculum_transition_present": true,
+    "historical_policy_versions": [0, 30, 60, 90, 120, 180, 240, 300, 359]
+  },
+  "boundaries": {
+    "five_minute_matches_run": false,
+    "nexto_training_run": false,
+    "collapsed_scoring_checkpoint_used": false,
+    "updates_beyond_plus_239": 0
+  },
+  "runtime_observations": [
+    {
+      "severity": "qualified_nonblocking",
+      "observation": "PyTorch emitted one recoverable CUDA caching-allocator allocation-failure/retry warning while update 326 was running.",
+      "outcome": "Update 326 completed PASS_GREEN; all later updates, the final evaluation, checkpoint load, finite-model audit, and SHA-256 checks passed."
+    },
+    {
+      "severity": "qualified_nonblocking",
+      "observation": "Final update 359 took 65.8642354 wall seconds versus the usual approximately 5-6 seconds.",
+      "outcome": "Its counters, PPO diagnostics, integrity checks, checkpoint audit, and final held-out evaluation all passed."
+    }
+  ]
+}
