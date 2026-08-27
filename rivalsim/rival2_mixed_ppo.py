@@ -311,6 +311,34 @@ def set_policy_learning_rate(optimizer: torch.optim.Optimizer, value: float) -> 
         raise ValueError("mixed PPO policy group is absent")
 
 
+def reset_policy_learning_rate_for_new_update(
+    optimizer: torch.optim.Optimizer,
+    config: Rival2MixedPPOSafetyConfig,
+) -> dict[str, float | bool]:
+    """Re-arm the update-local policy rate without touching parameter-owned Adam state."""
+
+    before = mixed_optimizer_learning_rates(optimizer)
+    if before[CRITIC_GROUP_NAME] != config.critic_learning_rate:
+        raise ValueError("critic-head learning rate differs from the frozen safety setting")
+    if not (
+        config.minimum_policy_learning_rate
+        <= before[POLICY_GROUP_NAME]
+        <= config.initial_policy_learning_rate
+    ):
+        raise ValueError("policy learning rate is outside the authorized adaptive range")
+    set_policy_learning_rate(optimizer, config.initial_policy_learning_rate)
+    after = mixed_optimizer_learning_rates(optimizer)
+    return {
+        "policy_learning_rate_before_reset": before[POLICY_GROUP_NAME],
+        "policy_learning_rate_after_reset": after[POLICY_GROUP_NAME],
+        "policy_learning_rate_reset_applied": (
+            before[POLICY_GROUP_NAME] != after[POLICY_GROUP_NAME]
+        ),
+        "critic_learning_rate_before_reset": before[CRITIC_GROUP_NAME],
+        "critic_learning_rate_after_reset": after[CRITIC_GROUP_NAME],
+    }
+
+
 def retention_observation_sha256(value: torch.Tensor) -> str:
     host = value.detach().cpu().contiguous()
     digest = hashlib.sha256()
@@ -652,15 +680,8 @@ def ppo_update_mixed_curriculum(
         rollout.compute_gae(ppo_config)
     if rollout.opponent_family is None:
         raise ValueError("mixed PPO rollout has no authoritative opponent-family identity")
+    learning_rate_reset = reset_policy_learning_rate_for_new_update(optimizer, safety_config)
     learning_rates = mixed_optimizer_learning_rates(optimizer)
-    if learning_rates[CRITIC_GROUP_NAME] != safety_config.critic_learning_rate:
-        raise ValueError("critic-head learning rate differs from the frozen safety setting")
-    if not (
-        safety_config.minimum_policy_learning_rate
-        <= learning_rates[POLICY_GROUP_NAME]
-        <= safety_config.initial_policy_learning_rate
-    ):
-        raise ValueError("policy learning rate is outside the authorized adaptive range")
     if retention_observations.shape != (safety_config.retention_corpus_size, OBS_DIM):
         raise ValueError("retention observation corpus shape mismatch")
 
@@ -694,6 +715,7 @@ def ppo_update_mixed_curriculum(
     behavior_model = copy.deepcopy(model).eval().requires_grad_(False)
     with torch.no_grad():
         retention_reference, _ = behavior_model(retention_observations)
+    retention_reference_sha256 = retention_observation_sha256(retention_reference)
 
     _policy_parameters, critic_parameters = _split_parameter_lists(model)
     trunk_parameters = list(model.trunk.parameters())
@@ -1104,6 +1126,13 @@ def ppo_update_mixed_curriculum(
         "optimizer_step_proposals": proposal_count,
         "optimizer_step_retries": len(retry_log),
         "policy_learning_rate_backoffs": lr_backoffs,
+        "policy_learning_rate_scope": "ppo_update_local",
+        "policy_learning_rate_before_update_reset": learning_rate_reset[
+            "policy_learning_rate_before_reset"
+        ],
+        "policy_learning_rate_update_start_reset_applied": learning_rate_reset[
+            "policy_learning_rate_reset_applied"
+        ],
         "policy_learning_rate_start": start_policy_lr,
         "policy_learning_rate_end": end_rates[POLICY_GROUP_NAME],
         "critic_learning_rate_start_end": end_rates[CRITIC_GROUP_NAME],
@@ -1115,6 +1144,7 @@ def ppo_update_mixed_curriculum(
         ),
         "completed_update_mean_kl": completed_kl,
         "retention_corpus_mean_kl": float(final_retention_mean.item()),
+        "retention_reference_actor_sha256": retention_reference_sha256,
         "retention_kl_by_action_channel": {
             name: float(final_retention_channel_mean[index].item())
             for index, name in enumerate(ACTION_CHANNEL_NAMES)
@@ -1151,6 +1181,13 @@ def ppo_update_mixed_curriculum(
             ),
             "critic_learning_rate_unchanged": end_rates[CRITIC_GROUP_NAME]
             == safety_config.critic_learning_rate,
+            "policy_learning_rate_starts_at_configured_base": start_policy_lr
+            == safety_config.initial_policy_learning_rate,
+            "update_start_reset_changed_only_policy_group_lr": learning_rate_reset[
+                "critic_learning_rate_before_reset"
+            ]
+            == learning_rate_reset["critic_learning_rate_after_reset"]
+            == safety_config.critic_learning_rate,
             "hard_minibatch_guard_unchanged": kl_guard.minibatch_kl_limit == 0.10,
             "hard_completed_guard_unchanged": (kl_guard.completed_update_mean_kl_limit == 0.05),
             "accepted_steps_within_soft_minibatch_target": all(
@@ -1178,6 +1215,7 @@ __all__ = [
     "migrate_adam_to_mixed_groups",
     "mixed_optimizer_learning_rates",
     "ppo_update_mixed_curriculum",
+    "reset_policy_learning_rate_for_new_update",
     "retention_observation_sha256",
     "set_policy_learning_rate",
 ]

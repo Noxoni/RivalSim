@@ -62,7 +62,7 @@ RETRY_RESULT = RESULTS_DIR / "transactional_retry_proof.json"
 MIGRATION_RESULT = RESULTS_DIR / "optimizer_migration.json"
 MANIFEST = RESULTS_DIR / "artifact_manifest.json"
 REPORT = Path("docs/RIVAL2_MIXED_PPO_SAFE_TRANSITION.md")
-REQUIRED_BASE = "77b1e3df3a9f7226458445a13128e784fd22c268"
+REQUIRED_BASE = "35b71101d317c956de1b045baf3a1b7c2aa200ea"
 DIAGNOSTIC_RETRY_SOFT_TARGET = 0.002
 
 
@@ -178,7 +178,7 @@ def _transactional_retry_proof(
         soft_minibatch_kl_target=DIAGNOSTIC_RETRY_SOFT_TARGET,
         retention_soft_mean_kl_target=1.0,
     )
-    metrics, diagnostics = ppo_update_mixed_curriculum(
+    metrics_a, diagnostics_a = ppo_update_mixed_curriculum(
         model,
         optimizer,
         rollout,
@@ -192,8 +192,34 @@ def _transactional_retry_proof(
         gae_ready=True,
         diagnostic_optimizer_step_limit=1,
     )
-    retry = diagnostics["retry_log"][0] if diagnostics["retry_log"] else None
-    accepted = diagnostics["optimizer_steps"][0] if diagnostics["optimizer_steps"] else None
+    retry = diagnostics_a["retry_log"][0] if diagnostics_a["retry_log"] else None
+    accepted = diagnostics_a["optimizer_steps"][0] if diagnostics_a["optimizer_steps"] else None
+    steps_after_a = {
+        name: int(optimizer.state[parameter]["step"].item())
+        for name, parameter in model.named_parameters()
+    }
+    metrics_b, diagnostics_b = ppo_update_mixed_curriculum(
+        model,
+        optimizer,
+        rollout,
+        trainer.ppo_config,
+        replace(
+            MIXED_PPO_SAFETY,
+            soft_minibatch_kl_target=1.0,
+            retention_soft_mean_kl_target=1.0,
+        ),
+        retention_observations=trainer.retention_observations,
+        family_names=OPPONENT_NAMES,
+        generator=generator,
+        policy_config=trainer.policy_config,
+        kl_guard=KL_GUARD,
+        gae_ready=True,
+        diagnostic_optimizer_step_limit=1,
+    )
+    steps_after_b = {
+        name: int(optimizer.state[parameter]["step"].item())
+        for name, parameter in model.named_parameters()
+    }
     checks = {
         "diagnostic_soft_target_lower_than_production": MIXED_PPO_SAFETY.soft_minibatch_kl_target
         > DIAGNOSTIC_RETRY_SOFT_TARGET,
@@ -218,22 +244,58 @@ def _transactional_retry_proof(
         and accepted["retry_count"] == 1,
         "accepted_step_below_diagnostic_soft_target": accepted is not None
         and accepted["post_step_empirical_kl"] <= DIAGNOSTIC_RETRY_SOFT_TARGET,
-        "diagnostic_limited_to_one_accepted_step": diagnostics["accepted_optimizer_steps"] == 1,
-        "hard_guards_unchanged": diagnostics["checks"]["hard_minibatch_guard_unchanged"]
-        and diagnostics["checks"]["hard_completed_guard_unchanged"],
+        "update_a_limited_to_one_accepted_step": diagnostics_a["accepted_optimizer_steps"] == 1,
+        "update_a_started_at_base_policy_lr": diagnostics_a["policy_learning_rate_start"] == 1.0e-4,
+        "update_a_ended_at_backed_off_policy_lr": diagnostics_a["policy_learning_rate_end"]
+        == 5.0e-5,
+        "update_b_observed_update_a_backoff": diagnostics_b[
+            "policy_learning_rate_before_update_reset"
+        ]
+        == 5.0e-5,
+        "update_b_reset_was_applied": diagnostics_b[
+            "policy_learning_rate_update_start_reset_applied"
+        ]
+        is True,
+        "update_b_started_at_base_policy_lr": diagnostics_b["policy_learning_rate_start"] == 1.0e-4,
+        "update_b_policy_lr_remained_base": diagnostics_b["policy_learning_rate_end"] == 1.0e-4,
+        "critic_lr_unchanged_across_updates": diagnostics_a["critic_learning_rate_start_end"]
+        == diagnostics_b["critic_learning_rate_start_end"]
+        == 3.0e-4,
+        "retention_reference_refreshed_for_update_b": diagnostics_a[
+            "retention_reference_actor_sha256"
+        ]
+        != diagnostics_b["retention_reference_actor_sha256"],
+        "adam_steps_advanced_normally_across_update_b": all(
+            steps_after_b[name] == steps_after_a[name] + 1 for name in steps_after_a
+        ),
+        "hard_guards_unchanged": diagnostics_a["checks"]["hard_minibatch_guard_unchanged"]
+        and diagnostics_a["checks"]["hard_completed_guard_unchanged"]
+        and diagnostics_b["checks"]["hard_minibatch_guard_unchanged"]
+        and diagnostics_b["checks"]["hard_completed_guard_unchanged"],
     }
     return {
         "schema_version": 1,
         "created_utc": _utc_now(),
         "diagnostic_override": {
-            "soft_minibatch_kl_target": DIAGNOSTIC_RETRY_SOFT_TARGET,
-            "retention_soft_mean_kl_target": 1.0,
-            "optimizer_step_limit": 1,
+            "update_a_soft_minibatch_kl_target": DIAGNOSTIC_RETRY_SOFT_TARGET,
+            "update_a_retention_soft_mean_kl_target": 1.0,
+            "update_b_soft_targets": 1.0,
+            "optimizer_step_limit_per_update": 1,
             "production_configuration_modified": False,
         },
         "retry": retry,
         "accepted_step": accepted,
-        "completed_update_mean_kl_after_one_step": float(metrics["approx_kl"].item()),
+        "update_a": {
+            "metrics": {name: float(value.item()) for name, value in metrics_a.items()},
+            "adaptive_ppo": diagnostics_a,
+            "adam_steps_after": steps_after_a,
+        },
+        "update_b": {
+            "metrics": {name: float(value.item()) for name, value in metrics_b.items()},
+            "adaptive_ppo": diagnostics_b,
+            "adam_steps_after": steps_after_b,
+        },
+        "completed_update_mean_kl_after_one_step": float(metrics_a["approx_kl"].item()),
         "checks": checks,
         "verdict": "PASS_GREEN" if all(checks.values()) else "FAIL_RED",
     }
@@ -262,6 +324,8 @@ def _write_report(result: dict[str, Any], retry: dict[str, Any]) -> None:
         f"- retention-corpus mean KL: `{adaptive['retention_corpus_mean_kl']:.9f}`;",
         f"- policy LR start/end: `{adaptive['policy_learning_rate_start']}` / "
         f"`{adaptive['policy_learning_rate_end']}`;",
+        f"- policy LR armed for next update: "
+        f"`{result['post_update_runtime_learning_rates'][POLICY_GROUP_NAME]}`;",
         f"- retries/backoffs: `{adaptive['optimizer_step_retries']}` / "
         f"`{adaptive['policy_learning_rate_backoffs']}`;",
         f"- PPO early stop: `{str(adaptive['ppo_early_stop']).lower()}` "
@@ -313,6 +377,12 @@ def _write_report(result: dict[str, Any], retry: dict[str, Any]) -> None:
             "forced the same first minibatch to roll back and retry at `5e-5`. Model "
             "parameters, Adam moments, and Adam step counters restored exactly before "
             "only the policy-group LR changed; the critic group remained at `3e-4`.",
+            "",
+            "The accepted diagnostic update A ended at `5e-5`. Without reconstructing "
+            "the model or optimizer, diagnostic update B observed that prior value, "
+            "reset its update-start policy LR to `1e-4`, refreshed the retention actor "
+            "reference, and accepted its bounded step at `1e-4`. Every Adam counter "
+            "advanced by exactly one between A and B; critic LR remained `3e-4`.",
             "",
             "## Boundary",
             "",
@@ -376,6 +446,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     adaptive = trainer.last_adaptive_ppo_diagnostics
     if adaptive is None:
         raise RuntimeError("production replay did not publish adaptive diagnostics")
+    runtime_learning_rates = mixed_optimizer_learning_rates(trainer.optimizer)
+    checkpoint_payload = trainer.checkpoint_payload()
+    checkpoint_adaptive = checkpoint_payload["opponent_curriculum"]["adaptive_ppo"]
+    checkpoint_learning_rates = {
+        group["name"]: float(group["lr"])
+        for group in checkpoint_payload["optimizer"]["param_groups"]
+    }
     source_after = _sha256(SOURCE_CHECKPOINT)
     retention_sha_after = _sha256(RETENTION_CORPUS)
     retention_early_stop_safe = (
@@ -419,6 +496,24 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "value_loss_to_shared_trunk_gradient_exact_zero"
         ],
         "value_loss_to_actor_zero": adaptive["checks"]["value_loss_to_actor_gradient_exact_zero"],
+        "production_update_started_at_base_policy_lr": adaptive["policy_learning_rate_start"]
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "production_update_recorded_actual_backed_off_end_lr": adaptive["policy_learning_rate_end"]
+        == MIXED_PPO_SAFETY.minimum_policy_learning_rate,
+        "runtime_policy_lr_rearmed_for_next_update": runtime_learning_rates[POLICY_GROUP_NAME]
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "runtime_critic_lr_unchanged": runtime_learning_rates[CRITIC_GROUP_NAME]
+        == MIXED_PPO_SAFETY.critic_learning_rate,
+        "checkpoint_schema_v2_update_local": checkpoint_adaptive["schema_version"] == 2
+        and checkpoint_adaptive["policy_learning_rate_scope"] == "ppo_update_local",
+        "checkpoint_arms_next_update_at_base_policy_lr": checkpoint_adaptive[
+            "next_update_policy_learning_rate"
+        ]
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate
+        and checkpoint_learning_rates[POLICY_GROUP_NAME]
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "checkpoint_critic_lr_unchanged": checkpoint_learning_rates[CRITIC_GROUP_NAME]
+        == MIXED_PPO_SAFETY.critic_learning_rate,
         "production_model_changed": not _nested_exact(
             model_before_update, trainer.model.state_dict()
         ),
@@ -465,6 +560,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "transactional_retry_proof": retry,
         "metrics": {name: float(value.item()) for name, value in metrics.items()},
         "adaptive_ppo": adaptive,
+        "post_update_runtime_learning_rates": runtime_learning_rates,
+        "checkpoint_adaptive_ppo_summary": {
+            "schema_version": checkpoint_adaptive["schema_version"],
+            "policy_learning_rate_scope": checkpoint_adaptive["policy_learning_rate_scope"],
+            "optimizer_learning_rates": checkpoint_adaptive["optimizer_learning_rates"],
+            "next_update_policy_learning_rate": checkpoint_adaptive[
+                "next_update_policy_learning_rate"
+            ],
+            "last_update_summary": checkpoint_adaptive["last_update_summary"],
+        },
         "checks": checks,
     }
     _write_json(MIGRATION_RESULT, migration)
@@ -495,6 +600,9 @@ def main() -> int:
                 "completed_update_mean_kl": adaptive["completed_update_mean_kl"],
                 "retention_corpus_mean_kl": adaptive["retention_corpus_mean_kl"],
                 "policy_learning_rate_end": adaptive["policy_learning_rate_end"],
+                "next_update_policy_learning_rate": result["post_update_runtime_learning_rates"][
+                    POLICY_GROUP_NAME
+                ],
             },
             indent=2,
         )

@@ -11,6 +11,7 @@ This is an exact disposable update-360 replay through the production mixed-curri
 - completed-update mean KL: `0.005559046`;
 - retention-corpus mean KL: `0.019727562`;
 - policy LR start/end: `0.0001` / `2.5e-05`;
+- policy LR armed for next update: `0.0001`;
 - retries/backoffs: `3` / `2`;
 - PPO early stop: `true` (`retention_mean_kl_at_minimum_policy_lr`).
 
@@ -36,6 +37,8 @@ The fixed `1e-4` strategy previously completed all 154 steps with maximum miniba
 ## Transactional retry proof
 
 Verdict: `PASS_GREEN`. The diagnostic-only `0.002` soft target forced the same first minibatch to roll back and retry at `5e-5`. Model parameters, Adam moments, and Adam step counters restored exactly before only the policy-group LR changed; the critic group remained at `3e-4`.
+
+The accepted diagnostic update A ended at `5e-5`. Without reconstructing the model or optimizer, diagnostic update B observed that prior value, reset its update-start policy LR to `1e-4`, refreshed the retention actor reference, and accepted its bounded step at `1e-4`. Every Adam counter advanced by exactly one between A and B; critic LR remained `3e-4`.
 
 ## Boundary
 

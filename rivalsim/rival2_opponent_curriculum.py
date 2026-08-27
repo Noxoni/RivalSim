@@ -18,6 +18,7 @@ from rivalsim.rival2_mixed_ppo import (
     migrate_adam_to_mixed_groups,
     mixed_optimizer_learning_rates,
     ppo_update_mixed_curriculum,
+    reset_policy_learning_rate_for_new_update,
     retention_observation_sha256,
 )
 from rivalsim.rival2_policy import sample_hybrid_action
@@ -91,6 +92,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         self.retention_observations: torch.Tensor | None = None
         self.retention_corpus_summary: dict[str, Any] | None = None
         self.last_adaptive_ppo_diagnostics: dict[str, Any] | None = None
+        self.last_adaptive_ppo_summary: dict[str, Any] | None = None
 
     def initialize_curriculum_assignments(self) -> None:
         if bool((self.opponent_family >= 0).any()):
@@ -520,7 +522,41 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 }
             )
             raise
+        rearm = reset_policy_learning_rate_for_new_update(
+            self.optimizer,
+            self.mixed_ppo_safety,
+        )
+        diagnostics["policy_learning_rate_after_update_rearm"] = rearm[
+            "policy_learning_rate_after_reset"
+        ]
+        diagnostics["next_update_policy_learning_rate"] = (
+            self.mixed_ppo_safety.initial_policy_learning_rate
+        )
+        diagnostics["checks"]["next_update_policy_learning_rate_rearmed"] = (
+            rearm["policy_learning_rate_after_reset"]
+            == self.mixed_ppo_safety.initial_policy_learning_rate
+            and rearm["critic_learning_rate_after_reset"]
+            == self.mixed_ppo_safety.critic_learning_rate
+        )
+        diagnostics["verdict"] = "PASS_GREEN" if all(diagnostics["checks"].values()) else "FAIL_RED"
+        if diagnostics["verdict"] != "PASS_GREEN":
+            raise RuntimeError("mixed PPO next-update learning rate re-arm failed")
         self.last_adaptive_ppo_diagnostics = diagnostics
+        self.last_adaptive_ppo_summary = {
+            key: copy.deepcopy(diagnostics[key])
+            for key in (
+                "policy_learning_rate_scope",
+                "policy_learning_rate_before_update_reset",
+                "policy_learning_rate_start",
+                "policy_learning_rate_end",
+                "policy_learning_rate_after_update_rearm",
+                "next_update_policy_learning_rate",
+                "policy_learning_rate_backoffs",
+                "optimizer_step_retries",
+                "ppo_early_stop",
+                "ppo_early_stop_reason",
+            )
+        }
         self.policy_version += 1
         self.iteration += 1
         return metrics
@@ -537,12 +573,18 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 None
                 if self.mixed_ppo_safety is None
                 else {
+                    "schema_version": 2,
+                    "policy_learning_rate_scope": "ppo_update_local",
                     "config": asdict(self.mixed_ppo_safety),
                     "config_hash": self.mixed_ppo_safety.content_hash,
                     "optimizer_migration_proof": copy.deepcopy(self.optimizer_migration_proof),
                     "retention_observations": self.retention_observations,
                     "retention_corpus_summary": copy.deepcopy(self.retention_corpus_summary),
                     "optimizer_learning_rates": mixed_optimizer_learning_rates(self.optimizer),
+                    "next_update_policy_learning_rate": (
+                        self.mixed_ppo_safety.initial_policy_learning_rate
+                    ),
+                    "last_update_summary": copy.deepcopy(self.last_adaptive_ppo_summary),
                 }
             ),
             "nexto": {
@@ -592,6 +634,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         self.retention_observations = None
         self.retention_corpus_summary = None
         self.last_adaptive_ppo_diagnostics = None
+        self.last_adaptive_ppo_summary = None
         if curriculum is None:
             return
         if curriculum["config"] != asdict(self.opponent_curriculum):
@@ -622,6 +665,25 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             self.optimizer_migration_proof = copy.deepcopy(adaptive["optimizer_migration_proof"])
             self.retention_observations = adaptive["retention_observations"].to(self.device)
             self.retention_corpus_summary = copy.deepcopy(adaptive["retention_corpus_summary"])
+            schema_version = int(adaptive.get("schema_version", 1))
+            if schema_version not in (1, 2):
+                raise ValueError("unsupported adaptive PPO checkpoint schema")
+            if schema_version == 2 and (
+                adaptive.get("policy_learning_rate_scope") != "ppo_update_local"
+                or adaptive.get("next_update_policy_learning_rate")
+                != self.mixed_ppo_safety.initial_policy_learning_rate
+                or adaptive.get("optimizer_learning_rates")
+                != {
+                    "policy": self.mixed_ppo_safety.initial_policy_learning_rate,
+                    "critic": self.mixed_ppo_safety.critic_learning_rate,
+                }
+            ):
+                raise ValueError("adaptive PPO checkpoint update-local LR semantics mismatch")
+            reset_policy_learning_rate_for_new_update(
+                self.optimizer,
+                self.mixed_ppo_safety,
+            )
+            self.last_adaptive_ppo_summary = copy.deepcopy(adaptive.get("last_update_summary"))
 
 
 __all__ = [

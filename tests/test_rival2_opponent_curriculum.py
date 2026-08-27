@@ -57,6 +57,16 @@ def _env(
     )
 
 
+def _optimizer_steps_by_parameter(
+    trainer: Rival2OpponentCurriculumTrainer,
+) -> dict[str, int | None]:
+    output: dict[str, int | None] = {}
+    for name, parameter in trainer.model.named_parameters():
+        step = trainer.optimizer.state.get(parameter, {}).get("step")
+        output[name] = None if step is None else int(step.item())
+    return output
+
+
 def test_gameplay_v2_reward_adds_only_competitive_strict_double_dash(
     arena_assets,
 ) -> None:
@@ -233,6 +243,15 @@ def test_safe_mixed_optimizer_and_retention_checkpoint_round_trip(
     checkpoint = Path(".tools/opponent_curriculum_safe_transition_test_checkpoint.pt")
     checkpoint.parent.mkdir(parents=True, exist_ok=True)
     trainer.save_checkpoint(checkpoint)
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    adaptive = payload["opponent_curriculum"]["adaptive_ppo"]
+    assert adaptive["schema_version"] == 2
+    assert adaptive["policy_learning_rate_scope"] == "ppo_update_local"
+    assert adaptive["next_update_policy_learning_rate"] == 1.0e-4
+    assert adaptive["optimizer_learning_rates"] == {
+        "policy": 1.0e-4,
+        "critic": 3.0e-4,
+    }
     restored = Rival2OpponentCurriculumTrainer(
         _env(arena_assets, count, seed=999),
         ppo_config=ppo,
@@ -253,4 +272,33 @@ def test_safe_mixed_optimizer_and_retention_checkpoint_round_trip(
         "policy": safety.initial_policy_learning_rate,
         "critic": safety.critic_learning_rate,
     }
+
+    # A schema-v1 checkpoint could have captured an update-local backed-off LR.
+    # Loading it must retain Adam state while arming the next update at the base LR.
+    old_payload = payload
+    old_adaptive = old_payload["opponent_curriculum"]["adaptive_ppo"]
+    for key in (
+        "schema_version",
+        "policy_learning_rate_scope",
+        "next_update_policy_learning_rate",
+        "last_update_summary",
+    ):
+        old_adaptive.pop(key, None)
+    for group in old_payload["optimizer"]["param_groups"]:
+        if group.get("name") == "policy":
+            group["lr"] = safety.minimum_policy_learning_rate
+    old_checkpoint = Path(".tools/opponent_curriculum_safe_transition_v1_test_checkpoint.pt")
+    torch.save(old_payload, old_checkpoint)
+    restored_old = Rival2OpponentCurriculumTrainer(
+        _env(arena_assets, count, seed=1000),
+        ppo_config=ppo,
+        seed=1000,
+    )
+    restored_old.load_checkpoint(old_checkpoint)
+    assert mixed_optimizer_learning_rates(restored_old.optimizer) == {
+        "policy": safety.initial_policy_learning_rate,
+        "critic": safety.critic_learning_rate,
+    }
+    assert _optimizer_steps_by_parameter(restored_old) == _optimizer_steps_by_parameter(trainer)
     checkpoint.unlink()
+    old_checkpoint.unlink()

@@ -710,6 +710,7 @@ def frozen_configuration(source: dict[str, Any]) -> dict[str, Any]:
         "ppo_config_hash": ppo.content_hash,
         "mixed_ppo_safety": asdict(MIXED_PPO_SAFETY),
         "mixed_ppo_safety_hash": MIXED_PPO_SAFETY.content_hash,
+        "mixed_ppo_policy_learning_rate_scope": "ppo_update_local",
         "retention_corpus": RETENTION_CORPUS.as_posix(),
         "self_play_config": asdict(self_play),
         "opponent_curriculum": asdict(curriculum),
@@ -829,6 +830,10 @@ def verify_launch(configuration: dict[str, Any], source: dict[str, Any]) -> dict
             "minimum_policy_learning_rate"
         ]
         == 0.000025,
+        "mixed_policy_learning_rate_scope_update_local": configuration[
+            "mixed_ppo_policy_learning_rate_scope"
+        ]
+        == "ppo_update_local",
         "clip_range_unchanged": ppo["clip_range"] == 0.2,
         "value_loss_coefficient_unchanged": ppo["value_loss_coefficient"] == 0.5,
         "max_gradient_norm_unchanged": ppo["max_gradient_norm"] == 0.5,
@@ -964,6 +969,10 @@ def _training_integrity(
         and adaptive["checks"]["value_loss_to_actor_gradient_exact_zero"],
         "retention_kl_within_soft_target": adaptive is not None
         and adaptive["retention_corpus_mean_kl"] <= MIXED_PPO_SAFETY.retention_soft_mean_kl_target,
+        "policy_learning_rate_started_at_base": adaptive is not None
+        and adaptive["policy_learning_rate_start"] == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "next_update_policy_learning_rate_rearmed": adaptive is not None
+        and adaptive["checks"]["next_update_policy_learning_rate_rearmed"],
         "world_hot_path_zero_transfer": trainer.env.hot_path_transfer_bytes()
         == {"h2d": 0, "d2h": 0},
     }
@@ -985,6 +994,9 @@ def _checkpoint(
     payload = torch.load(path, map_location="cpu", weights_only=False)
     finite_model = all(torch.isfinite(value).all().item() for value in payload["model"].values())
     curriculum = payload.get("opponent_curriculum")
+    optimizer_learning_rates = {
+        group.get("name"): float(group["lr"]) for group in payload["optimizer"]["param_groups"]
+    }
     checks = {
         "format_exact": payload["format"] == "RIVAL2_CHECKPOINT_V1",
         "iteration_exact": int(payload["iteration"]) == trainer.iteration,
@@ -1004,6 +1016,20 @@ def _checkpoint(
         "retention_corpus_present": curriculum is not None
         and (curriculum.get("adaptive_ppo") or {}).get("retention_observations") is not None,
         "split_optimizer_groups_present": len(payload["optimizer"]["param_groups"]) == 2,
+        "adaptive_ppo_schema_v2": curriculum is not None
+        and (curriculum.get("adaptive_ppo") or {}).get("schema_version") == 2,
+        "adaptive_policy_learning_rate_update_local": curriculum is not None
+        and (curriculum.get("adaptive_ppo") or {}).get("policy_learning_rate_scope")
+        == "ppo_update_local",
+        "checkpoint_next_policy_learning_rate_base": curriculum is not None
+        and (curriculum.get("adaptive_ppo") or {}).get("next_update_policy_learning_rate")
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "checkpoint_optimizer_policy_learning_rate_base": optimizer_learning_rates.get("policy")
+        == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+        "checkpoint_optimizer_critic_learning_rate_unchanged": optimizer_learning_rates.get(
+            "critic"
+        )
+        == MIXED_PPO_SAFETY.critic_learning_rate,
     }
     return {
         "label": label,
