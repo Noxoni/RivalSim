@@ -660,9 +660,9 @@ def _breezi_cases(
     offset_index.fill(5)
     for index, row in enumerate(rows):
         local = int(row["class_index"])
-        duration[index] = (24, 30, 36)[local % 3]
+        duration[index] = (84, 90, 96)[local % 3]
         if row["class"] == "positive":
-            duration[index] = 34 + local % 5
+            duration[index] = 86 + local % 5
             roll[index] = -1.0
             yaw[index] = 0.72 + 0.04 * (local % 5)
         elif row["class"] == "near_miss":
@@ -691,67 +691,134 @@ def _breezi_cases(
 
     probe = initial.copy()
     probe.ball_pos[:] = (0.0, -3000.0, 1500.0)
-    probe_trace = _run(probe, 40, collision_root, geometry, meshes, setup_controller)
-    full = initial.copy()
+    run_ticks = int(np.max(duration)) + 65
+    probe_trace = _run(probe, run_ticks, collision_root, geometry, meshes, setup_controller)
+    terminal_offset_count = len(MUSTY_OFFSETS)
+    terminal_state = _base_state(count * terminal_offset_count)
+    terminal_state.on_ground[:, 0] = 0
+    terminal_state.has_jumped[:, 0] = 1
+    terminal_state.air_time[:, 0] = 0.2
+    terminal_state.air_time_since_jump[:, 0] = 0.2
     for index in range(count):
         terminal = int(duration[index])
         car_position = probe_trace["car_pos"][terminal, index]
         car_quat = probe_trace["car_quat"][terminal, index]
-        local_target = np.asarray(MUSTY_OFFSETS[int(offset_index[index])], dtype=np.float32)
-        target = car_position + _quat_rotate(car_quat, local_target)
-        gravity_displacement = (
-            probe_trace["ball_pos"][terminal, index] - probe_trace["ball_pos"][0, index]
-        )
-        full.ball_pos[index] = target - gravity_displacement
-        full.ball_vel[index, 0] = 400.0
+        for offset_id, offset in enumerate(MUSTY_OFFSETS):
+            candidate = index * terminal_offset_count + offset_id
+            terminal_state.car_pos[candidate, 0] = car_position
+            terminal_state.car_quat[candidate, 0] = car_quat
+            terminal_state.car_vel[candidate, 0] = probe_trace["car_vel"][terminal, index]
+            terminal_state.car_ang_vel[candidate, 0] = probe_trace["car_ang"][terminal, index]
+            local_target = np.asarray(offset, dtype=np.float32)
+            terminal_state.ball_pos[candidate] = car_position + _quat_rotate(
+                car_quat, local_target
+            )
+            terminal_state.ball_vel[candidate] = probe_trace["car_vel"][terminal, index]
 
-    def controller(tick: int, controls: ControlBatch) -> None:
-        active = tick < duration
-        controls.roll[active, 0] = roll[active]
-        controls.yaw[active, 0] = yaw[active]
-        dodge = tick == duration
-        controls.jump[dodge, 0] = 1
-        controls.pitch[dodge, 0] = 1.0
+    def terminal_controller(tick: int, controls: ControlBatch) -> None:
+        if tick == 0:
+            controls.jump[:, 0] = 1
+            controls.pitch[:, 0] = 1.0
 
-    trace = _run(full, 95, collision_root, geometry, meshes, controller)
-    onsets = _touch_onsets(trace["hit"])
+    terminal_trace = _run(
+        terminal_state, 55, collision_root, geometry, meshes, terminal_controller
+    )
+    onsets = _touch_onsets(terminal_trace["hit"])
     for index, row in enumerate(rows):
-        ticks = onsets[index]
         stop = int(duration[index])
         roll_path = 0.0
         yaw_path = 0.0
         forward_z: list[float] = []
         up_z: list[float] = []
         for tick in range(stop + 1):
-            q = trace["car_quat"][tick, index]
+            q = probe_trace["car_quat"][tick, index]
             forward = _quat_rotate(q, np.asarray((1.0, 0.0, 0.0), dtype=np.float32))
             up = _quat_rotate(q, np.asarray((0.0, 0.0, 1.0), dtype=np.float32))
-            ang = trace["car_ang"][tick, index]
+            ang = probe_trace["car_ang"][tick, index]
             roll_path += abs(float(np.dot(ang, forward))) / 120.0
             yaw_path += abs(float(np.dot(ang, up))) / 120.0
             forward_z.append(float(forward[2]))
             up_z.append(float(up[2]))
         terminal_musty = 0.0
         rotational = 0.0
-        if ticks.size:
+        selected_candidate = -1
+        selected_tick = -1
+        for offset_id in range(terminal_offset_count):
+            candidate = index * terminal_offset_count + offset_id
+            ticks = onsets[candidate]
+            if not ticks.size:
+                continue
             tick = int(ticks[0])
-            normal = trace["contact_normal"][tick, index]
-            r_bt = trace["contact_point"][tick, index] - trace["car_pos"][tick - 1, index] * 0.02
-            rotational = abs(
-                float(np.dot(np.cross(trace["pre_car_ang"][tick, index], r_bt) * 50.0, normal))
+            normal = terminal_trace["contact_normal"][tick, candidate]
+            r_bt = (
+                terminal_trace["contact_point"][tick, candidate]
+                - terminal_trace["car_pos"][tick - 1, candidate] * 0.02
             )
-            terminal_musty = float(rotational > 1.0 and np.any(trace["has_flipped"][:, index] != 0))
+            candidate_rotational = abs(
+                float(
+                    np.dot(
+                        np.cross(terminal_trace["pre_car_ang"][tick, candidate], r_bt)
+                        * 50.0,
+                        normal,
+                    )
+                )
+            )
+            if candidate_rotational > 1.0 and np.any(
+                terminal_trace["has_flipped"][:, candidate] != 0
+            ):
+                selected_candidate = candidate
+                selected_tick = tick
+                rotational = candidate_rotational
+                terminal_musty = 1.0
+                row["scenario"]["selected_terminal_offset"] = MUSTY_OFFSETS[offset_id]
+                break
+        if selected_candidate >= 0:
+            tick = selected_tick
+            for terminal_tick in range(tick + 1):
+                q = terminal_trace["car_quat"][terminal_tick, selected_candidate]
+                forward_z.append(
+                    float(
+                        _quat_rotate(
+                            q, np.asarray((1.0, 0.0, 0.0), dtype=np.float32)
+                        )[2]
+                    )
+                )
+                up_z.append(
+                    float(
+                        _quat_rotate(
+                            q, np.asarray((0.0, 0.0, 1.0), dtype=np.float32)
+                        )[2]
+                    )
+                )
         row["features"] = {
             "terminal_musty": terminal_musty,
             "roll_path": roll_path,
             "yaw_path": yaw_path,
             "setup_ticks": float(stop),
+            "setup_ticks_min_feature": float(stop),
+            "setup_ticks_max_feature": float(stop),
             "nose_up_peak": float(max(forward_z, default=0.0)),
             "inverted_depth": float(-min(up_z, default=0.0)),
+            "nose_down_depth": float(-min(forward_z, default=0.0)),
             "rotational_normal_speed": rotational,
         }
+        nose_up = next((i for i, value in enumerate(forward_z) if value > 0.1), -1)
+        inverted = next(
+            (i for i, value in enumerate(up_z) if i > nose_up and value < -0.1), -1
+        )
+        nose_down = next(
+            (i for i, value in enumerate(forward_z) if i > inverted and value < -0.1), -1
+        )
+        row["features"]["ordered_orientation"] = float(
+            nose_up >= 0 and inverted > nose_up and nose_down > inverted
+        )
         row["physical_invariant"] = (
-            bool(terminal_musty and roll_path > 0.1 and yaw_path > 0.1 and stop >= 24)
+            bool(
+                terminal_musty
+                and row["features"]["ordered_orientation"] > 0.0
+                and roll_path > 0.1
+                and yaw_path > 0.1
+            )
             if row["class"] == "positive"
             else True
         )
@@ -878,6 +945,7 @@ def _pinch_cases(
         row["features"] = {
             "overlap_ticks": overlap,
             "opposition": opposition,
+            "opposition_sign": float(opposition > 0.0),
             "closing_speed": closing,
             "ball_delta_v": delta,
         }
@@ -916,9 +984,16 @@ def _pogo_cases(
             )
             incoming = float(-np.dot(point_before, normal))
             outgoing = float(np.dot(point_after, normal))
-            corner = float(
-                max(abs(local[0]) / 2.3602, abs(local[1]) / 1.6840, abs(local[2]) / 0.7232)
+            normalized = sorted(
+                (
+                    abs(local[0]) / 2.3602,
+                    abs(local[1]) / 1.6840,
+                    abs(local[2]) / 0.7232,
+                )
             )
+            # An edge/corner needs at least two local coordinates near a
+            # hitbox extent.  The largest coordinate alone identifies a face.
+            corner = float(normalized[1])
             post = slice(tick, min(tick + 12, trace["wheel_count"].shape[0]))
             wheels = float(np.max(trace["wheel_count"][post, index]))
             cleared = np.flatnonzero(trace["chassis_count"][tick + 1 :, index] == 0)
@@ -960,7 +1035,7 @@ def _pogo_cases(
     for index in range(pool_count):
         item = extract(pool_trace, index)
         if (
-            item["corner_region"] >= 0.7
+            item["corner_region"] >= 0.6
             and item["incoming_normal_speed"] > 1.0
             and item["outgoing_normal_speed"] > 1.0
             and item["wheel_support"] < 3.0
@@ -970,7 +1045,14 @@ def _pogo_cases(
             if len(selected) == CASE_COUNT_PER_CLASS:
                 break
     if len(selected) != CASE_COUNT_PER_CLASS:
-        raise RuntimeError(f"pogo discovery produced only {len(selected)} positives")
+        observed_corner = sorted(
+            (extract(pool_trace, index)["corner_region"] for index in range(pool_count)),
+            reverse=True,
+        )
+        raise RuntimeError(
+            f"pogo discovery produced only {len(selected)} positives; "
+            f"largest second-axis corner values={observed_corner[:24]}"
+        )
 
     state = _base_state(count)
     state.on_ground[:, 0] = 0
@@ -1022,7 +1104,7 @@ def _pogo_cases(
         row["physical_invariant"] = (
             bool(
                 features["chassis_contact"] > 0.0
-                and features["corner_region"] >= 0.7
+                and features["corner_region"] >= 0.6
                 and features["incoming_normal_speed"] > 1.0
                 and features["outgoing_normal_speed"] > 1.0
                 and features["wheel_support"] < 3.0
@@ -1069,9 +1151,14 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
     ),
     "breezi": (
         ("terminal_musty", "min", "discrete_terminal_musty"),
+        ("ordered_orientation", "min", "discrete_ordered_orientation"),
+        ("nose_up_peak", "min", "breezi_nose_up_min"),
+        ("inverted_depth", "min", "breezi_inverted_depth_min"),
+        ("nose_down_depth", "min", "breezi_nose_down_depth_min"),
         ("roll_path", "min", "breezi_roll_path_min"),
         ("yaw_path", "min", "breezi_yaw_path_min"),
-        ("setup_ticks", "min", "breezi_setup_ticks_min"),
+        ("setup_ticks_min_feature", "min", "breezi_setup_ticks_min"),
+        ("setup_ticks_max_feature", "max", "breezi_setup_ticks_max"),
     ),
     "redirect": (
         ("incoming_speed", "min", "redirect_incoming_speed_min"),
@@ -1080,6 +1167,7 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
     ),
     "pinch": (
         ("overlap_ticks", "max", "pinch_overlap_ticks_max"),
+        ("opposition_sign", "min", "discrete_opposed_normals"),
         ("opposition", "min", "pinch_opposition_min"),
         ("closing_speed", "min", "pinch_closing_speed_min"),
         ("ball_delta_v", "min", "pinch_ball_delta_v_min"),
@@ -1112,7 +1200,7 @@ DIAGNOSTIC_FEATURES: dict[str, tuple[str, ...]] = {
         "tangent_speed_delta",
     ),
     "ground_carry": ("velocity_change",),
-    "breezi": ("inverted_depth",),
+    "breezi": ("nose_up_peak", "inverted_depth", "nose_down_depth"),
 }
 
 

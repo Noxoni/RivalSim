@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import warp as wp
 
-from benchmarks.run_rival2_mechanics_calibration import _scenario_rows
+from benchmarks.run_rival2_mechanics_calibration import CALIBRATION_FEATURES, _scenario_rows
 from rivalsim.kernels.rival2 import (
     REWARD_MODE_GAMEPLAY,
     STRICT_DASH_LANDING_WINDOW_TICKS,
@@ -24,6 +24,7 @@ from rivalsim.mechanics_calibration import (
     RESET_SUPPORT_CAR,
     SURFACE_FLOOR_CEILING_NZ,
     SURFACE_WALL_NZ,
+    THRESHOLD_NAMES,
     ZAP_DODGE_TICKS,
     ZAP_JUMP_TICKS,
     MechanicsShadowObserver,
@@ -60,6 +61,11 @@ def test_every_continuous_detector_has_exact_72_case_split() -> None:
             assert len(selected) == 24
             assert sum(row["split"] == "derivation" for row in selected) == 16
             assert sum(row["split"] == "heldout" for row in selected) == 8
+
+    runtime_names = set(THRESHOLD_NAMES)
+    for candidates in CALIBRATION_FEATURES.values():
+        for _feature, _direction, runtime_name in candidates:
+            assert runtime_name.startswith("discrete_") or runtime_name in runtime_names
 
 
 def test_source_exact_reset_resource_and_body_identity() -> None:

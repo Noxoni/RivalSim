@@ -82,6 +82,10 @@ THRESHOLD_NAMES = (
     "half_flip_cancel_ticks_min",
     "half_flip_cancel_ticks_max",
     "pinch_ball_delta_v_min",
+    "breezi_setup_ticks_max",
+    "breezi_nose_up_min",
+    "breezi_inverted_depth_min",
+    "breezi_nose_down_depth_min",
 )
 THRESHOLD_INDEX = {name: index for index, name in enumerate(THRESHOLD_NAMES)}
 
@@ -351,6 +355,7 @@ def collect_mechanics_shadow_tick(
     setup_ticks: wp.array(dtype=wp.int32),
     setup_roll_path: wp.array(dtype=wp.float32),
     setup_yaw_path: wp.array(dtype=wp.float32),
+    setup_orientation_stage: wp.array(dtype=wp.int32),
     pogo_pending: wp.array(dtype=wp.int32),
     pogo_age: wp.array(dtype=wp.int32),
     pogo_features: wp.array(dtype=wp.float32),
@@ -390,6 +395,12 @@ def collect_mechanics_shadow_tick(
         setup_ticks[car] = setup_ticks[car] + 1
         setup_roll_path[car] = setup_roll_path[car] + wp.abs(wp.dot(angular, forward)) / 120.0
         setup_yaw_path[car] = setup_yaw_path[car] + wp.abs(wp.dot(angular, up)) / 120.0
+        if setup_orientation_stage[car] == 0 and forward[2] >= thresholds[33]:
+            setup_orientation_stage[car] = 1
+        elif setup_orientation_stage[car] == 1 and -up[2] >= thresholds[34]:
+            setup_orientation_stage[car] = 2
+        elif setup_orientation_stage[car] == 2 and -forward[2] >= thresholds[35]:
+            setup_orientation_stage[car] = 3
 
         new_flip = has_flipped[car] != 0 and previous_has_flipped[car] == 0
         if new_flip:
@@ -563,6 +574,8 @@ def collect_mechanics_shadow_tick(
                 and setup_roll_path[car] >= thresholds[15]
                 and setup_yaw_path[car] >= thresholds[16]
                 and float(setup_ticks[car]) >= thresholds[17]
+                and float(setup_ticks[car]) <= thresholds[32]
+                and setup_orientation_stage[car] >= 3
             )
             if breezi:
                 _emit_mechanic(
@@ -650,6 +663,7 @@ def collect_mechanics_shadow_tick(
                 if (
                     family_ready[7] != 0
                     and thresholds[21] >= 0.0
+                    and opposition > 0.0
                     and opposition >= thresholds[22]
                     and closing >= thresholds[23]
                     and ball_delta >= thresholds[31]
@@ -677,6 +691,7 @@ def collect_mechanics_shadow_tick(
             setup_ticks[car] = 0
             setup_roll_path[car] = 0.0
             setup_yaw_path[car] = 0.0
+            setup_orientation_stage[car] = 0
         elif possession_owner[env] == local_car:
             possession_gap[env] = possession_gap[env] + 1
             if (
@@ -733,9 +748,14 @@ def collect_mechanics_shadow_tick(
             point_after = velocity + wp.cross(angular, world_r_after)
             incoming_normal = -wp.dot(point_before, normal)
             outgoing_normal = wp.dot(point_after, normal)
+            corner_x = wp.abs(local_point[0]) / 2.3602
+            corner_y = wp.abs(local_point[1]) / 1.6840
+            corner_z = wp.abs(local_point[2]) / 0.7232
+            # Second-largest normalized coordinate: an edge/corner needs two
+            # axes near the Octane hitbox extents; max alone is a face test.
             corner = wp.max(
-                wp.max(wp.abs(local_point[0]) / 2.3602, wp.abs(local_point[1]) / 1.6840),
-                wp.abs(local_point[2]) / 0.7232,
+                wp.min(corner_x, corner_y),
+                wp.min(wp.max(corner_x, corner_y), corner_z),
             )
             base = car * 4
             pogo_features[base] = corner
@@ -865,6 +885,7 @@ class MechanicsShadowObserver:
         self.setup_ticks = ints(self.car_count)
         self.setup_roll_path = floats(self.car_count)
         self.setup_yaw_path = floats(self.car_count)
+        self.setup_orientation_stage = ints(self.car_count)
         self.pogo_pending = ints(self.car_count)
         self.pogo_age = ints(self.car_count)
         self.pogo_features = floats(self.car_count * 4)
@@ -980,6 +1001,7 @@ class MechanicsShadowObserver:
                 self.setup_ticks,
                 self.setup_roll_path,
                 self.setup_yaw_path,
+                self.setup_orientation_stage,
                 self.pogo_pending,
                 self.pogo_age,
                 self.pogo_features,
