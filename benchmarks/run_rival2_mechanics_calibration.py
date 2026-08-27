@@ -1010,7 +1010,7 @@ def _pogo_cases(
     # Prospectively search one fixed random impact pool, then retain the first
     # 24 cases whose measured real contact satisfies the positive invariant.
     # This fixes failed intended positives without weakening the classifier.
-    pool_count = 768
+    pool_count = 2048
     pool = _base_state(pool_count)
     pool.on_ground[:, 0] = 0
     for index in range(pool_count):
@@ -1032,29 +1032,48 @@ def _pogo_cases(
         pool.car_ang_vel[index, 0] = rng.uniform(-5.5, 5.5, 3)
     pool_trace = _run(pool, 100, collision_root, geometry, meshes, lambda _tick, _controls: None)
     selected: list[int] = []
-    near_selected: list[int] = []
+    face_selected: list[int] = []
+    slow_selected: list[int] = []
     for index in range(pool_count):
         item = extract(pool_trace, index)
-        impact_rebounds = (
+        energetic_impact = (
             item["incoming_normal_speed"] > 1.0
             and item["outgoing_normal_speed"] > 1.0
+        )
+        prompt_unsupported_rebound = (
+            energetic_impact
             and item["wheel_support"] < 3.0
             and item["separation_ticks"] < 12.0
         )
-        if item["corner_region"] >= 0.6 and impact_rebounds:
+        if item["corner_region"] >= 0.6 and prompt_unsupported_rebound:
             selected.append(index)
-        elif 0.3 <= item["corner_region"] < 0.6 and impact_rebounds:
-            near_selected.append(index)
-        if len(selected) >= CASE_COUNT_PER_CLASS and len(near_selected) >= CASE_COUNT_PER_CLASS:
+        elif 0.3 <= item["corner_region"] < 0.6 and prompt_unsupported_rebound:
+            face_selected.append(index)
+        elif (
+            item["corner_region"] >= 0.6
+            and energetic_impact
+            and item["wheel_support"] < 3.0
+            and 12.0 <= item["separation_ticks"] < 999.0
+        ):
+            slow_selected.append(index)
+        if (
+            len(selected) >= CASE_COUNT_PER_CLASS
+            and len(face_selected) >= CASE_COUNT_PER_CLASS
+            and len(slow_selected) >= 1
+        ):
             break
-    if len(selected) < CASE_COUNT_PER_CLASS or len(near_selected) < CASE_COUNT_PER_CLASS:
+    if (
+        len(selected) < CASE_COUNT_PER_CLASS
+        or len(face_selected) < CASE_COUNT_PER_CLASS
+        or len(slow_selected) < 1
+    ):
         observed_corner = sorted(
             (extract(pool_trace, index)["corner_region"] for index in range(pool_count)),
             reverse=True,
         )
         raise RuntimeError(
             f"pogo discovery produced {len(selected)} positives and "
-            f"{len(near_selected)} face-impact near misses; "
+            f"near misses face={len(face_selected)}, slow={len(slow_selected)}, "
             f"largest second-axis corner values={observed_corner[:24]}"
         )
 
@@ -1069,7 +1088,10 @@ def _pogo_cases(
             state.car_vel[index, 0] = pool.car_vel[source, 0]
             state.car_ang_vel[index, 0] = pool.car_ang_vel[source, 0]
         elif row["class"] == "near_miss":
-            source = near_selected[local]
+            if local % 3 == 0:
+                source = slow_selected[(local // 3) % len(slow_selected)]
+            else:
+                source = face_selected[local]
             state.car_pos[index, 0] = pool.car_pos[source, 0]
             state.car_quat[index, 0] = pool.car_quat[source, 0]
             state.car_vel[index, 0] = pool.car_vel[source, 0]
