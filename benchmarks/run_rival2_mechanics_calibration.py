@@ -12,6 +12,7 @@ lifecycle behavior.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import math
@@ -41,13 +42,18 @@ from rivalsim.mechanics_calibration import (
     MechanicsShadowObserver,
     ScalarBoundary,
     classify,
+    midpoint_boundary,
 )
 from rivalsim.nexto_short_eval import NextoShortEpisodeRunner
 from rivalsim.wisp_short_eval import WispShortEpisodeRunner
 
 SOURCE_HANDOFF_COMMIT = "1da8557f32a94e6a8e96d1acbb0103656e203e27"
+ACCEPTED_BASELINE_COMMIT = "f49768368377dcb5aa0cc67f3a08f79bd68538a3"
+TARGET_FAMILIES = ("musty", "breezi", "redirect")
 EXPECTED_CHECKPOINT_SHA256 = "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21"
 CALIBRATION_SEED = 2026082701
+TARGET_CALIBRATION_SEED = 2026082707
+TARGET_HELDOUT_SCENARIO_OFFSET = 509
 SHADOW_SEED = 2026082702
 CASE_COUNT_PER_CLASS = 24
 DERIVATION_PER_CLASS = 16
@@ -61,6 +67,12 @@ def _sha256(path: Path) -> str:
 
 def _git(*args: str) -> str:
     return subprocess.check_output(["git", *args], text=True).strip()
+
+
+def _git_text_at(commit: str, path: str) -> str:
+    return subprocess.check_output(
+        ["git", "show", f"{commit}:{path}"], text=True, encoding="utf-8"
+    )
 
 
 def _quat_from_euler(roll: float, pitch: float, yaw: float) -> np.ndarray:
@@ -85,6 +97,11 @@ def _quat_rotate(q: np.ndarray, value: np.ndarray) -> np.ndarray:
         + (q[3] * q[3] - np.dot(u, u)) * value
         + 2.0 * q[3] * np.cross(u, value)
     )
+
+
+def _quat_unrotate(q: np.ndarray, value: np.ndarray) -> np.ndarray:
+    conjugate = np.asarray((-q[0], -q[1], -q[2], q[3]), dtype=np.float32)
+    return _quat_rotate(conjugate, value)
 
 
 def _unit(value: np.ndarray) -> np.ndarray:
@@ -113,14 +130,21 @@ def _scenario_rows(family: str) -> list[dict[str, Any]]:
     for class_name in ("positive", "near_miss", "ordinary_control"):
         for index in range(CASE_COUNT_PER_CLASS):
             split = "derivation" if index < DERIVATION_PER_CLASS else "heldout"
+            scenario_index = index
+            seed = CALIBRATION_SEED + FAMILY_ID[family] * 1000 + index
+            if family in TARGET_FAMILIES:
+                seed = TARGET_CALIBRATION_SEED + FAMILY_ID[family] * 1000 + index
             rows.append(
                 {
                     "case_id": f"{family}-{class_name}-{split[0].upper()}{index:02d}",
                     "family": family,
                     "class": class_name,
                     "split": split,
-                    "class_index": index,
-                    "seed": CALIBRATION_SEED + FAMILY_ID[family] * 1000 + index,
+                    "class_index": scenario_index,
+                    "scenario_variant": (
+                        TARGET_HELDOUT_SCENARIO_OFFSET if split == "heldout" else 0
+                    ),
+                    "seed": seed,
                     "scenario": {},
                 }
             )
@@ -552,6 +576,131 @@ MUSTY_OFFSETS = (
 )
 
 
+def _musty_contact_features(
+    trace: dict[str, np.ndarray],
+    index: int,
+    tick: int,
+    *,
+    history_ticks: int = 8,
+    dodge_tick: int = 0,
+) -> dict[str, float]:
+    """Measure the signed rotating-surface sweep at one legitimate contact onset."""
+
+    pre_tick = max(0, tick - 1)
+    car_position = trace["car_pos"][pre_tick, index]
+    ball_position = trace["ball_pos"][pre_tick, index]
+    car_quaternion = trace["car_quat"][pre_tick, index]
+    contact_world = trace["contact_point"][tick, index] * 50.0
+    contact_offset_world = contact_world - car_position
+    contact_offset_local = _quat_unrotate(car_quaternion, contact_offset_world)
+    car_to_ball = _unit(ball_position - car_position)
+    rotational_velocity = np.cross(
+        trace["pre_car_ang"][tick, index], contact_offset_world
+    )
+    car_velocity = trace["pre_car_vel"][tick, index] * 50.0
+    incoming_ball_velocity = trace["ball_vel"][pre_tick, index]
+    translation_relative = car_velocity - incoming_ball_velocity
+    rotational_closing = float(np.dot(rotational_velocity, car_to_ball))
+    translation_closing = float(np.dot(translation_relative, car_to_ball))
+    rotational_positive = max(0.0, rotational_closing)
+    translation_positive = max(0.0, translation_closing)
+    rotational_fraction = rotational_positive / max(
+        rotational_positive + translation_positive, 1.0e-8
+    )
+
+    start = max(0, pre_tick - history_ticks)
+    surface_points: list[np.ndarray] = []
+    gaps: list[float] = []
+    rotation_offsets: list[np.ndarray] = []
+    for sample_tick in range(start, pre_tick + 1):
+        rotated_offset = _quat_rotate(
+            trace["car_quat"][sample_tick, index], contact_offset_local
+        )
+        surface_point = trace["car_pos"][sample_tick, index] + rotated_offset
+        rotation_offsets.append(rotated_offset)
+        surface_points.append(surface_point)
+        gaps.append(
+            float(np.linalg.norm(trace["ball_pos"][sample_tick, index] - surface_point))
+        )
+    path_length = float(
+        sum(
+            np.linalg.norm(rotation_offsets[item] - rotation_offsets[item - 1])
+            for item in range(1, len(rotation_offsets))
+        )
+    )
+    rotational_displacement = rotation_offsets[-1] - rotation_offsets[0]
+    sweep_closure = float(np.dot(rotational_displacement, car_to_ball))
+    sweep_alignment = float(np.dot(_unit(rotational_displacement), car_to_ball))
+    monotonic_steps = sum(
+        gaps[item] < gaps[item - 1] for item in range(1, len(gaps))
+    )
+    monotonic_fraction = float(monotonic_steps / max(len(gaps) - 1, 1))
+    gap_closure = float(gaps[0] - gaps[-1])
+    ball_delta = float(np.linalg.norm(trace["ball_delta_v"][tick, index]))
+    delta_velocity = trace["ball_delta_v"][tick, index]
+    rotational_impulse_alignment = float(
+        np.dot(_unit(delta_velocity), _unit(rotational_velocity))
+    )
+    translation_impulse_alignment = float(
+        np.dot(_unit(delta_velocity), _unit(translation_relative))
+    )
+    ball_offset_local = _quat_unrotate(
+        car_quaternion, ball_position - car_position
+    )
+    return {
+        "legitimate_contact": 1.0,
+        "actual_backward_dodge": float(
+            np.any(trace["has_flipped"][: tick + 1, index] != 0)
+            and np.min(trace["flip_torque"][: tick + 1, index, 1]) < -0.25
+        ),
+        "contact_age_ticks": float(tick - dodge_tick),
+        "rotational_closing_speed": rotational_closing,
+        "translation_closing_speed": translation_closing,
+        "rotational_fraction": rotational_fraction,
+        "sweep_closure": sweep_closure,
+        "sweep_alignment": sweep_alignment,
+        "sweep_path_length": path_length,
+        "sweep_monotonic_fraction": monotonic_fraction,
+        "precontact_gap_closure": gap_closure,
+        "contact_local_x": float(contact_offset_local[0]),
+        "contact_local_y": float(contact_offset_local[1]),
+        "contact_local_z": float(contact_offset_local[2]),
+        "contact_local_up_fraction": float(contact_offset_local[2] / 36.16),
+        "ball_local_x": float(ball_offset_local[0]),
+        "ball_local_y": float(ball_offset_local[1]),
+        "ball_local_z": float(ball_offset_local[2]),
+        "rotational_impulse_alignment": rotational_impulse_alignment,
+        "translation_impulse_alignment": translation_impulse_alignment,
+        "ball_delta_v": ball_delta,
+    }
+
+
+def _empty_musty_features() -> dict[str, float]:
+    return {
+        "legitimate_contact": 0.0,
+        "actual_backward_dodge": 0.0,
+        "contact_age_ticks": -1.0,
+        "rotational_closing_speed": 0.0,
+        "translation_closing_speed": 0.0,
+        "rotational_fraction": 0.0,
+        "sweep_closure": 0.0,
+        "sweep_alignment": -1.0,
+        "sweep_path_length": 0.0,
+        "sweep_monotonic_fraction": 0.0,
+        "precontact_gap_closure": 0.0,
+        "contact_local_x": 0.0,
+        "contact_local_y": 0.0,
+        "contact_local_z": 0.0,
+        "contact_local_up_fraction": 0.0,
+        "ball_local_x": 0.0,
+        "ball_local_y": 0.0,
+        "ball_local_z": 0.0,
+        "rotational_impulse_alignment": -1.0,
+        "translation_impulse_alignment": -1.0,
+        "ball_delta_v": 0.0,
+    }
+
+
 def _musty_cases(
     family: str,
     rows: list[dict[str, Any]],
@@ -561,33 +710,115 @@ def _musty_cases(
 ) -> list[dict[str, Any]]:
     count = len(rows)
     state = _base_state(count)
-    state.car_pos[:, 0] = (0.0, 0.0, 800.0)
-    state.car_vel[:, 0, 0] = 400.0
     state.on_ground[:, 0] = 0
     state.has_jumped[:, 0] = 1
     state.air_time[:, 0] = 0.2
     state.air_time_since_jump[:, 0] = 0.2
     for index, row in enumerate(rows):
         local = int(row["class_index"])
+        variant = int(row.get("scenario_variant", 0))
+        phase = ((variant * 17 + local * 13) % 11 - 5) if variant else 0
+        origin = local % 4
+        yaw = (-0.45, -0.12, 0.28, 0.55)[local % 4] + phase * 0.006
+        roll = (0.0, 0.18, -0.22, 0.08)[local % 4]
+        pitch = (0.0, 0.08, -0.10, 0.04)[local % 4]
+        quaternion = _quat_from_euler(roll, pitch, yaw)
+        height = (
+            (620.0, 980.0, 1320.0, 860.0)[origin]
+            + 8.0 * (local // 4)
+            + phase * 2.0
+        )
+        local_speed = (
+            (320.0, 520.0, 690.0, 430.0)[origin]
+            + 12.0 * (local % 3)
+            + phase * 3.0
+        )
+        local_vertical = (-30.0, 35.0, -70.0, 55.0)[origin]
+        local_car_velocity = np.asarray(
+            (local_speed, ((local % 3) - 1) * 18.0, local_vertical), dtype=np.float32
+        )
+        car_velocity = _quat_rotate(quaternion, local_car_velocity)
+        state.car_pos[index, 0] = (0.0, 0.0, height)
+        state.car_quat[index, 0] = quaternion
+        state.car_vel[index, 0] = car_velocity
+        state.has_jumped[index, 0] = 0 if origin == 3 else 1
         if row["class"] == "positive":
-            offset = np.asarray(MUSTY_OFFSETS[local % len(MUSTY_OFFSETS)], dtype=np.float32)
-            offset[1] += ((local // len(MUSTY_OFFSETS)) - 1) * 4.0
-            ball_vx = 400.0
+            offset = np.asarray(MUSTY_OFFSETS[1 + local % 5], dtype=np.float32)
+            offset[1] += ((local % 3) - 1) * 6.0
+            relative_velocity = np.asarray(
+                ((local % 4 - 1.5) * 8.0, (local % 3 - 1) * 5.0, 0.0),
+                dtype=np.float32,
+            )
             dodge = True
+            hard_negative = ""
         elif row["class"] == "near_miss":
-            offset = np.asarray((25.0 + 2.0 * (local % 5), 0.0, 105.0), dtype=np.float32)
-            ball_vx = 150.0
+            negative_kind = local % 6
+            hard_negative = (
+                "rotated_translation_dominated_rear_bonk",
+                "rotated_front_clear",
+                "lateral_loose_ball_backflip_hit",
+                "pre_scoop_contact",
+                "roof_slap_from_incoming_ball",
+                "high_delta_v_head_on_backflip_hit",
+            )[negative_kind]
+            if negative_kind == 0:
+                # A fast rear impact after the backflip has developed: the
+                # incoming ball catches the rotating car, so translation (not
+                # the swept rear/roof surface) owns the closure.
+                offset = np.asarray((-520.0, 0.0, 135.0), dtype=np.float32)
+                relative_velocity = np.asarray((1700.0, 0.0, 0.0), dtype=np.float32)
+            elif negative_kind == 1:
+                offset = np.asarray((180.0, 0.0, 108.0), dtype=np.float32)
+                relative_velocity = np.asarray((-950.0, 0.0, 0.0), dtype=np.float32)
+            elif negative_kind == 2:
+                side = -1.0 if local % 2 else 1.0
+                offset = np.asarray((-140.0, side * 150.0, 125.0), dtype=np.float32)
+                relative_velocity = np.asarray((0.0, -side * 620.0, 0.0), dtype=np.float32)
+            elif negative_kind == 3:
+                offset = np.asarray((28.0 + local % 4, 0.0, 105.0), dtype=np.float32)
+                relative_velocity = np.asarray((-250.0, 0.0, 0.0), dtype=np.float32)
+            elif negative_kind == 4:
+                # A descending ball slaps the roof during a developed
+                # backflip, but the roof's rotational sweep is not what
+                # closes the contact.
+                offset = np.asarray((0.0, 150.0, 150.0), dtype=np.float32)
+                relative_velocity = np.asarray((0.0, -400.0, -400.0), dtype=np.float32)
+            else:
+                offset = np.asarray((300.0, 0.0, 105.0), dtype=np.float32)
+                relative_velocity = np.asarray((-1050.0, 0.0, 0.0), dtype=np.float32)
             dodge = True
         else:
-            offset = np.asarray((45.0, ((local % 5) - 2) * 8.0, 105.0), dtype=np.float32)
-            ball_vx = 100.0
-            dodge = False
-        state.ball_pos[index] = state.car_pos[index, 0] + offset
-        state.ball_vel[index, 0] = ball_vx
+            control_kind = local % 3
+            hard_negative = (
+                "non_dodge_incoming_contact",
+                "forward_dodge_contact",
+                "random_tumble_contact",
+            )[control_kind]
+            offset = np.asarray((260.0, ((local % 5) - 2) * 16.0, 110.0), dtype=np.float32)
+            relative_velocity = np.asarray((-850.0, 0.0, 0.0), dtype=np.float32)
+            dodge = control_kind == 1
+            if control_kind == 2:
+                state.car_ang_vel[index, 0] = _quat_rotate(
+                    quaternion, np.asarray((0.8, 2.0, 1.2), dtype=np.float32)
+                )
+        world_offset = _quat_rotate(quaternion, offset)
+        world_relative_velocity = _quat_rotate(quaternion, relative_velocity)
+        state.ball_pos[index] = state.car_pos[index, 0] + world_offset
+        state.ball_vel[index] = car_velocity + world_relative_velocity
         row["scenario"] = {
-            "ball_offset": offset.tolist(),
-            "ball_vx": ball_vx,
+            "origin": (
+                "controlled_catch",
+                "aerial",
+                "rotated_aerial",
+                "untimed_resource_origin",
+            )[origin],
+            "car_height": height,
+            "car_local_velocity": local_car_velocity.tolist(),
+            "initial_euler": [roll, pitch, yaw],
+            "ball_local_offset": offset.tolist(),
+            "ball_local_relative_velocity": relative_velocity.tolist(),
             "backward_dodge": dodge,
+            "hard_negative_kind": hard_negative,
         }
 
     def controller(tick: int, controls: ControlBatch) -> None:
@@ -595,40 +826,31 @@ def _musty_cases(
             for index, row in enumerate(rows):
                 if row["scenario"]["backward_dodge"]:
                     controls.jump[index, 0] = 1
-                    controls.pitch[index, 0] = 1.0
+                    controls.pitch[index, 0] = (
+                        -1.0
+                        if row["scenario"]["hard_negative_kind"] == "forward_dodge_contact"
+                        else 1.0
+                    )
 
-    trace = _run(state, 55, collision_root, geometry, meshes, controller)
+    trace = _run(state, 70, collision_root, geometry, meshes, controller)
     onsets = _touch_onsets(trace["hit"])
     for index, row in enumerate(rows):
         touches = onsets[index]
         if touches.size:
             tick = int(touches[0])
-            normal = trace["contact_normal"][tick, index]
-            r_bt = trace["contact_point"][tick, index] - trace["car_pos"][tick - 1, index] * 0.02
-            rotational = np.cross(trace["pre_car_ang"][tick, index], r_bt) * 50.0
-            translation = trace["pre_car_vel"][tick, index] * 50.0
-            rotational_normal = abs(float(np.dot(rotational, normal)))
-            translation_normal = abs(float(np.dot(translation, normal)))
-            fraction = rotational_normal / max(rotational_normal + translation_normal, 1.0e-8)
-            ball_delta = float(np.linalg.norm(trace["ball_delta_v"][tick, index]))
-            hit_tick = float(tick)
+            features = _musty_contact_features(trace, index, tick)
         else:
-            rotational_normal = fraction = ball_delta = 0.0
-            translation_normal = 0.0
-            hit_tick = -1.0
-        row["features"] = {
-            "actual_backward_dodge": float(np.any(trace["has_flipped"][:, index] != 0)),
-            "rotational_normal_speed": rotational_normal,
-            "rotational_fraction": fraction,
-            "ball_delta_v": ball_delta,
-            "translation_normal_speed": translation_normal,
-            "contact_tick": hit_tick,
-        }
+            features = _empty_musty_features()
+        row["features"] = features
         row["physical_invariant"] = (
             bool(
                 touches.size
-                and row["features"]["actual_backward_dodge"] > 0.0
-                and rotational_normal > translation_normal
+                and features["actual_backward_dodge"] > 0.0
+                and features["contact_age_ticks"] >= 4.0
+                and features["rotational_closing_speed"] > 1.0
+                and features["sweep_closure"] > 1.0
+                and features["sweep_path_length"] > 1.0
+                and features["ball_delta_v"] > 1.0
             )
             if row["class"] == "positive"
             else True
@@ -644,152 +866,239 @@ def _breezi_cases(
 ) -> list[dict[str, Any]]:
     count = len(rows)
     initial = _base_state(count)
-    initial.car_pos[:, 0] = (0.0, 0.0, 800.0)
-    initial.car_vel[:, 0, 0] = 400.0
     initial.on_ground[:, 0] = 0
     initial.has_jumped[:, 0] = 1
     initial.air_time[:, 0] = 0.2
-    initial.air_time_since_jump[:, 0] = 0.2
+    initial.air_time_since_jump[:, 0] = 0.0
     duration = np.zeros(count, dtype=np.int32)
     roll = np.zeros(count, dtype=np.float32)
     yaw = np.zeros(count, dtype=np.float32)
-    offset_index = np.full(count, 3, dtype=np.int32)
-    # This timing/path is the physically verified terminal-contact setup from
-    # the prospective probe.  Cases vary their arena origin; identity is
-    # translation invariant and the actual path/contact is remeasured below.
-    offset_index.fill(5)
+    tornado_duration = np.zeros(count, dtype=np.int32)
+    transition_pitch = np.zeros(count, dtype=np.float32)
+    terminal_dodge = np.ones(count, dtype=bool)
+    ball_relative_velocity = np.zeros((count, 3), dtype=np.float32)
+    terminal_offsets = np.zeros((count, 3), dtype=np.float32)
     for index, row in enumerate(rows):
         local = int(row["class_index"])
-        duration[index] = (84, 90, 96)[local % 3]
-        if row["class"] == "positive":
-            duration[index] = 86 + local % 5
-            roll[index] = -1.0
-            yaw[index] = 0.72 + 0.04 * (local % 5)
-        elif row["class"] == "near_miss":
-            roll[index] = 1.0 if local % 2 else 0.0
-            yaw[index] = 0.0 if local % 2 else 1.0
-        else:
-            duration[index] = 0
-        origin = (
-            (float(local % 6) - 2.5) * 160.0,
-            (float(local // 6) - 1.5) * 160.0,
+        variant = int(row.get("scenario_variant", 0))
+        phase = ((variant * 19 + local * 7) % 11 - 5) if variant else 0
+        initial_yaw = (-0.30, -0.08, 0.18, 0.42)[local % 4] + phase * 0.005
+        quaternion = _quat_from_euler(0.0, 0.0, initial_yaw)
+        initial.car_pos[index, 0] = (
+            ((local % 6) - 2.5) * 120.0,
+            ((local // 6) - 1.5) * 120.0,
+            1450.0 + 10.0 * (local % 5) + phase * 2.0,
         )
-        initial.car_pos[index, 0, 0] = origin[0]
-        initial.car_pos[index, 0, 1] = origin[1]
+        initial.car_quat[index, 0] = quaternion
+        initial.car_vel[index, 0] = _quat_rotate(
+            quaternion,
+            np.asarray((360.0 + 14.0 * (local % 5), 0.0, 20.0), dtype=np.float32),
+        )
+        terminal_offsets[index] = np.asarray((-180.0, 0.0, 130.0), dtype=np.float32)
+        if row["class"] == "positive":
+            duration[index] = 132 + local % 7
+            tornado_duration[index] = duration[index] - 48
+            transition_pitch[index] = 1.0
+            roll[index] = -1.0
+            yaw[index] = 0.68 + 0.025 * (local % 5) + phase * 0.004
+            hard_negative = ""
+        elif row["class"] == "near_miss":
+            kind = local % 6
+            hard_negative = (
+                "ordinary_musty_without_breezi_setup",
+                "roll_only_then_musty",
+                "yaw_only_then_musty",
+                "wrong_orientation_order_then_musty",
+                "ball_control_lost_during_correct_setup",
+                "ball_reacquired_only_at_terminal_contact",
+            )[kind]
+            if kind == 0:
+                duration[index] = 0
+                terminal_offsets[index] = np.asarray(
+                    MUSTY_OFFSETS[1 + local % 5], dtype=np.float32
+                )
+            elif kind == 1:
+                duration[index] = 86 + local % 4
+                roll[index] = -1.0
+            elif kind == 2:
+                duration[index] = 86 + local % 4
+                yaw[index] = 0.78
+            elif kind == 3:
+                duration[index] = 132 + local % 7
+                tornado_duration[index] = duration[index] - 48
+                transition_pitch[index] = 1.0
+                roll[index] = 1.0
+                yaw[index] = 0.72
+                terminal_offsets[index] = np.asarray((-132.0, 0.0, 150.0), dtype=np.float32)
+            elif kind == 4:
+                duration[index] = 132 + local % 7
+                tornado_duration[index] = duration[index] - 48
+                transition_pitch[index] = 1.0
+                roll[index] = -1.0
+                yaw[index] = 0.72
+                ball_relative_velocity[index] = (0.0, 520.0, 260.0)
+            else:
+                duration[index] = 132 + local % 7
+                tornado_duration[index] = duration[index] - 48
+                transition_pitch[index] = 1.0
+                roll[index] = -1.0
+                yaw[index] = 0.72
+                ball_relative_velocity[index] = (-620.0, 0.0, 180.0)
+        else:
+            kind = local % 3
+            hard_negative = (
+                "continuous_random_air_roll_without_release",
+                "controlled_ball_without_rotational_setup",
+                "breezi_path_without_terminal_dodge",
+            )[kind]
+            duration[index] = 130 + local % 9
+            if kind == 0:
+                roll[index] = 0.4
+                yaw[index] = -0.3
+            elif kind == 2:
+                roll[index] = -1.0
+                yaw[index] = 0.72
+                tornado_duration[index] = duration[index] - 48
+                transition_pitch[index] = 1.0
+            terminal_dodge[index] = False
+        if tornado_duration[index] == 0:
+            tornado_duration[index] = duration[index]
         row["scenario"] = {
             "setup_ticks": int(duration[index]),
             "roll": float(roll[index]),
             "yaw": float(yaw[index]),
-            "musty_offset": MUSTY_OFFSETS[int(offset_index[index])],
-            "origin_xy": origin,
+            "tornado_ticks": int(tornado_duration[index]),
+            "transition_pitch": float(transition_pitch[index]),
+            "initial_yaw": initial_yaw,
+            "initial_car_position": initial.car_pos[index, 0].tolist(),
+            "initial_car_velocity": initial.car_vel[index, 0].tolist(),
+            "terminal_local_ball_offset": terminal_offsets[index].tolist(),
+            "ball_relative_velocity": ball_relative_velocity[index].tolist(),
+            "terminal_backward_dodge": bool(terminal_dodge[index]),
+            "hard_negative_kind": hard_negative,
+            "continuous_ball_trace": True,
         }
 
     def setup_controller(tick: int, controls: ControlBatch) -> None:
-        active = tick < duration
-        controls.roll[active, 0] = roll[active]
-        controls.yaw[active, 0] = yaw[active]
+        tornado_active = tick < tornado_duration
+        controls.roll[tornado_active, 0] = roll[tornado_active]
+        controls.yaw[tornado_active, 0] = yaw[tornado_active]
+        transition_active = (tick >= tornado_duration) & (tick < duration)
+        controls.pitch[transition_active, 0] = transition_pitch[transition_active]
 
+    # Prospectively solve only the initial ball location.  The calibration
+    # trace below contains the ball for every setup and terminal physics tick;
+    # no terminal state is spliced or reconstructed.
     probe = initial.copy()
-    probe.ball_pos[:] = (0.0, -3000.0, 1500.0)
-    run_ticks = int(np.max(duration)) + 65
+    probe.ball_pos[:] = (0.0, -3000.0, 2400.0)
+    probe.ball_vel[:] = initial.car_vel[:, 0] + ball_relative_velocity
+    run_ticks = int(np.max(duration)) + 1
     probe_trace = _run(probe, run_ticks, collision_root, geometry, meshes, setup_controller)
-    terminal_offset_count = len(MUSTY_OFFSETS)
-    terminal_state = _base_state(count * terminal_offset_count)
-    terminal_state.on_ground[:, 0] = 0
-    terminal_state.has_jumped[:, 0] = 1
-    terminal_state.air_time[:, 0] = 0.2
-    terminal_state.air_time_since_jump[:, 0] = 0.2
+    continuous = initial.copy()
     for index in range(count):
-        terminal = int(duration[index])
-        car_position = probe_trace["car_pos"][terminal, index]
-        car_quat = probe_trace["car_quat"][terminal, index]
-        for offset_id, offset in enumerate(MUSTY_OFFSETS):
-            candidate = index * terminal_offset_count + offset_id
-            terminal_state.car_pos[candidate, 0] = car_position
-            terminal_state.car_quat[candidate, 0] = car_quat
-            terminal_state.car_vel[candidate, 0] = probe_trace["car_vel"][terminal, index]
-            terminal_state.car_ang_vel[candidate, 0] = probe_trace["car_ang"][terminal, index]
-            local_target = np.asarray(offset, dtype=np.float32)
-            terminal_state.ball_pos[candidate] = car_position + _quat_rotate(
-                car_quat, local_target
-            )
-            terminal_state.ball_vel[candidate] = probe_trace["car_vel"][terminal, index]
+        stop = int(duration[index])
+        target = probe_trace["car_pos"][stop, index] + _quat_rotate(
+            probe_trace["car_quat"][stop, index], terminal_offsets[index]
+        )
+        ball_displacement = (
+            probe_trace["ball_pos"][stop, index] - probe_trace["ball_pos"][0, index]
+        )
+        continuous.ball_pos[index] = target - ball_displacement
+        continuous.ball_vel[index] = initial.car_vel[index, 0] + ball_relative_velocity[index]
+        row = rows[index]
+        row["scenario"]["initial_ball_position"] = continuous.ball_pos[index].tolist()
+        row["scenario"]["initial_ball_velocity"] = continuous.ball_vel[index].tolist()
 
-    def terminal_controller(tick: int, controls: ControlBatch) -> None:
-        if tick == 0:
-            controls.jump[:, 0] = 1
-            controls.pitch[:, 0] = 1.0
+    def continuous_controller(tick: int, controls: ControlBatch) -> None:
+        setup_controller(tick, controls)
+        terminal = (duration == tick) & terminal_dodge
+        controls.jump[terminal, 0] = 1
+        controls.pitch[terminal, 0] = 1.0
 
-    terminal_trace = _run(
-        terminal_state, 55, collision_root, geometry, meshes, terminal_controller
+    placement_trace = _run(
+        continuous,
+        int(np.max(duration)) + 1,
+        collision_root,
+        geometry,
+        meshes,
+        setup_controller,
     )
-    onsets = _touch_onsets(terminal_trace["hit"])
+    for index, row in enumerate(rows):
+        stop = int(duration[index])
+        desired_terminal = placement_trace["car_pos"][stop, index] + _quat_rotate(
+            placement_trace["car_quat"][stop, index], terminal_offsets[index]
+        )
+        correction = desired_terminal - placement_trace["ball_pos"][stop, index]
+        continuous.ball_pos[index] += correction
+        row["scenario"]["placement_correction"] = correction.tolist()
+        row["scenario"]["initial_ball_position"] = continuous.ball_pos[index].tolist()
+
+    continuous_trace = _run(
+        continuous,
+        int(np.max(duration)) + 65,
+        collision_root,
+        geometry,
+        meshes,
+        continuous_controller,
+    )
+    onsets = _touch_onsets(continuous_trace["hit"])
     for index, row in enumerate(rows):
         stop = int(duration[index])
         roll_path = 0.0
         yaw_path = 0.0
         forward_z: list[float] = []
         up_z: list[float] = []
+        combined_motion_ticks = 0
         for tick in range(stop + 1):
-            q = probe_trace["car_quat"][tick, index]
+            q = continuous_trace["car_quat"][tick, index]
             forward = _quat_rotate(q, np.asarray((1.0, 0.0, 0.0), dtype=np.float32))
             up = _quat_rotate(q, np.asarray((0.0, 0.0, 1.0), dtype=np.float32))
-            ang = probe_trace["car_ang"][tick, index]
-            roll_path += abs(float(np.dot(ang, forward))) / 120.0
-            yaw_path += abs(float(np.dot(ang, up))) / 120.0
+            ang = continuous_trace["car_ang"][tick, index]
+            roll_rate = abs(float(np.dot(ang, forward)))
+            yaw_rate = abs(float(np.dot(ang, up)))
+            roll_path += roll_rate / 120.0
+            yaw_path += yaw_rate / 120.0
+            combined_motion_ticks += int(roll_rate > 0.1 and yaw_rate > 0.1)
             forward_z.append(float(forward[2]))
             up_z.append(float(up[2]))
-        terminal_musty = 0.0
-        rotational = 0.0
-        selected_candidate = -1
-        selected_tick = -1
-        for offset_id in range(terminal_offset_count):
-            candidate = index * terminal_offset_count + offset_id
-            ticks = onsets[candidate]
-            if not ticks.size:
-                continue
-            tick = int(ticks[0])
-            normal = terminal_trace["contact_normal"][tick, candidate]
-            r_bt = (
-                terminal_trace["contact_point"][tick, candidate]
-                - terminal_trace["car_pos"][tick - 1, candidate] * 0.02
+        setup_distances = np.linalg.norm(
+            continuous_trace["ball_pos"][: stop + 1, index]
+            - continuous_trace["car_pos"][: stop + 1, index],
+            axis=1,
+        )
+        setup_relative_speeds = np.linalg.norm(
+            continuous_trace["ball_vel"][: stop + 1, index]
+            - continuous_trace["car_vel"][: stop + 1, index],
+            axis=1,
+        )
+        setup_terminal_relative = (
+            continuous_trace["ball_pos"][stop, index]
+            - continuous_trace["car_pos"][stop, index]
+        )
+        setup_terminal_local = _quat_unrotate(
+            continuous_trace["car_quat"][stop, index], setup_terminal_relative
+        )
+        early_onsets = onsets[index][onsets[index] < stop]
+        terminal_onsets = onsets[index][onsets[index] >= stop]
+        terminal_features = _empty_musty_features()
+        terminal_distances = np.linalg.norm(
+            continuous_trace["ball_pos"][stop:, index]
+            - continuous_trace["car_pos"][stop:, index],
+            axis=1,
+        )
+        if terminal_onsets.size:
+            terminal_tick = int(terminal_onsets[0])
+            terminal_features = _musty_contact_features(
+                continuous_trace, index, terminal_tick, dodge_tick=stop
             )
-            candidate_rotational = abs(
-                float(
-                    np.dot(
-                        np.cross(terminal_trace["pre_car_ang"][tick, candidate], r_bt)
-                        * 50.0,
-                        normal,
-                    )
-                )
-            )
-            if candidate_rotational > 1.0 and np.any(
-                terminal_trace["has_flipped"][:, candidate] != 0
-            ):
-                selected_candidate = candidate
-                selected_tick = tick
-                rotational = candidate_rotational
-                terminal_musty = 1.0
-                row["scenario"]["selected_terminal_offset"] = MUSTY_OFFSETS[offset_id]
-                break
-        if selected_candidate >= 0:
-            tick = selected_tick
-            for terminal_tick in range(tick + 1):
-                q = terminal_trace["car_quat"][terminal_tick, selected_candidate]
-                forward_z.append(
-                    float(
-                        _quat_rotate(
-                            q, np.asarray((1.0, 0.0, 0.0), dtype=np.float32)
-                        )[2]
-                    )
-                )
-                up_z.append(
-                    float(
-                        _quat_rotate(
-                            q, np.asarray((0.0, 0.0, 1.0), dtype=np.float32)
-                        )[2]
-                    )
-                )
+        terminal_musty = float(
+            terminal_features["actual_backward_dodge"] > 0.0
+            and terminal_features["contact_age_ticks"] >= 4.0
+            and terminal_features["rotational_closing_speed"] > 1.0
+            and terminal_features["sweep_closure"] > 1.0
+            and terminal_features["sweep_path_length"] > 1.0
+            and terminal_features["ball_delta_v"] > 1.0
+        )
         row["features"] = {
             "terminal_musty": terminal_musty,
             "roll_path": roll_path,
@@ -800,7 +1109,25 @@ def _breezi_cases(
             "nose_up_peak": float(max(forward_z, default=0.0)),
             "inverted_depth": float(-min(up_z, default=0.0)),
             "nose_down_depth": float(-min(forward_z, default=0.0)),
-            "rotational_normal_speed": rotational,
+            "combined_roll_yaw_ticks": float(combined_motion_ticks),
+            "roll_yaw_overlap_fraction": float(combined_motion_ticks / max(stop, 1)),
+            "control_max_distance": float(np.max(setup_distances)),
+            "control_max_relative_speed": float(np.max(setup_relative_speeds)),
+            "control_min_distance": float(np.min(setup_distances)),
+            "control_terminal_distance": float(setup_distances[-1]),
+            "control_terminal_local_x": float(setup_terminal_local[0]),
+            "control_terminal_local_y": float(setup_terminal_local[1]),
+            "control_terminal_local_z": float(setup_terminal_local[2]),
+            "preterminal_touch_onsets": float(early_onsets.size),
+            "terminal_contact": float(terminal_onsets.size > 0),
+            "terminal_min_distance": float(np.min(terminal_distances)),
+            "terminal_rotational_closing_speed": terminal_features[
+                "rotational_closing_speed"
+            ],
+            "terminal_rotational_fraction": terminal_features["rotational_fraction"],
+            "terminal_sweep_closure": terminal_features["sweep_closure"],
+            "terminal_sweep_alignment": terminal_features["sweep_alignment"],
+            "terminal_ball_delta_v": terminal_features["ball_delta_v"],
         }
         nose_up = next((i for i, value in enumerate(forward_z) if value > 0.1), -1)
         inverted = next(
@@ -818,6 +1145,8 @@ def _breezi_cases(
                 and row["features"]["ordered_orientation"] > 0.0
                 and roll_path > 0.1
                 and yaw_path > 0.1
+                and combined_motion_ticks > 0
+                and early_onsets.size == 0
             )
             if row["class"] == "positive"
             else True
@@ -835,35 +1164,137 @@ def _redirect_cases(
     state = _base_state(count)
     for index, row in enumerate(rows):
         local = int(row["class_index"])
-        state.car_quat[index, 0] = _quat_from_euler(0.0, 0.0, math.pi * 0.5)
+        variant = int(row.get("scenario_variant", 0))
+        phase = ((variant * 23 + local * 5) % 11 - 5) if variant else 0
+        incoming_angle = (
+            (-0.70, -0.35, 0.0, 0.32, 0.66, 1.0)[local % 6]
+            + phase * 0.01
+        )
+        incoming_direction = np.asarray(
+            (math.cos(incoming_angle), math.sin(incoming_angle), 0.0), dtype=np.float32
+        )
+        cross_direction = np.asarray(
+            (-incoming_direction[1], incoming_direction[0], 0.0), dtype=np.float32
+        )
+        car_height = 320.0 + 70.0 * (local % 6) + phase * 4.0
+        state.car_pos[index, 0] = (0.0, 0.0, car_height)
+        state.on_ground[index, 0] = int(car_height <= 17.0)
+        state.has_jumped[index, 0] = int(car_height > 17.0)
         if row["class"] == "positive":
-            incoming = 900.0 + 35.0 * (local % 8)
-            state.car_vel[index, 0, 1] = 250.0 + 25.0 * (local % 5)
-            height = 120.0 + 3.0 * (local % 4)
+            incoming = 520.0 + 65.0 * (local % 8) + phase * 4.0
+            cross_speed = 400.0 + 55.0 * (local % 6) + phase * 3.0
+            longitudinal_speed = -80.0 + 40.0 * (local % 5)
+            height_offset = 105.0 + 5.0 * (local % 4)
+            # Prospectively include one weak-but-genuine transverse redirect
+            # in derivation so outgoing-speed/retention limits do not become
+            # a quality grade on otherwise valid redirects.
+            if not variant and local == 15:
+                incoming = 650.0
+                cross_speed = 380.0
+                longitudinal_speed = 40.0
+            hard_negative = ""
         elif row["class"] == "near_miss":
-            incoming = 180.0 + 15.0 * (local % 8)
-            state.car_vel[index, 0, 1] = 0.0
-            height = 110.0
+            kind = local % 8
+            hard_negative = (
+                "high_speed_head_on_clear",
+                "high_speed_trajectory_continuation",
+                "small_incidental_deflection",
+                "dead_catch",
+                "normal_aerial_head_on_touch",
+                "dribble_or_bounce_touch",
+                "strong_hit_on_slow_ball",
+                "high_angle_non_transverse_clear",
+            )[kind]
+            if kind == 0:
+                incoming, cross_speed, longitudinal_speed, height_offset = (
+                    1050.0,
+                    0.0,
+                    -750.0,
+                    105.0,
+                )
+            elif kind == 1:
+                incoming, cross_speed, longitudinal_speed, height_offset = 900.0, 12.0, 420.0, 105.0
+            elif kind == 2:
+                incoming, cross_speed, longitudinal_speed, height_offset = 760.0, 55.0, 0.0, 105.0
+            elif kind == 3:
+                incoming, cross_speed, longitudinal_speed, height_offset = 620.0, 0.0, 500.0, 105.0
+            elif kind == 4:
+                incoming, cross_speed, longitudinal_speed, height_offset = 880.0, 0.0, -480.0, 105.0
+            elif kind == 5:
+                incoming, cross_speed, longitudinal_speed, height_offset = 420.0, 45.0, 120.0, 92.0
+                state.car_pos[index, 0, 2] = 17.0
+                state.on_ground[index, 0] = 1
+                state.has_jumped[index, 0] = 0
+            elif kind == 6:
+                incoming, cross_speed, longitudinal_speed, height_offset = 90.0, 820.0, 0.0, 105.0
+            else:
+                incoming, cross_speed, longitudinal_speed, height_offset = (
+                    1150.0,
+                    0.0,
+                    -900.0,
+                    105.0,
+                )
         else:
-            incoming = 60.0
-            state.car_vel[index, 0, 0] = incoming
-            height = 105.0
-        state.ball_pos[index] = (-350.0, 0.0, height)
-        state.ball_vel[index] = (incoming, 0.0, 0.0)
+            kind = local % 4
+            hard_negative = (
+                "ordinary_forward_touch",
+                "ordinary_side_touch_on_nearly_stationary_ball",
+                "ordinary_low_bounce_touch",
+                "ordinary_high_speed_clear",
+            )[kind]
+            incoming = (360.0, 35.0, 260.0, 980.0)[kind]
+            cross_speed = (0.0, 500.0, 30.0, 0.0)[kind]
+            longitudinal_speed = (180.0, 0.0, 100.0, -600.0)[kind]
+            height_offset = (100.0, 105.0, 90.0, 105.0)[kind]
+            if kind in (1, 2):
+                state.car_pos[index, 0, 2] = 17.0
+                state.on_ground[index, 0] = 1
+                state.has_jumped[index, 0] = 0
+        car_velocity = (
+            incoming_direction * longitudinal_speed + cross_direction * cross_speed
+        )
+        state.car_vel[index, 0] = car_velocity
+        approach_distance = 350.0
+        if row["class"] == "near_miss" and local % 8 == 3:
+            approach_distance = 90.0
+        elif row["class"] == "near_miss" and local % 8 == 6:
+            approach_distance = 50.0
+        elif row["class"] == "ordinary_control" and local % 4 in (1, 2):
+            approach_distance = 70.0
+        elif row["class"] == "ordinary_control":
+            approach_distance = 220.0
+        closing_speed = max(incoming - longitudinal_speed, 1.0)
+        intercept_time = approach_distance / closing_speed
+        state.ball_pos[index] = (
+            state.car_pos[index, 0]
+            - incoming_direction * approach_distance
+            + cross_direction * (cross_speed * intercept_time)
+            + np.asarray((0.0, 0.0, height_offset), dtype=np.float32)
+        )
+        state.ball_vel[index] = incoming_direction * incoming
+        state.car_quat[index, 0] = _quat_from_euler(
+            0.0, 0.0, incoming_angle + (math.pi * 0.5 if abs(cross_speed) > 80.0 else math.pi)
+        )
         row["scenario"] = {
             "incoming_speed": incoming,
-            "ball_height": height,
-            "car_cross_speed": float(state.car_vel[index, 0, 1]),
+            "incoming_angle": incoming_angle,
+            "incoming_direction": incoming_direction.tolist(),
+            "car_cross_speed": cross_speed,
+            "car_longitudinal_speed": longitudinal_speed,
+            "car_height": float(state.car_pos[index, 0, 2]),
+            "ball_height_offset": height_offset,
+            "prospective_intercept_time": intercept_time,
+            "hard_negative_kind": hard_negative,
         }
 
-    trace = _run(state, 70, collision_root, geometry, meshes, lambda _tick, _controls: None)
+    trace = _run(state, 110, collision_root, geometry, meshes, lambda _tick, _controls: None)
     onsets = _touch_onsets(trace["hit"])
     for index, row in enumerate(rows):
         ticks = onsets[index]
         if ticks.size:
             tick = int(ticks[0])
             incoming = trace["ball_vel"][max(0, tick - 1), index]
-            outgoing = trace["ball_vel"][min(tick + 1, trace["ball_vel"].shape[0] - 1), index]
+            outgoing = trace["ball_vel"][tick, index]
             in_speed = float(np.linalg.norm(incoming))
             out_speed = float(np.linalg.norm(outgoing))
             angle = float(
@@ -872,17 +1303,54 @@ def _redirect_cases(
             context_height = float(
                 trace["ball_pos"][tick, index, 2] - trace["car_pos"][tick, index, 2]
             )
+            pre_car_velocity = trace["pre_car_vel"][tick, index] * 50.0
+            relative_approach = pre_car_velocity - incoming
+            incoming_unit = _unit(incoming)
+            transverse_approach = relative_approach - incoming_unit * float(
+                np.dot(relative_approach, incoming_unit)
+            )
+            approach_cross_fraction = float(
+                np.linalg.norm(transverse_approach)
+                / max(float(np.linalg.norm(relative_approach)), 1.0e-8)
+            )
+            normal = _unit(trace["contact_normal"][tick, index])
+            normal_cross_fraction = float(
+                np.linalg.norm(normal - incoming_unit * float(np.dot(normal, incoming_unit)))
+            )
+            ball_delta = float(np.linalg.norm(trace["ball_delta_v"][tick, index]))
+            speed_retention = out_speed / max(in_speed, 1.0e-8)
+            legitimate_contact = 1.0
         else:
             in_speed = out_speed = angle = 0.0
             context_height = -999.0
+            approach_cross_fraction = 0.0
+            normal_cross_fraction = 0.0
+            ball_delta = 0.0
+            speed_retention = 0.0
+            legitimate_contact = 0.0
         row["features"] = {
+            "legitimate_contact": legitimate_contact,
             "incoming_speed": in_speed,
             "outgoing_speed": out_speed,
             "direction_change": angle,
             "contact_height": context_height,
+            "world_contact_height": float(trace["ball_pos"][tick, index, 2])
+            if ticks.size
+            else -999.0,
+            "approach_cross_fraction": approach_cross_fraction,
+            "contact_normal_cross_fraction": normal_cross_fraction,
+            "speed_retention": speed_retention,
+            "ball_delta_v": ball_delta,
         }
         row["physical_invariant"] = (
-            bool(ticks.size and in_speed > 500.0 and angle > 0.1)
+            bool(
+                ticks.size
+                and in_speed > 1.0
+                and out_speed > 1.0
+                and angle > 0.01
+                and approach_cross_fraction > 0.01
+                and ball_delta > 1.0
+            )
             if row["class"] == "positive"
             else True
         )
@@ -1169,9 +1637,13 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
         ("control_relative_speed", "max", "carry_relative_speed_max"),
     ),
     "musty": (
+        ("legitimate_contact", "min", "musty_legitimate_contact_min"),
         ("actual_backward_dodge", "min", "discrete_backward_dodge"),
-        ("rotational_normal_speed", "min", "musty_rotational_normal_speed_min"),
+        ("contact_age_ticks", "min", "musty_contact_age_ticks_min"),
+        ("rotational_closing_speed", "min", "musty_rotational_closing_speed_min"),
         ("rotational_fraction", "min", "musty_rotational_fraction_min"),
+        ("sweep_closure", "min", "musty_sweep_closure_min"),
+        ("sweep_path_length", "min", "musty_sweep_path_length_min"),
         ("ball_delta_v", "min", "musty_ball_delta_v_min"),
     ),
     "breezi": (
@@ -1182,13 +1654,25 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
         ("nose_down_depth", "min", "breezi_nose_down_depth_min"),
         ("roll_path", "min", "breezi_roll_path_min"),
         ("yaw_path", "min", "breezi_yaw_path_min"),
-        ("setup_ticks_min_feature", "min", "breezi_setup_ticks_min"),
-        ("setup_ticks_max_feature", "max", "breezi_setup_ticks_max"),
+        ("combined_roll_yaw_ticks", "min", "breezi_combined_motion_ticks_min"),
+        ("roll_yaw_overlap_fraction", "min", "breezi_roll_yaw_overlap_min"),
     ),
     "redirect": (
+        ("legitimate_contact", "min", "redirect_legitimate_contact_min"),
         ("incoming_speed", "min", "redirect_incoming_speed_min"),
         ("outgoing_speed", "min", "redirect_outgoing_speed_min"),
         ("direction_change", "min", "redirect_angle_min_radians"),
+        (
+            "approach_cross_fraction",
+            "min",
+            "redirect_approach_cross_fraction_min",
+        ),
+        (
+            "contact_normal_cross_fraction",
+            "min",
+            "redirect_contact_normal_cross_fraction_min",
+        ),
+        ("speed_retention", "min", "redirect_speed_retention_min"),
     ),
     "pinch": (
         ("overlap_ticks", "max", "pinch_overlap_ticks_max"),
@@ -1225,7 +1709,29 @@ DIAGNOSTIC_FEATURES: dict[str, tuple[str, ...]] = {
         "tangent_speed_delta",
     ),
     "ground_carry": ("velocity_change",),
-    "breezi": ("nose_up_peak", "inverted_depth", "nose_down_depth"),
+    "musty": (
+        "translation_closing_speed",
+        "sweep_alignment",
+        "sweep_monotonic_fraction",
+        "precontact_gap_closure",
+        "contact_local_x",
+        "contact_local_y",
+        "contact_local_z",
+        "ball_local_x",
+        "ball_local_y",
+        "ball_local_z",
+        "rotational_impulse_alignment",
+        "translation_impulse_alignment",
+    ),
+    "breezi": (
+        "nose_up_peak",
+        "inverted_depth",
+        "nose_down_depth",
+        "control_max_distance",
+        "control_max_relative_speed",
+        "terminal_sweep_alignment",
+    ),
+    "redirect": ("contact_height", "ball_delta_v"),
 }
 
 
@@ -1296,20 +1802,28 @@ def _calibrate(
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     geometry = ArenaGeometry.load_soccar(args.collision_root)
     meshes = WarpArenaMeshes(geometry)
-    all_rows: list[dict[str, Any]] = []
-    detectors: dict[str, Any] = {}
+    baseline_thresholds = json.loads(
+        _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/thresholds.json",
+        )
+    )
+    baseline_rows = [
+        json.loads(line)
+        for line in _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/case_results.jsonl",
+        ).splitlines()
+        if line
+    ]
+    detectors: dict[str, Any] = copy.deepcopy(baseline_thresholds["detectors"])
+    corrected_rows: dict[str, list[dict[str, Any]]] = {}
     runners: dict[str, Callable[..., list[dict[str, Any]]]] = {
-        "speedflip": lambda rows, *shared: _flip_cases("speedflip", rows, *shared),
-        "half_flip": lambda rows, *shared: _flip_cases("half_flip", rows, *shared),
-        "possession": lambda rows, *shared: _roof_cases("possession", rows, *shared),
-        "ground_carry": lambda rows, *shared: _roof_cases("ground_carry", rows, *shared),
         "musty": lambda rows, *shared: _musty_cases("musty", rows, *shared),
         "breezi": lambda rows, *shared: _breezi_cases(rows, *shared),
         "redirect": lambda rows, *shared: _redirect_cases(rows, *shared),
-        "pinch": lambda rows, *shared: _pinch_cases(rows, *shared),
-        "pogo": lambda rows, *shared: _pogo_cases(rows, *shared),
     }
-    for family in FAMILY_NAMES:
+    for family in TARGET_FAMILIES:
         print(f"calibrating {family}", flush=True)
         rows = runners[family](_scenario_rows(family), args.collision_root, geometry, meshes)
         derivation_positive = [
@@ -1330,6 +1844,45 @@ def _calibrate(
         boundaries, unresolved = _derive_boundaries(
             derivation_positive, derivation_negative, CALIBRATION_FEATURES[family]
         )
+        if family == "breezi":
+            # Control distance is an envelope, not a stand-alone Breezi
+            # separator: ordinary Musties correctly live inside it and are
+            # rejected by the path topology.  Derive the far edge only from
+            # the two hard negatives which actually lose/reacquire control.
+            control_losses = [
+                row["features"]
+                for row in rows
+                if row["split"] == "derivation"
+                and row["class"] == "near_miss"
+                and row["scenario"]["hard_negative_kind"]
+                in (
+                    "ball_control_lost_during_correct_setup",
+                    "ball_reacquired_only_at_terminal_contact",
+                )
+            ]
+            control_boundary = midpoint_boundary(
+                "control_max_distance",
+                "max",
+                derivation_positive,
+                control_losses,
+            )
+            if control_boundary is None:
+                unresolved.append(len(derivation_negative))
+            else:
+                boundaries.append(
+                    {
+                        "feature": control_boundary.feature,
+                        "direction": control_boundary.direction,
+                        "runtime_threshold": "breezi_control_distance_max",
+                        "threshold": control_boundary.threshold,
+                        "positive_edge": control_boundary.positive_edge,
+                        "negative_edge": control_boundary.negative_edge,
+                        "separation_margin": control_boundary.margin,
+                        "negative_scope": (
+                            "ball_control_lost_or_terminal_only_reacquisition"
+                        ),
+                    }
+                )
         objects = _boundary_objects(boundaries)
         status = STATUS_NOT_READY if intended_positive_failures or unresolved else STATUS_CALIBRATED
         for row in rows:
@@ -1376,7 +1929,8 @@ def _calibrate(
         detectors[family] = {
             "status": status,
             "features_considered": feature_names,
-            "boundary_candidates": [item[0] for item in CALIBRATION_FEATURES[family]],
+            "boundary_candidates": [item[0] for item in CALIBRATION_FEATURES[family]]
+            + (["control_max_distance"] if family == "breezi" else []),
             "boundaries": boundaries,
             "derivation_extrema": extrema,
             "derivation_errors": derivation_errors,
@@ -1389,19 +1943,30 @@ def _calibrate(
                 for name in ("positive", "near_miss", "ordinary_control")
             },
         }
-        all_rows.extend(rows)
-    threshold_payload = {
-        "format": "RIVAL2_MECHANICS_THRESHOLDS_V1",
-        "source_head": source_head,
-        "handoff_source_commit": SOURCE_HANDOFF_COMMIT,
-        "calibration_seed": CALIBRATION_SEED,
-        "physics_hz": 120,
-        "policy_hz": 30,
-        "binary_identity_only": True,
-        "reward_enabled": False,
-        "runtime_threshold_slots": list(THRESHOLD_NAMES),
-        "detectors": detectors,
+        corrected_rows[family] = rows
+    frozen_families = [name for name in FAMILY_NAMES if name not in TARGET_FAMILIES]
+    baseline_by_family = {
+        family: [row for row in baseline_rows if row["family"] == family]
+        for family in frozen_families
     }
+    all_rows = [
+        row
+        for family in FAMILY_NAMES
+        for row in corrected_rows.get(family, baseline_by_family.get(family, []))
+    ]
+    threshold_payload = copy.deepcopy(baseline_thresholds)
+    threshold_payload.update(
+        {
+            "source_head": source_head,
+            "targeted_correction_baseline_commit": ACCEPTED_BASELINE_COMMIT,
+            "targeted_correction_families": list(TARGET_FAMILIES),
+            "targeted_correction_seed": TARGET_CALIBRATION_SEED,
+            "targeted_heldout_scenario_offset": TARGET_HELDOUT_SCENARIO_OFFSET,
+            "frozen_families": frozen_families,
+            "runtime_threshold_slots": list(THRESHOLD_NAMES),
+            "detectors": detectors,
+        }
+    )
     return threshold_payload, all_rows
 
 

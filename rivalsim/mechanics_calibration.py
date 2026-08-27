@@ -27,6 +27,7 @@ ZAP_DODGE_TICKS = 30
 DOUBLE_DASH_TICKS = 90
 SURFACE_FLOOR_CEILING_NZ = 0.85
 SURFACE_WALL_NZ = 0.25
+MUSTY_SWEEP_HISTORY = 9
 
 FAMILY_NAMES = (
     "speedflip",
@@ -86,6 +87,23 @@ THRESHOLD_NAMES = (
     "breezi_nose_up_min",
     "breezi_inverted_depth_min",
     "breezi_nose_down_depth_min",
+    # Targeted continuous-detector correction.  The accepted V1 slots above
+    # remain byte-for-byte stable so frozen detector ABI/threshold evidence is
+    # not renumbered.
+    "musty_legitimate_contact_min",
+    "musty_contact_age_ticks_min",
+    "musty_rotational_closing_speed_min",
+    "musty_sweep_closure_min",
+    "musty_sweep_path_length_min",
+    "breezi_combined_motion_ticks_min",
+    "breezi_roll_yaw_overlap_min",
+    "breezi_control_distance_max",
+    "breezi_control_relative_speed_max",
+    "redirect_legitimate_contact_min",
+    "redirect_world_height_min",
+    "redirect_approach_cross_fraction_min",
+    "redirect_contact_normal_cross_fraction_min",
+    "redirect_speed_retention_min",
 )
 THRESHOLD_INDEX = {name: index for index, name in enumerate(THRESHOLD_NAMES)}
 
@@ -264,13 +282,16 @@ def _emit_mechanic(
 
 @wp.kernel
 def initialize_mechanics_shadow(
+    car_pos: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
     car_ang_vel: wp.array(dtype=wp.vec3),
     has_flipped: wp.array(dtype=wp.int32),
     wheel_contact: wp.array(dtype=wp.int32),
     chassis_contact_count: wp.array(dtype=wp.int32),
+    ball_pos: wp.array(dtype=wp.vec3),
     ball_vel: wp.array(dtype=wp.vec3),
+    previous_position: wp.array(dtype=wp.vec3),
     previous_velocity: wp.array(dtype=wp.vec3),
     previous_quaternion: wp.array(dtype=wp.quat),
     previous_angular_velocity: wp.array(dtype=wp.vec3),
@@ -278,9 +299,16 @@ def initialize_mechanics_shadow(
     previous_wheel_mask: wp.array(dtype=wp.int32),
     previous_chassis_contacts: wp.array(dtype=wp.int32),
     previous_ball_velocity: wp.array(dtype=wp.vec3),
+    previous_ball_position: wp.array(dtype=wp.vec3),
+    history_car_position: wp.array(dtype=wp.vec3),
+    history_car_quaternion: wp.array(dtype=wp.quat),
+    history_ball_position: wp.array(dtype=wp.vec3),
+    history_cursor: wp.array(dtype=wp.int32),
+    history_count: wp.array(dtype=wp.int32),
 ):
     car = wp.tid()
     env = car // 2
+    previous_position[car] = car_pos[car]
     previous_velocity[car] = car_vel[car]
     previous_quaternion[car] = car_quat[car]
     previous_angular_velocity[car] = car_ang_vel[car]
@@ -292,6 +320,14 @@ def initialize_mechanics_shadow(
     previous_wheel_mask[car] = mask
     previous_chassis_contacts[car] = chassis_contact_count[car]
     previous_ball_velocity[env] = ball_vel[env]
+    previous_ball_position[env] = ball_pos[env]
+    history_cursor[car] = 0
+    history_count[car] = 1
+    for sample in range(MUSTY_SWEEP_HISTORY):
+        slot = car * MUSTY_SWEEP_HISTORY + sample
+        history_car_position[slot] = car_pos[car]
+        history_car_quaternion[slot] = car_quat[car]
+        history_ball_position[slot] = ball_pos[env]
 
 
 @wp.kernel
@@ -332,6 +368,7 @@ def collect_mechanics_shadow_tick(
     chassis_local_point: wp.array(dtype=wp.vec3),
     chassis_normal: wp.array(dtype=wp.vec3),
     wheel_contact: wp.array(dtype=wp.int32),
+    previous_position: wp.array(dtype=wp.vec3),
     previous_velocity: wp.array(dtype=wp.vec3),
     previous_quaternion: wp.array(dtype=wp.quat),
     previous_angular_velocity: wp.array(dtype=wp.vec3),
@@ -339,6 +376,13 @@ def collect_mechanics_shadow_tick(
     previous_wheel_mask: wp.array(dtype=wp.int32),
     previous_chassis_contacts: wp.array(dtype=wp.int32),
     previous_ball_velocity: wp.array(dtype=wp.vec3),
+    previous_ball_position: wp.array(dtype=wp.vec3),
+    previous_episode_tick: wp.array(dtype=wp.int32),
+    history_car_position: wp.array(dtype=wp.vec3),
+    history_car_quaternion: wp.array(dtype=wp.quat),
+    history_ball_position: wp.array(dtype=wp.vec3),
+    history_cursor: wp.array(dtype=wp.int32),
+    history_count: wp.array(dtype=wp.int32),
     flip_kind: wp.array(dtype=wp.int32),
     flip_age: wp.array(dtype=wp.int32),
     flip_cancel_age: wp.array(dtype=wp.int32),
@@ -356,6 +400,11 @@ def collect_mechanics_shadow_tick(
     setup_roll_path: wp.array(dtype=wp.float32),
     setup_yaw_path: wp.array(dtype=wp.float32),
     setup_orientation_stage: wp.array(dtype=wp.int32),
+    setup_combined_ticks: wp.array(dtype=wp.int32),
+    setup_control_active: wp.array(dtype=wp.int32),
+    setup_terminal_pending: wp.array(dtype=wp.int32),
+    setup_control_max_distance: wp.array(dtype=wp.float32),
+    setup_control_max_relative_speed: wp.array(dtype=wp.float32),
     pogo_pending: wp.array(dtype=wp.int32),
     pogo_age: wp.array(dtype=wp.int32),
     pogo_features: wp.array(dtype=wp.float32),
@@ -388,23 +437,82 @@ def collect_mechanics_shadow_tick(
             wheel_mask = wheel_mask | (1 << wheel)
             wheel_count = wheel_count + 1
 
+    ball_relative = ball_pos[env] - car_pos[car]
+    relative_velocity = ball_vel[env] - velocity
+    distance = wp.length(ball_relative)
+    relative_speed = wp.length(relative_velocity)
+
+    # History is per-car GPU state.  Episode reconstruction clears it instead
+    # of allowing a sweep path to bridge two unrelated worlds.
+    if tick < previous_episode_tick[car]:
+        history_cursor[car] = 0
+        history_count[car] = 1
+        for sample in range(MUSTY_SWEEP_HISTORY):
+            slot = car * MUSTY_SWEEP_HISTORY + sample
+            history_car_position[slot] = car_pos[car]
+            history_car_quaternion[slot] = quat
+            history_ball_position[slot] = ball_pos[env]
+        setup_ticks[car] = 0
+        setup_roll_path[car] = 0.0
+        setup_yaw_path[car] = 0.0
+        setup_orientation_stage[car] = 0
+        setup_combined_ticks[car] = 0
+        setup_control_active[car] = 0
+        setup_terminal_pending[car] = 0
+        setup_control_max_distance[car] = 0.0
+        setup_control_max_relative_speed[car] = 0.0
+
     if done[env] == 0:
-        # Keep orientation-path history continuously.  It is consumed only by
-        # terminal Breezi/Musty candidates and therefore cannot create events
-        # from controls alone.
-        setup_ticks[car] = setup_ticks[car] + 1
-        setup_roll_path[car] = setup_roll_path[car] + wp.abs(wp.dot(angular, forward)) / 120.0
-        setup_yaw_path[car] = setup_yaw_path[car] + wp.abs(wp.dot(angular, up)) / 120.0
-        if setup_orientation_stage[car] == 0 and forward[2] >= thresholds[33]:
-            setup_orientation_stage[car] = 1
-        elif setup_orientation_stage[car] == 1 and -up[2] >= thresholds[34]:
-            setup_orientation_stage[car] = 2
-        elif setup_orientation_stage[car] == 2 and -forward[2] >= thresholds[35]:
-            setup_orientation_stage[car] = 3
+        # Breezi setup exists only while one continuous, physically controlled
+        # ball relation is maintained.  The accumulated setup is frozen at the
+        # terminal backward-dodge onset so the release motion cannot fabricate
+        # the required tornado path.
+        if setup_terminal_pending[car] == 0:
+            controlled = distance <= thresholds[43]
+            if controlled:
+                if setup_control_active[car] == 0:
+                    setup_control_active[car] = 1
+                    setup_ticks[car] = 0
+                    setup_roll_path[car] = 0.0
+                    setup_yaw_path[car] = 0.0
+                    setup_orientation_stage[car] = 0
+                    setup_combined_ticks[car] = 0
+                    setup_control_max_distance[car] = distance
+                    setup_control_max_relative_speed[car] = relative_speed
+                setup_ticks[car] = setup_ticks[car] + 1
+                roll_rate = wp.abs(wp.dot(angular, forward))
+                yaw_rate = wp.abs(wp.dot(angular, up))
+                setup_roll_path[car] = setup_roll_path[car] + roll_rate / 120.0
+                setup_yaw_path[car] = setup_yaw_path[car] + yaw_rate / 120.0
+                if roll_rate > 0.1 and yaw_rate > 0.1:
+                    setup_combined_ticks[car] = setup_combined_ticks[car] + 1
+                setup_control_max_distance[car] = wp.max(
+                    setup_control_max_distance[car], distance
+                )
+                setup_control_max_relative_speed[car] = wp.max(
+                    setup_control_max_relative_speed[car], relative_speed
+                )
+                if setup_orientation_stage[car] == 0 and forward[2] >= thresholds[33]:
+                    setup_orientation_stage[car] = 1
+                elif setup_orientation_stage[car] == 1 and -up[2] >= thresholds[34]:
+                    setup_orientation_stage[car] = 2
+                elif setup_orientation_stage[car] == 2 and -forward[2] >= thresholds[35]:
+                    setup_orientation_stage[car] = 3
+            else:
+                setup_control_active[car] = 0
+                setup_ticks[car] = 0
+                setup_roll_path[car] = 0.0
+                setup_yaw_path[car] = 0.0
+                setup_orientation_stage[car] = 0
+                setup_combined_ticks[car] = 0
+                setup_control_max_distance[car] = 0.0
+                setup_control_max_relative_speed[car] = 0.0
 
         new_flip = has_flipped[car] != 0 and previous_has_flipped[car] == 0
         if new_flip:
             torque = flip_rel_torque[car]
+            if torque[1] < -0.25 and setup_control_active[car] != 0:
+                setup_terminal_pending[car] = 1
             flip_kind[car] = 1
             if torque[0] > 0.25:
                 flip_kind[car] = 2
@@ -501,10 +609,6 @@ def collect_mechanics_shadow_tick(
         touch_onset = reports_contact != 0 and touch_latched[car] == 0
         touch_latched[car] = int(reports_contact != 0)
         other = env * 2 + (1 - local_car)
-        ball_relative = ball_pos[env] - car_pos[car]
-        relative_velocity = ball_vel[env] - velocity
-        distance = wp.length(ball_relative)
-        relative_speed = wp.length(relative_velocity)
 
         if touch_onset:
             possession_owner[env] = local_car
@@ -553,28 +657,75 @@ def collect_mechanics_shadow_tick(
                 car_a_contact_normal[env] if local_car == 0 else car_b_contact_normal[env]
             )
             delta_v = car_a_ball_delta_v[env] if local_car == 0 else car_b_ball_delta_v[env]
-            center_bt = car_pos[car] * 0.02
-            r_bt = point_bt - center_bt
-            rotational_bt = wp.cross(pre_angular, r_bt)
-            rotational_normal = wp.abs(wp.dot(rotational_bt * 50.0, contact_normal))
-            translation_normal = wp.abs(wp.dot(pre_velocity_bt * 50.0, contact_normal))
-            fraction = rotational_normal / wp.max(rotational_normal + translation_normal, 1.0e-6)
+            pre_position = previous_position[car]
+            pre_ball_position = previous_ball_position[env]
+            contact_world = point_bt * 50.0
+            contact_offset_world = contact_world - pre_position
+            contact_offset_local = wp.quat_rotate_inv(
+                previous_quaternion[car], contact_offset_world
+            )
+            car_to_ball = _safe_unit(pre_ball_position - pre_position)
+            rotational_velocity = wp.cross(pre_angular, contact_offset_world)
+            incoming = previous_ball_velocity[env]
+            translation_relative = pre_velocity_bt * 50.0 - incoming
+            rotational_closing = wp.dot(rotational_velocity, car_to_ball)
+            translation_closing = wp.dot(translation_relative, car_to_ball)
+            positive_rotation = wp.max(rotational_closing, 0.0)
+            positive_translation = wp.max(translation_closing, 0.0)
+            fraction = positive_rotation / wp.max(
+                positive_rotation + positive_translation, 1.0e-6
+            )
+
+            cursor = history_cursor[car]
+            count = history_count[car]
+            first_rotated = wp.vec3(0.0, 0.0, 0.0)
+            previous_rotated = wp.vec3(0.0, 0.0, 0.0)
+            last_rotated = wp.vec3(0.0, 0.0, 0.0)
+            sweep_path_length = 0.0
+            for sample in range(MUSTY_SWEEP_HISTORY):
+                if sample < count:
+                    ordered_slot = cursor - (count - 1) + sample
+                    if ordered_slot < 0:
+                        ordered_slot = ordered_slot + MUSTY_SWEEP_HISTORY
+                    slot = car * MUSTY_SWEEP_HISTORY + ordered_slot
+                    rotated = wp.quat_rotate(
+                        history_car_quaternion[slot], contact_offset_local
+                    )
+                    if sample == 0:
+                        first_rotated = rotated
+                    else:
+                        sweep_path_length = sweep_path_length + wp.length(
+                            rotated - previous_rotated
+                        )
+                    previous_rotated = rotated
+                    last_rotated = rotated
+            sweep_closure = wp.dot(last_rotated - first_rotated, car_to_ball)
             ball_delta = wp.length(delta_v)
-            backward_dodge = is_flipping[car] != 0 and flip_rel_torque[car][0] > 0.25
+            backward_dodge = has_flipped[car] != 0 and flip_rel_torque[car][1] < -0.25
             musty = (
                 family_ready[4] != 0
+                and thresholds[36] <= 1.0
                 and backward_dodge
-                and rotational_normal >= thresholds[12]
+                and float(flip_age[car]) >= thresholds[37]
+                and rotational_closing >= thresholds[38]
                 and fraction >= thresholds[13]
+                and sweep_closure >= thresholds[39]
+                and sweep_path_length >= thresholds[40]
                 and ball_delta >= thresholds[14]
+            )
+            setup_overlap = float(setup_combined_ticks[car]) / wp.max(
+                float(setup_ticks[car]), 1.0
             )
             breezi = (
                 family_ready[5] != 0
                 and musty
+                and setup_terminal_pending[car] != 0
+                and setup_control_active[car] != 0
                 and setup_roll_path[car] >= thresholds[15]
                 and setup_yaw_path[car] >= thresholds[16]
-                and float(setup_ticks[car]) >= thresholds[17]
-                and float(setup_ticks[car]) <= thresholds[32]
+                and float(setup_combined_ticks[car]) >= thresholds[41]
+                and setup_overlap >= thresholds[42]
+                and setup_control_max_distance[car] <= thresholds[43]
                 and setup_orientation_stage[car] >= 3
             )
             if breezi:
@@ -585,8 +736,8 @@ def collect_mechanics_shadow_tick(
                     tick,
                     setup_roll_path[car],
                     setup_yaw_path[car],
-                    float(setup_ticks[car]),
-                    rotational_normal,
+                    setup_overlap,
+                    setup_control_max_distance[car],
                     evidence_capacity,
                     family_event_count,
                     family_lockout,
@@ -607,10 +758,10 @@ def collect_mechanics_shadow_tick(
                     4,
                     1,
                     tick,
-                    rotational_normal,
+                    rotational_closing,
                     fraction,
-                    ball_delta,
-                    translation_normal,
+                    sweep_closure,
+                    sweep_path_length,
                     evidence_capacity,
                     family_event_count,
                     family_lockout,
@@ -622,18 +773,33 @@ def collect_mechanics_shadow_tick(
                     evidence_features,
                 )
 
-            incoming = previous_ball_velocity[env]
             outgoing = ball_vel[env]
             incoming_speed = wp.length(incoming)
             outgoing_speed = wp.length(outgoing)
             cosine = wp.clamp(wp.dot(_safe_unit(incoming), _safe_unit(outgoing)), -1.0, 1.0)
             angle = wp.acos(cosine)
+            incoming_unit = _safe_unit(incoming)
+            transverse_approach = translation_relative - incoming_unit * wp.dot(
+                translation_relative, incoming_unit
+            )
+            approach_cross_fraction = wp.length(transverse_approach) / wp.max(
+                wp.length(translation_relative), 1.0e-6
+            )
+            unit_contact_normal = _safe_unit(contact_normal)
+            normal_cross_fraction = wp.length(
+                unit_contact_normal
+                - incoming_unit * wp.dot(unit_contact_normal, incoming_unit)
+            )
+            speed_retention = outgoing_speed / wp.max(incoming_speed, 1.0e-6)
             if (
                 family_ready[6] != 0
+                and thresholds[45] <= 1.0
                 and incoming_speed >= thresholds[18]
                 and outgoing_speed >= thresholds[19]
                 and angle >= thresholds[20]
-                and ball_relative[2] > 80.0
+                and approach_cross_fraction >= thresholds[47]
+                and normal_cross_fraction >= thresholds[48]
+                and speed_retention >= thresholds[49]
             ):
                 _emit_mechanic(
                     car,
@@ -643,7 +809,7 @@ def collect_mechanics_shadow_tick(
                     incoming_speed,
                     outgoing_speed,
                     angle,
-                    ball_relative[2],
+                    approach_cross_fraction,
                     evidence_capacity,
                     family_event_count,
                     family_lockout,
@@ -692,6 +858,11 @@ def collect_mechanics_shadow_tick(
             setup_roll_path[car] = 0.0
             setup_yaw_path[car] = 0.0
             setup_orientation_stage[car] = 0
+            setup_combined_ticks[car] = 0
+            setup_control_active[car] = 0
+            setup_terminal_pending[car] = 0
+            setup_control_max_distance[car] = 0.0
+            setup_control_max_relative_speed[car] = 0.0
         elif possession_owner[env] == local_car:
             possession_gap[env] = possession_gap[env] + 1
             if (
@@ -818,14 +989,26 @@ def collect_mechanics_shadow_tick(
                     family_lockout[slot] = 0
                     family_rearm_count[slot] = family_rearm_count[slot] + 1
 
+    previous_position[car] = car_pos[car]
     previous_velocity[car] = velocity
     previous_quaternion[car] = quat
     previous_angular_velocity[car] = angular
     previous_has_flipped[car] = has_flipped[car]
     previous_wheel_mask[car] = wheel_mask
     previous_chassis_contacts[car] = chassis_contact_count[car]
+    previous_episode_tick[car] = tick
+    next_history_slot = history_cursor[car] + 1
+    if next_history_slot >= MUSTY_SWEEP_HISTORY:
+        next_history_slot = 0
+    history_cursor[car] = next_history_slot
+    history_count[car] = wp.min(history_count[car] + 1, MUSTY_SWEEP_HISTORY)
+    history_slot = car * MUSTY_SWEEP_HISTORY + next_history_slot
+    history_car_position[history_slot] = car_pos[car]
+    history_car_quaternion[history_slot] = quat
+    history_ball_position[history_slot] = ball_pos[env]
     if local_car == 0:
         previous_ball_velocity[env] = ball_vel[env]
+        previous_ball_position[env] = ball_pos[env]
 
 
 class MechanicsShadowObserver:
@@ -862,6 +1045,7 @@ class MechanicsShadowObserver:
         def vectors(count: int) -> wp.array:
             return wp.zeros(count, dtype=wp.vec3, device=self.device)
 
+        self.previous_position = vectors(self.car_count)
         self.previous_velocity = vectors(self.car_count)
         self.previous_quaternion = wp.zeros(self.car_count, dtype=wp.quat, device=self.device)
         self.previous_angular_velocity = vectors(self.car_count)
@@ -869,6 +1053,16 @@ class MechanicsShadowObserver:
         self.previous_wheel_mask = ints(self.car_count)
         self.previous_chassis_contacts = ints(self.car_count)
         self.previous_ball_velocity = vectors(self.num_worlds)
+        self.previous_ball_position = vectors(self.num_worlds)
+        self.previous_episode_tick = ints(self.car_count)
+        history_size = self.car_count * MUSTY_SWEEP_HISTORY
+        self.history_car_position = vectors(history_size)
+        self.history_car_quaternion = wp.zeros(
+            history_size, dtype=wp.quat, device=self.device
+        )
+        self.history_ball_position = vectors(history_size)
+        self.history_cursor = ints(self.car_count)
+        self.history_count = ints(self.car_count)
         self.flip_kind = ints(self.car_count)
         self.flip_age = ints(self.car_count)
         self.flip_cancel_age = wp.full(self.car_count, -1, dtype=wp.int32, device=self.device)
@@ -886,6 +1080,11 @@ class MechanicsShadowObserver:
         self.setup_roll_path = floats(self.car_count)
         self.setup_yaw_path = floats(self.car_count)
         self.setup_orientation_stage = ints(self.car_count)
+        self.setup_combined_ticks = ints(self.car_count)
+        self.setup_control_active = ints(self.car_count)
+        self.setup_terminal_pending = ints(self.car_count)
+        self.setup_control_max_distance = floats(self.car_count)
+        self.setup_control_max_relative_speed = floats(self.car_count)
         self.pogo_pending = ints(self.car_count)
         self.pogo_age = ints(self.car_count)
         self.pogo_features = floats(self.car_count * 4)
@@ -905,13 +1104,16 @@ class MechanicsShadowObserver:
             initialize_mechanics_shadow,
             dim=self.car_count,
             inputs=[
+                world.state.car_pos,
                 world.state.car_vel,
                 world.state.car_quat,
                 world.state.car_ang_vel,
                 world.state.has_flipped,
                 world.vehicle.wheel_contact,
                 world.vehicle.contact_count,
+                world.state.ball_pos,
                 world.state.ball_vel,
+                self.previous_position,
                 self.previous_velocity,
                 self.previous_quaternion,
                 self.previous_angular_velocity,
@@ -919,6 +1121,12 @@ class MechanicsShadowObserver:
                 self.previous_wheel_mask,
                 self.previous_chassis_contacts,
                 self.previous_ball_velocity,
+                self.previous_ball_position,
+                self.history_car_position,
+                self.history_car_quaternion,
+                self.history_ball_position,
+                self.history_cursor,
+                self.history_count,
             ],
             device=self.device,
         )
@@ -978,6 +1186,7 @@ class MechanicsShadowObserver:
                 world.vehicle.contact_local_a,
                 world.vehicle.contact_normal,
                 world.vehicle.wheel_contact,
+                self.previous_position,
                 self.previous_velocity,
                 self.previous_quaternion,
                 self.previous_angular_velocity,
@@ -985,6 +1194,13 @@ class MechanicsShadowObserver:
                 self.previous_wheel_mask,
                 self.previous_chassis_contacts,
                 self.previous_ball_velocity,
+                self.previous_ball_position,
+                self.previous_episode_tick,
+                self.history_car_position,
+                self.history_car_quaternion,
+                self.history_ball_position,
+                self.history_cursor,
+                self.history_count,
                 self.flip_kind,
                 self.flip_age,
                 self.flip_cancel_age,
@@ -1002,6 +1218,11 @@ class MechanicsShadowObserver:
                 self.setup_roll_path,
                 self.setup_yaw_path,
                 self.setup_orientation_stage,
+                self.setup_combined_ticks,
+                self.setup_control_active,
+                self.setup_terminal_pending,
+                self.setup_control_max_distance,
+                self.setup_control_max_relative_speed,
                 self.pogo_pending,
                 self.pogo_age,
                 self.pogo_features,
