@@ -73,3 +73,15 @@ restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as
    being the original software.
 3. This notice may not be removed or altered from any source distribution.
+
+## Wisp v2-75B
+
+The frozen opponent integration under `third_party/wisp75b/` uses the public
+Wisp v2-75B policy and shared-head artifacts retrieved through the RLBot v5
+BotPack submodule. BotPack pins `NicEastvillage/RLBot-Wisp-v2-py` commit
+`58d4ab18fd0c92529b5ae6582ecf1713a6b1887a`. Exact artifact paths, Git blob
+identities, byte SHA-256 values, and the BotPack retrieval commit are recorded
+in `third_party/wisp75b/PROVENANCE.json`. The policy weights are unmodified.
+
+Wisp v2-75B is distributed under the MIT License. The complete upstream notice
+is retained at `third_party/wisp75b/LICENSE`.

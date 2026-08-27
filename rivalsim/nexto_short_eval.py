@@ -29,6 +29,7 @@ from rivalsim.kernels.rival2 import (
 from rivalsim.rival2_contracts import (
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
@@ -415,6 +416,8 @@ def collect_short_eval_mechanics_tick(
 
 @wp.kernel(enable_backward=False)
 def collect_short_eval_metrics_tick(
+    touch_event_capacity: int,
+    ball_position: wp.array(dtype=wp.vec3),
     car_velocity: wp.array(dtype=wp.vec3),
     boost: wp.array(dtype=wp.float32),
     is_boosting: wp.array(dtype=wp.int32),
@@ -448,6 +451,10 @@ def collect_short_eval_metrics_tick(
     previous_save_count_interval: wp.array(dtype=wp.int32),
     simulated_ticks: wp.array(dtype=wp.int32),
     touch_count: wp.array(dtype=wp.int32),
+    touch_event_count: wp.array(dtype=wp.int32),
+    touch_event_overflow: wp.array(dtype=wp.int32),
+    airborne_touch_count: wp.array(dtype=wp.int32),
+    touch_ball_height: wp.array(dtype=wp.float32),
     save_count: wp.array(dtype=wp.int32),
     speed_sum: wp.array(dtype=wp.float32),
     supersonic_ticks: wp.array(dtype=wp.int32),
@@ -473,8 +480,26 @@ def collect_short_eval_metrics_tick(
     touch_contact_latched[car_base + 1] = reports_b
     if onset_a != 0:
         touch_count[car_base] = touch_count[car_base] + 1
+        ordinal = touch_event_count[car_base]
+        touch_event_count[car_base] = ordinal + 1
+        if ordinal < touch_event_capacity:
+            touch_ball_height[car_base * touch_event_capacity + ordinal] = ball_position[env][2]
+        else:
+            touch_event_overflow[car_base] = touch_event_overflow[car_base] + 1
+        if on_ground[car_base] == 0:
+            airborne_touch_count[car_base] = airborne_touch_count[car_base] + 1
     if onset_b != 0:
         touch_count[car_base + 1] = touch_count[car_base + 1] + 1
+        ordinal = touch_event_count[car_base + 1]
+        touch_event_count[car_base + 1] = ordinal + 1
+        if ordinal < touch_event_capacity:
+            touch_ball_height[(car_base + 1) * touch_event_capacity + ordinal] = (
+                ball_position[env][2]
+            )
+        else:
+            touch_event_overflow[car_base + 1] = touch_event_overflow[car_base + 1] + 1
+        if on_ground[car_base + 1] == 0:
+            airborne_touch_count[car_base + 1] = airborne_touch_count[car_base + 1] + 1
     if first_toucher[env] < 0 and (onset_a != 0 or onset_b != 0):
         if onset_a != 0 and onset_b != 0:
             first_toucher[env] = pre_tick_first_car[env]
@@ -548,6 +573,9 @@ class ShortEvalTelemetry:
     _CAR_INT_FIELDS = (
         "simulated_ticks",
         "touch_count",
+        "touch_event_count",
+        "touch_event_overflow",
+        "airborne_touch_count",
         "save_count",
         "supersonic_ticks",
         "grounded_ticks",
@@ -709,6 +737,9 @@ class ShortEvalTelemetry:
         for name in self._EVENT_VEC_FIELDS:
             setattr(self, name, wp.zeros(event_count, dtype=wp.vec3, device=self.device))
         self.event_action = wp.zeros(event_count * 8, dtype=wp.float32, device=self.device)
+        self.touch_ball_height = wp.zeros(
+            event_count, dtype=wp.float32, device=self.device
+        )
         for name in (
             "event_suspension_length_before",
             "event_suspension_velocity_before",
@@ -865,6 +896,8 @@ class ShortEvalTelemetry:
             collect_short_eval_metrics_tick,
             dim=self.num_worlds,
             inputs=[
+                self.event_capacity,
+                world.state.ball_pos,
                 world.state.car_vel,
                 world.state.boost,
                 world.state.is_boosting,
@@ -898,6 +931,10 @@ class ShortEvalTelemetry:
                 self.previous_save_count_interval,
                 self.simulated_ticks,
                 self.touch_count,
+                self.touch_event_count,
+                self.touch_event_overflow,
+                self.airborne_touch_count,
+                self.touch_ball_height,
                 self.save_count,
                 self.speed_sum,
                 self.supersonic_ticks,
@@ -930,6 +967,9 @@ class ShortEvalTelemetry:
         for name in self._EVENT_VEC_FIELDS:
             raw[name] = np.asarray(getattr(self, name).numpy()).reshape(*event_shape, 3).copy()
         raw["event_action"] = np.asarray(self.event_action.numpy()).reshape(*event_shape, 8).copy()
+        raw["touch_ball_height"] = np.asarray(self.touch_ball_height.numpy()).reshape(
+            event_shape
+        ).copy()
         for name in (
             "event_suspension_length_before",
             "event_suspension_velocity_before",
@@ -998,15 +1038,19 @@ class NextoShortEpisodeRunner:
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
             raise RuntimeError("unsupported Rival checkpoint format")
-        if payload.get("reward_version") != RIVAL2_REWARD_GAMEPLAY_V1_VERSION:
-            raise RuntimeError("short evaluator requires a Gameplay V1 checkpoint")
+        checkpoint_reward = payload.get("reward_version")
+        if checkpoint_reward not in (
+            RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+        ):
+            raise RuntimeError("short evaluator requires a Gameplay V1/V2 checkpoint")
         if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
             raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
         policy_config = Rival2PolicyConfig(**payload["policy_config"])
         if policy_config.content_hash != payload["policy_config_hash"]:
             raise RuntimeError("Rival checkpoint policy contract mismatch")
         expected_contracts = contract_hashes_for_reward(
-            RIVAL2_REWARD_GAMEPLAY_V1_VERSION, RIVAL2_EPISODE_VERSION
+            checkpoint_reward, RIVAL2_EPISODE_VERSION
         )
         if payload.get("contract_hashes") != expected_contracts:
             raise RuntimeError("Rival checkpoint observation/action/reward contract mismatch")
@@ -1163,6 +1207,7 @@ def classify_dash_events(
     rival_side: np.ndarray,
     starting_layout: np.ndarray,
     checkpoint_label: str,
+    opponent_name: str = "Nexto",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Classify inspectable candidates without inferring intent.
 
@@ -1337,7 +1382,7 @@ def classify_dash_events(
                     "starting_layout": int(starting_layout[world]),
                     "rival_side": int(rival_side[world]),
                     "physical_side": side,
-                    "policy": "Rival" if side == int(rival_side[world]) else "Nexto",
+                    "policy": "Rival" if side == int(rival_side[world]) else opponent_name,
                     "ordinal": ordinal,
                     "tick": tick,
                     "seconds": tick / PHYSICS_HZ,
@@ -1433,6 +1478,7 @@ def classify_dash_events(
                     classified.append(event)
             all_events_by_car[(world, side)] = per_car
 
+    strict_pair_counts: dict[str, int] = {"Rival": 0, opponent_name: 0}
     for events in all_events_by_car.values():
         wavedashes = [
             event for event in events if "wavedash_candidate" in event["candidate_labels"]
@@ -1445,6 +1491,7 @@ def classify_dash_events(
                 and landing_tick <= current["tick"]
                 and 0 < ticks_between <= DOUBLE_DASH_WINDOW_TICKS
             ):
+                strict_pair_counts[current["policy"]] += 1
                 evidence = {
                     "previous_world": previous["world"],
                     "previous_ordinal": previous["ordinal"],
@@ -1469,7 +1516,7 @@ def classify_dash_events(
         for event in events
         if event["candidate_labels"]
     ]
-    counts: dict[str, dict[str, int]] = {"Rival": {}, "Nexto": {}}
+    counts: dict[str, dict[str, int]] = {"Rival": {}, opponent_name: {}}
     for event in classified:
         policy_counts = counts[event["policy"]]
         for label in event["candidate_labels"]:
@@ -1525,6 +1572,7 @@ def classify_dash_events(
         "event_overflow_total": int(raw["event_overflow"].sum()),
         "classified_event_count": len(classified),
         "candidate_event_counts_by_policy": counts,
+        "strict_double_dash_pair_count_by_policy": strict_pair_counts,
     }
     return classified, summary
 

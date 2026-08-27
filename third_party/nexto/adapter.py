@@ -475,7 +475,11 @@ class NextoPolicyAdapter:
         self.inference_calls += 1
         return output
 
-    def neural_action(self, state: NextoStateTensors) -> tuple[torch.Tensor, torch.Tensor]:
+    def neural_action(
+        self,
+        state: NextoStateTensors,
+        active_mask: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         observation = build_nexto_observation(
             state,
             self.player_index,
@@ -483,16 +487,49 @@ class NextoPolicyAdapter:
             constants=self.constants,
         )
         self.observation_builds += 1
-        logits = self.logits(observation)
-        indices = torch.argmax(logits, dim=-1)
-        action = self.action_table.index_select(0, indices)
-        self.previous_action.copy_(action)
+        if active_mask is None:
+            logits = self.logits(observation)
+            indices = torch.argmax(logits, dim=-1)
+            action = self.action_table.index_select(0, indices)
+            self.previous_action.copy_(action)
+            return action, indices
+        selected = torch.nonzero(active_mask, as_tuple=False).squeeze(-1)
+        indices = torch.full(
+            (self.num_worlds,), -1, dtype=torch.long, device=self.device
+        )
+        action = self.previous_action.clone()
+        if selected.numel() > 0:
+            selected_observation = NextoObservation(
+                q=observation.q.index_select(0, selected),
+                kv=observation.kv.index_select(0, selected),
+                mask=observation.mask.index_select(0, selected),
+            )
+            logits = self.logits(selected_observation)
+            selected_indices = torch.argmax(logits, dim=-1)
+            selected_action = self.action_table.index_select(0, selected_indices)
+            indices.index_copy_(0, selected, selected_indices)
+            action.index_copy_(0, selected, selected_action)
+            self.previous_action.index_copy_(0, selected, selected_action)
         return action, indices
+
+    def activate(self, active_mask: torch.Tensor) -> None:
+        """Initialize only worlds newly assigned to a Nexto episode."""
+
+        if active_mask.shape != (self.num_worlds,) or active_mask.device != self.device:
+            raise ValueError("Nexto activation mask must be device resident")
+        self.previous_action.masked_fill_(active_mask[:, None], 0.0)
+        self.neural_counter.copy_(
+            torch.where(active_mask, torch.zeros_like(self.neural_counter), self.neural_counter)
+        )
+        self.kickoff_index.copy_(
+            torch.where(active_mask, torch.zeros_like(self.kickoff_index), self.kickoff_index)
+        )
 
     def tick_action(
         self,
         state: NextoStateTensors,
         kickoff_active: torch.Tensor,
+        active_mask: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
         """Return this tick's controls and advance the 15/120 Hz state.
 
@@ -504,20 +541,31 @@ class NextoPolicyAdapter:
 
         if kickoff_active.shape != (self.num_worlds,) or kickoff_active.device != self.device:
             raise ValueError("kickoff_active must be device resident")
+        all_active = active_mask is None
+        if all_active:
+            active_mask = torch.ones(self.num_worlds, dtype=torch.bool, device=self.device)
+        if active_mask.shape != (self.num_worlds,) or active_mask.device != self.device:
+            raise ValueError("Nexto active mask must be device resident")
         indices: torch.Tensor | None = None
-        if self._cadence_tick == 0:
-            _action, indices = self.neural_action(state)
+        if all_active:
+            if self._cadence_tick == 0:
+                _action, indices = self.neural_action(state)
+        else:
+            compute = active_mask & (self.neural_counter == 0)
+            if compute.any():
+                _action, indices = self.neural_action(state, compute)
 
-        inactive = ~kickoff_active
+        inactive = active_mask & ~kickoff_active
         self.kickoff_index.copy_(
             torch.where(inactive, torch.full_like(self.kickoff_index, -1), self.kickoff_index)
         )
-        newly_active = kickoff_active & (self.kickoff_index < 0)
+        newly_active = active_mask & kickoff_active & (self.kickoff_index < 0)
         self.kickoff_index.copy_(
             torch.where(newly_active, torch.zeros_like(self.kickoff_index), self.kickoff_index)
         )
         in_sequence = (
-            kickoff_active
+            active_mask
+            & kickoff_active
             & (self.kickoff_index >= 0)
             & (self.kickoff_index < KICKOFF_LENGTH)
             & (state.ball_pos[:, 1] == 0.0)
@@ -529,10 +577,21 @@ class NextoPolicyAdapter:
             torch.where(in_sequence[:, None], sequence_action, self.previous_action)
         )
         self.kickoff_index.copy_(
-            torch.where(kickoff_active, self.kickoff_index + 1, self.kickoff_index)
+            torch.where(
+                active_mask & kickoff_active,
+                self.kickoff_index + 1,
+                self.kickoff_index,
+            )
         )
-        self.neural_counter.add_(1).remainder_(8)
-        self._cadence_tick = (self._cadence_tick + 1) % 8
+        self.neural_counter.copy_(
+            torch.where(
+                active_mask,
+                torch.remainder(self.neural_counter + 1, 8),
+                self.neural_counter,
+            )
+        )
+        if all_active:
+            self._cadence_tick = (self._cadence_tick + 1) % 8
         return self.previous_action, indices
 
 

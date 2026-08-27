@@ -1,0 +1,126 @@
+{
+  "verdict": "PASS_GREEN",
+  "corpus": {
+    "states": 2048,
+    "seed": 1313167444,
+    "blue_viewpoints": 1024,
+    "orange_viewpoints": 1024,
+    "coverage": [
+      "grounded",
+      "aerial",
+      "demoed",
+      "low_boost",
+      "high_boost",
+      "pad_active",
+      "pad_inactive",
+      "all_five_kickoff_layouts_both_viewpoints"
+    ]
+  },
+  "provenance": {
+    "upstream_commit": "2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca",
+    "model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+    "model_size_bytes": 1852625,
+    "torch_version": "2.13.0+cu130",
+    "cuda_device": "NVIDIA GeForce RTX 5090",
+    "compatibility_patch": "one stale TorchScript explicit CPU device literal retargeted to cuda:0; weights unchanged",
+    "compatibility_graph_literals_patched": 1,
+    "compatibility_scalar_constants_rehomed": 4
+  },
+  "observation_parity": {
+    "q_max_abs_error": 0.0,
+    "kv_max_abs_error": 6.106226635438361e-16,
+    "mask_max_abs_error": 0.0
+  },
+  "model_action_parity": {
+    "logit_max_abs_error_cpu_reference_vs_cuda": 4.00543212890625e-05,
+    "argmax_agreement_fraction": 1.0,
+    "argmax_agreement_count": 2048
+  },
+  "action_table": {
+    "count": 90,
+    "shape": [
+      90,
+      8
+    ],
+    "float32_sha256": "86BAA15C48C42C497F3EA0FE62EFEB49E4A8241CB3191957822E453CD2D0B655"
+  },
+  "kickoff_sequence": {
+    "physics_ticks": 168,
+    "shape": [
+      168,
+      8
+    ],
+    "float32_sha256": "55BBDEB064EE173D9D2F48CBD3109509F82FDE1AA5EBD176B86C9AF2768A7FEF"
+  },
+  "boost_pad_mapping": {
+    "nexto_to_rivalsim": [
+      6,
+      7,
+      8,
+      4,
+      5,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      0,
+      19,
+      20,
+      1,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      2,
+      3,
+      31,
+      32,
+      33
+    ],
+    "max_coordinate_residual_uu": 2.0,
+    "nonzero_residuals": [
+      {
+        "nexto_index": 27,
+        "rivalsim_index": 29,
+        "residual_uu": 2.0
+      }
+    ]
+  },
+  "hot_path": {
+    "profiled_h2d_d2h_event_count": 0,
+    "profiled_h2d_d2h_event_names": [],
+    "adapter_timed_h2d_bytes": 0,
+    "adapter_timed_d2h_bytes": 0
+  },
+  "performance": {
+    "batch_size": 2048,
+    "observation_worlds_per_second": 903874.3645893716,
+    "model_inferences_per_second": 1826955.9237040381,
+    "observation_batch_milliseconds": 2.2658016204833986,
+    "model_batch_milliseconds": 1.1209903717041017
+  },
+  "gates": {
+    "model_sha_exact": true,
+    "observation_q_max_abs_le_1e6": true,
+    "observation_kv_max_abs_le_1e6": true,
+    "observation_mask_max_abs_le_1e6": true,
+    "argmax_agreement_100_percent": true,
+    "action_table_exact": true,
+    "kickoff_sequence_exact_float32": true,
+    "timed_hot_path_h2d_d2h_zero": true,
+    "pad_mapping_unique": true
+  },
+  "wall_seconds": 1.2120483999606222
+}

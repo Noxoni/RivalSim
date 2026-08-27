@@ -22,6 +22,7 @@ from rivalsim.rival2_contracts import (
     GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS,
     GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
     GAMEPLAY_SPEED_COEFFICIENT,
+    GAMEPLAY_STRICT_DOUBLE_DASH_REWARD,
     GAMEPLAY_SUPERSONIC_REWARD,
 )
 
@@ -33,6 +34,118 @@ REWARD_MODE_BASE = 0
 REWARD_MODE_ACQUISITION = 1
 REWARD_MODE_GOAL_ONLY = 2
 REWARD_MODE_GAMEPLAY = 3
+REWARD_MODE_GAMEPLAY_V2 = 4
+
+STRICT_DASH_LOW_AIR_TICKS = 42
+STRICT_DASH_LANDING_WINDOW_TICKS = 24
+STRICT_DOUBLE_DASH_WINDOW_TICKS = 90
+
+
+@wp.func
+def _rival2_wheel_mask(car: int, wheel_contact: wp.array(dtype=wp.int32)) -> int:
+    mask = wp.int32(0)
+    for wheel in range(4):
+        if wheel_contact[car * 4 + wheel] != 0:
+            mask = mask | wp.int32(1 << wheel)
+    return mask
+
+
+@wp.kernel(enable_backward=False)
+def rival2_reset_strict_dash_state(
+    reset_mask: wp.array(dtype=wp.int32),
+    on_ground: wp.array(dtype=wp.int32),
+    has_flipped: wp.array(dtype=wp.int32),
+    air_time: wp.array(dtype=wp.float32),
+    wheel_contact: wp.array(dtype=wp.int32),
+    previous_on_ground: wp.array(dtype=wp.int32),
+    previous_has_flipped: wp.array(dtype=wp.int32),
+    previous_air_time: wp.array(dtype=wp.float32),
+    previous_wheel_mask: wp.array(dtype=wp.int32),
+    pending_wavedash_flip_tick: wp.array(dtype=wp.int32),
+    last_successful_wavedash_flip_tick: wp.array(dtype=wp.int32),
+    last_successful_wavedash_landing_tick: wp.array(dtype=wp.int32),
+):
+    car = wp.tid()
+    env = car // 2
+    if reset_mask[env] != 0:
+        previous_on_ground[car] = on_ground[car]
+        previous_has_flipped[car] = has_flipped[car]
+        previous_air_time[car] = air_time[car]
+        previous_wheel_mask[car] = _rival2_wheel_mask(car, wheel_contact)
+        pending_wavedash_flip_tick[car] = -1
+        last_successful_wavedash_flip_tick[car] = -1
+        last_successful_wavedash_landing_tick[car] = -1
+
+
+@wp.kernel(enable_backward=False)
+def rival2_track_strict_double_dash(
+    episode_ticks: wp.array(dtype=wp.int32),
+    on_ground: wp.array(dtype=wp.int32),
+    has_flipped: wp.array(dtype=wp.int32),
+    air_time: wp.array(dtype=wp.float32),
+    wheel_contact: wp.array(dtype=wp.int32),
+    previous_on_ground: wp.array(dtype=wp.int32),
+    previous_has_flipped: wp.array(dtype=wp.int32),
+    previous_air_time: wp.array(dtype=wp.float32),
+    previous_wheel_mask: wp.array(dtype=wp.int32),
+    pending_wavedash_flip_tick: wp.array(dtype=wp.int32),
+    last_successful_wavedash_flip_tick: wp.array(dtype=wp.int32),
+    last_successful_wavedash_landing_tick: wp.array(dtype=wp.int32),
+    strict_double_dash_count: wp.array(dtype=wp.int32),
+):
+    """Online form of the published strict offline double-dash classifier."""
+
+    car = wp.tid()
+    env = car // 2
+    tick = episode_ticks[env] + 1
+    prior_ground = previous_on_ground[car]
+    prior_flipped = previous_has_flipped[car]
+    prior_air_time = previous_air_time[car]
+    prior_wheels = previous_wheel_mask[car]
+    current_wheels = _rival2_wheel_mask(car, wheel_contact)
+    flip = prior_flipped == 0 and has_flipped[car] != 0
+
+    pending = pending_wavedash_flip_tick[car]
+    if pending >= 0 and tick - pending > STRICT_DASH_LANDING_WINDOW_TICKS:
+        pending = -1
+    if flip:
+        air_ticks = wp.int32(wp.floor(prior_air_time * 120.0 + 0.5))
+        if (
+            prior_wheels == 0
+            and prior_ground == 0
+            and air_ticks >= 0
+            and air_ticks <= STRICT_DASH_LOW_AIR_TICKS
+        ):
+            pending = tick
+        else:
+            pending = -1
+
+    landing = prior_wheels == 0 and current_wheels != 0
+    if landing and pending >= 0:
+        flip_to_landing = tick - pending
+        if (
+            flip_to_landing >= 0
+            and flip_to_landing <= STRICT_DASH_LANDING_WINDOW_TICKS
+        ):
+            prior_success = last_successful_wavedash_flip_tick[car]
+            prior_landing = last_successful_wavedash_landing_tick[car]
+            separation = pending - prior_success
+            if (
+                prior_success >= 0
+                and separation > 0
+                and separation <= STRICT_DOUBLE_DASH_WINDOW_TICKS
+                and prior_landing <= pending
+            ):
+                strict_double_dash_count[car] = strict_double_dash_count[car] + 1
+            last_successful_wavedash_flip_tick[car] = pending
+            last_successful_wavedash_landing_tick[car] = tick
+        pending = -1
+
+    pending_wavedash_flip_tick[car] = pending
+    previous_on_ground[car] = on_ground[car]
+    previous_has_flipped[car] = has_flipped[car]
+    previous_air_time[car] = air_time[car]
+    previous_wheel_mask[car] = current_wheels
 
 
 @wp.func
@@ -83,6 +196,7 @@ def rival2_begin_decision(
     small_pad_pickup_count: wp.array(dtype=wp.int32),
     big_pad_pickup_count: wp.array(dtype=wp.int32),
     save_count: wp.array(dtype=wp.int32),
+    strict_double_dash_count: wp.array(dtype=wp.int32),
     boost_gained_amount: wp.array(dtype=wp.float32),
     v1_goal_component: wp.array(dtype=wp.float32),
     v1_progress_component: wp.array(dtype=wp.float32),
@@ -93,6 +207,7 @@ def rival2_begin_decision(
     boost_use_component: wp.array(dtype=wp.float32),
     boost_pickup_component: wp.array(dtype=wp.float32),
     save_component: wp.array(dtype=wp.float32),
+    strict_double_dash_component: wp.array(dtype=wp.float32),
 ):
     """Open one 30 Hz decision interval without touching episode-age state."""
 
@@ -116,6 +231,7 @@ def rival2_begin_decision(
     boost_use_component[env] = 0.0
     boost_pickup_component[env] = 0.0
     save_component[env] = 0.0
+    strict_double_dash_component[env] = 0.0
     for local_car in range(2):
         car = car_base + local_car
         touch_count[car] = 0
@@ -127,6 +243,7 @@ def rival2_begin_decision(
         small_pad_pickup_count[car] = 0
         big_pad_pickup_count[car] = 0
         save_count[car] = 0
+        strict_double_dash_count[car] = 0
         boost_gained_amount[car] = 0.0
 
 
@@ -173,6 +290,7 @@ def rival2_accumulate_tick(
     small_pad_pickup_count: wp.array(dtype=wp.int32),
     big_pad_pickup_count: wp.array(dtype=wp.int32),
     save_count: wp.array(dtype=wp.int32),
+    strict_double_dash_count: wp.array(dtype=wp.int32),
     boost_gained_amount: wp.array(dtype=wp.float32),
     v1_goal_component: wp.array(dtype=wp.float32),
     v1_progress_component: wp.array(dtype=wp.float32),
@@ -183,6 +301,7 @@ def rival2_accumulate_tick(
     boost_use_component: wp.array(dtype=wp.float32),
     boost_pickup_component: wp.array(dtype=wp.float32),
     save_component: wp.array(dtype=wp.float32),
+    strict_double_dash_component: wp.array(dtype=wp.float32),
 ):
     """Accumulate source-backed events and finish reward/done on tick four."""
 
@@ -209,7 +328,7 @@ def rival2_accumulate_tick(
     else:
         no_touch_ticks[env] = no_touch_ticks[env] + 1
 
-    if reward_mode == REWARD_MODE_GAMEPLAY:
+    if reward_mode == REWARD_MODE_GAMEPLAY or reward_mode == REWARD_MODE_GAMEPLAY_V2:
         boost_gained_amount[car_base] = boost_gained_amount[car_base] + pad_boost_gained[car_base]
         boost_gained_amount[car_base + 1] = (
             boost_gained_amount[car_base + 1] + pad_boost_gained[car_base + 1]
@@ -382,6 +501,12 @@ def rival2_accumulate_tick(
             competitive_save = GAMEPLAY_SAVE_REWARD * float(
                 save_count[car_base] - save_count[car_base + 1]
             )
+            competitive_strict_double_dash = 0.0
+            if reward_mode == REWARD_MODE_GAMEPLAY_V2:
+                competitive_strict_double_dash = GAMEPLAY_STRICT_DOUBLE_DASH_REWARD * float(
+                    strict_double_dash_count[car_base]
+                    - strict_double_dash_count[car_base + 1]
+                )
 
             blue_reward = historical_v1_blue
             blue_reward = blue_reward + competitive_speed
@@ -389,6 +514,7 @@ def rival2_accumulate_tick(
             blue_reward = blue_reward + competitive_boost_use
             blue_reward = blue_reward + competitive_pickup
             blue_reward = blue_reward + competitive_save
+            blue_reward = blue_reward + competitive_strict_double_dash
             orange_reward = -blue_reward
 
             v1_goal_component[env] = goal_reward
@@ -400,6 +526,7 @@ def rival2_accumulate_tick(
             boost_use_component[env] = competitive_boost_use
             boost_pickup_component[env] = competitive_pickup
             save_component[env] = competitive_save
+            strict_double_dash_component[env] = competitive_strict_double_dash
         reward[car_base] = blue_reward
         reward[car_base + 1] = orange_reward
 
@@ -593,9 +720,12 @@ __all__ = [
     "REWARD_MODE_ACQUISITION",
     "REWARD_MODE_BASE",
     "REWARD_MODE_GAMEPLAY",
+    "REWARD_MODE_GAMEPLAY_V2",
     "REWARD_MODE_GOAL_ONLY",
     "rival2_accumulate_tick",
     "rival2_after_interval_reset",
     "rival2_begin_decision",
     "rival2_interval_reset",
+    "rival2_reset_strict_dash_state",
+    "rival2_track_strict_double_dash",
 ]

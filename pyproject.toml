@@ -9,6 +9,7 @@ description = "GPU-native Rocket League standard-1v1 simulation and Rival 2.0 tr
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "numba==0.67.0",
     "numpy==2.5.2",
     "torch==2.13.0",
     "warp-lang==1.16.0",
@@ -27,10 +28,11 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["rivalsim*", "third_party.nexto*"]
+include = ["rivalsim*", "third_party.nexto*", "third_party.wisp75b*"]
 
 [tool.setuptools.package-data]
 "third_party.nexto" = ["LICENSE", "PROVENANCE.json", "nexto-model.pt", "upstream/*.py"]
+"third_party.wisp75b" = ["LICENSE", "PROVENANCE.json", "models/*.lt"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"

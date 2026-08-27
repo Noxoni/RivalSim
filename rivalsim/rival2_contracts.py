@@ -14,6 +14,7 @@ RIVAL2_REWARD_ACQUISITION_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_V1"
 RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
 RIVAL2_REWARD_SCORING_V1_VERSION: Final = "RIVAL2_REWARD_SCORING_V1"
 RIVAL2_REWARD_GAMEPLAY_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V1"
+RIVAL2_REWARD_GAMEPLAY_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V2"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -92,6 +93,7 @@ GAMEPLAY_SMALL_PAD_PICKUP_REWARD: Final = 0.001
 GAMEPLAY_BIG_PAD_PICKUP_REWARD: Final = 0.005
 GAMEPLAY_SAVE_REWARD: Final = 0.75
 GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS: Final = 2.0
+GAMEPLAY_STRICT_DOUBLE_DASH_REWARD: Final = 0.005
 
 _CAR_FIELDS = (
     "position.x",
@@ -420,6 +422,38 @@ REWARD_GAMEPLAY_V1_CONTRACT: Final = {
     "direct_mechanic_rewards_or_costs": [],
 }
 
+REWARD_GAMEPLAY_V2_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    "base_reward_version": RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    "cadence_hz": 30,
+    "zero_sum": True,
+    "composition": (
+        "BlueReward = GameplayV1Blue + 0.005 * BlueSuccessfulStrictDoubleDashEvents "
+        "- 0.005 * OrangeSuccessfulStrictDoubleDashEvents; OrangeReward = -BlueReward"
+    ),
+    "base_reward": REWARD_GAMEPLAY_V1_CONTRACT,
+    "successful_strict_double_dash": {
+        "event_reward": GAMEPLAY_STRICT_DOUBLE_DASH_REWARD,
+        "competitive_composition": "Blue events minus Orange events",
+        "paid_when": "second successful wavedash landing completes the strict sequence",
+        "successful_wavedash": {
+            "actual_flip_onset": True,
+            "wheel_mask_before": 0,
+            "on_ground_before": False,
+            "maximum_air_time_ticks_at_120_hz": 42,
+            "maximum_flip_to_first_landing_ticks_at_120_hz": 24,
+        },
+        "pair": {
+            "maximum_flip_onset_separation_ticks_at_120_hz": 90,
+            "intervening_wheel_contact_required": True,
+        },
+        "individual_flip_reward": 0.0,
+        "individual_wavedash_reward": 0.0,
+        "partial_attempt_reward": 0.0,
+    },
+    "other_changes_from_gameplay_v1": [],
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -453,6 +487,7 @@ REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_ACQUISITION_
 REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
 REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SCORING_V1_CONTRACT)
 REWARD_GAMEPLAY_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V1_CONTRACT)
+REWARD_GAMEPLAY_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V2_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -519,6 +554,13 @@ def contract_hashes_for_reward(
             RIVAL2_REWARD_GAMEPLAY_V1_VERSION: REWARD_GAMEPLAY_V1_CONTRACT_HASH,
             episode_version: episode_hash,
         }
+    if reward_version == RIVAL2_REWARD_GAMEPLAY_V2_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_GAMEPLAY_V2_VERSION: REWARD_GAMEPLAY_V2_CONTRACT_HASH,
+            episode_version: episode_hash,
+        }
     raise ValueError(f"unsupported Rival 2.0 reward version: {reward_version}")
 
 
@@ -541,6 +583,7 @@ __all__ = [
     "GAMEPLAY_SMALL_PAD_PICKUP_REWARD",
     "GAMEPLAY_SPEED_COEFFICIENT",
     "GAMEPLAY_SUPERSONIC_REWARD",
+    "GAMEPLAY_STRICT_DOUBLE_DASH_REWARD",
     "OBSERVATION_SCHEMA",
     "OBSERVATION_SCHEMA_HASH",
     "OBS_DIM",
@@ -552,6 +595,8 @@ __all__ = [
     "REWARD_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V1_CONTRACT",
     "REWARD_GAMEPLAY_V1_CONTRACT_HASH",
+    "REWARD_GAMEPLAY_V2_CONTRACT",
+    "REWARD_GAMEPLAY_V2_CONTRACT_HASH",
     "REWARD_GOAL_ONLY_CONTRACT",
     "REWARD_GOAL_ONLY_CONTRACT_HASH",
     "REWARD_SCORING_V1_CONTRACT",
@@ -561,6 +606,7 @@ __all__ = [
     "RIVAL2_FULL_MATCH_EPISODE_VERSION",
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V1_VERSION",
+    "RIVAL2_REWARD_GAMEPLAY_V2_VERSION",
     "RIVAL2_REWARD_GOAL_ONLY_VERSION",
     "RIVAL2_REWARD_SCORING_V1_VERSION",
     "RIVAL2_REWARD_V2_VERSION",

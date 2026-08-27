@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-27T16:34:04.352519+00:00",
+  "source_checkpoint": {
+    "path": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+    "sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+    "iteration": 359,
+    "policy_version": 359,
+    "agent_decision_samples": 3011510272
+  },
+  "restored_checkpoint": {
+    "path": "checkpoints/rival2/opponent_curriculum_v1/rival2_opponent_curriculum_resume.pt",
+    "sha256": "430F0113AEF437CA778552A40654AE09263CAC4487A455CC013467FAFD271481",
+    "size_bytes": 58945397,
+    "iteration": 359,
+    "policy_version": 359,
+    "agent_decision_samples": 3016538976
+  },
+  "rollout_trainable_agent_samples": 5028704,
+  "rollout_trainable_agent_samples_by_family": {
+    "current": 1668800,
+    "historical": 416864,
+    "nexto": 1467488,
+    "wisp": 1475552
+  },
+  "initial_episode_assignments_by_family": {
+    "current": 26075,
+    "historical": 13027,
+    "nexto": 45859,
+    "wisp": 46111
+  },
+  "policy_generator_rng_note": "The rollout legitimately advanced the policy generator. The KL transaction restored it to the exact state immediately before the rejected PPO update, not to the source checkpoint state before rollout collection.",
+  "checks": {
+    "model_exactly_restored_to_source": true,
+    "optimizer_exactly_restored_to_source": true,
+    "policy_configuration_exact": true,
+    "ppo_configuration_exact": true,
+    "self_play_configuration_exact": true,
+    "historical_pool_exact": true,
+    "cpu_rng_exact": true,
+    "cuda_rng_exact": true,
+    "opponent_generator_rng_exact": true,
+    "iteration_not_advanced": true,
+    "policy_version_not_advanced": true,
+    "rollout_sample_delta_exact": true,
+    "restored_checkpoint_hash_exact": true,
+    "work_and_repository_checkpoint_bytes_exact": true,
+    "transactional_rollback_reported": true,
+    "no_later_training_reported": true
+  },
+  "verdict": "PASS_GREEN"
+}

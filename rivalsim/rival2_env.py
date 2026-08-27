@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
 import torch
 import warp as wp
@@ -14,11 +14,14 @@ from rivalsim.kernels.rival2 import (
     REWARD_MODE_ACQUISITION,
     REWARD_MODE_BASE,
     REWARD_MODE_GAMEPLAY,
+    REWARD_MODE_GAMEPLAY_V2,
     REWARD_MODE_GOAL_ONLY,
     rival2_accumulate_tick,
     rival2_after_interval_reset,
     rival2_begin_decision,
     rival2_interval_reset,
+    rival2_reset_strict_dash_state,
+    rival2_track_strict_double_dash,
 )
 from rivalsim.rival2_contracts import (
     AIR_TIME_SCALE,
@@ -40,6 +43,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
     RIVAL2_REWARD_SCORING_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
@@ -90,6 +94,20 @@ class Rival2EpisodeState:
         self.small_pad_pickup_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.big_pad_pickup_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.save_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.strict_double_dash_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.strict_dash_previous_on_ground = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.strict_dash_previous_has_flipped = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.strict_dash_previous_air_time = wp.zeros(car_count, dtype=wp.float32, device=device)
+        self.strict_dash_previous_wheel_mask = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.strict_dash_pending_flip_tick = wp.full(
+            car_count, -1, dtype=wp.int32, device=device
+        )
+        self.strict_dash_last_success_flip_tick = wp.full(
+            car_count, -1, dtype=wp.int32, device=device
+        )
+        self.strict_dash_last_success_landing_tick = wp.full(
+            car_count, -1, dtype=wp.int32, device=device
+        )
         self.boost_gained_amount = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.reward = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.previous_action = wp.zeros(car_count * 8, dtype=wp.float32, device=device)
@@ -103,6 +121,7 @@ class Rival2EpisodeState:
             "boost_use_component",
             "boost_pickup_component",
             "save_component",
+            "strict_double_dash_component",
         ):
             setattr(self, name, wp.zeros(num_envs, dtype=wp.float32, device=device))
 
@@ -121,6 +140,26 @@ class Rival2WorldSim(CompleteWorldSim):
         self.reward_mode = int(reward_mode)
         super().__init__(*args, **kwargs)
         self.rival2 = Rival2EpisodeState(self.num_envs, self.device)
+        state = self.rival2
+        wp.launch(
+            rival2_reset_strict_dash_state,
+            dim=self.num_envs * 2,
+            inputs=[
+                state.kickoff_indicator,
+                self.state.on_ground,
+                self.state.has_flipped,
+                self.state.air_time,
+                self.vehicle.wheel_contact,
+                state.strict_dash_previous_on_ground,
+                state.strict_dash_previous_has_flipped,
+                state.strict_dash_previous_air_time,
+                state.strict_dash_previous_wheel_mask,
+                state.strict_dash_pending_flip_tick,
+                state.strict_dash_last_success_flip_tick,
+                state.strict_dash_last_success_landing_tick,
+            ],
+            device=self.device,
+        )
 
     @property
     def logical_state_bytes(self) -> int:
@@ -152,6 +191,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.small_pad_pickup_count,
                 state.big_pad_pickup_count,
                 state.save_count,
+                state.strict_double_dash_count,
                 state.boost_gained_amount,
                 state.v1_goal_component,
                 state.v1_progress_component,
@@ -162,6 +202,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.boost_use_component,
                 state.boost_pickup_component,
                 state.save_component,
+                state.strict_double_dash_component,
             ],
             device=self.device,
         )
@@ -169,6 +210,27 @@ class Rival2WorldSim(CompleteWorldSim):
     def _launch_tick(self) -> None:
         super()._launch_tick()
         state = self.rival2
+        if self.reward_mode == REWARD_MODE_GAMEPLAY_V2:
+            wp.launch(
+                rival2_track_strict_double_dash,
+                dim=self.num_envs * 2,
+                inputs=[
+                    state.episode_ticks,
+                    self.state.on_ground,
+                    self.state.has_flipped,
+                    self.state.air_time,
+                    self.vehicle.wheel_contact,
+                    state.strict_dash_previous_on_ground,
+                    state.strict_dash_previous_has_flipped,
+                    state.strict_dash_previous_air_time,
+                    state.strict_dash_previous_wheel_mask,
+                    state.strict_dash_pending_flip_tick,
+                    state.strict_dash_last_success_flip_tick,
+                    state.strict_dash_last_success_landing_tick,
+                    state.strict_double_dash_count,
+                ],
+                device=self.device,
+            )
         wp.launch(
             rival2_accumulate_tick,
             dim=self.num_envs,
@@ -214,6 +276,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.small_pad_pickup_count,
                 state.big_pad_pickup_count,
                 state.save_count,
+                state.strict_double_dash_count,
                 state.boost_gained_amount,
                 state.v1_goal_component,
                 state.v1_progress_component,
@@ -224,6 +287,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.boost_use_component,
                 state.boost_pickup_component,
                 state.save_component,
+                state.strict_double_dash_component,
             ],
             device=self.device,
         )
@@ -329,6 +393,25 @@ class Rival2WorldSim(CompleteWorldSim):
             ],
             device=self.device,
         )
+        wp.launch(
+            rival2_reset_strict_dash_state,
+            dim=self.num_envs * 2,
+            inputs=[
+                mask,
+                self.state.on_ground,
+                self.state.has_flipped,
+                self.state.air_time,
+                self.vehicle.wheel_contact,
+                self.rival2.strict_dash_previous_on_ground,
+                self.rival2.strict_dash_previous_has_flipped,
+                self.rival2.strict_dash_previous_air_time,
+                self.rival2.strict_dash_previous_wheel_mask,
+                self.rival2.strict_dash_pending_flip_tick,
+                self.rival2.strict_dash_last_success_flip_tick,
+                self.rival2.strict_dash_last_success_landing_tick,
+            ],
+            device=self.device,
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -410,6 +493,7 @@ class Rival2TensorBridge:
         ):
             self._bind(name, getattr(state, name))
         self._bind("wheel_contact", self.sim.vehicle.wheel_contact)
+        self._bind("handbrake_value", self.sim.vehicle.handbrake_value)
         self._bind("pad_cooldown", self.sim.boost_pad_cooldown)
         self._bind("pad_boost_gained", self.sim.lifecycle.pad_boost_gained)
         self._bind("car_is_demoed", self.sim.car_car.car_is_demoed)
@@ -430,6 +514,7 @@ class Rival2TensorBridge:
             "small_pad_pickup_count",
             "big_pad_pickup_count",
             "save_count",
+            "strict_double_dash_count",
             "boost_gained_amount",
             "v1_goal_component",
             "v1_progress_component",
@@ -440,7 +525,16 @@ class Rival2TensorBridge:
             "boost_use_component",
             "boost_pickup_component",
             "save_component",
+            "strict_double_dash_component",
+            "strict_dash_previous_on_ground",
+            "strict_dash_previous_has_flipped",
+            "strict_dash_previous_air_time",
+            "strict_dash_previous_wheel_mask",
+            "strict_dash_pending_flip_tick",
+            "strict_dash_last_success_flip_tick",
+            "strict_dash_last_success_landing_tick",
             "kickoff_indicator",
+            "scoring_team_latched",
             "reward",
             "terminated",
             "truncated",
@@ -723,6 +817,8 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GOAL_ONLY
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_V1_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_V2_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_V2
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
@@ -754,6 +850,7 @@ class Rival2Env:
         self,
         action: torch.Tensor,
         markers: list[torch.cuda.Event] | None = None,
+        tick_action_provider: Callable[[int], torch.Tensor] | None = None,
     ) -> Rival2Step:
         self._activate_torch_stream()
         if markers is not None:
@@ -761,7 +858,12 @@ class Rival2Env:
         decision_observation = self.observation
         self.world.begin_decision()
         emitted = self.bridge.set_actions(action)
-        self.world.step(PHYSICS_TICKS_PER_DECISION)
+        if tick_action_provider is None:
+            self.world.step(PHYSICS_TICKS_PER_DECISION)
+        else:
+            for tick in range(PHYSICS_TICKS_PER_DECISION):
+                self.bridge.set_actions(tick_action_provider(tick))
+                self.world.step(1)
         if markers is not None:
             markers[1].record()
         transition_observation = self.bridge.observation().clone()
@@ -813,6 +915,8 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GOAL_ONLY
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_V1_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_V2_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_V2
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
@@ -821,6 +925,15 @@ class Rival2Env:
 
     def step(self, action: torch.Tensor) -> Rival2Step:
         return self._step_impl(action)
+
+    def step_with_tick_actions(
+        self,
+        action: torch.Tensor,
+        tick_action_provider: Callable[[int], torch.Tensor],
+    ) -> Rival2Step:
+        """Step one decision while frozen opponents supply 120 Hz controls."""
+
+        return self._step_impl(action, tick_action_provider=tick_action_provider)
 
     def step_profiled(self, action: torch.Tensor) -> Rival2ProfiledStep:
         """Explicit offline phase timing; not used by ordinary rollout."""

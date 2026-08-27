@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "authority": "handoff/rival2-opponent-curriculum-v1/README.md",
+  "authoritative_head": "58c1578ccb719b1a7782a128842cf10761a6d227",
+  "source_checkpoint": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+  "source_checkpoint_sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+  "source_iteration": 359,
+  "source_policy_version": 359,
+  "source_agent_decision_samples": 3011510272,
+  "source_reward_version": "RIVAL2_REWARD_GAMEPLAY_V1",
+  "destination_reward_version": "RIVAL2_REWARD_GAMEPLAY_V2",
+  "destination_reward_contract": {
+    "version": "RIVAL2_REWARD_GAMEPLAY_V2",
+    "base_reward_version": "RIVAL2_REWARD_GAMEPLAY_V1",
+    "cadence_hz": 30,
+    "zero_sum": true,
+    "composition": "BlueReward = GameplayV1Blue + 0.005 * BlueSuccessfulStrictDoubleDashEvents - 0.005 * OrangeSuccessfulStrictDoubleDashEvents; OrangeReward = -BlueReward",
+    "base_reward": {
+      "version": "RIVAL2_REWARD_GAMEPLAY_V1",
+      "base_reward_version": "RIVAL2_REWARD_V1",
+      "cadence_hz": 30,
+      "zero_sum": true,
+      "composition": "calculate the complete Blue competitive reward, then set OrangeReward = -BlueReward",
+      "base_reward": {
+        "version": "RIVAL2_REWARD_V1",
+        "cadence_hz": 30,
+        "zero_sum": true,
+        "goal": 10.0,
+        "progress_coefficient": 0.5,
+        "progress_y_scale": 5120.0,
+        "unique_touch": 0.05,
+        "unique_demolition": 0.1,
+        "other_shaping": []
+      },
+      "speed": {
+        "per_player": "0.0001 * clamp(actual_linear_speed / 2300.0, 0, 1)",
+        "competitive_composition": "Blue minus Orange",
+        "controller_input_rewarded": false,
+        "wheel_speed_rewarded": false
+      },
+      "supersonic": {
+        "per_player_if_authoritative_state_active": 0.0002,
+        "competitive_composition": "Blue minus Orange",
+        "controller_input_inference": false
+      },
+      "boost_use": {
+        "per_player_if_actual_boost_thrust_active_during_interval": 5e-05,
+        "competitive_composition": "Blue minus Orange",
+        "boost_button_alone_rewarded": false,
+        "empty_boost_rewarded": false
+      },
+      "boost_pickup": {
+        "small_pad_event": 0.001,
+        "large_pad_event": 0.005,
+        "competitive_composition": "Blue minus Orange",
+        "authoritative_resource_event": true,
+        "unavailable_pad_proximity_rewarded": false
+      },
+      "save": {
+        "event_reward": 0.75,
+        "competitive_composition": "Blue saves minus Orange saves",
+        "requires_unique_touch_onset": true,
+        "pre_touch_threat": {
+          "model": "straight-line ball trajectory to the defending player's own scoring plane",
+          "goal_geometry": "existing Soccar scoring plane and goal-mouth dimensions",
+          "maximum_seconds": 2.0,
+          "intersection_inside_goal_mouth": true
+        },
+        "post_touch_same_threat_must_be_absent": true,
+        "touch_tick_goal_must_be_absent": true,
+        "continuous_contact_latched": true
+      },
+      "approach_reward": null,
+      "first_touch_bonus": null,
+      "no_touch_reward_penalty": null,
+      "proximity_reward": null,
+      "direct_mechanic_rewards_or_costs": []
+    },
+    "successful_strict_double_dash": {
+      "event_reward": 0.005,
+      "competitive_composition": "Blue events minus Orange events",
+      "paid_when": "second successful wavedash landing completes the strict sequence",
+      "successful_wavedash": {
+        "actual_flip_onset": true,
+        "wheel_mask_before": 0,
+        "on_ground_before": false,
+        "maximum_air_time_ticks_at_120_hz": 42,
+        "maximum_flip_to_first_landing_ticks_at_120_hz": 24
+      },
+      "pair": {
+        "maximum_flip_onset_separation_ticks_at_120_hz": 90,
+        "intervening_wheel_contact_required": true
+      },
+      "individual_flip_reward": 0.0,
+      "individual_wavedash_reward": 0.0,
+      "partial_attempt_reward": 0.0
+    },
+    "other_changes_from_gameplay_v1": []
+  },
+  "destination_reward_contract_hash": "4073E29C1013458D5784435061FE47C639525BE37E8CD519783889C69BA87D41",
+  "episode_version": "RIVAL2_EPISODE_V1",
+  "episode_contract_hash": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+  "policy_config": {
+    "obs_dim": 182,
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "activation": "silu",
+    "actor_outputs": 13,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "dtype": "float32",
+    "autocast": false,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+  },
+  "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+  "ppo_config": {
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0.0,
+    "max_gradient_norm": 0.5,
+    "learning_rate": 0.0003,
+    "epochs": 2,
+    "rollout_horizon": 32,
+    "minibatch_size": 65536
+  },
+  "ppo_config_hash": "1ED4A47155B538DA16CB7FF5BD19804999E20619792DA4297125F9733B6F603A",
+  "self_play_config": {
+    "historical_chance": 0.2,
+    "historical_pool_bound": 16
+  },
+  "opponent_curriculum": {
+    "nexto_probability": 0.35,
+    "wisp_probability": 0.35,
+    "current_probability": 0.2,
+    "historical_probability": 0.1,
+    "seed": 2026082703
+  },
+  "worlds": 131072,
+  "campaign_seed": 2026082703,
+  "training": {
+    "additional_updates": 120,
+    "checkpoint_offsets": [
+      30,
+      60,
+      90,
+      120
+    ],
+    "expected_iterations": [
+      389,
+      419,
+      449,
+      479
+    ],
+    "trainable_samples_are_measured_not_assumed": true
+  },
+  "kl_guard": {
+    "minibatch_kl_limit": 0.1,
+    "completed_update_mean_kl_limit": 0.05
+  },
+  "evaluation": {
+    "labels": [
+      "source",
+      "plus_030",
+      "plus_060",
+      "plus_090",
+      "plus_120"
+    ],
+    "opponents": [
+      "Nexto",
+      "Wisp"
+    ],
+    "deterministic": {
+      "episodes_per_opponent": 10,
+      "five_layouts_each_rival_side": true,
+      "seed": 2026082711
+    },
+    "stochastic": {
+      "episodes_per_opponent": 256,
+      "episodes_per_rival_side": 128,
+      "seed": 2026082712
+    }
+  },
+  "frozen_opponents": {
+    "Nexto": {
+      "upstream_commit": "2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca",
+      "model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA"
+    },
+    "Wisp": {
+      "upstream_commit": "58d4ab18fd0c92529b5ae6582ecf1713a6b1887a",
+      "botpack_commit": "bfc9b79b0ec1599e0ac2f57363dfc28b0bda4f15",
+      "policy_sha256": "1BD600A15F43106645DE84B42379FE9AE404ECFB509DC21A2E309480EA17EBF7",
+      "shared_head_sha256": "3F7B6B363A72D7CEABA3CDB58BC13E1AE95E07B041B5E94A326C7045BEBD7E42"
+    }
+  },
+  "five_minute_training_matches": false,
+  "imitation_learning": false,
+  "opponent_training": false
+}
