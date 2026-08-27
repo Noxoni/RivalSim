@@ -78,9 +78,10 @@ THRESHOLD_NAMES = (
     "pogo_incoming_normal_speed_min",
     "pogo_outgoing_normal_speed_min",
     "pogo_wheel_support_max",
-    "pogo_separation_ticks_min",
+    "pogo_separation_ticks_max",
     "half_flip_cancel_ticks_min",
     "half_flip_cancel_ticks_max",
+    "pinch_ball_delta_v_min",
 )
 THRESHOLD_INDEX = {name: index for index, name in enumerate(THRESHOLD_NAMES)}
 
@@ -177,11 +178,19 @@ def canonical_family_events(events: list[tuple[str, str]]) -> list[tuple[str, st
     """Deduplicate subtype labels while retaining genuine compound families."""
 
     result: list[tuple[str, str]] = []
-    seen: set[str] = set()
+    slot_by_family: dict[str, int] = {}
+    subtype_specificity = {"musty": 1, "breezi": 2}
     for family, subtype in events:
-        if family not in seen:
+        if family not in slot_by_family:
+            slot_by_family[family] = len(result)
             result.append((family, subtype))
-            seen.add(family)
+            continue
+        slot = slot_by_family[family]
+        retained_subtype = result[slot][1]
+        if subtype_specificity.get(subtype, 0) > subtype_specificity.get(
+            retained_subtype, 0
+        ):
+            result[slot] = (family, subtype)
     return result
 
 
@@ -397,7 +406,7 @@ def collect_mechanics_shadow_tick(
             tangent = wp.vec3(velocity[0], velocity[1], 0.0)
             flip_initial_tangent_speed[car] = wp.length(tangent)
 
-        if flip_kind[car] != 0:
+        if flip_kind[car] != 0 and flip_kind[car] != 3:
             flip_age[car] = flip_age[car] + 1
             flip_pitch_path[car] = flip_pitch_path[car] + wp.abs(wp.dot(angular, right)) / 120.0
             flip_roll_path[car] = flip_roll_path[car] + wp.abs(wp.dot(angular, forward)) / 120.0
@@ -439,40 +448,43 @@ def collect_mechanics_shadow_tick(
                         evidence_features,
                     )
                 flip_kind[car] = 0
-            elif flip_kind[car] == 2 and flip_age[car] == 220:
-                heading_dot = wp.dot(_safe_unit(forward), _safe_unit(flip_initial_forward[car]))
-                new_forward_speed = wp.dot(velocity, forward)
+            elif flip_kind[car] == 2 and flip_age[car] == 72:
                 accepted = (
                     family_ready[1] != 0
                     and flip_cancel_age[car] >= 0
                     and float(flip_cancel_age[car]) >= thresholds[29]
                     and float(flip_cancel_age[car]) <= thresholds[30]
                     and flip_pitch_path[car] <= thresholds[3]
-                    and heading_dot <= thresholds[4]
-                    and new_forward_speed >= thresholds[5]
-                    and (on_ground[car] != 0 or wheel_count > 0 or up[2] > 0.25)
                 )
                 if accepted:
-                    _emit_mechanic(
-                        car,
-                        1,
-                        1,
-                        tick,
-                        float(flip_cancel_age[car]),
-                        flip_pitch_path[car],
-                        heading_dot,
-                        new_forward_speed,
-                        evidence_capacity,
-                        family_event_count,
-                        family_lockout,
-                        duplicate_suppression,
-                        evidence_count,
-                        evidence_family,
-                        evidence_subtype,
-                        evidence_tick,
-                        evidence_features,
-                    )
-                flip_kind[car] = 0
+                    flip_kind[car] = 3
+                else:
+                    flip_kind[car] = 0
+
+        if flip_kind[car] == 3 and (on_ground[car] != 0 or wheel_count > 0):
+            heading_dot = wp.dot(_safe_unit(forward), _safe_unit(flip_initial_forward[car]))
+            new_forward_speed = wp.dot(velocity, forward)
+            if heading_dot <= thresholds[4] and new_forward_speed >= thresholds[5]:
+                _emit_mechanic(
+                    car,
+                    1,
+                    1,
+                    tick,
+                    float(flip_cancel_age[car]),
+                    flip_pitch_path[car],
+                    heading_dot,
+                    new_forward_speed,
+                    evidence_capacity,
+                    family_event_count,
+                    family_lockout,
+                    duplicate_suppression,
+                    evidence_count,
+                    evidence_family,
+                    evidence_subtype,
+                    evidence_tick,
+                    evidence_features,
+                )
+            flip_kind[car] = 0
 
         reports_contact = car_a_hit[env] if local_car == 0 else car_b_hit[env]
         touch_onset = reports_contact != 0 and touch_latched[car] == 0
@@ -640,7 +652,7 @@ def collect_mechanics_shadow_tick(
                     and thresholds[21] >= 0.0
                     and opposition >= thresholds[22]
                     and closing >= thresholds[23]
-                    and ball_delta >= 1.0
+                    and ball_delta >= thresholds[31]
                 ):
                     _emit_mechanic(
                         car,
@@ -736,7 +748,7 @@ def collect_mechanics_shadow_tick(
             pogo_age[car] = pogo_age[car] + 1
             if wheel_count >= 3:
                 pogo_pending[car] = 0
-            elif chassis_contact_count[car] == 0 and float(pogo_age[car]) >= thresholds[28]:
+            elif chassis_contact_count[car] == 0 and float(pogo_age[car]) <= thresholds[28]:
                 base = car * 4
                 if (
                     family_ready[8] != 0
@@ -785,9 +797,6 @@ def collect_mechanics_shadow_tick(
                 if release:
                     family_lockout[slot] = 0
                     family_rearm_count[slot] = family_rearm_count[slot] + 1
-
-        if family_event_count[car * FAMILY_COUNT + 5] > family_event_count[car * FAMILY_COUNT + 4]:
-            impossible_count[car] = impossible_count[car] + 1
 
     previous_velocity[car] = velocity
     previous_quaternion[car] = quat

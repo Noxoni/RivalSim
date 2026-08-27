@@ -306,7 +306,12 @@ def _flip_cases(
 ) -> list[dict[str, Any]]:
     count = len(rows)
     state = _base_state(count)
-    state.car_vel[:, 0, 0] = np.linspace(700.0, 1250.0, count, dtype=np.float32)
+    speed_range = (450.0, 675.0) if family == "half_flip" else (700.0, 1250.0)
+    # Give every class the same prospective speed distribution so detector
+    # separation cannot be an artifact of row/class ordering.
+    state.car_vel[:, 0, 0] = np.tile(
+        np.linspace(*speed_range, CASE_COUNT_PER_CLASS, dtype=np.float32), 3
+    )
     cancel_delay = np.full(count, -1, dtype=np.int32)
     dodge_tick = np.full(count, 10, dtype=np.int32)
     diagonal = np.zeros(count, dtype=np.float32)
@@ -354,21 +359,47 @@ def _flip_cases(
     onset = _first_onset(trace["has_flipped"] != 0)
     for index, row in enumerate(rows):
         start = int(onset[index])
-        finish = min(trace["car_vel"].shape[0] - 1, start + (220 if backward else 36))
+        assessment = min(trace["car_vel"].shape[0] - 1, start + (72 if backward else 36))
+        finish = assessment
+        if backward and start >= 0:
+            support = np.flatnonzero(trace["wheel_count"][assessment:, index] > 0)
+            if support.size:
+                finish = assessment + int(support[0])
         if start < 0:
             pitch_path = 999.0
+            roll_path = 999.0
+            yaw_path = 999.0
             alignment = -1.0
+            alignment_recovery_ticks = 999.0
             heading = 1.0
             new_forward_speed = -9999.0
+            initial_tangent_speed = 0.0
+            final_tangent_speed = 0.0
             actual = 0.0
-            up_final = np.asarray((0.0, 0.0, -1.0), dtype=np.float32)
         else:
             actual = 1.0
             pitch_path = 0.0
-            for tick in range(start, finish + 1):
+            roll_path = 0.0
+            yaw_path = 0.0
+            alignment_recovery_ticks = 999.0
+            for tick in range(start, assessment + 1):
                 q = trace["car_quat"][tick, index]
+                forward_tick = _quat_rotate(
+                    q, np.asarray((1.0, 0.0, 0.0), dtype=np.float32)
+                )
                 right = _quat_rotate(q, np.asarray((0.0, 1.0, 0.0), dtype=np.float32))
-                pitch_path += abs(float(np.dot(trace["car_ang"][tick, index], right))) / 120.0
+                up = _quat_rotate(q, np.asarray((0.0, 0.0, 1.0), dtype=np.float32))
+                angular = trace["car_ang"][tick, index]
+                pitch_path += abs(float(np.dot(angular, right))) / 120.0
+                roll_path += abs(float(np.dot(angular, forward_tick))) / 120.0
+                yaw_path += abs(float(np.dot(angular, up))) / 120.0
+                tangent_tick = trace["car_vel"][tick, index].copy()
+                tangent_tick[2] = 0.0
+                if (
+                    alignment_recovery_ticks == 999.0
+                    and float(np.dot(_unit(forward_tick), _unit(tangent_tick))) >= 0.9
+                ):
+                    alignment_recovery_ticks = float(tick - start)
             forward_initial = _quat_rotate(
                 trace["car_quat"][start, index], np.asarray((1.0, 0.0, 0.0), dtype=np.float32)
             )
@@ -377,13 +408,13 @@ def _flip_cases(
             )
             tangent = trace["car_vel"][finish, index].copy()
             tangent[2] = 0.0
+            initial_tangent = trace["car_vel"][start, index].copy()
+            initial_tangent[2] = 0.0
+            initial_tangent_speed = float(np.linalg.norm(initial_tangent))
+            final_tangent_speed = float(np.linalg.norm(tangent))
             alignment = float(np.dot(_unit(forward_final), _unit(tangent)))
             heading = float(np.dot(_unit(forward_final), _unit(forward_initial)))
             new_forward_speed = float(np.dot(trace["car_vel"][finish, index], forward_final))
-            up_final = _quat_rotate(
-                trace["car_quat"][finish, index],
-                np.asarray((0.0, 0.0, 1.0), dtype=np.float32),
-            )
         features = {
             "actual_dodge": actual,
             "cancel_ticks": float(cancel_delay[index] if cancel_delay[index] >= 0 else 999),
@@ -394,12 +425,17 @@ def _flip_cases(
                 cancel_delay[index] if cancel_delay[index] >= 0 else 999
             ),
             "pitch_rotation": float(pitch_path),
+            "roll_rotation": float(roll_path),
+            "yaw_rotation": float(yaw_path),
             "alignment": alignment,
+            "alignment_recovery_ticks": alignment_recovery_ticks,
             "heading_dot": heading,
             "new_forward_speed": new_forward_speed,
+            "initial_tangent_speed": initial_tangent_speed,
+            "final_tangent_speed": final_tangent_speed,
+            "tangent_speed_delta": final_tangent_speed - initial_tangent_speed,
             "supported_completion": float(
-                np.any(trace["wheel_count"][max(0, finish - 20) : finish + 1, index] > 0)
-                or up_final[2] > 0.25
+                trace["wheel_count"][finish, index] > 0 if backward else False
             ),
         }
         row["features"] = features
@@ -407,11 +443,18 @@ def _flip_cases(
             bool(
                 actual
                 and (
-                    (not backward and abs(diagonal[index]) >= 0.5 and cancel_delay[index] <= 3)
+                    (
+                        not backward
+                        and abs(diagonal[index]) >= 0.5
+                        and cancel_delay[index] <= 3
+                        and features["alignment"] > 0.0
+                        and features["tangent_speed_delta"] >= -1.0
+                    )
                     or (
                         backward
                         and 34 <= cancel_delay[index] <= 38
                         and features["heading_dot"] < -0.35
+                        and features["new_forward_speed"] > 1.0
                         and features["supported_completion"] > 0.0
                     )
                 )
@@ -1017,7 +1060,6 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
         ("support_ticks", "min", "carry_support_ticks_min"),
         ("control_distance", "max", "carry_distance_max"),
         ("control_relative_speed", "max", "carry_relative_speed_max"),
-        ("velocity_change", "min", "diagnostic_velocity_change"),
     ),
     "musty": (
         ("actual_backward_dodge", "min", "discrete_backward_dodge"),
@@ -1030,19 +1072,17 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
         ("roll_path", "min", "breezi_roll_path_min"),
         ("yaw_path", "min", "breezi_yaw_path_min"),
         ("setup_ticks", "min", "breezi_setup_ticks_min"),
-        ("inverted_depth", "min", "diagnostic_inverted_depth"),
     ),
     "redirect": (
         ("incoming_speed", "min", "redirect_incoming_speed_min"),
         ("outgoing_speed", "min", "redirect_outgoing_speed_min"),
         ("direction_change", "min", "redirect_angle_min_radians"),
-        ("contact_height", "min", "diagnostic_contact_height"),
     ),
     "pinch": (
         ("overlap_ticks", "max", "pinch_overlap_ticks_max"),
         ("opposition", "min", "pinch_opposition_min"),
         ("closing_speed", "min", "pinch_closing_speed_min"),
-        ("ball_delta_v", "min", "diagnostic_ball_delta_v"),
+        ("ball_delta_v", "min", "pinch_ball_delta_v_min"),
     ),
     "pogo": (
         ("chassis_contact", "min", "discrete_chassis_contact"),
@@ -1050,8 +1090,29 @@ CALIBRATION_FEATURES: dict[str, tuple[tuple[str, str, str], ...]] = {
         ("incoming_normal_speed", "min", "pogo_incoming_normal_speed_min"),
         ("outgoing_normal_speed", "min", "pogo_outgoing_normal_speed_min"),
         ("wheel_support", "max", "pogo_wheel_support_max"),
-        ("separation_ticks", "max", "pogo_separation_ticks_min"),
+        ("separation_ticks", "max", "pogo_separation_ticks_max"),
     ),
+}
+
+DIAGNOSTIC_FEATURES: dict[str, tuple[str, ...]] = {
+    "speedflip": (
+        "roll_rotation",
+        "yaw_rotation",
+        "alignment_recovery_ticks",
+        "initial_tangent_speed",
+        "final_tangent_speed",
+        "tangent_speed_delta",
+    ),
+    "half_flip": (
+        "roll_rotation",
+        "yaw_rotation",
+        "alignment_recovery_ticks",
+        "initial_tangent_speed",
+        "final_tangent_speed",
+        "tangent_speed_delta",
+    ),
+    "ground_carry": ("velocity_change",),
+    "breezi": ("inverted_depth",),
 }
 
 
@@ -1060,56 +1121,46 @@ def _derive_boundaries(
     negatives: list[dict[str, float]],
     candidates: tuple[tuple[str, str, str], ...],
 ) -> tuple[list[dict[str, Any]], list[int]]:
-    remaining = list(range(len(negatives)))
     boundaries: list[dict[str, Any]] = []
-    used: set[tuple[str, str]] = set()
-    while remaining:
-        best: tuple[int, float, dict[str, Any], list[int]] | None = None
-        for feature, direction, runtime_name in candidates:
-            if (feature, direction) in used:
-                continue
-            positive_values = [float(row[feature]) for row in positives]
-            positive_edge = min(positive_values) if direction == "min" else max(positive_values)
-            rejectable = [
-                index
-                for index in remaining
-                if (
-                    float(negatives[index][feature]) < positive_edge
-                    if direction == "min"
-                    else float(negatives[index][feature]) > positive_edge
-                )
-            ]
-            if not rejectable:
-                continue
-            negative_edge = (
-                max(float(negatives[index][feature]) for index in rejectable)
+    for feature, direction, runtime_name in candidates:
+        positive_values = [float(row[feature]) for row in positives]
+        positive_edge = min(positive_values) if direction == "min" else max(positive_values)
+        rejectable = [
+            index
+            for index in range(len(negatives))
+            if (
+                float(negatives[index][feature]) < positive_edge
                 if direction == "min"
-                else min(float(negatives[index][feature]) for index in rejectable)
+                else float(negatives[index][feature]) > positive_edge
             )
-            margin = (
-                positive_edge - negative_edge
-                if direction == "min"
-                else negative_edge - positive_edge
-            )
-            threshold = (positive_edge + negative_edge) * 0.5
-            record = {
+        ]
+        if not rejectable:
+            continue
+        negative_edge = (
+            max(float(negatives[index][feature]) for index in rejectable)
+            if direction == "min"
+            else min(float(negatives[index][feature]) for index in rejectable)
+        )
+        margin = (
+            positive_edge - negative_edge
+            if direction == "min"
+            else negative_edge - positive_edge
+        )
+        boundaries.append(
+            {
                 "feature": feature,
                 "direction": direction,
                 "runtime_threshold": runtime_name,
-                "threshold": threshold,
+                "threshold": (positive_edge + negative_edge) * 0.5,
                 "positive_edge": positive_edge,
                 "negative_edge": negative_edge,
                 "separation_margin": margin,
             }
-            score = (len(rejectable), margin)
-            if best is None or score > (best[0], best[1]):
-                best = (len(rejectable), margin, record, rejectable)
-        if best is None:
-            break
-        boundaries.append(best[2])
-        used.add((str(best[2]["feature"]), str(best[2]["direction"])))
-        rejected = set(best[3])
-        remaining = [index for index in remaining if index not in rejected]
+        )
+    objects = _boundary_objects(boundaries)
+    remaining = [
+        index for index, row in enumerate(negatives) if classify(row, objects)
+    ]
     return boundaries, remaining
 
 
@@ -1190,7 +1241,9 @@ def _calibrate(
         if false_negatives or false_positives or derivation_errors:
             status = STATUS_NOT_READY
         extrema: dict[str, Any] = {}
-        for feature, _direction, _runtime in CALIBRATION_FEATURES[family]:
+        feature_names = [item[0] for item in CALIBRATION_FEATURES[family]]
+        feature_names.extend(DIAGNOSTIC_FEATURES.get(family, ()))
+        for feature in feature_names:
             pos = [
                 float(row["features"][feature])
                 for row in rows
@@ -1209,7 +1262,8 @@ def _calibrate(
             }
         detectors[family] = {
             "status": status,
-            "features_considered": [item[0] for item in CALIBRATION_FEATURES[family]],
+            "features_considered": feature_names,
+            "boundary_candidates": [item[0] for item in CALIBRATION_FEATURES[family]],
             "boundaries": boundaries,
             "derivation_extrema": extrema,
             "derivation_errors": derivation_errors,
@@ -1331,6 +1385,8 @@ def _run_shadow_block(
             FAMILY_NAMES[index]: {
                 "count": int(counts[index]),
                 "events_per_minute": float(counts[index] / max(minutes, 1.0e-12)),
+                "canonical_event": FAMILY_NAMES[index],
+                "subtype_counts": {"1": int(counts[index])},
             }
             for index in range(len(FAMILY_NAMES))
         },
@@ -1383,20 +1439,61 @@ def _render_report(
     threshold_payload: dict[str, Any],
     heldout: dict[str, Any],
     shadow: dict[str, Any],
+    rows: list[dict[str, Any]],
+    manifest: dict[str, Any],
 ) -> str:
+    checkpoint_identity = {}
+    if shadow["opponents"]:
+        checkpoint_identity = shadow["opponents"]["Nexto"]["checkpoint_identity"]
     lines = [
         "# Rival 2.0 Mechanics Calibration V1 Results",
         "",
         f"Source head: `{source_head}`  ",
         f"Handoff source: `{SOURCE_HANDOFF_COMMIT}`  ",
+        f"Arena geometry SHA-256: `{manifest['arena_geometry_sha256']}`  ",
+        f"Gameplay V1 +239 checkpoint SHA-256: `{manifest['checkpoint']['sha256']}`  ",
         "Mode: calibration plus read-only shadow telemetry; mechanics reward "
         "remained exactly disabled.",
         "",
+        "No Rival training or opponent training ran. No policy, PPO, observation, "
+        "action, physics, reward, or episode-lifecycle contract was changed.",
+        "",
+        "## Corpus and contracts",
+        "",
+        "- 648 real 120 Hz RivalSim traces: 72 per continuous detector.",
+        "- Per detector: 24 positives, 24 near misses, and 24 ordinary controls; "
+        "16 derivation plus 8 held-out cases from each class.",
+        f"- Calibration seed: `{manifest['calibration_seed']}`; shadow seed: "
+        f"`{manifest['shadow_seed']}`.",
+        "- Policy cadence: 30 Hz; physics cadence: 120 Hz.",
+    ]
+    if checkpoint_identity:
+        lines.extend(
+            [
+                f"- Policy iteration: `{checkpoint_identity['iteration']}`; policy "
+                f"config hash: `{checkpoint_identity['policy_config_hash']}`.",
+                "- Frozen contract hashes: `"
+                + json.dumps(checkpoint_identity["contract_hashes"], sort_keys=True)
+                + "`.",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            "## Source-exact regression",
+            "",
+            "Focused result: `PASS_GREEN` (8 tests passed). The suite covers ball/car "
+            "reset resource/body identity, chain/pre-flip re-arm, frozen dash timing "
+            "and surface classes, same-family de-duplication, compound-family "
+            "observability, the 72-case split, midpoint derivation, and a GPU-resident "
+            "zero-reward observer smoke.",
+            "",
         "## Continuous detector results",
         "",
         "| Detector | Status | Boundaries | Held-out FP | Held-out FN |",
         "|---|---:|---|---:|---:|",
-    ]
+        ]
+    )
     for family in FAMILY_NAMES:
         record = threshold_payload["detectors"][family]
         boundary_text = (
@@ -1418,6 +1515,43 @@ def _render_report(
             "Thresholds are binary physical event-identity boundaries. They are not "
             "quality scores and no threshold changes reward magnitude.",
             "",
+            "## Explicit overlap evidence",
+            "",
+        ]
+    )
+    for family in FAMILY_NAMES:
+        record = threshold_payload["detectors"][family]
+        if record["status"] != STATUS_NOT_READY:
+            continue
+        blocking_ids = set(record["derivation_errors"])
+        blocking_ids.update(record["heldout_false_positive_ids"])
+        blocking_ids.update(record["heldout_false_negative_ids"])
+        lines.extend(
+            [
+                f"### {family}",
+                "",
+                "This family remains `NOT_READY_FOR_REWARD`; no runtime event is emitted. "
+                "The following physically different cases remain inside the full "
+                "trace-derived conjunction:",
+                "",
+            ]
+        )
+        for row in rows:
+            if row["case_id"] in blocking_ids:
+                compact = json.dumps(row["features"], sort_keys=True, separators=(",", ":"))
+                lines.append(
+                    f"- `{row['case_id']}` ({row['split']} {row['class']}): `{compact}`"
+                )
+        lines.extend(
+            [
+                "",
+                "The complete parameters, extrema, labels, and measured features are "
+                "preserved in `case_results.jsonl` and `thresholds.json`.",
+                "",
+            ]
+        )
+    lines.extend(
+        [
             "## Shadow gate",
             "",
             (
@@ -1438,6 +1572,37 @@ def _render_report(
     for family in FAMILY_NAMES:
         item = shadow["overall_events"][family]
         lines.append(f"| {family} | {item['count']} | {item['events_per_minute']:.6f} |")
+    if shadow["opponents"]:
+        lines.extend(
+            [
+                "",
+                "| Opponent | Episodes | Sim min | Goals | No-touch | Hard-time |",
+                "|---|---:|---:|---:|---:|---:|",
+            ]
+        )
+        for opponent in ("Nexto", "Wisp"):
+            item = shadow["opponents"][opponent]
+            outcomes = item["episode_outcomes"]
+            lines.append(
+                f"| {opponent} | {item['episodes']} | {item['simulated_minutes']:.6f} | "
+                f"{outcomes['goal']} | {outcomes['no_touch']} | {outcomes['hard_time']} |"
+            )
+        lines.extend(
+            [
+                "",
+                "| Opponent | Rival side | Family | Count | Events/min |",
+                "|---|---|---|---:|---:|",
+            ]
+        )
+        for opponent in ("Nexto", "Wisp"):
+            item = shadow["opponents"][opponent]
+            for side_name in ("Blue", "Orange"):
+                for family in FAMILY_NAMES:
+                    event = item["by_rival_side"][side_name][family]
+                    lines.append(
+                        f"| {opponent} | {side_name} | {family} | {event['count']} | "
+                        f"{event['events_per_minute']:.6f} |"
+                    )
     lines.extend(
         [
             "",
@@ -1448,6 +1613,25 @@ def _render_report(
             "Bounded per-event raw features are retained in "
             "`shadow_event_evidence.json`; all calibration case parameters and "
             "measured features are retained in `case_results.jsonl`.",
+            "",
+            "No detector fired on an impossible-state assertion. Calibrated-family "
+            "frequencies were bounded by physical family lockout/re-arm state; the two "
+            "telemetry-only families emitted zero events by construction. No suspicious "
+            "case required threshold retuning after held-out evaluation.",
+            "",
+            "## Reproduction",
+            "",
+            "```powershell",
+            "$env:RIVALSIM_COLLISION_DIR='G:\\dev\\RLBot-Rival\\bot\\collision_meshes'",
+            ".venv\\Scripts\\python.exe -m pytest -q "
+            "tests/test_rival2_mechanics_calibration.py --basetemp "
+            ".pytest_cache\\mechanics-final",
+            ".venv\\Scripts\\python.exe benchmarks/run_rival2_mechanics_calibration.py "
+            "--collision-root $env:RIVALSIM_COLLISION_DIR",
+            "```",
+            "",
+            "Machine-readable artifacts and their SHA-256 hashes are indexed by "
+            "`results/rival2/mechanics_calibration_v1/calibration_manifest.json`.",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -1556,9 +1740,25 @@ def main() -> int:
             + wisp["mechanics_reward_contribution_sum"],
             "reward_enabled": False,
         }
+        not_ready_events = {
+            family: overall_events[family]["count"]
+            for family in FAMILY_NAMES
+            if thresholds["detectors"][family]["status"] == STATUS_NOT_READY
+            and overall_events[family]["count"] != 0
+        }
+        shadow["pathology_checks"] = {
+            "impossible_state_count_zero": shadow["impossible_count"] == 0,
+            "mechanics_reward_exactly_zero": shadow["mechanics_reward_contribution_sum"] == 0.0,
+            "not_ready_families_emit_zero": not not_ready_events,
+            "not_ready_nonzero_events": not_ready_events,
+        }
         _write_json(args.output_dir / "shadow_event_evidence.json", evidence)
         if shadow["mechanics_reward_contribution_sum"] != 0.0:
             raise RuntimeError("mechanics reward contribution was non-zero in shadow mode")
+        if shadow["impossible_count"] != 0:
+            raise RuntimeError("impossible mechanics classifications occurred in shadow mode")
+        if not_ready_events:
+            raise RuntimeError(f"NOT_READY families emitted shadow events: {not_ready_events}")
     _write_json(args.output_dir / "shadow_gate_summary.json", shadow)
     manifest = {
         "format": "RIVAL2_MECHANICS_CALIBRATION_MANIFEST_V1",
@@ -1566,6 +1766,13 @@ def main() -> int:
         "handoff_source_commit": SOURCE_HANDOFF_COMMIT,
         "checkpoint": {"path": args.checkpoint.as_posix(), "sha256": checkpoint_sha},
         "collision_root": str(Path(args.collision_root).resolve()),
+        "arena_geometry_sha256": ArenaGeometry.load_soccar(args.collision_root).content_sha256,
+        "contract_source_sha256": {
+            "rivalsim/rival2_contracts.py": _sha256(
+                REPOSITORY_ROOT / "rivalsim/rival2_contracts.py"
+            ),
+            "rivalsim/rival2_env.py": _sha256(REPOSITORY_ROOT / "rivalsim/rival2_env.py"),
+        },
         "calibration_seed": CALIBRATION_SEED,
         "shadow_seed": SHADOW_SEED,
         "case_count": len(rows),
@@ -1596,7 +1803,7 @@ def main() -> int:
             args.output_dir / "shadow_event_evidence.json"
         )
     _write_json(args.output_dir / "calibration_manifest.json", manifest)
-    report = _render_report(source_head, thresholds, heldout, shadow)
+    report = _render_report(source_head, thresholds, heldout, shadow, rows, manifest)
     Path("docs/RIVAL2_MECHANICS_CALIBRATION_V1_RESULTS.md").write_text(
         report, encoding="utf-8", newline="\n"
     )

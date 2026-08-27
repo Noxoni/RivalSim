@@ -9,7 +9,12 @@ import pytest
 import warp as wp
 
 from benchmarks.run_rival2_mechanics_calibration import _scenario_rows
-from rivalsim.kernels.rival2 import REWARD_MODE_GAMEPLAY
+from rivalsim.kernels.rival2 import (
+    REWARD_MODE_GAMEPLAY,
+    STRICT_DASH_LANDING_WINDOW_TICKS,
+    STRICT_DASH_LOW_AIR_TICKS,
+    STRICT_DOUBLE_DASH_WINDOW_TICKS,
+)
 from rivalsim.mechanics_calibration import (
     DASH_AIR_TICKS,
     DASH_LANDING_TICKS,
@@ -110,6 +115,9 @@ def test_source_exact_dash_windows_and_surface_classes_are_frozen() -> None:
     assert (DASH_AIR_TICKS, DASH_LANDING_TICKS) == (42, 24)
     assert (ZAP_JUMP_TICKS, ZAP_DODGE_TICKS) == (12, 30)
     assert DOUBLE_DASH_TICKS == 90
+    assert DASH_AIR_TICKS == STRICT_DASH_LOW_AIR_TICKS
+    assert DASH_LANDING_TICKS == STRICT_DASH_LANDING_WINDOW_TICKS
+    assert DOUBLE_DASH_TICKS == STRICT_DOUBLE_DASH_WINDOW_TICKS
     assert SURFACE_FLOOR_CEILING_NZ == 0.85
     assert SURFACE_WALL_NZ == 0.25
 
@@ -127,7 +135,7 @@ def test_same_family_subtype_dedup_and_compound_observability() -> None:
     assert events == [
         ("movement", "wavedash"),
         ("reset", "ball_reset"),
-        ("flick", "musty"),
+        ("flick", "breezi"),
     ]
 
 
