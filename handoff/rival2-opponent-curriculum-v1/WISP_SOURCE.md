@@ -34,11 +34,11 @@ Do not silently advance the upstream commit.
 At the pinned commit, the model files are:
 
 - `src/models/POLICY.lt`
-  - Git blob SHA: `5bcff2f1df61a55b0133a05f8d40e2c97e51259a`
-  - size: `7,701,849` bytes
+  - Git blob SHA: `2262095fbeb41846f0c68934aeefac5c56984f4a`
+  - size: `7,689,613` bytes
 - `src/models/SHARED_HEAD.lt`
-  - Git blob SHA: `0d2e9e57e5774138a6f656e79b87abd65a8e283b`
-  - size: `6,052,377` bytes
+  - Git blob SHA: `201917fac35badb7c9846688416b706082a3002a`
+  - size: `5,995,907` bytes
 
 Before training, retrieve the exact pinned files, compute their byte SHA-256
 values, and freeze those values in RivalSim provenance plus the launch gate.
