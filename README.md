@@ -11,6 +11,25 @@ The project is deliberately narrower than RocketSim. The target is standard Socc
 - fixed 120 Hz physics;
 - no rendering in the training benchmark path.
 
+## RivalVis checkpoint viewer
+
+RivalVis is a separate one-world Panda3D spectator for watching a Rival 2.0
+checkpoint play an authoritative five-minute RivalSim match. It is intentionally
+outside the trainer and never copies state from the 131,072-world training hot path.
+
+Install the optional dependency and launch the latest acquisition checkpoint:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -e ".[viewer]"
+.\.venv\Scripts\python.exe -m rivalsim.viewer --checkpoint checkpoints\rival2\acquisition_v1\rival2_acquisition_resume.pt
+```
+
+RivalVis discovers the standard sibling `RLBot-Rival/bot/collision_meshes`
+checkout automatically. On another layout, pass `--collision-dir PATH` or set
+`RIVALSIM_COLLISION_DIR`. Stochastic policy behavior is the default; add
+`--deterministic` for reproducible debugging. See [RivalVis documentation](docs/RIVALVIS.md)
+for cameras, playback controls, seeds, and architecture.
+
 ## Current boundary — v0.5 / Rival 2.0 overnight curriculum complete
 
 The uninterrupted overnight curriculum resumed Campaign 04's exact update-120 Reward V2
