@@ -1,26 +1,38 @@
-# Active Codex Handoff - Rival 2.0 Gameplay V1
+# Active Codex Handoff - Rival 2.0 Opponent Curriculum V1
 
-The active objective is the bounded acquisition-to-gameplay continuation described
-in:
+The active objective is the bounded mixed-opponent Gameplay V2 continuation in:
 
-`handoff/rival2-gameplay-v1/README.md`
+`handoff/rival2-opponent-curriculum-v1/README.md`
 
-Use only the acquisition-complete source checkpoint:
+Read the entire package before implementation:
 
-`checkpoints/rival2/acquisition_v1/rival2_acquisition_resume.pt`
+- `handoff/rival2-opponent-curriculum-v1/README.md`
+- `handoff/rival2-opponent-curriculum-v1/WISP_SOURCE.md`
+- `handoff/rival2-opponent-curriculum-v1/PACKAGE_MANIFEST.md`
+
+Use only the selected healthy Gameplay V1 +239 checkpoint:
+
+`checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt`
 
 Expected SHA-256:
 
-`4FB7A3B134B25D595374E3968E2EDFA150A9CD6F8910B903BF892B59D7F8BC9A`
+`77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21`
 
-The source commit is:
+The required experiment-source commit is:
 
-`61307571d86508f3026402c4948f759f310ff36c`
+`1a4437fe92fa7ab66efd0e4100d74bb90302ea46`
 
-Do not resume any full-match Scoring V1 checkpoint. Preserve the acquisition
-checkpoint's learned and training state, create fresh original short-lifecycle
-world state, use only `RIVAL2_REWARD_GAMEPLAY_V1`, and run no more than 239
-additional PPO updates. A policy-displacement rejection is a mandatory immediate
-stop. Otherwise stop after the +239 checkpoint and held-out evaluation. Do not
-begin an overnight continuation, train against Nexto, use five-minute training
-matches, change simulator mechanics, or begin v0.6.
+It must be an ancestor of the implementation head; do not reset `main` back to
+that commit after this package is published.
+
+Implement the pinned Wisp v2-75B adapter and its targeted fidelity gate, create
+`RIVAL2_REWARD_GAMEPLAY_V2` as the immutable Gameplay V1 reward plus only the
+strict successful-double-dash `+0.005` competitive event, then run the authorized
+35% Nexto / 35% Wisp / 20% current self-play / 10% historical Rival short-episode
+curriculum.
+
+Preserve the existing transactional KL safety guard. Stop immediately on a
+rejected policy update; otherwise stop after exactly +120 PPO updates and the
+scheduled compact evaluations. Do not train Nexto/Wisp, use imitation learning,
+run five-minute training matches, alter physics/PPO/network/observation/action
+contracts, begin v0.6, or continue beyond +120.
