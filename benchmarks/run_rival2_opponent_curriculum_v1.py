@@ -49,6 +49,7 @@ from rivalsim.rival2_contracts import (  # noqa: E402
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2Env  # noqa: E402
+from rivalsim.rival2_mixed_ppo import Rival2MixedPPOSafetyConfig  # noqa: E402
 from rivalsim.rival2_opponent_curriculum import (  # noqa: E402
     NEXTO_ACTING_VERSION,
     OPPONENT_NAMES,
@@ -74,6 +75,7 @@ from third_party.wisp75b.adapter import (  # noqa: E402
 SCHEMA_VERSION = 1
 AUTHORITY = Path("handoff/rival2-opponent-curriculum-v1/README.md")
 AUTHORITATIVE_HEAD = "58c1578ccb719b1a7782a128842cf10761a6d227"
+SAFE_TRANSITION_BASE = "77b1e3df3a9f7226458445a13128e784fd22c268"
 SOURCE_CHECKPOINT = Path("checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt")
 SOURCE_CHECKPOINT_SHA256 = "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21"
 WISP_FIDELITY = Path("results/rival2/opponent_curriculum_v1/wisp_fidelity.json")
@@ -85,6 +87,8 @@ KL_TRANSITION_REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_TRANSITION_
 FINAL_CHECKPOINT = Path(
     "checkpoints/rival2/opponent_curriculum_v1/rival2_opponent_curriculum_resume.pt"
 )
+RETENTION_CORPUS = Path("results/rival2/opponent_curriculum_v1/safe_transition/retention_corpus.pt")
+RETENTION_CORPUS_SUMMARY = RETENTION_CORPUS.with_suffix(".json")
 WORLDS = 131_072
 CAMPAIGN_SEED = 2_026_082_703
 DETERMINISTIC_EVALUATION_SEED = 2_026_082_711
@@ -97,6 +101,7 @@ KL_GUARD = Rival2KLGuardConfig(
     minibatch_kl_limit=0.10,
     completed_update_mean_kl_limit=0.05,
 )
+MIXED_PPO_SAFETY = Rival2MixedPPOSafetyConfig()
 
 
 def parse_args() -> argparse.Namespace:
@@ -133,6 +138,17 @@ def _utc_now() -> str:
 
 def _git(*arguments: str) -> str:
     return subprocess.check_output(["git", *arguments], cwd=REPO_ROOT, text=True).strip()
+
+
+def _git_is_ancestor(ancestor: str, descendant: str) -> bool:
+    return (
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+            cwd=REPO_ROOT,
+            check=False,
+        ).returncode
+        == 0
+    )
 
 
 def _sha256(path: Path) -> str:
@@ -692,6 +708,9 @@ def frozen_configuration(source: dict[str, Any]) -> dict[str, Any]:
         "policy_config_hash": policy.content_hash,
         "ppo_config": asdict(ppo),
         "ppo_config_hash": ppo.content_hash,
+        "mixed_ppo_safety": asdict(MIXED_PPO_SAFETY),
+        "mixed_ppo_safety_hash": MIXED_PPO_SAFETY.content_hash,
+        "retention_corpus": RETENTION_CORPUS.as_posix(),
         "self_play_config": asdict(self_play),
         "opponent_curriculum": asdict(curriculum),
         "worlds": WORLDS,
@@ -739,11 +758,14 @@ def verify_launch(configuration: dict[str, Any], source: dict[str, Any]) -> dict
     source_sha = _sha256(SOURCE_CHECKPOINT)
     wisp = json.loads(WISP_FIDELITY.read_text(encoding="utf-8"))
     nexto = json.loads(NEXTO_FIDELITY.read_text(encoding="utf-8"))
+    retention = json.loads(RETENTION_CORPUS_SUMMARY.read_text(encoding="utf-8"))
     ppo = configuration["ppo_config"]
     mix = configuration["opponent_curriculum"]
     checks = {
-        "head_exact": _git("rev-parse", "HEAD") == AUTHORITATIVE_HEAD,
-        "origin_main_exact": _git("rev-parse", "origin/main") == AUTHORITATIVE_HEAD,
+        "safe_transition_base_in_head_history": _git_is_ancestor(SAFE_TRANSITION_BASE, "HEAD"),
+        "safe_transition_base_in_origin_main_history": _git_is_ancestor(
+            SAFE_TRANSITION_BASE, "origin/main"
+        ),
         "authority_present": AUTHORITY.is_file(),
         "source_checkpoint_sha256_exact": source_sha == SOURCE_CHECKPOINT_SHA256,
         "source_iteration_359": int(source["iteration"]) == 359,
@@ -769,6 +791,13 @@ def verify_launch(configuration: dict[str, Any], source: dict[str, Any]) -> dict
         == WISP_SHARED_HEAD_SHA256,
         "nexto_fidelity_pass_green": nexto.get("verdict") == "PASS_GREEN",
         "nexto_model_sha_exact": nexto["provenance"]["model_sha256"] == NEXTO_MODEL_SHA256,
+        "retention_corpus_pass_green": retention.get("verdict") == "PASS_GREEN",
+        "retention_source_checkpoint_exact": retention["source_identity"]["checkpoint_sha256"]
+        == SOURCE_CHECKPOINT_SHA256,
+        "retention_safety_config_exact": retention["safety_config_hash"]
+        == MIXED_PPO_SAFETY.content_hash,
+        "retention_artifact_sha_exact": retention["artifact"]["sha256"]
+        == _sha256(RETENTION_CORPUS),
         "world_count_exact": configuration["worlds"] == WORLDS,
         "mix_exact": mix
         == {
@@ -779,7 +808,27 @@ def verify_launch(configuration: dict[str, Any], source: dict[str, Any]) -> dict
             "seed": CAMPAIGN_SEED,
         },
         "entropy_zero": ppo["entropy_coefficient"] == 0.0,
-        "learning_rate_unchanged": ppo["learning_rate"] == 0.0003,
+        "base_ppo_learning_rate_identity_unchanged": ppo["learning_rate"] == 0.0003,
+        "mixed_policy_learning_rate_exact": configuration["mixed_ppo_safety"][
+            "initial_policy_learning_rate"
+        ]
+        == 0.0001,
+        "mixed_critic_learning_rate_exact": configuration["mixed_ppo_safety"][
+            "critic_learning_rate"
+        ]
+        == 0.0003,
+        "mixed_soft_minibatch_kl_exact": configuration["mixed_ppo_safety"][
+            "soft_minibatch_kl_target"
+        ]
+        == 0.02,
+        "mixed_retention_kl_exact": configuration["mixed_ppo_safety"][
+            "retention_soft_mean_kl_target"
+        ]
+        == 0.02,
+        "mixed_policy_minimum_learning_rate_exact": configuration["mixed_ppo_safety"][
+            "minimum_policy_learning_rate"
+        ]
+        == 0.000025,
         "clip_range_unchanged": ppo["clip_range"] == 0.2,
         "value_loss_coefficient_unchanged": ppo["value_loss_coefficient"] == 0.5,
         "max_gradient_norm_unchanged": ppo["max_gradient_norm"] == 0.5,
@@ -879,6 +928,7 @@ def _training_integrity(
 ) -> dict[str, Any]:
     expected_samples = int(rollout.train_mask.sum().item())
     curriculum = trainer.last_rollout_curriculum_metrics
+    adaptive = trainer.last_adaptive_ppo_diagnostics
     checks = {
         "finite_metrics": all(torch.isfinite(value).item() for value in metrics.values()),
         "finite_rewards": bool(torch.isfinite(rollout.rewards).all().item()),
@@ -906,6 +956,14 @@ def _training_integrity(
         <= KL_GUARD.completed_update_mean_kl_limit,
         "minibatch_kl_within_guard": float(metrics["optimizer_post_step_approx_kl_max"].item())
         <= KL_GUARD.minibatch_kl_limit,
+        "adaptive_ppo_diagnostics_present": adaptive is not None,
+        "adaptive_ppo_pass_green": adaptive is not None and adaptive.get("verdict") == "PASS_GREEN",
+        "value_loss_to_trunk_gradient_zero": adaptive is not None
+        and adaptive["checks"]["value_loss_to_shared_trunk_gradient_exact_zero"],
+        "value_loss_to_actor_gradient_zero": adaptive is not None
+        and adaptive["checks"]["value_loss_to_actor_gradient_exact_zero"],
+        "retention_kl_within_soft_target": adaptive is not None
+        and adaptive["retention_corpus_mean_kl"] <= MIXED_PPO_SAFETY.retention_soft_mean_kl_target,
         "world_hot_path_zero_transfer": trainer.env.hot_path_transfer_bytes()
         == {"h2d": 0, "d2h": 0},
     }
@@ -941,6 +999,11 @@ def _checkpoint(
         "curriculum_rng_present": curriculum is not None and "generator_state" in curriculum,
         "wisp_temporal_state_present": curriculum is not None and "wisp" in curriculum,
         "nexto_temporal_state_present": curriculum is not None and "nexto" in curriculum,
+        "adaptive_ppo_present": curriculum is not None
+        and curriculum.get("adaptive_ppo") is not None,
+        "retention_corpus_present": curriculum is not None
+        and (curriculum.get("adaptive_ppo") or {}).get("retention_observations") is not None,
+        "split_optimizer_groups_present": len(payload["optimizer"]["param_groups"]) == 2,
     }
     return {
         "label": label,
@@ -1337,8 +1400,17 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     transition_gate = transition_preservation_gate(source, trainer, transition)
     if transition_gate["verdict"] != "PASS_GREEN":
         raise RuntimeError(f"transition gate failed: {transition_gate['checks']}")
+    optimizer_migration = trainer.enable_safe_mixed_ppo(MIXED_PPO_SAFETY)
+    retention_payload = torch.load(RETENTION_CORPUS, map_location=args.device, weights_only=False)
+    if retention_payload.get("format") != "RIVAL2_RETENTION_OBSERVATIONS_V1":
+        raise ValueError("unsupported Rival 2.0 retention corpus format")
+    trainer.install_retention_corpus(
+        retention_payload["observations"], retention_payload["summary"]
+    )
     _write_json(args.work_dir / "transition.json", trainer.curriculum_transition)
     _write_json(args.work_dir / "transition_gate.json", transition_gate)
+    _write_json(args.work_dir / "optimizer_migration.json", optimizer_migration)
+    _write_json(args.work_dir / "retention_corpus.json", trainer.retention_corpus_summary)
 
     ledger = args.work_dir / "training_curve.jsonl"
     started = time.perf_counter()
@@ -1413,6 +1485,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
                 (trainer.total_agent_samples - samples_before) / seconds
             ),
             "family": trainer.last_rollout_curriculum_metrics,
+            "adaptive_ppo": trainer.last_adaptive_ppo_diagnostics,
             "metrics": values,
             "integrity": integrity,
             "verdict": integrity["verdict"],

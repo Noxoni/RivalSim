@@ -80,6 +80,7 @@ class Rival2RolloutBuffer:
         device: torch.device | str,
         *,
         obs_dim: int = OBS_DIM,
+        store_opponent_family: bool = False,
     ):
         if horizon <= 0 or num_envs <= 0:
             raise ValueError("horizon and num_envs must be positive")
@@ -100,6 +101,11 @@ class Rival2RolloutBuffer:
         self.next_values = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
         self.policy_version = torch.empty(agent_shape, dtype=torch.int64, device=self.device)
         self.opponent_version = torch.empty(agent_shape, dtype=torch.int64, device=self.device)
+        self.opponent_family = (
+            torch.full(agent_shape, -1, dtype=torch.int64, device=self.device)
+            if store_opponent_family
+            else None
+        )
         self.train_mask = torch.empty(agent_shape, dtype=torch.bool, device=self.device)
         self.advantages = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
         self.returns = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
@@ -123,7 +129,10 @@ class Rival2RolloutBuffer:
             self.advantages,
             self.returns,
         )
-        return sum(tensor.numel() * tensor.element_size() for tensor in tensors)
+        stored = sum(tensor.numel() * tensor.element_size() for tensor in tensors)
+        if self.opponent_family is not None:
+            stored += self.opponent_family.numel() * self.opponent_family.element_size()
+        return stored
 
     def add(
         self,
@@ -140,6 +149,7 @@ class Rival2RolloutBuffer:
         policy_version: torch.Tensor,
         opponent_version: torch.Tensor,
         train_mask: torch.Tensor,
+        opponent_family: torch.Tensor | None = None,
     ) -> None:
         if self.position >= self.horizon:
             raise RuntimeError("rollout buffer is full")
@@ -160,6 +170,12 @@ class Rival2RolloutBuffer:
         }
         for name, value_tensor in fields.items():
             getattr(self, name)[index].copy_(value_tensor)
+        if self.opponent_family is not None and opponent_family is None:
+            self.opponent_family[index].fill_(-1)
+        elif self.opponent_family is not None:
+            self.opponent_family[index].copy_(opponent_family)
+        elif opponent_family is not None:
+            raise ValueError("rollout was not configured to store opponent family")
         self.position += 1
 
     def compute_gae(self, config: Rival2PPOConfig) -> tuple[torch.Tensor, torch.Tensor]:

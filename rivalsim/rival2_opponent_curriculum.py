@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 from dataclasses import asdict, dataclass
 from typing import Any
@@ -10,8 +11,21 @@ import numpy as np
 import torch
 
 from rivalsim.rival2_env import Rival2Env
+from rivalsim.rival2_mixed_ppo import (
+    Rival2MixedPPOSafetyConfig,
+    build_retention_observation_corpus,
+    make_empty_mixed_optimizer,
+    migrate_adam_to_mixed_groups,
+    mixed_optimizer_learning_rates,
+    ppo_update_mixed_curriculum,
+    retention_observation_sha256,
+)
 from rivalsim.rival2_policy import sample_hybrid_action
-from rivalsim.rival2_ppo import Rival2RolloutBuffer
+from rivalsim.rival2_ppo import (
+    Rival2KLGuardConfig,
+    Rival2PolicyDisplacementRejected,
+    Rival2RolloutBuffer,
+)
 from rivalsim.rival2_training import Rival2Trainer
 from third_party.nexto.adapter import NextoPolicyAdapter, NextoStateTensors
 from third_party.wisp75b.adapter import WispPolicyAdapter, WispStateTensors
@@ -72,6 +86,11 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         self.wisp_state = WispStateTensors.from_bridge(env.bridge)
         self._world_rows = torch.arange(env.num_envs, device=self.device)
         self.last_rollout_curriculum_metrics: dict[str, Any] | None = None
+        self.mixed_ppo_safety: Rival2MixedPPOSafetyConfig | None = None
+        self.optimizer_migration_proof: dict[str, Any] | None = None
+        self.retention_observations: torch.Tensor | None = None
+        self.retention_corpus_summary: dict[str, Any] | None = None
+        self.last_adaptive_ppo_diagnostics: dict[str, Any] | None = None
 
     def initialize_curriculum_assignments(self) -> None:
         if bool((self.opponent_family >= 0).any()):
@@ -259,7 +278,12 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             raise ValueError("active world mask shape/dtype/device mismatch")
         if bool((self.opponent_family < 0).any()):
             raise RuntimeError("opponent curriculum assignments were not initialized")
-        rollout = Rival2RolloutBuffer(config.rollout_horizon, self.env.num_envs, self.device)
+        rollout = Rival2RolloutBuffer(
+            config.rollout_horizon,
+            self.env.num_envs,
+            self.device,
+            store_opponent_family=True,
+        )
         observation = self.env.observation
         active_agent_samples = torch.zeros((), dtype=torch.int64, device=self.device)
         family_world_decisions = torch.zeros(4, dtype=torch.int64, device=self.device)
@@ -331,6 +355,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                     policy_version=acting_version,
                     opponent_version=opponent_version,
                     train_mask=train_mask,
+                    opponent_family=active_family[:, None].expand(-1, 2),
                 )
                 self.assign_opponents_at_reset(transition.reset_mask)
                 if active_world_mask is not None:
@@ -355,6 +380,151 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         }
         return rollout
 
+    def enable_safe_mixed_ppo(
+        self,
+        config: Rival2MixedPPOSafetyConfig | None = None,
+    ) -> dict[str, Any]:
+        """Install the curriculum-only split optimizer with exact Adam migration."""
+
+        if self.mixed_ppo_safety is not None:
+            raise ValueError("safe mixed PPO is already enabled")
+        selected = config or Rival2MixedPPOSafetyConfig()
+        self.optimizer, proof = migrate_adam_to_mixed_groups(self.model, self.optimizer, selected)
+        self.mixed_ppo_safety = selected
+        self.optimizer_migration_proof = proof
+        if self.curriculum_transition is not None:
+            self.curriculum_transition["mixed_ppo_safety_transition"] = {
+                "config": asdict(selected),
+                "config_hash": selected.content_hash,
+                "optimizer_migration": copy.deepcopy(proof),
+                "legacy_ppo_path_changed": False,
+                "model_architecture_changed": False,
+            }
+        return copy.deepcopy(proof)
+
+    def initialize_retention_corpus_from_rollout(
+        self,
+        rollout: Rival2RolloutBuffer,
+        *,
+        source_identity: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Freeze the source-policy safety corpus before the first mixed update."""
+
+        if self.mixed_ppo_safety is None:
+            raise RuntimeError("safe mixed PPO must be enabled before retention setup")
+        if self.retention_observations is not None:
+            raise ValueError("retention corpus is already initialized")
+        observations, summary = build_retention_observation_corpus(
+            rollout,
+            corpus_size=self.mixed_ppo_safety.retention_corpus_size,
+        )
+        summary.update(
+            {
+                "source_iteration": self.iteration,
+                "source_policy_version": self.policy_version,
+                "source_agent_decision_samples_after_rollout": self.total_agent_samples,
+                "source_identity": copy.deepcopy(source_identity or {}),
+            }
+        )
+        self.install_retention_corpus(observations, summary)
+        return copy.deepcopy(summary)
+
+    def install_retention_corpus(
+        self,
+        observations: torch.Tensor,
+        summary: dict[str, Any],
+    ) -> None:
+        """Install and verify the immutable source-policy retention observations."""
+
+        if self.mixed_ppo_safety is None:
+            raise RuntimeError("safe mixed PPO must be enabled before retention setup")
+        if self.retention_observations is not None:
+            raise ValueError("retention corpus is already initialized")
+        installed = observations.to(self.device, dtype=torch.float32).detach().clone()
+        expected_shape = (self.mixed_ppo_safety.retention_corpus_size, self.policy_config.obs_dim)
+        checks = {
+            "shape_exact": installed.shape == expected_shape,
+            "finite": bool(torch.isfinite(installed).all().item()),
+            "sha256_exact": retention_observation_sha256(installed) == summary.get("sha256"),
+            "source_policy_identity_present": bool(summary.get("source_identity")),
+        }
+        if not all(checks.values()):
+            raise RuntimeError(f"retention corpus installation failed closed: {checks}")
+        self.retention_observations = installed
+        self.retention_corpus_summary = copy.deepcopy(summary)
+        if self.curriculum_transition is not None:
+            self.curriculum_transition["retention_corpus"] = copy.deepcopy(summary)
+
+    def update(
+        self,
+        rollout: Rival2RolloutBuffer,
+        *,
+        kl_guard: Rival2KLGuardConfig | None = None,
+    ) -> dict[str, torch.Tensor]:
+        if self.mixed_ppo_safety is None:
+            return super().update(rollout, kl_guard=kl_guard)
+        if kl_guard is None:
+            raise ValueError("safe mixed PPO requires the unchanged hard KL guard")
+        if self.retention_observations is None:
+            raise RuntimeError("safe mixed PPO retention corpus is not initialized")
+
+        self.model.train()
+        rollback = {
+            "model": copy.deepcopy(self.model.state_dict()),
+            "optimizer": copy.deepcopy(self.optimizer.state_dict()),
+            "gradients": [
+                None if parameter.grad is None else parameter.grad.detach().clone()
+                for parameter in self.model.parameters()
+            ],
+            "torch_cpu_rng_state": torch.get_rng_state().clone(),
+            "torch_cuda_rng_state": torch.cuda.get_rng_state(self.device).clone(),
+            "policy_generator_state": self.policy_generator.get_state().clone(),
+            "opponent_generator_state": self.opponent_generator.get_state().clone(),
+            "curriculum_generator_state": self.curriculum_generator.get_state().clone(),
+            "model_training": self.model.training,
+        }
+        try:
+            metrics, diagnostics = ppo_update_mixed_curriculum(
+                self.model,
+                self.optimizer,
+                rollout,
+                self.ppo_config,
+                self.mixed_ppo_safety,
+                retention_observations=self.retention_observations,
+                family_names=OPPONENT_NAMES,
+                generator=self.policy_generator,
+                policy_config=self.policy_config,
+                kl_guard=kl_guard,
+            )
+        except Rival2PolicyDisplacementRejected as error:
+            self.model.load_state_dict(rollback["model"])
+            self.optimizer.load_state_dict(rollback["optimizer"])
+            for parameter, gradient in zip(
+                self.model.parameters(), rollback["gradients"], strict=True
+            ):
+                parameter.grad = None if gradient is None else gradient.clone()
+            self.policy_generator.set_state(rollback["policy_generator_state"])
+            self.opponent_generator.set_state(rollback["opponent_generator_state"])
+            self.curriculum_generator.set_state(rollback["curriculum_generator_state"])
+            torch.set_rng_state(rollback["torch_cpu_rng_state"])
+            torch.cuda.set_rng_state(rollback["torch_cuda_rng_state"], self.device)
+            self.model.train(bool(rollback["model_training"]))
+            error.diagnostics.update(
+                {
+                    "rejected_iteration": self.iteration + 1,
+                    "restored_iteration": self.iteration,
+                    "restored_policy_version": self.policy_version,
+                    "pre_update_agent_decision_samples": self.total_agent_samples,
+                    "transactional_rollback_completed": True,
+                    "mixed_ppo_safety_config": asdict(self.mixed_ppo_safety),
+                }
+            )
+            raise
+        self.last_adaptive_ppo_diagnostics = diagnostics
+        self.policy_version += 1
+        self.iteration += 1
+        return metrics
+
     def checkpoint_payload(self) -> dict[str, Any]:
         payload = super().checkpoint_payload()
         payload["opponent_curriculum"] = {
@@ -363,6 +533,18 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             "family": self.opponent_family,
             "rival_side": self.rival_side,
             "realized_family_assignments": self.realized_family_assignments,
+            "adaptive_ppo": (
+                None
+                if self.mixed_ppo_safety is None
+                else {
+                    "config": asdict(self.mixed_ppo_safety),
+                    "config_hash": self.mixed_ppo_safety.content_hash,
+                    "optimizer_migration_proof": copy.deepcopy(self.optimizer_migration_proof),
+                    "retention_observations": self.retention_observations,
+                    "retention_corpus_summary": copy.deepcopy(self.retention_corpus_summary),
+                    "optimizer_learning_rates": mixed_optimizer_learning_rates(self.optimizer),
+                }
+            ),
             "nexto": {
                 "player_index": self.nexto.player_index,
                 "previous_action": self.nexto.previous_action,
@@ -385,8 +567,31 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         return payload
 
     def _restore_checkpoint_state(self, payload: dict[str, Any]) -> None:
-        super()._restore_checkpoint_state(payload)
+        optimizer_groups = payload["optimizer"]["param_groups"]
         curriculum = payload.get("opponent_curriculum")
+        adaptive = None if curriculum is None else curriculum.get("adaptive_ppo")
+        if len(optimizer_groups) == 2:
+            if adaptive is None:
+                raise ValueError("split optimizer checkpoint lacks adaptive PPO state")
+            restored_config = Rival2MixedPPOSafetyConfig(**adaptive["config"])
+            if restored_config.content_hash != adaptive["config_hash"]:
+                raise ValueError("adaptive PPO checkpoint configuration hash mismatch")
+            group_by_name = {group.get("name"): group for group in optimizer_groups}
+            if set(group_by_name) != {"policy", "critic"}:
+                raise ValueError("split optimizer checkpoint group names are invalid")
+            self.optimizer = make_empty_mixed_optimizer(
+                self.model,
+                policy_learning_rate=float(group_by_name["policy"]["lr"]),
+                critic_learning_rate=float(group_by_name["critic"]["lr"]),
+            )
+        elif len(optimizer_groups) != 1:
+            raise ValueError("unsupported optimizer parameter-group count")
+        super()._restore_checkpoint_state(payload)
+        self.mixed_ppo_safety = None
+        self.optimizer_migration_proof = None
+        self.retention_observations = None
+        self.retention_corpus_summary = None
+        self.last_adaptive_ppo_diagnostics = None
         if curriculum is None:
             return
         if curriculum["config"] != asdict(self.opponent_curriculum):
@@ -412,6 +617,11 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             getattr(self.wisp, name).copy_(wisp[name])
         self.wisp.eta_cache[:] = np.asarray(wisp["eta_cache"], dtype=np.float64)
         self.wisp.observation_generator.set_state(wisp["observation_generator_state"].cpu())
+        if adaptive is not None:
+            self.mixed_ppo_safety = Rival2MixedPPOSafetyConfig(**adaptive["config"])
+            self.optimizer_migration_proof = copy.deepcopy(adaptive["optimizer_migration_proof"])
+            self.retention_observations = adaptive["retention_observations"].to(self.device)
+            self.retention_corpus_summary = copy.deepcopy(adaptive["retention_corpus_summary"])
 
 
 __all__ = [

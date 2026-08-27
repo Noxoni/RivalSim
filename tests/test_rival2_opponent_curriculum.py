@@ -14,6 +14,10 @@ from rivalsim.rival2_contracts import (
     RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
 )
 from rivalsim.rival2_env import Rival2Env
+from rivalsim.rival2_mixed_ppo import (
+    Rival2MixedPPOSafetyConfig,
+    mixed_optimizer_learning_rates,
+)
 from rivalsim.rival2_opponent_curriculum import (
     OPPONENT_CURRENT,
     OPPONENT_HISTORICAL,
@@ -202,4 +206,51 @@ def test_mixed_opponent_assignment_train_mask_reset_and_checkpoint_round_trip(
         restored.wisp.observation_generator.get_state(),
         trainer.wisp.observation_generator.get_state(),
     )
+    checkpoint.unlink()
+
+
+def test_safe_mixed_optimizer_and_retention_checkpoint_round_trip(
+    arena_assets,
+) -> None:
+    count = 16
+    ppo = Rival2PPOConfig(rollout_horizon=2, minibatch_size=16, epochs=1)
+    trainer = Rival2OpponentCurriculumTrainer(
+        _env(arena_assets, count, seed=2026082704),
+        ppo_config=ppo,
+        seed=2026082704,
+    )
+    trainer.initialize_curriculum_assignments()
+    rollout = trainer.collect_rollout()
+    safety = Rival2MixedPPOSafetyConfig(retention_corpus_size=8)
+    migration = trainer.enable_safe_mixed_ppo(safety)
+    summary = trainer.initialize_retention_corpus_from_rollout(
+        rollout,
+        source_identity={"test_fixture": "healthy_source_policy"},
+    )
+    assert migration["verdict"] == "PASS_GREEN"
+    assert summary["verdict"] == "PASS_GREEN"
+
+    checkpoint = Path(".tools/opponent_curriculum_safe_transition_test_checkpoint.pt")
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    trainer.save_checkpoint(checkpoint)
+    restored = Rival2OpponentCurriculumTrainer(
+        _env(arena_assets, count, seed=999),
+        ppo_config=ppo,
+        seed=999,
+    )
+    restored.load_checkpoint(checkpoint)
+
+    assert restored.mixed_ppo_safety == safety
+    assert restored.optimizer_migration_proof == migration
+    assert restored.retention_corpus_summary == summary
+    torch.testing.assert_close(
+        restored.retention_observations,
+        trainer.retention_observations,
+        rtol=0,
+        atol=0,
+    )
+    assert mixed_optimizer_learning_rates(restored.optimizer) == {
+        "policy": safety.initial_policy_learning_rate,
+        "critic": safety.critic_learning_rate,
+    }
     checkpoint.unlink()

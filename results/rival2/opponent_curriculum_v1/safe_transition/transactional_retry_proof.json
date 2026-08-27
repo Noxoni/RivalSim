@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-27T18:39:06.319757+00:00",
+  "diagnostic_override": {
+    "soft_minibatch_kl_target": 0.002,
+    "retention_soft_mean_kl_target": 1.0,
+    "optimizer_step_limit": 1,
+    "production_configuration_modified": false
+  },
+  "retry": {
+    "optimizer_step_index": 0,
+    "retry_index": 0,
+    "epoch": 0,
+    "minibatch_start": 0,
+    "minibatch_samples": 65536,
+    "minibatch_index_sha256": "3D2570694761DCCB404A5872A90F1ADB10E20B78DA07B75B5613B08AF14120F3",
+    "violations": [
+      "soft_minibatch_kl"
+    ],
+    "proposed_post_step_minibatch_kl": 0.004213964566588402,
+    "proposed_retention_mean_kl": 0.0007368451333604753,
+    "policy_learning_rate_before": 0.0001,
+    "policy_learning_rate_after": 5e-05,
+    "critic_learning_rate_before_after": 0.0003,
+    "restore_checks": {
+      "parameters_exact": true,
+      "optimizer_state_exact": true,
+      "adam_step_counters_exact": true
+    },
+    "same_minibatch_retry": true,
+    "accepted": false,
+    "early_stop": false
+  },
+  "accepted_step": {
+    "optimizer_step_index": 0,
+    "epoch": 0,
+    "minibatch_start": 0,
+    "minibatch_samples": 65536,
+    "minibatch_index_sha256": "3D2570694761DCCB404A5872A90F1ADB10E20B78DA07B75B5613B08AF14120F3",
+    "retry_count": 1,
+    "policy_learning_rate": 5e-05,
+    "critic_learning_rate": 0.0003,
+    "pre_step_empirical_kl": 0.0,
+    "post_step_empirical_kl": 0.001045931363478303,
+    "retention_mean_kl": 0.00018372497288510203,
+    "retention_kl_by_action_channel": {
+      "throttle": 4.0037790313363075e-05,
+      "steer": 7.510173600167036e-05,
+      "pitch": 4.511850420385599e-05,
+      "yaw": 9.084469638764858e-06,
+      "roll": 8.98563303053379e-06,
+      "jump": 2.4300863969983766e-06,
+      "boost": 8.251144549831224e-07,
+      "handbrake": 2.141628556273645e-06
+    },
+    "rollout_minibatch_kl_by_action_channel": {
+      "throttle": 4.9529185162100475e-06,
+      "steer": 0.00034601130755618215,
+      "pitch": 0.0005577020347118378,
+      "yaw": 9.994146967073902e-05,
+      "roll": 4.0162492950912565e-05,
+      "jump": 1.212382449011784e-05,
+      "boost": 8.179906103578105e-07,
+      "handbrake": 1.172044449049281e-06
+    },
+    "clip_fraction": 0.0,
+    "policy_loss": -0.00384734570980072,
+    "value_loss": 0.1868603229522705,
+    "raw_gradient_norm": 1.8543200492858887,
+    "post_clip_gradient_norm": 0.4999997317790985,
+    "policy_trunk_gradient_norm": 0.36441415548324585,
+    "actor_head_gradient_norm": 0.875713586807251,
+    "critic_head_gradient_norm": 1.5933709144592285,
+    "value_loss_to_trunk_gradient_norm": 0.0,
+    "value_loss_to_actor_gradient_norm": 0.0,
+    "parameter_step_norms": {
+      "shared_trunk": 0.005320523865520954,
+      "actor_head": 0.0006055058911442757,
+      "critic_head": 0.005957405082881451
+    }
+  },
+  "completed_update_mean_kl_after_one_step": 0.001056812354363501,
+  "checks": {
+    "diagnostic_soft_target_lower_than_production": true,
+    "retry_was_exercised": true,
+    "same_minibatch_retried": true,
+    "parameters_restored_exactly": true,
+    "adam_state_restored_exactly": true,
+    "adam_step_counters_restored_exactly": true,
+    "only_policy_lr_changed": true,
+    "same_step_accepted_after_retry": true,
+    "accepted_step_below_diagnostic_soft_target": true,
+    "diagnostic_limited_to_one_accepted_step": true,
+    "hard_guards_unchanged": true
+  },
+  "verdict": "PASS_GREEN"
+}
