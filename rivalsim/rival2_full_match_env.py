@@ -65,9 +65,7 @@ class Rival2FullMatchState(Rival2EpisodeState):
 
     def __init__(self, num_envs: int, device: str):
         super().__init__(num_envs, device)
-        self.physics_reset_mask = wp.zeros(
-            num_envs, dtype=wp.int32, device=device
-        )
+        self.physics_reset_mask = wp.zeros(num_envs, dtype=wp.int32, device=device)
         self.regulation_ticks_remaining = wp.full(
             num_envs, REGULATION_TICKS, dtype=wp.int32, device=device
         )
@@ -96,19 +94,14 @@ class Rival2FullMatchState(Rival2EpisodeState):
         ):
             setattr(self, name, wp.zeros(num_envs, dtype=wp.int32, device=device))
         self.winner = wp.full(num_envs, -1, dtype=wp.int32, device=device)
-        self.kickoff_segment_active = wp.ones(
-            num_envs, dtype=wp.int32, device=device
-        )
+        self.kickoff_segment_active = wp.ones(num_envs, dtype=wp.int32, device=device)
 
     @property
     def logical_bytes(self) -> int:
         return super().logical_bytes + self.num_envs * 25 * 4
 
     def torch_views(self) -> dict[str, torch.Tensor]:
-        return {
-            name: wp.to_torch(getattr(self, name))
-            for name in self._FULL_VIEW_NAMES
-        }
+        return {name: wp.to_torch(getattr(self, name)) for name in self._FULL_VIEW_NAMES}
 
 
 class Rival2FullMatchWorldSim(Rival2WorldSim):
@@ -140,6 +133,20 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.reset_mask,
                 state.reward,
                 state.kickoff_indicator,
+                state.boost_use_event,
+                state.small_pad_pickup_count,
+                state.big_pad_pickup_count,
+                state.save_count,
+                state.boost_gained_amount,
+                state.v1_goal_component,
+                state.v1_progress_component,
+                state.v1_touch_component,
+                state.v1_demo_component,
+                state.speed_component,
+                state.supersonic_component,
+                state.boost_use_component,
+                state.boost_pickup_component,
+                state.save_component,
             ],
             device=self.device,
         )
@@ -266,9 +273,7 @@ class Rival2FullMatchEnv(Rival2Env):
             raise ValueError(f"unsupported full-match reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = RIVAL2_FULL_MATCH_EPISODE_VERSION
-        self.contract_hashes = contract_hashes_for_reward(
-            reward_version, self.episode_version
-        )
+        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
         self.world = Rival2FullMatchWorldSim(
             num_envs,
             collision_root,
@@ -296,9 +301,7 @@ class Rival2FullMatchEnv(Rival2Env):
         else:
             raise ValueError(f"unsupported full-match reward: {reward_version}")
         self.reward_version = reward_version
-        self.contract_hashes = contract_hashes_for_reward(
-            reward_version, self.episode_version
-        )
+        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
         self.world.reward_mode = reward_mode
 
     def start_fresh_matches(self) -> None:

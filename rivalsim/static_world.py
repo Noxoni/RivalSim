@@ -1515,6 +1515,7 @@ class CompleteWorldSim(IntegratedWorldSim):
                 state.car_pos,
                 state.car_quat,
                 state.boost,
+                lifecycle.pad_boost_gained,
                 self.boost_pad_cooldown,
                 self.boost_pad_previous_locked_car,
             ],

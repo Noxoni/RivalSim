@@ -13,6 +13,7 @@ from rivalsim.kernels.rival2 import (
     PHYSICS_TICKS_PER_DECISION,
     REWARD_MODE_ACQUISITION,
     REWARD_MODE_BASE,
+    REWARD_MODE_GAMEPLAY,
     REWARD_MODE_GOAL_ONLY,
     rival2_accumulate_tick,
     rival2_after_interval_reset,
@@ -38,6 +39,7 @@ from rivalsim.rival2_contracts import (
     POSITION_SCALE,
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
     RIVAL2_REWARD_SCORING_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
@@ -80,28 +82,39 @@ class Rival2EpisodeState:
         car_count = num_envs * 2
         self.touch_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.touch_contact_latched = wp.zeros(car_count, dtype=wp.int32, device=device)
-        self.episode_player_touched = wp.zeros(
-            car_count, dtype=wp.int32, device=device
-        )
-        self.first_contact_count = wp.zeros(
-            car_count, dtype=wp.int32, device=device
-        )
+        self.episode_player_touched = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.first_contact_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.demo_by_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.demoed_event = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.boost_use_event = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.small_pad_pickup_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.big_pad_pickup_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.save_count = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.boost_gained_amount = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.reward = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.previous_action = wp.zeros(car_count * 8, dtype=wp.float32, device=device)
+        for name in (
+            "v1_goal_component",
+            "v1_progress_component",
+            "v1_touch_component",
+            "v1_demo_component",
+            "speed_component",
+            "supersonic_component",
+            "boost_use_component",
+            "boost_pickup_component",
+            "save_component",
+        ):
+            setattr(self, name, wp.zeros(num_envs, dtype=wp.float32, device=device))
 
     @property
     def logical_bytes(self) -> int:
-        return self.num_envs * ((9 + 2 * 6) * 4 + 2 * 8 * 4)
+        return self.num_envs * ((9 + 11) * 4 + 2 * (10 + 2) * 4 + 2 * 8 * 4)
 
 
 class Rival2WorldSim(CompleteWorldSim):
     """CompleteWorldSim plus policy-neutral 30 Hz interval event accounting."""
 
-    def __init__(
-        self, *args: Any, reward_mode: int = REWARD_MODE_BASE, **kwargs: Any
-    ):
+    def __init__(self, *args: Any, reward_mode: int = REWARD_MODE_BASE, **kwargs: Any):
         if kwargs.get("auto_kickoff") not in (None, False):
             raise ValueError("Rival2WorldSim owns reset timing at decision boundaries")
         kwargs["auto_kickoff"] = False
@@ -135,6 +148,20 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.reset_mask,
                 state.reward,
                 state.kickoff_indicator,
+                state.boost_use_event,
+                state.small_pad_pickup_count,
+                state.big_pad_pickup_count,
+                state.save_count,
+                state.boost_gained_amount,
+                state.v1_goal_component,
+                state.v1_progress_component,
+                state.v1_touch_component,
+                state.v1_demo_component,
+                state.speed_component,
+                state.supersonic_component,
+                state.boost_use_component,
+                state.boost_pickup_component,
+                state.save_component,
             ],
             device=self.device,
         )
@@ -148,6 +175,16 @@ class Rival2WorldSim(CompleteWorldSim):
             inputs=[
                 self.reward_mode,
                 self.state.ball_pos,
+                self.state.ball_vel,
+                self.state.car_vel,
+                self.state.is_boosting,
+                self.state.is_supersonic,
+                self.lifecycle.pad_pickup_car,
+                self.lifecycle.pad_boost_gained,
+                self.car_ball.pre_ball_position_bt,
+                self.car_ball.pre_ball_velocity_bt,
+                self.car_ball_b.pre_ball_position_bt,
+                self.car_ball_b.pre_ball_velocity_bt,
                 self.lifecycle.goal_scored,
                 self.lifecycle.scoring_team,
                 self.car_ball.hit_this_tick,
@@ -173,6 +210,20 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.truncated,
                 state.reset_mask,
                 state.reward,
+                state.boost_use_event,
+                state.small_pad_pickup_count,
+                state.big_pad_pickup_count,
+                state.save_count,
+                state.boost_gained_amount,
+                state.v1_goal_component,
+                state.v1_progress_component,
+                state.v1_touch_component,
+                state.v1_demo_component,
+                state.speed_component,
+                state.supersonic_component,
+                state.boost_use_component,
+                state.boost_pickup_component,
+                state.save_component,
             ],
             device=self.device,
         )
@@ -338,6 +389,7 @@ class Rival2TensorBridge:
             "car_ang_vel",
             "boost",
             "boosting_time",
+            "is_boosting",
             "time_since_boosted",
             "on_ground",
             "has_jumped",
@@ -359,6 +411,7 @@ class Rival2TensorBridge:
             self._bind(name, getattr(state, name))
         self._bind("wheel_contact", self.sim.vehicle.wheel_contact)
         self._bind("pad_cooldown", self.sim.boost_pad_cooldown)
+        self._bind("pad_boost_gained", self.sim.lifecycle.pad_boost_gained)
         self._bind("car_is_demoed", self.sim.car_car.car_is_demoed)
         self._bind("demo_respawn_timer", self.sim.lifecycle.demo_respawn_timer)
         episode = self.sim.rival2
@@ -372,6 +425,21 @@ class Rival2TensorBridge:
             "episode_player_touched",
             "first_contact_count",
             "demoed_event",
+            "demo_by_count",
+            "boost_use_event",
+            "small_pad_pickup_count",
+            "big_pad_pickup_count",
+            "save_count",
+            "boost_gained_amount",
+            "v1_goal_component",
+            "v1_progress_component",
+            "v1_touch_component",
+            "v1_demo_component",
+            "speed_component",
+            "supersonic_component",
+            "boost_use_component",
+            "boost_pickup_component",
+            "save_component",
             "kickoff_indicator",
             "reward",
             "terminated",
@@ -613,15 +681,15 @@ class Rival2TensorBridge:
             raise ValueError("scoring emitted action shape mismatch")
         if emitted_action.device != self.device:
             raise ValueError("scoring emitted actions must remain on the RivalSim CUDA device")
-        auxiliary = self.approach_reward(
-            decision_observation, transition_observation
-        ).mul(SCORING_APPROACH_COEFFICIENT)
+        auxiliary = self.approach_reward(decision_observation, transition_observation).mul(
+            SCORING_APPROACH_COEFFICIENT
+        )
         jump_rising = (emitted_action[..., 5] >= 0.5) & (
             decision_observation[..., _PREVIOUS_JUMP_INDEX] < 0.5
         )
-        flip_onset = (
-            transition_observation[..., _SELF_HAS_FLIPPED_INDEX] >= 0.5
-        ) & (decision_observation[..., _SELF_HAS_FLIPPED_INDEX] < 0.5)
+        flip_onset = (transition_observation[..., _SELF_HAS_FLIPPED_INDEX] >= 0.5) & (
+            decision_observation[..., _SELF_HAS_FLIPPED_INDEX] < 0.5
+        )
         auxiliary.add_(
             jump_rising.to(auxiliary.dtype),
             alpha=SCORING_JUMP_RISING_EDGE_COST,
@@ -653,13 +721,13 @@ class Rival2Env:
             reward_mode = REWARD_MODE_ACQUISITION
         elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_MODE_GOAL_ONLY
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_V1_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = episode_version
-        self.contract_hashes = contract_hashes_for_reward(
-            reward_version, episode_version
-        )
+        self.contract_hashes = contract_hashes_for_reward(reward_version, episode_version)
         self.world = Rival2WorldSim(
             num_envs,
             collision_root,
@@ -702,9 +770,7 @@ class Rival2Env:
             RIVAL2_REWARD_V2_VERSION,
             RIVAL2_REWARD_ACQUISITION_V1_VERSION,
         ):
-            reward.add_(
-                self.bridge.approach_reward(decision_observation, transition_observation)
-            )
+            reward.add_(self.bridge.approach_reward(decision_observation, transition_observation))
         elif self.reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
             reward.add_(
                 self.bridge.scoring_auxiliary_reward(
@@ -745,12 +811,12 @@ class Rival2Env:
             reward_mode = REWARD_MODE_ACQUISITION
         elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_MODE_GOAL_ONLY
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_V1_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
-        self.contract_hashes = contract_hashes_for_reward(
-            reward_version, self.episode_version
-        )
+        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
         self.world.reward_mode = reward_mode
 
     def step(self, action: torch.Tensor) -> Rival2Step:

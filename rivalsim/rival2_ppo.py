@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import asdict, dataclass
+from typing import Any
 
 import torch
 
-from rivalsim.rival2_contracts import OBS_DIM
+from rivalsim.rival2_contracts import (
+    ANALOG_ACTION_NAMES,
+    BUTTON_ACTION_NAMES,
+    OBS_DIM,
+)
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
     Rival2PolicyConfig,
@@ -34,6 +40,34 @@ class Rival2PPOConfig:
     def content_hash(self) -> str:
         payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode("ascii")
         return hashlib.sha256(payload).hexdigest().upper()
+
+
+@dataclass(frozen=True, slots=True)
+class Rival2KLGuardConfig:
+    """Transactional PPO corruption guard; not part of the frozen PPO identity."""
+
+    minibatch_kl_limit: float = 0.10
+    completed_update_mean_kl_limit: float = 0.05
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.minibatch_kl_limit) or self.minibatch_kl_limit <= 0.0:
+            raise ValueError("minibatch KL limit must be finite and positive")
+        if (
+            not math.isfinite(self.completed_update_mean_kl_limit)
+            or self.completed_update_mean_kl_limit <= 0.0
+        ):
+            raise ValueError("completed-update KL limit must be finite and positive")
+
+
+class Rival2PolicyDisplacementRejected(RuntimeError):
+    """Raised only after a guarded PPO update violates its hard safety boundary."""
+
+    def __init__(self, diagnostics: dict[str, Any]):
+        self.diagnostics = diagnostics
+        super().__init__(
+            "Rival 2.0 PPO update rejected: "
+            f"{diagnostics.get('reason', 'policy displacement guard')}"
+        )
 
 
 class Rival2RolloutBuffer:
@@ -172,6 +206,85 @@ def compute_gae_gpu(
     return advantages, advantages + values
 
 
+@torch.no_grad()
+def _completed_update_diagnostics(
+    model: Rival2ActorCritic,
+    observation: torch.Tensor,
+    action: torch.Tensor,
+    pre_tanh: torch.Tensor,
+    old_log_probability: torch.Tensor,
+    policy_config: Rival2PolicyConfig,
+    chunk_size: int,
+) -> dict[str, torch.Tensor]:
+    """Measure the final policy once against every trainable rollout sample."""
+
+    device = observation.device
+    count = observation.shape[0]
+    scalar_count = torch.tensor(float(count), dtype=torch.float64, device=device)
+    mean_sum = torch.zeros(5, dtype=torch.float64, device=device)
+    mean_abs_sum = torch.zeros(5, dtype=torch.float64, device=device)
+    mean_abs_max = torch.zeros(5, dtype=torch.float32, device=device)
+    log_std_sum = torch.zeros(5, dtype=torch.float64, device=device)
+    button_probability_sum = torch.zeros(3, dtype=torch.float64, device=device)
+    value_sum = torch.zeros((), dtype=torch.float64, device=device)
+    value_square_sum = torch.zeros((), dtype=torch.float64, device=device)
+    value_abs_max = torch.zeros((), dtype=torch.float32, device=device)
+    kl_sum = torch.zeros((), dtype=torch.float64, device=device)
+    kl_max = torch.zeros((), dtype=torch.float32, device=device)
+
+    for start in range(0, count, chunk_size):
+        stop = min(start + chunk_size, count)
+        actor_output, value = model(observation[start:stop])
+        mean = actor_output[..., :5]
+        log_std = actor_output[..., 5:10].clamp(
+            policy_config.log_std_min, policy_config.log_std_max
+        )
+        probability = torch.sigmoid(actor_output[..., 10:13])
+        new_log_probability = hybrid_log_probability(
+            actor_output,
+            action[start:stop],
+            config=policy_config,
+            pre_tanh=pre_tanh[start:stop],
+        )
+        log_ratio = new_log_probability - old_log_probability[start:stop]
+        ratio = torch.exp(log_ratio)
+        sample_kl = (ratio - 1.0) - log_ratio
+        mean_sum += mean.sum(dim=0, dtype=torch.float64)
+        mean_abs_sum += mean.abs().sum(dim=0, dtype=torch.float64)
+        mean_abs_max = torch.maximum(mean_abs_max, mean.abs().amax(dim=0))
+        log_std_sum += log_std.sum(dim=0, dtype=torch.float64)
+        button_probability_sum += probability.sum(dim=0, dtype=torch.float64)
+        value_sum += value.sum(dtype=torch.float64)
+        value_square_sum += value.square().sum(dtype=torch.float64)
+        value_abs_max = torch.maximum(value_abs_max, value.abs().amax())
+        kl_sum += sample_kl.sum(dtype=torch.float64)
+        kl_max = torch.maximum(kl_max, sample_kl.amax())
+
+    value_mean = value_sum / scalar_count
+    value_variance = (value_square_sum / scalar_count - value_mean.square()).clamp_min(0.0)
+    result: dict[str, torch.Tensor] = {
+        "completed_update_mean_kl": (kl_sum / scalar_count).to(torch.float32),
+        "completed_update_sample_kl_max": kl_max,
+        "post_update_value_mean": value_mean.to(torch.float32),
+        "post_update_value_std": torch.sqrt(value_variance).to(torch.float32),
+        "post_update_value_max_abs": value_abs_max,
+    }
+    for channel, name in enumerate(ANALOG_ACTION_NAMES):
+        result[f"actor_mean_mean_{name}"] = (mean_sum[channel] / scalar_count).to(torch.float32)
+        result[f"actor_mean_abs_mean_{name}"] = (mean_abs_sum[channel] / scalar_count).to(
+            torch.float32
+        )
+        result[f"actor_mean_abs_max_{name}"] = mean_abs_max[channel]
+        result[f"actor_log_std_mean_{name}"] = (log_std_sum[channel] / scalar_count).to(
+            torch.float32
+        )
+    for channel, name in enumerate(BUTTON_ACTION_NAMES):
+        result[f"actor_button_probability_{name}"] = (
+            button_probability_sum[channel] / scalar_count
+        ).to(torch.float32)
+    return result
+
+
 def ppo_update(
     model: Rival2ActorCritic,
     optimizer: torch.optim.Optimizer,
@@ -181,6 +294,7 @@ def ppo_update(
     generator: torch.Generator,
     policy_config: Rival2PolicyConfig | None = None,
     gae_ready: bool = False,
+    kl_guard: Rival2KLGuardConfig | None = None,
 ) -> dict[str, torch.Tensor]:
     """Run all PPO shuffling, gathers, losses, and optimizer work on CUDA."""
 
@@ -199,8 +313,10 @@ def ppo_update(
     old_log_probability = rollout.old_log_probability.reshape(-1).index_select(0, indices)
     old_value = rollout.values.reshape(-1).index_select(0, indices)
     returns = rollout.returns.reshape(-1).index_select(0, indices)
-    advantage = rollout.advantages.reshape(-1).index_select(0, indices)
-    advantage = (advantage - advantage.mean()) / advantage.std(unbiased=False).clamp_min(1e-8)
+    raw_advantage = rollout.advantages.reshape(-1).index_select(0, indices)
+    advantage = (raw_advantage - raw_advantage.mean()) / raw_advantage.std(
+        unbiased=False
+    ).clamp_min(1e-8)
 
     metrics: dict[str, list[torch.Tensor]] = {
         "policy_loss": [],
@@ -212,18 +328,24 @@ def ppo_update(
         "gradient_norm": [],
         "post_clip_gradient_norm": [],
     }
-    for _ in range(config.epochs):
+    guarded_post_step_kl: list[torch.Tensor] = []
+    optimizer_step_index = 0
+    for epoch in range(config.epochs):
         permutation = torch.randperm(sample_count, device=rollout.device, generator=generator)
         for start in range(0, sample_count, config.minibatch_size):
             batch = permutation[start : start + config.minibatch_size]
-            actor_output, value = model(observation.index_select(0, batch))
+            batch_observation = observation.index_select(0, batch)
+            batch_action = action.index_select(0, batch)
+            batch_pre_tanh = pre_tanh.index_select(0, batch)
+            batch_old_log_probability = old_log_probability.index_select(0, batch)
+            actor_output, value = model(batch_observation)
             new_log_probability = hybrid_log_probability(
                 actor_output,
-                action.index_select(0, batch),
+                batch_action,
                 config=policy_config,
-                pre_tanh=pre_tanh.index_select(0, batch),
+                pre_tanh=batch_pre_tanh,
             )
-            log_ratio = new_log_probability - old_log_probability.index_select(0, batch)
+            log_ratio = new_log_probability - batch_old_log_probability
             ratio = torch.exp(log_ratio)
             batch_advantage = advantage.index_select(0, batch)
             unclipped = ratio * batch_advantage
@@ -238,6 +360,18 @@ def ppo_update(
                 + config.value_loss_coefficient * value_loss
                 - config.entropy_coefficient * entropy
             )
+            if kl_guard is not None and not bool(torch.isfinite(total_loss).item()):
+                raise Rival2PolicyDisplacementRejected(
+                    {
+                        "reason": "nonfinite_total_loss",
+                        "epoch": epoch,
+                        "optimizer_step_index": optimizer_step_index,
+                        "minibatch_start": start,
+                        "minibatch_samples": int(batch.shape[0]),
+                        "minibatch_kl_limit": kl_guard.minibatch_kl_limit,
+                        "completed_update_mean_kl_limit": (kl_guard.completed_update_mean_kl_limit),
+                    }
+                )
             optimizer.zero_grad(set_to_none=True)
             total_loss.backward()
             gradient_norm = torch.nn.utils.clip_grad_norm_(
@@ -253,6 +387,22 @@ def ppo_update(
                 ),
                 2,
             )
+            if kl_guard is not None and not bool(
+                torch.isfinite(gradient_norm) & torch.isfinite(post_clip_gradient_norm)
+            ):
+                raise Rival2PolicyDisplacementRejected(
+                    {
+                        "reason": "nonfinite_gradient",
+                        "epoch": epoch,
+                        "optimizer_step_index": optimizer_step_index,
+                        "minibatch_start": start,
+                        "minibatch_samples": int(batch.shape[0]),
+                        "raw_gradient_norm": float(gradient_norm.item()),
+                        "post_clip_gradient_norm": float(post_clip_gradient_norm.item()),
+                        "minibatch_kl_limit": kl_guard.minibatch_kl_limit,
+                        "completed_update_mean_kl_limit": (kl_guard.completed_update_mean_kl_limit),
+                    }
+                )
             optimizer.step()
 
             with torch.no_grad():
@@ -260,6 +410,44 @@ def ppo_update(
                 clip_fraction = (
                     (torch.abs(ratio - 1.0) > config.clip_range).to(torch.float32).mean()
                 )
+                if kl_guard is not None:
+                    post_actor_output, _post_value = model(batch_observation)
+                    post_log_probability = hybrid_log_probability(
+                        post_actor_output,
+                        batch_action,
+                        config=policy_config,
+                        pre_tanh=batch_pre_tanh,
+                    )
+                    post_log_ratio = post_log_probability - batch_old_log_probability
+                    post_ratio = torch.exp(post_log_ratio)
+                    post_step_kl = ((post_ratio - 1.0) - post_log_ratio).mean()
+                    guarded_post_step_kl.append(post_step_kl.detach())
+                    post_step_kl_value = float(post_step_kl.item())
+                    if (
+                        not math.isfinite(post_step_kl_value)
+                        or post_step_kl_value > kl_guard.minibatch_kl_limit
+                    ):
+                        raise Rival2PolicyDisplacementRejected(
+                            {
+                                "reason": "minibatch_kl_limit_exceeded",
+                                "epoch": epoch,
+                                "optimizer_step_index": optimizer_step_index,
+                                "minibatch_start": start,
+                                "minibatch_samples": int(batch.shape[0]),
+                                "pre_step_approx_kl": float(approx_kl.item()),
+                                "post_step_approx_kl": post_step_kl_value,
+                                "policy_loss": float(policy_loss.item()),
+                                "value_loss": float(value_loss.item()),
+                                "entropy_diagnostic": float(entropy.item()),
+                                "total_loss": float(total_loss.item()),
+                                "raw_gradient_norm": float(gradient_norm.item()),
+                                "post_clip_gradient_norm": float(post_clip_gradient_norm.item()),
+                                "minibatch_kl_limit": kl_guard.minibatch_kl_limit,
+                                "completed_update_mean_kl_limit": (
+                                    kl_guard.completed_update_mean_kl_limit
+                                ),
+                            }
+                        )
             metrics["policy_loss"].append(policy_loss.detach())
             metrics["value_loss"].append(value_loss.detach())
             metrics["entropy"].append(entropy.detach())
@@ -268,9 +456,65 @@ def ppo_update(
             metrics["clip_fraction"].append(clip_fraction.detach())
             metrics["gradient_norm"].append(gradient_norm.detach())
             metrics["post_clip_gradient_norm"].append(post_clip_gradient_norm.detach())
+            optimizer_step_index += 1
 
     result = {name: torch.stack(values).mean() for name, values in metrics.items()}
     result["old_value_mean"] = old_value.mean()
+    if kl_guard is not None:
+        result["optimizer_pre_step_approx_kl_mean"] = result["approx_kl"]
+        result["optimizer_post_step_approx_kl_mean"] = torch.stack(guarded_post_step_kl).mean()
+        result["optimizer_post_step_approx_kl_max"] = torch.stack(guarded_post_step_kl).amax()
+        completed = _completed_update_diagnostics(
+            model,
+            observation,
+            action,
+            pre_tanh,
+            old_log_probability,
+            policy_config,
+            config.minibatch_size,
+        )
+        result.update(completed)
+        result["approx_kl"] = completed["completed_update_mean_kl"]
+        result["predicted_value_mean"] = old_value.mean()
+        result["predicted_value_std"] = old_value.std(unbiased=False)
+        result["predicted_value_max_abs"] = old_value.abs().amax()
+        result["return_mean"] = returns.mean()
+        result["return_std"] = returns.std(unbiased=False)
+        result["return_max_abs"] = returns.abs().amax()
+        result["advantage_before_normalization_mean"] = raw_advantage.mean()
+        result["advantage_before_normalization_std"] = raw_advantage.std(unbiased=False)
+        result["advantage_before_normalization_max_abs"] = raw_advantage.abs().amax()
+        for channel, name in enumerate(ANALOG_ACTION_NAMES):
+            result[f"emitted_action_saturation_fraction_{name}"] = (
+                (action[:, channel].abs() > 0.95).to(torch.float32).mean()
+            )
+        completed_kl = float(result["completed_update_mean_kl"].item())
+        if (
+            not math.isfinite(completed_kl)
+            or completed_kl > kl_guard.completed_update_mean_kl_limit
+        ):
+            raise Rival2PolicyDisplacementRejected(
+                {
+                    "reason": "completed_update_mean_kl_limit_exceeded",
+                    "optimizer_steps_completed": optimizer_step_index,
+                    "completed_update_mean_kl": completed_kl,
+                    "completed_update_sample_kl_max": float(
+                        result["completed_update_sample_kl_max"].item()
+                    ),
+                    "optimizer_post_step_approx_kl_mean": float(
+                        result["optimizer_post_step_approx_kl_mean"].item()
+                    ),
+                    "optimizer_post_step_approx_kl_max": float(
+                        result["optimizer_post_step_approx_kl_max"].item()
+                    ),
+                    "policy_loss": float(result["policy_loss"].item()),
+                    "value_loss": float(result["value_loss"].item()),
+                    "raw_gradient_norm": float(result["gradient_norm"].item()),
+                    "post_clip_gradient_norm": float(result["post_clip_gradient_norm"].item()),
+                    "minibatch_kl_limit": kl_guard.minibatch_kl_limit,
+                    "completed_update_mean_kl_limit": (kl_guard.completed_update_mean_kl_limit),
+                }
+            )
     return result
 
 
@@ -324,7 +568,9 @@ def evaluate_clipped_policy_objective(
 
 
 __all__ = [
+    "Rival2KLGuardConfig",
     "Rival2PPOConfig",
+    "Rival2PolicyDisplacementRejected",
     "Rival2RolloutBuffer",
     "compute_gae_gpu",
     "evaluate_clipped_policy_objective",

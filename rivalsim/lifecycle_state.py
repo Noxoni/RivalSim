@@ -39,6 +39,7 @@ class LifecycleSnapshot:
     pad_cooldown: np.ndarray
     pad_previous_locked_car: np.ndarray
     pad_pickup_car: np.ndarray
+    pad_boost_gained: np.ndarray
     pad_reactivated: np.ndarray
     car_is_demoed: np.ndarray
     demo_respawn_timer: np.ndarray
@@ -102,6 +103,7 @@ class LifecycleState:
 
         car_capacity = num_envs * 2
         self.demo_respawn_timer = wp.zeros(car_capacity, dtype=wp.float32, device=device)
+        self.pad_boost_gained = wp.zeros(car_capacity, dtype=wp.float32, device=device)
         self.demo_held_valid = wp.zeros(car_capacity, dtype=wp.int32, device=device)
         self.demo_request = wp.zeros(car_capacity, dtype=wp.int32, device=device)
         self.respawn_pending = wp.zeros(car_capacity, dtype=wp.int32, device=device)
@@ -117,7 +119,7 @@ class LifecycleState:
     def logical_bytes(self) -> int:
         world_ints = 16
         pad = PAD_COUNT * (4 + 4 + 4)
-        car = 2 * (7 * 4 + HELD_FLOAT_FIELDS * 4 + HELD_INT_FIELDS * 4)
+        car = 2 * (8 * 4 + HELD_FLOAT_FIELDS * 4 + HELD_INT_FIELDS * 4)
         return self.num_envs * (world_ints * 4 + pad + car)
 
     def snapshot(
@@ -155,6 +157,9 @@ class LifecycleState:
             pad_cooldown=cooldown,
             pad_previous_locked_car=previous,
             pad_pickup_car=integer("pad_pickup_car", (count, PAD_COUNT)),
+            pad_boost_gained=np.asarray(
+                self.pad_boost_gained.numpy(), dtype=np.float32
+            ).reshape(count, 2),
             pad_reactivated=integer("pad_reactivated", (count, PAD_COUNT)),
             car_is_demoed=demoed,
             demo_respawn_timer=np.asarray(

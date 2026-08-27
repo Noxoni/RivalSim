@@ -1,58 +1,26 @@
-# Active Codex Handoff — RocketSim Reciprocal Validation v2
+# Active Codex Handoff - Rival 2.0 Gameplay V1
 
-The last completed execution is the RivalSim kickoff-free Rival-vs-Nexto benchmark at commit:
+The active objective is the bounded acquisition-to-gameplay continuation described
+in:
 
-`9807da8b3c404beb63a5426959132de549332128`
+`handoff/rival2-gameplay-v1/README.md`
 
-Do **not** repeat that benchmark. Its implementation and evidence are complete and are now reference evidence for the next objective.
+Use only the acquisition-complete source checkpoint:
 
-## Active objective
+`checkpoints/rival2/acquisition_v1/rival2_acquisition_resume.pt`
 
-Build and validate the adapter required to run the frozen final-45B Rival policy inside the pinned RocketSim/RLGym-style environment, while keeping public Nexto on its native/source RocketSim semantics.
+Expected SHA-256:
 
-Then execute **both** authorized RocketSim comparisons:
+`4FB7A3B134B25D595374E3968E2EDFA150A9CD6F8910B903BF892B59D7F8BC9A`
 
-1. **Normal 1v1 full matches** — standard 5:00 regulation, ordinary kickoffs from all standard layouts, goal scoring and kickoff resets, and overtime when tied. This is the primary gameplay benchmark. Rival must play its normal frozen policy, including its own kickoff behavior; do not substitute a scripted Rival kickoff. Nexto must retain its stock source kickoff controller.
-2. **Kickoff-free open play** — the paired restored-state benchmark used to isolate ordinary play from kickoff advantage and to compare the Blue/Orange asymmetry against RivalSim.
+The source commit is:
 
-Read and execute the controlling handoff:
+`61307571d86508f3026402c4948f759f310ff36c`
 
-`handoff/rival2-rocketsim-crosscheck/README.md`
-
-Required adapter flow:
-
-`RocketSim state -> RIVAL2_OBS_V1 adapter -> frozen Rival policy -> native 8 controls -> RocketSim`
-
-Frozen Rival checkpoint SHA-256:
-
-`4DC158DC2A9D16B79FB5FE7D868E3B50928AB113B55DFCC753F3734F8D87372E`
-
-Pinned Nexto upstream:
-
-`Rolv-Arild/Necto@2e6ed7d6ed2b352e8ff529d4a12a0c9c70c28cca`
-
-Pinned Nexto model SHA-256:
-
-`BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA`
-
-Pinned RocketSim reference physics:
-
-`ZealanL/RocketSim@c2baacb8f4b441dd8505e63c2aeb5a1679b60b02`
-
-## Critical side-asymmetry target
-
-The completed RivalSim kickoff-free benchmark found:
-
-- Rival as Blue: `46.948%` decisive win rate;
-- Rival as Orange: `62.545%` decisive win rate;
-- Orange-minus-Blue difference: approximately `15.597` percentage points;
-- original states: `55.158%`;
-- mirrored states: `54.384%`;
-- Rival inheriting original Blue car: `54.678%`;
-- Rival inheriting original Orange car: `54.866%`.
-
-Adapter parity must therefore be checked separately for Blue and Orange and with exact team/mirror pairs before official gameplay. Both normal-match and kickoff-free results must preserve Blue/Orange as explicit dimensions; never hide them inside an aggregate-only result.
-
-No training is authorized. Do not change Rival or Nexto weights, rewards, PPO, policy architecture, observation/action contracts, controller behavior, or either simulator's physics. Do not begin fake-kickoff curriculum work, viewer work, or v0.6.
-
-When the complete reciprocal-validation handoff is finished, commit and push implementation/evidence to `origin/main` and stop for review.
+Do not resume any full-match Scoring V1 checkpoint. Preserve the acquisition
+checkpoint's learned and training state, create fresh original short-lifecycle
+world state, use only `RIVAL2_REWARD_GAMEPLAY_V1`, and run no more than 239
+additional PPO updates. A policy-displacement rejection is a mandatory immediate
+stop. Otherwise stop after the +239 checkpoint and held-out evaluation. Do not
+begin an overnight continuation, train against Nexto, use five-minute training
+matches, change simulator mechanics, or begin v0.6.

@@ -4,12 +4,25 @@ from __future__ import annotations
 
 import warp as wp
 
-from rivalsim.kernels.boost_pad import PAD_COUNT
+from rivalsim.kernels.boost_pad import BIG_PAD_COUNT, PAD_COUNT
 from rivalsim.kernels.lifecycle import (
     BALL_REST_Z,
     CAR_SPAWN_BOOST,
+    GOAL_HALF_WIDTH,
+    GOAL_HEIGHT,
+    GOAL_SCORING_PLANE_Y,
     _kickoff_position,
     _kickoff_quaternion,
+)
+from rivalsim.rival2_contracts import (
+    CAR_LINEAR_SPEED_SCALE,
+    GAMEPLAY_BIG_PAD_PICKUP_REWARD,
+    GAMEPLAY_BOOST_USE_REWARD,
+    GAMEPLAY_SAVE_REWARD,
+    GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS,
+    GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
+    GAMEPLAY_SPEED_COEFFICIENT,
+    GAMEPLAY_SUPERSONIC_REWARD,
 )
 
 PHYSICS_TICKS_PER_DECISION = 4
@@ -19,6 +32,34 @@ GOAL_PROGRESS_SCALE_Y = 5120.0
 REWARD_MODE_BASE = 0
 REWARD_MODE_ACQUISITION = 1
 REWARD_MODE_GOAL_ONLY = 2
+REWARD_MODE_GAMEPLAY = 3
+
+
+@wp.func
+def _ball_threatens_own_goal(
+    ball_position_uu: wp.vec3,
+    ball_velocity_uu: wp.vec3,
+    defending_team: int,
+) -> bool:
+    """Straight-line, source-geometry goal threat used only for save events."""
+
+    goal_plane_y = -GOAL_SCORING_PLANE_Y
+    if defending_team == 1:
+        goal_plane_y = GOAL_SCORING_PLANE_Y
+    delta_y = goal_plane_y - ball_position_uu[1]
+    velocity_y = ball_velocity_uu[1]
+    if wp.abs(velocity_y) <= 0.000001 or delta_y * velocity_y <= 0.0:
+        return False
+    seconds = delta_y / velocity_y
+    if seconds <= 0.0 or seconds > GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS:
+        return False
+    intersection_x = ball_position_uu[0] + ball_velocity_uu[0] * seconds
+    intersection_z = ball_position_uu[2] + ball_velocity_uu[2] * seconds
+    return (
+        wp.abs(intersection_x) <= GOAL_HALF_WIDTH
+        and intersection_z >= 0.0
+        and intersection_z <= GOAL_HEIGHT
+    )
 
 
 @wp.kernel(enable_backward=False)
@@ -38,6 +79,20 @@ def rival2_begin_decision(
     reset_mask: wp.array(dtype=wp.int32),
     reward: wp.array(dtype=wp.float32),
     kickoff_indicator: wp.array(dtype=wp.int32),
+    boost_use_event: wp.array(dtype=wp.int32),
+    small_pad_pickup_count: wp.array(dtype=wp.int32),
+    big_pad_pickup_count: wp.array(dtype=wp.int32),
+    save_count: wp.array(dtype=wp.int32),
+    boost_gained_amount: wp.array(dtype=wp.float32),
+    v1_goal_component: wp.array(dtype=wp.float32),
+    v1_progress_component: wp.array(dtype=wp.float32),
+    v1_touch_component: wp.array(dtype=wp.float32),
+    v1_demo_component: wp.array(dtype=wp.float32),
+    speed_component: wp.array(dtype=wp.float32),
+    supersonic_component: wp.array(dtype=wp.float32),
+    boost_use_component: wp.array(dtype=wp.float32),
+    boost_pickup_component: wp.array(dtype=wp.float32),
+    save_component: wp.array(dtype=wp.float32),
 ):
     """Open one 30 Hz decision interval without touching episode-age state."""
 
@@ -52,6 +107,15 @@ def rival2_begin_decision(
     truncated[env] = 0
     reset_mask[env] = 0
     kickoff_indicator[env] = 0
+    v1_goal_component[env] = 0.0
+    v1_progress_component[env] = 0.0
+    v1_touch_component[env] = 0.0
+    v1_demo_component[env] = 0.0
+    speed_component[env] = 0.0
+    supersonic_component[env] = 0.0
+    boost_use_component[env] = 0.0
+    boost_pickup_component[env] = 0.0
+    save_component[env] = 0.0
     for local_car in range(2):
         car = car_base + local_car
         touch_count[car] = 0
@@ -59,12 +123,27 @@ def rival2_begin_decision(
         demo_by_count[car] = 0
         demoed_event[car] = 0
         reward[car] = 0.0
+        boost_use_event[car] = 0
+        small_pad_pickup_count[car] = 0
+        big_pad_pickup_count[car] = 0
+        save_count[car] = 0
+        boost_gained_amount[car] = 0.0
 
 
 @wp.kernel(enable_backward=False)
 def rival2_accumulate_tick(
     reward_mode: int,
     ball_pos: wp.array(dtype=wp.vec3),
+    ball_vel: wp.array(dtype=wp.vec3),
+    car_vel: wp.array(dtype=wp.vec3),
+    is_boosting: wp.array(dtype=wp.int32),
+    is_supersonic: wp.array(dtype=wp.int32),
+    pad_pickup_car: wp.array(dtype=wp.int32),
+    pad_boost_gained: wp.array(dtype=wp.float32),
+    pair_a_pre_ball_position_bt: wp.array(dtype=wp.vec3),
+    pair_a_pre_ball_velocity_bt: wp.array(dtype=wp.vec3),
+    pair_b_pre_ball_position_bt: wp.array(dtype=wp.vec3),
+    pair_b_pre_ball_velocity_bt: wp.array(dtype=wp.vec3),
     goal_scored: wp.array(dtype=wp.int32),
     scoring_team: wp.array(dtype=wp.int32),
     car_a_hit_this_tick: wp.array(dtype=wp.int32),
@@ -90,6 +169,20 @@ def rival2_accumulate_tick(
     truncated: wp.array(dtype=wp.int32),
     reset_mask: wp.array(dtype=wp.int32),
     reward: wp.array(dtype=wp.float32),
+    boost_use_event: wp.array(dtype=wp.int32),
+    small_pad_pickup_count: wp.array(dtype=wp.int32),
+    big_pad_pickup_count: wp.array(dtype=wp.int32),
+    save_count: wp.array(dtype=wp.int32),
+    boost_gained_amount: wp.array(dtype=wp.float32),
+    v1_goal_component: wp.array(dtype=wp.float32),
+    v1_progress_component: wp.array(dtype=wp.float32),
+    v1_touch_component: wp.array(dtype=wp.float32),
+    v1_demo_component: wp.array(dtype=wp.float32),
+    speed_component: wp.array(dtype=wp.float32),
+    supersonic_component: wp.array(dtype=wp.float32),
+    boost_use_component: wp.array(dtype=wp.float32),
+    boost_pickup_component: wp.array(dtype=wp.float32),
+    save_component: wp.array(dtype=wp.float32),
 ):
     """Accumulate source-backed events and finish reward/done on tick four."""
 
@@ -115,6 +208,46 @@ def rival2_accumulate_tick(
         no_touch_ticks[env] = 0
     else:
         no_touch_ticks[env] = no_touch_ticks[env] + 1
+
+    if reward_mode == REWARD_MODE_GAMEPLAY:
+        boost_gained_amount[car_base] = boost_gained_amount[car_base] + pad_boost_gained[car_base]
+        boost_gained_amount[car_base + 1] = (
+            boost_gained_amount[car_base + 1] + pad_boost_gained[car_base + 1]
+        )
+        if is_boosting[car_base] != 0:
+            boost_use_event[car_base] = 1
+        if is_boosting[car_base + 1] != 0:
+            boost_use_event[car_base + 1] = 1
+        pad_base = env * PAD_COUNT
+        for pad in range(PAD_COUNT):
+            pickup = pad_pickup_car[pad_base + pad]
+            if pickup == 1 and pad_boost_gained[car_base] > 0.0:
+                if pad < BIG_PAD_COUNT:
+                    big_pad_pickup_count[car_base] = big_pad_pickup_count[car_base] + 1
+                else:
+                    small_pad_pickup_count[car_base] = small_pad_pickup_count[car_base] + 1
+            elif pickup == 2 and pad_boost_gained[car_base + 1] > 0.0:
+                if pad < BIG_PAD_COUNT:
+                    big_pad_pickup_count[car_base + 1] = big_pad_pickup_count[car_base + 1] + 1
+                else:
+                    small_pad_pickup_count[car_base + 1] = small_pad_pickup_count[car_base + 1] + 1
+
+        post_position = ball_pos[env]
+        post_velocity = ball_vel[env]
+        if touched_a != 0 and goal_scored[env] == 0:
+            pre_position_a = pair_a_pre_ball_position_bt[env] * 50.0
+            pre_velocity_a = pair_a_pre_ball_velocity_bt[env] * 50.0
+            if _ball_threatens_own_goal(
+                pre_position_a, pre_velocity_a, 0
+            ) and not _ball_threatens_own_goal(post_position, post_velocity, 0):
+                save_count[car_base] = save_count[car_base] + 1
+        if touched_b != 0 and goal_scored[env] == 0:
+            pre_position_b = pair_b_pre_ball_position_bt[env] * 50.0
+            pre_velocity_b = pair_b_pre_ball_velocity_bt[env] * 50.0
+            if _ball_threatens_own_goal(
+                pre_position_b, pre_velocity_b, 1
+            ) and not _ball_threatens_own_goal(post_position, post_velocity, 1):
+                save_count[car_base + 1] = save_count[car_base + 1] + 1
 
     event_base = env * 4
     count = bump_event_count[env]
@@ -156,11 +289,7 @@ def rival2_accumulate_tick(
         if reward_mode == REWARD_MODE_BASE:
             # Preserve the exact historical RIVAL2_REWARD_V1/V2 arithmetic and
             # operation order. Orange remains the final negation of Blue.
-            blue_reward = (
-                0.5
-                * (ball_y_after[env] - ball_y_before[env])
-                / GOAL_PROGRESS_SCALE_Y
-            )
+            blue_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
             if terminal != 0:
                 if scoring_team_latched[env] == 0:
                     blue_reward = blue_reward + 10.0
@@ -174,11 +303,7 @@ def rival2_accumulate_tick(
             )
             orange_reward = -blue_reward
         elif reward_mode == REWARD_MODE_ACQUISITION:
-            progress_reward = (
-                0.5
-                * (ball_y_after[env] - ball_y_before[env])
-                / GOAL_PROGRESS_SCALE_Y
-            )
+            progress_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
             blue_reward = progress_reward
             orange_reward = -progress_reward
             if terminal != 0:
@@ -200,12 +325,10 @@ def rival2_accumulate_tick(
                     blue_reward = blue_reward - 0.5
                 if episode_player_touched[car_base + 1] == 0:
                     orange_reward = orange_reward - 0.5
-            demo_reward = 0.10 * float(
-                demo_by_count[car_base] - demo_by_count[car_base + 1]
-            )
+            demo_reward = 0.10 * float(demo_by_count[car_base] - demo_by_count[car_base + 1])
             blue_reward = blue_reward + demo_reward
             orange_reward = orange_reward - demo_reward
-        else:
+        elif reward_mode == REWARD_MODE_GOAL_ONLY:
             # Goal-only mode intentionally excludes progress, touch, approach,
             # no-touch, demo, and mechanic shaping.
             if terminal != 0:
@@ -215,6 +338,68 @@ def rival2_accumulate_tick(
                 else:
                     blue_reward = blue_reward - 10.0
                     orange_reward = orange_reward + 10.0
+        else:
+            # RIVAL2_REWARD_GAMEPLAY_V1 preserves historical V1 exactly, then
+            # adds small competitive gameplay terms before the final negation.
+            progress_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
+            goal_reward = 0.0
+            if terminal != 0:
+                if scoring_team_latched[env] == 0:
+                    goal_reward = 10.0
+                else:
+                    goal_reward = -10.0
+            touch_reward = 0.05 * float(touch_count[car_base] - touch_count[car_base + 1])
+            demo_reward = 0.10 * float(demo_by_count[car_base] - demo_by_count[car_base + 1])
+            historical_v1_blue = progress_reward
+            historical_v1_blue = historical_v1_blue + goal_reward
+            historical_v1_blue = historical_v1_blue + touch_reward
+            historical_v1_blue = historical_v1_blue + demo_reward
+
+            blue_speed = GAMEPLAY_SPEED_COEFFICIENT * wp.clamp(
+                wp.length(car_vel[car_base]) / CAR_LINEAR_SPEED_SCALE,
+                0.0,
+                1.0,
+            )
+            orange_speed = GAMEPLAY_SPEED_COEFFICIENT * wp.clamp(
+                wp.length(car_vel[car_base + 1]) / CAR_LINEAR_SPEED_SCALE,
+                0.0,
+                1.0,
+            )
+            competitive_speed = blue_speed - orange_speed
+            competitive_supersonic = GAMEPLAY_SUPERSONIC_REWARD * float(
+                is_supersonic[car_base] - is_supersonic[car_base + 1]
+            )
+            competitive_boost_use = GAMEPLAY_BOOST_USE_REWARD * float(
+                boost_use_event[car_base] - boost_use_event[car_base + 1]
+            )
+            blue_pickup = GAMEPLAY_SMALL_PAD_PICKUP_REWARD * float(
+                small_pad_pickup_count[car_base]
+            ) + GAMEPLAY_BIG_PAD_PICKUP_REWARD * float(big_pad_pickup_count[car_base])
+            orange_pickup = GAMEPLAY_SMALL_PAD_PICKUP_REWARD * float(
+                small_pad_pickup_count[car_base + 1]
+            ) + GAMEPLAY_BIG_PAD_PICKUP_REWARD * float(big_pad_pickup_count[car_base + 1])
+            competitive_pickup = blue_pickup - orange_pickup
+            competitive_save = GAMEPLAY_SAVE_REWARD * float(
+                save_count[car_base] - save_count[car_base + 1]
+            )
+
+            blue_reward = historical_v1_blue
+            blue_reward = blue_reward + competitive_speed
+            blue_reward = blue_reward + competitive_supersonic
+            blue_reward = blue_reward + competitive_boost_use
+            blue_reward = blue_reward + competitive_pickup
+            blue_reward = blue_reward + competitive_save
+            orange_reward = -blue_reward
+
+            v1_goal_component[env] = goal_reward
+            v1_progress_component[env] = progress_reward
+            v1_touch_component[env] = touch_reward
+            v1_demo_component[env] = demo_reward
+            speed_component[env] = competitive_speed
+            supersonic_component[env] = competitive_supersonic
+            boost_use_component[env] = competitive_boost_use
+            boost_pickup_component[env] = competitive_pickup
+            save_component[env] = competitive_save
         reward[car_base] = blue_reward
         reward[car_base + 1] = orange_reward
 
@@ -407,6 +592,7 @@ __all__ = [
     "PHYSICS_TICKS_PER_DECISION",
     "REWARD_MODE_ACQUISITION",
     "REWARD_MODE_BASE",
+    "REWARD_MODE_GAMEPLAY",
     "REWARD_MODE_GOAL_ONLY",
     "rival2_accumulate_tick",
     "rival2_after_interval_reset",

@@ -18,6 +18,8 @@ from rivalsim.rival2_policy import (
     sample_hybrid_action,
 )
 from rivalsim.rival2_ppo import (
+    Rival2KLGuardConfig,
+    Rival2PolicyDisplacementRejected,
     Rival2PPOConfig,
     Rival2RolloutBuffer,
     ppo_update,
@@ -186,9 +188,7 @@ class Rival2Trainer:
             value[:, 1].index_copy_(0, indices, historical_value)
         return actor, value, acting_version, train_mask
 
-    def collect_rollout(
-        self, active_world_mask: torch.Tensor | None = None
-    ) -> Rival2RolloutBuffer:
+    def collect_rollout(self, active_world_mask: torch.Tensor | None = None) -> Rival2RolloutBuffer:
         """Collect one rollout, optionally training only unfinished match worlds.
 
         The optional mask is mutated in place as complete matches terminate.
@@ -257,25 +257,74 @@ class Rival2Trainer:
             self.total_agent_samples += int(active_agent_samples.item())
         return rollout
 
-    def update(self, rollout: Rival2RolloutBuffer) -> dict[str, torch.Tensor]:
+    def update(
+        self,
+        rollout: Rival2RolloutBuffer,
+        *,
+        kl_guard: Rival2KLGuardConfig | None = None,
+    ) -> dict[str, torch.Tensor]:
         self.model.train()
-        metrics = ppo_update(
-            self.model,
-            self.optimizer,
-            rollout,
-            self.ppo_config,
-            generator=self.policy_generator,
-            policy_config=self.policy_config,
-        )
+        rollback: dict[str, Any] | None = None
+        if kl_guard is not None:
+            rollback = {
+                "model": copy.deepcopy(self.model.state_dict()),
+                "optimizer": copy.deepcopy(self.optimizer.state_dict()),
+                "gradients": [
+                    None if parameter.grad is None else parameter.grad.detach().clone()
+                    for parameter in self.model.parameters()
+                ],
+                "torch_cpu_rng_state": torch.get_rng_state().clone(),
+                "torch_cuda_rng_state": torch.cuda.get_rng_state(self.device).clone(),
+                "policy_generator_state": self.policy_generator.get_state().clone(),
+                "opponent_generator_state": self.opponent_generator.get_state().clone(),
+                "model_training": self.model.training,
+            }
+        try:
+            metrics = ppo_update(
+                self.model,
+                self.optimizer,
+                rollout,
+                self.ppo_config,
+                generator=self.policy_generator,
+                policy_config=self.policy_config,
+                kl_guard=kl_guard,
+            )
+        except Rival2PolicyDisplacementRejected as error:
+            if rollback is None:
+                raise RuntimeError("KL rejection occurred without rollback state") from error
+            self.model.load_state_dict(rollback["model"])
+            self.optimizer.load_state_dict(rollback["optimizer"])
+            for parameter, gradient in zip(
+                self.model.parameters(), rollback["gradients"], strict=True
+            ):
+                parameter.grad = None if gradient is None else gradient.clone()
+            self.policy_generator.set_state(rollback["policy_generator_state"])
+            self.opponent_generator.set_state(rollback["opponent_generator_state"])
+            torch.set_rng_state(rollback["torch_cpu_rng_state"])
+            torch.cuda.set_rng_state(rollback["torch_cuda_rng_state"], self.device)
+            self.model.train(bool(rollback["model_training"]))
+            error.diagnostics.update(
+                {
+                    "rejected_iteration": self.iteration + 1,
+                    "restored_iteration": self.iteration,
+                    "restored_policy_version": self.policy_version,
+                    "pre_update_agent_decision_samples": self.total_agent_samples,
+                    "transactional_rollback_completed": True,
+                }
+            )
+            raise
         self.policy_version += 1
         self.iteration += 1
         return metrics
 
     def train_iteration(
-        self, active_world_mask: torch.Tensor | None = None
+        self,
+        active_world_mask: torch.Tensor | None = None,
+        *,
+        kl_guard: Rival2KLGuardConfig | None = None,
     ) -> tuple[Rival2RolloutBuffer, dict[str, torch.Tensor]]:
         rollout = self.collect_rollout(active_world_mask)
-        return rollout, self.update(rollout)
+        return rollout, self.update(rollout, kl_guard=kl_guard)
 
     @torch.no_grad()
     def deterministic_action_value(
@@ -381,9 +430,7 @@ class Rival2Trainer:
             raise ValueError("curriculum transition requires an explicit authority record")
         payload = torch.load(Path(path), map_location=self.device, weights_only=False)
         self._validate_checkpoint_configuration(payload)
-        source_contracts = contract_hashes_for_reward(
-            source_reward_version, source_episode_version
-        )
+        source_contracts = contract_hashes_for_reward(source_reward_version, source_episode_version)
         if payload["contract_hashes"] != source_contracts:
             raise ValueError("source checkpoint contract hashes are incompatible")
         if payload.get("reward_version") != source_reward_version:
@@ -413,6 +460,20 @@ class Rival2Trainer:
 
         prior_transition = copy.deepcopy(payload.get("curriculum_transition"))
         self._restore_checkpoint_state(payload)
+        changed_semantics = ["reward_contract", "fresh_world_state"]
+        if source_episode_version != destination_episode_version:
+            changed_semantics.insert(1, "episode_contract")
+        reinitialized_state = [
+            "simulator_world_state",
+            "kickoff_lifecycle_state",
+        ]
+        if (
+            source_episode_version == "RIVAL2_EPISODE_FULL_MATCH_V1"
+            or destination_episode_version == "RIVAL2_EPISODE_FULL_MATCH_V1"
+        ):
+            reinitialized_state.append("five_minute_match_clock_and_score")
+        else:
+            reinitialized_state.append("short_episode_timers_and_latches")
         recorded = {
             **copy.deepcopy(transition_record),
             "source_reward_version": source_reward_version,
@@ -424,11 +485,7 @@ class Rival2Trainer:
             "transition_iteration": self.iteration,
             "transition_policy_version": self.policy_version,
             "transition_agent_decision_samples": self.total_agent_samples,
-            "changed_semantics": [
-                "reward_contract",
-                "episode_contract",
-                "fresh_world_and_match_state",
-            ],
+            "changed_semantics": changed_semantics,
             "preserved_checkpoint_state": [
                 "model",
                 "optimizer",
@@ -441,11 +498,7 @@ class Rival2Trainer:
                 "opponent_assignment",
                 "historical_policy_pool",
             ],
-            "reinitialized_state": [
-                "simulator_world_state",
-                "five_minute_match_clock_and_score",
-                "kickoff_lifecycle_state",
-            ],
+            "reinitialized_state": reinitialized_state,
             "source_curriculum_transition": prior_transition,
         }
         self.curriculum_transition = recorded

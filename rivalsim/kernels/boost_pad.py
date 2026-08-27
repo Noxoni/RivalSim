@@ -173,6 +173,7 @@ def boost_pad_tick_lifecycle(
     car_pos: wp.array(dtype=wp.vec3),
     car_quat: wp.array(dtype=wp.quat),
     car_boost: wp.array(dtype=wp.float32),
+    boost_gained: wp.array(dtype=wp.float32),
     cooldown: wp.array(dtype=wp.float32),
     previous_locked_car: wp.array(dtype=wp.int32),
 ):
@@ -181,6 +182,8 @@ def boost_pad_tick_lifecycle(
     env = wp.tid()
     pad_base = env * PAD_COUNT
     car_base = env * 2
+    boost_gained[car_base] = 0.0
+    boost_gained[car_base + 1] = 0.0
     for pad in range(PAD_COUNT):
         index = pad_base + pad
         pad_pos = pad_positions[pad]
@@ -225,12 +228,14 @@ def boost_pad_tick_lifecycle(
 
         if locked_car != 0 and active:
             car = car_base + locked_car - 1
+            boost_before = car_boost[car]
             if is_big:
                 car_boost[car] = 100.0
                 current_cooldown = 10.0
             else:
                 car_boost[car] = wp.min(100.0, car_boost[car] + 12.0)
                 current_cooldown = 4.0
+            boost_gained[car] = boost_gained[car] + car_boost[car] - boost_before
 
         cooldown[index] = current_cooldown
         previous_locked_car[index] = locked_car

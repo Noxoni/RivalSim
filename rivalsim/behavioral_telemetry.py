@@ -15,13 +15,17 @@ import numpy as np
 import warp as wp
 
 from rivalsim.ball_world_state import MAX_BALL_CONTACTS
-from rivalsim.kernels.lifecycle import BALL_RADIUS, GOAL_BASE_THRESHOLD_Y
+from rivalsim.kernels.lifecycle import (
+    GOAL_HALF_WIDTH,
+    GOAL_HEIGHT,
+    GOAL_SCORING_PLANE_Y,
+)
 
 PHYSICS_HZ = 120
-GOAL_SCORING_PLANE_Y_UU = float(GOAL_BASE_THRESHOLD_Y + BALL_RADIUS)
+GOAL_SCORING_PLANE_Y_UU = float(GOAL_SCORING_PLANE_Y)
 GOAL_CENTER_Y_UU = 5120.0
-GOAL_HALF_WIDTH_UU = 892.755
-GOAL_HEIGHT_UU = 642.775
+GOAL_HALF_WIDTH_UU = float(GOAL_HALF_WIDTH)
+GOAL_HEIGHT_UU = float(GOAL_HEIGHT)
 GOAL_CENTER_Z_UU = GOAL_HEIGHT_UU / 2.0
 
 MAX_TOUCHES_PER_WORLD = 256
@@ -46,10 +50,7 @@ def _surface_category(normal: wp.vec3) -> int:
     absolute_z = wp.abs(normal[2])
     result = SURFACE_BACKBOARD
     if absolute_z >= absolute_x and absolute_z >= absolute_y:
-        if normal[2] >= 0.0:
-            result = SURFACE_GROUND
-        else:
-            result = SURFACE_CEILING
+        result = SURFACE_GROUND if normal[2] >= 0.0 else SURFACE_CEILING
     elif absolute_x >= absolute_y:
         result = SURFACE_SIDE_WALL
     return result
@@ -703,7 +704,6 @@ class BehavioralTelemetry:
 
 
 __all__ = [
-    "BehavioralTelemetry",
     "END_EPISODE",
     "END_GOAL",
     "END_NEXT_TOUCH",
@@ -719,4 +719,5 @@ __all__ = [
     "SURFACE_CEILING",
     "SURFACE_GROUND",
     "SURFACE_SIDE_WALL",
+    "BehavioralTelemetry",
 ]
