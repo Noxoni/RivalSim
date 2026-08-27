@@ -49,7 +49,10 @@ from rivalsim.rival2_contracts import (  # noqa: E402
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2Env  # noqa: E402
-from rivalsim.rival2_mixed_ppo import Rival2MixedPPOSafetyConfig  # noqa: E402
+from rivalsim.rival2_mixed_ppo import (  # noqa: E402
+    Rival2MixedPPOSafetyConfig,
+    mixed_optimizer_learning_rates,
+)
 from rivalsim.rival2_opponent_curriculum import (  # noqa: E402
     NEXTO_ACTING_VERSION,
     OPPONENT_NAMES,
@@ -123,6 +126,36 @@ def parse_args() -> argparse.Namespace:
         "--resume-source-evaluation",
         action="store_true",
         help="reuse a complete green source evaluation in the work directory",
+    )
+    parser.add_argument(
+        "--resume-boundary-checkpoint",
+        type=Path,
+        help=(
+            "resume an interrupted campaign from an audited +30/+60/+90/+120 "
+            "checkpoint; any missing evaluation for that boundary runs before the "
+            "large training environment is constructed"
+        ),
+    )
+    parser.add_argument(
+        "--resume-offset",
+        type=int,
+        choices=CHECKPOINT_OFFSETS,
+        help="completed additional-update offset represented by the resume checkpoint",
+    )
+    parser.add_argument(
+        "--defer-boundary-evaluation",
+        action="store_true",
+        help=(
+            "exit cleanly after saving the next scheduled boundary so its evaluation "
+            "can run in a fresh process before resuming"
+        ),
+    )
+    parser.add_argument("--evaluation-single-checkpoint", type=Path)
+    parser.add_argument("--evaluation-single-sha256")
+    parser.add_argument("--evaluation-single-label")
+    parser.add_argument("--evaluation-single-opponent", choices=("Nexto", "Wisp"))
+    parser.add_argument(
+        "--evaluation-single-mode", choices=("deterministic", "stochastic")
     )
     parser.add_argument(
         "--finalize-existing-rejection",
@@ -648,6 +681,54 @@ def evaluate_checkpoint(
     device: str,
     work_dir: Path,
 ) -> dict[str, Any]:
+    def isolated_evaluation(opponent_name: str, mode: str) -> dict[str, Any]:
+        worlds_per_side = 5 if mode == "deterministic" else 128
+        seed = (
+            DETERMINISTIC_EVALUATION_SEED
+            if mode == "deterministic"
+            else STOCHASTIC_EVALUATION_SEED
+        )
+        stem = f"evaluation_{label}_{opponent_name.lower()}_{mode}"
+        result_path = work_dir / f"{stem}.json"
+        event_path = work_dir / f"{stem}_dash_events.json"
+        episode_path = work_dir / f"{stem}_episodes.csv"
+        if result_path.is_file() and event_path.is_file() and episode_path.is_file():
+            existing = json.loads(result_path.read_text(encoding="utf-8"))
+            if (
+                existing.get("verdict") == "PASS_GREEN"
+                and existing.get("opponent") == opponent_name
+                and existing.get("rival_action_mode") == mode
+                and existing.get("evaluation_seed") == seed
+                and existing.get("episodes") == worlds_per_side * 2
+                and existing.get("checkpoint", {}).get("sha256") == checkpoint_sha256
+            ):
+                return existing
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--work-dir",
+            str(work_dir.resolve()),
+            "--collision-dir",
+            str(collision_dir.resolve()),
+            "--device",
+            device,
+            "--evaluation-single-checkpoint",
+            str(checkpoint_path.resolve()),
+            "--evaluation-single-sha256",
+            checkpoint_sha256,
+            "--evaluation-single-label",
+            label,
+            "--evaluation-single-opponent",
+            opponent_name,
+            "--evaluation-single-mode",
+            mode,
+        ]
+        subprocess.run(command, cwd=REPO_ROOT, check=True, stdout=subprocess.DEVNULL)
+        completed = json.loads(result_path.read_text(encoding="utf-8"))
+        if completed.get("verdict") != "PASS_GREEN":
+            raise RuntimeError(f"isolated {stem} did not publish a green result")
+        return completed
+
     result: dict[str, Any] = {
         "checkpoint_label": label,
         "checkpoint_path": checkpoint_path.resolve().as_posix(),
@@ -656,30 +737,8 @@ def evaluate_checkpoint(
     }
     for opponent_name in ("Nexto", "Wisp"):
         result["opponents"][opponent_name] = {
-            "deterministic": run_evaluation(
-                opponent_name=opponent_name,
-                mode="deterministic",
-                checkpoint_label=label,
-                checkpoint_path=checkpoint_path,
-                checkpoint_sha256=checkpoint_sha256,
-                collision_dir=collision_dir,
-                device=device,
-                work_dir=work_dir,
-                worlds_per_side=5,
-                seed=DETERMINISTIC_EVALUATION_SEED,
-            ),
-            "stochastic": run_evaluation(
-                opponent_name=opponent_name,
-                mode="stochastic",
-                checkpoint_label=label,
-                checkpoint_path=checkpoint_path,
-                checkpoint_sha256=checkpoint_sha256,
-                collision_dir=collision_dir,
-                device=device,
-                work_dir=work_dir,
-                worlds_per_side=128,
-                seed=STOCHASTIC_EVALUATION_SEED,
-            ),
+            "deterministic": isolated_evaluation(opponent_name, "deterministic"),
+            "stochastic": isolated_evaluation(opponent_name, "stochastic"),
         }
     return result
 
@@ -987,10 +1046,15 @@ def _checkpoint(
     label: str,
     trainer: Rival2OpponentCurriculumTrainer,
     work_dir: Path,
+    *,
+    save: bool = True,
 ) -> dict[str, Any]:
     path = work_dir / "checkpoints" / f"rival2_opponent_curriculum_{label}_resume.pt"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    trainer.save_checkpoint(path)
+    if save:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        trainer.save_checkpoint(path)
+    elif not path.is_file():
+        raise FileNotFoundError(path)
     payload = torch.load(path, map_location="cpu", weights_only=False)
     finite_model = all(torch.isfinite(value).all().item() for value in payload["model"].values())
     curriculum = payload.get("opponent_curriculum")
@@ -1176,10 +1240,31 @@ def publish(
     checkpoints: list[dict[str, Any]],
 ) -> None:
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    allowed_existing = {"wisp_fidelity.json"}
+    work_artifacts = {
+        path.name
+        for path in work_dir.iterdir()
+        if path.is_file() and path.suffix in {".json", ".jsonl", ".csv"}
+    }
+    preserved_existing = {
+        "wisp_fidelity.json",
+        "safe_transition",
+        "kl_replay_diagnostic.json",
+        "kl_transition_strategy_diagnostic.json",
+        "nexto_fidelity_regression.json",
+        "artifact_manifest.json",
+        "final_checkpoint.json",
+        "kl_rejection.json",
+        "rollback_audit.json",
+    }
+    allowed_existing = work_artifacts | preserved_existing
     unexpected = {path.name for path in RESULTS_DIR.iterdir() if path.name not in allowed_existing}
     if unexpected:
         raise RuntimeError(f"results directory has unexpected existing artifacts: {unexpected}")
+    if summary.get("status") == "COMPLETE_120_UPDATE_BOUNDARY":
+        for stale_name in ("kl_rejection.json", "rollback_audit.json"):
+            stale_path = RESULTS_DIR / stale_name
+            if stale_path.is_file():
+                stale_path.unlink()
     for path in sorted(work_dir.iterdir()):
         if path.is_file() and path.suffix in {".json", ".jsonl", ".csv"}:
             shutil.copy2(path, RESULTS_DIR / path.name)
@@ -1349,6 +1434,11 @@ def finalize_existing_rejection(work_dir: Path) -> dict[str, Any]:
 
 
 def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
+    run_started = time.perf_counter()
+    if (args.resume_boundary_checkpoint is None) != (args.resume_offset is None):
+        raise ValueError(
+            "--resume-boundary-checkpoint and --resume-offset must be supplied together"
+        )
     source = torch.load(SOURCE_CHECKPOINT, map_location="cpu", weights_only=False)
     configuration = frozen_configuration(source)
     launch = verify_launch(configuration, source)
@@ -1356,13 +1446,17 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     _write_json(args.work_dir / "launch_gate.json", launch)
 
     evaluations: list[dict[str, Any]] = []
-    checkpoints: list[dict[str, Any]] = []
+    checkpoints: list[dict[str, Any]] = (
+        json.loads((args.work_dir / "checkpoints.json").read_text(encoding="utf-8"))
+        if (args.work_dir / "checkpoints.json").is_file()
+        else []
+    )
     if args.resume_source_evaluation:
         evaluations = json.loads(
             (args.work_dir / "evaluation_curve.json").read_text(encoding="utf-8")
         )
         if (
-            len(evaluations) != 1
+            not evaluations
             or evaluations[0].get("checkpoint_label") != "source"
             or evaluations[0].get("checkpoint_sha256") != SOURCE_CHECKPOINT_SHA256
             or any(
@@ -1383,6 +1477,77 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         )
         evaluations.append(source_evaluation)
         _write_json(args.work_dir / "evaluation_curve.json", evaluations)
+
+    resume_offset = 0
+    resume_checkpoint: Path | None = None
+    if args.resume_boundary_checkpoint is not None:
+        resume_offset = int(args.resume_offset)
+        resume_checkpoint = args.resume_boundary_checkpoint.resolve()
+        resume_payload = torch.load(resume_checkpoint, map_location="cpu", weights_only=False)
+        expected_iteration = int(source["iteration"]) + resume_offset
+        expected_label = f"plus_{resume_offset:03d}"
+        resume_sha256 = _sha256(resume_checkpoint)
+        resume_checks = {
+            "checkpoint_exists": resume_checkpoint.is_file(),
+            "format_exact": resume_payload.get("format") == "RIVAL2_CHECKPOINT_V1",
+            "iteration_exact": int(resume_payload.get("iteration", -1))
+            == expected_iteration,
+            "policy_version_exact": int(resume_payload.get("policy_version", -1))
+            == expected_iteration,
+            "reward_exact": resume_payload.get("reward_version")
+            == RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+            "episode_exact": resume_payload.get("episode_version") == RIVAL2_EPISODE_VERSION,
+            "contracts_exact": resume_payload.get("contract_hashes")
+            == contract_hashes_for_reward(
+                RIVAL2_REWARD_GAMEPLAY_V2_VERSION, RIVAL2_EPISODE_VERSION
+            ),
+            "curriculum_transition_present": "curriculum_transition" in resume_payload,
+            "opponent_curriculum_present": resume_payload.get("opponent_curriculum")
+            is not None,
+        }
+        if not all(resume_checks.values()):
+            raise RuntimeError(f"resume checkpoint gate failed: {resume_checks}")
+        _write_json(
+            args.work_dir / f"resume_gate_{resume_offset:03d}.json",
+            {
+                "schema_version": SCHEMA_VERSION,
+                "created_utc": _utc_now(),
+                "checkpoint": resume_checkpoint.as_posix(),
+                "checkpoint_sha256": resume_sha256,
+                "offset": resume_offset,
+                "checks": resume_checks,
+                "verdict": "PASS_GREEN",
+            },
+        )
+
+        matching_evaluations = [
+            item for item in evaluations if item.get("checkpoint_label") == expected_label
+        ]
+        if matching_evaluations:
+            if (
+                len(matching_evaluations) != 1
+                or matching_evaluations[0].get("checkpoint_sha256") != resume_sha256
+                or any(
+                    result.get("verdict") != "PASS_GREEN"
+                    for modes in matching_evaluations[0]["opponents"].values()
+                    for result in modes.values()
+                )
+            ):
+                raise RuntimeError("existing resume-boundary evaluation is not reusable")
+        else:
+            evaluation = evaluate_checkpoint(
+                label=expected_label,
+                checkpoint_path=resume_checkpoint,
+                checkpoint_sha256=resume_sha256,
+                collision_dir=args.collision_dir,
+                device=args.device,
+                work_dir=args.work_dir,
+            )
+            evaluations.append(evaluation)
+            _write_json(args.work_dir / "evaluation_curve.json", evaluations)
+        del resume_payload
+        gc.collect()
+        torch.cuda.empty_cache()
 
     geometry = ArenaGeometry.load_soccar(args.collision_dir)
     meshes = WarpArenaMeshes(geometry, args.device)
@@ -1407,41 +1572,162 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         opponent_curriculum=Rival2OpponentCurriculumConfig(),
         seed=CAMPAIGN_SEED,
     )
-    transition = trainer.load_checkpoint_curriculum_transition(
-        SOURCE_CHECKPOINT,
-        source_reward_version=RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
-        source_episode_version=RIVAL2_EPISODE_VERSION,
-        transition_record={
+    if resume_checkpoint is None:
+        transition = trainer.load_checkpoint_curriculum_transition(
+            SOURCE_CHECKPOINT,
+            source_reward_version=RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+            source_episode_version=RIVAL2_EPISODE_VERSION,
+            transition_record={
+                "schema_version": SCHEMA_VERSION,
+                "authority": AUTHORITY.as_posix(),
+                "authorized_change": (
+                    "Gameplay V1 +239 to fresh short-lifecycle Gameplay V2 mixed opponents"
+                ),
+                "source_commit": AUTHORITATIVE_HEAD,
+                "source_checkpoint_sha256": SOURCE_CHECKPOINT_SHA256,
+                "collapsed_scoring_v1_lineage_used": False,
+                "five_minute_world_state_carried": False,
+            },
+        )
+        transition_gate = transition_preservation_gate(source, trainer, transition)
+        if transition_gate["verdict"] != "PASS_GREEN":
+            raise RuntimeError(f"transition gate failed: {transition_gate['checks']}")
+        optimizer_migration = trainer.enable_safe_mixed_ppo(MIXED_PPO_SAFETY)
+        retention_payload = torch.load(
+            RETENTION_CORPUS, map_location=args.device, weights_only=False
+        )
+        if retention_payload.get("format") != "RIVAL2_RETENTION_OBSERVATIONS_V1":
+            raise ValueError("unsupported Rival 2.0 retention corpus format")
+        trainer.install_retention_corpus(
+            retention_payload["observations"], retention_payload["summary"]
+        )
+    else:
+        trainer.load_checkpoint(resume_checkpoint)
+        transition = trainer.curriculum_transition
+        optimizer_migration = trainer.optimizer_migration_proof
+        transition_gate = {
             "schema_version": SCHEMA_VERSION,
-            "authority": AUTHORITY.as_posix(),
-            "authorized_change": (
-                "Gameplay V1 +239 to fresh short-lifecycle Gameplay V2 mixed opponents"
-            ),
-            "source_commit": AUTHORITATIVE_HEAD,
-            "source_checkpoint_sha256": SOURCE_CHECKPOINT_SHA256,
-            "collapsed_scoring_v1_lineage_used": False,
-            "five_minute_world_state_carried": False,
-        },
-    )
-    transition_gate = transition_preservation_gate(source, trainer, transition)
-    if transition_gate["verdict"] != "PASS_GREEN":
-        raise RuntimeError(f"transition gate failed: {transition_gate['checks']}")
-    optimizer_migration = trainer.enable_safe_mixed_ppo(MIXED_PPO_SAFETY)
-    retention_payload = torch.load(RETENTION_CORPUS, map_location=args.device, weights_only=False)
-    if retention_payload.get("format") != "RIVAL2_RETENTION_OBSERVATIONS_V1":
-        raise ValueError("unsupported Rival 2.0 retention corpus format")
-    trainer.install_retention_corpus(
-        retention_payload["observations"], retention_payload["summary"]
-    )
+            "created_utc": _utc_now(),
+            "mode": "AUDITED_BOUNDARY_RESUME",
+            "resume_offset": resume_offset,
+            "resume_checkpoint": resume_checkpoint.as_posix(),
+            "checks": {
+                "iteration_exact": trainer.iteration == int(source["iteration"])
+                + resume_offset,
+                "policy_version_exact": trainer.policy_version
+                == int(source["policy_version"]) + resume_offset,
+                "adaptive_ppo_present": trainer.mixed_ppo_safety == MIXED_PPO_SAFETY,
+                "retention_corpus_present": trainer.retention_observations is not None,
+                "retention_reference_refreshes_on_next_update": True,
+                "policy_learning_rate_rearmed": mixed_optimizer_learning_rates(
+                    trainer.optimizer
+                )["policy"]
+                == MIXED_PPO_SAFETY.initial_policy_learning_rate,
+                "critic_learning_rate_unchanged": mixed_optimizer_learning_rates(
+                    trainer.optimizer
+                )["critic"]
+                == MIXED_PPO_SAFETY.critic_learning_rate,
+            },
+        }
+        transition_gate["verdict"] = (
+            "PASS_GREEN"
+            if all(transition_gate["checks"].values())
+            else "FAIL_RED"
+        )
+        if transition_gate["verdict"] != "PASS_GREEN":
+            raise RuntimeError(f"boundary resume gate failed: {transition_gate['checks']}")
     _write_json(args.work_dir / "transition.json", trainer.curriculum_transition)
     _write_json(args.work_dir / "transition_gate.json", transition_gate)
     _write_json(args.work_dir / "optimizer_migration.json", optimizer_migration)
     _write_json(args.work_dir / "retention_corpus.json", trainer.retention_corpus_summary)
 
     ledger = args.work_dir / "training_curve.jsonl"
-    started = time.perf_counter()
-    snapshot_records: list[dict[str, Any]] = []
-    for offset in range(1, ADDITIONAL_UPDATES + 1):
+    if resume_checkpoint is not None and ledger.is_file():
+        ledger_lines = ledger.read_text(encoding="utf-8").splitlines()
+        ledger_rows = [json.loads(line) for line in ledger_lines if line.strip()]
+        accepted_prefix = [
+            line
+            for line, row in zip(ledger_lines, ledger_rows, strict=True)
+            if int(row["offset"]) <= resume_offset
+        ]
+        trailing_rows = [row for row in ledger_rows if int(row["offset"]) > resume_offset]
+        expected_prefix = list(range(1, resume_offset + 1))
+        actual_prefix = [
+            int(row["offset"])
+            for row in ledger_rows
+            if int(row["offset"]) <= resume_offset
+        ]
+        if actual_prefix != expected_prefix:
+            raise RuntimeError("training ledger prefix is not exact at the resume boundary")
+        if trailing_rows:
+            attempt_dir = args.work_dir / "interrupted_attempts"
+            attempt_dir.mkdir(parents=True, exist_ok=True)
+            attempt_path = attempt_dir / (
+                f"training_curve_after_{resume_offset:03d}_discarded_"
+                f"{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}.jsonl"
+            )
+            ledger.replace(attempt_path)
+            ledger.write_text(
+                "\n".join(accepted_prefix) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            _write_json(
+                args.work_dir / f"resume_recovery_{resume_offset:03d}.json",
+                {
+                    "schema_version": SCHEMA_VERSION,
+                    "created_utc": _utc_now(),
+                    "resume_offset": resume_offset,
+                    "preserved_prefix_rows": len(accepted_prefix),
+                    "discarded_uncheckpointed_rows": len(trailing_rows),
+                    "discarded_offsets": [int(row["offset"]) for row in trailing_rows],
+                    "discarded_attempt_path": attempt_path.as_posix(),
+                    "discarded_attempt_sha256": _sha256(attempt_path),
+                    "discarded_attempt_size_bytes": attempt_path.stat().st_size,
+                    "reason": "resource-stalled process interrupted after audited boundary",
+                    "checkpoint_lineage_changed": False,
+                },
+            )
+    snapshot_records: list[dict[str, Any]] = (
+        json.loads((args.work_dir / "snapshot_records.json").read_text(encoding="utf-8"))
+        if (args.work_dir / "snapshot_records.json").is_file()
+        else []
+    )
+    if resume_checkpoint is not None:
+        label = f"plus_{resume_offset:03d}"
+        audited = _checkpoint(label, trainer, args.work_dir, save=False)
+        if audited["sha256"] != _sha256(resume_checkpoint):
+            raise RuntimeError("resume checkpoint path does not match canonical work checkpoint")
+        existing = [item for item in checkpoints if item.get("label") == label]
+        if existing:
+            if len(existing) != 1 or existing[0].get("sha256") != audited["sha256"]:
+                raise RuntimeError("existing checkpoint ledger conflicts with resume checkpoint")
+        else:
+            checkpoints.append(audited)
+            _write_json(args.work_dir / "checkpoints.json", checkpoints)
+        if not any(item.get("offset") == resume_offset for item in snapshot_records):
+            pool_after = list(trainer.opponent_pool.versions)
+            pool_before = [
+                int(item["version"]) for item in source["historical_opponents"]
+            ]
+            if snapshot_records:
+                pool_before = list(snapshot_records[-1]["pool_after"])
+            added = trainer.policy_version
+            evicted = [version for version in pool_before if version not in pool_after]
+            snapshot_records.append(
+                {
+                    "offset": resume_offset,
+                    "iteration": trainer.iteration,
+                    "added_version": added,
+                    "pool_before": pool_before,
+                    "pool_after": pool_after,
+                    "evicted_versions": evicted,
+                    "reconstructed_from_audited_resume_checkpoint": True,
+                }
+            )
+            _write_json(args.work_dir / "snapshot_records.json", snapshot_records)
+
+    for offset in range(resume_offset + 1, ADDITIONAL_UPDATES + 1):
         policy_before = trainer.policy_version
         samples_before = trainer.total_agent_samples
         trainer.env.reset_transfer_counters()
@@ -1530,6 +1816,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             raise RuntimeError(f"training integrity failure at iteration {trainer.iteration}")
         del rollout, metrics
         gc.collect()
+        torch.cuda.empty_cache()
         if offset not in CHECKPOINT_OFFSETS:
             continue
 
@@ -1551,6 +1838,27 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         checkpoint = _checkpoint(label, trainer, args.work_dir)
         if checkpoint["audit"]["verdict"] != "PASS_GREEN":
             raise RuntimeError(f"checkpoint audit failed at {label}")
+        checkpoints.append(checkpoint)
+        _write_json(args.work_dir / "snapshot_records.json", snapshot_records)
+        _write_json(args.work_dir / "checkpoints.json", checkpoints)
+        _write_json(args.work_dir / "evaluation_curve.json", evaluations)
+        if args.defer_boundary_evaluation:
+            summary = {
+                "schema_version": SCHEMA_VERSION,
+                "created_utc": _utc_now(),
+                "status": "PAUSED_FOR_FRESH_PROCESS_BOUNDARY_EVALUATION",
+                "completed_additional_updates": offset,
+                "iteration": trainer.iteration,
+                "policy_version": trainer.policy_version,
+                "agent_decision_samples": trainer.total_agent_samples,
+                "boundary_checkpoint": checkpoint,
+                "boundary_evaluation_pending": True,
+                "resume_command_requires_offset": offset,
+                "hard_kl_guard_rejections": 0,
+                "wall_seconds_this_process": time.perf_counter() - run_started,
+            }
+            _write_json(args.work_dir / "run_summary.json", summary)
+            return summary
         evaluation = evaluate_checkpoint(
             label=label,
             checkpoint_path=Path(checkpoint["path"]),
@@ -1559,10 +1867,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             device=args.device,
             work_dir=args.work_dir,
         )
-        checkpoints.append(checkpoint)
         evaluations.append(evaluation)
-        _write_json(args.work_dir / "snapshot_records.json", snapshot_records)
-        _write_json(args.work_dir / "checkpoints.json", checkpoints)
         _write_json(args.work_dir / "evaluation_curve.json", evaluations)
 
     final = checkpoints[-1]
@@ -1594,7 +1899,9 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         "final_work_checkpoint": final,
         "evaluation_labels": [item["checkpoint_label"] for item in evaluations],
         "kl_guard_rejections": 0,
-        "wall_seconds_including_training_and_boundary_evaluations": time.perf_counter() - started,
+        "wall_seconds_including_training_and_boundary_evaluations_this_process": (
+            time.perf_counter() - run_started
+        ),
         "five_minute_training_matches_run": False,
         "opponent_training_run": False,
         "imitation_learning_run": False,
@@ -1639,6 +1946,7 @@ def main() -> int:
         and any(args.work_dir.iterdir())
         and not args.resume_source_evaluation
         and not args.finalize_existing_rejection
+        and args.evaluation_single_checkpoint is None
     ):
         raise RuntimeError("work directory must be absent or empty")
     args.work_dir.mkdir(parents=True, exist_ok=True)
@@ -1648,6 +1956,34 @@ def main() -> int:
     torch.set_float32_matmul_precision("highest")
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
+    if args.evaluation_single_checkpoint is not None:
+        required = {
+            "sha256": args.evaluation_single_sha256,
+            "label": args.evaluation_single_label,
+            "opponent": args.evaluation_single_opponent,
+            "mode": args.evaluation_single_mode,
+        }
+        if any(value is None for value in required.values()):
+            raise ValueError(f"single evaluation arguments are incomplete: {required}")
+        mode = str(args.evaluation_single_mode)
+        result = run_evaluation(
+            opponent_name=str(args.evaluation_single_opponent),
+            mode=mode,
+            checkpoint_label=str(args.evaluation_single_label),
+            checkpoint_path=args.evaluation_single_checkpoint,
+            checkpoint_sha256=str(args.evaluation_single_sha256),
+            collision_dir=args.collision_dir,
+            device=args.device,
+            work_dir=args.work_dir,
+            worlds_per_side=5 if mode == "deterministic" else 128,
+            seed=(
+                DETERMINISTIC_EVALUATION_SEED
+                if mode == "deterministic"
+                else STOCHASTIC_EVALUATION_SEED
+            ),
+        )
+        print(json.dumps(result, indent=2), flush=True)
+        return 0
     if args.evaluation_smoke_checkpoint is not None:
         result = run_evaluation_smoke(args)
         print(json.dumps(result, indent=2), flush=True)
@@ -1658,7 +1994,15 @@ def main() -> int:
         return 0
     summary = run_campaign(args)
     print(json.dumps(summary, indent=2), flush=True)
-    return 0 if summary["status"] == "COMPLETE_120_UPDATE_BOUNDARY" else 2
+    return (
+        0
+        if summary["status"]
+        in {
+            "COMPLETE_120_UPDATE_BOUNDARY",
+            "PAUSED_FOR_FRESH_PROCESS_BOUNDARY_EVALUATION",
+        }
+        else 2
+    )
 
 
 if __name__ == "__main__":

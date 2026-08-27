@@ -107,5 +107,206 @@
     "source_assignment_historical_count": 20490,
     "source_assignment_replaced_at_fresh_episode_boundary": true,
     "dedicated_generator_state_sha256_after_initialization": "E8A607D34C5DF764087D2C56547153B97F3DC4ADEA9342C3770C2F02C5F6FA79"
+  },
+  "mixed_ppo_safety_transition": {
+    "config": {
+      "initial_policy_learning_rate": 0.0001,
+      "critic_learning_rate": 0.0003,
+      "soft_minibatch_kl_target": 0.02,
+      "retention_soft_mean_kl_target": 0.02,
+      "policy_learning_rate_backoff": 0.5,
+      "minimum_policy_learning_rate": 2.5e-05,
+      "retention_corpus_size": 512
+    },
+    "config_hash": "6831FAC91013C26767CD8518357BBEBD0FBBFF97F764688C228A069457A058B4",
+    "optimizer_migration": {
+      "schema_version": 1,
+      "source_group_count": 1,
+      "destination_group_count": 2,
+      "parameter_count": 10,
+      "source_named_state_sha256": "BA81E60C32DA256F3022FC0D64C0982B800BFB205CA7DA40D05F8E3C161DD2E0",
+      "destination_named_state_sha256": "BA81E60C32DA256F3022FC0D64C0982B800BFB205CA7DA40D05F8E3C161DD2E0",
+      "state_exact_by_parameter": {
+        "trunk.0.weight": true,
+        "trunk.0.bias": true,
+        "trunk.2.weight": true,
+        "trunk.2.bias": true,
+        "trunk.4.weight": true,
+        "trunk.4.bias": true,
+        "actor.weight": true,
+        "actor.bias": true,
+        "critic.weight": true,
+        "critic.bias": true
+      },
+      "step_counter_exact_by_parameter": {
+        "trunk.0.weight": true,
+        "trunk.0.bias": true,
+        "trunk.2.weight": true,
+        "trunk.2.bias": true,
+        "trunk.4.weight": true,
+        "trunk.4.bias": true,
+        "actor.weight": true,
+        "actor.bias": true,
+        "critic.weight": true,
+        "critic.bias": true
+      },
+      "source_step_counter_by_parameter": {
+        "trunk.0.weight": 84988,
+        "trunk.0.bias": 84988,
+        "trunk.2.weight": 84988,
+        "trunk.2.bias": 84988,
+        "trunk.4.weight": 84988,
+        "trunk.4.bias": 84988,
+        "actor.weight": 84988,
+        "actor.bias": 84988,
+        "critic.weight": 84988,
+        "critic.bias": 84988
+      },
+      "destination_step_counter_by_parameter": {
+        "trunk.0.weight": 84988,
+        "trunk.0.bias": 84988,
+        "trunk.2.weight": 84988,
+        "trunk.2.bias": 84988,
+        "trunk.4.weight": 84988,
+        "trunk.4.bias": 84988,
+        "actor.weight": 84988,
+        "actor.bias": 84988,
+        "critic.weight": 84988,
+        "critic.bias": 84988
+      },
+      "destination_groups": [
+        {
+          "name": "policy",
+          "learning_rate": 0.0001,
+          "parameter_count": 8
+        },
+        {
+          "name": "critic",
+          "learning_rate": 0.0003,
+          "parameter_count": 2
+        }
+      ],
+      "checks": {
+        "every_parameter_present": true,
+        "all_parameter_adam_state_exact": true,
+        "all_parameter_step_counters_exact": true,
+        "named_state_digest_exact": true,
+        "two_parameter_groups": true,
+        "policy_group_identity_exact": true,
+        "critic_group_identity_exact": true,
+        "policy_learning_rate_exact": true,
+        "critic_learning_rate_exact": true
+      },
+      "verdict": "PASS_GREEN"
+    },
+    "legacy_ppo_path_changed": false,
+    "model_architecture_changed": false
+  },
+  "retention_corpus": {
+    "schema_version": 1,
+    "source": "authoritative trainable observations from the healthy source-policy rollout",
+    "selection": "fixed deterministic category order and evenly-spaced candidate indices",
+    "observation_contract": "RIVAL2_OBS_V1",
+    "observation_count": 512,
+    "observation_dimension": 182,
+    "dtype": "torch.float32",
+    "sha256": "0085011CECDF7BFCADCFD832AC7D3FDBF5A08A7D36E84E0A8AF85C827947E1C7",
+    "category_counts": {
+      "near_ball_interaction": {
+        "requested": 96,
+        "available_before_exclusion": 802910,
+        "selected": 96
+      },
+      "possession_ball_approach": {
+        "requested": 96,
+        "available_before_exclusion": 676861,
+        "selected": 96
+      },
+      "recovery": {
+        "requested": 80,
+        "available_before_exclusion": 1314204,
+        "selected": 80
+      },
+      "airborne": {
+        "requested": 96,
+        "available_before_exclusion": 12023,
+        "selected": 96
+      },
+      "ordinary_ground_play": {
+        "requested": 96,
+        "available_before_exclusion": 1323152,
+        "selected": 96
+      },
+      "field_position_orientation_diversity": {
+        "requested": 48,
+        "available_before_exclusion": 3931696,
+        "selected": 48
+      }
+    },
+    "checks": {
+      "source_observations_authoritative": true,
+      "trainable_samples_only": true,
+      "fixed_count_exact": true,
+      "observation_dimension_exact": true,
+      "finite": true,
+      "unique_source_indices": true,
+      "required_category_coverage": true,
+      "field_position_orientation_coverage": true
+    },
+    "verdict": "PASS_GREEN",
+    "created_utc": "2026-08-27T18:35:51.352440+00:00",
+    "source_identity": {
+      "checkpoint": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+      "checkpoint_sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+      "iteration": 359,
+      "policy_version": 359,
+      "reward_version": "RIVAL2_REWARD_GAMEPLAY_V1",
+      "episode_version": "RIVAL2_EPISODE_V1"
+    },
+    "collection": {
+      "worlds": 8192,
+      "decisions_per_world": 240,
+      "agent_observations_considered": 3932160,
+      "seed": 2026082721,
+      "all_five_kickoff_layouts": true,
+      "current_source_policy_on_both_sides": true,
+      "stochastic_source_policy_actions": true,
+      "training_performed": false
+    },
+    "safety_config_hash": "6831FAC91013C26767CD8518357BBEBD0FBBFF97F764688C228A069457A058B4",
+    "state_coverage": {
+      "self_position_x_min_max_uu": [
+        -4069.215087890625,
+        4078.96875
+      ],
+      "self_position_y_min_max_uu": [
+        -5010.95654296875,
+        4176.3037109375
+      ],
+      "self_position_z_min_max_uu": [
+        15.924297332763672,
+        1188.759033203125
+      ],
+      "occupied_x_field_regions_of_3": 3,
+      "occupied_y_field_regions_of_3": 3,
+      "occupied_heading_octants_of_8": 8,
+      "heading_octant_counts": [
+        49,
+        14,
+        7,
+        13,
+        52,
+        132,
+        168,
+        77
+      ]
+    },
+    "required_category_coverage": {
+      "ordinary_ground_play": true,
+      "possession_ball_approach": true,
+      "near_ball_interaction": true,
+      "recovery": true,
+      "airborne": true
+    }
   }
 }

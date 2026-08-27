@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "source": "authoritative trainable observations from the healthy source-policy rollout",
+  "selection": "fixed deterministic category order and evenly-spaced candidate indices",
+  "observation_contract": "RIVAL2_OBS_V1",
+  "observation_count": 512,
+  "observation_dimension": 182,
+  "dtype": "torch.float32",
+  "sha256": "0085011CECDF7BFCADCFD832AC7D3FDBF5A08A7D36E84E0A8AF85C827947E1C7",
+  "category_counts": {
+    "near_ball_interaction": {
+      "requested": 96,
+      "available_before_exclusion": 802910,
+      "selected": 96
+    },
+    "possession_ball_approach": {
+      "requested": 96,
+      "available_before_exclusion": 676861,
+      "selected": 96
+    },
+    "recovery": {
+      "requested": 80,
+      "available_before_exclusion": 1314204,
+      "selected": 80
+    },
+    "airborne": {
+      "requested": 96,
+      "available_before_exclusion": 12023,
+      "selected": 96
+    },
+    "ordinary_ground_play": {
+      "requested": 96,
+      "available_before_exclusion": 1323152,
+      "selected": 96
+    },
+    "field_position_orientation_diversity": {
+      "requested": 48,
+      "available_before_exclusion": 3931696,
+      "selected": 48
+    }
+  },
+  "checks": {
+    "source_observations_authoritative": true,
+    "trainable_samples_only": true,
+    "fixed_count_exact": true,
+    "observation_dimension_exact": true,
+    "finite": true,
+    "unique_source_indices": true,
+    "required_category_coverage": true,
+    "field_position_orientation_coverage": true
+  },
+  "verdict": "PASS_GREEN",
+  "created_utc": "2026-08-27T18:35:51.352440+00:00",
+  "source_identity": {
+    "checkpoint": "checkpoints/rival2/gameplay_v1/rival2_gameplay_resume.pt",
+    "checkpoint_sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+    "iteration": 359,
+    "policy_version": 359,
+    "reward_version": "RIVAL2_REWARD_GAMEPLAY_V1",
+    "episode_version": "RIVAL2_EPISODE_V1"
+  },
+  "collection": {
+    "worlds": 8192,
+    "decisions_per_world": 240,
+    "agent_observations_considered": 3932160,
+    "seed": 2026082721,
+    "all_five_kickoff_layouts": true,
+    "current_source_policy_on_both_sides": true,
+    "stochastic_source_policy_actions": true,
+    "training_performed": false
+  },
+  "safety_config_hash": "6831FAC91013C26767CD8518357BBEBD0FBBFF97F764688C228A069457A058B4",
+  "state_coverage": {
+    "self_position_x_min_max_uu": [
+      -4069.215087890625,
+      4078.96875
+    ],
+    "self_position_y_min_max_uu": [
+      -5010.95654296875,
+      4176.3037109375
+    ],
+    "self_position_z_min_max_uu": [
+      15.924297332763672,
+      1188.759033203125
+    ],
+    "occupied_x_field_regions_of_3": 3,
+    "occupied_y_field_regions_of_3": 3,
+    "occupied_heading_octants_of_8": 8,
+    "heading_octant_counts": [
+      49,
+      14,
+      7,
+      13,
+      52,
+      132,
+      168,
+      77
+    ]
+  },
+  "required_category_coverage": {
+    "ordinary_ground_play": true,
+    "possession_ball_approach": true,
+    "near_ball_interaction": true,
+    "recovery": true,
+    "airborne": true
+  }
+}

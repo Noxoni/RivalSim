@@ -1,43 +1,35 @@
 {
   "schema_version": 1,
-  "created_utc": "2026-08-27T16:28:35.456877+00:00",
-  "status": "STOPPED_KL_GUARD_REJECTION",
-  "completed_additional_updates": 0,
-  "restored_iteration": 359,
-  "restored_policy_version": 359,
-  "agent_decision_samples_after_rejected_rollout": 3016538976,
-  "diagnostic": {
-    "reason": "minibatch_kl_limit_exceeded",
-    "epoch": 0,
-    "optimizer_step_index": 6,
-    "minibatch_start": 393216,
-    "minibatch_samples": 65536,
-    "pre_step_approx_kl": 0.06886175274848938,
-    "post_step_approx_kl": 0.10656759142875671,
-    "policy_loss": 0.048770032823085785,
-    "value_loss": 0.2619129419326782,
-    "entropy_diagnostic": 1.387378215789795,
-    "total_loss": 0.1797265112400055,
-    "raw_gradient_norm": 12.032594680786133,
-    "post_clip_gradient_norm": 0.4999999701976776,
-    "minibatch_kl_limit": 0.1,
-    "completed_update_mean_kl_limit": 0.05,
-    "rejected_iteration": 360,
-    "restored_iteration": 359,
-    "restored_policy_version": 359,
-    "pre_update_agent_decision_samples": 3016538976,
-    "transactional_rollback_completed": true,
-    "created_utc": "2026-08-27T16:28:35.456864+00:00",
-    "source_checkpoint_sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
-    "restored_checkpoint": {
-      "label": "pre_rejected_update_00360",
-      "path": "G:/dev/RivalSim-runs/opponent-curriculum-v1-20260827-58c1578-r2/checkpoints/rival2_opponent_curriculum_pre_rejected_update_00360_resume.pt",
-      "sha256": "430F0113AEF437CA778552A40654AE09263CAC4487A455CC013467FAFD271481",
-      "size_bytes": 58945397,
-      "iteration": 359,
-      "policy_version": 359,
-      "agent_decision_samples": 3016538976,
-      "historical_pool_versions": [
+  "created_utc": "2026-08-27T20:08:58.539240+00:00",
+  "status": "COMPLETE_120_UPDATE_BOUNDARY",
+  "source_commit": "58c1578ccb719b1a7782a128842cf10761a6d227",
+  "source_checkpoint_sha256": "77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21",
+  "reward_version": "RIVAL2_REWARD_GAMEPLAY_V2",
+  "reward_contract_hash": "4073E29C1013458D5784435061FE47C639525BE37E8CD519783889C69BA87D41",
+  "episode_version": "RIVAL2_EPISODE_V1",
+  "final_iteration": 479,
+  "final_policy_version": 479,
+  "final_agent_decision_samples": 3655854038,
+  "additional_updates": 120,
+  "additional_agent_decision_samples": 644343766,
+  "realized_family_assignments": {
+    "current": 207821,
+    "historical": 102735,
+    "nexto": 362894,
+    "wisp": 362835
+  },
+  "realized_family_assignment_fraction": {
+    "current": 0.20054425182261637,
+    "historical": 0.09913778545477354,
+    "nexto": 0.3501874484335873,
+    "wisp": 0.3501305142890228
+  },
+  "historical_snapshot_records": [
+    {
+      "offset": 30,
+      "iteration": 389,
+      "added_version": 389,
+      "pool_before": [
         0,
         30,
         60,
@@ -48,54 +40,197 @@
         300,
         359
       ],
-      "realized_family_assignments": {
-        "current": 26075,
-        "historical": 13027,
-        "nexto": 45859,
-        "wisp": 46111
-      },
-      "audit": {
-        "checks": {
-          "format_exact": true,
-          "iteration_exact": true,
-          "policy_version_exact": true,
-          "sample_count_exact": true,
-          "reward_exact": true,
-          "episode_exact": true,
-          "contracts_exact": true,
-          "model_finite": true,
-          "curriculum_transition_present": true,
-          "opponent_curriculum_present": true,
-          "curriculum_rng_present": true,
-          "wisp_temporal_state_present": true,
-          "nexto_temporal_state_present": true
-        },
-        "verdict": "PASS_GREEN"
-      }
+      "pool_after": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389
+      ],
+      "evicted_versions": [],
+      "reconstructed_from_audited_resume_checkpoint": true
     },
-    "no_later_training_performed": true
+    {
+      "offset": 60,
+      "iteration": 419,
+      "added_version": 419,
+      "pool_before": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389
+      ],
+      "pool_after": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389,
+        419
+      ],
+      "evicted_versions": []
+    },
+    {
+      "offset": 90,
+      "iteration": 449,
+      "added_version": 449,
+      "pool_before": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389,
+        419
+      ],
+      "pool_after": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389,
+        419,
+        449
+      ],
+      "evicted_versions": []
+    },
+    {
+      "offset": 120,
+      "iteration": 479,
+      "added_version": 479,
+      "pool_before": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389,
+        419,
+        449
+      ],
+      "pool_after": [
+        0,
+        30,
+        60,
+        90,
+        120,
+        180,
+        240,
+        300,
+        359,
+        389,
+        419,
+        449,
+        479
+      ],
+      "evicted_versions": []
+    }
+  ],
+  "final_work_checkpoint": {
+    "label": "plus_120",
+    "path": "G:/dev/RivalSim-runs/opponent-curriculum-v1-safe-20260827-b2af03d/checkpoints/rival2_opponent_curriculum_plus_120_resume.pt",
+    "sha256": "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A",
+    "size_bytes": 69778897,
+    "iteration": 479,
+    "policy_version": 479,
+    "agent_decision_samples": 3655854038,
+    "historical_pool_versions": [
+      0,
+      30,
+      60,
+      90,
+      120,
+      180,
+      240,
+      300,
+      359,
+      389,
+      419,
+      449,
+      479
+    ],
+    "realized_family_assignments": {
+      "current": 207821,
+      "historical": 102735,
+      "nexto": 362894,
+      "wisp": 362835
+    },
+    "audit": {
+      "checks": {
+        "format_exact": true,
+        "iteration_exact": true,
+        "policy_version_exact": true,
+        "sample_count_exact": true,
+        "reward_exact": true,
+        "episode_exact": true,
+        "contracts_exact": true,
+        "model_finite": true,
+        "curriculum_transition_present": true,
+        "opponent_curriculum_present": true,
+        "curriculum_rng_present": true,
+        "wisp_temporal_state_present": true,
+        "nexto_temporal_state_present": true,
+        "adaptive_ppo_present": true,
+        "retention_corpus_present": true,
+        "split_optimizer_groups_present": true,
+        "adaptive_ppo_schema_v2": true,
+        "adaptive_policy_learning_rate_update_local": true,
+        "checkpoint_next_policy_learning_rate_base": true,
+        "checkpoint_optimizer_policy_learning_rate_base": true,
+        "checkpoint_optimizer_critic_learning_rate_unchanged": true
+      },
+      "verdict": "PASS_GREEN"
+    }
   },
+  "evaluation_labels": [
+    "source",
+    "plus_030",
+    "plus_060",
+    "plus_090",
+    "plus_120"
+  ],
+  "kl_guard_rejections": 0,
+  "wall_seconds_including_training_and_boundary_evaluations_this_process": 165.99632630008273,
+  "five_minute_training_matches_run": false,
+  "opponent_training_run": false,
+  "imitation_learning_run": false,
+  "v0_6_started": false,
+  "recommendation": "Compare side-separated Nexto/Wisp goal, acquisition, high-ball, and strict-dash curves before authorizing any curriculum beyond +120.",
   "final_repository_checkpoint": {
     "path": "checkpoints/rival2/opponent_curriculum_v1/rival2_opponent_curriculum_resume.pt",
-    "sha256": "430F0113AEF437CA778552A40654AE09263CAC4487A455CC013467FAFD271481",
-    "size_bytes": 58945397,
-    "iteration": 359,
-    "policy_version": 359,
-    "agent_decision_samples": 3016538976
-  },
-  "rollout_trainable_agent_samples": 5028704,
-  "rollout_trainable_agent_samples_by_family": {
-    "current": 1668800,
-    "historical": 416864,
-    "nexto": 1467488,
-    "wisp": 1475552
-  },
-  "initial_episode_assignments_by_family": {
-    "current": 26075,
-    "historical": 13027,
-    "nexto": 45859,
-    "wisp": 46111
-  },
-  "rollback_audit_verdict": "PASS_GREEN",
-  "no_completed_ppo_update": true
+    "sha256": "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A",
+    "size_bytes": 69778897,
+    "iteration": 479,
+    "policy_version": 479,
+    "agent_decision_samples": 3655854038
+  }
 }

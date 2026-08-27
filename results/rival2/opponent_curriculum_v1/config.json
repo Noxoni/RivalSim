@@ -126,6 +126,18 @@
     "minibatch_size": 65536
   },
   "ppo_config_hash": "1ED4A47155B538DA16CB7FF5BD19804999E20619792DA4297125F9733B6F603A",
+  "mixed_ppo_safety": {
+    "initial_policy_learning_rate": 0.0001,
+    "critic_learning_rate": 0.0003,
+    "soft_minibatch_kl_target": 0.02,
+    "retention_soft_mean_kl_target": 0.02,
+    "policy_learning_rate_backoff": 0.5,
+    "minimum_policy_learning_rate": 2.5e-05,
+    "retention_corpus_size": 512
+  },
+  "mixed_ppo_safety_hash": "6831FAC91013C26767CD8518357BBEBD0FBBFF97F764688C228A069457A058B4",
+  "mixed_ppo_policy_learning_rate_scope": "ppo_update_local",
+  "retention_corpus": "results/rival2/opponent_curriculum_v1/safe_transition/retention_corpus.pt",
   "self_play_config": {
     "historical_chance": 0.2,
     "historical_pool_bound": 16

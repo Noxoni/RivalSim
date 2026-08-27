@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "source_group_count": 1,
+  "destination_group_count": 2,
+  "parameter_count": 10,
+  "source_named_state_sha256": "BA81E60C32DA256F3022FC0D64C0982B800BFB205CA7DA40D05F8E3C161DD2E0",
+  "destination_named_state_sha256": "BA81E60C32DA256F3022FC0D64C0982B800BFB205CA7DA40D05F8E3C161DD2E0",
+  "state_exact_by_parameter": {
+    "trunk.0.weight": true,
+    "trunk.0.bias": true,
+    "trunk.2.weight": true,
+    "trunk.2.bias": true,
+    "trunk.4.weight": true,
+    "trunk.4.bias": true,
+    "actor.weight": true,
+    "actor.bias": true,
+    "critic.weight": true,
+    "critic.bias": true
+  },
+  "step_counter_exact_by_parameter": {
+    "trunk.0.weight": true,
+    "trunk.0.bias": true,
+    "trunk.2.weight": true,
+    "trunk.2.bias": true,
+    "trunk.4.weight": true,
+    "trunk.4.bias": true,
+    "actor.weight": true,
+    "actor.bias": true,
+    "critic.weight": true,
+    "critic.bias": true
+  },
+  "source_step_counter_by_parameter": {
+    "trunk.0.weight": 84988,
+    "trunk.0.bias": 84988,
+    "trunk.2.weight": 84988,
+    "trunk.2.bias": 84988,
+    "trunk.4.weight": 84988,
+    "trunk.4.bias": 84988,
+    "actor.weight": 84988,
+    "actor.bias": 84988,
+    "critic.weight": 84988,
+    "critic.bias": 84988
+  },
+  "destination_step_counter_by_parameter": {
+    "trunk.0.weight": 84988,
+    "trunk.0.bias": 84988,
+    "trunk.2.weight": 84988,
+    "trunk.2.bias": 84988,
+    "trunk.4.weight": 84988,
+    "trunk.4.bias": 84988,
+    "actor.weight": 84988,
+    "actor.bias": 84988,
+    "critic.weight": 84988,
+    "critic.bias": 84988
+  },
+  "destination_groups": [
+    {
+      "name": "policy",
+      "learning_rate": 0.0001,
+      "parameter_count": 8
+    },
+    {
+      "name": "critic",
+      "learning_rate": 0.0003,
+      "parameter_count": 2
+    }
+  ],
+  "checks": {
+    "every_parameter_present": true,
+    "all_parameter_adam_state_exact": true,
+    "all_parameter_step_counters_exact": true,
+    "named_state_digest_exact": true,
+    "two_parameter_groups": true,
+    "policy_group_identity_exact": true,
+    "critic_group_identity_exact": true,
+    "policy_learning_rate_exact": true,
+    "critic_learning_rate_exact": true
+  },
+  "verdict": "PASS_GREEN"
+}
