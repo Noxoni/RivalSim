@@ -766,9 +766,7 @@ def collect_mechanics_shadow_tick(
             pogo_age[car] = 0
         elif pogo_pending[car] != 0:
             pogo_age[car] = pogo_age[car] + 1
-            if wheel_count >= 3:
-                pogo_pending[car] = 0
-            elif float(pogo_age[car]) > thresholds[28]:
+            if wheel_count >= 3 or float(pogo_age[car]) > thresholds[28]:
                 pogo_pending[car] = 0
             elif chassis_contact_count[car] == 0 and float(pogo_age[car]) <= thresholds[28]:
                 base = car * 4
