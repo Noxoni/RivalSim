@@ -9,10 +9,16 @@ from rivalsim.kernels.rival2 import (
     NO_TOUCH_TIMEOUT_TICKS,
     PHYSICS_TICKS_PER_DECISION,
 )
+from rivalsim.rival2_contracts import (
+    SCORING_DEMOLITION_REWARD,
+    SCORING_PROGRESS_COEFFICIENT,
+    SCORING_TOUCH_REWARD,
+)
 
 REGULATION_TICKS = 5 * 60 * 120
 REWARD_BASE = 0
 REWARD_GOAL_ONLY = 1
+REWARD_SCORING = 2
 
 
 @wp.kernel(enable_backward=False)
@@ -196,6 +202,7 @@ def rival2_full_match_accumulate_tick(
         )
 
         blue_reward = 0.0
+        orange_reward = 0.0
         if reward_mode == REWARD_BASE:
             blue_reward = (
                 0.5
@@ -208,13 +215,48 @@ def rival2_full_match_accumulate_tick(
             blue_reward = blue_reward + 0.10 * float(
                 demo_by_count[car_base] - demo_by_count[car_base + 1]
             )
-        if goal_latched[env] != 0:
-            if scoring_team_latched[env] == 0:
-                blue_reward = blue_reward + 10.0
-            else:
-                blue_reward = blue_reward - 10.0
+            if goal_latched[env] != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+            orange_reward = -blue_reward
+        elif reward_mode == REWARD_SCORING:
+            progress_reward = (
+                SCORING_PROGRESS_COEFFICIENT
+                * (ball_y_after[env] - ball_y_before[env])
+                / GOAL_PROGRESS_SCALE_Y
+            )
+            blue_reward = progress_reward
+            orange_reward = -progress_reward
+            blue_reward = blue_reward + SCORING_TOUCH_REWARD * float(
+                touch_count[car_base]
+            )
+            orange_reward = orange_reward + SCORING_TOUCH_REWARD * float(
+                touch_count[car_base + 1]
+            )
+            demo_reward = SCORING_DEMOLITION_REWARD * float(
+                demo_by_count[car_base] - demo_by_count[car_base + 1]
+            )
+            blue_reward = blue_reward + demo_reward
+            orange_reward = orange_reward - demo_reward
+            if goal_latched[env] != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                    orange_reward = orange_reward - 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+                    orange_reward = orange_reward + 10.0
+        else:
+            if goal_latched[env] != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                    orange_reward = orange_reward - 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+                    orange_reward = orange_reward + 10.0
         reward[car_base] = blue_reward
-        reward[car_base + 1] = -blue_reward
+        reward[car_base + 1] = orange_reward
 
 
 @wp.kernel(enable_backward=False)
@@ -287,6 +329,7 @@ __all__ = [
     "REGULATION_TICKS",
     "REWARD_BASE",
     "REWARD_GOAL_ONLY",
+    "REWARD_SCORING",
     "rival2_full_match_accumulate_tick",
     "rival2_full_match_after_reset",
 ]

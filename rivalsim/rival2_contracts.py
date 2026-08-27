@@ -12,6 +12,7 @@ RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
 RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
 RIVAL2_REWARD_ACQUISITION_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_V1"
 RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
+RIVAL2_REWARD_SCORING_V1_VERSION: Final = "RIVAL2_REWARD_SCORING_V1"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -75,6 +76,13 @@ EPISODE_AGE_SCALE_TICKS: Final = 45 * 120
 NO_TOUCH_AGE_SCALE_TICKS: Final = 15 * 120
 PROGRESS_Y_SCALE: Final = 5120.0
 APPROACH_DISTANCE_SCALE: Final = 4096.0
+
+SCORING_PROGRESS_COEFFICIENT: Final = 0.5
+SCORING_APPROACH_COEFFICIENT: Final = 0.10
+SCORING_TOUCH_REWARD: Final = 0.02
+SCORING_DEMOLITION_REWARD: Final = 0.10
+SCORING_JUMP_RISING_EDGE_COST: Final = -0.002
+SCORING_FLIP_ONSET_COST: Final = -0.01
 
 _CAR_FIELDS = (
     "position.x",
@@ -301,6 +309,51 @@ REWARD_GOAL_ONLY_CONTRACT: Final = {
     "other_shaping": [],
 }
 
+REWARD_SCORING_V1_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_SCORING_V1_VERSION,
+    "cadence_hz": 30,
+    "zero_sum": False,
+    "goal": {"score": 10.0, "concede": -10.0, "zero_sum": True},
+    "progress": {
+        "coefficient": SCORING_PROGRESS_COEFFICIENT,
+        "progress_y_scale": PROGRESS_Y_SCALE,
+        "composition": "signed canonical delta ball Y toward the opponent goal / progress_y_scale",
+        "zero_sum": True,
+    },
+    "approach": {
+        "coefficient": SCORING_APPROACH_COEFFICIENT,
+        "distance_scale": APPROACH_DISTANCE_SCALE,
+        "distance": "true 3D Euclidean car-center to ball-center distance in unreal units",
+        "before": "start of four-tick decision interval",
+        "after": "final pre-reset transition state after four physics ticks",
+        "composition": "0.10 * (distance_before - distance_after) / distance_scale per agent",
+        "reset_motion_excluded": True,
+        "zero_sum": False,
+    },
+    "first_legitimate_touch_per_player_per_match": {
+        "reward": 0.0,
+    },
+    "unique_touch_per_player": {
+        "reward": SCORING_TOUCH_REWARD,
+        "continuous_contact_latched": True,
+        "zero_sum": False,
+    },
+    "unique_demolition": {
+        "reward": SCORING_DEMOLITION_REWARD,
+        "zero_sum": True,
+        "unchanged_from": RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    },
+    "mechanic_initiation_cost": {
+        "jump_button_rising_edge": SCORING_JUMP_RISING_EDGE_COST,
+        "actual_directional_flip_or_dodge_onset": SCORING_FLIP_ONSET_COST,
+        "jump_hold_cost": 0.0,
+        "airborne_occupancy_cost": 0.0,
+        "named_mechanic_reward": 0.0,
+    },
+    "no_touch_failure": None,
+    "direct_mechanic_rewards": [],
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -334,6 +387,9 @@ REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(
     REWARD_ACQUISITION_V1_CONTRACT
 )
 REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
+REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(
+    REWARD_SCORING_V1_CONTRACT
+)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -388,6 +444,13 @@ def contract_hashes_for_reward(
             RIVAL2_REWARD_GOAL_ONLY_VERSION: REWARD_GOAL_ONLY_CONTRACT_HASH,
             episode_version: episode_hash,
         }
+    if reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_SCORING_V1_VERSION: REWARD_SCORING_V1_CONTRACT_HASH,
+            episode_version: episode_hash,
+        }
     raise ValueError(f"unsupported Rival 2.0 reward version: {reward_version}")
 
 
@@ -414,11 +477,20 @@ __all__ = [
     "REWARD_CONTRACT_HASH",
     "REWARD_GOAL_ONLY_CONTRACT",
     "REWARD_GOAL_ONLY_CONTRACT_HASH",
+    "REWARD_SCORING_V1_CONTRACT",
+    "REWARD_SCORING_V1_CONTRACT_HASH",
     "REWARD_V2_CONTRACT",
     "REWARD_V2_CONTRACT_HASH",
     "RIVAL2_FULL_MATCH_EPISODE_VERSION",
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GOAL_ONLY_VERSION",
+    "RIVAL2_REWARD_SCORING_V1_VERSION",
     "RIVAL2_REWARD_V2_VERSION",
+    "SCORING_APPROACH_COEFFICIENT",
+    "SCORING_DEMOLITION_REWARD",
+    "SCORING_FLIP_ONSET_COST",
+    "SCORING_JUMP_RISING_EDGE_COST",
+    "SCORING_PROGRESS_COEFFICIENT",
+    "SCORING_TOUCH_REWARD",
     "contract_hashes_for_reward",
 ]

@@ -39,8 +39,12 @@ from rivalsim.rival2_contracts import (
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
+    RIVAL2_REWARD_SCORING_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     RIVAL2_REWARD_VERSION,
+    SCORING_APPROACH_COEFFICIENT,
+    SCORING_FLIP_ONSET_COST,
+    SCORING_JUMP_RISING_EDGE_COST,
     STICKY_TICK_SCALE,
     SUPERSONIC_TIME_SCALE,
     TIME_SINCE_BOOSTED_SCALE,
@@ -49,6 +53,8 @@ from rivalsim.rival2_contracts import (
 from rivalsim.static_world import CompleteWorldSim
 
 _RELATIVE_BALL_POSITION_START = OBS_FIELD_NAMES.index("relative.ball_position.x")
+_PREVIOUS_JUMP_INDEX = OBS_FIELD_NAMES.index("previous_action.jump")
+_SELF_HAS_FLIPPED_INDEX = OBS_FIELD_NAMES.index("self.has_flipped")
 
 
 class Rival2EpisodeState:
@@ -595,6 +601,37 @@ class Rival2TensorBridge:
         distance_after = torch.linalg.vector_norm(after_relative, dim=-1)
         return (distance_before - distance_after) / APPROACH_DISTANCE_SCALE
 
+    def scoring_auxiliary_reward(
+        self,
+        decision_observation: torch.Tensor,
+        transition_observation: torch.Tensor,
+        emitted_action: torch.Tensor,
+    ) -> torch.Tensor:
+        """Return scoring-stage approach and mechanic-onset terms on CUDA."""
+
+        if emitted_action.shape != (*decision_observation.shape[:-1], 8):
+            raise ValueError("scoring emitted action shape mismatch")
+        if emitted_action.device != self.device:
+            raise ValueError("scoring emitted actions must remain on the RivalSim CUDA device")
+        auxiliary = self.approach_reward(
+            decision_observation, transition_observation
+        ).mul(SCORING_APPROACH_COEFFICIENT)
+        jump_rising = (emitted_action[..., 5] >= 0.5) & (
+            decision_observation[..., _PREVIOUS_JUMP_INDEX] < 0.5
+        )
+        flip_onset = (
+            transition_observation[..., _SELF_HAS_FLIPPED_INDEX] >= 0.5
+        ) & (decision_observation[..., _SELF_HAS_FLIPPED_INDEX] < 0.5)
+        auxiliary.add_(
+            jump_rising.to(auxiliary.dtype),
+            alpha=SCORING_JUMP_RISING_EDGE_COST,
+        )
+        auxiliary.add_(
+            flip_onset.to(auxiliary.dtype),
+            alpha=SCORING_FLIP_ONSET_COST,
+        )
+        return auxiliary
+
 
 class Rival2Env:
     """30 Hz Rival 2.0 environment with no host data path."""
@@ -667,6 +704,14 @@ class Rival2Env:
         ):
             reward.add_(
                 self.bridge.approach_reward(decision_observation, transition_observation)
+            )
+        elif self.reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
+            reward.add_(
+                self.bridge.scoring_auxiliary_reward(
+                    decision_observation,
+                    transition_observation,
+                    emitted,
+                )
             )
         terminated = self.bridge.views["rival2.terminated"].to(torch.bool).clone()
         truncated = self.bridge.views["rival2.truncated"].to(torch.bool).clone()

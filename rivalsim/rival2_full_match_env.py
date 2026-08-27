@@ -12,12 +12,14 @@ from rivalsim.kernels.rival2_full_match import (
     REGULATION_TICKS,
     REWARD_BASE,
     REWARD_GOAL_ONLY,
+    REWARD_SCORING,
     rival2_full_match_accumulate_tick,
     rival2_full_match_after_reset,
 )
 from rivalsim.rival2_contracts import (
     RIVAL2_FULL_MATCH_EPISODE_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
+    RIVAL2_REWARD_SCORING_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     RIVAL2_REWARD_VERSION,
     contract_hashes_for_reward,
@@ -258,6 +260,8 @@ class Rival2FullMatchEnv(Rival2Env):
             reward_mode = REWARD_BASE
         elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_GOAL_ONLY
+        elif reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
+            reward_mode = REWARD_SCORING
         else:
             raise ValueError(f"unsupported full-match reward: {reward_version}")
         self.reward_version = reward_version
@@ -285,6 +289,8 @@ class Rival2FullMatchEnv(Rival2Env):
 
         if reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_GOAL_ONLY
+        elif reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
+            reward_mode = REWARD_SCORING
         elif reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
             reward_mode = REWARD_BASE
         else:

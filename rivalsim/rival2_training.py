@@ -315,20 +315,20 @@ class Rival2Trainer:
     def save_checkpoint(self, path: str | Path) -> None:
         torch.save(self.checkpoint_payload(), Path(path))
 
-    def load_checkpoint(self, path: str | Path) -> None:
-        payload = torch.load(Path(path), map_location=self.device, weights_only=False)
+    def _validate_checkpoint_configuration(self, payload: dict[str, Any]) -> None:
         if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
             raise ValueError("unsupported Rival 2.0 checkpoint format")
-        if payload["contract_hashes"] != self.env.contract_hashes:
-            raise ValueError("Rival 2.0 checkpoint contract hashes are incompatible")
-        if payload.get("reward_version", self.env.reward_version) != self.env.reward_version:
-            raise ValueError("Rival 2.0 checkpoint reward version is incompatible")
-        if payload.get("episode_version", "RIVAL2_EPISODE_V1") != self.env.episode_version:
-            raise ValueError("Rival 2.0 checkpoint episode version is incompatible")
         if payload["policy_config_hash"] != self.policy_config.content_hash:
             raise ValueError("Rival 2.0 checkpoint policy configuration is incompatible")
         if payload["ppo_config_hash"] != self.ppo_config.content_hash:
             raise ValueError("Rival 2.0 checkpoint PPO configuration is incompatible")
+        assignment = payload["opponent_assignment"]
+        if assignment.shape != self.opponent_assignment.shape:
+            raise ValueError("Rival 2.0 checkpoint world count is incompatible")
+
+    def _restore_checkpoint_state(self, payload: dict[str, Any]) -> None:
+        """Restore all resumable state, leaving global RNG restoration last."""
+
         self.model.load_state_dict(payload["model"])
         self.optimizer.load_state_dict(payload["optimizer"])
         self.policy_version = int(payload["policy_version"])
@@ -336,13 +336,120 @@ class Rival2Trainer:
         self.total_agent_samples = int(payload["total_agent_samples"])
         self.self_play_config = Rival2SelfPlayConfig(**payload["self_play_config"])
         self.opponent_pool.bound = self.self_play_config.historical_pool_bound
-        torch.set_rng_state(payload["torch_cpu_rng_state"].cpu())
-        torch.cuda.set_rng_state(payload["torch_cuda_rng_state"].cpu(), self.device)
         self.policy_generator.set_state(payload["policy_generator_state"].cpu())
         self.opponent_generator.set_state(payload["opponent_generator_state"].cpu())
         self.opponent_assignment.copy_(payload["opponent_assignment"])
         self.opponent_pool.load_checkpoint_state(payload["historical_opponents"])
         self.curriculum_transition = copy.deepcopy(payload.get("curriculum_transition"))
+
+        # Constructing the frozen historical policy objects consumes the global
+        # generators. Restore these last so exact continuation really is exact.
+        torch.set_rng_state(payload["torch_cpu_rng_state"].cpu())
+        torch.cuda.set_rng_state(payload["torch_cuda_rng_state"].cpu(), self.device)
+
+    def load_checkpoint(self, path: str | Path) -> None:
+        payload = torch.load(Path(path), map_location=self.device, weights_only=False)
+        self._validate_checkpoint_configuration(payload)
+        if payload["contract_hashes"] != self.env.contract_hashes:
+            raise ValueError("Rival 2.0 checkpoint contract hashes are incompatible")
+        if payload.get("reward_version", self.env.reward_version) != self.env.reward_version:
+            raise ValueError("Rival 2.0 checkpoint reward version is incompatible")
+        if payload.get("episode_version", "RIVAL2_EPISODE_V1") != self.env.episode_version:
+            raise ValueError("Rival 2.0 checkpoint episode version is incompatible")
+        self._restore_checkpoint_state(payload)
+
+    def load_checkpoint_curriculum_transition(
+        self,
+        path: str | Path,
+        *,
+        source_reward_version: str,
+        source_episode_version: str,
+        transition_record: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Load compatible learned state while explicitly changing lifecycle contracts.
+
+        This path intentionally does not copy simulator world state. It is for an
+        authorized transition from a completed checkpoint into a freshly constructed
+        environment whose reward and episode identities differ while observation,
+        action, network, PPO, self-play, optimizer, RNG, counters, assignments, and
+        historical policies remain exact.
+        """
+
+        if self.curriculum_transition is not None:
+            raise ValueError("destination trainer already has a curriculum transition")
+        if not transition_record:
+            raise ValueError("curriculum transition requires an explicit authority record")
+        payload = torch.load(Path(path), map_location=self.device, weights_only=False)
+        self._validate_checkpoint_configuration(payload)
+        source_contracts = contract_hashes_for_reward(
+            source_reward_version, source_episode_version
+        )
+        if payload["contract_hashes"] != source_contracts:
+            raise ValueError("source checkpoint contract hashes are incompatible")
+        if payload.get("reward_version") != source_reward_version:
+            raise ValueError("source checkpoint reward version is incompatible")
+        if payload.get("episode_version") != source_episode_version:
+            raise ValueError("source checkpoint episode version is incompatible")
+
+        destination_reward_version = self.env.reward_version
+        destination_episode_version = self.env.episode_version
+        destination_contracts = contract_hashes_for_reward(
+            destination_reward_version, destination_episode_version
+        )
+        if self.env.contract_hashes != destination_contracts:
+            raise ValueError("destination environment contracts are inconsistent")
+        source_shared = {
+            name: digest
+            for name, digest in source_contracts.items()
+            if name not in (source_reward_version, source_episode_version)
+        }
+        destination_shared = {
+            name: digest
+            for name, digest in destination_contracts.items()
+            if name not in (destination_reward_version, destination_episode_version)
+        }
+        if source_shared != destination_shared:
+            raise ValueError("curriculum transition would change observation or action")
+
+        prior_transition = copy.deepcopy(payload.get("curriculum_transition"))
+        self._restore_checkpoint_state(payload)
+        recorded = {
+            **copy.deepcopy(transition_record),
+            "source_reward_version": source_reward_version,
+            "source_episode_version": source_episode_version,
+            "source_contract_hashes": source_contracts,
+            "destination_reward_version": destination_reward_version,
+            "destination_episode_version": destination_episode_version,
+            "destination_contract_hashes": destination_contracts,
+            "transition_iteration": self.iteration,
+            "transition_policy_version": self.policy_version,
+            "transition_agent_decision_samples": self.total_agent_samples,
+            "changed_semantics": [
+                "reward_contract",
+                "episode_contract",
+                "fresh_world_and_match_state",
+            ],
+            "preserved_checkpoint_state": [
+                "model",
+                "optimizer",
+                "torch_cpu_rng",
+                "torch_cuda_rng",
+                "policy_generator_rng",
+                "opponent_generator_rng",
+                "policy_and_sample_counters",
+                "self_play_configuration",
+                "opponent_assignment",
+                "historical_policy_pool",
+            ],
+            "reinitialized_state": [
+                "simulator_world_state",
+                "five_minute_match_clock_and_score",
+                "kickoff_lifecycle_state",
+            ],
+            "source_curriculum_transition": prior_transition,
+        }
+        self.curriculum_transition = recorded
+        return copy.deepcopy(recorded)
 
     def transition_reward_curriculum(
         self,
