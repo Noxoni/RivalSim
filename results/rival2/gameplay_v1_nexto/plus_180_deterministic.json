@@ -1,0 +1,564 @@
+{
+  "checkpoint": {
+    "path": "G:/dev/RivalSim-runs/gameplay-v1-20260827-1507d3f/checkpoints/rival2_gameplay_plus_180_resume.pt",
+    "sha256": "FEC1C289E7F7EB8D69876FB75C5325D56063A7A674A46F6FD20C5C270542511B",
+    "size_bytes": 28653325,
+    "iteration": 300,
+    "policy_version": 300,
+    "total_agent_samples": 2516582400,
+    "policy_config": {
+      "obs_dim": 182,
+      "hidden_dim": 512,
+      "hidden_layers": 3,
+      "activation": "silu",
+      "actor_outputs": 13,
+      "log_std_min": -5.0,
+      "log_std_max": 1.0,
+      "dtype": "float32",
+      "autocast": false,
+      "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+    },
+    "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+    "reward_version": "RIVAL2_REWARD_GAMEPLAY_V1",
+    "episode_version": "RIVAL2_EPISODE_V1",
+    "contract_hashes": {
+      "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+      "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+      "RIVAL2_REWARD_GAMEPLAY_V1": "48AAC000B97D2652507F677184A3FE4F0A3A86CED136B680C933EFF33CD9F072",
+      "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+    }
+  },
+  "rival_action_mode": "deterministic_deployment",
+  "nexto_action_mode": "deterministic beta=1 argmax at 15 Hz plus stock 120 Hz kickoff controller",
+  "evaluation_seed": 2026082701,
+  "episode_contract": {
+    "version": "RIVAL2_EPISODE_V1",
+    "standard_kickoff": true,
+    "first_goal_terminates": true,
+    "no_touch_truncation_seconds": 15,
+    "hard_limit_seconds": 45,
+    "rival_policy_hz": 30,
+    "nexto_neural_hz": 15,
+    "nexto_kickoff_controller_hz": 120,
+    "physics_hz": 120
+  },
+  "episodes": 1024,
+  "by_rival_side": {
+    "overall": {
+      "episodes": 1024,
+      "rival_wins": 0,
+      "nexto_wins": 1024,
+      "no_goal_truncated_episodes": 0,
+      "decisive_episodes": 1024,
+      "rival_win_rate_among_decisive": {
+        "count": 0,
+        "denominator": 1024,
+        "fraction": 0.0
+      },
+      "goals_for": 0,
+      "goals_against": 1024,
+      "goal_differential": -1024,
+      "goal_terminated_fraction": {
+        "count": 1024,
+        "denominator": 1024,
+        "fraction": 1.0
+      },
+      "no_touch_fraction": {
+        "count": 0,
+        "denominator": 1024,
+        "fraction": 0.0
+      },
+      "hard_timeout_fraction": {
+        "count": 0,
+        "denominator": 1024,
+        "fraction": 0.0
+      },
+      "rival_touches": 2816,
+      "nexto_touches": 9315,
+      "touch_differential": -6499,
+      "first_touch": {
+        "resolved_episodes": 1024,
+        "rival": 1024,
+        "nexto": 0,
+        "rival_share": {
+          "count": 1024,
+          "denominator": 1024,
+          "fraction": 1.0
+        }
+      },
+      "saves": {
+        "Rival": 0,
+        "Nexto": 0
+      },
+      "episode_duration_seconds": {
+        "count": 1024,
+        "mean": 18.892903645833332,
+        "median": 17.233333333333334,
+        "minimum": 8.333333333333334,
+        "p25": 14.066666666666666,
+        "p75": 23.766666666666666,
+        "maximum": 33.03333333333333
+      },
+      "movement_controller": {
+        "Rival": {
+          "simulated_ticks": 2321560,
+          "simulated_minutes": 322.43888888888887,
+          "mean_speed_uu_per_s": 1155.6315538904873,
+          "supersonic_fraction": {
+            "count": 116048,
+            "denominator": 2321560,
+            "fraction": 0.049987077654680474
+          },
+          "grounded_fraction": {
+            "count": 1114282,
+            "denominator": 2321560,
+            "fraction": 0.47997122624442184
+          },
+          "airborne_fraction": {
+            "count": 1207278,
+            "denominator": 2321560,
+            "fraction": 0.5200287737555781
+          },
+          "boost_active_fraction": {
+            "count": 295204,
+            "denominator": 2321560,
+            "fraction": 0.12715760092351694
+          },
+          "observed_boost_consumed": 81111.39378738403,
+          "boost_pickups": 3380,
+          "jump_activation_fraction": {
+            "count": 791380,
+            "denominator": 2321560,
+            "fraction": 0.34088285463223006
+          },
+          "jump_rising_edges": 21520,
+          "first_jump_onsets": 8660,
+          "double_jump_onsets": 103,
+          "actual_flip_onsets": 9017,
+          "actual_flips_per_simulated_minute": 27.964989059080963,
+          "analog_saturation_fraction": {
+            "count": 90256,
+            "denominator": 11607800,
+            "fraction": 0.007775461327727907
+          },
+          "analog_mean_absolute": 0.3725747296663868
+        },
+        "Nexto": {
+          "simulated_ticks": 2321560,
+          "simulated_minutes": 322.43888888888887,
+          "mean_speed_uu_per_s": 1417.512323933045,
+          "supersonic_fraction": {
+            "count": 174315,
+            "denominator": 2321560,
+            "fraction": 0.07508528747910888
+          },
+          "grounded_fraction": {
+            "count": 1564332,
+            "denominator": 2321560,
+            "fraction": 0.6738279432795189
+          },
+          "airborne_fraction": {
+            "count": 757228,
+            "denominator": 2321560,
+            "fraction": 0.32617205672048105
+          },
+          "boost_active_fraction": {
+            "count": 537141,
+            "denominator": 2321560,
+            "fraction": 0.2313707162425266
+          },
+          "observed_boost_consumed": 148523.98051452637,
+          "boost_pickups": 6245,
+          "jump_activation_fraction": {
+            "count": 133032,
+            "denominator": 2321560,
+            "fraction": 0.057302848084908424
+          },
+          "jump_rising_edges": 12548,
+          "first_jump_onsets": 4353,
+          "double_jump_onsets": 0,
+          "actual_flip_onsets": 4762,
+          "actual_flips_per_simulated_minute": 14.768690018780475,
+          "analog_saturation_fraction": {
+            "count": 5864752,
+            "denominator": 11607800,
+            "fraction": 0.5052423370492255
+          },
+          "analog_mean_absolute": 0.5052423370492255
+        }
+      },
+      "dash_candidate_event_counts": {
+        "Rival": {
+          "ground_contact_dodge_candidate": 1487,
+          "speed_increasing_wavedash_candidate": 103,
+          "wavedash_candidate": 103
+        },
+        "Nexto": {
+          "ground_contact_dodge_candidate": 511
+        }
+      }
+    },
+    "Rival_Blue": {
+      "episodes": 512,
+      "rival_wins": 0,
+      "nexto_wins": 512,
+      "no_goal_truncated_episodes": 0,
+      "decisive_episodes": 512,
+      "rival_win_rate_among_decisive": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "goals_for": 0,
+      "goals_against": 512,
+      "goal_differential": -512,
+      "goal_terminated_fraction": {
+        "count": 512,
+        "denominator": 512,
+        "fraction": 1.0
+      },
+      "no_touch_fraction": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "hard_timeout_fraction": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "rival_touches": 1588,
+      "nexto_touches": 3280,
+      "touch_differential": -1692,
+      "first_touch": {
+        "resolved_episodes": 512,
+        "rival": 512,
+        "nexto": 0,
+        "rival_share": {
+          "count": 512,
+          "denominator": 512,
+          "fraction": 1.0
+        }
+      },
+      "saves": {
+        "Rival": 0,
+        "Nexto": 0
+      },
+      "episode_duration_seconds": {
+        "count": 512,
+        "mean": 17.278971354166668,
+        "median": 17.233333333333334,
+        "minimum": 8.333333333333334,
+        "p25": 14.066666666666666,
+        "p75": 21.9,
+        "maximum": 27.4
+      },
+      "movement_controller": {
+        "Rival": {
+          "simulated_ticks": 1061620,
+          "simulated_minutes": 147.44722222222222,
+          "mean_speed_uu_per_s": 1176.198496637215,
+          "supersonic_fraction": {
+            "count": 62001,
+            "denominator": 1061620,
+            "fraction": 0.058402253160264504
+          },
+          "grounded_fraction": {
+            "count": 469511,
+            "denominator": 1061620,
+            "fraction": 0.44225900039562177
+          },
+          "airborne_fraction": {
+            "count": 592109,
+            "denominator": 1061620,
+            "fraction": 0.5577409996043782
+          },
+          "boost_active_fraction": {
+            "count": 133778,
+            "denominator": 1061620,
+            "fraction": 0.12601307435805656
+          },
+          "observed_boost_consumed": 36731.285541534424,
+          "boost_pickups": 1640,
+          "jump_activation_fraction": {
+            "count": 363828,
+            "denominator": 1061620,
+            "fraction": 0.34271019762250143
+          },
+          "jump_rising_edges": 10146,
+          "first_jump_onsets": 4254,
+          "double_jump_onsets": 0,
+          "actual_flip_onsets": 4407,
+          "actual_flips_per_simulated_minute": 29.888660726060174,
+          "analog_saturation_fraction": {
+            "count": 39416,
+            "denominator": 5308100,
+            "fraction": 0.007425632523878601
+          },
+          "analog_mean_absolute": 0.3709597212536913
+        },
+        "Nexto": {
+          "simulated_ticks": 1061620,
+          "simulated_minutes": 147.44722222222222,
+          "mean_speed_uu_per_s": 1408.6299539854185,
+          "supersonic_fraction": {
+            "count": 84025,
+            "denominator": 1061620,
+            "fraction": 0.07914790603040636
+          },
+          "grounded_fraction": {
+            "count": 726943,
+            "denominator": 1061620,
+            "fraction": 0.6847487801661611
+          },
+          "airborne_fraction": {
+            "count": 334677,
+            "denominator": 1061620,
+            "fraction": 0.31525121983383886
+          },
+          "boost_active_fraction": {
+            "count": 255740,
+            "denominator": 1061620,
+            "fraction": 0.2408959891486596
+          },
+          "observed_boost_consumed": 70692.5511932373,
+          "boost_pickups": 2866,
+          "jump_activation_fraction": {
+            "count": 56784,
+            "denominator": 1061620,
+            "fraction": 0.05348806540946855
+          },
+          "jump_rising_edges": 5480,
+          "first_jump_onsets": 1997,
+          "double_jump_onsets": 0,
+          "actual_flip_onsets": 2099,
+          "actual_flips_per_simulated_minute": 14.23560219287504,
+          "analog_saturation_fraction": {
+            "count": 2708452,
+            "denominator": 5308100,
+            "fraction": 0.5102488649422581
+          },
+          "analog_mean_absolute": 0.5102488649422581
+        }
+      },
+      "dash_candidate_event_counts": {
+        "Rival": {
+          "ground_contact_dodge_candidate": 769
+        },
+        "Nexto": {
+          "ground_contact_dodge_candidate": 102
+        }
+      }
+    },
+    "Rival_Orange": {
+      "episodes": 512,
+      "rival_wins": 0,
+      "nexto_wins": 512,
+      "no_goal_truncated_episodes": 0,
+      "decisive_episodes": 512,
+      "rival_win_rate_among_decisive": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "goals_for": 0,
+      "goals_against": 512,
+      "goal_differential": -512,
+      "goal_terminated_fraction": {
+        "count": 512,
+        "denominator": 512,
+        "fraction": 1.0
+      },
+      "no_touch_fraction": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "hard_timeout_fraction": {
+        "count": 0,
+        "denominator": 512,
+        "fraction": 0.0
+      },
+      "rival_touches": 1228,
+      "nexto_touches": 6035,
+      "touch_differential": -4807,
+      "first_touch": {
+        "resolved_episodes": 512,
+        "rival": 512,
+        "nexto": 0,
+        "rival_share": {
+          "count": 512,
+          "denominator": 512,
+          "fraction": 1.0
+        }
+      },
+      "saves": {
+        "Rival": 0,
+        "Nexto": 0
+      },
+      "episode_duration_seconds": {
+        "count": 512,
+        "mean": 20.506835937499996,
+        "median": 17.333333333333332,
+        "minimum": 11.466666666666667,
+        "p25": 16.933333333333334,
+        "p75": 23.766666666666666,
+        "maximum": 33.03333333333333
+      },
+      "movement_controller": {
+        "Rival": {
+          "simulated_ticks": 1259940,
+          "simulated_minutes": 174.99166666666667,
+          "mean_speed_uu_per_s": 1138.3019367985778,
+          "supersonic_fraction": {
+            "count": 54047,
+            "denominator": 1259940,
+            "fraction": 0.042896487134307985
+          },
+          "grounded_fraction": {
+            "count": 644771,
+            "denominator": 1259940,
+            "fraction": 0.5117473847961014
+          },
+          "airborne_fraction": {
+            "count": 615169,
+            "denominator": 1259940,
+            "fraction": 0.4882526152038986
+          },
+          "boost_active_fraction": {
+            "count": 161426,
+            "denominator": 1259940,
+            "fraction": 0.12812197406225692
+          },
+          "observed_boost_consumed": 44380.10824584961,
+          "boost_pickups": 1740,
+          "jump_activation_fraction": {
+            "count": 427552,
+            "denominator": 1259940,
+            "fraction": 0.3393431433242853
+          },
+          "jump_rising_edges": 11374,
+          "first_jump_onsets": 4406,
+          "double_jump_onsets": 103,
+          "actual_flip_onsets": 4610,
+          "actual_flips_per_simulated_minute": 26.344111624363062,
+          "analog_saturation_fraction": {
+            "count": 50840,
+            "denominator": 6299700,
+            "fraction": 0.008070225566296808
+          },
+          "analog_mean_absolute": 0.3739355287767299
+        },
+        "Nexto": {
+          "simulated_ticks": 1259940,
+          "simulated_minutes": 174.99166666666667,
+          "mean_speed_uu_per_s": 1424.9965704716099,
+          "supersonic_fraction": {
+            "count": 90290,
+            "denominator": 1259940,
+            "fraction": 0.0716621426417131
+          },
+          "grounded_fraction": {
+            "count": 837389,
+            "denominator": 1259940,
+            "fraction": 0.6646260933060304
+          },
+          "airborne_fraction": {
+            "count": 422551,
+            "denominator": 1259940,
+            "fraction": 0.33537390669396955
+          },
+          "boost_active_fraction": {
+            "count": 281401,
+            "denominator": 1259940,
+            "fraction": 0.2233447624490055
+          },
+          "observed_boost_consumed": 77831.42932128906,
+          "boost_pickups": 3379,
+          "jump_activation_fraction": {
+            "count": 76248,
+            "denominator": 1259940,
+            "fraction": 0.06051716748416591
+          },
+          "jump_rising_edges": 7068,
+          "first_jump_onsets": 2356,
+          "double_jump_onsets": 0,
+          "actual_flip_onsets": 2663,
+          "actual_flips_per_simulated_minute": 15.217867517500833,
+          "analog_saturation_fraction": {
+            "count": 3156300,
+            "denominator": 6299700,
+            "fraction": 0.5010238582789657
+          },
+          "analog_mean_absolute": 0.5010238582789657
+        }
+      },
+      "dash_candidate_event_counts": {
+        "Rival": {
+          "ground_contact_dodge_candidate": 718,
+          "speed_increasing_wavedash_candidate": 103,
+          "wavedash_candidate": 103
+        },
+        "Nexto": {
+          "ground_contact_dodge_candidate": 409
+        }
+      }
+    }
+  },
+  "mechanics": {
+    "classification_windows": {
+      "physics_hz": 120,
+      "engine_double_jump_dodge_availability_seconds": 1.25,
+      "low_air_time_ticks": 42,
+      "low_air_time_seconds": 0.35,
+      "wavedash_flip_to_landing_ticks": 24,
+      "wavedash_flip_to_landing_seconds": 0.2,
+      "zap_landing_to_jump_ticks": 12,
+      "zap_jump_to_flip_ticks": 30,
+      "double_dash_flip_to_flip_ticks": 90,
+      "post_landing_speed_sample_ticks": 4
+    },
+    "definitions": {
+      "wavedash_candidate": "actual has_flipped onset from zero wheel contact, pre-flip air time <=0.35 s, followed by first wheel contact within 0.20 s",
+      "speed_increasing_wavedash_candidate": "wavedash candidate whose measured velocity tangent to the contacted surface after landing is strictly greater than immediately before the dodge",
+      "zapdash_candidate": "wavedash candidate preceded by a front-wheel-only first landing, a non-flat three-wheel first-jump onset within 0.10 s, and the directional landing dodge within 0.25 s; named wheel masks, descent velocity, and suspension velocity are retained",
+      "double_dash_candidate": "two wavedash candidates within 0.75 s with an intervening wheel contact; evidence states whether another first jump occurred",
+      "wall_dash_candidate": "wavedash candidate whose first landing normal has abs(z)<=0.25",
+      "curved_surface_dash_candidate": "wavedash candidate whose first landing normal has 0.25<abs(z)<0.85",
+      "qualification": "labels are prospective state-transition classifications, not claims of intent; every label retains the underlying controller, wheel, jump, suspension, orientation, landing, and velocity trace"
+    },
+    "actual_flip_events_retained": 13779,
+    "event_capacity_per_car": 64,
+    "event_overflow_total": 0,
+    "classified_event_count": 2101,
+    "candidate_event_counts_by_policy": {
+      "Rival": {
+        "ground_contact_dodge_candidate": 1487,
+        "wavedash_candidate": 103,
+        "speed_increasing_wavedash_candidate": 103
+      },
+      "Nexto": {
+        "ground_contact_dodge_candidate": 511
+      }
+    }
+  },
+  "performance": {
+    "physics_ticks_requested": 5400,
+    "wall_seconds": 11.80557639990002,
+    "world_ticks_per_second": 468388.8200534478,
+    "peak_cuda_bytes": 141488640,
+    "nexto_inference_calls": 675,
+    "nexto_observation_builds": 675
+  },
+  "checks": {
+    "every_world_completed_exactly_one_episode": true,
+    "every_world_has_valid_termination": true,
+    "done_partition_exact": true,
+    "dash_event_capacity_no_overflow": true,
+    "timed_world_h2d_bytes_zero": true,
+    "timed_world_d2h_bytes_zero": true,
+    "timed_nexto_h2d_bytes_zero": true,
+    "timed_nexto_d2h_bytes_zero": true
+  },
+  "verdict": "PASS_GREEN"
+}

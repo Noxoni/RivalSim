@@ -1,0 +1,62 @@
+{
+  "purpose": "read-only, inspectable classification of dash-like state transitions; never inferred from jump frequency alone",
+  "engine_facts": {
+    "physics_hz": 120,
+    "dodge_requires_jump_rising_edge": true,
+    "dodge_requires_airborne": true,
+    "dodge_requires_has_jumped": true,
+    "dodge_forbidden_after_has_double_jumped_or_has_flipped": true,
+    "dodge_availability_seconds": 1.25,
+    "directional_input_deadzone_sum": 0.5,
+    "base_directional_dodge_impulse_uu_per_s": 500.0,
+    "source": "pinned RocketSim-derived RivalSim vehicle operation path and constants"
+  },
+  "mechanic_requirements": {
+    "wavedash": "an actual airborne directional dodge begins immediately before or during wheel contact; the contacted surface interrupts the rotation while the dodge impulse contributes translation",
+    "landing_wavedash": "the same dodge/contact relation occurs during an existing landing, without requiring that the current airborne phase began with a fresh jump",
+    "zapdash": "an angled landing reaches the front wheels before the rear; once at least three wheels establish grounded jump availability but before a flat four-wheel landing, a jump pops the front upward and is followed by the directional landing dodge/wavedash",
+    "double_dash": "two wavedash outcomes occur in rapid succession with intervening contact; the raw trace states whether another first-jump onset occurred",
+    "wall_or_curve_dash": "the wavedash contact relation occurs against a wall or curved transition rather than a floor-like surface"
+  },
+  "retained_per_flip_evidence": [
+    "controller and actual has_flipped onset",
+    "wheel masks before/after and at first landing",
+    "named prior-landing and first-jump wheel masks for front/rear ordering",
+    "last contact/takeoff/landing/jump-rising/first-jump ticks",
+    "air-time and air-time-since-jump",
+    "car velocity and contact-surface-tangent speed before/after flip, at landing, and four ticks after landing",
+    "orientation up-z before/after/at landing",
+    "wheel suspension length and velocity before flip and at landing",
+    "landing contact normal and surface class",
+    "actual flip-relative torque"
+  ],
+  "classification_qualification": "community mechanic names do not have authoritative engine event flags; candidate labels use prospective windows and retain raw evidence so the classification can be audited without relabeling from outcomes",
+  "sources": [
+    {
+      "title": "Psyonix GDC 2018: It IS Rocket Science!",
+      "url": "https://media.gdcvault.com/gdc2018/presentations/Cone_Jared_It_Is_Rocket.pdf",
+      "role": "primary vehicle/wheel/suspension physics context"
+    },
+    {
+      "title": "RLBot Wiki useful game values",
+      "url": "https://wiki.rlbot.org/v5/botmaking/useful-game-values/",
+      "role": "bot-facing coordinate, jump, speed, and game-value reference"
+    },
+    {
+      "title": "Rocket Science: Dodges explained",
+      "url": "https://www.s543778567.website-start.de/know/videos/dodges",
+      "role": "measured 500 uu/s directional dodge impulse behavior"
+    },
+    {
+      "title": "Rocket Science: Landing Wavedash",
+      "url": "https://www.youtube.com/watch?v=baNsqFEfRMY",
+      "role": "measured landing/suspension dash behavior"
+    },
+    {
+      "title": "Rocket League Mechanics Database",
+      "url": "https://0byte-coding.github.io/rocket_league_mechanics/",
+      "role": "community definitions for zapdash and double-dash naming"
+    }
+  ],
+  "content_sha256": "F8FCF018A1D013D84DEF0F16D5033CE86F56B3F82CB95C1022F32722D1FB7510"
+}
