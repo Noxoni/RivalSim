@@ -1561,10 +1561,10 @@ def _render_report(
     lines = [
         "# Rival 2.0 Mechanics Calibration V1 Results",
         "",
-        f"Source head: `{source_head}`  ",
-        f"Handoff source: `{SOURCE_HANDOFF_COMMIT}`  ",
-        f"Arena geometry SHA-256: `{manifest['arena_geometry_sha256']}`  ",
-        f"Gameplay V1 +239 checkpoint SHA-256: `{manifest['checkpoint']['sha256']}`  ",
+        f"Source head: `{source_head}`",
+        f"Handoff source: `{SOURCE_HANDOFF_COMMIT}`",
+        f"Arena geometry SHA-256: `{manifest['arena_geometry_sha256']}`",
+        f"Gameplay V1 +239 checkpoint SHA-256: `{manifest['checkpoint']['sha256']}`",
         "Mode: calibration plus read-only shadow telemetry; mechanics reward "
         "remained exactly disabled.",
         "",
@@ -1719,7 +1719,7 @@ def _render_report(
     lines.extend(
         [
             "",
-            f"Impossible/pathological classifications: {shadow['impossible_count']}.  ",
+            f"Impossible/pathological classifications: {shadow['impossible_count']}.",
             "Mechanics reward contribution: "
             f"`{shadow['mechanics_reward_contribution_sum']}` (required exact zero).",
             "",

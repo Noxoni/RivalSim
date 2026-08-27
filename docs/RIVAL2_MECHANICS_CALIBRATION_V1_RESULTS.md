@@ -1,9 +1,9 @@
 # Rival 2.0 Mechanics Calibration V1 Results
 
-Source head: `b07fece6ebc21d3f752dc7f8213880c4b7f3c0b1`  
-Handoff source: `1da8557f32a94e6a8e96d1acbb0103656e203e27`  
-Arena geometry SHA-256: `2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538`  
-Gameplay V1 +239 checkpoint SHA-256: `77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21`  
+Source head: `b07fece6ebc21d3f752dc7f8213880c4b7f3c0b1`
+Handoff source: `1da8557f32a94e6a8e96d1acbb0103656e203e27`
+Arena geometry SHA-256: `2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538`
+Gameplay V1 +239 checkpoint SHA-256: `77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21`
 Mode: calibration plus read-only shadow telemetry; mechanics reward remained exactly disabled.
 
 No Rival training or opponent training ran. No policy, PPO, observation, action, physics, reward, or episode-lifecycle contract was changed.
@@ -138,7 +138,7 @@ Episodes: 256 (Nexto 128, Wisp 128); stochastic Gameplay V1 +239 Rival, side-bal
 | Wisp | Orange | pinch | 0 | 0.000000 |
 | Wisp | Orange | pogo | 32 | 1.742867 |
 
-Impossible/pathological classifications: 0.  
+Impossible/pathological classifications: 0.
 Mechanics reward contribution: `0.0` (required exact zero).
 
 Bounded per-event raw features are retained in `shadow_event_evidence.json`; all calibration case parameters and measured features are retained in `case_results.jsonl`.
