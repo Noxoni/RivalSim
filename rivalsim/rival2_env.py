@@ -11,6 +11,9 @@ import warp as wp
 from rivalsim.constants import DOUBLEJUMP_MAX_DELAY
 from rivalsim.kernels.rival2 import (
     PHYSICS_TICKS_PER_DECISION,
+    REWARD_MODE_ACQUISITION,
+    REWARD_MODE_BASE,
+    REWARD_MODE_GOAL_ONLY,
     rival2_accumulate_tick,
     rival2_after_interval_reset,
     rival2_begin_decision,
@@ -34,6 +37,8 @@ from rivalsim.rival2_contracts import (
     ORANGE_PAD_REMAP,
     POSITION_SCALE,
     RIVAL2_EPISODE_VERSION,
+    RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    RIVAL2_REWARD_GOAL_ONLY_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     RIVAL2_REWARD_VERSION,
     STICKY_TICK_SCALE,
@@ -69,6 +74,12 @@ class Rival2EpisodeState:
         car_count = num_envs * 2
         self.touch_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.touch_contact_latched = wp.zeros(car_count, dtype=wp.int32, device=device)
+        self.episode_player_touched = wp.zeros(
+            car_count, dtype=wp.int32, device=device
+        )
+        self.first_contact_count = wp.zeros(
+            car_count, dtype=wp.int32, device=device
+        )
         self.demo_by_count = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.demoed_event = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.reward = wp.zeros(car_count, dtype=wp.float32, device=device)
@@ -76,16 +87,19 @@ class Rival2EpisodeState:
 
     @property
     def logical_bytes(self) -> int:
-        return self.num_envs * ((9 + 2 * 4) * 4 + 2 * 8 * 4)
+        return self.num_envs * ((9 + 2 * 6) * 4 + 2 * 8 * 4)
 
 
 class Rival2WorldSim(CompleteWorldSim):
     """CompleteWorldSim plus policy-neutral 30 Hz interval event accounting."""
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(
+        self, *args: Any, reward_mode: int = REWARD_MODE_BASE, **kwargs: Any
+    ):
         if kwargs.get("auto_kickoff") not in (None, False):
             raise ValueError("Rival2WorldSim owns reset timing at decision boundaries")
         kwargs["auto_kickoff"] = False
+        self.reward_mode = int(reward_mode)
         super().__init__(*args, **kwargs)
         self.rival2 = Rival2EpisodeState(self.num_envs, self.device)
 
@@ -105,6 +119,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.ball_y_before,
                 state.ball_y_after,
                 state.touch_count,
+                state.first_contact_count,
                 state.demo_by_count,
                 state.demoed_event,
                 state.goal_latched,
@@ -125,6 +140,7 @@ class Rival2WorldSim(CompleteWorldSim):
             rival2_accumulate_tick,
             dim=self.num_envs,
             inputs=[
+                self.reward_mode,
                 self.state.ball_pos,
                 self.lifecycle.goal_scored,
                 self.lifecycle.scoring_team,
@@ -141,6 +157,8 @@ class Rival2WorldSim(CompleteWorldSim):
                 state.ball_y_after,
                 state.touch_count,
                 state.touch_contact_latched,
+                state.episode_player_touched,
+                state.first_contact_count,
                 state.demo_by_count,
                 state.demoed_event,
                 state.goal_latched,
@@ -246,6 +264,8 @@ class Rival2WorldSim(CompleteWorldSim):
                 self.rival2.kickoff_indicator,
                 self.rival2.touch_count,
                 self.rival2.touch_contact_latched,
+                self.rival2.episode_player_touched,
+                self.rival2.first_contact_count,
                 self.rival2.demo_by_count,
                 self.rival2.demoed_event,
                 self.rival2.previous_action,
@@ -343,6 +363,8 @@ class Rival2TensorBridge:
             "ball_y_after",
             "touch_count",
             "touch_contact_latched",
+            "episode_player_touched",
+            "first_contact_count",
             "demoed_event",
             "kickoff_indicator",
             "reward",
@@ -588,6 +610,14 @@ class Rival2Env:
         episode_version: str = RIVAL2_EPISODE_VERSION,
         **world_kwargs: Any,
     ):
+        if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
+            reward_mode = REWARD_MODE_BASE
+        elif reward_version == RIVAL2_REWARD_ACQUISITION_V1_VERSION:
+            reward_mode = REWARD_MODE_ACQUISITION
+        elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
+            reward_mode = REWARD_MODE_GOAL_ONLY
+        else:
+            raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = episode_version
         self.contract_hashes = contract_hashes_for_reward(
@@ -598,6 +628,7 @@ class Rival2Env:
             collision_root,
             device=device,
             seed=seed,
+            reward_mode=reward_mode,
             **world_kwargs,
         )
         self.device = torch.device(self.world.device)
@@ -630,7 +661,10 @@ class Rival2Env:
             markers[1].record()
         transition_observation = self.bridge.observation().clone()
         reward = self.bridge.views["rival2.reward"].reshape(self.num_envs, 2).clone()
-        if self.reward_version == RIVAL2_REWARD_V2_VERSION:
+        if self.reward_version in (
+            RIVAL2_REWARD_V2_VERSION,
+            RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+        ):
             reward.add_(
                 self.bridge.approach_reward(decision_observation, transition_observation)
             )
@@ -656,6 +690,23 @@ class Rival2Env:
             truncated=truncated,
             reset_mask=reset_mask,
         )
+
+    def set_reward_version(self, reward_version: str) -> None:
+        """Apply an authorized update-boundary reward-only transition."""
+
+        if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
+            reward_mode = REWARD_MODE_BASE
+        elif reward_version == RIVAL2_REWARD_ACQUISITION_V1_VERSION:
+            reward_mode = REWARD_MODE_ACQUISITION
+        elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
+            reward_mode = REWARD_MODE_GOAL_ONLY
+        else:
+            raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
+        self.reward_version = reward_version
+        self.contract_hashes = contract_hashes_for_reward(
+            reward_version, self.episode_version
+        )
+        self.world.reward_mode = reward_mode
 
     def step(self, action: torch.Tensor) -> Rival2Step:
         return self._step_impl(action)

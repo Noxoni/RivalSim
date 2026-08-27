@@ -10,6 +10,7 @@ RIVAL2_OBS_VERSION: Final = "RIVAL2_OBS_V1"
 RIVAL2_ACTION_VERSION: Final = "RIVAL2_ACTION_V1"
 RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
 RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
+RIVAL2_REWARD_ACQUISITION_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_V1"
 RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
@@ -243,6 +244,52 @@ REWARD_V2_CONTRACT: Final = {
     "other_changes_from_v1": [],
 }
 
+REWARD_ACQUISITION_V1_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    "cadence_hz": 30,
+    "zero_sum": False,
+    "goal": {"score": 10.0, "concede": -10.0, "zero_sum": True},
+    "progress": {
+        "coefficient": 0.5,
+        "progress_y_scale": PROGRESS_Y_SCALE,
+        "zero_sum": True,
+    },
+    "approach": {
+        "coefficient": 1.0,
+        "distance_scale": APPROACH_DISTANCE_SCALE,
+        "distance": "true 3D Euclidean car-center to ball-center distance in unreal units",
+        "before": "start of four-tick decision interval",
+        "after": "final pre-reset transition state after four physics ticks",
+        "composition": "(distance_before - distance_after) / distance_scale per agent",
+        "positive_condition": "positive only when true distance decreases",
+        "proximity_reward": False,
+        "reset_motion_excluded": True,
+        "zero_sum": False,
+    },
+    "first_legitimate_touch_per_player_per_episode": {
+        "reward": 1.0,
+        "stacks_with_unique_touch_reward": True,
+        "zero_sum": False,
+    },
+    "unique_touch_per_player": {
+        "reward": 0.20,
+        "continuous_contact_latched": True,
+        "zero_sum": False,
+    },
+    "unique_demolition": {
+        "reward": 0.10,
+        "zero_sum": True,
+        "unchanged_from": RIVAL2_REWARD_VERSION,
+    },
+    "no_touch_failure": {
+        "seconds": 15.0,
+        "reward_per_player_without_any_episode_touch": -0.5,
+        "player_with_prior_touch_penalized": False,
+        "training_episode_effect": "RIVAL2_EPISODE_V1 truncation and kickoff reset",
+    },
+    "direct_mechanic_rewards": [],
+}
+
 REWARD_GOAL_ONLY_CONTRACT: Final = {
     "version": RIVAL2_REWARD_GOAL_ONLY_VERSION,
     "cadence_hz": 30,
@@ -283,6 +330,9 @@ OBSERVATION_SCHEMA_HASH: Final = _canonical_hash(OBSERVATION_SCHEMA)
 ACTION_CONTRACT_HASH: Final = _canonical_hash(ACTION_CONTRACT)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
 REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
+REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(
+    REWARD_ACQUISITION_V1_CONTRACT
+)
 REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
@@ -322,6 +372,15 @@ def contract_hashes_for_reward(
             RIVAL2_REWARD_V2_VERSION: REWARD_V2_CONTRACT_HASH,
             episode_version: episode_hash,
         }
+    if reward_version == RIVAL2_REWARD_ACQUISITION_V1_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_ACQUISITION_V1_VERSION: (
+                REWARD_ACQUISITION_V1_CONTRACT_HASH
+            ),
+            episode_version: episode_hash,
+        }
     if reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
         return {
             RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
@@ -349,6 +408,8 @@ __all__ = [
     "OBS_DIM",
     "OBS_FIELD_NAMES",
     "ORANGE_PAD_REMAP",
+    "REWARD_ACQUISITION_V1_CONTRACT",
+    "REWARD_ACQUISITION_V1_CONTRACT_HASH",
     "REWARD_CONTRACT",
     "REWARD_CONTRACT_HASH",
     "REWARD_GOAL_ONLY_CONTRACT",
@@ -356,6 +417,7 @@ __all__ = [
     "REWARD_V2_CONTRACT",
     "REWARD_V2_CONTRACT_HASH",
     "RIVAL2_FULL_MATCH_EPISODE_VERSION",
+    "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GOAL_ONLY_VERSION",
     "RIVAL2_REWARD_V2_VERSION",
     "contract_hashes_for_reward",

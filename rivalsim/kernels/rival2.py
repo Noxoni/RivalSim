@@ -16,6 +16,9 @@ PHYSICS_TICKS_PER_DECISION = 4
 NO_TOUCH_TIMEOUT_TICKS = 15 * 120
 EPISODE_LIMIT_TICKS = 45 * 120
 GOAL_PROGRESS_SCALE_Y = 5120.0
+REWARD_MODE_BASE = 0
+REWARD_MODE_ACQUISITION = 1
+REWARD_MODE_GOAL_ONLY = 2
 
 
 @wp.kernel(enable_backward=False)
@@ -25,6 +28,7 @@ def rival2_begin_decision(
     ball_y_before: wp.array(dtype=wp.float32),
     ball_y_after: wp.array(dtype=wp.float32),
     touch_count: wp.array(dtype=wp.int32),
+    first_contact_count: wp.array(dtype=wp.int32),
     demo_by_count: wp.array(dtype=wp.int32),
     demoed_event: wp.array(dtype=wp.int32),
     goal_latched: wp.array(dtype=wp.int32),
@@ -51,6 +55,7 @@ def rival2_begin_decision(
     for local_car in range(2):
         car = car_base + local_car
         touch_count[car] = 0
+        first_contact_count[car] = 0
         demo_by_count[car] = 0
         demoed_event[car] = 0
         reward[car] = 0.0
@@ -58,6 +63,7 @@ def rival2_begin_decision(
 
 @wp.kernel(enable_backward=False)
 def rival2_accumulate_tick(
+    reward_mode: int,
     ball_pos: wp.array(dtype=wp.vec3),
     goal_scored: wp.array(dtype=wp.int32),
     scoring_team: wp.array(dtype=wp.int32),
@@ -74,6 +80,8 @@ def rival2_accumulate_tick(
     ball_y_after: wp.array(dtype=wp.float32),
     touch_count: wp.array(dtype=wp.int32),
     touch_contact_latched: wp.array(dtype=wp.int32),
+    episode_player_touched: wp.array(dtype=wp.int32),
+    first_contact_count: wp.array(dtype=wp.int32),
     demo_by_count: wp.array(dtype=wp.int32),
     demoed_event: wp.array(dtype=wp.int32),
     goal_latched: wp.array(dtype=wp.int32),
@@ -95,8 +103,14 @@ def rival2_accumulate_tick(
     touch_contact_latched[car_base + 1] = reports_b
     if touched_a != 0:
         touch_count[car_base] = touch_count[car_base] + 1
+        if episode_player_touched[car_base] == 0:
+            episode_player_touched[car_base] = 1
+            first_contact_count[car_base] = first_contact_count[car_base] + 1
     if touched_b != 0:
         touch_count[car_base + 1] = touch_count[car_base + 1] + 1
+        if episode_player_touched[car_base + 1] == 0:
+            episode_player_touched[car_base + 1] = 1
+            first_contact_count[car_base + 1] = first_contact_count[car_base + 1] + 1
     if touched_a != 0 or touched_b != 0:
         no_touch_ticks[env] = 0
     else:
@@ -137,18 +151,72 @@ def rival2_accumulate_tick(
         truncated[env] = timeout
         reset_mask[env] = wp.int32(terminal != 0 or timeout != 0)
 
-        blue_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
-        if terminal != 0:
-            if scoring_team_latched[env] == 0:
-                blue_reward = blue_reward + 10.0
-            else:
-                blue_reward = blue_reward - 10.0
-        blue_reward = blue_reward + 0.05 * float(touch_count[car_base] - touch_count[car_base + 1])
-        blue_reward = blue_reward + 0.10 * float(
-            demo_by_count[car_base] - demo_by_count[car_base + 1]
-        )
+        blue_reward = 0.0
+        orange_reward = 0.0
+        if reward_mode == REWARD_MODE_BASE:
+            # Preserve the exact historical RIVAL2_REWARD_V1/V2 arithmetic and
+            # operation order. Orange remains the final negation of Blue.
+            blue_reward = (
+                0.5
+                * (ball_y_after[env] - ball_y_before[env])
+                / GOAL_PROGRESS_SCALE_Y
+            )
+            if terminal != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+            blue_reward = blue_reward + 0.05 * float(
+                touch_count[car_base] - touch_count[car_base + 1]
+            )
+            blue_reward = blue_reward + 0.10 * float(
+                demo_by_count[car_base] - demo_by_count[car_base + 1]
+            )
+            orange_reward = -blue_reward
+        elif reward_mode == REWARD_MODE_ACQUISITION:
+            progress_reward = (
+                0.5
+                * (ball_y_after[env] - ball_y_before[env])
+                / GOAL_PROGRESS_SCALE_Y
+            )
+            blue_reward = progress_reward
+            orange_reward = -progress_reward
+            if terminal != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                    orange_reward = orange_reward - 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+                    orange_reward = orange_reward + 10.0
+            blue_reward = blue_reward + 0.20 * float(touch_count[car_base])
+            orange_reward = orange_reward + 0.20 * float(touch_count[car_base + 1])
+            blue_reward = blue_reward + float(first_contact_count[car_base])
+            orange_reward = orange_reward + float(first_contact_count[car_base + 1])
+            no_touch_failure = wp.int32(
+                terminal == 0 and no_touch_ticks[env] >= NO_TOUCH_TIMEOUT_TICKS
+            )
+            if no_touch_failure != 0:
+                if episode_player_touched[car_base] == 0:
+                    blue_reward = blue_reward - 0.5
+                if episode_player_touched[car_base + 1] == 0:
+                    orange_reward = orange_reward - 0.5
+            demo_reward = 0.10 * float(
+                demo_by_count[car_base] - demo_by_count[car_base + 1]
+            )
+            blue_reward = blue_reward + demo_reward
+            orange_reward = orange_reward - demo_reward
+        else:
+            # Goal-only mode intentionally excludes progress, touch, approach,
+            # no-touch, demo, and mechanic shaping.
+            if terminal != 0:
+                if scoring_team_latched[env] == 0:
+                    blue_reward = blue_reward + 10.0
+                    orange_reward = orange_reward - 10.0
+                else:
+                    blue_reward = blue_reward - 10.0
+                    orange_reward = orange_reward + 10.0
         reward[car_base] = blue_reward
-        reward[car_base + 1] = -blue_reward
+        reward[car_base + 1] = orange_reward
 
 
 @wp.kernel(enable_backward=False)
@@ -159,6 +227,8 @@ def rival2_after_interval_reset(
     kickoff_indicator: wp.array(dtype=wp.int32),
     touch_count: wp.array(dtype=wp.int32),
     touch_contact_latched: wp.array(dtype=wp.int32),
+    episode_player_touched: wp.array(dtype=wp.int32),
+    first_contact_count: wp.array(dtype=wp.int32),
     demo_by_count: wp.array(dtype=wp.int32),
     demoed_event: wp.array(dtype=wp.int32),
     previous_action: wp.array(dtype=wp.float32),
@@ -175,6 +245,8 @@ def rival2_after_interval_reset(
             car = car_base + local_car
             touch_count[car] = 0
             touch_contact_latched[car] = 0
+            episode_player_touched[car] = 0
+            first_contact_count[car] = 0
             demo_by_count[car] = 0
             demoed_event[car] = 0
             action_base = car * 8
@@ -333,6 +405,9 @@ __all__ = [
     "EPISODE_LIMIT_TICKS",
     "NO_TOUCH_TIMEOUT_TICKS",
     "PHYSICS_TICKS_PER_DECISION",
+    "REWARD_MODE_ACQUISITION",
+    "REWARD_MODE_BASE",
+    "REWARD_MODE_GOAL_ONLY",
     "rival2_accumulate_tick",
     "rival2_after_interval_reset",
     "rival2_begin_decision",

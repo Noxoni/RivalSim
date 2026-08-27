@@ -114,7 +114,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
 
     def __init__(self, *args: Any, reward_mode: int, **kwargs: Any):
         self.reward_mode = int(reward_mode)
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, reward_mode=reward_mode, **kwargs)
         self.rival2 = Rival2FullMatchState(self.num_envs, self.device)
 
     def begin_decision(self) -> None:
@@ -128,6 +128,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
                 state.ball_y_before,
                 state.ball_y_after,
                 state.touch_count,
+                state.first_contact_count,
                 state.demo_by_count,
                 state.demoed_event,
                 state.goal_latched,
