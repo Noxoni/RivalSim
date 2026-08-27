@@ -80,6 +80,7 @@ WISP_FIDELITY = Path("results/rival2/opponent_curriculum_v1/wisp_fidelity.json")
 NEXTO_FIDELITY = Path(".tools/opponent_curriculum_nexto_fidelity.json")
 RESULTS_DIR = Path("results/rival2/opponent_curriculum_v1")
 REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_RESULTS.md")
+KL_DIAGNOSIS_REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_KL_DIAGNOSIS.md")
 FINAL_CHECKPOINT = Path(
     "checkpoints/rival2/opponent_curriculum_v1/rival2_opponent_curriculum_resume.pt"
 )
@@ -1115,22 +1116,32 @@ def publish(
 
 
 def _write_artifact_manifest() -> None:
+    def committed_identity(path: Path) -> tuple[str, int]:
+        content = path.read_bytes()
+        if path.suffix.lower() in {".csv", ".json", ".jsonl", ".md"}:
+            content = content.replace(b"\r\n", b"\n")
+        return hashlib.sha256(content).hexdigest().upper(), len(content)
+
     artifacts = []
     for path in sorted(RESULTS_DIR.iterdir()):
         if path.is_file() and path.name != "artifact_manifest.json":
+            digest, size_bytes = committed_identity(path)
             artifacts.append(
                 {
                     "path": path.as_posix(),
-                    "sha256": _sha256(path),
-                    "size_bytes": path.stat().st_size,
+                    "sha256": digest,
+                    "size_bytes": size_bytes,
                 }
             )
-    for path in (FINAL_CHECKPOINT, REPORT_PATH):
+    for path in (FINAL_CHECKPOINT, REPORT_PATH, KL_DIAGNOSIS_REPORT_PATH):
+        if not path.is_file():
+            continue
+        digest, size_bytes = committed_identity(path)
         artifacts.append(
             {
                 "path": path.as_posix(),
-                "sha256": _sha256(path),
-                "size_bytes": path.stat().st_size,
+                "sha256": digest,
+                "size_bytes": size_bytes,
             }
         )
     _write_json(
