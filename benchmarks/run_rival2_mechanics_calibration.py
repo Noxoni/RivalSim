@@ -1032,25 +1032,29 @@ def _pogo_cases(
         pool.car_ang_vel[index, 0] = rng.uniform(-5.5, 5.5, 3)
     pool_trace = _run(pool, 100, collision_root, geometry, meshes, lambda _tick, _controls: None)
     selected: list[int] = []
+    near_selected: list[int] = []
     for index in range(pool_count):
         item = extract(pool_trace, index)
-        if (
-            item["corner_region"] >= 0.6
-            and item["incoming_normal_speed"] > 1.0
+        impact_rebounds = (
+            item["incoming_normal_speed"] > 1.0
             and item["outgoing_normal_speed"] > 1.0
             and item["wheel_support"] < 3.0
             and item["separation_ticks"] < 12.0
-        ):
+        )
+        if item["corner_region"] >= 0.6 and impact_rebounds:
             selected.append(index)
-            if len(selected) == CASE_COUNT_PER_CLASS:
-                break
-    if len(selected) != CASE_COUNT_PER_CLASS:
+        elif 0.3 <= item["corner_region"] < 0.6 and impact_rebounds:
+            near_selected.append(index)
+        if len(selected) >= CASE_COUNT_PER_CLASS and len(near_selected) >= CASE_COUNT_PER_CLASS:
+            break
+    if len(selected) < CASE_COUNT_PER_CLASS or len(near_selected) < CASE_COUNT_PER_CLASS:
         observed_corner = sorted(
             (extract(pool_trace, index)["corner_region"] for index in range(pool_count)),
             reverse=True,
         )
         raise RuntimeError(
-            f"pogo discovery produced only {len(selected)} positives; "
+            f"pogo discovery produced {len(selected)} positives and "
+            f"{len(near_selected)} face-impact near misses; "
             f"largest second-axis corner values={observed_corner[:24]}"
         )
 
@@ -1064,18 +1068,17 @@ def _pogo_cases(
             state.car_quat[index, 0] = pool.car_quat[source, 0]
             state.car_vel[index, 0] = pool.car_vel[source, 0]
             state.car_ang_vel[index, 0] = pool.car_ang_vel[source, 0]
+        elif row["class"] == "near_miss":
+            source = near_selected[local]
+            state.car_pos[index, 0] = pool.car_pos[source, 0]
+            state.car_quat[index, 0] = pool.car_quat[source, 0]
+            state.car_vel[index, 0] = pool.car_vel[source, 0]
+            state.car_ang_vel[index, 0] = pool.car_ang_vel[source, 0]
         else:
-            if row["class"] == "near_miss":
-                roll = rng.uniform(-0.35, 0.35)
-                pitch = rng.uniform(-0.35, 0.35)
-                vz = rng.uniform(-900.0, -350.0)
-                angular = rng.uniform(-1.0, 1.0, 3)
-                height = rng.uniform(90.0, 220.0)
-            else:
-                roll = pitch = 0.0
-                vz = -300.0 - 10.0 * (local % 8)
-                angular = np.zeros(3)
-                height = 80.0 + 3.0 * (local % 8)
+            roll = pitch = 0.0
+            vz = -300.0 - 10.0 * (local % 8)
+            angular = np.zeros(3)
+            height = 80.0 + 3.0 * (local % 8)
             state.car_pos[index, 0] = (
                 rng.uniform(-800.0, 800.0),
                 rng.uniform(-800.0, 800.0),
