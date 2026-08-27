@@ -81,6 +81,7 @@ NEXTO_FIDELITY = Path(".tools/opponent_curriculum_nexto_fidelity.json")
 RESULTS_DIR = Path("results/rival2/opponent_curriculum_v1")
 REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_RESULTS.md")
 KL_DIAGNOSIS_REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_KL_DIAGNOSIS.md")
+KL_TRANSITION_REPORT_PATH = Path("docs/RIVAL2_OPPONENT_CURRICULUM_V1_TRANSITION_STRATEGY.md")
 FINAL_CHECKPOINT = Path(
     "checkpoints/rival2/opponent_curriculum_v1/rival2_opponent_curriculum_resume.pt"
 )
@@ -1133,7 +1134,12 @@ def _write_artifact_manifest() -> None:
                     "size_bytes": size_bytes,
                 }
             )
-    for path in (FINAL_CHECKPOINT, REPORT_PATH, KL_DIAGNOSIS_REPORT_PATH):
+    for path in (
+        FINAL_CHECKPOINT,
+        REPORT_PATH,
+        KL_DIAGNOSIS_REPORT_PATH,
+        KL_TRANSITION_REPORT_PATH,
+    ):
         if not path.is_file():
             continue
         digest, size_bytes = committed_identity(path)
