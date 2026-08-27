@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "authority": "handoff/rival2-acquisition-v1/README.md",
+  "mechanics_fix_commit": "0fa27d2fd846b4e8d4b9955a0ad88c2c2af91037",
+  "campaign_seed": 20260827,
+  "worlds": 131072,
+  "policy_config": {
+    "obs_dim": 182,
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "activation": "silu",
+    "actor_outputs": 13,
+    "log_std_min": -5.0,
+    "log_std_max": 1.0,
+    "dtype": "float32",
+    "autocast": false,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01"
+  },
+  "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+  "ppo_config": {
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0.0,
+    "max_gradient_norm": 0.5,
+    "learning_rate": 0.0003,
+    "epochs": 2,
+    "rollout_horizon": 32,
+    "minibatch_size": 65536
+  },
+  "ppo_config_hash": "1ED4A47155B538DA16CB7FF5BD19804999E20619792DA4297125F9733B6F603A",
+  "self_play_config": {
+    "historical_chance": 0.2,
+    "historical_pool_bound": 16
+  },
+  "episode_version": "RIVAL2_EPISODE_V1",
+  "episode_contract_hash": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+  "episode_mode": "original Rival 2.0 first-goal/15-second-no-touch/45-second-hard-limit intervals",
+  "reward_version": "RIVAL2_REWARD_ACQUISITION_V1",
+  "reward_contract_hash": "8181F0381262BB51A19F31C0B3FBF2C3E89CCF99FC801671D3B1179F9477C530",
+  "reward_contract": {
+    "version": "RIVAL2_REWARD_ACQUISITION_V1",
+    "cadence_hz": 30,
+    "zero_sum": false,
+    "goal": {
+      "score": 10.0,
+      "concede": -10.0,
+      "zero_sum": true
+    },
+    "progress": {
+      "coefficient": 0.5,
+      "progress_y_scale": 5120.0,
+      "zero_sum": true
+    },
+    "approach": {
+      "coefficient": 1.0,
+      "distance_scale": 4096.0,
+      "distance": "true 3D Euclidean car-center to ball-center distance in unreal units",
+      "before": "start of four-tick decision interval",
+      "after": "final pre-reset transition state after four physics ticks",
+      "composition": "(distance_before - distance_after) / distance_scale per agent",
+      "positive_condition": "positive only when true distance decreases",
+      "proximity_reward": false,
+      "reset_motion_excluded": true,
+      "zero_sum": false
+    },
+    "first_legitimate_touch_per_player_per_episode": {
+      "reward": 1.0,
+      "stacks_with_unique_touch_reward": true,
+      "zero_sum": false
+    },
+    "unique_touch_per_player": {
+      "reward": 0.2,
+      "continuous_contact_latched": true,
+      "zero_sum": false
+    },
+    "unique_demolition": {
+      "reward": 0.1,
+      "zero_sum": true,
+      "unchanged_from": "RIVAL2_REWARD_V1"
+    },
+    "no_touch_failure": {
+      "seconds": 15.0,
+      "reward_per_player_without_any_episode_touch": -0.5,
+      "player_with_prior_touch_penalized": false,
+      "training_episode_effect": "RIVAL2_EPISODE_V1 truncation and kickoff reset"
+    },
+    "direct_mechanic_rewards": []
+  },
+  "evaluation": {
+    "worlds": 4096,
+    "seed": 920260827,
+    "interval_updates": 30,
+    "same_short_episode_lifecycle_as_training": true,
+    "stochastic_current_policy_self_play": true
+  },
+  "gate": {
+    "no_touch_fraction_maximum": 0.01,
+    "required_consecutive_evaluations": 2,
+    "sample_cap": null
+  },
+  "nexto_training": false,
+  "five_minute_matches": false
+}

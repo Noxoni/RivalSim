@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-27T00:26:23.332628+00:00",
+  "checkpoint_label": "update_60",
+  "iteration": 60,
+  "policy_version": 60,
+  "agent_decision_samples": 503316480,
+  "evaluation_seed": 920260827,
+  "evaluation_worlds": 4096,
+  "episode_version": "RIVAL2_EPISODE_V1",
+  "reward_version": "RIVAL2_REWARD_ACQUISITION_V1",
+  "result": {
+    "completed_episodes": 4096,
+    "goal_terminated_episodes": 1574,
+    "no_touch_truncated_episodes": 116,
+    "hard_truncated_episodes": 2406,
+    "no_touch_truncated_fraction": 0.0283203125,
+    "touches_per_simulated_minute": 25.24818812164726,
+    "unique_touches": {
+      "Blue": 30304,
+      "Orange": 30775
+    },
+    "goals_per_simulated_minute": 0.6506433979513874,
+    "first_touch_latency": {
+      "contacted_episodes": 4096,
+      "mean_seconds_contacted": 2.4462971687316895,
+      "median_seconds_contacted": 2.366666793823242,
+      "fraction_with_contact_within_seconds": {
+        "3": 0.981689453125,
+        "5": 0.984375,
+        "10": 0.99951171875,
+        "15": 1.0
+      }
+    },
+    "controller_mean": {
+      "Blue": {
+        "throttle": 0.12415122575547667,
+        "steer": -0.01791091006453065,
+        "pitch": -0.06824866947782503,
+        "yaw": -0.043355423528994734,
+        "roll": -0.04163891200321217,
+        "jump": 0.5160836282991756,
+        "boost": 0.559728085624414,
+        "handbrake": 0.5651900729803634
+      },
+      "Orange": {
+        "throttle": 0.12348726466844333,
+        "steer": -0.017313913470588138,
+        "pitch": -0.06687026797863616,
+        "yaw": -0.044214029399176034,
+        "roll": -0.04192670454576252,
+        "jump": 0.5170995983657212,
+        "boost": 0.558728879982565,
+        "handbrake": 0.5659442424420577
+      }
+    },
+    "controller_mean_absolute": {
+      "Blue": {
+        "throttle": 0.5300697344899301,
+        "steer": 0.49621140909422823,
+        "pitch": 0.5300556512838278,
+        "yaw": 0.5332488962971025,
+        "roll": 0.5149136219652664,
+        "jump": 0.5160836282991756,
+        "boost": 0.559728085624414,
+        "handbrake": 0.5651900729803634
+      },
+      "Orange": {
+        "throttle": 0.5297873844442165,
+        "steer": 0.49615115766487605,
+        "pitch": 0.5297830765374677,
+        "yaw": 0.5333005932492164,
+        "roll": 0.5152464729298657,
+        "jump": 0.5170995983657212,
+        "boost": 0.558728879982565,
+        "handbrake": 0.5659442424420577
+      }
+    },
+    "movement": {
+      "Blue": {
+        "average_boost_level": 7.169224877305999,
+        "net_observed_boost_consumed": 515589.6290672198,
+        "boost_starved_fraction": 0.8178173224274244,
+        "mean_speed_uu_per_s": 847.0574879307484,
+        "maximum_speed_uu_per_s": 2300.00048828125,
+        "supersonic_fraction": 0.014991299722881763,
+        "grounded_fraction": 0.1040728595676294,
+        "airborne_fraction": 0.8959271404323705,
+        "mean_car_ball_distance_uu": 1113.9687798012228,
+        "jump_rising_edges": 1102848,
+        "actual_flip_onsets": 104971,
+        "flips_per_simulated_minute": 43.391796776591534
+      },
+      "Orange": {
+        "average_boost_level": 7.098840643340569,
+        "net_observed_boost_consumed": 513364.90372774005,
+        "boost_starved_fraction": 0.8182187500215297,
+        "mean_speed_uu_per_s": 847.9389277619175,
+        "maximum_speed_uu_per_s": 2300.00048828125,
+        "supersonic_fraction": 0.014639706103559592,
+        "grounded_fraction": 0.1037026643263836,
+        "airborne_fraction": 0.8962973356736164,
+        "mean_car_ball_distance_uu": 1108.0606752576505,
+        "jump_rising_edges": 1102386,
+        "actual_flip_onsets": 105060,
+        "flips_per_simulated_minute": 43.42858665106274
+      }
+    },
+    "simulated_minutes": 2419.143888888889
+  },
+  "checks": {
+    "all_worlds_completed_once": true,
+    "done_partition_exact": true,
+    "no_five_minute_match_lifecycle": true,
+    "finite_summary": true
+  },
+  "wall_seconds": 25.260869599878788,
+  "verdict": "PASS_GREEN",
+  "acquisition_gate": {
+    "threshold": 0.01,
+    "passed": false,
+    "consecutive_passing_evaluations": 0
+  }
+}
