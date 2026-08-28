@@ -6,6 +6,15 @@
       "boundaries": [
         {
           "direction": "min",
+          "feature": "terminal_musty",
+          "negative_edge": 0.0,
+          "positive_edge": 1.0,
+          "runtime_threshold": "discrete_terminal_musty",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
           "feature": "ordered_orientation",
           "negative_edge": 0.0,
           "positive_edge": 1.0,
@@ -16,65 +25,75 @@
         {
           "direction": "min",
           "feature": "nose_up_peak",
-          "negative_edge": 0.269364595413208,
-          "positive_edge": 0.5619936585426331,
+          "negative_edge": 2.9802322387695312e-08,
+          "positive_edge": 0.5313705205917358,
           "runtime_threshold": "breezi_nose_up_min",
-          "separation_margin": 0.29262906312942505,
-          "threshold": 0.41567912697792053
+          "separation_margin": 0.5313704907894135,
+          "threshold": 0.2656852751970291
         },
         {
           "direction": "min",
           "feature": "inverted_depth",
-          "negative_edge": -0.7465200424194336,
-          "positive_edge": 0.7357743978500366,
+          "negative_edge": 0.7457908391952515,
+          "positive_edge": 0.7947680950164795,
           "runtime_threshold": "breezi_inverted_depth_min",
-          "separation_margin": 1.4822944402694702,
-          "threshold": -0.005372822284698486
+          "separation_margin": 0.04897725582122803,
+          "threshold": 0.7702794671058655
         },
         {
           "direction": "min",
           "feature": "nose_down_depth",
-          "negative_edge": 0.10278607904911041,
-          "positive_edge": 0.10997986793518066,
+          "negative_edge": 2.980232238769531e-07,
+          "positive_edge": 0.13256390392780304,
           "runtime_threshold": "breezi_nose_down_depth_min",
-          "separation_margin": 0.0071937888860702515,
-          "threshold": 0.10638297349214554
+          "separation_margin": 0.13256360590457916,
+          "threshold": 0.06628210097551346
         },
         {
           "direction": "min",
           "feature": "roll_path",
-          "negative_edge": 0.0,
-          "positive_edge": 3.2957499558726946,
+          "negative_edge": 3.5719593793153757,
+          "positive_edge": 4.058905179301895,
           "runtime_threshold": "breezi_roll_path_min",
-          "separation_margin": 3.2957499558726946,
-          "threshold": 1.6478749779363473
+          "separation_margin": 0.48694579998651966,
+          "threshold": 3.8154322793086353
         },
         {
           "direction": "min",
           "feature": "yaw_path",
-          "negative_edge": 0.0,
-          "positive_edge": 1.0180899047603211,
+          "negative_edge": 1.1322581388832385,
+          "positive_edge": 1.4236070843103028,
           "runtime_threshold": "breezi_yaw_path_min",
-          "separation_margin": 1.0180899047603211,
-          "threshold": 0.5090449523801606
+          "separation_margin": 0.29134894542706435,
+          "threshold": 1.2779326115967706
         },
         {
           "direction": "min",
-          "feature": "setup_ticks_min_feature",
-          "negative_edge": 84.0,
-          "positive_edge": 86.0,
-          "runtime_threshold": "breezi_setup_ticks_min",
+          "feature": "combined_roll_yaw_ticks",
+          "negative_edge": 129.0,
+          "positive_edge": 131.0,
+          "runtime_threshold": "breezi_combined_motion_ticks_min",
           "separation_margin": 2.0,
-          "threshold": 85.0
+          "threshold": 130.0
+        },
+        {
+          "direction": "min",
+          "feature": "roll_yaw_overlap_fraction",
+          "negative_edge": 0.9705882352941176,
+          "positive_edge": 0.9924242424242424,
+          "runtime_threshold": "breezi_roll_yaw_overlap_min",
+          "separation_margin": 0.02183600713012479,
+          "threshold": 0.98150623885918
         },
         {
           "direction": "max",
-          "feature": "setup_ticks_max_feature",
-          "negative_edge": 96.0,
-          "positive_edge": 90.0,
-          "runtime_threshold": "breezi_setup_ticks_max",
-          "separation_margin": 6.0,
-          "threshold": 93.0
+          "feature": "control_max_distance",
+          "negative_edge": 566.1350708007812,
+          "negative_scope": "ball_control_lost_or_terminal_only_reacquisition",
+          "positive_edge": 223.48085021972656,
+          "runtime_threshold": "breezi_control_distance_max",
+          "separation_margin": 342.6542205810547,
+          "threshold": 394.8079605102539
         }
       ],
       "boundary_candidates": [
@@ -85,8 +104,9 @@
         "nose_down_depth",
         "roll_path",
         "yaw_path",
-        "setup_ticks_min_feature",
-        "setup_ticks_max_feature"
+        "combined_roll_yaw_ticks",
+        "roll_yaw_overlap_fraction",
+        "control_max_distance"
       ],
       "case_ids": {
         "near_miss": [
@@ -170,59 +190,77 @@
       },
       "derivation_errors": [],
       "derivation_extrema": {
+        "combined_roll_yaw_ticks": {
+          "negative_max": 137.0,
+          "negative_min": 0.0,
+          "positive_max": 137.0,
+          "positive_min": 131.0
+        },
+        "control_max_distance": {
+          "negative_max": 690.83935546875,
+          "negative_min": 150.0,
+          "positive_max": 223.48085021972656,
+          "positive_min": 216.69627380371094
+        },
+        "control_max_relative_speed": {
+          "negative_max": 645.6005249023438,
+          "negative_min": 0.0,
+          "positive_max": 18.420608520507812,
+          "positive_min": 16.24384117126465
+        },
         "inverted_depth": {
-          "negative_max": 0.9999015927314758,
-          "negative_min": -0.9630385041236877,
-          "positive_max": 0.8268542885780334,
-          "positive_min": 0.7357743978500366
+          "negative_max": 0.9999016523361206,
+          "negative_min": -1.0,
+          "positive_max": 0.8469991087913513,
+          "positive_min": 0.7947680950164795
         },
         "nose_down_depth": {
-          "negative_max": 0.17147989571094513,
+          "negative_max": 0.5619938373565674,
           "negative_min": -0.0,
-          "positive_max": 0.2576139271259308,
-          "positive_min": 0.10997986793518066
+          "positive_max": 0.283818781375885,
+          "positive_min": 0.13256390392780304
         },
         "nose_up_peak": {
-          "negative_max": 0.6641595363616943,
+          "negative_max": 0.6661490797996521,
           "negative_min": 0.0,
-          "positive_max": 0.6771969795227051,
-          "positive_min": 0.5619936585426331
+          "positive_max": 0.6067715883255005,
+          "positive_min": 0.5313705205917358
         },
         "ordered_orientation": {
-          "negative_max": 0.0,
+          "negative_max": 1.0,
           "negative_min": 0.0,
           "positive_max": 1.0,
           "positive_min": 1.0
         },
         "roll_path": {
-          "negative_max": 3.8927928927044064,
+          "negative_max": 4.352989202986164,
           "negative_min": 0.0,
-          "positive_max": 3.382978370289008,
-          "positive_min": 3.2957499558726946
+          "positive_max": 4.362737920880321,
+          "positive_min": 4.058905179301895
         },
-        "setup_ticks_max_feature": {
-          "negative_max": 96.0,
+        "roll_yaw_overlap_fraction": {
+          "negative_max": 0.9927536231884058,
           "negative_min": 0.0,
-          "positive_max": 90.0,
-          "positive_min": 86.0
-        },
-        "setup_ticks_min_feature": {
-          "negative_max": 96.0,
-          "negative_min": 0.0,
-          "positive_max": 90.0,
-          "positive_min": 86.0
+          "positive_max": 0.9927536231884058,
+          "positive_min": 0.9924242424242424
         },
         "terminal_musty": {
           "negative_max": 1.0,
-          "negative_min": 1.0,
+          "negative_min": 0.0,
           "positive_max": 1.0,
           "positive_min": 1.0
         },
+        "terminal_sweep_alignment": {
+          "negative_max": 0.9460734724998474,
+          "negative_min": -1.0,
+          "positive_max": 0.7086914777755737,
+          "positive_min": 0.6398274898529053
+        },
         "yaw_path": {
-          "negative_max": 2.7622120403995107,
+          "negative_max": 1.7490441666295133,
           "negative_min": 0.0,
-          "positive_max": 1.3413190399607027,
-          "positive_min": 1.0180899047603211
+          "positive_max": 1.724834652710706,
+          "positive_min": 1.4236070843103028
         }
       },
       "features_considered": [
@@ -233,11 +271,14 @@
         "nose_down_depth",
         "roll_path",
         "yaw_path",
-        "setup_ticks_min_feature",
-        "setup_ticks_max_feature",
+        "combined_roll_yaw_ticks",
+        "roll_yaw_overlap_fraction",
         "nose_up_peak",
         "inverted_depth",
-        "nose_down_depth"
+        "nose_down_depth",
+        "control_max_distance",
+        "control_max_relative_speed",
+        "terminal_sweep_alignment"
       ],
       "heldout_false_negative_ids": [],
       "heldout_false_positive_ids": [],
@@ -708,36 +749,67 @@
         },
         {
           "direction": "min",
-          "feature": "rotational_normal_speed",
-          "negative_edge": 0.0,
-          "positive_edge": 172.27210998535156,
-          "runtime_threshold": "musty_rotational_normal_speed_min",
-          "separation_margin": 172.27210998535156,
-          "threshold": 86.13605499267578
+          "feature": "contact_age_ticks",
+          "negative_edge": 1.0,
+          "positive_edge": 8.0,
+          "runtime_threshold": "musty_contact_age_ticks_min",
+          "separation_margin": 7.0,
+          "threshold": 4.5
+        },
+        {
+          "direction": "min",
+          "feature": "rotational_closing_speed",
+          "negative_edge": 148.6537322998047,
+          "positive_edge": 160.30506896972656,
+          "runtime_threshold": "musty_rotational_closing_speed_min",
+          "separation_margin": 11.651336669921875,
+          "threshold": 154.47940063476562
         },
         {
           "direction": "min",
           "feature": "rotational_fraction",
-          "negative_edge": 0.0,
-          "positive_edge": 0.5985351032227664,
+          "negative_edge": 0.255020552584769,
+          "positive_edge": 0.27301064670404135,
           "runtime_threshold": "musty_rotational_fraction_min",
-          "separation_margin": 0.5985351032227664,
-          "threshold": 0.2992675516113832
+          "separation_margin": 0.017990094119272326,
+          "threshold": 0.2640155996444052
+        },
+        {
+          "direction": "min",
+          "feature": "sweep_closure",
+          "negative_edge": 13.450054168701172,
+          "positive_edge": 13.525093078613281,
+          "runtime_threshold": "musty_sweep_closure_min",
+          "separation_margin": 0.07503890991210938,
+          "threshold": 13.487573623657227
+        },
+        {
+          "direction": "min",
+          "feature": "sweep_path_length",
+          "negative_edge": 22.801904678344727,
+          "positive_edge": 23.23262596130371,
+          "runtime_threshold": "musty_sweep_path_length_min",
+          "separation_margin": 0.4307212829589844,
+          "threshold": 23.01726531982422
         },
         {
           "direction": "min",
           "feature": "ball_delta_v",
-          "negative_edge": 274.5767517089844,
-          "positive_edge": 429.6194763183594,
+          "negative_edge": 302.485595703125,
+          "positive_edge": 406.1376037597656,
           "runtime_threshold": "musty_ball_delta_v_min",
-          "separation_margin": 155.042724609375,
-          "threshold": 352.0981140136719
+          "separation_margin": 103.65200805664062,
+          "threshold": 354.3115997314453
         }
       ],
       "boundary_candidates": [
+        "legitimate_contact",
         "actual_backward_dodge",
-        "rotational_normal_speed",
+        "contact_age_ticks",
+        "rotational_closing_speed",
         "rotational_fraction",
+        "sweep_closure",
+        "sweep_path_length",
         "ball_delta_v"
       ],
       "case_ids": {
@@ -829,29 +901,141 @@
           "positive_min": 1.0
         },
         "ball_delta_v": {
-          "negative_max": 274.5767517089844,
-          "negative_min": 195.01649475097656,
-          "positive_max": 434.6380615234375,
-          "positive_min": 429.6194763183594
+          "negative_max": 1308.3072509765625,
+          "negative_min": 173.72994995117188,
+          "positive_max": 499.35650634765625,
+          "positive_min": 406.1376037597656
+        },
+        "ball_local_x": {
+          "negative_max": 132.69140625,
+          "negative_min": -136.5250701904297,
+          "positive_max": 104.84452819824219,
+          "positive_min": 57.048057556152344
+        },
+        "ball_local_y": {
+          "negative_max": 121.30824279785156,
+          "negative_min": -33.545257568359375,
+          "positive_max": 10.28393268585205,
+          "positive_min": -6.7009124755859375
+        },
+        "ball_local_z": {
+          "negative_max": 132.92298889160156,
+          "negative_min": -89.13684844970703,
+          "positive_max": 132.3648223876953,
+          "positive_min": 121.75452423095703
+        },
+        "contact_age_ticks": {
+          "negative_max": 66.0,
+          "negative_min": 1.0,
+          "positive_max": 24.0,
+          "positive_min": 8.0
+        },
+        "contact_local_x": {
+          "negative_max": 73.37409210205078,
+          "negative_min": -46.30803680419922,
+          "positive_max": 72.83304595947266,
+          "positive_min": 57.048030853271484
+        },
+        "contact_local_y": {
+          "negative_max": 42.975433349609375,
+          "negative_min": -33.545257568359375,
+          "positive_max": 10.283956527709961,
+          "positive_min": -6.700909614562988
+        },
+        "contact_local_z": {
+          "negative_max": 40.017616271972656,
+          "negative_min": 1.503143310546875,
+          "positive_max": 40.017547607421875,
+          "positive_min": 39.8847541809082
+        },
+        "legitimate_contact": {
+          "negative_max": 1.0,
+          "negative_min": 1.0,
+          "positive_max": 1.0,
+          "positive_min": 1.0
+        },
+        "precontact_gap_closure": {
+          "negative_max": 199.45531463623047,
+          "negative_min": 0.0,
+          "positive_max": 89.30150604248047,
+          "positive_min": 39.80060577392578
+        },
+        "rotational_closing_speed": {
+          "negative_max": 240.687744140625,
+          "negative_min": -44.84600830078125,
+          "positive_max": 237.5439453125,
+          "positive_min": 160.30506896972656
         },
         "rotational_fraction": {
-          "negative_max": 0.0,
+          "negative_max": 0.3637203631629198,
           "negative_min": 0.0,
-          "positive_max": 0.9661964916979019,
-          "positive_min": 0.5985351032227664
+          "positive_max": 1.0,
+          "positive_min": 0.27301064670404135
         },
-        "rotational_normal_speed": {
-          "negative_max": 0.0,
+        "rotational_impulse_alignment": {
+          "negative_max": 0.8387570977210999,
+          "negative_min": -0.3212970793247223,
+          "positive_max": 0.8701946139335632,
+          "positive_min": 0.1654084324836731
+        },
+        "sweep_alignment": {
+          "negative_max": 0.9471001029014587,
+          "negative_min": -0.7141085863113403,
+          "positive_max": 0.721747636795044,
+          "positive_min": 0.5607442855834961
+        },
+        "sweep_closure": {
+          "negative_max": 28.862985610961914,
+          "negative_min": -3.0572257041931152,
+          "positive_max": 28.477296829223633,
+          "positive_min": 13.525093078613281
+        },
+        "sweep_monotonic_fraction": {
+          "negative_max": 1.0,
           "negative_min": 0.0,
-          "positive_max": 393.7039794921875,
-          "positive_min": 172.27210998535156
+          "positive_max": 1.0,
+          "positive_min": 1.0
+        },
+        "sweep_path_length": {
+          "negative_max": 40.796966552734375,
+          "negative_min": 0.0,
+          "positive_max": 40.774864196777344,
+          "positive_min": 23.23262596130371
+        },
+        "translation_closing_speed": {
+          "negative_max": 1589.5960693359375,
+          "negative_min": -177.1001739501953,
+          "positive_max": 584.1867065429688,
+          "positive_min": -266.53350830078125
+        },
+        "translation_impulse_alignment": {
+          "negative_max": 0.9780203104019165,
+          "negative_min": -0.5579260587692261,
+          "positive_max": 0.9862832427024841,
+          "positive_min": -0.582038938999176
         }
       },
       "features_considered": [
+        "legitimate_contact",
         "actual_backward_dodge",
-        "rotational_normal_speed",
+        "contact_age_ticks",
+        "rotational_closing_speed",
         "rotational_fraction",
-        "ball_delta_v"
+        "sweep_closure",
+        "sweep_path_length",
+        "ball_delta_v",
+        "translation_closing_speed",
+        "sweep_alignment",
+        "sweep_monotonic_fraction",
+        "precontact_gap_closure",
+        "contact_local_x",
+        "contact_local_y",
+        "contact_local_z",
+        "ball_local_x",
+        "ball_local_y",
+        "ball_local_z",
+        "rotational_impulse_alignment",
+        "translation_impulse_alignment"
       ],
       "heldout_false_negative_ids": [],
       "heldout_false_positive_ids": [],
@@ -1414,36 +1598,76 @@
       "boundaries": [
         {
           "direction": "min",
-          "feature": "incoming_speed",
+          "feature": "legitimate_contact",
           "negative_edge": 0.0,
-          "positive_edge": 908.4793701171875,
+          "positive_edge": 1.0,
+          "runtime_threshold": "redirect_legitimate_contact_min",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
+          "feature": "incoming_speed",
+          "negative_edge": 452.2613830566406,
+          "positive_edge": 577.3651123046875,
           "runtime_threshold": "redirect_incoming_speed_min",
-          "separation_margin": 908.4793701171875,
-          "threshold": 454.23968505859375
+          "separation_margin": 125.10372924804688,
+          "threshold": 514.8132476806641
         },
         {
           "direction": "min",
           "feature": "outgoing_speed",
-          "negative_edge": 0.0,
-          "positive_edge": 335.44110107421875,
+          "negative_edge": 243.01828002929688,
+          "positive_edge": 255.2158660888672,
           "runtime_threshold": "redirect_outgoing_speed_min",
-          "separation_margin": 335.44110107421875,
-          "threshold": 167.72055053710938
+          "separation_margin": 12.197586059570312,
+          "threshold": 249.11707305908203
         },
         {
           "direction": "min",
           "feature": "direction_change",
-          "negative_edge": 0.0,
-          "positive_edge": 1.9306784187516377,
+          "negative_edge": 0.3390569455371212,
+          "positive_edge": 1.5390775525395346,
           "runtime_threshold": "redirect_angle_min_radians",
-          "separation_margin": 1.9306784187516377,
-          "threshold": 0.9653392093758189
+          "separation_margin": 1.2000206070024135,
+          "threshold": 0.9390672490383278
+        },
+        {
+          "direction": "min",
+          "feature": "approach_cross_fraction",
+          "negative_edge": 0.3159601092338562,
+          "positive_edge": 0.42969998717308044,
+          "runtime_threshold": "redirect_approach_cross_fraction_min",
+          "separation_margin": 0.11373987793922424,
+          "threshold": 0.3728300482034683
+        },
+        {
+          "direction": "min",
+          "feature": "contact_normal_cross_fraction",
+          "negative_edge": 0.05266779661178589,
+          "positive_edge": 0.32132190465927124,
+          "runtime_threshold": "redirect_contact_normal_cross_fraction_min",
+          "separation_margin": 0.26865410804748535,
+          "threshold": 0.18699485063552856
+        },
+        {
+          "direction": "min",
+          "feature": "speed_retention",
+          "negative_edge": 0.3133827243943221,
+          "positive_edge": 0.3646650000828495,
+          "runtime_threshold": "redirect_speed_retention_min",
+          "separation_margin": 0.051282275688527446,
+          "threshold": 0.3390238622385858
         }
       ],
       "boundary_candidates": [
+        "legitimate_contact",
         "incoming_speed",
         "outgoing_speed",
-        "direction_change"
+        "direction_change",
+        "approach_cross_fraction",
+        "contact_normal_cross_fraction",
+        "speed_retention"
       ],
       "case_ids": {
         "near_miss": [
@@ -1527,29 +1751,71 @@
       },
       "derivation_errors": [],
       "derivation_extrema": {
-        "direction_change": {
-          "negative_max": 0.0,
+        "approach_cross_fraction": {
+          "negative_max": 0.999420166015625,
           "negative_min": 0.0,
-          "positive_max": 2.381258808825296,
-          "positive_min": 1.9306784187516377
+          "positive_max": 0.8256446123123169,
+          "positive_min": 0.42969998717308044
+        },
+        "ball_delta_v": {
+          "negative_max": 1154.1356201171875,
+          "negative_min": 0.0,
+          "positive_max": 700.0482788085938,
+          "positive_min": 444.0085144042969
+        },
+        "contact_height": {
+          "negative_max": 118.533935546875,
+          "negative_min": -999.0,
+          "positive_max": 122.97909545898438,
+          "positive_min": 106.42068481445312
+        },
+        "contact_normal_cross_fraction": {
+          "negative_max": 1.0,
+          "negative_min": 0.0,
+          "positive_max": 0.7946193814277649,
+          "positive_min": 0.32132190465927124
+        },
+        "direction_change": {
+          "negative_max": 2.4856092915127457,
+          "negative_min": 0.0,
+          "positive_max": 2.017351695668082,
+          "positive_min": 1.5390775525395346
         },
         "incoming_speed": {
-          "negative_max": 0.0,
+          "negative_max": 1148.365966796875,
           "negative_min": 0.0,
-          "positive_max": 1145.739013671875,
-          "positive_min": 908.4793701171875
+          "positive_max": 983.1201782226562,
+          "positive_min": 577.3651123046875
+        },
+        "legitimate_contact": {
+          "negative_max": 1.0,
+          "negative_min": 0.0,
+          "positive_max": 1.0,
+          "positive_min": 1.0
         },
         "outgoing_speed": {
-          "negative_max": 0.0,
+          "negative_max": 1367.4049072265625,
           "negative_min": 0.0,
-          "positive_max": 494.5763854980469,
-          "positive_min": 335.44110107421875
+          "positive_max": 538.8108520507812,
+          "positive_min": 255.2158660888672
+        },
+        "speed_retention": {
+          "negative_max": 3.471229584646314,
+          "negative_min": 0.0,
+          "positive_max": 0.7696656740420881,
+          "positive_min": 0.3646650000828495
         }
       },
       "features_considered": [
+        "legitimate_contact",
         "incoming_speed",
         "outgoing_speed",
-        "direction_change"
+        "direction_change",
+        "approach_cross_fraction",
+        "contact_normal_cross_fraction",
+        "speed_retention",
+        "contact_height",
+        "ball_delta_v"
       ],
       "heldout_false_negative_ids": [],
       "heldout_false_positive_ids": [],
@@ -1765,6 +2031,14 @@
     }
   },
   "format": "RIVAL2_MECHANICS_THRESHOLDS_V1",
+  "frozen_families": [
+    "speedflip",
+    "half_flip",
+    "possession",
+    "ground_carry",
+    "pinch",
+    "pogo"
+  ],
   "handoff_source_commit": "1da8557f32a94e6a8e96d1acbb0103656e203e27",
   "physics_hz": 120,
   "policy_hz": 30,
@@ -1805,7 +2079,29 @@
     "breezi_setup_ticks_max",
     "breezi_nose_up_min",
     "breezi_inverted_depth_min",
-    "breezi_nose_down_depth_min"
+    "breezi_nose_down_depth_min",
+    "musty_legitimate_contact_min",
+    "musty_contact_age_ticks_min",
+    "musty_rotational_closing_speed_min",
+    "musty_sweep_closure_min",
+    "musty_sweep_path_length_min",
+    "breezi_combined_motion_ticks_min",
+    "breezi_roll_yaw_overlap_min",
+    "breezi_control_distance_max",
+    "breezi_control_relative_speed_max",
+    "redirect_legitimate_contact_min",
+    "redirect_world_height_min",
+    "redirect_approach_cross_fraction_min",
+    "redirect_contact_normal_cross_fraction_min",
+    "redirect_speed_retention_min"
   ],
-  "source_head": "b07fece6ebc21d3f752dc7f8213880c4b7f3c0b1"
+  "source_head": "0124cd7f29278702158c9cbba9c741c11a29f111",
+  "targeted_correction_baseline_commit": "f49768368377dcb5aa0cc67f3a08f79bd68538a3",
+  "targeted_correction_families": [
+    "musty",
+    "breezi",
+    "redirect"
+  ],
+  "targeted_correction_seed": 2026082707,
+  "targeted_heldout_scenario_offset": 509
 }

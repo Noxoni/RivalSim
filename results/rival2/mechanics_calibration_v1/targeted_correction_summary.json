@@ -1,0 +1,414 @@
+{
+  "accepted_baseline_commit": "f49768368377dcb5aa0cc67f3a08f79bd68538a3",
+  "contract_changes": {
+    "action": false,
+    "lifecycle": false,
+    "observation": false,
+    "physics": false,
+    "policy": false,
+    "ppo": false
+  },
+  "format": "RIVAL2_MECHANICS_TARGETED_CORRECTION_V1",
+  "frozen_families": {
+    "ground_carry": {
+      "case_rows_canonical_sha256": "0E3E81200DA418AFBB8BBF34FDBD2276552B04D59CA1905565228BBCC74F7711",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "3B6489459FC0C0B003AB4CE698FF50CB15FB3F204A5182B42BC5D203F14F226D",
+      "threshold_record_exact": true
+    },
+    "half_flip": {
+      "case_rows_canonical_sha256": "FA17FFA46C6AB53F3707E1F986AA8CF17E95DB117E4F9BFB16DA8069D8854129",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "F64D61BEBBB9819B7117AA26854DB732D1471D34F7521558D30B0464FAF50A7E",
+      "threshold_record_exact": true
+    },
+    "pinch": {
+      "case_rows_canonical_sha256": "DDAA8EEADA6B73A95989057EB33E0139F88287D02E8A59EE59E0E48CEB270962",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "192650606186CD9FC9698903285A037546F269023E3C225FF7498FBE864F7A49",
+      "threshold_record_exact": true
+    },
+    "pogo": {
+      "case_rows_canonical_sha256": "D7E76BDB2D6D8715429031701A14449A245A2FB9591623E04B531CAE30207D27",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "50BB9FFB4F0154107849280C2665EE03D4F30464DCA1995A3F681C6472B47147",
+      "threshold_record_exact": true
+    },
+    "possession": {
+      "case_rows_canonical_sha256": "FDF4CBB4D7868D35D3F0FB4B69B73307A910196E4964248DD020F6B57275BE08",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "2612DD47F5AD4FB9B27BB8150681360AA2D0055C092ED5B9544F7B85EF034184",
+      "threshold_record_exact": true
+    },
+    "speedflip": {
+      "case_rows_canonical_sha256": "EE4C5CE5B745577372EA568FCC0A99E6C6015CFF27831F965E39367896BF18F1",
+      "case_rows_exact": true,
+      "threshold_record_canonical_sha256": "4A24977A300ACBCCD4D3F2E477C07853D325142CFC7A0E13CEB17F7C82CC3EBA",
+      "threshold_record_exact": true
+    }
+  },
+  "heldout_retuning": false,
+  "heldout_scenario_variant": 509,
+  "implementation_source_head": "0124cd7f29278702158c9cbba9c741c11a29f111",
+  "mechanics_reward_contribution_sum": 0.0,
+  "reward_enabled": false,
+  "shadow_episodes": 256,
+  "shadow_pathology_checks": {
+    "impossible_state_count_zero": true,
+    "mechanics_reward_exactly_zero": true,
+    "not_ready_families_emit_zero": true,
+    "not_ready_nonzero_events": {}
+  },
+  "target_calibration_seed": 2026082707,
+  "target_families": [
+    "musty",
+    "breezi",
+    "redirect"
+  ],
+  "targets": {
+    "breezi": {
+      "boundaries": [
+        {
+          "direction": "min",
+          "feature": "terminal_musty",
+          "negative_edge": 0.0,
+          "positive_edge": 1.0,
+          "runtime_threshold": "discrete_terminal_musty",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
+          "feature": "ordered_orientation",
+          "negative_edge": 0.0,
+          "positive_edge": 1.0,
+          "runtime_threshold": "discrete_ordered_orientation",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
+          "feature": "nose_up_peak",
+          "negative_edge": 2.9802322387695312e-08,
+          "positive_edge": 0.5313705205917358,
+          "runtime_threshold": "breezi_nose_up_min",
+          "separation_margin": 0.5313704907894135,
+          "threshold": 0.2656852751970291
+        },
+        {
+          "direction": "min",
+          "feature": "inverted_depth",
+          "negative_edge": 0.7457908391952515,
+          "positive_edge": 0.7947680950164795,
+          "runtime_threshold": "breezi_inverted_depth_min",
+          "separation_margin": 0.04897725582122803,
+          "threshold": 0.7702794671058655
+        },
+        {
+          "direction": "min",
+          "feature": "nose_down_depth",
+          "negative_edge": 2.980232238769531e-07,
+          "positive_edge": 0.13256390392780304,
+          "runtime_threshold": "breezi_nose_down_depth_min",
+          "separation_margin": 0.13256360590457916,
+          "threshold": 0.06628210097551346
+        },
+        {
+          "direction": "min",
+          "feature": "roll_path",
+          "negative_edge": 3.5719593793153757,
+          "positive_edge": 4.058905179301895,
+          "runtime_threshold": "breezi_roll_path_min",
+          "separation_margin": 0.48694579998651966,
+          "threshold": 3.8154322793086353
+        },
+        {
+          "direction": "min",
+          "feature": "yaw_path",
+          "negative_edge": 1.1322581388832385,
+          "positive_edge": 1.4236070843103028,
+          "runtime_threshold": "breezi_yaw_path_min",
+          "separation_margin": 0.29134894542706435,
+          "threshold": 1.2779326115967706
+        },
+        {
+          "direction": "min",
+          "feature": "combined_roll_yaw_ticks",
+          "negative_edge": 129.0,
+          "positive_edge": 131.0,
+          "runtime_threshold": "breezi_combined_motion_ticks_min",
+          "separation_margin": 2.0,
+          "threshold": 130.0
+        },
+        {
+          "direction": "min",
+          "feature": "roll_yaw_overlap_fraction",
+          "negative_edge": 0.9705882352941176,
+          "positive_edge": 0.9924242424242424,
+          "runtime_threshold": "breezi_roll_yaw_overlap_min",
+          "separation_margin": 0.02183600713012479,
+          "threshold": 0.98150623885918
+        },
+        {
+          "direction": "max",
+          "feature": "control_max_distance",
+          "negative_edge": 566.1350708007812,
+          "negative_scope": "ball_control_lost_or_terminal_only_reacquisition",
+          "positive_edge": 223.48085021972656,
+          "runtime_threshold": "breezi_control_distance_max",
+          "separation_margin": 342.6542205810547,
+          "threshold": 394.8079605102539
+        }
+      ],
+      "confusion": {
+        "derivation": {
+          "cases": 48,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 32,
+          "true_positive": 16
+        },
+        "heldout": {
+          "cases": 24,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 16,
+          "true_positive": 8
+        }
+      },
+      "hard_negative_counts": {
+        "ball_control_lost_during_correct_setup": 4,
+        "ball_reacquired_only_at_terminal_contact": 4,
+        "ordinary_musty_without_breezi_setup": 4,
+        "roll_only_then_musty": 4,
+        "wrong_orientation_order_then_musty": 4,
+        "yaw_only_then_musty": 4
+      },
+      "intended_positive_physics_failures": [],
+      "legacy_replay": {
+        "baseline_bounded_evidence_count": 0,
+        "baseline_total_events": 0,
+        "bounded_exact_identity_retained": 0,
+        "corrected_bounded_evidence_count": 0,
+        "corrected_total_events": 0
+      },
+      "shadow": {
+        "count": 0,
+        "events_per_minute": 0.0
+      },
+      "status": "CALIBRATED"
+    },
+    "musty": {
+      "boundaries": [
+        {
+          "direction": "min",
+          "feature": "actual_backward_dodge",
+          "negative_edge": 0.0,
+          "positive_edge": 1.0,
+          "runtime_threshold": "discrete_backward_dodge",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
+          "feature": "contact_age_ticks",
+          "negative_edge": 1.0,
+          "positive_edge": 8.0,
+          "runtime_threshold": "musty_contact_age_ticks_min",
+          "separation_margin": 7.0,
+          "threshold": 4.5
+        },
+        {
+          "direction": "min",
+          "feature": "rotational_closing_speed",
+          "negative_edge": 148.6537322998047,
+          "positive_edge": 160.30506896972656,
+          "runtime_threshold": "musty_rotational_closing_speed_min",
+          "separation_margin": 11.651336669921875,
+          "threshold": 154.47940063476562
+        },
+        {
+          "direction": "min",
+          "feature": "rotational_fraction",
+          "negative_edge": 0.255020552584769,
+          "positive_edge": 0.27301064670404135,
+          "runtime_threshold": "musty_rotational_fraction_min",
+          "separation_margin": 0.017990094119272326,
+          "threshold": 0.2640155996444052
+        },
+        {
+          "direction": "min",
+          "feature": "sweep_closure",
+          "negative_edge": 13.450054168701172,
+          "positive_edge": 13.525093078613281,
+          "runtime_threshold": "musty_sweep_closure_min",
+          "separation_margin": 0.07503890991210938,
+          "threshold": 13.487573623657227
+        },
+        {
+          "direction": "min",
+          "feature": "sweep_path_length",
+          "negative_edge": 22.801904678344727,
+          "positive_edge": 23.23262596130371,
+          "runtime_threshold": "musty_sweep_path_length_min",
+          "separation_margin": 0.4307212829589844,
+          "threshold": 23.01726531982422
+        },
+        {
+          "direction": "min",
+          "feature": "ball_delta_v",
+          "negative_edge": 302.485595703125,
+          "positive_edge": 406.1376037597656,
+          "runtime_threshold": "musty_ball_delta_v_min",
+          "separation_margin": 103.65200805664062,
+          "threshold": 354.3115997314453
+        }
+      ],
+      "confusion": {
+        "derivation": {
+          "cases": 48,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 32,
+          "true_positive": 16
+        },
+        "heldout": {
+          "cases": 24,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 16,
+          "true_positive": 8
+        }
+      },
+      "hard_negative_counts": {
+        "high_delta_v_head_on_backflip_hit": 4,
+        "lateral_loose_ball_backflip_hit": 4,
+        "pre_scoop_contact": 4,
+        "roof_slap_from_incoming_ball": 4,
+        "rotated_front_clear": 4,
+        "rotated_translation_dominated_rear_bonk": 4
+      },
+      "intended_positive_physics_failures": [],
+      "legacy_replay": {
+        "baseline_bounded_evidence_count": 14,
+        "baseline_total_events": 15,
+        "bounded_exact_identity_retained": 0,
+        "corrected_bounded_evidence_count": 0,
+        "corrected_total_events": 0
+      },
+      "shadow": {
+        "count": 0,
+        "events_per_minute": 0.0
+      },
+      "status": "CALIBRATED"
+    },
+    "redirect": {
+      "boundaries": [
+        {
+          "direction": "min",
+          "feature": "legitimate_contact",
+          "negative_edge": 0.0,
+          "positive_edge": 1.0,
+          "runtime_threshold": "redirect_legitimate_contact_min",
+          "separation_margin": 1.0,
+          "threshold": 0.5
+        },
+        {
+          "direction": "min",
+          "feature": "incoming_speed",
+          "negative_edge": 452.2613830566406,
+          "positive_edge": 577.3651123046875,
+          "runtime_threshold": "redirect_incoming_speed_min",
+          "separation_margin": 125.10372924804688,
+          "threshold": 514.8132476806641
+        },
+        {
+          "direction": "min",
+          "feature": "outgoing_speed",
+          "negative_edge": 243.01828002929688,
+          "positive_edge": 255.2158660888672,
+          "runtime_threshold": "redirect_outgoing_speed_min",
+          "separation_margin": 12.197586059570312,
+          "threshold": 249.11707305908203
+        },
+        {
+          "direction": "min",
+          "feature": "direction_change",
+          "negative_edge": 0.3390569455371212,
+          "positive_edge": 1.5390775525395346,
+          "runtime_threshold": "redirect_angle_min_radians",
+          "separation_margin": 1.2000206070024135,
+          "threshold": 0.9390672490383278
+        },
+        {
+          "direction": "min",
+          "feature": "approach_cross_fraction",
+          "negative_edge": 0.3159601092338562,
+          "positive_edge": 0.42969998717308044,
+          "runtime_threshold": "redirect_approach_cross_fraction_min",
+          "separation_margin": 0.11373987793922424,
+          "threshold": 0.3728300482034683
+        },
+        {
+          "direction": "min",
+          "feature": "contact_normal_cross_fraction",
+          "negative_edge": 0.05266779661178589,
+          "positive_edge": 0.32132190465927124,
+          "runtime_threshold": "redirect_contact_normal_cross_fraction_min",
+          "separation_margin": 0.26865410804748535,
+          "threshold": 0.18699485063552856
+        },
+        {
+          "direction": "min",
+          "feature": "speed_retention",
+          "negative_edge": 0.3133827243943221,
+          "positive_edge": 0.3646650000828495,
+          "runtime_threshold": "redirect_speed_retention_min",
+          "separation_margin": 0.051282275688527446,
+          "threshold": 0.3390238622385858
+        }
+      ],
+      "confusion": {
+        "derivation": {
+          "cases": 48,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 32,
+          "true_positive": 16
+        },
+        "heldout": {
+          "cases": 24,
+          "false_negative": 0,
+          "false_positive": 0,
+          "true_negative": 16,
+          "true_positive": 8
+        }
+      },
+      "hard_negative_counts": {
+        "dead_catch": 3,
+        "dribble_or_bounce_touch": 3,
+        "high_angle_non_transverse_clear": 3,
+        "high_speed_head_on_clear": 3,
+        "high_speed_trajectory_continuation": 3,
+        "normal_aerial_head_on_touch": 3,
+        "small_incidental_deflection": 3,
+        "strong_hit_on_slow_ball": 3
+      },
+      "intended_positive_physics_failures": [],
+      "legacy_replay": {
+        "baseline_bounded_evidence_count": 16,
+        "baseline_total_events": 83,
+        "bounded_exact_identity_retained": 6,
+        "corrected_bounded_evidence_count": 16,
+        "corrected_total_events": 84
+      },
+      "shadow": {
+        "count": 84,
+        "events_per_minute": 1.2263072094211538
+      },
+      "status": "CALIBRATED"
+    }
+  },
+  "thresholds_frozen_before_heldout": true,
+  "training_started": false
+}

@@ -1,12 +1,14 @@
 # Rival 2.0 Mechanics Calibration V1 Results
 
-Source head: `b07fece6ebc21d3f752dc7f8213880c4b7f3c0b1`
+Source head: `0124cd7f29278702158c9cbba9c741c11a29f111`
 Handoff source: `1da8557f32a94e6a8e96d1acbb0103656e203e27`
 Arena geometry SHA-256: `2239556BDC74D205CAA6E46A0F6E91FA2C6E4257E84D4F608BA775958B0A5538`
 Gameplay V1 +239 checkpoint SHA-256: `77BF257131FB71DDEAEAE49D668C5E25AB1D06EE26149AB0D0AE303573CA5F21`
 Mode: calibration plus read-only shadow telemetry; mechanics reward remained exactly disabled.
 
 No Rival training or opponent training ran. No policy, PPO, observation, action, physics, reward, or episode-lifecycle contract was changed.
+
+Targeted correction baseline: `f49768368377dcb5aa0cc67f3a08f79bd68538a3`; corrected families: Musty, Breezi, Redirect. The six other calibration records/corpora are preserved exactly. See `docs/RIVAL2_MECHANICS_CALIBRATION_TARGETED_CORRECTION_V1.md` for the reviewer package and legacy-event replay.
 
 ## Corpus and contracts
 
@@ -29,9 +31,9 @@ Focused result: `PASS_GREEN` (8 tests passed). The suite covers ball/car reset r
 | half_flip | CALIBRATED | actual_dodge min 0.5 (margin 1); cancel_ticks_min_feature min 28.5 (margin 11); cancel_ticks_max_feature max 518.5 (margin 961); pitch_rotation max 2.94978 (margin 0.461565); heading_dot max -0.374697 (margin 0.64389); new_forward_speed min 18.3763 (margin 121.202); supported_completion min 0.5 (margin 1) | 0 | 0 |
 | possession | NOT_READY_FOR_REWARD | touch_onsets min 5 (margin 2); control_distance max 5085.91 (margin 9826.17); control_relative_speed max 5164.95 (margin 9668.1); contact_gap_ticks max 613 (margin 772) | 1 | 0 |
 | ground_carry | NOT_READY_FOR_REWARD | support_ticks min 1 (margin 2); control_distance max 154.739 (margin 2.37064); control_relative_speed max 438.029 (margin 20.1516) | 8 | 0 |
-| musty | CALIBRATED | actual_backward_dodge min 0.5 (margin 1); rotational_normal_speed min 86.1361 (margin 172.272); rotational_fraction min 0.299268 (margin 0.598535); ball_delta_v min 352.098 (margin 155.043) | 0 | 0 |
-| breezi | CALIBRATED | ordered_orientation min 0.5 (margin 1); nose_up_peak min 0.415679 (margin 0.292629); inverted_depth min -0.00537282 (margin 1.48229); nose_down_depth min 0.106383 (margin 0.00719379); roll_path min 1.64787 (margin 3.29575); yaw_path min 0.509045 (margin 1.01809); setup_ticks_min_feature min 85 (margin 2); setup_ticks_max_feature max 93 (margin 6) | 0 | 0 |
-| redirect | CALIBRATED | incoming_speed min 454.24 (margin 908.479); outgoing_speed min 167.721 (margin 335.441); direction_change min 0.965339 (margin 1.93068) | 0 | 0 |
+| musty | CALIBRATED | actual_backward_dodge min 0.5 (margin 1); contact_age_ticks min 4.5 (margin 7); rotational_closing_speed min 154.479 (margin 11.6513); rotational_fraction min 0.264016 (margin 0.0179901); sweep_closure min 13.4876 (margin 0.0750389); sweep_path_length min 23.0173 (margin 0.430721); ball_delta_v min 354.312 (margin 103.652) | 0 | 0 |
+| breezi | CALIBRATED | terminal_musty min 0.5 (margin 1); ordered_orientation min 0.5 (margin 1); nose_up_peak min 0.265685 (margin 0.53137); inverted_depth min 0.770279 (margin 0.0489773); nose_down_depth min 0.0662821 (margin 0.132564); roll_path min 3.81543 (margin 0.486946); yaw_path min 1.27793 (margin 0.291349); combined_roll_yaw_ticks min 130 (margin 2); roll_yaw_overlap_fraction min 0.981506 (margin 0.021836); control_max_distance max 394.808 (margin 342.654) | 0 | 0 |
+| redirect | CALIBRATED | legitimate_contact min 0.5 (margin 1); incoming_speed min 514.813 (margin 125.104); outgoing_speed min 249.117 (margin 12.1976); direction_change min 0.939067 (margin 1.20002); approach_cross_fraction min 0.37283 (margin 0.11374); contact_normal_cross_fraction min 0.186995 (margin 0.268654); speed_retention min 0.339024 (margin 0.0512823) | 0 | 0 |
 | pinch | CALIBRATED | overlap_ticks max 6.5 (margin 11); opposition_sign min 0.5 (margin 1); opposition min -0.482971 (margin 1.03406); closing_speed min 178.269 (margin 356.537); ball_delta_v min 506.547 (margin 85.6791) | 0 | 0 |
 | pogo | CALIBRATED | chassis_contact min 0.5 (margin 1); corner_region min 0.570819 (margin 0.113546); incoming_normal_speed min 223.147 (margin 446.295); outgoing_normal_speed min 3.6041 (margin 3.89449); wheel_support max 1 (margin 2); separation_ticks max 10 (margin 4) | 0 | 0 |
 
@@ -88,9 +90,9 @@ Episodes: 256 (Nexto 128, Wisp 128); stochastic Gameplay V1 +239 Rival, side-bal
 | half_flip | 0 | 0.000000 |
 | possession | 0 | 0.000000 |
 | ground_carry | 0 | 0.000000 |
-| musty | 15 | 0.218983 |
+| musty | 0 | 0.000000 |
 | breezi | 0 | 0.000000 |
-| redirect | 83 | 1.211708 |
+| redirect | 84 | 1.226307 |
 | pinch | 4 | 0.058396 |
 | pogo | 105 | 1.532884 |
 
@@ -105,25 +107,25 @@ Episodes: 256 (Nexto 128, Wisp 128); stochastic Gameplay V1 +239 Rival, side-bal
 | Nexto | Blue | half_flip | 0 | 0.000000 |
 | Nexto | Blue | possession | 0 | 0.000000 |
 | Nexto | Blue | ground_carry | 0 | 0.000000 |
-| Nexto | Blue | musty | 6 | 0.439793 |
+| Nexto | Blue | musty | 0 | 0.000000 |
 | Nexto | Blue | breezi | 0 | 0.000000 |
-| Nexto | Blue | redirect | 17 | 1.246081 |
+| Nexto | Blue | redirect | 15 | 1.099483 |
 | Nexto | Blue | pinch | 0 | 0.000000 |
 | Nexto | Blue | pogo | 19 | 1.392678 |
 | Nexto | Orange | speedflip | 4 | 0.261923 |
 | Nexto | Orange | half_flip | 0 | 0.000000 |
 | Nexto | Orange | possession | 0 | 0.000000 |
 | Nexto | Orange | ground_carry | 0 | 0.000000 |
-| Nexto | Orange | musty | 3 | 0.196442 |
+| Nexto | Orange | musty | 0 | 0.000000 |
 | Nexto | Orange | breezi | 0 | 0.000000 |
-| Nexto | Orange | redirect | 27 | 1.767980 |
+| Nexto | Orange | redirect | 29 | 1.898941 |
 | Nexto | Orange | pinch | 2 | 0.130961 |
 | Nexto | Orange | pogo | 26 | 1.702499 |
 | Wisp | Blue | speedflip | 5 | 0.235590 |
 | Wisp | Blue | half_flip | 0 | 0.000000 |
 | Wisp | Blue | possession | 0 | 0.000000 |
 | Wisp | Blue | ground_carry | 0 | 0.000000 |
-| Wisp | Blue | musty | 2 | 0.094236 |
+| Wisp | Blue | musty | 0 | 0.000000 |
 | Wisp | Blue | breezi | 0 | 0.000000 |
 | Wisp | Blue | redirect | 24 | 1.130831 |
 | Wisp | Blue | pinch | 2 | 0.094236 |
@@ -132,9 +134,9 @@ Episodes: 256 (Nexto 128, Wisp 128); stochastic Gameplay V1 +239 Rival, side-bal
 | Wisp | Orange | half_flip | 0 | 0.000000 |
 | Wisp | Orange | possession | 0 | 0.000000 |
 | Wisp | Orange | ground_carry | 0 | 0.000000 |
-| Wisp | Orange | musty | 4 | 0.217858 |
+| Wisp | Orange | musty | 0 | 0.000000 |
 | Wisp | Orange | breezi | 0 | 0.000000 |
-| Wisp | Orange | redirect | 15 | 0.816969 |
+| Wisp | Orange | redirect | 16 | 0.871433 |
 | Wisp | Orange | pinch | 0 | 0.000000 |
 | Wisp | Orange | pogo | 32 | 1.742867 |
 
@@ -143,7 +145,7 @@ Mechanics reward contribution: `0.0` (required exact zero).
 
 Bounded per-event raw features are retained in `shadow_event_evidence.json`; all calibration case parameters and measured features are retained in `case_results.jsonl`.
 
-No detector fired on an impossible-state assertion. Calibrated-family frequencies were bounded by physical family lockout/re-arm state; the two telemetry-only families emitted zero events by construction. Pogo remained the most frequent family at `1.532884/min` and is an explicit reviewer watch item, not a hidden aggregate. Its bounded final samples all satisfy the corrected second-axis edge/corner boundary and the trace-derived `<=10`-tick separation window. This is a physical detector result, not evidence that the policy intentionally performs tactically useful pogos; mechanics reward remains disabled.
+No detector fired on an impossible-state assertion. Calibrated-family frequencies were bounded by physical family lockout/re-arm state; the two telemetry-only families emitted zero events by construction. No suspicious case required threshold retuning after held-out evaluation.
 
 ## Reproduction
 

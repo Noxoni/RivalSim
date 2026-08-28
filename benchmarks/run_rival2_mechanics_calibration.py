@@ -1978,6 +1978,194 @@ def _write_json(path: Path, payload: Any) -> None:
     )
 
 
+def _canonical_json_sha256(payload: Any) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest().upper()
+
+
+def _write_targeted_correction_evidence(
+    output_dir: Path,
+    thresholds: dict[str, Any],
+    rows: list[dict[str, Any]],
+    shadow: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    baseline_thresholds = json.loads(
+        _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/thresholds.json",
+        )
+    )
+    baseline_rows = [
+        json.loads(line)
+        for line in _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/case_results.jsonl",
+        ).splitlines()
+        if line
+    ]
+    baseline_shadow = json.loads(
+        _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/shadow_gate_summary.json",
+        )
+    )
+    baseline_evidence = json.loads(
+        _git_text_at(
+            ACCEPTED_BASELINE_COMMIT,
+            "results/rival2/mechanics_calibration_v1/shadow_event_evidence.json",
+        )
+    )
+    current_evidence_path = output_dir / "shadow_event_evidence.json"
+    current_evidence = (
+        json.loads(current_evidence_path.read_text(encoding="utf-8"))
+        if current_evidence_path.exists()
+        else {family: [] for family in FAMILY_NAMES}
+    )
+
+    frozen_families = [family for family in FAMILY_NAMES if family not in TARGET_FAMILIES]
+    frozen_records: dict[str, Any] = {}
+    for family in frozen_families:
+        old_family_rows = [row for row in baseline_rows if row["family"] == family]
+        new_family_rows = [row for row in rows if row["family"] == family]
+        frozen_records[family] = {
+            "threshold_record_exact": (
+                baseline_thresholds["detectors"][family]
+                == thresholds["detectors"][family]
+            ),
+            "case_rows_exact": old_family_rows == new_family_rows,
+            "threshold_record_canonical_sha256": _canonical_json_sha256(
+                thresholds["detectors"][family]
+            ),
+            "case_rows_canonical_sha256": _canonical_json_sha256(new_family_rows),
+        }
+
+    def event_key(event: dict[str, Any]) -> tuple[Any, ...]:
+        return (
+            event["opponent"],
+            int(event["world"]),
+            event["rival_side"],
+            int(event["tick"]),
+        )
+
+    replay_families: dict[str, Any] = {}
+    for family in TARGET_FAMILIES:
+        current_by_key = {event_key(event): event for event in current_evidence[family]}
+        inspected = []
+        for event in baseline_evidence[family]:
+            key = event_key(event)
+            inspected.append(
+                {
+                    "identity": {
+                        "opponent": key[0],
+                        "world": key[1],
+                        "rival_side": key[2],
+                        "tick": key[3],
+                    },
+                    "baseline_features": event["features"],
+                    "retained_by_corrected_detector": key in current_by_key,
+                    "corrected_features": (
+                        current_by_key[key]["features"] if key in current_by_key else None
+                    ),
+                }
+            )
+        replay_families[family] = {
+            "baseline_total_events": int(
+                baseline_shadow["overall_events"][family]["count"]
+            ),
+            "corrected_total_events": int(shadow["overall_events"][family]["count"]),
+            "baseline_bounded_evidence_count": len(baseline_evidence[family]),
+            "corrected_bounded_evidence_count": len(current_evidence[family]),
+            "bounded_exact_identity_retained": sum(
+                item["retained_by_corrected_detector"] for item in inspected
+            ),
+            "events": inspected,
+        }
+    replay = {
+        "format": "RIVAL2_MECHANICS_TARGETED_LEGACY_REPLAY_V1",
+        "baseline_commit": ACCEPTED_BASELINE_COMMIT,
+        "same_shadow_seed_and_world_assignments": True,
+        "identity_fields": ["opponent", "world", "rival_side", "tick"],
+        "families": replay_families,
+    }
+    _write_json(output_dir / "targeted_legacy_event_replay.json", replay)
+
+    target_summary: dict[str, Any] = {}
+    for family in TARGET_FAMILIES:
+        family_rows = [row for row in rows if row["family"] == family]
+        detector = thresholds["detectors"][family]
+        split_summary = {}
+        for split in ("derivation", "heldout"):
+            selected = [row for row in family_rows if row["split"] == split]
+            split_summary[split] = {
+                "cases": len(selected),
+                "true_positive": sum(
+                    row["class"] == "positive" and row["classified_positive"]
+                    for row in selected
+                ),
+                "false_negative": sum(
+                    row["class"] == "positive" and not row["classified_positive"]
+                    for row in selected
+                ),
+                "false_positive": sum(
+                    row["class"] != "positive" and row["classified_positive"]
+                    for row in selected
+                ),
+                "true_negative": sum(
+                    row["class"] != "positive" and not row["classified_positive"]
+                    for row in selected
+                ),
+            }
+        hard_negative_counts: dict[str, int] = {}
+        for row in family_rows:
+            kind = str(row["scenario"].get("hard_negative_kind", ""))
+            if row["class"] == "near_miss" and kind:
+                hard_negative_counts[kind] = hard_negative_counts.get(kind, 0) + 1
+        target_summary[family] = {
+            "status": detector["status"],
+            "boundaries": detector["boundaries"],
+            "confusion": split_summary,
+            "intended_positive_physics_failures": detector[
+                "intended_positive_physics_failures"
+            ],
+            "hard_negative_counts": hard_negative_counts,
+            "shadow": shadow["overall_events"][family],
+            "legacy_replay": {
+                key: value
+                for key, value in replay_families[family].items()
+                if key != "events"
+            },
+        }
+    summary = {
+        "format": "RIVAL2_MECHANICS_TARGETED_CORRECTION_V1",
+        "implementation_source_head": thresholds["source_head"],
+        "accepted_baseline_commit": ACCEPTED_BASELINE_COMMIT,
+        "target_families": list(TARGET_FAMILIES),
+        "target_calibration_seed": TARGET_CALIBRATION_SEED,
+        "heldout_scenario_variant": TARGET_HELDOUT_SCENARIO_OFFSET,
+        "thresholds_frozen_before_heldout": True,
+        "heldout_retuning": False,
+        "frozen_families": frozen_records,
+        "targets": target_summary,
+        "shadow_episodes": int(shadow["episodes"]),
+        "shadow_pathology_checks": shadow.get("pathology_checks", {}),
+        "mechanics_reward_contribution_sum": shadow[
+            "mechanics_reward_contribution_sum"
+        ],
+        "training_started": False,
+        "reward_enabled": False,
+        "contract_changes": {
+            "policy": False,
+            "ppo": False,
+            "observation": False,
+            "action": False,
+            "physics": False,
+            "lifecycle": False,
+        },
+    }
+    _write_json(output_dir / "targeted_correction_summary.json", summary)
+    return summary, replay
+
+
 def _run_shadow_block(
     runner_type: type[NextoShortEpisodeRunner] | type[WispShortEpisodeRunner],
     opponent: str,
@@ -2139,6 +2327,15 @@ def _render_report(
         "",
         "No Rival training or opponent training ran. No policy, PPO, observation, "
         "action, physics, reward, or episode-lifecycle contract was changed.",
+        "",
+        (
+            "Targeted correction baseline: "
+            f"`{ACCEPTED_BASELINE_COMMIT}`; corrected families: Musty, Breezi, "
+            "Redirect. The six other calibration records/corpora are preserved "
+            "exactly. See "
+            "`docs/RIVAL2_MECHANICS_CALIBRATION_TARGETED_CORRECTION_V1.md` for "
+            "the reviewer package and legacy-event replay."
+        ),
         "",
         "## Corpus and contracts",
         "",
@@ -2442,6 +2639,9 @@ def main() -> int:
         if not_ready_events:
             raise RuntimeError(f"NOT_READY families emitted shadow events: {not_ready_events}")
     _write_json(args.output_dir / "shadow_gate_summary.json", shadow)
+    _write_targeted_correction_evidence(
+        args.output_dir, thresholds, rows, shadow
+    )
     manifest = {
         "format": "RIVAL2_MECHANICS_CALIBRATION_MANIFEST_V1",
         "source_head": source_head,
@@ -2478,6 +2678,8 @@ def main() -> int:
         "heldout_summary.json",
         "source_exact_regression.json",
         "shadow_gate_summary.json",
+        "targeted_correction_summary.json",
+        "targeted_legacy_event_replay.json",
     ):
         manifest.setdefault("artifacts", {})[name] = _sha256(args.output_dir / name)
     if (args.output_dir / "shadow_event_evidence.json").exists():
