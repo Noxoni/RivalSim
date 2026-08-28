@@ -1,0 +1,69 @@
+{
+  "adapter_artifact": {
+    "contains_frozen_rival_model": false,
+    "contains_fresh_adapter_optimizer": true,
+    "format": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_CHECKPOINT_V2",
+    "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+    "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+  },
+  "authority": {
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "bridge_quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "frozen_config_sha256": "227AFE90C5678E299851C30D14F9CA914C1B05D679BA2D67440248DED30F08A1",
+    "v1_evidence_diff_from_required_parent": false
+  },
+  "format": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_VERIFICATION_EVIDENCE_V2",
+  "human": {
+    "actions_unchanged": true,
+    "all_outputs_finite": true,
+    "committed_quality_masks_unchanged": true,
+    "exact_and_derived_fields_byte_unchanged": true,
+    "frame_count": 114311,
+    "human_optimizer_steps": 0,
+    "source_hashes_unchanged": true,
+    "source_supported_native_pad_value_count": 3231958
+  },
+  "native_boost_pads": {
+    "canonical_indices_discovered": 33,
+    "canonical_index_never_observed": 8,
+    "mapped_native_rows": 1615979,
+    "maximum_xy_error_uu": 2.0,
+    "pickup_events_resolved": 348,
+    "unmapped_native_rows": 0
+  },
+  "prohibited_work": {
+    "behavior_cloning": false,
+    "mechanic_detector_change": false,
+    "ppo": false,
+    "reward_change": false,
+    "rival_model_mutation": false
+  },
+  "simulator": {
+    "freeplay_meaningful_reconstruction_rmse_before_after": [
+      0.6041117584130126,
+      0.10810555900478495
+    ],
+    "full_actor_kl": 0.0,
+    "full_value_drift": 0.0,
+    "gameplay_actor_kl_before_after": [
+      6.7218898009846475,
+      0.10307226094724493
+    ],
+    "gameplay_reconstruction_rmse_before_after": [
+      0.5608440409660509,
+      0.10210090913871545
+    ],
+    "pad_reconstruction_rmse_before_after": [
+      0.7061694197905967,
+      0.12210516328392644
+    ]
+  },
+  "tests": {
+    "diff_check": "passed",
+    "focused_pytest_command": ".venv pytest observation adapter V2, BC bridge, exact training adapter, and V1 distillation tests",
+    "focused_pytest_passed": 33,
+    "ruff": "passed"
+  },
+  "verdict": "PASS"
+}

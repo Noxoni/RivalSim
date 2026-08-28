@@ -1,0 +1,1580 @@
+{
+  "acceptance": {
+    "accepted": true,
+    "checks": {
+      "all_finite": true,
+      "baseline_matches_authority": true,
+      "freeplay_meaningful_reconstruction": true,
+      "full_actor_exact": true,
+      "full_value_exact": true,
+      "gameplay_kl_absolute": true,
+      "gameplay_kl_relative_reduction": true,
+      "gameplay_reconstruction": true,
+      "pad_reconstruction": true
+    },
+    "freeplay_meaningful_reconstruction_rmse_before_after": [
+      0.6041117584130126,
+      0.10810555900478495
+    ],
+    "gameplay_actor_kl_after": 0.10307226094724493,
+    "gameplay_actor_kl_before": 6.7218898009846475,
+    "gameplay_actor_kl_relative_reduction": 0.984666178113758,
+    "gameplay_reconstruction_rmse_before_after": [
+      0.5608440409660509,
+      0.10210090913871545
+    ],
+    "pad_reconstruction_rmse_before_after": [
+      0.7061694197905967,
+      0.12210516328392644
+    ]
+  },
+  "adapter": {
+    "checkpoint": {
+      "adapter_tensor_sha256": "797E7139C485C692C2280F1CB126B9D1D682F1A8911C63AC46A4008042364863",
+      "bytes": 2488633,
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    },
+    "config_sha256": "9F97765CF446C7AF1D33DBFC02F0F3F1CE3490BD0FEFEE976A18D3CE49F43807",
+    "parameter_count": 206518,
+    "version": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
+  },
+  "config": {
+    "checks": {
+      "bridge_version_exact": true,
+      "exact_adapter_hash_exact": true,
+      "human_manifest_hash_exact": true,
+      "quality_contract_exact": true,
+      "v1_failed_evidence_present": true,
+      "v1_frozen_config_unchanged": true
+    },
+    "head": "ddeb429b5b1052de83ad09a6c35b996384f89d7a",
+    "origin_main": "ddeb429b5b1052de83ad09a6c35b996384f89d7a",
+    "path": "results/rival2/human_demo_observation_adapter_v2/frozen_config.json",
+    "required_parent": "10489acfb6396eaaf33844f149aa26e865d84af7",
+    "sha256": "227AFE90C5678E299851C30D14F9CA914C1B05D679BA2D67440248DED30F08A1"
+  },
+  "corpus_checks": {
+    "identity_matches_v1_authority": true,
+    "observation_hash_matches_v1_authority": true,
+    "split_manifest_matches_v1": true
+  },
+  "environment": {
+    "cuda": "13.0",
+    "device": "cuda:0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)]",
+    "torch": "2.13.0+cu130"
+  },
+  "format": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_EVIDENCE_V2",
+  "generated_utc": "2026-08-28T23:58:59.631114+00:00",
+  "human_audit": {
+    "actions_sha256_after": "90A80AC1AE84F6B008DC49CF1195A030FBD15FC3214E56759F3FDC3AE78FA109",
+    "actions_sha256_before": "90A80AC1AE84F6B008DC49CF1195A030FBD15FC3214E56759F3FDC3AE78FA109",
+    "actions_unchanged": true,
+    "actor_output_statistics": {
+      "freeplay": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.5920586585998535,
+            "mean": -0.33683282136917114,
+            "min": -2.206695795059204,
+            "std": 0.45523977279663086
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.8358221054077148,
+            "mean": 0.03477680683135986,
+            "min": -1.324365258216858,
+            "std": 0.4409802258014679
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.7809370756149292,
+            "mean": 0.04582366719841957,
+            "min": -1.516750693321228,
+            "std": 0.42524924874305725
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.3191323280334473,
+            "mean": 0.4330233037471771,
+            "min": -1.3838824033737183,
+            "std": 0.5656556487083435
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4846183061599731,
+            "mean": 0.012430226430296898,
+            "min": -1.5326236486434937,
+            "std": 0.38657575845718384
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.36132389307022095,
+            "saturation_fraction": 0.25351306796073914,
+            "std": 0.3950820863246918
+          },
+          "handbrake": {
+            "mean": 0.4223978817462921,
+            "saturation_fraction": 0.23313990235328674,
+            "std": 0.4187927842140198
+          },
+          "jump": {
+            "mean": 0.32289987802505493,
+            "saturation_fraction": 0.23935362696647644,
+            "std": 0.3792784512042999
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0023926435969769955,
+            "at_min_fraction": 0.0,
+            "mean": -1.3794811964035034
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2721847295761108
+          },
+          "steer": {
+            "at_max_fraction": 8.927774615585804e-05,
+            "at_min_fraction": 0.0,
+            "mean": -1.0983566045761108
+          },
+          "throttle": {
+            "at_max_fraction": 0.008713508024811745,
+            "at_min_fraction": 0.0,
+            "mean": -1.3360400199890137
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1680175065994263
+          }
+        },
+        "sample_count": 56005
+      },
+      "gameplay": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.9252822399139404,
+            "mean": -0.35875362157821655,
+            "min": -3.3423261642456055,
+            "std": 0.5855640769004822
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.0347540378570557,
+            "mean": -0.11277038604021072,
+            "min": -2.3829452991485596,
+            "std": 0.4308255910873413
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.4741013050079346,
+            "mean": 0.19413521885871887,
+            "min": -1.9072599411010742,
+            "std": 0.6105816960334778
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.61185884475708,
+            "mean": 0.657134473323822,
+            "min": -1.765852928161621,
+            "std": 0.7362308502197266
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.8126118183135986,
+            "mean": -0.06665301322937012,
+            "min": -1.9809225797653198,
+            "std": 0.4353245198726654
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.6044715642929077,
+            "saturation_fraction": 0.3387644588947296,
+            "std": 0.4245632290840149
+          },
+          "handbrake": {
+            "mean": 0.2286805957555771,
+            "saturation_fraction": 0.5944328308105469,
+            "std": 0.38306254148483276
+          },
+          "jump": {
+            "mean": 0.1948806196451187,
+            "saturation_fraction": 0.625870406627655,
+            "std": 0.3539661765098572
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.004270572680979967,
+            "at_min_fraction": 0.0,
+            "mean": -0.970741331577301
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.0263975858688354
+          },
+          "steer": {
+            "at_max_fraction": 0.0009947518119588494,
+            "at_min_fraction": 0.0,
+            "mean": -1.5002467632293701
+          },
+          "throttle": {
+            "at_max_fraction": 0.010410591959953308,
+            "at_min_fraction": 0.0,
+            "mean": -1.4685111045837402
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.8985098600387573
+          }
+        },
+        "sample_count": 58306
+      }
+    },
+    "all_adapter_and_actor_outputs_finite": true,
+    "behavior_cloning_performed": false,
+    "exact_and_derived_fields_byte_unchanged": true,
+    "expected_frame_count": 114311,
+    "field_quality_value_counts": {
+      "approximate": 3214338,
+      "exact_direct": 1380852,
+      "exactly_derived": 5397923,
+      "unavailable": 10811489
+    },
+    "format": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_HUMAN_AUDIT_V2",
+    "frame_count": 114311,
+    "human_actions_used_for_optimization": false,
+    "human_optimizer_steps": 0,
+    "native_pad_overlay_classification": "approximate_event_timed_separate_from_committed_mask",
+    "native_pad_prehistory_fabricated": false,
+    "profile_frame_counts": {
+      "freeplay": 56005,
+      "gameplay": 58306
+    },
+    "quality_masks_byte_unchanged": true,
+    "quality_promotions": 0,
+    "source_hashes_unchanged": true,
+    "source_supported_native_pad_frame_count": 57991,
+    "source_supported_native_pad_physical_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "source_supported_native_pad_value_count": 3231958,
+    "source_verification_after": [
+      {
+        "file_count": 4,
+        "session_uuid": "1ED91132-BEF2-4B18-8872-364E7893B89A",
+        "source_file_set_sha256": "B2ED6B4F8454B52E2DBEBD355EFC7B09CA4E4B0DC41AA663B85203F6541B336C",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "151E5828-251B-420D-8798-EE14B3A204C5",
+        "source_file_set_sha256": "35A6A86773B3512323858719E32CA29A2590317D9C87EDEF20DF038D57C07FC9",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "529360F1-9944-42E9-BDB4-9C39C29CD2A3",
+        "source_file_set_sha256": "BF701EC47F3C966415F8755306B4CCF3698CAE98550E89F9AB1169AFD61A6F29",
+        "unchanged": true
+      },
+      {
+        "file_count": 6,
+        "session_uuid": "8104A81F-9570-4E8D-9EF5-D310FFE78528",
+        "source_file_set_sha256": "8FA370D53D3B34B491FE1E757164120B8F5A2951C25AD4BEEADAD9BB5E4870EE",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "E9068B84-AABB-4EFE-B8F6-F028419DE642",
+        "source_file_set_sha256": "F1C18F0EB29E80AD41ACA9FB791D35E21EED6C709350993799239FDA0D1C045D",
+        "unchanged": true
+      },
+      {
+        "file_count": 12,
+        "session_uuid": "24A888CE-9F8A-4FBB-8FC9-F26730314ACF",
+        "source_file_set_sha256": "243C94216A923A5EE271AD7908E0D2D7CB953A4A9BBBBDE3314689FAA552FB62",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+        "source_file_set_sha256": "2BEBC58B9D7354FA8019DDF77C3C5374000EFC8B502B1C140CA5B5CA514D7F0A",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "B6B93AB6-A20C-4AF6-8BAD-6E17624BDFB9",
+        "source_file_set_sha256": "7588735F6070681D080426CD96E7040A8A68AC33DA71F94814F03368746F15FC",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "ED4D364B-DA86-483C-A668-4FAC04887F3A",
+        "source_file_set_sha256": "3F4A94516475951C0BD5C10440627FD095F2FDD9681634CF2A8E006FDD7F573C",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "F4B86029-AB4E-4725-AFF8-590C71F722D0",
+        "source_file_set_sha256": "6F3C52AE3781D3DFF1BECC91F34B6B085ACF58E26EE154EA05ED9F8464376CC8",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE",
+        "source_file_set_sha256": "084850CC9F5610DA064C877939B0C7F9D1F0BC72BE533BA843CA079E08B94C8F",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "A3B739EF-71DD-4825-AB72-17662B81D173",
+        "source_file_set_sha256": "2B46DE280252A96B3E90324DE8D0BA89B8020134FFE7E96A074F0998DE8247B9",
+        "unchanged": true
+      },
+      {
+        "file_count": 6,
+        "session_uuid": "B919DC95-DDD0-4C92-A908-F4C9C9D93C93",
+        "source_file_set_sha256": "901352B92D9E0212CCC5CAFAFDA1DA94FC8E0DFFD90EB886496EA851A7CE3CC1",
+        "unchanged": true
+      },
+      {
+        "file_count": 10,
+        "session_uuid": "3B97377E-EFFD-43C5-B8D3-E59BE304D9CC",
+        "source_file_set_sha256": "E5D099F6A3C6A69687A2839823466399B8623BF8574F72BB9C605B8475912BB3",
+        "unchanged": true
+      },
+      {
+        "file_count": 11,
+        "session_uuid": "5D36C080-1C98-4191-AED8-DD5B7C37F5BB",
+        "source_file_set_sha256": "0DF209A101E1334928070CE7493957F55E7985B02C75D6778A7914A0139492E3",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "513F33EB-27E7-430D-A3DD-035DA8912B2F",
+        "source_file_set_sha256": "3DF186F067C55D87216772BD7588E6942567402F984C2B8BE747C111F7D62991",
+        "unchanged": true
+      },
+      {
+        "file_count": 8,
+        "session_uuid": "3B0EDCE9-E093-44EC-8D08-A378873600C0",
+        "source_file_set_sha256": "1FBFD7DCF504901B6DF4535508180AE020D374F852D02BDD23D04FE130232E73",
+        "unchanged": true
+      },
+      {
+        "file_count": 20,
+        "session_uuid": "CD6E7DB1-2761-4B8B-BD37-F21C7F135722",
+        "source_file_set_sha256": "D7195C22964FDB096EDCB6D6ECBCE10C152F2D5F645B2095E64C2418F68927B9",
+        "unchanged": true
+      }
+    ],
+    "source_verification_before": [
+      {
+        "file_count": 4,
+        "session_uuid": "1ED91132-BEF2-4B18-8872-364E7893B89A",
+        "source_file_set_sha256": "B2ED6B4F8454B52E2DBEBD355EFC7B09CA4E4B0DC41AA663B85203F6541B336C",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "151E5828-251B-420D-8798-EE14B3A204C5",
+        "source_file_set_sha256": "35A6A86773B3512323858719E32CA29A2590317D9C87EDEF20DF038D57C07FC9",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "529360F1-9944-42E9-BDB4-9C39C29CD2A3",
+        "source_file_set_sha256": "BF701EC47F3C966415F8755306B4CCF3698CAE98550E89F9AB1169AFD61A6F29",
+        "unchanged": true
+      },
+      {
+        "file_count": 6,
+        "session_uuid": "8104A81F-9570-4E8D-9EF5-D310FFE78528",
+        "source_file_set_sha256": "8FA370D53D3B34B491FE1E757164120B8F5A2951C25AD4BEEADAD9BB5E4870EE",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "E9068B84-AABB-4EFE-B8F6-F028419DE642",
+        "source_file_set_sha256": "F1C18F0EB29E80AD41ACA9FB791D35E21EED6C709350993799239FDA0D1C045D",
+        "unchanged": true
+      },
+      {
+        "file_count": 12,
+        "session_uuid": "24A888CE-9F8A-4FBB-8FC9-F26730314ACF",
+        "source_file_set_sha256": "243C94216A923A5EE271AD7908E0D2D7CB953A4A9BBBBDE3314689FAA552FB62",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+        "source_file_set_sha256": "2BEBC58B9D7354FA8019DDF77C3C5374000EFC8B502B1C140CA5B5CA514D7F0A",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "B6B93AB6-A20C-4AF6-8BAD-6E17624BDFB9",
+        "source_file_set_sha256": "7588735F6070681D080426CD96E7040A8A68AC33DA71F94814F03368746F15FC",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "ED4D364B-DA86-483C-A668-4FAC04887F3A",
+        "source_file_set_sha256": "3F4A94516475951C0BD5C10440627FD095F2FDD9681634CF2A8E006FDD7F573C",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "F4B86029-AB4E-4725-AFF8-590C71F722D0",
+        "source_file_set_sha256": "6F3C52AE3781D3DFF1BECC91F34B6B085ACF58E26EE154EA05ED9F8464376CC8",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE",
+        "source_file_set_sha256": "084850CC9F5610DA064C877939B0C7F9D1F0BC72BE533BA843CA079E08B94C8F",
+        "unchanged": true
+      },
+      {
+        "file_count": 4,
+        "session_uuid": "A3B739EF-71DD-4825-AB72-17662B81D173",
+        "source_file_set_sha256": "2B46DE280252A96B3E90324DE8D0BA89B8020134FFE7E96A074F0998DE8247B9",
+        "unchanged": true
+      },
+      {
+        "file_count": 6,
+        "session_uuid": "B919DC95-DDD0-4C92-A908-F4C9C9D93C93",
+        "source_file_set_sha256": "901352B92D9E0212CCC5CAFAFDA1DA94FC8E0DFFD90EB886496EA851A7CE3CC1",
+        "unchanged": true
+      },
+      {
+        "file_count": 10,
+        "session_uuid": "3B97377E-EFFD-43C5-B8D3-E59BE304D9CC",
+        "source_file_set_sha256": "E5D099F6A3C6A69687A2839823466399B8623BF8574F72BB9C605B8475912BB3",
+        "unchanged": true
+      },
+      {
+        "file_count": 11,
+        "session_uuid": "5D36C080-1C98-4191-AED8-DD5B7C37F5BB",
+        "source_file_set_sha256": "0DF209A101E1334928070CE7493957F55E7985B02C75D6778A7914A0139492E3",
+        "unchanged": true
+      },
+      {
+        "file_count": 5,
+        "session_uuid": "513F33EB-27E7-430D-A3DD-035DA8912B2F",
+        "source_file_set_sha256": "3DF186F067C55D87216772BD7588E6942567402F984C2B8BE747C111F7D62991",
+        "unchanged": true
+      },
+      {
+        "file_count": 8,
+        "session_uuid": "3B0EDCE9-E093-44EC-8D08-A378873600C0",
+        "source_file_set_sha256": "1FBFD7DCF504901B6DF4535508180AE020D374F852D02BDD23D04FE130232E73",
+        "unchanged": true
+      },
+      {
+        "file_count": 20,
+        "session_uuid": "CD6E7DB1-2761-4B8B-BD37-F21C7F135722",
+        "source_file_set_sha256": "D7195C22964FDB096EDCB6D6ECBCE10C152F2D5F645B2095E64C2418F68927B9",
+        "unchanged": true
+      }
+    ],
+    "valid": true
+  },
+  "integrity": {
+    "adapter_checkpoint_contains_rival_model": false,
+    "adapter_optimizer_is_fresh": true,
+    "bootstrap_checkpoint_byte_identical": true,
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_gradients_absent": true,
+    "bootstrap_model_byte_identical": true,
+    "bootstrap_model_tensor_sha256_before_after": [
+      "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+      "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3"
+    ],
+    "bootstrap_requires_grad_false": true,
+    "historical_ppo_optimizer_sha256_before_after": [
+      "46C5D80514908BF9498B455A93E195977234F84A8F0EE39811C921B463AF5FA0",
+      "46C5D80514908BF9498B455A93E195977234F84A8F0EE39811C921B463AF5FA0"
+    ],
+    "historical_ppo_optimizer_untouched": true,
+    "human_behavior_cloning_absent": true,
+    "human_optimizer_steps_zero": true,
+    "v1_evidence_modified": false,
+    "valid": true
+  },
+  "native_boost_pad_audit": {
+    "boost_pad_pickup_event_count": 348,
+    "boost_pad_spawn_event_count": 0,
+    "bridge_quality_promoted": false,
+    "canonical_pad_count": 34,
+    "canonical_physical_indices_discovered": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "canonical_physical_indices_never_observed": [
+      8
+    ],
+    "committed_input_quality_mask_changed": false,
+    "cooldown_quality_counts": {
+      "1": 1615979
+    },
+    "deterministic_position_to_index_mapping_implemented": true,
+    "deterministic_position_to_index_mapping_supported": true,
+    "event_timed_pickup_and_respawn_overlay_implemented": true,
+    "format": "RIVAL2_NATIVE_BOOST_PAD_OBSERVABILITY_AUDIT_V2",
+    "frames_with_native_pad_rows": 57991,
+    "mapped_native_pad_rows": 1615979,
+    "maximum_canonical_xy_error_uu": 2.0,
+    "native_pad_row_count": 1615979,
+    "nearby_car_heuristic_used": false,
+    "outcome": "implemented deterministic XY-to-canonical mapping and event-timed pickup/respawn overlay; undiscovered pads and pre-pickup history remain unknown",
+    "pickup_event_distinct_runtime_pointer_count": 33,
+    "pickup_events_resolved_via_positioned_frame_row": 348,
+    "pickup_events_with_canonical_index": 0,
+    "pickup_events_with_position": 0,
+    "pointer_sorting_used": false,
+    "sessions": [
+      {
+        "frames": 2252,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "1ED91132-BEF2-4B18-8872-364E7893B89A"
+      },
+      {
+        "frames": 3824,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "151E5828-251B-420D-8798-EE14B3A204C5"
+      },
+      {
+        "frames": 1570,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "529360F1-9944-42E9-BDB4-9C39C29CD2A3"
+      },
+      {
+        "frames": 8787,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "8104A81F-9570-4E8D-9EF5-D310FFE78528"
+      },
+      {
+        "frames": 4781,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "E9068B84-AABB-4EFE-B8F6-F028419DE642"
+      },
+      {
+        "frames": 30003,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "24A888CE-9F8A-4FBB-8FC9-F26730314ACF"
+      },
+      {
+        "frames": 5207,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3"
+      },
+      {
+        "frames": 1093,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "B6B93AB6-A20C-4AF6-8BAD-6E17624BDFB9"
+      },
+      {
+        "frames": 2383,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "ED4D364B-DA86-483C-A668-4FAC04887F3A"
+      },
+      {
+        "frames": 1794,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "F4B86029-AB4E-4725-AFF8-590C71F722D0"
+      },
+      {
+        "frames": 2485,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE"
+      },
+      {
+        "frames": 975,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "A3B739EF-71DD-4825-AB72-17662B81D173"
+      },
+      {
+        "frames": 7539,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "B919DC95-DDD0-4C92-A908-F4C9C9D93C93"
+      },
+      {
+        "frames": 22467,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "3B97377E-EFFD-43C5-B8D3-E59BE304D9CC"
+      },
+      {
+        "frames": 26799,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "5D36C080-1C98-4191-AED8-DD5B7C37F5BB"
+      },
+      {
+        "frames": 5268,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "513F33EB-27E7-430D-A3DD-035DA8912B2F"
+      },
+      {
+        "frames": 17180,
+        "native_pad_rows": 0,
+        "pickup_events": 0,
+        "session_uuid": "3B0EDCE9-E093-44EC-8D08-A378873600C0"
+      },
+      {
+        "frames": 58306,
+        "native_pad_rows": 1615979,
+        "pickup_events": 348,
+        "session_uuid": "CD6E7DB1-2761-4B8B-BD37-F21C7F135722"
+      }
+    ],
+    "source_frame_count": 202713,
+    "source_session_count": 18,
+    "source_supported_overlay_quality": "approximate_event_timed",
+    "stable_pointer_position_conflicts": 0,
+    "unmapped_native_pad_rows": 0
+  },
+  "post_training_finalization": {
+    "adapter_optimizer_steps": 0,
+    "checkpoint_sha256_before_after": [
+      "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+      "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    ],
+    "human_optimizer_steps": 0,
+    "reason": "apply required deterministic native-pad evidence overlay and correct boolean evidence aggregation",
+    "simulator_rollout_repeated": false,
+    "simulator_training_repeated": false
+  },
+  "prohibited_work": {
+    "human_behavior_cloning": false,
+    "mechanic_detector_change": false,
+    "ppo": false,
+    "reward_change": false,
+    "rival_model_mutation": false
+  },
+  "test_baseline": {
+    "all_finite": true,
+    "freeplay_actor_kl_computed": false,
+    "freeplay_hidden_opponent_fabricated": false,
+    "full_authoritative": {
+      "actor_byte_exact": true,
+      "actor_kl": 0.0,
+      "structural_bypass": true,
+      "value_byte_exact": true,
+      "value_drift": 0.0
+    },
+    "gameplay_actor": {
+      "baseline_mean_kl": 6.7218898009846475,
+      "baseline_per_channel_kl": {
+        "boost": 0.0170552550855118,
+        "handbrake": 0.5429388773233963,
+        "jump": 0.08225516338773278,
+        "pitch": 2.0710194517571567,
+        "roll": 0.3341366270529194,
+        "steer": 3.0034792553479983,
+        "throttle": 0.23326962365949885,
+        "yaw": 0.43773554737043335
+      },
+      "repaired_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.9759924411773682,
+            "mean": 0.375590056180954,
+            "min": -2.0727734565734863,
+            "std": 0.7564159631729126
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.1570334434509277,
+            "mean": -0.27956318855285645,
+            "min": -1.5218749046325684,
+            "std": 0.2711578607559204
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.3412364721298218,
+            "mean": 0.369769424200058,
+            "min": -1.003020167350769,
+            "std": 0.33480966091156006
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.6672896146774292,
+            "mean": 1.1287676095962524,
+            "min": -0.8016392588615417,
+            "std": 0.1978491246700287
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.2868576049804688,
+            "mean": -0.2281934767961502,
+            "min": -1.5783047676086426,
+            "std": 0.2771052122116089
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9615756869316101,
+            "saturation_fraction": 0.8748354911804199,
+            "std": 0.178872749209404
+          },
+          "handbrake": {
+            "mean": 0.3435854911804199,
+            "saturation_fraction": 0.3502417504787445,
+            "std": 0.3758000135421753
+          },
+          "jump": {
+            "mean": 0.40386685729026794,
+            "saturation_fraction": 0.4430166780948639,
+            "std": 0.4345749616622925
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.5357800722122192
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2596428394317627
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -2.065138578414917
+          },
+          "throttle": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1078956127166748
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1458951234817505
+          }
+        },
+        "sample_count": 838912
+      },
+      "repaired_mean_kl": 6.53363147144242,
+      "repaired_per_channel_kl": {
+        "boost": 0.07098771189275514,
+        "handbrake": 0.10398592816499228,
+        "jump": 0.29391710795314346,
+        "pitch": 4.146825655953783,
+        "roll": 0.3215289355997709,
+        "steer": 1.1754703934977686,
+        "throttle": 0.18143520436710361,
+        "yaw": 0.23948053401310268
+      }
+    },
+    "reconstruction": {
+      "freeplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.36565174001341455,
+            "max_absolute": 1.0,
+            "rmse": 0.6041117584130126
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.3808582870917645,
+            "max_absolute": 0.5,
+            "rmse": 0.43607280549599825
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 0.5,
+            "rmse": 0.49937284655671604
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.5,
+            "max_absolute": 0.5,
+            "rmse": 0.5
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.4986040191384609,
+            "max_absolute": 0.5,
+            "rmse": 0.4987449044915796
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          }
+        }
+      },
+      "gameplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.31535821288692073,
+            "max_absolute": 1.0,
+            "rmse": 0.5608440409660509
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.3415472661885234,
+            "max_absolute": 0.5,
+            "rmse": 0.412897228976414
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 0.5,
+            "rmse": 0.49937284655671604
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.5,
+            "max_absolute": 0.5,
+            "rmse": 0.5
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.4986040191384609,
+            "max_absolute": 0.5,
+            "rmse": 0.4987449044915796
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          }
+        }
+      }
+    },
+    "sample_count": 838912
+  },
+  "test_final": {
+    "all_finite": true,
+    "freeplay_actor_kl_computed": false,
+    "freeplay_hidden_opponent_fabricated": false,
+    "full_authoritative": {
+      "actor_byte_exact": true,
+      "actor_kl": 0.0,
+      "structural_bypass": true,
+      "value_byte_exact": true,
+      "value_drift": 0.0
+    },
+    "gameplay_actor": {
+      "baseline_mean_kl": 6.7218898009846475,
+      "baseline_per_channel_kl": {
+        "boost": 0.0170552550855118,
+        "handbrake": 0.5429388773233963,
+        "jump": 0.08225516338773278,
+        "pitch": 2.0710194517571567,
+        "roll": 0.3341366270529194,
+        "steer": 3.0034792553479983,
+        "throttle": 0.23326962365949885,
+        "yaw": 0.43773554737043335
+      },
+      "repaired_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.5754101276397705,
+            "mean": 0.6250403523445129,
+            "min": -2.703483819961548,
+            "std": 0.9492664337158203
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.5800701379776,
+            "mean": -0.23007681965827942,
+            "min": -1.559787631034851,
+            "std": 0.3316493630409241
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4624258279800415,
+            "mean": 0.38038983941078186,
+            "min": -1.0524877309799194,
+            "std": 0.3435962498188019
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.0008959770202637,
+            "mean": 1.265532374382019,
+            "min": -0.6173468828201294,
+            "std": 0.21752393245697021
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.238998532295227,
+            "mean": -0.24206189811229706,
+            "min": -1.3295775651931763,
+            "std": 0.3464876413345337
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9825705289840698,
+            "saturation_fraction": 0.9734572768211365,
+            "std": 0.12665767967700958
+          },
+          "handbrake": {
+            "mean": 0.4494629502296448,
+            "saturation_fraction": 0.322384238243103,
+            "std": 0.4177633225917816
+          },
+          "jump": {
+            "mean": 0.5367399454116821,
+            "saturation_fraction": 0.46719440817832947,
+            "std": 0.4681137800216675
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.7006809711456299
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2306996583938599
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.8011856079101562
+          },
+          "throttle": {
+            "at_max_fraction": 2.5032422854565084e-05,
+            "at_min_fraction": 0.0,
+            "mean": -1.1697849035263062
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1087195873260498
+          }
+        },
+        "sample_count": 838912
+      },
+      "repaired_mean_kl": 0.10307226094724493,
+      "repaired_per_channel_kl": {
+        "boost": 0.000324264141456143,
+        "handbrake": 0.004313003627636246,
+        "jump": 0.004104579271686707,
+        "pitch": 0.0615475313816996,
+        "roll": 0.00783695829398464,
+        "steer": 0.011107822416903298,
+        "throttle": 0.007622223948792128,
+        "yaw": 0.006215877865086178
+      }
+    },
+    "reconstruction": {
+      "freeplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.36565174001341455,
+            "max_absolute": 1.0,
+            "rmse": 0.6041117584130126
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.04091059825333856,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.10810555900478495
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.04892029970537504,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.12415338408866097
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.050296983317929166,
+            "max_absolute": 0.9845486879348755,
+            "rmse": 0.12804561961199873
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.0475436160928209,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.12013511085237522
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.027481530001678012,
+            "max_absolute": 0.13476839661598206,
+            "rmse": 0.03392952683863213
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.011436812831308861,
+            "max_absolute": 0.07657858729362488,
+            "rmse": 0.014460267805649359
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.02210984632941041,
+            "max_absolute": 0.9501456022262573,
+            "rmse": 0.04812623410098478
+          }
+        }
+      },
+      "gameplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.31535821288692073,
+            "max_absolute": 1.0,
+            "rmse": 0.5608440409660509
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.05017249339597933,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.10210090913871545
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.060381476173136626,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.12210516328392644
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.06300921534041955,
+            "max_absolute": 0.9762771725654602,
+            "rmse": 0.12553309309907593
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.0577537370058537,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.1185781781702156
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.037621862111512486,
+            "max_absolute": 0.23619863390922546,
+            "rmse": 0.0509824436507989
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0340592615277949,
+            "max_absolute": 0.9589055180549622,
+            "rmse": 0.05678123861905944
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.026178118596190122,
+            "max_absolute": 0.15500426292419434,
+            "rmse": 0.035090839928481575
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.03447542073886716,
+            "max_absolute": 0.9276195168495178,
+            "rmse": 0.05691380456292539
+          }
+        }
+      }
+    },
+    "sample_count": 838912
+  },
+  "training": {
+    "accepted_optimizer_steps_executed": 820,
+    "best_epoch": 2,
+    "best_optimizer_step": 410,
+    "curve": [
+      {
+        "accepted_optimizer_steps": 205,
+        "all_finite": true,
+        "epoch": 1,
+        "training_means": {
+          "approximate_residual": 0.006604970688931644,
+          "freeplay_reconstruction": 0.04014041869015229,
+          "gameplay_actor_kl": 0.43030869437427055,
+          "gameplay_reconstruction": 0.03424821798121784,
+          "gradient_norm": 16.811724884917098,
+          "loss": 0.4390330291012438
+        },
+        "validation_freeplay_reconstruction_rmse": 0.11462284101231258,
+        "validation_gameplay_actor_kl": 0.178301376257368,
+        "validation_gameplay_reconstruction_rmse": 0.10713512917160917
+      },
+      {
+        "accepted_optimizer_steps": 410,
+        "all_finite": true,
+        "epoch": 2,
+        "training_means": {
+          "approximate_residual": 0.0014687081929523407,
+          "freeplay_reconstruction": 0.012434211614110121,
+          "gameplay_actor_kl": 0.17749371397786023,
+          "gameplay_reconstruction": 0.011314472678776194,
+          "gradient_norm": 22.010074841103904,
+          "loss": 0.16034187903491462
+        },
+        "validation_freeplay_reconstruction_rmse": 0.10938677472978611,
+        "validation_gameplay_actor_kl": 0.1017296932533106,
+        "validation_gameplay_reconstruction_rmse": 0.10311926312072213
+      },
+      {
+        "accepted_optimizer_steps": 615,
+        "all_finite": true,
+        "epoch": 3,
+        "training_means": {
+          "approximate_residual": 0.0014897400041951276,
+          "freeplay_reconstruction": 0.010850453985536971,
+          "gameplay_actor_kl": 0.13493309922334623,
+          "gameplay_reconstruction": 0.009270031788817993,
+          "gradient_norm": 16.68919424603625,
+          "loss": 0.12773732550260497
+        },
+        "validation_freeplay_reconstruction_rmse": 0.10141841819106492,
+        "validation_gameplay_actor_kl": 0.146285675930443,
+        "validation_gameplay_reconstruction_rmse": 0.0952544297517566
+      },
+      {
+        "accepted_optimizer_steps": 820,
+        "all_finite": true,
+        "epoch": 4,
+        "training_means": {
+          "approximate_residual": 0.000989413486577843,
+          "freeplay_reconstruction": 0.008908104324122755,
+          "gameplay_actor_kl": 0.10312869341635122,
+          "gameplay_reconstruction": 0.006889273185373806,
+          "gradient_norm": 13.87399427716325,
+          "loss": 0.09792706186815006
+        },
+        "validation_freeplay_reconstruction_rmse": 0.09136994437180723,
+        "validation_gameplay_actor_kl": 0.11352931379207298,
+        "validation_gameplay_reconstruction_rmse": 0.08034844703598899
+      }
+    ],
+    "fresh_adapter_optimizer": true,
+    "frozen_policy_tensor_sha256_before_after": [
+      "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+      "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3"
+    ],
+    "historical_ppo_optimizer_loaded": false,
+    "historical_ppo_optimizer_mutated": false,
+    "stop_reason": "early_stopping_patience",
+    "transactional_nonfinite_rollbacks": 0
+  },
+  "verdict": "PASS"
+}

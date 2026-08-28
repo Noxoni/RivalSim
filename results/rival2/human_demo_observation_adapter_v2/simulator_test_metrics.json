@@ -1,0 +1,783 @@
+{
+  "acceptance": {
+    "accepted": true,
+    "checks": {
+      "all_finite": true,
+      "baseline_matches_authority": true,
+      "freeplay_meaningful_reconstruction": true,
+      "full_actor_exact": true,
+      "full_value_exact": true,
+      "gameplay_kl_absolute": true,
+      "gameplay_kl_relative_reduction": true,
+      "gameplay_reconstruction": true,
+      "pad_reconstruction": true
+    },
+    "freeplay_meaningful_reconstruction_rmse_before_after": [
+      0.6041117584130126,
+      0.10810555900478495
+    ],
+    "gameplay_actor_kl_after": 0.10307226094724493,
+    "gameplay_actor_kl_before": 6.7218898009846475,
+    "gameplay_actor_kl_relative_reduction": 0.984666178113758,
+    "gameplay_reconstruction_rmse_before_after": [
+      0.5608440409660509,
+      0.10210090913871545
+    ],
+    "pad_reconstruction_rmse_before_after": [
+      0.7061694197905967,
+      0.12210516328392644
+    ]
+  },
+  "baseline": {
+    "all_finite": true,
+    "freeplay_actor_kl_computed": false,
+    "freeplay_hidden_opponent_fabricated": false,
+    "full_authoritative": {
+      "actor_byte_exact": true,
+      "actor_kl": 0.0,
+      "structural_bypass": true,
+      "value_byte_exact": true,
+      "value_drift": 0.0
+    },
+    "gameplay_actor": {
+      "baseline_mean_kl": 6.7218898009846475,
+      "baseline_per_channel_kl": {
+        "boost": 0.0170552550855118,
+        "handbrake": 0.5429388773233963,
+        "jump": 0.08225516338773278,
+        "pitch": 2.0710194517571567,
+        "roll": 0.3341366270529194,
+        "steer": 3.0034792553479983,
+        "throttle": 0.23326962365949885,
+        "yaw": 0.43773554737043335
+      },
+      "repaired_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.9759924411773682,
+            "mean": 0.375590056180954,
+            "min": -2.0727734565734863,
+            "std": 0.7564159631729126
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.1570334434509277,
+            "mean": -0.27956318855285645,
+            "min": -1.5218749046325684,
+            "std": 0.2711578607559204
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.3412364721298218,
+            "mean": 0.369769424200058,
+            "min": -1.003020167350769,
+            "std": 0.33480966091156006
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.6672896146774292,
+            "mean": 1.1287676095962524,
+            "min": -0.8016392588615417,
+            "std": 0.1978491246700287
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.2868576049804688,
+            "mean": -0.2281934767961502,
+            "min": -1.5783047676086426,
+            "std": 0.2771052122116089
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9615756869316101,
+            "saturation_fraction": 0.8748354911804199,
+            "std": 0.178872749209404
+          },
+          "handbrake": {
+            "mean": 0.3435854911804199,
+            "saturation_fraction": 0.3502417504787445,
+            "std": 0.3758000135421753
+          },
+          "jump": {
+            "mean": 0.40386685729026794,
+            "saturation_fraction": 0.4430166780948639,
+            "std": 0.4345749616622925
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.5357800722122192
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2596428394317627
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -2.065138578414917
+          },
+          "throttle": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1078956127166748
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1458951234817505
+          }
+        },
+        "sample_count": 838912
+      },
+      "repaired_mean_kl": 6.53363147144242,
+      "repaired_per_channel_kl": {
+        "boost": 0.07098771189275514,
+        "handbrake": 0.10398592816499228,
+        "jump": 0.29391710795314346,
+        "pitch": 4.146825655953783,
+        "roll": 0.3215289355997709,
+        "steer": 1.1754703934977686,
+        "throttle": 0.18143520436710361,
+        "yaw": 0.23948053401310268
+      }
+    },
+    "reconstruction": {
+      "freeplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.36565174001341455,
+            "max_absolute": 1.0,
+            "rmse": 0.6041117584130126
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.3808582870917645,
+            "max_absolute": 0.5,
+            "rmse": 0.43607280549599825
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 0.5,
+            "rmse": 0.49937284655671604
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.5,
+            "max_absolute": 0.5,
+            "rmse": 0.5
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.4986040191384609,
+            "max_absolute": 0.5,
+            "rmse": 0.4987449044915796
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          }
+        }
+      },
+      "gameplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.31535821288692073,
+            "max_absolute": 1.0,
+            "rmse": 0.5608440409660509
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.3415472661885234,
+            "max_absolute": 0.5,
+            "rmse": 0.412897228976414
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 0.5,
+            "rmse": 0.49937284655671604
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.5,
+            "max_absolute": 0.5,
+            "rmse": 0.5
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.4986040191384609,
+            "max_absolute": 0.5,
+            "rmse": 0.4987449044915796
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.09781893658842843,
+            "max_absolute": 0.5,
+            "rmse": 0.22021995303912478
+          }
+        }
+      }
+    },
+    "sample_count": 838912
+  },
+  "final": {
+    "all_finite": true,
+    "freeplay_actor_kl_computed": false,
+    "freeplay_hidden_opponent_fabricated": false,
+    "full_authoritative": {
+      "actor_byte_exact": true,
+      "actor_kl": 0.0,
+      "structural_bypass": true,
+      "value_byte_exact": true,
+      "value_drift": 0.0
+    },
+    "gameplay_actor": {
+      "baseline_mean_kl": 6.7218898009846475,
+      "baseline_per_channel_kl": {
+        "boost": 0.0170552550855118,
+        "handbrake": 0.5429388773233963,
+        "jump": 0.08225516338773278,
+        "pitch": 2.0710194517571567,
+        "roll": 0.3341366270529194,
+        "steer": 3.0034792553479983,
+        "throttle": 0.23326962365949885,
+        "yaw": 0.43773554737043335
+      },
+      "repaired_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.5754101276397705,
+            "mean": 0.6250403523445129,
+            "min": -2.703483819961548,
+            "std": 0.9492664337158203
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.5800701379776,
+            "mean": -0.23007681965827942,
+            "min": -1.559787631034851,
+            "std": 0.3316493630409241
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4624258279800415,
+            "mean": 0.38038983941078186,
+            "min": -1.0524877309799194,
+            "std": 0.3435962498188019
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.0008959770202637,
+            "mean": 1.265532374382019,
+            "min": -0.6173468828201294,
+            "std": 0.21752393245697021
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.238998532295227,
+            "mean": -0.24206189811229706,
+            "min": -1.3295775651931763,
+            "std": 0.3464876413345337
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9825705289840698,
+            "saturation_fraction": 0.9734572768211365,
+            "std": 0.12665767967700958
+          },
+          "handbrake": {
+            "mean": 0.4494629502296448,
+            "saturation_fraction": 0.322384238243103,
+            "std": 0.4177633225917816
+          },
+          "jump": {
+            "mean": 0.5367399454116821,
+            "saturation_fraction": 0.46719440817832947,
+            "std": 0.4681137800216675
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.7006809711456299
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2306996583938599
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.8011856079101562
+          },
+          "throttle": {
+            "at_max_fraction": 2.5032422854565084e-05,
+            "at_min_fraction": 0.0,
+            "mean": -1.1697849035263062
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1087195873260498
+          }
+        },
+        "sample_count": 838912
+      },
+      "repaired_mean_kl": 0.10307226094724493,
+      "repaired_per_channel_kl": {
+        "boost": 0.000324264141456143,
+        "handbrake": 0.004313003627636246,
+        "jump": 0.004104579271686707,
+        "pitch": 0.0615475313816996,
+        "roll": 0.00783695829398464,
+        "steer": 0.011107822416903298,
+        "throttle": 0.007622223948792128,
+        "yaw": 0.006215877865086178
+      }
+    },
+    "reconstruction": {
+      "freeplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.36565174001341455,
+            "max_absolute": 1.0,
+            "rmse": 0.6041117584130126
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 78018816,
+            "mae": 0.04091059825333856,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.10810555900478495
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.04892029970537504,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.12415338408866097
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.050296983317929166,
+            "max_absolute": 0.9845486879348755,
+            "rmse": 0.12804561961199873
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.0475436160928209,
+            "max_absolute": 0.9857451915740967,
+            "rmse": 0.12013511085237522
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.027481530001678012,
+            "max_absolute": 0.13476839661598206,
+            "rmse": 0.03392952683863213
+          },
+          "opponent": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.011436812831308861,
+            "max_absolute": 0.07657858729362488,
+            "rmse": 0.014460267805649359
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.02210984632941041,
+            "max_absolute": 0.9501456022262573,
+            "rmse": 0.04812623410098478
+          }
+        }
+      },
+      "gameplay": {
+        "degraded": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.31535821288692073,
+            "max_absolute": 1.0,
+            "rmse": 0.5608440409660509
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.49930200956923043,
+            "max_absolute": 1.0,
+            "rmse": 0.7061694197905967
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.9810388862212569,
+            "max_absolute": 1.0,
+            "rmse": 0.9904740714532899
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.017565132917204015,
+            "max_absolute": 1.0,
+            "rmse": 0.1277169239902014
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.0,
+            "max_absolute": 0.0,
+            "rmse": 0.0
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.0035383447026587733,
+            "max_absolute": 1.0,
+            "rmse": 0.045112885294409155
+          }
+        },
+        "repaired": {
+          "all_meaningful": {
+            "count": 90602496,
+            "mae": 0.05017249339597933,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.10210090913871545
+          },
+          "ball": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "boost_pad": {
+            "count": 57046016,
+            "mae": 0.060381476173136626,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.12210516328392644
+          },
+          "boost_pad_active": {
+            "count": 28523008,
+            "mae": 0.06300921534041955,
+            "max_absolute": 0.9762771725654602,
+            "rmse": 0.12553309309907593
+          },
+          "boost_pad_cooldown": {
+            "count": 28523008,
+            "mae": 0.0577537370058537,
+            "max_absolute": 0.977089524269104,
+            "rmse": 0.1185781781702156
+          },
+          "lifecycle": {
+            "count": 1677824,
+            "mae": 0.037621862111512486,
+            "max_absolute": 0.23619863390922546,
+            "rmse": 0.0509824436507989
+          },
+          "opponent": {
+            "count": 12583680,
+            "mae": 0.0340592615277949,
+            "max_absolute": 0.9589055180549622,
+            "rmse": 0.05678123861905944
+          },
+          "previous_action": {
+            "count": 6711296,
+            "mae": 0.026178118596190122,
+            "max_absolute": 0.15500426292419434,
+            "rmse": 0.035090839928481575
+          },
+          "relative": {
+            "count": 0,
+            "mae": null,
+            "max_absolute": null,
+            "rmse": null
+          },
+          "self": {
+            "count": 12583680,
+            "mae": 0.03447542073886716,
+            "max_absolute": 0.9276195168495178,
+            "rmse": 0.05691380456292539
+          }
+        }
+      }
+    },
+    "sample_count": 838912
+  }
+}

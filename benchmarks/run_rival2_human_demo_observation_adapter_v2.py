@@ -1109,6 +1109,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         RESULT_ROOT / "native_boost_pad_audit.json",
         RESULT_ROOT / "simulator_test_metrics.json",
         RESULT_ROOT / "training_curve.json",
+        RESULT_ROOT / "verification_evidence.json",
     ]
     _write_json(
         ROOT / RESULT_ROOT / "artifact_manifest.json",
@@ -1227,6 +1228,7 @@ def finalize_existing(args: argparse.Namespace) -> dict[str, Any]:
         RESULT_ROOT / "native_boost_pad_audit.json",
         RESULT_ROOT / "simulator_test_metrics.json",
         RESULT_ROOT / "training_curve.json",
+        RESULT_ROOT / "verification_evidence.json",
     ]
     _write_json(
         ROOT / RESULT_ROOT / "artifact_manifest.json",
