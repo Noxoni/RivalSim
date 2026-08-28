@@ -1,0 +1,70 @@
+{
+  "format": "RIVAL2_GAMEPLAY_V3_VALIDATION_CORRECTION_POST_COMMIT_AUDIT_V1",
+  "created_utc": "2026-08-28T03:24:49.517405+00:00",
+  "authority": "handoff/rival2-gameplay-v3-production-v1/POST_COMMIT_AUDIT.md",
+  "implementation_commits": [
+    "296ca3d126f963b3a0a375554daf637230df2a31",
+    "cb5a144e1a8733bde525bd5f1d23c96227bb3484"
+  ],
+  "findings": {
+    "1_retained_gameplay_event_accumulation": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/reward_reconstruction.json",
+        "results/rival2/gameplay_v3_validation_correction_v1/regression_tests.json",
+        "tests/test_rival2_gameplay_v3.py"
+      ],
+      "finding": "V3 retains boost-use, pad-pickup, and save accumulation; touch remains exactly zero and historical V1/V2 focused tests pass."
+    },
+    "2_unknown_mode_fails_closed": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/regression_tests.json",
+        "tests/test_rival2_gameplay_v3.py"
+      ],
+      "finding": "V3 has explicit composition; unsupported reward identity rejects and cannot fall through to Gameplay or Gameplay V2 rewards."
+    },
+    "3_all_v3_dispatch_sites": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/contract.json",
+        "results/rival2/gameplay_v3_validation_correction_v1/checkpoint_transition.json",
+        "results/rival2/gameplay_v3_validation_correction_v1/regression_tests.json"
+      ],
+      "finding": "Contract, environment, kernel, world-state, bridge, and explicit V2-to-V3 transition identities are covered and green."
+    },
+    "4_disposable_rollout_only": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/checkpoint_transition.json",
+        "results/rival2/gameplay_v3_validation_correction_v1/shadow_gate_summary.json",
+        "results/rival2/gameplay_v3_validation_correction_v1/no_training_assertion.json"
+      ],
+      "finding": "The exact-scale rollout and shadow used disposable state; no update ran, model/optimizer and iteration/policy stayed exact, and no campaign checkpoint was written."
+    },
+    "5_reward_identity_construction_matrix": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/regression_tests.json",
+        "tests/test_rival2_gameplay_v3.py"
+      ],
+      "finding": "Gameplay V1, V2, and V3 construction/step allocation and observation-shape cases pass with historical hashes exact."
+    },
+    "6_actual_production_array_memory": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/memory_smoke.json"
+      ],
+      "finding": "Logical memory is summed from actual production arrays; correction evidence buffers are absent; exact 131072-world one-decision and horizon-32 gates pass."
+    },
+    "7_graph_capture_unaffected": {
+      "status": "PASS",
+      "evidence": [
+        "results/rival2/gameplay_v3_validation_correction_v1/regression_tests.json"
+      ],
+      "finding": "The correction touched classifier state/signals but did not alter graph capture or invalidation APIs; the audited Rival2 validation path continues to use direct launches."
+    }
+  },
+  "all_findings_pass": true,
+  "verdict": "PASS"
+}

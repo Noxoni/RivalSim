@@ -1,0 +1,123 @@
+{
+  "authoritative_arrays": true,
+  "bounded_full_simulator_benchmark": false,
+  "case_count": 12,
+  "cases": {
+    "ball_reset_three_support_wheels_and_resource_transition": {
+      "observed": {
+        "chain_reset_total": 0,
+        "interval_requested": 1,
+        "pending_after_support": 1,
+        "preflip_reset_total": 0,
+        "reset_completion_total": 1
+      },
+      "pass": true
+    },
+    "car_reset_three_other_car_support_wheels": {
+      "observed": {
+        "chain_reset_total": 0,
+        "interval_requested": 1,
+        "pending_after_support": 2,
+        "preflip_reset_total": 0,
+        "reset_completion_total": 1
+      },
+      "pass": true
+    },
+    "chain_requires_loss_then_distinct_reacquisition": {
+      "observed": {
+        "after_distinct_reacquisition": 2,
+        "before_consumption": 1,
+        "chain_reset_total": 1,
+        "first_completion": 1,
+        "interval_requested": 2
+      },
+      "pass": true
+    },
+    "dash_air_over_42_ticks_rejects": {
+      "observed": {
+        "dash_success_total": 0,
+        "interval_requested": 0,
+        "pending_flip_tick": -1
+      },
+      "pass": true
+    },
+    "dash_gain_at_most_one_rejects": {
+      "observed": {
+        "dash_success_total": 0,
+        "interval_requested": 0,
+        "pending_flip_tick": -1
+      },
+      "pass": true
+    },
+    "dash_gain_strictly_greater_than_one_accepts": {
+      "observed": {
+        "dash_success_total": 1,
+        "interval_requested": 1,
+        "pending_flip_tick": -1
+      },
+      "pass": true
+    },
+    "dash_has_no_fresh_jump_prohibition": {
+      "observed": {
+        "dash_success_total": 1,
+        "interval_requested": 1,
+        "pending_flip_tick": -1
+      },
+      "pass": true
+    },
+    "dash_landing_over_24_ticks_rejects": {
+      "observed": {
+        "dash_success_total": 0,
+        "interval_requested": 0,
+        "pending_flip_tick": -1
+      },
+      "pass": true
+    },
+    "preflip_subtype_adds_zero_extra_payout": {
+      "observed": {
+        "ball_reset_detected": 1,
+        "chain_reset_total": 0,
+        "interval_requested": 1,
+        "pending_after_support": 1,
+        "preflip_reset_total": 1,
+        "reset_completion_total": 1
+      },
+      "pass": true
+    },
+    "reset_two_support_wheels_rejects": {
+      "observed": {
+        "chain_reset_total": 0,
+        "interval_requested": 0,
+        "pending_after_support": 0,
+        "preflip_reset_total": 0,
+        "reset_completion_total": 0
+      },
+      "pass": true
+    },
+    "two_dashes_pay_twice_double_label_has_no_third_payout": {
+      "observed": {
+        "dash_success_total": 2,
+        "double_dash_total": 1,
+        "interval_requested": 2,
+        "successful_dash_detected": 2
+      },
+      "pass": true
+    },
+    "unchanged_untimed_resource_rejects": {
+      "observed": {
+        "chain_reset_total": 0,
+        "interval_requested": 0,
+        "pending_after_support": 0,
+        "preflip_reset_total": 0,
+        "reset_completion_total": 0
+      },
+      "pass": true
+    }
+  },
+  "created_utc": "2026-08-28T03:15:49.309846+00:00",
+  "failed": [],
+  "format": "RIVAL2_GAMEPLAY_V3_DASH_RESET_SOURCE_EXACT_V1",
+  "passed": 12,
+  "production_kernel": "rivalsim.gameplay_v3.gameplay_v3_track_tick",
+  "verdict": "PASS"
+}

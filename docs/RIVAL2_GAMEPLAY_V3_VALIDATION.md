@@ -1,6 +1,14 @@
 # Rival2 Gameplay V3 production validation
 
-Status: `GAMEPLAY_V3_READY_FOR_REVIEW`
+Status: `SUPERSEDED_BY_VALIDATION_CORRECTION_V1`
+
+> The classifier-calibration claims in this original package were found to be
+> circular because they were based on hand-authored feature dictionaries. They
+> are not current review evidence. The replacement physical-trace calibration,
+> rerun runtime gates, and corrected verdict are indexed in
+> `docs/RIVAL2_GAMEPLAY_V3_VALIDATION_CORRECTION_V1.md`. This original document
+> remains only as the immutable index for the provisionally accepted production
+> package at `00a4865400291a5ff0a34925a966c0963f55d963`.
 
 This document is the compact reviewer index for the implementation and evidence authorized by `handoff/rival2-gameplay-v3-production-v1/`. It is a review gate only. Gameplay V3 PPO training was not started.
 
