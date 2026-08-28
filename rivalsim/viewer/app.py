@@ -331,14 +331,23 @@ class RivalVisApp(ShowBase):
             else ("Blue" if frame.last_touch == 0 else "Orange")
         )
         self.match_text.setText(
-            f"BLUE {frame.blue_score}  |  {_clock(frame)}  |  {frame.orange_score} ORANGE\n"
+            f"{self.session.blue_label} {frame.blue_score}  |  {_clock(frame)}  |  "
+            f"{frame.orange_score} {self.session.orange_label}\n"
             f"{phase}  {kickoff}  tick {frame.physics_tick}  decision {frame.policy_decision}  "
             f"{playback}  last touch {touch}  camera {self.camera_mode}"
         )
-        self.blue_text.setText(_car_hud("BLUE", frame, 0))
-        self.orange_text.setText(_car_hud("ORANGE", frame, 1))
+        self.blue_text.setText(
+            _car_hud(f"{self.session.blue_label} - BLUE", frame, 0)
+        )
+        self.orange_text.setText(
+            _car_hud(f"{self.session.orange_label} - ORANGE", frame, 1)
+        )
         if frame.match_finished:
-            winner = "BLUE WINS" if frame.winner == 0 else "ORANGE WINS"
+            winner = (
+                f"{self.session.blue_label} WINS"
+                if frame.winner == 0
+                else f"{self.session.orange_label} WINS"
+            )
             self.final_text.setText(
                 f"FINAL  {frame.blue_score} - {frame.orange_score}\n{winner}\n"
                 "R: same seed   N: new seed"
@@ -395,6 +404,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     behavior.add_argument("--deterministic", dest="stochastic", action="store_false")
     parser.set_defaults(stochastic=True)
     parser.add_argument(
+        "--opponent",
+        choices=("self", "wisp"),
+        default="self",
+        help="Orange-side opponent; default current-policy self-play",
+    )
+    parser.add_argument(
         "--smoke-frames",
         type=int,
         default=0,
@@ -410,7 +425,11 @@ def main(argv: list[str] | None = None) -> int:
         "",
         "\n".join(
             (
-                "window-title RivalVis - RivalSim checkpoint spectator",
+                (
+                    "window-title RivalVis - Rival vs Wisp"
+                    if args.opponent == "wisp"
+                    else "window-title RivalVis - RivalSim checkpoint spectator"
+                ),
                 "win-size 1600 900",
                 "sync-video true",
                 "show-frame-rate-meter false",
@@ -426,11 +445,13 @@ def main(argv: list[str] | None = None) -> int:
         device=args.device,
         seed=args.seed,
         stochastic=args.stochastic,
+        opponent=args.opponent,
     )
     info = session.checkpoint_info
     print(
         f"RivalVis checkpoint={info.path} sha256={info.sha256} "
-        f"mode={'stochastic' if args.stochastic else 'deterministic'} seed={args.seed}",
+        f"mode={'stochastic' if args.stochastic else 'deterministic'} "
+        f"opponent={args.opponent} seed={args.seed}",
         flush=True,
     )
     app = RivalVisApp(

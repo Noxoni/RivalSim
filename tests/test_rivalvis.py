@@ -14,7 +14,7 @@ from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
 from rivalsim.rival2_contracts import OBS_DIM
 from rivalsim.rival2_full_match_env import Rival2FullMatchEnv
 from rivalsim.rival2_policy import deterministic_hybrid_action
-from rivalsim.viewer.app import PHYSICS_SECONDS, PlaybackState
+from rivalsim.viewer.app import PHYSICS_SECONDS, PlaybackState, parse_args
 from rivalsim.viewer.frame import interpolate_viewer_frame
 from rivalsim.viewer.rendering import make_arena_collision_geometry, panda_quaternion
 from rivalsim.viewer.spectator import RivalVisSession, ViewerStateAdapter
@@ -194,3 +194,36 @@ def test_visual_interpolation_quaternion_and_playback_controls() -> None:
     assert visual.physics_tick == current.physics_tick
     assert visual.blue_score == current.blue_score
     session.close()
+
+
+def test_viewer_cli_accepts_frozen_wisp_opponent() -> None:
+    args = parse_args(["--checkpoint", str(CHECKPOINT), "--opponent", "wisp"])
+    assert args.opponent == "wisp"
+
+
+def test_wisp_viewer_drives_orange_with_pinned_adapter(
+    arena_assets: tuple[str, ArenaGeometry, WarpArenaMeshes],
+) -> None:
+    root, _geometry, _meshes = arena_assets
+    before_hash = _sha256(CHECKPOINT)
+    session = RivalVisSession(
+        CHECKPOINT,
+        collision_root=root,
+        seed=20260827,
+        stochastic=False,
+        opponent="wisp",
+    )
+    assert session.blue_label == "RIVAL"
+    assert session.orange_label == "WISP"
+    assert session.wisp is not None
+    session.advance_physics_tick()
+    assert session.wisp.inference_calls >= 1
+    torch.testing.assert_close(
+        session.current_action[0, 1],
+        session.wisp.previous_action[0],
+        rtol=0.0,
+        atol=0.0,
+    )
+    session.close()
+    assert session.checkpoint_unchanged()
+    assert _sha256(CHECKPOINT) == before_hash

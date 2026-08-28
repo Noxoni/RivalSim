@@ -31,6 +31,7 @@ from rivalsim.viewer.frame import (
     TransformFrame,
     ViewerFrame,
 )
+from third_party.wisp75b.adapter import WispPolicyAdapter, WispStateTensors
 
 
 @dataclass(frozen=True, slots=True)
@@ -276,7 +277,10 @@ class RivalVisSession:
         device: str = "cuda:0",
         seed: int = 20260827,
         stochastic: bool = True,
+        opponent: str = "self",
     ):
+        if opponent not in {"self", "wisp"}:
+            raise ValueError("RivalVis opponent must be 'self' or 'wisp'")
         self.device = torch.device(device)
         self.collision_root = resolve_collision_root(collision_root)
         self.model, self.policy_config, self.checkpoint_info = load_checkpoint_policy(
@@ -284,6 +288,9 @@ class RivalVisSession:
         )
         self.seed = int(seed)
         self.stochastic = bool(stochastic)
+        self.opponent = opponent
+        self.blue_label = "RIVAL" if opponent == "wisp" else "BLUE"
+        self.orange_label = "WISP" if opponent == "wisp" else "ORANGE"
         self._closed = False
         self._create_match(self.seed)
 
@@ -299,6 +306,20 @@ class RivalVisSession:
             car_visitation_order="a_then_b",
         )
         self.generator = torch.Generator(device=self.device).manual_seed(seed)
+        self.wisp: WispPolicyAdapter | None = None
+        self.wisp_state: WispStateTensors | None = None
+        self.wisp_active: torch.Tensor | None = None
+        self.physics_reset_mask = wp.to_torch(
+            self.env.world.rival2.physics_reset_mask
+        )
+        if self.opponent == "wisp":
+            self.wisp = WispPolicyAdapter(1, device=self.device)
+            self.wisp.set_player_index(
+                torch.ones(1, dtype=torch.long, device=self.device)
+            )
+            self.wisp_active = torch.ones(1, dtype=torch.bool, device=self.device)
+            self.wisp.activate(self.wisp_active)
+            self.wisp_state = WispStateTensors.from_bridge(self.env.bridge)
         self.adapter = ViewerStateAdapter(self.env)
         self.current_action = torch.zeros((1, 2, 8), device=self.device)
         self.last_reward = torch.zeros((1, 2), device=self.device)
@@ -314,7 +335,10 @@ class RivalVisSession:
 
     @torch.no_grad()
     def _policy_action(self) -> torch.Tensor:
-        actor, _value = self.model(self.env.observation.reshape(-1, OBS_DIM))
+        observation = self.env.observation
+        if self.opponent == "wisp":
+            observation = observation[:, 0]
+        actor, _value = self.model(observation.reshape(-1, OBS_DIM))
         if self.stochastic:
             action = sample_hybrid_action(
                 actor,
@@ -323,7 +347,23 @@ class RivalVisSession:
             ).action
         else:
             action = deterministic_hybrid_action(actor, self.policy_config)
+        if self.opponent == "wisp":
+            return action.reshape(1, 8)
         return action.reshape(1, 2, 8)
+
+    def _wisp_action(self) -> torch.Tensor:
+        if self.wisp is None or self.wisp_state is None or self.wisp_active is None:
+            raise RuntimeError("Wisp opponent state is unavailable")
+        score_diff = (
+            self.env.full_match_views["orange_score"]
+            - self.env.full_match_views["blue_score"]
+        ).to(torch.float32)
+        action, _indices = self.wisp.tick_action(
+            self.wisp_state,
+            active_mask=self.wisp_active,
+            score_diff=score_diff,
+        )
+        return action
 
     def _capture(self) -> ViewerFrame:
         return self.adapter.capture(
@@ -344,7 +384,15 @@ class RivalVisSession:
         if self.interval_tick == 0:
             self._decision_observation = self.env.observation
             self.env.world.begin_decision()
-            self.current_action = self.env.bridge.set_actions(self._policy_action()).clone()
+            if self.opponent == "wisp":
+                self.current_action[:, 0].copy_(self._policy_action())
+            else:
+                self.current_action = self.env.bridge.set_actions(
+                    self._policy_action()
+                ).clone()
+        if self.opponent == "wisp":
+            self.current_action[:, 1].copy_(self._wisp_action())
+            self.current_action = self.env.bridge.set_actions(self.current_action).clone()
         self.env.world.step(1)
         self.interval_tick += 1
         if bool(self.adapter.hit_blue[0].item()):
@@ -371,7 +419,10 @@ class RivalVisSession:
                 raw_winner = int(self.env.full_match_views["winner"].item())
                 self.winner = raw_winner if raw_winner in (0, 1) else None
             else:
+                physical_reset = self.physics_reset_mask.to(torch.bool).clone()
                 self.env.world.apply_interval_resets()
+                if self.wisp is not None and bool(physical_reset.any()):
+                    self.wisp.activate(physical_reset)
                 self.env.observation = self.env.bridge.observation()
                 self.env.decision_count += 1
             self.interval_tick = 0

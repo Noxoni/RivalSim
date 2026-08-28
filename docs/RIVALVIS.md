@@ -22,6 +22,16 @@ held-out policy sampling. Deterministic debugging is available with:
 .\.venv\Scripts\python.exe -m rivalsim.viewer --checkpoint checkpoints\rival2\acquisition_v1\rival2_acquisition_resume.pt --deterministic --seed 20260827
 ```
 
+To watch Rival on Blue against the pinned, deterministic Wisp policy on Orange:
+
+```powershell
+.\.venv\Scripts\python.exe -m rivalsim.viewer --checkpoint CHECKPOINT.pt --opponent wisp
+```
+
+Wisp runs through the same source-faithful 8/7-tick frozen adapter used by the
+held-out evaluator. Rival retains the selected stochastic or deterministic 30 Hz
+policy mode. The HUD labels the two policies explicitly.
+
 Use `--speed 0.25`, `0.5`, `1`, `2`, or `4` to choose the initial playback speed.
 Use `--collision-dir PATH` if the collision meshes are not in the normal sibling
 `RLBot-Rival/bot/collision_meshes` checkout. `RIVALSIM_COLLISION_DIR` is also
