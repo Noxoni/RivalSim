@@ -48,9 +48,15 @@ target_link_libraries(rivalrec_format PUBLIC bcrypt)
 add_executable(rivalrec_format_fixture tests/format_fixture.cpp)
 target_link_libraries(rivalrec_format_fixture PRIVATE rivalrec_format)
 
+include(CTest)
+add_executable(rivalrec_policy_tests tests/recorder_policy_tests.cpp)
+target_include_directories(rivalrec_policy_tests PRIVATE include)
+add_test(NAME rivalrec_policy_tests COMMAND rivalrec_policy_tests)
+
 add_library(rival_demo_recorder SHARED
     src/rival_demo_recorder.cpp
     src/rival_demo_recorder.hpp
+    include/rivalrec/recorder_policy.hpp
 )
 set_target_properties(rival_demo_recorder PROPERTIES
     PREFIX ""
@@ -66,7 +72,7 @@ target_compile_definitions(rival_demo_recorder PRIVATE
     _CRT_SECURE_NO_WARNINGS
     RIVALREC_GIT_SHA="${RIVALREC_GIT_SHA}"
     RIVALREC_SDK_REVISION="479e8f571cf554b25f4eeb64d611dec4133edcaf"
-    RIVALREC_PLUGIN_BUILD="1.0.0"
+    RIVALREC_PLUGIN_BUILD="1.0.1"
 )
 target_link_libraries(rival_demo_recorder PRIVATE
     rivalrec_format
@@ -74,7 +80,7 @@ target_link_libraries(rival_demo_recorder PRIVATE
 )
 
 if(MSVC)
-    foreach(target rivalrec_format rivalrec_format_fixture rival_demo_recorder)
+    foreach(target rivalrec_format rivalrec_format_fixture rivalrec_policy_tests rival_demo_recorder)
         target_compile_options(${target} PRIVATE /W4 /permissive- /EHsc /utf-8)
     endforeach()
 endif()

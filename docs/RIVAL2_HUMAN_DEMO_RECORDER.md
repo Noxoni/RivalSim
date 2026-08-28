@@ -137,17 +137,25 @@ authoritative workflow.
 
 ## Human-car identification
 
-At start and before every captured frame, the plugin requires all of the following to agree:
+At start and at every relevant `SetVehicleInput` callback, the plugin requires all of the
+following to agree:
 
 1. `GameWrapper::GetLocalCar()`;
 2. `GameWrapper::GetPlayerController().GetPRI()`;
 3. exactly one PRI in `ServerWrapper::GetPRIs()` whose PRI and owned car match both values.
 
-The stable player identity is `PriWrapper::GetUniqueIdWrapper().GetIdString()`, with the native
-player ID as a fallback only if the unique-ID string is unavailable. No car index, team, or player
-name assumption is made. If the relationship is null or not unique, start is rejected. If it stops
-being unique while recording, capture stops as incomplete and the identity failure is reported.
-Every frame contains all nonspectator PRIs/cars and exactly one `is_local_human` flag.
+The session identity is strictly `PriWrapper::GetUniqueIdWrapper().GetIdString()`. A missing stable
+unique ID is an identity failure; the recorder does not substitute a car address, index, team,
+player name, or other guess.
+
+The car UObject address is a replaceable binding, not player identity. If the same stable player
+uniquely owns a different current car after a goal, round reset, respawn, Freeplay reset, or other
+supported local replacement, the recorder atomically rebinds to that car and continues. Every
+transition emits `local_car_rebind` with the previous and new addresses, stable player ID, physics
+frame/time, sequence boundary, and most recent lifecycle-event context. If the logical player
+relationship becomes null, ambiguous, or changes stable ID, recording stops as incomplete and an
+`identity_failure` event preserves the reason. Every frame contains all nonspectator PRIs/cars and
+exactly one `is_local_human` flag.
 
 ## Native inputs captured
 
@@ -179,6 +187,12 @@ handbrake
 No analog channel is quantized or downsampled. Native float32 values are serialized by exact bit
 representation. The five bitfields are stored as their exact logical true/false values.
 
+The top-level frame `native_input` copied from the hook parameter is the authoritative action
+label. `cars[*].native_input`, obtained separately from `CarWrapper::GetInput()`, is state/debug
+telemetry observed at a different engine phase and is not interchangeable with the applied action.
+The first live smoke differed on 4,104 of 5,052 frames, so converters must never substitute the
+per-car snapshot for the top-level hook input.
+
 ## Native state captured per input application
 
 Each frame represents state read synchronously at the native input-application hook plus the exact
@@ -194,8 +208,21 @@ Frame/timing identity:
 - server seconds elapsed;
 - high-resolution local monotonic nanoseconds;
 - UTC nanoseconds;
-- deltas from the preceding captured hook;
-- duplicate, out-of-order, and missing physics-frame flags and counts.
+- deltas from the preceding published physics tick;
+- out-of-order and missing physics-frame flags and counts;
+- duplicate-hook, suppressed-duplicate, and retained-duplicate counters.
+
+`SetVehicleInput` can be invoked more than once for the local car in one physics frame. The
+recorder holds one frame pending until the physics-frame identity advances. A later same-tick
+callback replaces the pending frame because it is the final input application observed before the
+engine advances. Each replaced callback is preserved as a `duplicate_hook_callback_suppressed`
+event containing both raw native inputs. Only the final callback is published, so the binary frame
+stream has one unambiguous frame per physics tick. The counters are:
+
+- `duplicate_hook_callbacks`: extra same-tick hook invocations observed;
+- `duplicate_frames_suppressed`: earlier pending frames replaced by the deterministic rule;
+- `duplicate_frames_retained`: duplicate physics frames published; production value must remain
+  zero.
 
 No missing physics tick is synthesized. If the bounded writer queue is exhausted, that frame is
 dropped, the recorder sequence advances, and the final manifest reports the drop; a reader then
@@ -266,6 +293,14 @@ time, monotonic/UTC time, caller identity, and relevant actor identity for:
 - boost-pad pickup/spawn;
 - ball out-of-world.
 
+Recorder lifecycle evidence is also journaled:
+
+- `local_car_rebind`: `previous_car_address`, `new_car_address`, `stable_player_id`,
+  `reason=resolved_local_car_changed`, and `event_context` in addition to the common timing fields;
+- `identity_failure`: the unresolved/changed identity reason before an incomplete stop;
+- `duplicate_hook_callback_suppressed`: same-tick identity, deterministic rule, sequence, and the
+  suppressed and retained raw `ControllerInput` objects.
+
 `markers.jsonl` stores optional `rivalrec_mark` and `rivalrec_note` entries with the same timing
 identity. Events are segmentation evidence only; the recorder makes no reward or mechanic-quality
 judgment.
@@ -312,9 +347,12 @@ On clean stop the manifest includes:
 - match/freeplay mode and user labels;
 - Rocket League, BakkesMod, plugin, SDK, schema, and RivalSim Git identities;
 - map and local player/team identity;
-- duration, final frame count, and observed capture rate;
-- attempted, enqueued, written, queue-dropped, duplicate, out-of-order, missing, and identity-failure
-  counts;
+- session wall duration, final frame count, and session-wide capture rate;
+- active-capture first/last physics frame and engine time, active duration, and active capture rate;
+- stop physics frame, engine time, and local monotonic time;
+- attempted, enqueued, written, queue-dropped, duplicate-hook, suppressed/retained duplicate,
+  out-of-order, missing, identity-failure, and local-car-rebind counts;
+- the same-tick last-callback resolution rule and authoritative action-source declaration;
 - per-chunk frame/sequence ranges, bytes, clean-complete flag, and SHA-256;
 - event/marker bytes and SHA-256;
 - clean/incomplete flag and termination reason.
@@ -333,11 +371,25 @@ $session = "$env:APPDATA\bakkesmod\bakkesmod\data\rival2\human_demos\<session-uu
 .\.venv\Scripts\python.exe -m rivalsim.human_demo mapping-report
 ```
 
-`validate` verifies binary framing, CRCs, complete footers, chunk/session/index metadata, per-chunk
-frame counts and sequence ranges, chunk and journal SHA-256/size, deterministic sequence order,
-physics duplicates/order, action ranges/types, exactly one human car per frame, and clean final
-frame count. Use `--strict-complete` to reject rather than recover a final partial chunk. Add
-`--output report.json` to any command to write machine-readable JSON.
+`validate` reports three distinct verdicts:
+
+```text
+container_valid
+capture_complete
+overall_demonstration_valid = container_valid AND clean stop AND capture_complete
+```
+
+`container_valid` covers binary framing, CRCs, complete footers, chunk/session/index metadata,
+per-chunk frame counts and sequence ranges, chunk and journal SHA-256/size, deterministic sequence
+order, action ranges/types, exactly one human car per frame, and clean final frame count.
+
+`capture_complete` separately compares the final frame with the final event, marker, and recorded
+stop physics identity. It reports all final identities, trailing uncovered ticks/engine seconds,
+active-capture bounds/rate, session wall duration/rate, and rejects duplicate published ticks,
+missing/out-of-order ticks, queue drops, retained duplicates, identity failures, or material active
+simulation after the final frame. The legacy `valid` field and CLI exit status now use the safe
+`overall_demonstration_valid` verdict. Use `--strict-complete` to reject rather than recover a final
+partial chunk. Add `--output report.json` to write machine-readable JSON.
 
 The API is deterministic and streaming:
 
@@ -396,7 +448,7 @@ by session/mechanic class and orders `classes_by_intra_window_variation` by the 
 any changed channel. It also retains every per-session report, so repeated mechanic classes can be
 audited without joining frames across session boundaries.
 
-## Manual read-only smoke test
+## Manual replacement/lifecycle smoke test
 
 Use this procedure on a machine with Rocket League and BakkesMod. It is a failed gate if any step
 cannot be verified; do not replace it with synthetic data.
@@ -404,20 +456,35 @@ cannot be verified; do not replace it with synthetic data.
 1. Build and install the DLL, launch BakkesMod and Rocket League, and run
    `plugin load rival_demo_recorder`.
 2. Enter ordinary Freeplay. Do not load an online match.
-3. Run `rivalrec_start freeplay recorder_smoke`.
-4. For 10 seconds, drive, steer both ways, jump, boost, powerslide, pitch/yaw/roll in the air, and
-   hit the ball at least once.
-5. Run `rivalrec_mark smoke_midpoint`, then `rivalrec_status`, then `rivalrec_stop`.
-6. Confirm the console reports a clean stop, no queue drops, no out-of-order frames, and a capture
-   rate near the engine cadence. Occasional duplicate/gap counts must be investigated, not hidden.
-7. Run `validate`, `inspect`, and `action-variation` on the emitted UUID directory.
-8. Confirm validation is true, exactly one human car exists in every frame, native analog values are
-   in their actual game ranges, physics frames progress coherently, state changes are continuous,
-   the ball-touch and marker journals are present, and hashes verify.
-9. Repeat in an RLBot-created local 1v1 using `rivalrec_start match nexto_smoke`; confirm the opponent
-   name/bot identity and user label are retained.
-10. Attempt start from an online game only as a refusal check; it must reject recording. Do not play
+3. Run `rivalrec_start freeplay replacement_smoke`.
+4. Drive, steer, jump, boost, powerslide, rotate in the air, and touch the ball.
+5. Trigger at least two explicit Freeplay resets. Continue driving/jumping/boosting/touching after
+   every reset; do not stop recording between replacements.
+6. Score or otherwise trigger a normal goal/round reset if the active Freeplay mode supports it.
+7. Near the end run `rivalrec_mark after_multiple_replacements`, continue driving for several more
+   seconds, then run `rivalrec_status` and `rivalrec_stop`.
+8. Confirm a clean stop, zero queue drops/out-of-order/missing frames, one or more
+   `local_car_rebind` events when addresses changed, nonzero `duplicate_hook_callbacks` only if each
+   has a matching suppressed event, and `duplicate_frames_retained=0`.
+9. Run `validate`, `inspect`, and `action-variation` on the emitted UUID. Require
+   `container_valid=true`, `capture_complete=true`, `overall_demonstration_valid=true`, no material
+   trailing uncovered time, active capture rate near the declared engine cadence, stable player ID,
+   continuous sequence/physics identity after every rebind, exact hashes/CRCs, and exactly one human
+   car per frame.
+10. Repeat in an RLBot-created local 1v1 with `rivalrec_start match nexto_replacement_smoke`. Score at
+    least one goal and continue playing after the kickoff/respawn. Confirm the opponent identity and
+    label remain present and the sequence crosses every replacement.
+11. Attempt start from an online game only as a refusal check; it must reject recording. Do not play
     or automate an online match for this test.
+
+## Failed first smoke retained as regression evidence
+
+Session `D373ED52-3F55-4082-A111-4CD64FC48ACD` is intentionally not rewritten or ingested. With the
+corrected validator it reports a structurally valid container and native-cadence prefix, but fails
+capture completeness because event/marker activity continues 10,359 physics ticks and 86.324664
+engine seconds beyond the final frame. Its active rate is approximately 120.0475 Hz while its
+session-wide rate is approximately 32.5540 Hz. This distinction is the regression contract for the
+completeness gate.
 
 ## Exact native-state limitations
 

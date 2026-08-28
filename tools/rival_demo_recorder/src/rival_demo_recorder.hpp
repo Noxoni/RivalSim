@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rivalrec/recorder_policy.hpp"
 #include "rivalrec/recording_format.hpp"
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
@@ -71,11 +72,30 @@ private:
         std::atomic<std::uint64_t> written_frames{};
         std::atomic<std::uint64_t> queue_dropped_frames{};
         std::atomic<std::uint64_t> duplicate_physics_frames{};
+        std::atomic<std::uint64_t> duplicate_hook_callbacks{};
+        std::atomic<std::uint64_t> duplicate_frames_suppressed{};
+        std::atomic<std::uint64_t> duplicate_frames_retained{};
         std::atomic<std::uint64_t> out_of_order_physics_frames{};
         std::atomic<std::uint64_t> missing_physics_frames{};
         std::atomic<std::uint64_t> identity_failures{};
+        std::atomic<std::uint64_t> local_car_rebinds{};
         std::atomic<std::uint64_t> event_records{};
         std::atomic<std::uint64_t> marker_records{};
+        std::atomic<std::int32_t> first_frame_physics{-1};
+        std::atomic<std::int32_t> last_frame_physics{-1};
+        std::atomic<float> first_frame_engine_time{};
+        std::atomic<float> last_frame_engine_time{};
+        std::atomic<std::int32_t> stop_physics_frame{-1};
+        std::atomic<float> stop_engine_time{};
+        std::atomic<std::uint64_t> stop_monotonic_ns{};
+    };
+
+    struct LocalHumanIdentity {
+        std::string stable_id;
+        std::string player_name;
+        std::int32_t player_id{-1};
+        std::int8_t team{-1};
+        std::uintptr_t car_address{};
     };
 
     struct PadObservation {
@@ -99,8 +119,7 @@ private:
                          bool active);
 
     [[nodiscard]] bool allowed_capture_context(std::string& reason) const;
-    [[nodiscard]] bool resolve_unique_local_human(SessionConfig* metadata,
-                                                  std::uintptr_t* local_car_address,
+    [[nodiscard]] bool resolve_unique_local_human(LocalHumanIdentity& identity,
                                                   std::string& reason) const;
     [[nodiscard]] rivalrec::Frame capture_frame(const ControllerInput& input,
                                                 std::uintptr_t local_car_address);
@@ -111,6 +130,14 @@ private:
     [[nodiscard]] std::vector<rivalrec::BoostPadState> snapshot_pads(float game_time);
 
     [[nodiscard]] bool enqueue(WriteItem item, bool is_frame);
+    void publish_frame(rivalrec::Frame frame);
+    void flush_pending_frame();
+    void remember_rebind_context(const std::string& context);
+    void record_rebind_event(std::uintptr_t previous_address,
+                             const LocalHumanIdentity& identity,
+                             const std::string& event_context);
+    void record_duplicate_callback_event(const rivalrec::Frame& suppressed,
+                                         const rivalrec::Frame& retained);
     void writer_main(SessionConfig config);
     void stop_session(bool clean, const std::string& reason);
     void write_manifest(const SessionConfig& config, bool clean, const std::string& reason,
@@ -134,10 +161,7 @@ private:
     mutable std::mutex session_mutex_;
     std::optional<SessionConfig> session_;
     std::uintptr_t local_car_address_{};
-    std::uint64_t next_sequence_{};
-    std::int32_t previous_physics_frame_{-1};
-    float previous_engine_time_{};
-    std::uint64_t previous_monotonic_ns_{};
+    std::string last_rebind_context_;
     std::chrono::steady_clock::time_point session_steady_start_{};
     std::string stop_reason_;
     bool clean_stop_{};
@@ -147,6 +171,9 @@ private:
     std::deque<WriteItem> queue_;
     std::thread writer_thread_;
     CaptureCounters counters_;
+
+    mutable std::mutex capture_mutex_;
+    rivalrec::TickFrameReducer tick_reducer_;
 
     mutable std::mutex pads_mutex_;
     std::map<std::uintptr_t, PadObservation> pads_;

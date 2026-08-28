@@ -26,6 +26,7 @@
 #include <cmath>
 #include <ctime>
 #include <iomanip>
+#include <limits>
 #include <memory>
 #include <cstring>
 #include <sstream>
@@ -46,9 +47,6 @@ BAKKESMOD_PLUGIN(RivalDemoRecorder, "Rival 2.0 Human Demonstration Recorder",
 
 namespace {
 
-constexpr std::uint32_t kFrameDuplicate = 1U << 0U;
-constexpr std::uint32_t kFrameOutOfOrder = 1U << 1U;
-constexpr std::uint32_t kFrameGap = 1U << 2U;
 constexpr std::uint32_t kBallTransform = 1U << 0U;
 constexpr std::uint32_t kBallDynamics = 1U << 1U;
 constexpr std::uint32_t kBallGravity = 1U << 2U;
@@ -143,6 +141,17 @@ std::string safe_pri_id(PriWrapper pri) {
     return "pri:" + std::to_string(pri.GetPlayerID());
 }
 
+std::string stable_pri_id(PriWrapper pri) {
+    if (!pri) {
+        return {};
+    }
+    try {
+        return pri.GetUniqueIdWrapper().GetIdString();
+    } catch (...) {
+        return {};
+    }
+}
+
 rivalrec::ComponentState component(CarComponentWrapper value) {
     if (!value) {
         return {};
@@ -151,6 +160,21 @@ rivalrec::ComponentState component(CarComponentWrapper value) {
 }
 
 std::string bool_json(bool value) { return value ? "true" : "false"; }
+
+std::string native_input_json(const rivalrec::NativeInput& value) {
+    std::ostringstream json;
+    json << std::setprecision(std::numeric_limits<float>::max_digits10)
+         << "{\"throttle\":" << value.throttle << ",\"steer\":" << value.steer
+         << ",\"pitch\":" << value.pitch << ",\"yaw\":" << value.yaw
+         << ",\"roll\":" << value.roll << ",\"dodge_forward\":"
+         << value.dodge_forward << ",\"dodge_strafe\":" << value.dodge_strafe
+         << ",\"handbrake\":" << bool_json(value.handbrake)
+         << ",\"jump\":" << bool_json(value.jump)
+         << ",\"activate_boost\":" << bool_json(value.activate_boost)
+         << ",\"holding_boost\":" << bool_json(value.holding_boost)
+         << ",\"jumped\":" << bool_json(value.jumped) << '}';
+    return json.str();
+}
 
 struct OnHitBallParams {
     std::uintptr_t ball;
@@ -304,12 +328,16 @@ void RivalDemoRecorder::start_command(const std::vector<std::string>& args) {
         return;
     }
 
-    std::uintptr_t local_address = 0;
+    LocalHumanIdentity local_identity;
     std::string identity_reason;
-    if (!resolve_unique_local_human(&config, &local_address, identity_reason)) {
+    if (!resolve_unique_local_human(local_identity, identity_reason)) {
         error("cannot uniquely identify the local human car: " + identity_reason);
         return;
     }
+    config.local_player_id = local_identity.stable_id;
+    config.local_player_name = local_identity.player_name;
+    config.local_player_numeric_id = local_identity.player_id;
+    config.local_team = local_identity.team;
 
     config.uuid = rivalrec::make_session_uuid();
     config.capture_start_utc = rivalrec::utc_now_iso8601();
@@ -333,15 +361,26 @@ void RivalDemoRecorder::start_command(const std::vector<std::string>& args) {
     counters_.written_frames = 0;
     counters_.queue_dropped_frames = 0;
     counters_.duplicate_physics_frames = 0;
+    counters_.duplicate_hook_callbacks = 0;
+    counters_.duplicate_frames_suppressed = 0;
+    counters_.duplicate_frames_retained = 0;
     counters_.out_of_order_physics_frames = 0;
     counters_.missing_physics_frames = 0;
     counters_.identity_failures = 0;
+    counters_.local_car_rebinds = 0;
     counters_.event_records = 0;
     counters_.marker_records = 0;
-    next_sequence_ = 0;
-    previous_physics_frame_ = -1;
-    previous_engine_time_ = 0.0F;
-    previous_monotonic_ns_ = 0;
+    counters_.first_frame_physics = -1;
+    counters_.last_frame_physics = -1;
+    counters_.first_frame_engine_time = 0.0F;
+    counters_.last_frame_engine_time = 0.0F;
+    counters_.stop_physics_frame = -1;
+    counters_.stop_engine_time = 0.0F;
+    counters_.stop_monotonic_ns = 0;
+    {
+        std::lock_guard capture_lock(capture_mutex_);
+        tick_reducer_.reset();
+    }
     session_steady_start_ = std::chrono::steady_clock::now();
     stop_reason_.clear();
     clean_stop_ = false;
@@ -358,7 +397,8 @@ void RivalDemoRecorder::start_command(const std::vector<std::string>& args) {
     {
         std::lock_guard session_lock(session_mutex_);
         session_ = config;
-        local_car_address_ = local_address;
+        local_car_address_ = local_identity.car_address;
+        last_rebind_context_.clear();
     }
     recording_ = true;
     writer_thread_ = std::thread(&RivalDemoRecorder::writer_main, this, config);
@@ -390,8 +430,11 @@ void RivalDemoRecorder::status_command(const std::vector<std::string>&) const {
         " written=" + std::to_string(counters_.written_frames.load()) +
         " queued=" + std::to_string(queued) +
         " queue_dropped=" + std::to_string(counters_.queue_dropped_frames.load()) +
-        " duplicate_physics=" +
-        std::to_string(counters_.duplicate_physics_frames.load()) +
+        " duplicate_hook_callbacks=" +
+        std::to_string(counters_.duplicate_hook_callbacks.load()) +
+        " duplicate_frames_suppressed=" +
+        std::to_string(counters_.duplicate_frames_suppressed.load()) +
+        " local_car_rebinds=" + std::to_string(counters_.local_car_rebinds.load()) +
         " out_of_order=" + std::to_string(counters_.out_of_order_physics_frames.load()) +
         " missing_physics=" + std::to_string(counters_.missing_physics_frames.load()));
 }
@@ -415,36 +458,91 @@ void RivalDemoRecorder::note_command(const std::vector<std::string>& args) {
 }
 
 void RivalDemoRecorder::on_vehicle_input(CarWrapper caller, void* params,
-                                         const std::string&) {
+                                         const std::string& event_name) {
     if (!recording_.load() || params == nullptr || !caller) {
         return;
     }
-    std::uintptr_t local_address = 0;
-    {
-        std::lock_guard lock(session_mutex_);
-        local_address = local_car_address_;
-    }
-    if (caller.memory_address != local_address) {
-        return;
-    }
-
-    // This is the only access to the hook parameter: copy the native value exactly.
-    // The recorder never writes to params and never calls any gameplay input setter.
-    const ControllerInput input = *static_cast<const ControllerInput*>(params);
-    ++counters_.attempted_frames;
     try {
+        LocalHumanIdentity identity;
         std::string reason;
-        std::uintptr_t resolved_address = 0;
-        if (!resolve_unique_local_human(nullptr, &resolved_address, reason) ||
-            resolved_address != local_address) {
+        if (!resolve_unique_local_human(identity, reason)) {
             ++counters_.identity_failures;
+            record_event("identity_failure", event_name, caller.memory_address,
+                         safe_pri_id(caller.GetPRI()),
+                         "\"reason\":\"" + rivalrec::json_escape(reason) + "\"");
             stop_session(false, "local_human_identity_lost:" + reason);
             error("recording stopped: local human car identity became ambiguous");
             return;
         }
-        rivalrec::Frame frame = capture_frame(input, local_address);
-        if (enqueue(std::move(frame), true)) {
-            ++counters_.enqueued_frames;
+
+        std::string session_player_id;
+        std::uintptr_t bound_address = 0;
+        std::string event_context;
+        {
+            std::lock_guard lock(session_mutex_);
+            if (!session_) {
+                return;
+            }
+            session_player_id = session_->local_player_id;
+            bound_address = local_car_address_;
+            event_context = last_rebind_context_;
+        }
+        const rivalrec::LocalCarBindingDecision binding =
+            rivalrec::evaluate_local_car_binding(
+                session_player_id, bound_address,
+                {true, identity.stable_id, identity.car_address}, caller.memory_address);
+        if (!binding.identity_valid) {
+            ++counters_.identity_failures;
+            record_event("identity_failure", event_name, caller.memory_address,
+                         identity.stable_id,
+                         "\"reason\":\"" +
+                             rivalrec::json_escape(binding.failure_reason) + "\"");
+            stop_session(false, "local_human_identity_lost:" + binding.failure_reason);
+            error("recording stopped: stable local human identity changed");
+            return;
+        }
+        if (binding.rebound) {
+            {
+                std::lock_guard lock(session_mutex_);
+                local_car_address_ = identity.car_address;
+                last_rebind_context_.clear();
+            }
+            ++counters_.local_car_rebinds;
+            record_rebind_event(binding.previous_car_address, identity, event_context);
+        }
+        if (!binding.capture_caller) {
+            return;
+        }
+
+        // This is the only access to the hook parameter: copy the native value exactly.
+        // The recorder never writes to params and never calls any gameplay input setter.
+        const ControllerInput input = *static_cast<const ControllerInput*>(params);
+        ++counters_.attempted_frames;
+        rivalrec::Frame frame = capture_frame(input, identity.car_address);
+        rivalrec::TickSubmitResult reduction;
+        {
+            std::lock_guard capture_lock(capture_mutex_);
+            reduction = tick_reducer_.submit(std::move(frame));
+        }
+        if (reduction.kind == rivalrec::TickSubmitKind::out_of_order_rejected) {
+            ++counters_.out_of_order_physics_frames;
+            record_event("out_of_order_hook_callback_rejected", event_name,
+                         caller.memory_address, identity.stable_id);
+            stop_session(false, "out_of_order_local_input_callback");
+            error("recording stopped after out-of-order local input callback");
+            return;
+        }
+        if (reduction.kind == rivalrec::TickSubmitKind::duplicate_replaced) {
+            ++counters_.duplicate_hook_callbacks;
+            ++counters_.duplicate_frames_suppressed;
+            record_duplicate_callback_event(*reduction.suppressed_duplicate,
+                                            *reduction.retained_duplicate);
+        }
+        if (reduction.missing_physics_frames > 0) {
+            counters_.missing_physics_frames += reduction.missing_physics_frames;
+        }
+        if (reduction.frame_to_publish) {
+            publish_frame(std::move(*reduction.frame_to_publish));
         }
     } catch (const std::exception& exception) {
         stop_session(false, "capture_exception:" + std::string(exception.what()));
@@ -471,6 +569,7 @@ void RivalDemoRecorder::on_car_event(CarWrapper caller, void* params,
         kind = "demolished_car_removed";
     } else if (event_name.find("Respawn") != std::string::npos) {
         kind = "respawn";
+        remember_rebind_context(event_name);
     }
     std::string extra_json;
     if (event_name.find("OnHitBall") != std::string::npos && params != nullptr) {
@@ -508,6 +607,10 @@ void RivalDemoRecorder::on_server_event(ServerWrapper caller, void*,
         kind = "respawn";
     } else if (event_name.find("PlayerResetTraining") != std::string::npos) {
         kind = "freeplay_reset";
+    }
+    if (kind == "kickoff_or_round_reset" || kind == "game_reset" ||
+        kind == "respawn" || kind == "freeplay_reset") {
+        remember_rebind_context(event_name);
     }
     record_event(kind, event_name, caller ? caller.memory_address : 0);
 }
@@ -572,8 +675,7 @@ bool RivalDemoRecorder::allowed_capture_context(std::string& reason) const {
     return true;
 }
 
-bool RivalDemoRecorder::resolve_unique_local_human(SessionConfig* metadata,
-                                                   std::uintptr_t* local_car_address,
+bool RivalDemoRecorder::resolve_unique_local_human(LocalHumanIdentity& identity,
                                                    std::string& reason) const {
     CarWrapper local_car = gameWrapper->GetLocalCar();
     PlayerControllerWrapper controller = gameWrapper->GetPlayerController();
@@ -582,7 +684,9 @@ bool RivalDemoRecorder::resolve_unique_local_human(SessionConfig* metadata,
         return false;
     }
     PriWrapper local_pri = controller.GetPRI();
-    if (!local_pri || local_pri.GetCar().memory_address != local_car.memory_address) {
+    CarWrapper controller_car = local_pri ? local_pri.GetCar() : CarWrapper(0);
+    if (!local_pri || !controller_car ||
+        controller_car.memory_address != local_car.memory_address) {
         reason = "local controller PRI does not own GetLocalCar";
         return false;
     }
@@ -611,22 +715,22 @@ bool RivalDemoRecorder::resolve_unique_local_human(SessionConfig* metadata,
                  std::to_string(matches);
         return false;
     }
-    if (local_car_address != nullptr) {
-        *local_car_address = local_car.memory_address;
+    const std::string stable_id = stable_pri_id(matched);
+    if (stable_id.empty()) {
+        reason = "local controller PRI has no stable UniqueIdWrapper identity";
+        return false;
     }
-    if (metadata != nullptr) {
-        metadata->local_player_id = safe_pri_id(matched);
-        metadata->local_player_name = matched.GetPlayerName().ToString();
-        metadata->local_player_numeric_id = matched.GetPlayerID();
-        metadata->local_team = static_cast<std::int8_t>(matched.GetTeamNum());
-    }
+    identity.stable_id = stable_id;
+    identity.player_name = matched.GetPlayerName().ToString();
+    identity.player_id = matched.GetPlayerID();
+    identity.team = static_cast<std::int8_t>(matched.GetTeamNum());
+    identity.car_address = local_car.memory_address;
     return true;
 }
 
 rivalrec::Frame RivalDemoRecorder::capture_frame(const ControllerInput& input,
                                                  std::uintptr_t local_car_address) {
     rivalrec::Frame frame;
-    frame.sequence = next_sequence_++;
     EngineTAWrapper engine = gameWrapper->GetEngine();
     ServerWrapper server = gameWrapper->GetGameEventAsServer();
     frame.physics_frame = engine ? engine.GetPhysicsFrame() : -1;
@@ -635,29 +739,6 @@ rivalrec::Frame RivalDemoRecorder::capture_frame(const ControllerInput& input,
     frame.game_time_seconds = server ? server.GetSecondsElapsed() : 0.0F;
     frame.monotonic_ns = monotonic_ns();
     frame.utc_ns = rivalrec::utc_now_ns();
-    frame.delta_monotonic_ns = previous_monotonic_ns_ == 0
-                                   ? 0
-                                   : frame.monotonic_ns - previous_monotonic_ns_;
-    frame.delta_engine_seconds = previous_physics_frame_ < 0
-                                     ? 0.0F
-                                     : frame.engine_physics_time - previous_engine_time_;
-    if (previous_physics_frame_ >= 0) {
-        if (frame.physics_frame == previous_physics_frame_) {
-            frame.status_flags |= kFrameDuplicate;
-            ++counters_.duplicate_physics_frames;
-        } else if (frame.physics_frame < previous_physics_frame_) {
-            frame.status_flags |= kFrameOutOfOrder;
-            ++counters_.out_of_order_physics_frames;
-        } else if (frame.physics_frame > previous_physics_frame_ + 1) {
-            frame.status_flags |= kFrameGap;
-            frame.missing_physics_frames = static_cast<std::uint32_t>(
-                frame.physics_frame - previous_physics_frame_ - 1);
-            counters_.missing_physics_frames += frame.missing_physics_frames;
-        }
-    }
-    previous_physics_frame_ = frame.physics_frame;
-    previous_engine_time_ = frame.engine_physics_time;
-    previous_monotonic_ns_ = frame.monotonic_ns;
     frame.native_input = native_input(input);
     frame.rival_action = rival_action(input);
     if (server) {
@@ -874,6 +955,71 @@ bool RivalDemoRecorder::enqueue(WriteItem item, bool is_frame) {
     return true;
 }
 
+void RivalDemoRecorder::publish_frame(rivalrec::Frame frame) {
+    if (enqueue(std::move(frame), true)) {
+        ++counters_.enqueued_frames;
+    }
+}
+
+void RivalDemoRecorder::flush_pending_frame() {
+    std::optional<rivalrec::Frame> pending;
+    {
+        std::lock_guard capture_lock(capture_mutex_);
+        pending = tick_reducer_.flush();
+    }
+    if (pending) {
+        publish_frame(std::move(*pending));
+    }
+}
+
+void RivalDemoRecorder::remember_rebind_context(const std::string& context) {
+    if (!recording_.load()) {
+        return;
+    }
+    std::lock_guard lock(session_mutex_);
+    last_rebind_context_ = context;
+}
+
+void RivalDemoRecorder::record_rebind_event(
+    std::uintptr_t previous_address, const LocalHumanIdentity& identity,
+    const std::string& event_context) {
+    std::ostringstream extra;
+    extra << "\"previous_car_address\":\"" << pointer_id(previous_address)
+          << "\",\"new_car_address\":\"" << pointer_id(identity.car_address)
+          << "\",\"stable_player_id\":\""
+          << rivalrec::json_escape(identity.stable_id)
+          << "\",\"reason\":\"resolved_local_car_changed\",\"event_context\":\""
+          << rivalrec::json_escape(event_context.empty() ? "set_vehicle_input_identity_refresh"
+                                                         : event_context)
+          << '"';
+    record_event("local_car_rebind", "Function TAGame.Car_TA.SetVehicleInput",
+                 identity.car_address, identity.stable_id, extra.str());
+}
+
+void RivalDemoRecorder::record_duplicate_callback_event(
+    const rivalrec::Frame& suppressed, const rivalrec::Frame& retained) {
+    std::uintptr_t local_address = 0;
+    std::string stable_player_id;
+    {
+        std::lock_guard lock(session_mutex_);
+        local_address = local_car_address_;
+        if (session_) {
+            stable_player_id = session_->local_player_id;
+        }
+    }
+    std::ostringstream extra;
+    extra << "\"physics_frame_identity\":" << retained.physics_frame
+          << ",\"deduplication_rule\":\"last_callback_before_physics_frame_advance\""
+          << ",\"suppressed_sequence\":" << suppressed.sequence
+          << ",\"retained_sequence\":" << retained.sequence
+          << ",\"suppressed_native_input\":"
+          << native_input_json(suppressed.native_input)
+          << ",\"retained_native_input\":" << native_input_json(retained.native_input);
+    record_event("duplicate_hook_callback_suppressed",
+                 "Function TAGame.Car_TA.SetVehicleInput", local_address,
+                 stable_player_id, extra.str());
+}
+
 void RivalDemoRecorder::writer_main(SessionConfig config) {
     std::vector<rivalrec::ChunkInfo> chunks;
     std::vector<rivalrec::FileInfo> journals;
@@ -912,7 +1058,14 @@ void RivalDemoRecorder::writer_main(SessionConfig config) {
                         config.flush_frames);
                 }
                 chunk->append(*frame);
-                ++counters_.written_frames;
+                const std::uint64_t previously_written =
+                    counters_.written_frames.fetch_add(1);
+                if (previously_written == 0) {
+                    counters_.first_frame_physics = frame->physics_frame;
+                    counters_.first_frame_engine_time = frame->engine_physics_time;
+                }
+                counters_.last_frame_physics = frame->physics_frame;
+                counters_.last_frame_engine_time = frame->engine_physics_time;
                 if (chunk->full(config.chunk_frames)) {
                     chunks.push_back(chunk->close());
                     chunk.reset();
@@ -966,6 +1119,13 @@ void RivalDemoRecorder::writer_main(SessionConfig config) {
 }
 
 void RivalDemoRecorder::stop_session(bool clean, const std::string& reason) {
+    if (recording_.load()) {
+        EngineTAWrapper engine = gameWrapper->GetEngine();
+        counters_.stop_physics_frame = engine ? engine.GetPhysicsFrame() : -1;
+        counters_.stop_engine_time = engine ? engine.GetPhysicsTime() : 0.0F;
+        counters_.stop_monotonic_ns = monotonic_ns();
+        flush_pending_frame();
+    }
     const bool was_recording = recording_.exchange(false);
     if (!was_recording && !writer_thread_.joinable()) {
         return;
@@ -983,6 +1143,7 @@ void RivalDemoRecorder::stop_session(bool clean, const std::string& reason) {
         config = session_;
         session_.reset();
         local_car_address_ = 0;
+        last_rebind_context_.clear();
     }
     if (was_recording) {
         const std::string result = writer_failed_.load() ? "incomplete (writer failure)" :
@@ -1002,6 +1163,16 @@ void RivalDemoRecorder::write_manifest(
                                                            session_steady_start_)
                                 .count();
     const std::uint64_t frames = counters_.written_frames.load();
+    const float active_start = counters_.first_frame_engine_time.load();
+    const float active_end = counters_.last_frame_engine_time.load();
+    const double active_duration =
+        frames > 1 && active_end >= active_start
+            ? static_cast<double>(active_end) - static_cast<double>(active_start)
+            : 0.0;
+    const double session_wide_rate =
+        duration > 0.0 ? static_cast<double>(frames) / duration : 0.0;
+    const double active_rate =
+        active_duration > 0.0 ? static_cast<double>(frames) / active_duration : 0.0;
     std::ostringstream json;
     json << std::setprecision(17);
     json << "{\n"
@@ -1039,20 +1210,50 @@ void RivalDemoRecorder::write_manifest(
          << "  \"chunk_frames\": " << config.chunk_frames << ",\n"
          << "  \"flush_frames\": " << config.flush_frames << ",\n"
          << "  \"duration_seconds\": " << duration << ",\n"
+         << "  \"session_wall_duration_seconds\": " << duration << ",\n"
          << "  \"final_frame_count\": " << frames << ",\n"
-         << "  \"observed_capture_rate_hz\": "
-         << (duration > 0.0 ? static_cast<double>(frames) / duration : 0.0) << ",\n"
+         << "  \"observed_capture_rate_hz\": " << session_wide_rate << ",\n"
+         << "  \"session_wide_capture_rate_hz\": " << session_wide_rate << ",\n"
+         << "  \"active_capture_start_physics_frame\": "
+         << counters_.first_frame_physics.load() << ",\n"
+         << "  \"active_capture_end_physics_frame\": "
+         << counters_.last_frame_physics.load() << ",\n"
+         << "  \"active_capture_start_engine_time\": " << active_start << ",\n"
+         << "  \"active_capture_end_engine_time\": " << active_end << ",\n"
+         << "  \"active_capture_duration_seconds\": " << active_duration << ",\n"
+         << "  \"active_capture_rate_hz\": " << active_rate << ",\n"
+         << "  \"capture_stop_physics_frame\": "
+         << counters_.stop_physics_frame.load() << ",\n"
+         << "  \"capture_stop_engine_time\": " << counters_.stop_engine_time.load()
+         << ",\n"
+         << "  \"capture_stop_monotonic_ns\": "
+         << counters_.stop_monotonic_ns.load() << ",\n"
+         << "  \"capture_completeness_tolerance_ticks\": 4,\n"
          << "  \"attempted_frame_count\": " << counters_.attempted_frames.load() << ",\n"
          << "  \"enqueued_frame_count\": " << counters_.enqueued_frames.load() << ",\n"
          << "  \"queue_dropped_frame_count\": "
          << counters_.queue_dropped_frames.load() << ",\n"
          << "  \"duplicate_physics_frame_count\": "
          << counters_.duplicate_physics_frames.load() << ",\n"
+         << "  \"duplicate_hook_callbacks\": "
+         << counters_.duplicate_hook_callbacks.load() << ",\n"
+         << "  \"duplicate_frames_suppressed\": "
+         << counters_.duplicate_frames_suppressed.load() << ",\n"
+         << "  \"duplicate_frames_retained\": "
+         << counters_.duplicate_frames_retained.load() << ",\n"
          << "  \"out_of_order_physics_frame_count\": "
          << counters_.out_of_order_physics_frames.load() << ",\n"
          << "  \"missing_physics_frame_count\": "
          << counters_.missing_physics_frames.load() << ",\n"
          << "  \"identity_failure_count\": " << counters_.identity_failures.load() << ",\n"
+         << "  \"local_car_rebind_count\": " << counters_.local_car_rebinds.load()
+         << ",\n"
+         << "  \"physics_tick_resolution_rule\": "
+            "\"last_set_vehicle_input_callback_before_physics_frame_advance\",\n"
+         << "  \"authoritative_action_source\": "
+            "\"Function TAGame.Car_TA.SetVehicleInput hook parameter\",\n"
+         << "  \"per_car_native_input_semantics\": "
+            "\"state_debug_telemetry_not_action_label\",\n"
          << "  \"event_record_count\": " << counters_.event_records.load() << ",\n"
          << "  \"marker_record_count\": " << counters_.marker_records.load() << ",\n"
          << "  \"chunks\": [";
@@ -1116,8 +1317,13 @@ void RivalDemoRecorder::record_marker(const std::string& kind, const std::string
 std::string RivalDemoRecorder::journal_prefix() const {
     EngineTAWrapper engine = gameWrapper->GetEngine();
     ServerWrapper server = gameWrapper->GetGameEventAsServer();
+    std::uint64_t sequence_boundary = 0;
+    {
+        std::lock_guard capture_lock(capture_mutex_);
+        sequence_boundary = tick_reducer_.next_sequence_boundary();
+    }
     std::ostringstream json;
-    json << "{\"sequence_boundary\":" << next_sequence_ << ",\"physics_frame\":"
+    json << "{\"sequence_boundary\":" << sequence_boundary << ",\"physics_frame\":"
          << (engine ? engine.GetPhysicsFrame() : -1) << ",\"engine_physics_time\":"
          << (engine ? engine.GetPhysicsTime() : 0.0F) << ",\"game_time_seconds\":"
          << (server ? server.GetSecondsElapsed() : 0.0F) << ",\"monotonic_ns\":"

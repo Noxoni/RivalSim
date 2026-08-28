@@ -201,6 +201,28 @@ def _manifest() -> dict[str, object]:
     }
 
 
+def _attach_journal(
+    session: Path, name: str, records: list[dict[str, object]]
+) -> None:
+    path = session / name
+    path.write_text(
+        "".join(json.dumps(record, sort_keys=True) + "\n" for record in records),
+        encoding="utf-8",
+    )
+    manifest_path = session / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    files = [row for row in manifest.get("files", []) if row.get("path") != name]
+    files.append(
+        {
+            "path": name,
+            "bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest().upper(),
+        }
+    )
+    manifest["files"] = files
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+
 def test_native_frame_and_action_round_trip_are_byte_exact() -> None:
     frame = _frame(0)
     encoded = encode_frame(frame)
@@ -240,7 +262,9 @@ def test_interrupted_session_recovers_only_complete_records(tmp_path: Path) -> N
     recovered = list(reader.iter_frames(recover_partial=True))
     assert [frame["sequence"] for frame in recovered] == [0, 1]
     report = reader.validate(recover_partial=True)
-    assert report.valid
+    assert report.container_valid
+    assert not report.capture_complete
+    assert not report.valid
     assert not report.clean_termination
     assert report.partial_chunks == 1
 
@@ -404,6 +428,116 @@ def test_manifest_journal_hashes_are_verified(tmp_path: Path) -> None:
     assert not report.manifest_hashes_valid
 
 
+def test_event_activity_after_final_frame_fails_capture_completeness(
+    tmp_path: Path,
+) -> None:
+    session = tmp_path / "event-tail"
+    writer = SessionWriter(session, _manifest())
+    writer.write_frame(_frame(0, physics_frame=100))
+    writer.write_frame(_frame(1, physics_frame=101))
+    writer.stop()
+    _attach_journal(
+        session,
+        "events.jsonl",
+        [
+            {
+                "kind": "jump_onset",
+                "physics_frame": 121,
+                "engine_physics_time": 10.175,
+                "sequence_boundary": 2,
+            }
+        ],
+    )
+    report = SessionReader(session).validate()
+    assert report.container_valid
+    assert not report.capture_complete
+    assert not report.overall_demonstration_valid
+    assert report.final_event_physics_frame == 121
+    assert report.trailing_uncovered_physics_ticks == 20
+    assert report.trailing_uncovered_engine_seconds == pytest.approx(1.0 / 6.0)
+
+
+def test_marker_activity_after_final_frame_fails_capture_completeness(
+    tmp_path: Path,
+) -> None:
+    session = tmp_path / "marker-tail"
+    writer = SessionWriter(session, _manifest())
+    writer.write_frame(_frame(0, physics_frame=100))
+    writer.stop()
+    _attach_journal(
+        session,
+        "markers.jsonl",
+        [
+            {
+                "kind": "marker",
+                "physics_frame": 160,
+                "engine_physics_time": 10.5,
+                "sequence_boundary": 1,
+                "text": "post-capture",
+            }
+        ],
+    )
+    report = SessionReader(session).validate()
+    assert report.container_valid
+    assert not report.capture_completeness_valid
+    assert report.final_marker_physics_frame == 160
+    assert report.trailing_uncovered_physics_ticks == 60
+
+
+def test_session_stop_timing_after_final_frame_fails_completeness(
+    tmp_path: Path,
+) -> None:
+    session = tmp_path / "stop-tail"
+    writer = SessionWriter(session, _manifest())
+    writer.write_frame(_frame(0, physics_frame=100))
+    writer.stop()
+    manifest_path = session / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["capture_stop_physics_frame"] = 120
+    manifest["capture_stop_engine_time"] = 10.2
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    report = SessionReader(session).validate()
+    assert report.container_valid
+    assert not report.capture_complete
+    assert report.session_stop_physics_frame == 120
+    assert report.trailing_uncovered_physics_ticks == 20
+
+
+def test_active_capture_rate_is_separate_from_session_wall_rate(tmp_path: Path) -> None:
+    session = tmp_path / "rates"
+    manifest = _manifest()
+    manifest["duration_seconds"] = 10.0
+    manifest["observed_capture_rate_hz"] = 12.1
+    writer = SessionWriter(session, manifest)
+    for sequence in range(121):
+        writer.write_frame(_frame(sequence, physics_frame=1000 + sequence))
+    writer.stop()
+    report = SessionReader(session).validate()
+    assert report.container_valid
+    assert report.capture_complete
+    assert report.active_capture_duration == pytest.approx(1.0)
+    assert report.active_capture_rate_hz == pytest.approx(121.0)
+    assert report.session_wall_duration == pytest.approx(10.0)
+    assert report.session_wide_capture_rate_hz == pytest.approx(12.1)
+
+
+def test_unique_sequences_with_duplicate_physics_tick_are_not_ingestion_safe(
+    tmp_path: Path,
+) -> None:
+    session = tmp_path / "duplicate-physics"
+    writer = SessionWriter(session, _manifest())
+    writer.write_frame(_frame(0, physics_frame=100))
+    duplicate = _frame(1, physics_frame=100)
+    duplicate["status_flags"] = FRAME_FLAG_DUPLICATE_PHYSICS_FRAME
+    writer.write_frame(duplicate)
+    writer.stop()
+    report = SessionReader(session).validate()
+    assert report.container_valid
+    assert report.duplicate_physics_frame_count == 1
+    assert not report.capture_complete
+    assert not report.overall_demonstration_valid
+
+
 def test_cpp_encoder_fixture_is_python_byte_stable(tmp_path: Path) -> None:
     executable = os.environ.get("RIVALREC_CPP_FIXTURE")
     if not executable:
@@ -450,3 +584,8 @@ def test_plugin_source_has_no_gameplay_mutation_calls() -> None:
         assert not re.search(rf"\.\s*{call}\s*\(", source), call
     assert "*static_cast<const ControllerInput*>(params)" in source
     assert "HookEventWithCaller<CarWrapper>" in source
+    assert "evaluate_local_car_binding" in source
+    assert 'record_event("identity_failure"' in source
+    assert 'stop_session(false, "local_human_identity_lost:' in source
+    assert 'record_event("local_car_rebind"' in source
+    assert "state_debug_telemetry_not_action_label" in source

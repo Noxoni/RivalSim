@@ -1,0 +1,41 @@
+{
+  "format": "RIVAL2_HUMAN_DEMO_RECORDER_CORRECTION_VALIDATION_V1",
+  "date": "2026-08-28",
+  "scope": "recorder_and_validator_only",
+  "plugin_build": "1.0.1",
+  "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
+  "native_release_build": {
+    "status": "passed",
+    "generator": "Visual Studio 17 2022",
+    "architecture": "x64"
+  },
+  "native_policy_tests": {
+    "passed": 1,
+    "failed": 0
+  },
+  "python_recorder_tests": {
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0,
+    "native_cpp_fixture_enabled": true
+  },
+  "failed_smoke_regression": {
+    "container_valid": true,
+    "capture_complete": false,
+    "overall_demonstration_valid": false,
+    "validator_exit_code": 1
+  },
+  "replacement_live_smoke": {
+    "status": "not_run",
+    "reason": "The lifecycle smoke requires the user to provide native human Rocket League controls; gameplay automation and input injection are prohibited.",
+    "manual_procedure": "docs/RIVAL2_HUMAN_DEMO_RECORDER.md#manual-replacementlifecycle-smoke-test"
+  },
+  "scope_assertions": {
+    "training_changed": false,
+    "rewards_changed": false,
+    "rivalsim_physics_changed": false,
+    "ppo_changed": false,
+    "gameplay_mutation_added": false,
+    "authoritative_action_source_changed": false
+  }
+}

@@ -7,6 +7,7 @@ This directory builds the read-only BakkesMod plugin and the native binary-forma
 - plugin: `src/rival_demo_recorder.cpp`
 - shared C++ format: `include/rivalrec/recording_format.hpp`
 - C++/Python fixture: `tests/format_fixture.cpp`
+- lifecycle/deduplication policy tests: `tests/recorder_policy_tests.cpp`
 - full installation, commands, schema, fields, limitations, and smoke procedure:
   `../../docs/RIVAL2_HUMAN_DEMO_RECORDER.md`
 
