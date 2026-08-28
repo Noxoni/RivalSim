@@ -165,6 +165,8 @@ class _ErrorAccumulator:
 
     def update(self, error: torch.Tensor) -> None:
         value = error.detach().to(torch.float64)
+        if value.numel() == 0:
+            return
         self.count += int(value.numel())
         self.absolute += float(value.abs().sum().item())
         self.squared += float(value.square().sum().item())
