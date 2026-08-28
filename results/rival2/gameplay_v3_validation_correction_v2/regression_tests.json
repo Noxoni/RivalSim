@@ -1,0 +1,50 @@
+{
+  "commands": {
+    "focused_pytest": {
+      "command": [
+        "G:\\dev\\RivalSim\\.venv\\Scripts\\pytest.exe",
+        "-q",
+        "tests/test_rival2_gameplay_v2.py",
+        "tests/test_rival2_gameplay_v3.py",
+        "tests/test_rival2_gameplay_reward.py",
+        "tests/test_rival2_mechanics_calibration.py",
+        "tests/test_rival2_opponent_curriculum.py",
+        "--basetemp",
+        "G:\\dev\\RivalSim-runs\\pytest-gameplay-v3-validation-correction-evidence"
+      ],
+      "elapsed_seconds": 44.813213,
+      "exit_code": 0,
+      "pass": true,
+      "stderr": "",
+      "stdout": "...................................                                      [100%]\n============================== warnings summary ===============================\ntests/test_rival2_opponent_curriculum.py: 15 warnings\n  G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\torch\\jit\\_serialization.py:170: DeprecationWarning: `torch.jit.load` is not supported in Python 3.14+ and may break. Please switch to `torch.export`.\n    warnings.warn(\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n35 passed, 15 warnings in 43.56s\n"
+    },
+    "ruff_changed_python": {
+      "command": [
+        "G:\\dev\\RivalSim\\.venv\\Scripts\\ruff.exe",
+        "check",
+        "benchmarks/run_rival2_gameplay_v3_validation.py",
+        "benchmarks/run_rival2_gameplay_v3_validation_correction.py",
+        "benchmarks/run_rival2_mechanics_calibration.py",
+        "rivalsim/gameplay_v3.py",
+        "rivalsim/rival2_contracts.py",
+        "tests/test_rival2_gameplay_v3.py"
+      ],
+      "elapsed_seconds": 0.026586,
+      "exit_code": 0,
+      "pass": true,
+      "stderr": "",
+      "stdout": "All checks passed!\n"
+    }
+  },
+  "created_utc": "2026-08-28T12:52:59.280594+00:00",
+  "focused_scope_authority": "validation-correction README and original acceptance focused command set",
+  "forbidden_training_call_source_scan": {
+    "optimizer.step": [],
+    "train_iteration": [],
+    "trainer.update": []
+  },
+  "format": "RIVAL2_GAMEPLAY_V3_VALIDATION_CORRECTION_REGRESSION_V1",
+  "full_simulator_suite_run": false,
+  "implementation_commit": "acffb4b01de43fc556cccc27ca5868de5fd1bc92",
+  "verdict": "PASS"
+}

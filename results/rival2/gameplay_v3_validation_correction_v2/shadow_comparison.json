@@ -1,0 +1,67 @@
+{
+  "format": "RIVAL2_GAMEPLAY_V3_VALIDATION_CORRECTION_SHADOW_COMPARISON_V2",
+  "created_utc": "2026-08-28T12:53:35.5195479Z",
+  "prior_evidence_commit": "5efa83f331855ae86a8076b7c0c1a9dc8fae88c4",
+  "episodes_each": 256,
+  "policy_and_opponents_frozen": true,
+  "ppo_update_calls": 0,
+  "identity_unchanged": true,
+  "metrics": {
+    "touches_per_min": {
+      "prior": 20.073142332354823,
+      "corrected": 20.073142332354823,
+      "delta": 0.0
+    },
+    "flip_active_touches_per_min": {
+      "prior": 12.6342719385998,
+      "corrected": 12.6342719385998,
+      "delta": 0.0
+    },
+    "unnecessary_flip_contacts_per_min": {
+      "prior": 6.280236810600719,
+      "corrected": 6.073601521885301,
+      "delta": -0.20663528871541792
+    },
+    "unnecessary_flip_touch_fraction": {
+      "prior": 0.49707943925233644,
+      "corrected": 0.4807242990654206,
+      "delta": -0.01635514018691586
+    },
+    "bad_flip_progress_ratio": {
+      "prior": 0.02883229355905161,
+      "corrected": 0.027341552317461264,
+      "delta": -0.0014907412415903458
+    },
+    "mechanics_progress_ratio": {
+      "prior": 0.013924879814738991,
+      "corrected": 0.013924879814738991,
+      "delta": 0.0
+    },
+    "budget_hit_player_episode_fraction": {
+      "prior": 0.001953125,
+      "corrected": 0.001953125,
+      "delta": 0.0
+    },
+    "impossible_count": {
+      "prior": 0,
+      "corrected": 0,
+      "delta": 0
+    }
+  },
+  "exemption_flags": {
+    "EXEMPT_CONTESTED_50": {"prior": 789, "corrected": 682, "delta": -107},
+    "EXEMPT_CONTROLLED_FLICK": {"prior": 66, "corrected": 255, "delta": 189},
+    "EXEMPT_POWER_CONTACT": {"prior": 15, "corrected": 15, "delta": 0},
+    "EXEMPT_RECOGNIZED_MECHANIC": {"prior": 3, "corrected": 3, "delta": 0}
+  },
+  "natural_shadow_contest_orders_exported": {
+    "opponent_before_self": 42,
+    "opponent_after_self": 51,
+    "closest_representable_simultaneous": 8,
+    "convergence_only_no_associated_contact": 21
+  },
+  "natural_shadow_controlled_release_exemplars_exported": 30,
+  "canonical_mechanic_counts_identical": true,
+  "interpretation": "The narrower physical contest association removes unrelated delayed contacts while the aligned release state identifies controlled flicks. Touch and mechanics behavior are unchanged because this was a read-only reward-detector validation.",
+  "verdict": "PASS"
+}

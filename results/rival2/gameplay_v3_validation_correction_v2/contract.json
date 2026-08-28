@@ -1,0 +1,165 @@
+{
+  "contract": {
+    "action_hold_ticks": 4,
+    "cadence_hz": 30,
+    "composition": "BlueReward = Goal + Progress + Demo + Speed + Supersonic + BoostUse + BoostPickup + Save + (BluePaidMechanics - OrangePaidMechanics) + (-0.01 * BlueUnnecessaryFlipThroughContacts + 0.01 * OrangeUnnecessaryFlipThroughContacts); OrangeReward = -BlueReward",
+    "disabled_mechanics_reward": [
+      "possession",
+      "ground_carry_or_dribble",
+      "generic_controlled_flick",
+      "air_dribble_milestones",
+      "pop_reset_beyond_reset_acquisition",
+      "double_tap_or_rebound",
+      "bare_stall",
+      "recovery",
+      "generic_jump_flip_or_aerial"
+    ],
+    "episode_version": "RIVAL2_EPISODE_V1",
+    "gameplay_v2_standalone_double_dash_reward": 0.0,
+    "mechanics": {
+      "canonical_rewardable": [
+        "speedflip",
+        "half_flip",
+        "musty",
+        "breezi",
+        "redirect",
+        "pinch",
+        "pogo",
+        "successful_dash",
+        "ball_reset_acquisition",
+        "car_reset_acquisition"
+      ],
+      "dash_tangent_speed_gain_strictly_greater_than_uu_s": 1.0,
+      "dash_windows_ticks_at_120_hz": {
+        "air": 42,
+        "double_dash": 90,
+        "landing": 24,
+        "zap_dodge": 30,
+        "zap_jump": 12
+      },
+      "episode_budget": 0.05,
+      "event_reward": 0.005,
+      "max_paid_events_per_player_episode": 10,
+      "quality_scaled": false,
+      "reset": {
+        "chain_requires_consumption_or_loss_before_reacquisition": true,
+        "requires_real_resource_transition": true,
+        "resource": "AIR_UNTIMED_AVAILABLE",
+        "supporting_wheels_min": 3
+      },
+      "subtype_no_extra_payout": [
+        "landing_dash",
+        "wall_dash",
+        "curve_dash",
+        "ceiling_dash",
+        "zapdash",
+        "rival_double_dash",
+        "chain_reset",
+        "preflip_reset"
+      ],
+      "surface_normal_classes_abs_nz": {
+        "floor_ceiling_min": 0.85,
+        "wall_max": 0.25
+      }
+    },
+    "physics_hz": 120,
+    "retained_gameplay_v1_terms": {
+      "boost_use": 5e-05,
+      "demo": 0.1,
+      "goal": 10.0,
+      "large_pad_pickup": 0.005,
+      "progress_coefficient": 0.5,
+      "progress_y_scale": 5120.0,
+      "save": 0.75,
+      "small_pad_pickup": 0.001,
+      "speed": 0.0001,
+      "supersonic": 0.0002
+    },
+    "transition_from": "RIVAL2_REWARD_GAMEPLAY_V2",
+    "unconditional_unique_touch": 0.0,
+    "unnecessary_flip_through_contact": {
+      "candidate": "new legitimate car-ball contact onset during active directional dodge: is_flipping and has_flipped and non-zero directional flip_rel_torque",
+      "generic_flip_penalty": 0.0,
+      "generic_jump_penalty": 0.0,
+      "mechanic_failure_penalty": 0.0,
+      "penalty_to_offender_before_zero_sum": -0.01,
+      "pending_window_ticks_at_120_hz": 5,
+      "physical_exemption_classifier_v2": {
+        "contest": {
+          "association_ball_displacement_max": 26.472905158996582,
+          "association_window_ticks_at_120_hz": 3,
+          "contact_order": "order-neutral; opponent-before and opponent-after are equivalent",
+          "convergence_velocity_sample": "authoritative_pre_contact",
+          "opponent_closing_speed_min": 590.4700012207031,
+          "opponent_distance_max": 436.1062316894531,
+          "recent_opponent_contact_state": "per-car legitimate opponent-contact onset tick and ball position",
+          "self_closing_speed_min": 727.6748657226562,
+          "time_to_ball_delta_max": 0.23664760693567713
+        },
+        "controlled_flick": {
+          "control_distance_max": 278.92047119140625,
+          "control_history_ticks_min": 5,
+          "control_relative_speed_max": 853.1399946212769,
+          "control_snapshot": "frozen_at_directional_dodge_onset",
+          "positive_reward": 0.0,
+          "release_ball_delta_v_min": 163.4154052734375,
+          "release_distance_min": 76.1766586303711,
+          "release_outward_speed_min": 111.21610260009766,
+          "release_snapshot": "first post-contact outward-separation transition within release window",
+          "release_window_ticks_at_120_hz": 5
+        },
+        "corpus": "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V2",
+        "dodge_powered_contact": {
+          "ball_delta_v_min": 303.5580596923828,
+          "rotational_closing_speed_min": 164.38546752929688,
+          "rotational_share_min": 0.2549042037005253,
+          "total_closing_speed_min": 95.31548309326172
+        }
+      },
+      "primary_precedence": [
+        "EXEMPT_RECOGNIZED_MECHANIC",
+        "EXEMPT_CONTROLLED_FLICK",
+        "EXEMPT_CONTESTED_50",
+        "EXEMPT_POWER_CONTACT",
+        "UNNECESSARY_FLIP_THROUGH_CONTACT"
+      ],
+      "recognized_same_contact_allowlist": [
+        "musty",
+        "breezi",
+        "preflip_reset"
+      ]
+    },
+    "version": "RIVAL2_REWARD_GAMEPLAY_V3",
+    "zero_sum": true
+  },
+  "contract_hashes": {
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_REWARD_GAMEPLAY_V3": "174D94E19B3F053E250147F98835C18CF65260A82E23B6E58F234F6E81E0D4E7"
+  },
+  "created_utc": "2026-08-28T12:52:12.118242+00:00",
+  "runtime_threshold_parity": {
+    "CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX": true,
+    "CONTEST_CONTACT_WINDOW_TICKS": true,
+    "CONTEST_OPPONENT_CLOSING_SPEED_MIN": true,
+    "CONTEST_OPPONENT_DISTANCE_MAX": true,
+    "CONTEST_SELF_CLOSING_SPEED_MIN": true,
+    "CONTEST_TIME_TO_BALL_DELTA_MAX": true,
+    "CONTROL_DISTANCE_MAX": true,
+    "CONTROL_HISTORY_TICKS_MIN": true,
+    "CONTROL_RELATIVE_SPEED_MAX": true,
+    "CONTROL_RELEASE_BALL_DELTA_V_MIN": true,
+    "CONTROL_RELEASE_DISTANCE_MIN": true,
+    "CONTROL_RELEASE_OUTWARD_SPEED_MIN": true,
+    "CONTROL_RELEASE_WINDOW_TICKS": true,
+    "POWER_BALL_DELTA_V_MIN": true,
+    "POWER_ROTATIONAL_CLOSING_SPEED_MIN": true,
+    "POWER_ROTATIONAL_SHARE_MIN": true,
+    "POWER_TOTAL_CLOSING_SPEED_MIN": true
+  },
+  "schema_version": 1,
+  "sha256": "174D94E19B3F053E250147F98835C18CF65260A82E23B6E58F234F6E81E0D4E7",
+  "verdict": "PASS",
+  "version": "RIVAL2_REWARD_GAMEPLAY_V3"
+}
