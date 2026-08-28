@@ -49,6 +49,7 @@ from rivalsim.gameplay_v3 import (  # noqa: E402
     power_contact_exempt,
     primary_flip_outcome,
 )
+from rivalsim.kernels.rival2 import EPISODE_LIMIT_TICKS  # noqa: E402
 from rivalsim.mechanics_calibration import FAMILY_NAMES  # noqa: E402
 from rivalsim.rival2_contracts import (  # noqa: E402
     ACTION_CONTRACT_HASH,
@@ -1132,6 +1133,8 @@ def shadow_phase(
     *,
     checkpoint: Path = SOURCE_CHECKPOINT,
     expected_checkpoint_sha256: str = SOURCE_SHA256,
+    policy_checkpoint: Path | None = None,
+    expected_policy_checkpoint_sha256: str | None = None,
 ) -> None:
     source_sha_before = _sha256(checkpoint)
     source = torch.load(checkpoint, map_location="cpu", weights_only=False)
@@ -1140,6 +1143,18 @@ def shadow_phase(
     slim = _slice_source_for_shadow(source, SHADOW_WORLDS)
     trainer._validate_checkpoint_configuration(slim)
     trainer._restore_checkpoint_state(slim)
+    policy_source: dict[str, Any] | None = None
+    policy_sha_before: str | None = None
+    if policy_checkpoint is not None:
+        if expected_policy_checkpoint_sha256 is None:
+            raise ValueError("paired shadow policy checkpoint requires an expected SHA-256")
+        policy_sha_before = _sha256(policy_checkpoint)
+        if policy_sha_before != expected_policy_checkpoint_sha256:
+            raise RuntimeError("paired shadow policy checkpoint identity mismatch")
+        policy_source = torch.load(policy_checkpoint, map_location="cpu", weights_only=False)
+        if policy_source["policy_config_hash"] != source["policy_config_hash"]:
+            raise RuntimeError("paired shadow policy configuration mismatch")
+        trainer.model.load_state_dict(policy_source["model"])
     fresh = torch.ones(SHADOW_WORLDS, dtype=torch.bool, device=trainer.device)
     opponent_side = 1 - trainer.rival_side
     trainer.nexto.set_player_index(opponent_side)
@@ -1176,7 +1191,33 @@ def shadow_phase(
     )
     final_rearms = torch.zeros_like(final_duplicates)
     final_impossible = torch.zeros((SHADOW_WORLDS, 2), dtype=torch.int32, device=trainer.device)
-    sums = {"mechanics_abs": 0.0, "bad_flip_abs": 0.0, "progress_abs": 0.0, "reward_abs": 0.0}
+    component_views = {
+        "goals": "rival2.v1_goal_component",
+        "progress": "rival2.v1_progress_component",
+        "demos": "rival2.v1_demo_component",
+        "speed": "rival2.speed_component",
+        "supersonic": "rival2.supersonic_component",
+        "boost_use": "rival2.boost_use_component",
+        "boost_pickups": "rival2.boost_pickup_component",
+        "saves": "rival2.save_component",
+        "mechanics": "gameplay_v3.mechanics_component",
+        "unnecessary_flip": "gameplay_v3.bad_flip_component",
+    }
+    component_abs_sums = {name: 0.0 for name in component_views}
+    sums = {
+        "mechanics_abs": 0.0,
+        "bad_flip_abs": 0.0,
+        "progress_abs": 0.0,
+        "gameplay_abs": 0.0,
+        "reward_abs": 0.0,
+    }
+    action_abs_sum = torch.zeros(8, dtype=torch.float64, device=trainer.device)
+    action_nonzero = torch.zeros(8, dtype=torch.float64, device=trainer.device)
+    action_saturation = torch.zeros(5, dtype=torch.float64, device=trainer.device)
+    rival_goals = 0
+    opponent_goals = 0
+    no_touch_truncations = 0
+    hard_time_truncations = 0
     active_decisions = 0
     observation = env.observation
     for _decision in range(1_400):
@@ -1201,9 +1242,40 @@ def shadow_phase(
         sums["progress_abs"] += float(
             env.bridge.views["rival2.v1_progress_component"][active].abs().sum().item()
         )
+        mechanics_component = env.bridge.views["gameplay_v3.mechanics_component"]
+        bad_flip_component = env.bridge.views["gameplay_v3.bad_flip_component"]
+        gameplay_blue = transition.reward[:, 0] - mechanics_component - bad_flip_component
+        sums["gameplay_abs"] += float(gameplay_blue[active].abs().sum().item())
         sums["reward_abs"] += float(transition.reward[active, 0].abs().sum().item())
+        for name, view_name in component_views.items():
+            component_abs_sums[name] += float(
+                env.bridge.views[view_name][active].abs().sum().item()
+            )
+        emitted = transition.emitted_action[active].reshape(-1, 8)
+        action_abs_sum += emitted.abs().sum(dim=0, dtype=torch.float64)
+        action_nonzero += (emitted.abs() > 1.0e-6).sum(dim=0, dtype=torch.float64)
+        action_saturation += (emitted[:, :5].abs() > 0.95).sum(
+            dim=0, dtype=torch.float64
+        )
         new = active & transition.reset_mask
         if bool(new.any()):
+            scoring_team = env.bridge.views["rival2.scoring_team_latched"].to(torch.int64)
+            rival_goals += int(
+                (new & transition.terminated & (scoring_team == trainer.rival_side)).sum().item()
+            )
+            opponent_goals += int(
+                (
+                    new
+                    & transition.terminated
+                    & (scoring_team == (1 - trainer.rival_side))
+                )
+                .sum()
+                .item()
+            )
+            truncated = new & transition.truncated
+            hard_time = truncated & (world_decisions >= EPISODE_LIMIT_TICKS // 4)
+            hard_time_truncations += int(hard_time.sum().item())
+            no_touch_truncations += int((truncated & ~hard_time).sum().item())
             final_detected[new] = env.bridge.views["gameplay_v3.total_detected"].reshape(
                 SHADOW_WORLDS, 2, -1
             )[new]
@@ -1256,9 +1328,14 @@ def shadow_phase(
         name: int(final_paid[..., index].sum().item())
         for index, name in enumerate(CANONICAL_MECHANIC_NAMES)
     }
+    action_denominator = max(active_decisions * 2, 1)
+    goal_episodes = rival_goals + opponent_goals
     model_after = _tensor_digest(trainer.model.state_dict())
     optimizer_after = _object_digest(trainer.optimizer.state_dict())
     source_sha_after = _sha256(checkpoint)
+    policy_sha_after = (
+        None if policy_checkpoint is None else _sha256(policy_checkpoint)
+    )
     metrics = {
         "episodes": completed_count,
         "active_world_decisions": active_decisions,
@@ -1286,6 +1363,43 @@ def shadow_phase(
         "total_mean_abs_reward_per_decision": sums["reward_abs"] / active_decisions,
         "mechanics_progress_ratio": sums["mechanics_abs"] / max(sums["progress_abs"], 1e-30),
         "bad_flip_progress_ratio": sums["bad_flip_abs"] / max(sums["progress_abs"], 1e-30),
+        "mechanics_absolute_gameplay_reward_ratio": sums["mechanics_abs"]
+        / max(sums["gameplay_abs"], 1e-30),
+        "bad_flip_absolute_gameplay_reward_ratio": sums["bad_flip_abs"]
+        / max(sums["gameplay_abs"], 1e-30),
+        "reward_component_mean_abs_per_active_world_decision": {
+            name: value / active_decisions for name, value in component_abs_sums.items()
+        },
+        "scoring_behavior": {
+            "goal_episodes": goal_episodes,
+            "rival_goals": rival_goals,
+            "opponent_goals": opponent_goals,
+            "goal_episode_fraction": goal_episodes / max(completed_count, 1),
+            "rival_goal_share": rival_goals / max(goal_episodes, 1),
+        },
+        "no_touch_behavior": {
+            "no_touch_truncations": no_touch_truncations,
+            "hard_time_truncations": hard_time_truncations,
+            "no_touch_episode_fraction": no_touch_truncations / max(completed_count, 1),
+        },
+        "movement_action_telemetry": {
+            "mean_absolute": {
+                name: float(action_abs_sum[index].item() / action_denominator)
+                for index, name in enumerate(
+                    ("throttle", "steer", "pitch", "yaw", "roll", "jump", "boost", "handbrake")
+                )
+            },
+            "nonzero_fraction": {
+                name: float(action_nonzero[index].item() / action_denominator)
+                for index, name in enumerate(
+                    ("throttle", "steer", "pitch", "yaw", "roll", "jump", "boost", "handbrake")
+                )
+            },
+            "analog_saturation_fraction": {
+                name: float(action_saturation[index].item() / action_denominator)
+                for index, name in enumerate(("throttle", "steer", "pitch", "yaw", "roll"))
+            },
+        },
         "impossible_count": int(final_impossible.sum().item()),
         "duplicate_suppression": {
             name: int(final_duplicates[..., index].sum().item())
@@ -1306,6 +1420,10 @@ def shadow_phase(
         "source_checkpoint_byte_identical": source_sha_before
         == source_sha_after
         == expected_checkpoint_sha256,
+        "policy_checkpoint_byte_identical": policy_checkpoint is None
+        or policy_sha_before
+        == policy_sha_after
+        == expected_policy_checkpoint_sha256,
         "no_update_called": True,
         "finite_metrics": all(np.isfinite(value) for value in sums.values()),
     }
@@ -1313,6 +1431,19 @@ def shadow_phase(
         "schema_version": 1,
         "created_utc": _utc_now(),
         "source": _source_metadata(checkpoint),
+        "evaluation_policy": (
+            _source_metadata(checkpoint)
+            if policy_source is None
+            else {
+                "path": policy_checkpoint.as_posix(),
+                "sha256": policy_sha_before,
+                "iteration": int(policy_source["iteration"]),
+                "policy_version": int(policy_source["policy_version"]),
+                "total_agent_samples": int(policy_source["total_agent_samples"]),
+                "model_sha256": _tensor_digest(policy_source["model"]),
+            }
+        ),
+        "paired_policy_only_evaluation": policy_source is not None,
         "evaluation_extract": (
             "first 256 source assignment rows; exact source model/optimizer/RNG restored in memory"
         ),
@@ -1464,6 +1595,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR)
     parser.add_argument("--checkpoint", type=Path, default=SOURCE_CHECKPOINT)
     parser.add_argument("--checkpoint-sha256", default=SOURCE_SHA256)
+    parser.add_argument("--policy-checkpoint", type=Path)
+    parser.add_argument("--policy-checkpoint-sha256")
     return parser.parse_args()
 
 
@@ -1486,6 +1619,14 @@ def main() -> None:
             args.collision_dir,
             checkpoint=checkpoint,
             expected_checkpoint_sha256=expected_checkpoint_sha256,
+            policy_checkpoint=(
+                None if args.policy_checkpoint is None else args.policy_checkpoint.resolve()
+            ),
+            expected_policy_checkpoint_sha256=(
+                None
+                if args.policy_checkpoint_sha256 is None
+                else str(args.policy_checkpoint_sha256).upper()
+            ),
         )
 
 
