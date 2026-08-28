@@ -86,3 +86,20 @@ Authorized distillation and final verification:
 
 The final test metrics, human pre-BC inference baseline, training curve, hashes, and acceptance
 verdict are stored under `results/rival2/missing_feature_distillation_v1/`.
+
+## Frozen-run outcome
+
+The authorized V1 run is blocked by its full-observation retention guard. The exact 32,768×128
+corpus completed with 8,388,608 finite observations and canonical observation SHA-256
+`F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349`. At the first 64-step
+boundary, all four frozen LR attempts (`1e-4`, `5e-5`, `2.5e-5`, `1.25e-5`) violated the actor and
+value guard. Even the minimum-LR attempt reached full-input actor mean KL `0.264397263`, maximum
+channel KL `0.135721892`, value RMSE `0.138564673`, and maximum value drift `0.878026009`, versus
+limits `0.02`, `0.01`, `0.075`, and `0.5` respectively.
+
+Every interval was rolled back to the byte-identical student initialization. No optimizer step was
+accepted, no distilled checkpoint was emitted, the bootstrap and historical PPO optimizer remain
+unchanged, and the human files/splits remain unchanged. Human post-distillation inference was not
+run because no guard-accepted distilled student exists. V1 thresholds were not weakened. Any retry
+with finer-grained transactional guarding or stronger retention enforcement requires a new
+prospectively frozen authority version.

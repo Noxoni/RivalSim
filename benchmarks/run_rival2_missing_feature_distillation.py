@@ -583,6 +583,7 @@ def _train(
     chunks = chunks[:max_steps]
     validation_interval = int(training["validation_interval_optimizer_steps"])
     curve: list[dict[str, Any]] = []
+    guard_attempts: list[dict[str, Any]] = []
     accepted_steps = 0
     proposed_steps = 0
     cursor = 0
@@ -676,6 +677,25 @@ def _train(
             if nonfinite_training:
                 guard_result["checks"]["finite_training"] = False
                 guard_result["accepted"] = False
+            guard_attempts.append(
+                {
+                    "interval_start_cursor": cursor,
+                    "retry": retries,
+                    "learning_rate": current_lr,
+                    "proposed_optimizer_steps": proposed_steps,
+                    "interval_steps_completed": (
+                        0 if nonfinite_training else len(interval)
+                    ),
+                    "retention_guard": guard_result,
+                }
+            )
+            _write_json(
+                ROOT / RESULT_ROOT / "guard_attempts_live.json",
+                {
+                    "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_GUARD_ATTEMPTS_V1",
+                    "attempts": guard_attempts,
+                },
+            )
             if not guard_result["accepted"]:
                 _load_interval_state(interval_state, student, optimizer)
                 retries += 1
@@ -782,6 +802,26 @@ def _train(
                 break
 
     if best_step <= 0 or not checkpoint_path.is_file():
+        _write_json(
+            ROOT / RESULT_ROOT / "failed_training_evidence.json",
+            {
+                "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_FAILED_TRAINING_V1",
+                "frozen_config_sha256": config_identity["sha256"],
+                "best_step": best_step,
+                "accepted_optimizer_steps": accepted_steps,
+                "proposed_optimizer_steps": proposed_steps,
+                "stop_reason": stop_reason,
+                "guard_attempts": guard_attempts,
+                "bootstrap_unchanged": file_sha256(ROOT / bootstrap_identity["path"])
+                == bootstrap_hash_before,
+                "teacher_unchanged": tensor_tree_sha256(teacher.state_dict())
+                == teacher_hash_before,
+                "historical_ppo_optimizer_unchanged": tensor_tree_sha256(
+                    bootstrap_payload["optimizer"]
+                )
+                == ppo_optimizer_hash_before,
+            },
+        )
         raise RuntimeError("distillation produced no material guard-accepted checkpoint")
     best_payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     student.load_state_dict(best_payload["model"])
@@ -832,6 +872,7 @@ def _train(
         "baseline_test": baseline_test,
         "initial_retention_guard": initial_guard,
         "curve": curve,
+        "guard_attempts": guard_attempts,
         "best_step": best_step,
         "best_validation": best_validation,
         "best_combined_degraded_validation_kl": best_monitor,
@@ -1222,9 +1263,57 @@ def verify() -> dict[str, Any]:
         elif path.stat().st_size != row["bytes"] or file_sha256(path) != row["sha256"]:
             errors.append(f"artifact hash mismatch: {row['path']}")
     evidence = json.loads((ROOT / RESULT_ROOT / "evidence.json").read_text())
-    if evidence["verdict"] != "PASS" or not all(evidence["checks"].values()):
-        errors.append("evidence verdict/checks are not PASS")
-    return {"valid": not errors, "errors": errors, "artifact_count": len(manifest["files"])}
+    if evidence["verdict"] == "PASS":
+        if not all(evidence["checks"].values()):
+            errors.append("PASS evidence contains a failed check")
+    elif evidence["verdict"] == "BLOCKED":
+        required_true = (
+            "all_failed_intervals_rolled_back",
+            "frozen_guard_not_weakened",
+            "historical_ppo_optimizer_untouched",
+            "human_demo_frozen_split_manifest_unchanged",
+            "human_demo_sources_unchanged",
+        )
+        if not all(evidence["checks"][name] for name in required_true):
+            errors.append("BLOCKED evidence lacks required preservation checks")
+        if evidence["checks"]["acceptance_claimed"]:
+            errors.append("BLOCKED evidence incorrectly claims acceptance")
+        if evidence["checks"]["distilled_checkpoint_emitted"]:
+            errors.append("BLOCKED evidence incorrectly claims a checkpoint")
+        if (ROOT / CHECKPOINT).exists():
+            errors.append("blocked run unexpectedly left a distilled checkpoint")
+    else:
+        errors.append("unknown evidence verdict")
+    return {
+        "valid": not errors,
+        "errors": errors,
+        "artifact_count": len(manifest["files"]),
+        "verdict": evidence["verdict"],
+    }
+
+
+def finalize_blocked() -> dict[str, Any]:
+    evidence_path = ROOT / RESULT_ROOT / "evidence.json"
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    if evidence["verdict"] != "BLOCKED":
+        raise ValueError("refusing blocked finalization for non-blocked evidence")
+    if (ROOT / CHECKPOINT).exists():
+        raise RuntimeError("refusing blocked finalization with a distilled checkpoint present")
+    artifacts = _artifact_manifest(
+        [
+            FROZEN_CONFIG,
+            RESULT_ROOT / "corpus_manifest.json",
+            RESULT_ROOT / "evidence.json",
+            RESULT_ROOT / "failed_training_evidence.json",
+            RESULT_ROOT / "guard_attempts_live.json",
+            RESULT_ROOT / "pre_step_freeze_evidence.json",
+            RESULT_ROOT / "preflight_correction_evidence.json",
+            RESULT_ROOT / "training_curve.json",
+            RESULT_ROOT / "verification_evidence.json",
+        ]
+    )
+    _write_json(ROOT / RESULT_ROOT / "artifact_manifest.json", artifacts)
+    return verify()
 
 
 def parse_args() -> argparse.Namespace:
@@ -1243,6 +1332,7 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--verify-only", action="store_true")
+    parser.add_argument("--finalize-blocked", action="store_true")
     return parser.parse_args()
 
 
@@ -1250,6 +1340,8 @@ def main() -> int:
     args = parse_args()
     if args.verify_only:
         result = verify()
+    elif args.finalize_blocked:
+        result = finalize_blocked()
     else:
         if not torch.cuda.is_available() or not wp.is_cuda_available():
             raise RuntimeError("CUDA PyTorch and Warp are required")

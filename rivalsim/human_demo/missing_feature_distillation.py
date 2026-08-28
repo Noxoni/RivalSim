@@ -137,7 +137,11 @@ def world_observation_batch(
 
     if observations.ndim != 4 or observations.shape[-2:] != (2, OBS_DIM):
         raise ValueError("corpus observations must have shape [T, W, 2, 182]")
-    indices = torch.as_tensor(world_indices, dtype=torch.int64, device=observations.device)
+    if isinstance(world_indices, np.ndarray):
+        host_indices = torch.from_numpy(np.asarray(world_indices, dtype=np.int64).copy())
+        indices = host_indices.to(device=observations.device)
+    else:
+        indices = world_indices.to(device=observations.device, dtype=torch.int64)
     selected = observations.index_select(1, indices)
     return selected.permute(1, 0, 2, 3).reshape(-1, OBS_DIM)
 

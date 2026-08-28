@@ -1,0 +1,61 @@
+{
+  "accepted_optimizer_steps": 0,
+  "documented_attempt": {
+    "guard_validation_interval_steps": 64,
+    "proposed_optimizer_steps": 256,
+    "retries": [
+      {
+        "full_actor_max_channel_kl": 0.7934169769287109,
+        "full_actor_max_sample_kl": 52.01139831542969,
+        "full_actor_mean_kl": 1.7717523574829102,
+        "full_value_max_absolute_drift": 2.6319642066955566,
+        "full_value_rmse": 0.34119687414420086,
+        "learning_rate": 0.0001,
+        "retention_guard_accepted": false
+      },
+      {
+        "full_actor_max_channel_kl": 0.5846878290176392,
+        "full_actor_max_sample_kl": 30.593090057373047,
+        "full_actor_mean_kl": 1.3484349250793457,
+        "full_value_max_absolute_drift": 2.136925220489502,
+        "full_value_rmse": 0.283889333780512,
+        "learning_rate": 5e-05,
+        "retention_guard_accepted": false
+      },
+      {
+        "full_actor_max_channel_kl": 0.4085785746574402,
+        "full_actor_max_sample_kl": 11.694573402404785,
+        "full_actor_mean_kl": 0.7648602724075317,
+        "full_value_max_absolute_drift": 1.388949990272522,
+        "full_value_rmse": 0.21617751100042887,
+        "learning_rate": 2.5e-05,
+        "retention_guard_accepted": false
+      },
+      {
+        "full_actor_max_channel_kl": 0.13572189211845398,
+        "full_actor_max_sample_kl": 5.209906578063965,
+        "full_actor_mean_kl": 0.2643972635269165,
+        "full_value_max_absolute_drift": 0.878026008605957,
+        "full_value_rmse": 0.13856467280665188,
+        "learning_rate": 1.25e-05,
+        "retention_guard_accepted": false
+      }
+    ]
+  },
+  "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_BLOCKED_TRAINING_CURVE_V1",
+  "frozen_guard": {
+    "full_actor_max_channel_kl": 0.01,
+    "full_actor_max_sample_kl": 2.0,
+    "full_actor_mean_kl": 0.02,
+    "full_value_max_absolute_drift": 0.5,
+    "full_value_rmse": 0.075,
+    "minimum_learning_rate": 1.25e-05
+  },
+  "historical_uninstrumented_attempt": {
+    "inferred_all_intervals_rolled_back": true,
+    "proposed_optimizer_steps": 256,
+    "retained_student_checkpoint": false
+  },
+  "total_proposed_supervised_optimizer_step_calls": 512,
+  "verdict": "BLOCKED_FULL_OBSERVATION_RETENTION_GUARD"
+}

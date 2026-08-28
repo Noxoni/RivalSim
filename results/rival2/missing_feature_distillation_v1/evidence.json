@@ -1,0 +1,68 @@
+{
+  "accepted_supervised_optimizer_steps": 0,
+  "blocker": "All four frozen-LR attempts at the first 64-step transactional boundary violated every full-observation actor/value retention limit; the interval was rolled back each time and the next backoff would be below the frozen minimum LR.",
+  "bootstrap": {
+    "checkpoint_sha256_after": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "checkpoint_sha256_before": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "unchanged": true
+  },
+  "checks": {
+    "acceptance_claimed": false,
+    "all_failed_intervals_rolled_back": true,
+    "distilled_checkpoint_emitted": false,
+    "frozen_guard_not_weakened": true,
+    "historical_ppo_optimizer_untouched": true,
+    "human_behavior_cloning_performed": false,
+    "human_demo_frozen_split_manifest_unchanged": true,
+    "human_demo_sources_unchanged": true,
+    "human_optimizer_steps": 0,
+    "mechanic_detector_changed": false,
+    "ppo_steps": 0,
+    "reward_changed": false
+  },
+  "corpus": {
+    "identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+    "observation_count": 8388608,
+    "observation_tensor_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+    "shape": [
+      128,
+      32768,
+      2,
+      182
+    ],
+    "whole_world_split": true
+  },
+  "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_BLOCKED_EVIDENCE_V1",
+  "frozen_config_sha256": "5F20CE9FDE854A99405D53864FB1FB72F9B28FA4EC882F8D4C675DF627A16955",
+  "human_sources": {
+    "dataset_manifest_sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55",
+    "session_count": 18,
+    "unchanged": true
+  },
+  "lowest_lr_rejected_metrics": {
+    "actor_channel_kl": {
+      "boost": 0.0025623543187975883,
+      "handbrake": 0.002021696185693145,
+      "jump": 0.0018373352941125631,
+      "pitch": 0.026192963123321533,
+      "roll": 0.013908183202147484,
+      "steer": 0.13572189211845398,
+      "throttle": 0.06825640052556992,
+      "yaw": 0.013896448537707329
+    },
+    "actor_max_sample_kl": 5.209906578063965,
+    "actor_mean_kl": 0.2643972635269165,
+    "learning_rate": 1.25e-05,
+    "value_max_absolute_drift": 0.878026008605957,
+    "value_rmse": 0.13856467280665188
+  },
+  "output_checkpoint": null,
+  "proposed_supervised_optimizer_step_calls": {
+    "documented_guard_attempt": 256,
+    "earlier_uninstrumented_identical_control_flow_attempt": 256,
+    "total": 512
+  },
+  "recommended_next_step": "Define and freeze a prospective V2 distillation authority with stronger explicit full-observation retention enforcement or finer-grained transactional guarding; do not weaken the accepted retention limits and do not start human BC.",
+  "verdict": "BLOCKED"
+}
