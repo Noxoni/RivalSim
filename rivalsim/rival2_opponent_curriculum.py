@@ -5,11 +5,13 @@ from __future__ import annotations
 import copy
 import hashlib
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
 
+from rivalsim.rival2_contracts import RIVAL2_REWARD_GAMEPLAY_V3_VERSION
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_mixed_ppo import (
     Rival2MixedPPOSafetyConfig,
@@ -684,6 +686,55 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 self.mixed_ppo_safety,
             )
             self.last_adaptive_ppo_summary = copy.deepcopy(adaptive.get("last_update_summary"))
+
+    def load_checkpoint_curriculum_transition(
+        self,
+        path: str | Path,
+        *,
+        source_reward_version: str,
+        source_episode_version: str,
+        transition_record: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Restore rich curriculum state but start V3 adapters at a fresh episode."""
+
+        recorded = super().load_checkpoint_curriculum_transition(
+            path,
+            source_reward_version=source_reward_version,
+            source_episode_version=source_episode_version,
+            transition_record=transition_record,
+        )
+        if self.env.reward_version != RIVAL2_REWARD_GAMEPLAY_V3_VERSION:
+            return recorded
+
+        fresh = torch.ones(self.env.num_envs, dtype=torch.bool, device=self.device)
+        opponent_side = 1 - self.rival_side
+        self.nexto.set_player_index(opponent_side)
+        self.nexto.activate(fresh)
+        self.nexto._cadence_tick = 0
+        self.wisp.set_player_index(opponent_side)
+        self.wisp.activate(fresh)
+        self.wisp.opponent_slot.zero_()
+
+        self.curriculum_transition["preserved_checkpoint_state"].extend(
+            [
+                "opponent_curriculum_configuration",
+                "opponent_curriculum_rng",
+                "opponent_family_assignments",
+                "rival_side_assignments",
+                "realized_family_assignment_counts",
+                "wisp_observation_generator_rng",
+            ]
+        )
+        self.curriculum_transition["reinitialized_state"].extend(
+            [
+                "nexto_previous_action_and_neural_cadence",
+                "nexto_kickoff_temporal_state",
+                "wisp_action_delay_history",
+                "wisp_eta_cache",
+                "wisp_opponent_slot_cache",
+            ]
+        )
+        return copy.deepcopy(self.curriculum_transition)
 
 
 __all__ = [

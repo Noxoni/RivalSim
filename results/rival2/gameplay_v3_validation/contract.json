@@ -1,0 +1,122 @@
+{
+  "arithmetic": "Blue = Goal + Progress + 0Touch + Demo + Speed + Supersonic + BoostUse + BoostPickup + Save + 0.005*(BluePaidMechanics-OrangePaidMechanics) + -0.01*(BlueBadFlipContacts-OrangeBadFlipContacts); Orange=-Blue",
+  "contract": {
+    "action_hold_ticks": 4,
+    "cadence_hz": 30,
+    "composition": "BlueReward = Goal + Progress + Demo + Speed + Supersonic + BoostUse + BoostPickup + Save + (BluePaidMechanics - OrangePaidMechanics) + (-0.01 * BlueUnnecessaryFlipThroughContacts + 0.01 * OrangeUnnecessaryFlipThroughContacts); OrangeReward = -BlueReward",
+    "disabled_mechanics_reward": [
+      "possession",
+      "ground_carry_or_dribble",
+      "generic_controlled_flick",
+      "air_dribble_milestones",
+      "pop_reset_beyond_reset_acquisition",
+      "double_tap_or_rebound",
+      "bare_stall",
+      "recovery",
+      "generic_jump_flip_or_aerial"
+    ],
+    "episode_version": "RIVAL2_EPISODE_V1",
+    "gameplay_v2_standalone_double_dash_reward": 0.0,
+    "mechanics": {
+      "canonical_rewardable": [
+        "speedflip",
+        "half_flip",
+        "musty",
+        "breezi",
+        "redirect",
+        "pinch",
+        "pogo",
+        "successful_dash",
+        "ball_reset_acquisition",
+        "car_reset_acquisition"
+      ],
+      "dash_tangent_speed_gain_strictly_greater_than_uu_s": 1.0,
+      "dash_windows_ticks_at_120_hz": {
+        "air": 42,
+        "double_dash": 90,
+        "landing": 24,
+        "zap_dodge": 30,
+        "zap_jump": 12
+      },
+      "episode_budget": 0.05,
+      "event_reward": 0.005,
+      "max_paid_events_per_player_episode": 10,
+      "quality_scaled": false,
+      "reset": {
+        "chain_requires_consumption_or_loss_before_reacquisition": true,
+        "requires_real_resource_transition": true,
+        "resource": "AIR_UNTIMED_AVAILABLE",
+        "supporting_wheels_min": 3
+      },
+      "subtype_no_extra_payout": [
+        "landing_dash",
+        "wall_dash",
+        "curve_dash",
+        "ceiling_dash",
+        "zapdash",
+        "rival_double_dash",
+        "chain_reset",
+        "preflip_reset"
+      ],
+      "surface_normal_classes_abs_nz": {
+        "floor_ceiling_min": 0.85,
+        "wall_max": 0.25
+      }
+    },
+    "physics_hz": 120,
+    "retained_gameplay_v1_terms": {
+      "boost_use": 5e-05,
+      "demo": 0.1,
+      "goal": 10.0,
+      "large_pad_pickup": 0.005,
+      "progress_coefficient": 0.5,
+      "progress_y_scale": 5120.0,
+      "save": 0.75,
+      "small_pad_pickup": 0.001,
+      "speed": 0.0001,
+      "supersonic": 0.0002
+    },
+    "transition_from": "RIVAL2_REWARD_GAMEPLAY_V2",
+    "unconditional_unique_touch": 0.0,
+    "unnecessary_flip_through_contact": {
+      "candidate": "new legitimate car-ball contact onset during active directional dodge: is_flipping and has_flipped and non-zero directional flip_rel_torque",
+      "generic_flip_penalty": 0.0,
+      "generic_jump_penalty": 0.0,
+      "mechanic_failure_penalty": 0.0,
+      "penalty_to_offender_before_zero_sum": -0.01,
+      "pending_window_ticks_at_120_hz": 2,
+      "primary_precedence": [
+        "EXEMPT_RECOGNIZED_MECHANIC",
+        "EXEMPT_CONTROLLED_FLICK",
+        "EXEMPT_CONTESTED_50",
+        "EXEMPT_POWER_CONTACT",
+        "UNNECESSARY_FLIP_THROUGH_CONTACT"
+      ],
+      "recognized_same_contact_allowlist": [
+        "musty",
+        "breezi",
+        "preflip_reset"
+      ]
+    },
+    "version": "RIVAL2_REWARD_GAMEPLAY_V3",
+    "zero_sum": true
+  },
+  "contract_hashes": {
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_REWARD_GAMEPLAY_V3": "77541461F470420451B9E17421FC0C6BA3E84F8B5BB453E4DCB5AF70871A5051"
+  },
+  "created_utc": "2026-08-28T02:09:34.080708+00:00",
+  "historical_hash_proof": {
+    "action": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "episode": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "gameplay_v1": "48AAC000B97D2652507F677184A3FE4F0A3A86CED136B680C933EFF33CD9F072",
+    "gameplay_v2": "4073E29C1013458D5784435061FE47C639525BE37E8CD519783889C69BA87D41",
+    "observation": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF"
+  },
+  "schema_version": 1,
+  "sha256": "77541461F470420451B9E17421FC0C6BA3E84F8B5BB453E4DCB5AF70871A5051",
+  "verdict": "PASS",
+  "version": "RIVAL2_REWARD_GAMEPLAY_V3"
+}

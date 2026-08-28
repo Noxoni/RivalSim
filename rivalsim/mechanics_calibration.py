@@ -266,18 +266,19 @@ def _emit_mechanic(
         return
     family_event_count[family_slot] = family_event_count[family_slot] + 1
     family_lockout[family_slot] = 1
-    slot = evidence_count[car]
-    evidence_count[car] = slot + 1
-    if slot < evidence_capacity:
+    if evidence_capacity > 0:
+        slot = evidence_count[car]
+        evidence_count[car] = slot + 1
         base = car * evidence_capacity + slot
-        evidence_family[base] = family
-        evidence_subtype[base] = subtype
-        evidence_tick[base] = tick
-        value_base = base * 4
-        evidence_features[value_base] = feature0
-        evidence_features[value_base + 1] = feature1
-        evidence_features[value_base + 2] = feature2
-        evidence_features[value_base + 3] = feature3
+        if slot < evidence_capacity:
+            evidence_family[base] = family
+            evidence_subtype[base] = subtype
+            evidence_tick[base] = tick
+            value_base = base * 4
+            evidence_features[value_base] = feature0
+            evidence_features[value_base + 1] = feature1
+            evidence_features[value_base + 2] = feature2
+            evidence_features[value_base + 3] = feature3
 
 
 @wp.kernel

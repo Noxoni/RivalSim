@@ -35,6 +35,7 @@ REWARD_MODE_ACQUISITION = 1
 REWARD_MODE_GOAL_ONLY = 2
 REWARD_MODE_GAMEPLAY = 3
 REWARD_MODE_GAMEPLAY_V2 = 4
+REWARD_MODE_GAMEPLAY_V3 = 5
 
 STRICT_DASH_LOW_AIR_TICKS = 42
 STRICT_DASH_LANDING_WINDOW_TICKS = 24
@@ -328,7 +329,11 @@ def rival2_accumulate_tick(
     else:
         no_touch_ticks[env] = no_touch_ticks[env] + 1
 
-    if reward_mode == REWARD_MODE_GAMEPLAY or reward_mode == REWARD_MODE_GAMEPLAY_V2:
+    if (
+        reward_mode == REWARD_MODE_GAMEPLAY
+        or reward_mode == REWARD_MODE_GAMEPLAY_V2
+        or reward_mode == REWARD_MODE_GAMEPLAY_V3
+    ):
         boost_gained_amount[car_base] = boost_gained_amount[car_base] + pad_boost_gained[car_base]
         boost_gained_amount[car_base + 1] = (
             boost_gained_amount[car_base + 1] + pad_boost_gained[car_base + 1]
@@ -457,7 +462,7 @@ def rival2_accumulate_tick(
                 else:
                     blue_reward = blue_reward - 10.0
                     orange_reward = orange_reward + 10.0
-        else:
+        elif reward_mode == REWARD_MODE_GAMEPLAY or reward_mode == REWARD_MODE_GAMEPLAY_V2:
             # RIVAL2_REWARD_GAMEPLAY_V1 preserves historical V1 exactly, then
             # adds small competitive gameplay terms before the final negation.
             progress_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
@@ -509,6 +514,72 @@ def rival2_accumulate_tick(
                 )
 
             blue_reward = historical_v1_blue
+            blue_reward = blue_reward + competitive_speed
+            blue_reward = blue_reward + competitive_supersonic
+            blue_reward = blue_reward + competitive_boost_use
+            blue_reward = blue_reward + competitive_pickup
+            blue_reward = blue_reward + competitive_save
+            blue_reward = blue_reward + competitive_strict_double_dash
+            orange_reward = -blue_reward
+
+            v1_goal_component[env] = goal_reward
+            v1_progress_component[env] = progress_reward
+            v1_touch_component[env] = touch_reward
+            v1_demo_component[env] = demo_reward
+            speed_component[env] = competitive_speed
+            supersonic_component[env] = competitive_supersonic
+            boost_use_component[env] = competitive_boost_use
+            boost_pickup_component[env] = competitive_pickup
+            save_component[env] = competitive_save
+            strict_double_dash_component[env] = competitive_strict_double_dash
+        elif reward_mode == REWARD_MODE_GAMEPLAY_V3:
+            # Gameplay V3 retains V1's goal/progress/demo and competitive
+            # speed/supersonic/boost/pickup/save terms.  Generic touch shaping
+            # and V2's strict-double-dash payout are exactly zero.  Native V3
+            # mechanic and bad-flip components are composed after this kernel.
+            progress_reward = 0.5 * (ball_y_after[env] - ball_y_before[env]) / GOAL_PROGRESS_SCALE_Y
+            goal_reward = 0.0
+            if terminal != 0:
+                if scoring_team_latched[env] == 0:
+                    goal_reward = 10.0
+                else:
+                    goal_reward = -10.0
+            touch_reward = 0.0
+            demo_reward = 0.10 * float(demo_by_count[car_base] - demo_by_count[car_base + 1])
+
+            blue_speed = GAMEPLAY_SPEED_COEFFICIENT * wp.clamp(
+                wp.length(car_vel[car_base]) / CAR_LINEAR_SPEED_SCALE,
+                0.0,
+                1.0,
+            )
+            orange_speed = GAMEPLAY_SPEED_COEFFICIENT * wp.clamp(
+                wp.length(car_vel[car_base + 1]) / CAR_LINEAR_SPEED_SCALE,
+                0.0,
+                1.0,
+            )
+            competitive_speed = blue_speed - orange_speed
+            competitive_supersonic = GAMEPLAY_SUPERSONIC_REWARD * float(
+                is_supersonic[car_base] - is_supersonic[car_base + 1]
+            )
+            competitive_boost_use = GAMEPLAY_BOOST_USE_REWARD * float(
+                boost_use_event[car_base] - boost_use_event[car_base + 1]
+            )
+            blue_pickup = GAMEPLAY_SMALL_PAD_PICKUP_REWARD * float(
+                small_pad_pickup_count[car_base]
+            ) + GAMEPLAY_BIG_PAD_PICKUP_REWARD * float(big_pad_pickup_count[car_base])
+            orange_pickup = GAMEPLAY_SMALL_PAD_PICKUP_REWARD * float(
+                small_pad_pickup_count[car_base + 1]
+            ) + GAMEPLAY_BIG_PAD_PICKUP_REWARD * float(big_pad_pickup_count[car_base + 1])
+            competitive_pickup = blue_pickup - orange_pickup
+            competitive_save = GAMEPLAY_SAVE_REWARD * float(
+                save_count[car_base] - save_count[car_base + 1]
+            )
+            competitive_strict_double_dash = 0.0
+
+            blue_reward = progress_reward
+            blue_reward = blue_reward + goal_reward
+            blue_reward = blue_reward + touch_reward
+            blue_reward = blue_reward + demo_reward
             blue_reward = blue_reward + competitive_speed
             blue_reward = blue_reward + competitive_supersonic
             blue_reward = blue_reward + competitive_boost_use
@@ -721,6 +792,7 @@ __all__ = [
     "REWARD_MODE_BASE",
     "REWARD_MODE_GAMEPLAY",
     "REWARD_MODE_GAMEPLAY_V2",
+    "REWARD_MODE_GAMEPLAY_V3",
     "REWARD_MODE_GOAL_ONLY",
     "rival2_accumulate_tick",
     "rival2_after_interval_reset",

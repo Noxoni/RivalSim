@@ -15,6 +15,7 @@ RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
 RIVAL2_REWARD_SCORING_V1_VERSION: Final = "RIVAL2_REWARD_SCORING_V1"
 RIVAL2_REWARD_GAMEPLAY_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V1"
 RIVAL2_REWARD_GAMEPLAY_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V2"
+RIVAL2_REWARD_GAMEPLAY_V3_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V3"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -94,6 +95,10 @@ GAMEPLAY_BIG_PAD_PICKUP_REWARD: Final = 0.005
 GAMEPLAY_SAVE_REWARD: Final = 0.75
 GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS: Final = 2.0
 GAMEPLAY_STRICT_DOUBLE_DASH_REWARD: Final = 0.005
+GAMEPLAY_V3_MECHANICS_EVENT_REWARD: Final = 0.005
+GAMEPLAY_V3_MECHANICS_EPISODE_BUDGET: Final = 0.05
+GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS: Final = 10
+GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY: Final = -0.01
 
 _CAR_FIELDS = (
     "position.x",
@@ -454,6 +459,109 @@ REWARD_GAMEPLAY_V2_CONTRACT: Final = {
     "other_changes_from_gameplay_v1": [],
 }
 
+REWARD_GAMEPLAY_V3_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+    "transition_from": RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    "cadence_hz": 30,
+    "physics_hz": 120,
+    "action_hold_ticks": 4,
+    "episode_version": RIVAL2_EPISODE_VERSION,
+    "zero_sum": True,
+    "composition": (
+        "BlueReward = Goal + Progress + Demo + Speed + Supersonic + BoostUse + "
+        "BoostPickup + Save + (BluePaidMechanics - OrangePaidMechanics) + "
+        "(-0.01 * BlueUnnecessaryFlipThroughContacts + 0.01 * "
+        "OrangeUnnecessaryFlipThroughContacts); OrangeReward = -BlueReward"
+    ),
+    "retained_gameplay_v1_terms": {
+        "goal": 10.0,
+        "progress_coefficient": 0.5,
+        "progress_y_scale": PROGRESS_Y_SCALE,
+        "demo": 0.10,
+        "speed": GAMEPLAY_SPEED_COEFFICIENT,
+        "supersonic": GAMEPLAY_SUPERSONIC_REWARD,
+        "boost_use": GAMEPLAY_BOOST_USE_REWARD,
+        "small_pad_pickup": GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
+        "large_pad_pickup": GAMEPLAY_BIG_PAD_PICKUP_REWARD,
+        "save": GAMEPLAY_SAVE_REWARD,
+    },
+    "unconditional_unique_touch": 0.0,
+    "gameplay_v2_standalone_double_dash_reward": 0.0,
+    "mechanics": {
+        "event_reward": GAMEPLAY_V3_MECHANICS_EVENT_REWARD,
+        "episode_budget": GAMEPLAY_V3_MECHANICS_EPISODE_BUDGET,
+        "max_paid_events_per_player_episode": GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS,
+        "quality_scaled": False,
+        "canonical_rewardable": [
+            "speedflip",
+            "half_flip",
+            "musty",
+            "breezi",
+            "redirect",
+            "pinch",
+            "pogo",
+            "successful_dash",
+            "ball_reset_acquisition",
+            "car_reset_acquisition",
+        ],
+        "subtype_no_extra_payout": [
+            "landing_dash",
+            "wall_dash",
+            "curve_dash",
+            "ceiling_dash",
+            "zapdash",
+            "rival_double_dash",
+            "chain_reset",
+            "preflip_reset",
+        ],
+        "dash_windows_ticks_at_120_hz": {
+            "air": 42,
+            "landing": 24,
+            "zap_jump": 12,
+            "zap_dodge": 30,
+            "double_dash": 90,
+        },
+        "dash_tangent_speed_gain_strictly_greater_than_uu_s": 1.0,
+        "surface_normal_classes_abs_nz": {"floor_ceiling_min": 0.85, "wall_max": 0.25},
+        "reset": {
+            "supporting_wheels_min": 3,
+            "resource": "AIR_UNTIMED_AVAILABLE",
+            "requires_real_resource_transition": True,
+            "chain_requires_consumption_or_loss_before_reacquisition": True,
+        },
+    },
+    "unnecessary_flip_through_contact": {
+        "penalty_to_offender_before_zero_sum": GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY,
+        "candidate": (
+            "new legitimate car-ball contact onset during active directional dodge: "
+            "is_flipping and has_flipped and non-zero directional flip_rel_torque"
+        ),
+        "pending_window_ticks_at_120_hz": 2,
+        "primary_precedence": [
+            "EXEMPT_RECOGNIZED_MECHANIC",
+            "EXEMPT_CONTROLLED_FLICK",
+            "EXEMPT_CONTESTED_50",
+            "EXEMPT_POWER_CONTACT",
+            "UNNECESSARY_FLIP_THROUGH_CONTACT",
+        ],
+        "recognized_same_contact_allowlist": ["musty", "breezi", "preflip_reset"],
+        "generic_jump_penalty": 0.0,
+        "generic_flip_penalty": 0.0,
+        "mechanic_failure_penalty": 0.0,
+    },
+    "disabled_mechanics_reward": [
+        "possession",
+        "ground_carry_or_dribble",
+        "generic_controlled_flick",
+        "air_dribble_milestones",
+        "pop_reset_beyond_reset_acquisition",
+        "double_tap_or_rebound",
+        "bare_stall",
+        "recovery",
+        "generic_jump_flip_or_aerial",
+    ],
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -488,6 +596,7 @@ REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRAC
 REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SCORING_V1_CONTRACT)
 REWARD_GAMEPLAY_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V1_CONTRACT)
 REWARD_GAMEPLAY_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V2_CONTRACT)
+REWARD_GAMEPLAY_V3_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V3_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -561,6 +670,13 @@ def contract_hashes_for_reward(
             RIVAL2_REWARD_GAMEPLAY_V2_VERSION: REWARD_GAMEPLAY_V2_CONTRACT_HASH,
             episode_version: episode_hash,
         }
+    if reward_version == RIVAL2_REWARD_GAMEPLAY_V3_VERSION:
+        return {
+            RIVAL2_OBS_VERSION: OBSERVATION_SCHEMA_HASH,
+            RIVAL2_ACTION_VERSION: ACTION_CONTRACT_HASH,
+            RIVAL2_REWARD_GAMEPLAY_V3_VERSION: REWARD_GAMEPLAY_V3_CONTRACT_HASH,
+            episode_version: episode_hash,
+        }
     raise ValueError(f"unsupported Rival 2.0 reward version: {reward_version}")
 
 
@@ -582,8 +698,12 @@ __all__ = [
     "GAMEPLAY_SAVE_THREAT_HORIZON_SECONDS",
     "GAMEPLAY_SMALL_PAD_PICKUP_REWARD",
     "GAMEPLAY_SPEED_COEFFICIENT",
-    "GAMEPLAY_SUPERSONIC_REWARD",
     "GAMEPLAY_STRICT_DOUBLE_DASH_REWARD",
+    "GAMEPLAY_SUPERSONIC_REWARD",
+    "GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS",
+    "GAMEPLAY_V3_MECHANICS_EPISODE_BUDGET",
+    "GAMEPLAY_V3_MECHANICS_EVENT_REWARD",
+    "GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY",
     "OBSERVATION_SCHEMA",
     "OBSERVATION_SCHEMA_HASH",
     "OBS_DIM",
@@ -597,6 +717,8 @@ __all__ = [
     "REWARD_GAMEPLAY_V1_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V2_CONTRACT",
     "REWARD_GAMEPLAY_V2_CONTRACT_HASH",
+    "REWARD_GAMEPLAY_V3_CONTRACT",
+    "REWARD_GAMEPLAY_V3_CONTRACT_HASH",
     "REWARD_GOAL_ONLY_CONTRACT",
     "REWARD_GOAL_ONLY_CONTRACT_HASH",
     "REWARD_SCORING_V1_CONTRACT",
@@ -607,6 +729,7 @@ __all__ = [
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V2_VERSION",
+    "RIVAL2_REWARD_GAMEPLAY_V3_VERSION",
     "RIVAL2_REWARD_GOAL_ONLY_VERSION",
     "RIVAL2_REWARD_SCORING_V1_VERSION",
     "RIVAL2_REWARD_V2_VERSION",

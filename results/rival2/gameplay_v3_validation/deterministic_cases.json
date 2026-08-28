@@ -1,0 +1,76 @@
+{
+  "bad_flip_candidate_matrix": [
+    {
+      "actual": true,
+      "expected": true,
+      "id": "active_directional_contact"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "id": "drive_through"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "id": "stale_has_flipped"
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "id": "no_contact"
+    }
+  ],
+  "created_utc": "2026-08-28T02:09:34.080708+00:00",
+  "dash": {
+    "air_window_ticks": 42,
+    "double_dash_extra_payout": 0.0,
+    "double_dash_window_ticks": 90,
+    "fresh_jump_prohibition": false,
+    "landing_window_ticks": 24,
+    "tangent_gain_strictly_greater_than": 1.0,
+    "zap_windows_ticks": [
+      12,
+      30
+    ]
+  },
+  "deduplication": {
+    "breezi_terminal_suppresses_musty_terminal": true,
+    "integer_budget_accounting": true,
+    "subtype_labels_add_payout": false
+  },
+  "disabled": [
+    "possession",
+    "ground_carry",
+    "controlled_flick_positive_reward",
+    "air_dribble",
+    "pop_reset",
+    "double_tap",
+    "bare_stall",
+    "recovery",
+    "generic_jump",
+    "generic_flip",
+    "generic_aerial"
+  ],
+  "primary_precedence": {
+    "all_flags_actual": "EXEMPT_RECOGNIZED_MECHANIC",
+    "ordered": [
+      "EXEMPT_RECOGNIZED_MECHANIC",
+      "EXEMPT_CONTROLLED_FLICK",
+      "EXEMPT_CONTESTED_50",
+      "EXEMPT_POWER_CONTACT",
+      "UNNECESSARY_FLIP_THROUGH_CONTACT"
+    ]
+  },
+  "reset": {
+    "ball_face_id": -6,
+    "chain_requires_rearm": true,
+    "other_car_face_id": -7,
+    "preflip_extra_payout": 0.0,
+    "requires_real_untimed_resource_transition": true,
+    "separation_required": true,
+    "supporting_wheels_min": 3
+  },
+  "schema_version": 1,
+  "verdict": "PASS"
+}

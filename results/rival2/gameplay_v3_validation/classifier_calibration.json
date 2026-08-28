@@ -1,0 +1,393 @@
+{
+  "classifier_source_sha256": "0C45E235584418959C4A2D1CBAB98B163C82DD34B86D2D34B4FA82BFE445BA89",
+  "contest": {
+    "heldout_cases": [
+      {
+        "features": {
+          "opponent_closing_speed": 190.0,
+          "opponent_distance": 420.0,
+          "self_closing_speed": 210.0,
+          "time_to_ball_delta": 0.07
+        },
+        "id": "contest_holdout_positive",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "opponent_closing_speed": -100.0,
+          "opponent_distance": 900.0,
+          "self_closing_speed": 500.0,
+          "time_to_ball_delta": 0.4
+        },
+        "id": "contest_holdout_loose",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "opponent_closing_speed": -5.0,
+          "opponent_distance": 180.0,
+          "self_closing_speed": 220.0,
+          "time_to_ball_delta": 0.04
+        },
+        "id": "contest_holdout_near_away",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "heldout_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 2,
+      "tp": 1
+    },
+    "thresholds": {
+      "association_ball_displacement_max": 300.0,
+      "association_window_ticks": 2,
+      "opponent_closing_min": 150.0,
+      "opponent_distance_max": 500.0,
+      "self_closing_min": 150.0,
+      "time_to_ball_delta_max": 0.12
+    },
+    "training_cases": [
+      {
+        "features": {
+          "opponent_closing_speed": 240.0,
+          "opponent_distance": 310.0,
+          "self_closing_speed": 260.0,
+          "time_to_ball_delta": 0.02
+        },
+        "id": "contest_train_simultaneous",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "opponent_closing_speed": 160.0,
+          "opponent_distance": 480.0,
+          "self_closing_speed": 160.0,
+          "time_to_ball_delta": 0.1
+        },
+        "id": "contest_train_adjacent",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "opponent_closing_speed": 300.0,
+          "opponent_distance": 520.0,
+          "self_closing_speed": 300.0,
+          "time_to_ball_delta": 0.05
+        },
+        "id": "contest_train_distant",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "opponent_closing_speed": 300.0,
+          "opponent_distance": 250.0,
+          "self_closing_speed": 140.0,
+          "time_to_ball_delta": 0.05
+        },
+        "id": "contest_train_nonconverging",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "opponent_closing_speed": 140.0,
+          "opponent_distance": 250.0,
+          "self_closing_speed": 300.0,
+          "time_to_ball_delta": 0.05
+        },
+        "id": "contest_train_moving_away",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "opponent_closing_speed": 300.0,
+          "opponent_distance": 250.0,
+          "self_closing_speed": 300.0,
+          "time_to_ball_delta": 0.14
+        },
+        "id": "contest_train_late",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "training_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 4,
+      "tp": 2
+    }
+  },
+  "controlled_flick": {
+    "exemption_only": true,
+    "heldout_cases": [
+      {
+        "features": {
+          "ball_delta_v": 180.0,
+          "control_max_distance": 190.0,
+          "control_max_relative_speed": 200.0,
+          "control_ticks": 6,
+          "release_distance": 290.0
+        },
+        "id": "control_holdout_release",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 200.0,
+          "control_max_distance": 160.0,
+          "control_max_relative_speed": 150.0,
+          "control_ticks": 3,
+          "release_distance": 280.0
+        },
+        "id": "control_holdout_brief",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 200.0,
+          "control_max_distance": 180.0,
+          "control_max_relative_speed": 180.0,
+          "control_ticks": 8,
+          "release_distance": 230.0
+        },
+        "id": "control_holdout_no_release",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "heldout_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 2,
+      "tp": 1
+    },
+    "positive_reward": 0.0,
+    "thresholds": {
+      "control_distance_max": 220.0,
+      "control_relative_speed_max": 260.0,
+      "control_ticks_min": 4,
+      "release_ball_delta_v_min": 120.0,
+      "release_distance_min": 245.0
+    },
+    "training_cases": [
+      {
+        "features": {
+          "ball_delta_v": 220.0,
+          "control_max_distance": 150.0,
+          "control_max_relative_speed": 130.0,
+          "control_ticks": 8,
+          "release_distance": 310.0
+        },
+        "id": "control_train_front",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 150.0,
+          "control_max_distance": 205.0,
+          "control_max_relative_speed": 230.0,
+          "control_ticks": 5,
+          "release_distance": 270.0
+        },
+        "id": "control_train_diagonal",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 135.0,
+          "control_max_distance": 210.0,
+          "control_max_relative_speed": 240.0,
+          "control_ticks": 4,
+          "release_distance": 255.0
+        },
+        "id": "control_train_side",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 300.0,
+          "control_max_distance": 0.0,
+          "control_max_relative_speed": 0.0,
+          "control_ticks": 0,
+          "release_distance": 400.0
+        },
+        "id": "control_train_loose",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 400.0,
+          "control_max_distance": 180.0,
+          "control_max_relative_speed": 210.0,
+          "control_ticks": 2,
+          "release_distance": 300.0
+        },
+        "id": "control_train_kickoff",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 180.0,
+          "control_max_distance": 250.0,
+          "control_max_relative_speed": 300.0,
+          "control_ticks": 7,
+          "release_distance": 280.0
+        },
+        "id": "control_train_chase",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "training_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 3,
+      "tp": 3
+    }
+  },
+  "created_utc": "2026-08-28T02:09:34.080708+00:00",
+  "physics_source_sha256": "D8501DC27AE3EA1503E45AA9E5D29F0F2D1431FC4F4A602A66A174CFC7E593C9",
+  "power": {
+    "heldout_cases": [
+      {
+        "features": {
+          "ball_delta_v": 220.0,
+          "rotational_closing_speed": 125.0,
+          "rotational_share": 0.22,
+          "total_closing_speed": 360.0
+        },
+        "id": "power_holdout_clear",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 300.0,
+          "rotational_closing_speed": 80.0,
+          "rotational_share": 0.11,
+          "total_closing_speed": 700.0
+        },
+        "id": "power_holdout_translation",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 100.0,
+          "rotational_closing_speed": 150.0,
+          "rotational_share": 0.3,
+          "total_closing_speed": 420.0
+        },
+        "id": "power_holdout_insignificant",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "heldout_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 2,
+      "tp": 1
+    },
+    "thresholds": {
+      "ball_delta_v_min": 175.0,
+      "contact_point_velocity": "v_linear + omega_cross_r",
+      "rotational_closing_min": 100.0,
+      "rotational_share_min": 0.18,
+      "total_closing_min": 300.0
+    },
+    "training_cases": [
+      {
+        "features": {
+          "ball_delta_v": 330.0,
+          "rotational_closing_speed": 170.0,
+          "rotational_share": 0.31,
+          "total_closing_speed": 520.0
+        },
+        "id": "power_train_offensive",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 260.0,
+          "rotational_closing_speed": 130.0,
+          "rotational_share": 0.24,
+          "total_closing_speed": 410.0
+        },
+        "id": "power_train_defensive",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 190.0,
+          "rotational_closing_speed": 110.0,
+          "rotational_share": 0.2,
+          "total_closing_speed": 320.0
+        },
+        "id": "power_train_weak_real",
+        "label": true,
+        "predicted": true
+      },
+      {
+        "features": {
+          "ball_delta_v": 160.0,
+          "rotational_closing_speed": 90.0,
+          "rotational_share": 0.16,
+          "total_closing_speed": 280.0
+        },
+        "id": "power_train_ordinary",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 400.0,
+          "rotational_closing_speed": 90.0,
+          "rotational_share": 0.1,
+          "total_closing_speed": 900.0
+        },
+        "id": "power_train_translation",
+        "label": false,
+        "predicted": false
+      },
+      {
+        "features": {
+          "ball_delta_v": 160.0,
+          "rotational_closing_speed": 180.0,
+          "rotational_share": 0.35,
+          "total_closing_speed": 500.0
+        },
+        "id": "power_train_fast_ball",
+        "label": false,
+        "predicted": false
+      }
+    ],
+    "training_confusion": {
+      "fn": 0,
+      "fp": 0,
+      "tn": 3,
+      "tp": 3
+    }
+  },
+  "prospective_split_frozen_before_heldout_evaluation": true,
+  "schema_version": 1,
+  "source_commit": "a38e1b5d88f94b733d631feb1eac955459a45d78",
+  "verdict": "PASS"
+}
