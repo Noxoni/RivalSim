@@ -10,6 +10,7 @@ from typing import Any
 from rivalsim.human_demo.analysis import (
     action_variation_collection_report,
     action_variation_report,
+    human_action_alignment_report,
     rival_observation_mapping_report,
 )
 from rivalsim.human_demo.reader import SessionReader
@@ -34,6 +35,8 @@ def build_parser() -> argparse.ArgumentParser:
         command.add_argument("--strict-complete", action="store_true")
     mapping = subparsers.add_parser("mapping-report")
     mapping.add_argument("--output", type=Path)
+    alignment = subparsers.add_parser("action-alignment")
+    alignment.add_argument("--output", type=Path)
     variation = subparsers.add_parser("action-variation")
     variation.add_argument("session", type=Path, nargs="+")
     variation.add_argument("--output", type=Path)
@@ -45,6 +48,9 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "mapping-report":
         _emit(rival_observation_mapping_report(), args.output)
+        return 0
+    if args.command == "action-alignment":
+        _emit(human_action_alignment_report(), args.output)
         return 0
     reader = SessionReader(args.session if isinstance(args.session, Path) else args.session[0])
     if args.command in {"inspect", "validate"}:

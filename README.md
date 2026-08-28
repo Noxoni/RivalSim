@@ -8,9 +8,15 @@ The repository includes a production-oriented, read-only BakkesMod plugin that r
 native Rocket League `ControllerInput` and synchronized game state at the physics input-application
 cadence. It supports continuous local/RLBot match demonstrations and Freeplay mechanic sessions,
 uses a crash-recoverable lossless chunk format, and includes deterministic Python validation,
-current 182-field observation-coverage reporting, and four-tick action-variation diagnostics. It
+current 182-field observation-coverage reporting, direct native-120-Hz to Rival-120-Hz action
+alignment metadata, and retained four-tick variation diagnostics for historical comparison. It
 does not train Rival, modify rewards or physics, inject controls, or automate gameplay. See
 [the complete recorder guide](docs/RIVAL2_HUMAN_DEMO_RECORDER.md).
+
+The no-learning 120 Hz control transition is documented in
+[the Rival 2.0 120 Hz transition report](docs/RIVAL2_120HZ_TRANSITION_V1.md). The active V2 line
+uses one policy decision per 120 Hz physics tick; historical V1 policies and evidence remain bound
+to their original 30 Hz/four-tick contract.
 
 The project is deliberately narrower than RocketSim. The target is standard Soccar 1v1 only:
 

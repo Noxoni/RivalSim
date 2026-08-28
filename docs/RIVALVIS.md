@@ -2,7 +2,9 @@
 
 RivalVis is a lightweight native 3D spectator/debug tool for RivalSim. It runs one
 isolated `Rival2FullMatchEnv` world using the selected checkpoint and renders a
-standard five-minute Soccar match at 30 Hz policy cadence and 120 Hz physics.
+standard five-minute Soccar match at the cadence declared by the checkpoint and 120 Hz physics.
+Historical `RIVAL2_ACTION_V1` checkpoints remain 30 Hz with a four-tick hold;
+`RIVAL2_ACTION_V2_120HZ` checkpoints run one policy decision on every physics tick.
 Training remains headless and GPU-resident; RivalVis never attaches to or copies
 state from an active training process.
 
@@ -29,8 +31,8 @@ To watch Rival on Blue against the pinned, deterministic Wisp policy on Orange:
 ```
 
 Wisp runs through the same source-faithful 8/7-tick frozen adapter used by the
-held-out evaluator. Rival retains the selected stochastic or deterministic 30 Hz
-policy mode. The HUD labels the two policies explicitly.
+held-out evaluator. Rival retains the selected stochastic or deterministic policy
+mode at its checkpoint-declared cadence. The HUD labels the two policies explicitly.
 
 Use `--speed 0.25`, `0.5`, `1`, `2`, or `4` to choose the initial playback speed.
 Use `--collision-dir PATH` if the collision meshes are not in the normal sibling
@@ -49,7 +51,8 @@ accepted.
 ## Playback and match controls
 
 - `Space` or `P`: pause/play.
-- `.`: complete one 30 Hz policy decision while paused.
+- `.`: complete one checkpoint-declared policy decision while paused (four ticks for historical
+  30 Hz V1 checkpoints, one tick for 120 Hz V2 checkpoints).
 - `,`: advance exactly one authoritative 120 Hz physics tick while paused.
 - `-` / `+`: slower/faster through 0.25x, 0.5x, 1x, 2x, and 4x.
 - `=`: return to 1x.
@@ -123,6 +126,12 @@ passed:
 
 The focused automated gate also covers source-mesh vertex/bounds identity, real
 position/quaternion and controller-state capture, scripted steering/boost/jump
-motion, score/kickoff lifecycle, 120 Hz tick stepping, 30 Hz decision stepping,
+motion, score/kickoff lifecycle, 120 Hz tick stepping, contract-selected decision stepping,
 interpolation, and checkpoint hash immutability. It passes together with the
 adjacent full-match goal-reset and regulation/overtime lifecycle tests.
+
+The `RIVAL2_120HZ_BOOTSTRAP_TRANSITION_EVIDENCE_V1` smoke additionally loads the iteration-479
+120 Hz bootstrap, advances two decisions/two physics ticks, verifies finite actions and V2
+metadata, and proves the checkpoint hash is unchanged. The full-match reward shown by RivalVis is
+display-only historical telemetry; it is not the active `RIVAL2_REWARD_GAMEPLAY_120_V1` PPO
+training contract.

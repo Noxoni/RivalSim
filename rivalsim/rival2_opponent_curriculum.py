@@ -88,6 +88,16 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         self.nexto_state = NextoStateTensors.from_bridge(env.bridge)
         self.wisp_state = WispStateTensors.from_bridge(env.bridge)
         self._world_rows = torch.arange(env.num_envs, device=self.device)
+        self.historical_cached_action = torch.zeros(
+            (env.num_envs, 2, 8), dtype=torch.float32, device=self.device
+        )
+        self.historical_cache_valid = torch.zeros(
+            env.num_envs, dtype=torch.bool, device=self.device
+        )
+        self.historical_cadence_phase = torch.zeros(
+            env.num_envs, dtype=torch.int64, device=self.device
+        )
+        self.historical_policy_evaluation_calls = 0
         self.last_rollout_curriculum_metrics: dict[str, Any] | None = None
         self.mixed_ppo_safety: Rival2MixedPPOSafetyConfig | None = None
         self.optimizer_migration_proof: dict[str, Any] | None = None
@@ -182,6 +192,9 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 torch.where(reset_mask, selected, self.opponent_assignment)
             )
 
+        self.historical_cache_valid.masked_fill_(reset_mask, False)
+        self.historical_cadence_phase.masked_fill_(reset_mask, 0)
+
         opponent_side = 1 - self.rival_side
         self.nexto.set_player_index(opponent_side)
         self.wisp.set_player_index(opponent_side)
@@ -225,12 +238,25 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             opponent_side[self.opponent_family == OPPONENT_WISP],
         ] = WISP_ACTING_VERSION
 
-        for version, policy in zip(
-            self.opponent_pool.versions, self.opponent_pool.policies, strict=True
+        for version, policy, source_policy_hz in zip(
+            self.opponent_pool.versions,
+            self.opponent_pool.policies,
+            self.opponent_pool.policy_hz,
+            strict=True,
         ):
-            selected = (self.opponent_family == OPPONENT_HISTORICAL) & (
+            assigned = (self.opponent_family == OPPONENT_HISTORICAL) & (
                 self.opponent_assignment == version
             )
+            assigned_indices = torch.nonzero(assigned, as_tuple=False).squeeze(-1)
+            if assigned_indices.numel() != 0:
+                assigned_sides = opponent_side.index_select(0, assigned_indices)
+                acting_version[assigned_indices, assigned_sides] = version
+            selected = assigned
+            if self.env.policy_hz == 120 and source_policy_hz == 30:
+                selected = selected & (
+                    (~self.historical_cache_valid)
+                    | (self.historical_cadence_phase == 0)
+                )
             indices = torch.nonzero(selected, as_tuple=False).squeeze(-1)
             if indices.numel() == 0:
                 continue
@@ -238,8 +264,47 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             historical_actor, historical_value = policy(observation[indices, sides])
             actor[indices, sides] = historical_actor
             value[indices, sides] = historical_value
-            acting_version[indices, sides] = version
+            self.historical_policy_evaluation_calls += 1
         return actor, value, acting_version, train_mask
+
+    def _apply_historical_policy_cadence(self, action: torch.Tensor) -> torch.Tensor:
+        """Hold legacy Rival opponents for four ticks in the 120 Hz outer loop."""
+
+        if self.env.policy_hz != 120:
+            return action
+        historical = self.opponent_family == OPPONENT_HISTORICAL
+        result = action.clone()
+        opponent_side = 1 - self.rival_side
+        for version, source_policy_hz in zip(
+            self.opponent_pool.versions,
+            self.opponent_pool.policy_hz,
+            strict=True,
+        ):
+            selected = historical & (self.opponent_assignment == version)
+            if source_policy_hz == 120:
+                self.historical_cache_valid.masked_fill_(selected, False)
+                self.historical_cadence_phase.masked_fill_(selected, 0)
+                continue
+            if source_policy_hz != 30:
+                raise RuntimeError(
+                    f"unsupported historical Rival policy cadence: {source_policy_hz} Hz"
+                )
+            refresh = selected & (
+                (~self.historical_cache_valid)
+                | (self.historical_cadence_phase == 0)
+            )
+            rows = self._world_rows[refresh]
+            sides = opponent_side[refresh]
+            self.historical_cached_action[rows, sides] = result[rows, sides]
+            self.historical_cache_valid.masked_fill_(refresh, True)
+            held = selected & ~refresh
+            rows = self._world_rows[held]
+            sides = opponent_side[held]
+            result[rows, sides] = self.historical_cached_action[rows, sides]
+            self.historical_cadence_phase[selected] = (
+                self.historical_cadence_phase[selected] + 1
+            ) % 4
+        return result
 
     def _step_with_frozen_opponents(
         self,
@@ -304,7 +369,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 sample = sample_hybrid_action(
                     actor, generator=self.policy_generator, config=self.policy_config
                 )
-                action = sample.action
+                action = self._apply_historical_policy_cadence(sample.action)
                 if active_world_mask is not None:
                     train_mask = train_mask & active_world_mask[:, None]
                     action = torch.where(
@@ -367,6 +432,13 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 observation = transition.observation
         self.env.observation = observation
         self.total_agent_samples += int(active_agent_samples.item())
+        if self.env.policy_hz == 120:
+            self.agent_decisions_120hz += int(active_agent_samples.item())
+        self.physical_physics_ticks_experienced += (
+            config.rollout_horizon
+            * self.env.num_envs
+            * self.env.physics_ticks_per_decision
+        )
         self.last_rollout_curriculum_metrics = {
             name: {OPPONENT_NAMES[index]: int(values[index].item()) for index in range(4)}
             for name, values in (
@@ -607,6 +679,16 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 "observation_generator_state": self.wisp.observation_generator.get_state(),
                 "opponent_slot": self.wisp.opponent_slot,
             },
+            "historical_rival_cadence": {
+                "cached_action": self.historical_cached_action,
+                "cache_valid": self.historical_cache_valid,
+                "phase": self.historical_cadence_phase,
+                "policy_evaluation_calls": self.historical_policy_evaluation_calls,
+                "semantics": (
+                    "30 Hz snapshots evaluate on phase 0 and hold four 120 Hz ticks; "
+                    "120 Hz snapshots evaluate every tick"
+                ),
+            },
         }
         return payload
 
@@ -662,6 +744,19 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             getattr(self.wisp, name).copy_(wisp[name])
         self.wisp.eta_cache[:] = np.asarray(wisp["eta_cache"], dtype=np.float64)
         self.wisp.observation_generator.set_state(wisp["observation_generator_state"].cpu())
+        historical_cadence = curriculum.get("historical_rival_cadence")
+        if historical_cadence is None:
+            self.historical_cached_action.zero_()
+            self.historical_cache_valid.zero_()
+            self.historical_cadence_phase.zero_()
+            self.historical_policy_evaluation_calls = 0
+        else:
+            self.historical_cached_action.copy_(historical_cadence["cached_action"])
+            self.historical_cache_valid.copy_(historical_cadence["cache_valid"])
+            self.historical_cadence_phase.copy_(historical_cadence["phase"])
+            self.historical_policy_evaluation_calls = int(
+                historical_cadence.get("policy_evaluation_calls", 0)
+            )
         if adaptive is not None:
             self.mixed_ppo_safety = Rival2MixedPPOSafetyConfig(**adaptive["config"])
             self.optimizer_migration_proof = copy.deepcopy(adaptive["optimizer_migration_proof"])

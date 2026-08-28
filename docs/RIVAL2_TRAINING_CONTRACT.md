@@ -2,6 +2,10 @@
 
 Status: **FROZEN / PASS_GREEN**
 
+This is the immutable historical 30 Hz V1 contract. It is not silently reinterpreted by the
+active 120 Hz V2 line. See `docs/RIVAL2_120HZ_TRANSITION_V1.md` for the new action, observation,
+reward, PPO timing, checkpoint, and validation identities.
+
 This document records the implemented Rival 2.0 v0.5 training interface. The machine-readable
 authority is `rivalsim/rival2_contracts.py` plus the hashes in `results/v0.5/manifest.json`.
 Changing any observation, action, reward, or episode semantic requires a new contract identity.

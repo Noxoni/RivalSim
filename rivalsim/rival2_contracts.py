@@ -8,6 +8,8 @@ from typing import Final
 
 RIVAL2_OBS_VERSION: Final = "RIVAL2_OBS_V1"
 RIVAL2_ACTION_VERSION: Final = "RIVAL2_ACTION_V1"
+RIVAL2_OBS_V2_120HZ_VERSION: Final = "RIVAL2_OBS_V2_120HZ"
+RIVAL2_ACTION_V2_120HZ_VERSION: Final = "RIVAL2_ACTION_V2_120HZ"
 RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
 RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
 RIVAL2_REWARD_ACQUISITION_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_V1"
@@ -16,6 +18,7 @@ RIVAL2_REWARD_SCORING_V1_VERSION: Final = "RIVAL2_REWARD_SCORING_V1"
 RIVAL2_REWARD_GAMEPLAY_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V1"
 RIVAL2_REWARD_GAMEPLAY_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V2"
 RIVAL2_REWARD_GAMEPLAY_V3_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V3"
+RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_120_V1"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -99,6 +102,9 @@ GAMEPLAY_V3_MECHANICS_EVENT_REWARD: Final = 0.005
 GAMEPLAY_V3_MECHANICS_EPISODE_BUDGET: Final = 0.05
 GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS: Final = 10
 GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY: Final = -0.01
+GAMEPLAY_120_SPEED_COEFFICIENT: Final = GAMEPLAY_SPEED_COEFFICIENT / 4.0
+GAMEPLAY_120_SUPERSONIC_REWARD: Final = GAMEPLAY_SUPERSONIC_REWARD / 4.0
+GAMEPLAY_120_BOOST_USE_REWARD: Final = GAMEPLAY_BOOST_USE_REWARD / 4.0
 
 _CAR_FIELDS = (
     "position.x",
@@ -219,6 +225,25 @@ OBSERVATION_SCHEMA: Final = {
     "history_updates": "policy decision boundaries only",
 }
 
+# V1 remains byte-for-byte immutable.  V2 deliberately preserves the 182-field
+# shape/order/normalization while changing the temporal meaning of decision
+# history and one-step event fields to the immediately preceding 120 Hz tick.
+OBSERVATION_SCHEMA_V2_120HZ: Final = {
+    **OBSERVATION_SCHEMA,
+    "version": RIVAL2_OBS_V2_120HZ_VERSION,
+    "history_updates": "every 120 Hz physics/policy tick",
+    "temporal_semantics": {
+        "previous_action.*": "action emitted on the immediately preceding 120 Hz tick",
+        "lifecycle.kickoff_reset": "reset visible at the immediately preceding tick boundary",
+        "lifecycle.self_touch_event": "unique touch onset during the immediately preceding tick",
+        "lifecycle.opponent_touch_event": (
+            "opponent unique touch onset during the immediately preceding tick"
+        ),
+        "lifecycle.self_demoed_event": "demolition during the immediately preceding tick",
+        "lifecycle.opponent_demoed_event": "demolition during the immediately preceding tick",
+    },
+}
+
 ACTION_CONTRACT: Final = {
     "version": RIVAL2_ACTION_VERSION,
     "physics_hz": 120,
@@ -235,6 +260,19 @@ ACTION_CONTRACT: Final = {
     "log_std_clamp": [-5.0, 1.0],
     "deterministic": "tanh(mu), sigmoid(logit)>=0.5",
     "fixed_lookup_table": False,
+}
+
+ACTION_CONTRACT_V2_120HZ: Final = {
+    **ACTION_CONTRACT,
+    "version": RIVAL2_ACTION_V2_120HZ_VERSION,
+    "policy_hz": 120,
+    "hold_ticks": 1,
+    "temporal_alignment": (
+        "one newly evaluated Rival action for each authoritative 120 Hz physics tick"
+    ),
+    "human_demonstration_alignment": (
+        "native Rocket League physics frame N maps directly to Rival policy decision N"
+    ),
 }
 
 REWARD_CONTRACT: Final = {
@@ -598,6 +636,64 @@ REWARD_GAMEPLAY_V3_CONTRACT: Final = {
     ],
 }
 
+REWARD_GAMEPLAY_120_V1_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+    "cadence_hz": 120,
+    "physics_hz": 120,
+    "action_hold_ticks": 1,
+    "observation_version": RIVAL2_OBS_V2_120HZ_VERSION,
+    "action_version": RIVAL2_ACTION_V2_120HZ_VERSION,
+    "episode_version": RIVAL2_EPISODE_VERSION,
+    "zero_sum": True,
+    "composition": (
+        "BlueReward = Goal + Progress + Demo + SpeedOccupancy + SupersonicOccupancy + "
+        "BoostUseOccupancy + BoostPickup + Save + BadFlipGuard; OrangeReward = -BlueReward"
+    ),
+    "event_rewards": {
+        "goal": 10.0,
+        "demo": 0.10,
+        "small_pad_pickup": GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
+        "large_pad_pickup": GAMEPLAY_BIG_PAD_PICKUP_REWARD,
+        "save": GAMEPLAY_SAVE_REWARD,
+        "unnecessary_flip_through_contact": GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY,
+        "cadence_scaling": "none; paid once per authoritative physical event",
+    },
+    "progress": {
+        "coefficient": SCORING_PROGRESS_COEFFICIENT,
+        "progress_y_scale": PROGRESS_Y_SCALE,
+        "displacement": "signed ball displacement over exactly one 120 Hz physics tick",
+        "four_tick_telescope": True,
+    },
+    "dense_time_occupancy": {
+        "speed_coefficient": GAMEPLAY_120_SPEED_COEFFICIENT,
+        "supersonic_reward": GAMEPLAY_120_SUPERSONIC_REWARD,
+        "physical_boost_use_reward": GAMEPLAY_120_BOOST_USE_REWARD,
+        "source_30hz_coefficients_divisor": 4,
+    },
+    "unconditional_unique_touch": 0.0,
+    "named_mechanics_reward": 0.0,
+    "named_mechanics_hot_path": False,
+    "bad_flip_guard": {
+        "penalty": GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY,
+        "candidate": (
+            "new legitimate car-ball contact onset during active directional dodge: "
+            "is_flipping and has_flipped and non-zero directional flip_rel_torque"
+        ),
+        "pending_window_ticks_at_120_hz": 3,
+        "active_exemptions_in_precedence_order": [
+            "EXEMPT_CONTESTED_50",
+            "EXEMPT_POWER_CONTACT",
+        ],
+        "recognized_mechanic_exemption": False,
+        "controlled_flick_exemption": False,
+        "generic_jump_penalty": 0.0,
+        "generic_flip_penalty": 0.0,
+    },
+    "quarantined_experimental_labels": list(
+        REWARD_GAMEPLAY_V3_CONTRACT["mechanics"]["canonical_rewardable"]
+    ),
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -625,6 +721,8 @@ FULL_MATCH_EPISODE_CONTRACT: Final = {
 
 OBSERVATION_SCHEMA_HASH: Final = _canonical_hash(OBSERVATION_SCHEMA)
 ACTION_CONTRACT_HASH: Final = _canonical_hash(ACTION_CONTRACT)
+OBSERVATION_SCHEMA_V2_120HZ_HASH: Final = _canonical_hash(OBSERVATION_SCHEMA_V2_120HZ)
+ACTION_CONTRACT_V2_120HZ_HASH: Final = _canonical_hash(ACTION_CONTRACT_V2_120HZ)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
 REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
 REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_ACQUISITION_V1_CONTRACT)
@@ -633,6 +731,9 @@ REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SCORING_V1_CONTR
 REWARD_GAMEPLAY_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V1_CONTRACT)
 REWARD_GAMEPLAY_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V2_CONTRACT)
 REWARD_GAMEPLAY_V3_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V3_CONTRACT)
+REWARD_GAMEPLAY_120_V1_CONTRACT_HASH: Final = _canonical_hash(
+    REWARD_GAMEPLAY_120_V1_CONTRACT
+)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -647,6 +748,9 @@ CONTRACT_HASHES: Final = {
 def contract_hashes_for_reward(
     reward_version: str,
     episode_version: str = RIVAL2_EPISODE_VERSION,
+    *,
+    observation_version: str | None = None,
+    action_version: str | None = None,
 ) -> dict[str, str]:
     """Return the frozen contract identity for one explicitly selected reward."""
 
@@ -656,6 +760,27 @@ def contract_hashes_for_reward(
         episode_hash = FULL_MATCH_EPISODE_CONTRACT_HASH
     else:
         raise ValueError(f"unsupported Rival 2.0 episode version: {episode_version}")
+
+    if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
+        selected_observation = observation_version or RIVAL2_OBS_V2_120HZ_VERSION
+        selected_action = action_version or RIVAL2_ACTION_V2_120HZ_VERSION
+        if selected_observation != RIVAL2_OBS_V2_120HZ_VERSION:
+            raise ValueError("Gameplay 120 V1 requires RIVAL2_OBS_V2_120HZ")
+        if selected_action != RIVAL2_ACTION_V2_120HZ_VERSION:
+            raise ValueError("Gameplay 120 V1 requires RIVAL2_ACTION_V2_120HZ")
+        return {
+            RIVAL2_OBS_V2_120HZ_VERSION: OBSERVATION_SCHEMA_V2_120HZ_HASH,
+            RIVAL2_ACTION_V2_120HZ_VERSION: ACTION_CONTRACT_V2_120HZ_HASH,
+            RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION: (
+                REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
+            ),
+            episode_version: episode_hash,
+        }
+
+    selected_observation = observation_version or RIVAL2_OBS_VERSION
+    selected_action = action_version or RIVAL2_ACTION_VERSION
+    if selected_observation != RIVAL2_OBS_VERSION or selected_action != RIVAL2_ACTION_VERSION:
+        raise ValueError("historical reward contracts require RIVAL2_OBS_V1/RIVAL2_ACTION_V1")
 
     if reward_version == RIVAL2_REWARD_VERSION:
         return {
@@ -719,6 +844,8 @@ def contract_hashes_for_reward(
 __all__ = [
     "ACTION_CONTRACT",
     "ACTION_CONTRACT_HASH",
+    "ACTION_CONTRACT_V2_120HZ",
+    "ACTION_CONTRACT_V2_120HZ_HASH",
     "ACTION_NAMES",
     "ANALOG_ACTION_NAMES",
     "APPROACH_DISTANCE_SCALE",
@@ -728,6 +855,9 @@ __all__ = [
     "EPISODE_CONTRACT_HASH",
     "FULL_MATCH_EPISODE_CONTRACT",
     "FULL_MATCH_EPISODE_CONTRACT_HASH",
+    "GAMEPLAY_120_BOOST_USE_REWARD",
+    "GAMEPLAY_120_SPEED_COEFFICIENT",
+    "GAMEPLAY_120_SUPERSONIC_REWARD",
     "GAMEPLAY_BIG_PAD_PICKUP_REWARD",
     "GAMEPLAY_BOOST_USE_REWARD",
     "GAMEPLAY_SAVE_REWARD",
@@ -742,6 +872,8 @@ __all__ = [
     "GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY",
     "OBSERVATION_SCHEMA",
     "OBSERVATION_SCHEMA_HASH",
+    "OBSERVATION_SCHEMA_V2_120HZ",
+    "OBSERVATION_SCHEMA_V2_120HZ_HASH",
     "OBS_DIM",
     "OBS_FIELD_NAMES",
     "ORANGE_PAD_REMAP",
@@ -749,6 +881,8 @@ __all__ = [
     "REWARD_ACQUISITION_V1_CONTRACT_HASH",
     "REWARD_CONTRACT",
     "REWARD_CONTRACT_HASH",
+    "REWARD_GAMEPLAY_120_V1_CONTRACT",
+    "REWARD_GAMEPLAY_120_V1_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V1_CONTRACT",
     "REWARD_GAMEPLAY_V1_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V2_CONTRACT",
@@ -761,8 +895,11 @@ __all__ = [
     "REWARD_SCORING_V1_CONTRACT_HASH",
     "REWARD_V2_CONTRACT",
     "REWARD_V2_CONTRACT_HASH",
+    "RIVAL2_ACTION_V2_120HZ_VERSION",
     "RIVAL2_FULL_MATCH_EPISODE_VERSION",
+    "RIVAL2_OBS_V2_120HZ_VERSION",
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
+    "RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V2_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V3_VERSION",

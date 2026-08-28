@@ -22,6 +22,12 @@ from rivalsim.rival2_policy import (
     hybrid_log_probability,
 )
 
+RIVAL2_PPO_120HZ_V1 = "RIVAL2_PPO_120HZ_V1"
+RIVAL2_PPO_120HZ_GAMMA = 0.9987476493904754
+RIVAL2_PPO_120HZ_GAE_LAMBDA = 0.9872585449014338
+RIVAL2_PPO_120HZ_ROLLOUT_HORIZON = 128
+RIVAL2_PPO_120HZ_WORLD_COUNT = 32_768
+
 
 @dataclass(frozen=True, slots=True)
 class Rival2PPOConfig:
@@ -40,6 +46,50 @@ class Rival2PPOConfig:
     def content_hash(self) -> str:
         payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode("ascii")
         return hashlib.sha256(payload).hexdigest().upper()
+
+
+def rival2_ppo_120hz_config() -> Rival2PPOConfig:
+    """Return the frozen physical-time-equivalent 120 Hz PPO configuration."""
+
+    return Rival2PPOConfig(
+        gamma=RIVAL2_PPO_120HZ_GAMMA,
+        gae_lambda=RIVAL2_PPO_120HZ_GAE_LAMBDA,
+        entropy_coefficient=0.0,
+        rollout_horizon=RIVAL2_PPO_120HZ_ROLLOUT_HORIZON,
+    )
+
+
+RIVAL2_PPO_120HZ_CONTRACT = {
+    "version": RIVAL2_PPO_120HZ_V1,
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "world_count": RIVAL2_PPO_120HZ_WORLD_COUNT,
+    "rollout_horizon": RIVAL2_PPO_120HZ_ROLLOUT_HORIZON,
+    "physical_rollout_seconds_per_world": RIVAL2_PPO_120HZ_ROLLOUT_HORIZON / 120.0,
+    "gamma": RIVAL2_PPO_120HZ_GAMMA,
+    "gae_lambda": RIVAL2_PPO_120HZ_GAE_LAMBDA,
+    "source_30hz": {
+        "rollout_horizon": 32,
+        "physical_rollout_seconds_per_world": 32 / 30.0,
+        "gamma": 0.995,
+        "gae_lambda": 0.95,
+    },
+    "unchanged": {
+        "clip_range": 0.20,
+        "value_loss_coefficient": 0.50,
+        "entropy_coefficient": 0.0,
+        "max_gradient_norm": 0.50,
+        "epochs": 2,
+        "minibatch_size": 65_536,
+    },
+}
+RIVAL2_PPO_120HZ_CONTRACT_HASH = hashlib.sha256(
+    json.dumps(
+        RIVAL2_PPO_120HZ_CONTRACT,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("ascii")
+).hexdigest().upper()
 
 
 @dataclass(frozen=True, slots=True)
@@ -584,6 +634,13 @@ def evaluate_clipped_policy_objective(
 
 
 __all__ = [
+    "RIVAL2_PPO_120HZ_CONTRACT",
+    "RIVAL2_PPO_120HZ_CONTRACT_HASH",
+    "RIVAL2_PPO_120HZ_GAE_LAMBDA",
+    "RIVAL2_PPO_120HZ_GAMMA",
+    "RIVAL2_PPO_120HZ_ROLLOUT_HORIZON",
+    "RIVAL2_PPO_120HZ_V1",
+    "RIVAL2_PPO_120HZ_WORLD_COUNT",
     "Rival2KLGuardConfig",
     "Rival2PPOConfig",
     "Rival2PolicyDisplacementRejected",
@@ -591,4 +648,5 @@ __all__ = [
     "compute_gae_gpu",
     "evaluate_clipped_policy_objective",
     "ppo_update",
+    "rival2_ppo_120hz_config",
 ]

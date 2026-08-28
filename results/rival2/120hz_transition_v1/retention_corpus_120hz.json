@@ -1,0 +1,134 @@
+{
+  "artifact": {
+    "bytes": 377746,
+    "path": "results/rival2/120hz_transition_v1/retention_corpus_120hz.pt",
+    "sha256": "C4957B06847E7F61B5DC313ABAC58CD2FE8AB696561C7A4898C6ACFF219DACDC"
+  },
+  "category_counts": {
+    "airborne": {
+      "available_before_exclusion": 117262,
+      "requested": 96,
+      "selected": 96
+    },
+    "field_position_orientation_diversity": {
+      "available_before_exclusion": 4193840,
+      "requested": 48,
+      "selected": 48
+    },
+    "near_ball_interaction": {
+      "available_before_exclusion": 814966,
+      "requested": 96,
+      "selected": 96
+    },
+    "ordinary_ground_play": {
+      "available_before_exclusion": 1383309,
+      "requested": 96,
+      "selected": 96
+    },
+    "possession_ball_approach": {
+      "available_before_exclusion": 773203,
+      "requested": 96,
+      "selected": 96
+    },
+    "recovery": {
+      "available_before_exclusion": 1575777,
+      "requested": 80,
+      "selected": 80
+    }
+  },
+  "checks": {
+    "collection_optimizer_unchanged": true,
+    "field_position_orientation_coverage": true,
+    "finite": true,
+    "fixed_count_exact": true,
+    "no_optimizer_update": true,
+    "observation_contract_v2_120hz": true,
+    "observation_dimension_exact": true,
+    "required_category_coverage": true,
+    "source_model_unchanged": true,
+    "source_observations_authoritative": true,
+    "trainable_samples_only": true,
+    "unique_source_indices": true
+  },
+  "collection": {
+    "agent_observations_considered": 4194304,
+    "all_five_kickoff_layouts": true,
+    "decisions_per_world": 2048,
+    "migrated_iteration_479_actor_on_both_sides": true,
+    "optimizer_steps": 0,
+    "physics_hz": 120,
+    "physics_ticks_per_decision": 1,
+    "policy_hz": 120,
+    "seed": 2026082812,
+    "stochastic_actions": true,
+    "training_performed": false,
+    "worlds": 1024
+  },
+  "created_utc": "2026-08-28T18:30:34.560060+00:00",
+  "dtype": "torch.float32",
+  "identity": "RIVAL2_RETENTION_120HZ_FROM_ITERATION_479_V1",
+  "observation_contract": "RIVAL2_OBS_V2_120HZ",
+  "observation_contract_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+  "observation_count": 512,
+  "observation_dimension": 182,
+  "required_category_coverage": {
+    "airborne": true,
+    "near_ball_interaction": true,
+    "ordinary_ground_play": true,
+    "possession_ball_approach": true,
+    "recovery": true
+  },
+  "safety_config_hash": "6831FAC91013C26767CD8518357BBEBD0FBBFF97F764688C228A069457A058B4",
+  "schema_version": 2,
+  "selection": "fixed deterministic category order and evenly-spaced candidate indices",
+  "sha256": "BED4DD26268A667251B944844544306734E0E44E54AB31689B4DE782FC0965FA",
+  "source": "authoritative trainable observations from the healthy source-policy rollout",
+  "source_identity": {
+    "bytes": 69778897,
+    "checks": {
+      "episode_source_exact": true,
+      "iteration_exact": true,
+      "policy_version_exact": true,
+      "reward_source_exact": true,
+      "sample_counter_exact": true,
+      "sha256_exact": true,
+      "world_count_exact": true
+    },
+    "historical_pool_tensor_sha256": "5D2AEA71501BB517B3061D3CF5FC5A1D425F3E7A5C5C77650138ECC7EF795B0C",
+    "iteration": 479,
+    "model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "optimizer_tensor_sha256": "46C5D80514908BF9498B455A93E195977234F84A8F0EE39811C921B463AF5FA0",
+    "path": "G:\\dev\\RivalSim-runs\\opponent-curriculum-v1-safe-20260827-b2af03d\\checkpoints\\rival2_opponent_curriculum_plus_120_resume.pt",
+    "policy_version": 479,
+    "sha256": "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A",
+    "source_30hz_agent_decisions": 3655854038
+  },
+  "state_coverage": {
+    "heading_octant_counts": [
+      52,
+      35,
+      12,
+      7,
+      44,
+      137,
+      178,
+      47
+    ],
+    "occupied_heading_octants_of_8": 8,
+    "occupied_x_field_regions_of_3": 3,
+    "occupied_y_field_regions_of_3": 3,
+    "self_position_x_min_max_uu": [
+      -4076.6650390625,
+      4071.849853515625
+    ],
+    "self_position_y_min_max_uu": [
+      -5236.166015625,
+      5047.99365234375
+    ],
+    "self_position_z_min_max_uu": [
+      15.967395782470703,
+      869.4953002929688
+    ]
+  },
+  "verdict": "PASS_GREEN"
+}

@@ -17,7 +17,11 @@ from rivalsim.kernels.rival2_full_match import (
     rival2_full_match_after_reset,
 )
 from rivalsim.rival2_contracts import (
+    ACTION_CONTRACT_V2_120HZ_HASH,
+    OBSERVATION_SCHEMA_V2_120HZ_HASH,
+    RIVAL2_ACTION_V2_120HZ_VERSION,
     RIVAL2_FULL_MATCH_EPISODE_VERSION,
+    RIVAL2_OBS_V2_120HZ_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
     RIVAL2_REWARD_SCORING_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
@@ -107,8 +111,17 @@ class Rival2FullMatchState(Rival2EpisodeState):
 class Rival2FullMatchWorldSim(Rival2WorldSim):
     """Complete world with match-owned done semantics and goal kickoffs."""
 
-    def __init__(self, *args: Any, reward_mode: int, **kwargs: Any):
+    def __init__(
+        self,
+        *args: Any,
+        reward_mode: int,
+        physics_ticks_per_decision: int = 4,
+        **kwargs: Any,
+    ):
         self.reward_mode = int(reward_mode)
+        self.physics_ticks_per_decision = int(physics_ticks_per_decision)
+        if self.physics_ticks_per_decision not in (1, 4):
+            raise ValueError("full-match decision cadence must be one or four physics ticks")
         super().__init__(*args, reward_mode=reward_mode, **kwargs)
         self.rival2 = Rival2FullMatchState(self.num_envs, self.device)
 
@@ -163,6 +176,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
             dim=self.num_envs,
             inputs=[
                 self.reward_mode,
+                self.physics_ticks_per_decision,
                 self.state.ball_pos,
                 self.lifecycle.goal_scored,
                 self.lifecycle.scoring_team,
@@ -253,7 +267,7 @@ class Rival2FullMatchWorldSim(Rival2WorldSim):
 
 
 class Rival2FullMatchEnv(Rival2Env):
-    """Thirty-hertz PPO interface whose episode is one complete match."""
+    """Contract-selected inference/training interface for one complete match."""
 
     def __init__(
         self,
@@ -263,6 +277,8 @@ class Rival2FullMatchEnv(Rival2Env):
         device: str = "cuda:0",
         seed: int = 0,
         reward_version: str = RIVAL2_REWARD_V2_VERSION,
+        observation_version: str = "RIVAL2_OBS_V1",
+        action_version: str = "RIVAL2_ACTION_V1",
         **world_kwargs: Any,
     ):
         if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
@@ -275,13 +291,27 @@ class Rival2FullMatchEnv(Rival2Env):
             raise ValueError(f"unsupported full-match reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = RIVAL2_FULL_MATCH_EPISODE_VERSION
-        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
+        self.observation_version = observation_version
+        self.action_version = action_version
+        self.physics_hz = 120
+        self.policy_hz = 120 if action_version == RIVAL2_ACTION_V2_120HZ_VERSION else 30
+        self.physics_ticks_per_decision = 1 if self.policy_hz == 120 else 4
+        self.contract_hashes = self._inference_contract_hashes(reward_version)
+        self.inference_contract_binding = "historical_full_match"
+        if self.policy_hz == 120:
+            if observation_version != RIVAL2_OBS_V2_120HZ_VERSION:
+                raise ValueError("120 Hz full-match inference requires RIVAL2_OBS_V2_120HZ")
+            self.inference_contract_binding = (
+                "120hz_action_observation_with_display_only_historical_full_match_reward; "
+                "not a PPO training contract"
+            )
         self.world = Rival2FullMatchWorldSim(
             num_envs,
             collision_root,
             device=device,
             seed=seed,
             reward_mode=reward_mode,
+            physics_ticks_per_decision=self.physics_ticks_per_decision,
             **world_kwargs,
         )
         self.device = torch.device(self.world.device)
@@ -290,6 +320,17 @@ class Rival2FullMatchEnv(Rival2Env):
         self.full_match_views = self.world.rival2.torch_views()
         self.observation = self.bridge.observation()
         self.decision_count = 0
+
+    def _inference_contract_hashes(self, reward_version: str) -> dict[str, str]:
+        hashes = contract_hashes_for_reward(reward_version, self.episode_version)
+        if self.policy_hz != 120:
+            return hashes
+        migrated = dict(hashes)
+        migrated.pop("RIVAL2_OBS_V1")
+        migrated.pop("RIVAL2_ACTION_V1")
+        migrated[RIVAL2_OBS_V2_120HZ_VERSION] = OBSERVATION_SCHEMA_V2_120HZ_HASH
+        migrated[RIVAL2_ACTION_V2_120HZ_VERSION] = ACTION_CONTRACT_V2_120HZ_HASH
+        return migrated
 
     def set_reward_version(self, reward_version: str) -> None:
         """Apply an authorized update-boundary reward-only transition."""
@@ -303,7 +344,7 @@ class Rival2FullMatchEnv(Rival2Env):
         else:
             raise ValueError(f"unsupported full-match reward: {reward_version}")
         self.reward_version = reward_version
-        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
+        self.contract_hashes = self._inference_contract_hashes(reward_version)
         self.world.reward_mode = reward_mode
 
     def start_fresh_matches(self) -> None:

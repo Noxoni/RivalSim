@@ -8,7 +8,13 @@ from itertools import pairwise
 from typing import Any
 
 from rivalsim.human_demo.format import ACTION_NAMES
-from rivalsim.rival2_contracts import OBS_FIELD_NAMES, OBSERVATION_SCHEMA_HASH
+from rivalsim.rival2_contracts import (
+    ACTION_CONTRACT_V2_120HZ_HASH,
+    OBS_FIELD_NAMES,
+    OBSERVATION_SCHEMA_V2_120HZ_HASH,
+    RIVAL2_ACTION_V2_120HZ_VERSION,
+    RIVAL2_OBS_V2_120HZ_VERSION,
+)
 
 
 def rival_observation_mapping_report() -> dict[str, Any]:
@@ -23,7 +29,8 @@ def rival_observation_mapping_report() -> dict[str, Any]:
         counts[row["status"]] += 1
     return {
         "format": "RIVALRL_NATIVE_TO_RIVAL_OBSERVATION_MAPPING_V1",
-        "rival_observation_schema_sha256": OBSERVATION_SCHEMA_HASH,
+        "rival_observation_version": RIVAL2_OBS_V2_120HZ_VERSION,
+        "rival_observation_schema_sha256": OBSERVATION_SCHEMA_V2_120HZ_HASH,
         "field_count": len(rows),
         "counts": dict(sorted(counts.items())),
         "fields": rows,
@@ -48,7 +55,8 @@ def _classify_observation_field(field: str) -> tuple[str, str, str]:
         return (
             "approximately_derivable",
             "120 Hz frame.rival_action history",
-            "Rival expects a prior 30 Hz policy action, but no human four-tick rule is selected.",
+            "The immediately preceding frame is exact under V2; the first recorded frame "
+            "has no pre-session predecessor and is never silently filled.",
         )
     if field.startswith("boost_pad."):
         return (
@@ -151,7 +159,7 @@ def action_variation_report(
     analog_epsilon: float = 1e-4,
     session_class: str = "unlabeled",
 ) -> dict[str, Any]:
-    """Measure, but do not choose, a future 120 Hz to 30 Hz conversion rule."""
+    """Preserve the historical four-tick variation diagnostic for comparison."""
 
     if window_size <= 1:
         raise ValueError("window_size must exceed one")
@@ -204,7 +212,10 @@ def action_variation_report(
         ),
         "per_channel": per_channel,
         "decision": None,
-        "decision_policy": "Evidence only; no 30 Hz target-action rule is selected.",
+        "decision_policy": (
+            "Historical evidence only; RIVAL2_ACTION_V2_120HZ uses every native frame "
+            "directly and performs no temporal reduction."
+        ),
     }
 
 
@@ -289,5 +300,42 @@ def action_variation_collection_report(
         "classes_by_intra_window_variation": classes,
         "sessions": session_reports,
         "decision": None,
-        "decision_policy": "Evidence only; no 30 Hz target-action rule is selected.",
+        "decision_policy": (
+            "Historical evidence only; RIVAL2_ACTION_V2_120HZ uses every native frame "
+            "directly and performs no temporal reduction."
+        ),
+    }
+
+
+def human_action_alignment_report() -> dict[str, Any]:
+    """Return the frozen direct native-frame to Rival V2 action relation."""
+
+    return {
+        "format": "RIVALRL_NATIVE_120_TO_RIVAL2_ACTION_V2_120HZ_V1",
+        "source": {
+            "schema": "RIVALRL_NATIVE_DEMO_V1",
+            "cadence_hz": 120,
+            "field": "frame.rival_action",
+            "authoritative_source": (
+                "Rocket League ControllerInput consumed at the physics application hook"
+            ),
+        },
+        "target": {
+            "action_version": RIVAL2_ACTION_V2_120HZ_VERSION,
+            "action_contract_sha256": ACTION_CONTRACT_V2_120HZ_HASH,
+            "policy_hz": 120,
+            "channels": list(ACTION_NAMES),
+        },
+        "alignment": (
+            "Rocket League native physics frame N -> one eight-channel target -> "
+            "Rival 120 Hz policy decision N"
+        ),
+        "temporal_reduction": None,
+        "averaging": False,
+        "subsampling": False,
+        "four_frame_combination": False,
+        "observation_quality_policy": (
+            "Action cadence is exact; observation fields retain the separate field-quality "
+            "classifications and unavailable values are not synthesized."
+        ),
     }

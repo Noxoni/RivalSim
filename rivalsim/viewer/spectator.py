@@ -15,8 +15,10 @@ import warp as wp
 
 from rivalsim.constants import DOUBLEJUMP_MAX_DELAY
 from rivalsim.kernels.boost_pad import BIG_PAD_COUNT, SOCCAR_PAD_POSITIONS
-from rivalsim.kernels.rival2 import PHYSICS_TICKS_PER_DECISION
-from rivalsim.rival2_contracts import OBS_DIM, RIVAL2_REWARD_V2_VERSION
+from rivalsim.rival2_contracts import (
+    OBS_DIM,
+    RIVAL2_REWARD_V2_VERSION,
+)
 from rivalsim.rival2_full_match_env import Rival2FullMatchEnv
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -44,6 +46,10 @@ class CheckpointInfo:
     total_agent_samples: int | None
     reward_version: str | None
     episode_version: str | None
+    observation_version: str
+    action_version: str
+    physics_hz: int
+    policy_hz: int
 
 
 def _sha256(path: Path) -> str:
@@ -137,6 +143,10 @@ def load_checkpoint_policy(
             if metadata.get("episode_version") is not None
             else None
         ),
+        observation_version=str(metadata.get("observation_version", "RIVAL2_OBS_V1")),
+        action_version=str(metadata.get("action_version", "RIVAL2_ACTION_V1")),
+        physics_hz=int(metadata.get("physics_hz", 120)),
+        policy_hz=int(metadata.get("policy_hz", 30)),
     )
     return model, config, info
 
@@ -302,6 +312,8 @@ class RivalVisSession:
             device=str(self.device),
             seed=seed,
             reward_version=RIVAL2_REWARD_V2_VERSION,
+            observation_version=self.checkpoint_info.observation_version,
+            action_version=self.checkpoint_info.action_version,
             kickoff_selector=kickoff_selector,
             car_visitation_order="a_then_b",
         )
@@ -399,7 +411,7 @@ class RivalVisSession:
             self.last_touch = 0
         if bool(self.adapter.hit_orange[0].item()):
             self.last_touch = 1
-        if self.interval_tick == PHYSICS_TICKS_PER_DECISION:
+        if self.interval_tick == self.env.physics_ticks_per_decision:
             transition_observation = self.env.bridge.observation().clone()
             reward = self.env.bridge.views["rival2.reward"].reshape(1, 2).clone()
             if self._decision_observation is None:
@@ -432,8 +444,8 @@ class RivalVisSession:
         return self.current_frame
 
     def advance_policy_decision(self) -> ViewerFrame:
-        target = PHYSICS_TICKS_PER_DECISION if self.interval_tick == 0 else (
-            PHYSICS_TICKS_PER_DECISION - self.interval_tick
+        target = self.env.physics_ticks_per_decision if self.interval_tick == 0 else (
+            self.env.physics_ticks_per_decision - self.interval_tick
         )
         for _ in range(target):
             self.advance_physics_tick()

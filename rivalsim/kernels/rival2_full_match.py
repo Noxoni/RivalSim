@@ -7,7 +7,6 @@ import warp as wp
 from rivalsim.kernels.rival2 import (
     GOAL_PROGRESS_SCALE_Y,
     NO_TOUCH_TIMEOUT_TICKS,
-    PHYSICS_TICKS_PER_DECISION,
 )
 from rivalsim.rival2_contracts import (
     SCORING_DEMOLITION_REWARD,
@@ -24,6 +23,7 @@ REWARD_SCORING = 2
 @wp.kernel(enable_backward=False)
 def rival2_full_match_accumulate_tick(
     reward_mode: int,
+    physics_ticks_per_decision: int,
     ball_pos: wp.array(dtype=wp.vec3),
     goal_scored: wp.array(dtype=wp.int32),
     scoring_team: wp.array(dtype=wp.int32),
@@ -192,7 +192,7 @@ def rival2_full_match_accumulate_tick(
 
     next_interval_tick = interval_tick[env] + 1
     interval_tick[env] = next_interval_tick
-    if next_interval_tick == PHYSICS_TICKS_PER_DECISION:
+    if next_interval_tick == physics_ticks_per_decision:
         terminal = match_done[env]
         terminated[env] = terminal
         truncated[env] = 0

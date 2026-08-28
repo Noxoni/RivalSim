@@ -1,0 +1,100 @@
+{
+  "checkpoint_sha256_before_after": [
+    "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350"
+  ],
+  "checks": {
+    "bootstrap_file_unchanged": true,
+    "consecutive_action_changes_observed": true,
+    "finite_actions": true,
+    "finite_observations": true,
+    "finite_rewards": true,
+    "iteration_unchanged": true,
+    "model_unchanged": true,
+    "named_mechanics_hot_path_absent": true,
+    "no_behavior_cloning": true,
+    "no_ppo_update": true,
+    "one_tick_action_contract": true,
+    "optimizer_state_unchanged": true,
+    "optimizer_step_counters_unchanged": true,
+    "physical_guard_present": true,
+    "policy_version_unchanged": true,
+    "rollout_shape_exact": true,
+    "simulator_hot_path_d2h_zero": true,
+    "simulator_hot_path_h2d_zero": true,
+    "source_file_unchanged": true
+  },
+  "consecutive_action_change_fraction": 0.9620985984802246,
+  "created_utc": "2026-08-28T18:30:44.198752+00:00",
+  "disposable_post_rollout_accounting_not_saved": {
+    "agent_decisions_120hz": 5035008,
+    "decision_count_cross_cadence_comparable": false,
+    "physical_physics_ticks_experienced": 4194304,
+    "simulated_agent_seconds": 69905.06666666667,
+    "simulated_world_seconds": 34952.53333333333,
+    "source_30hz_agent_decisions": 3655854038
+  },
+  "environment_logical_state_bytes": 420741120,
+  "identity": "RIVAL2_120HZ_32768X128_ROLLOUT_ONLY_VALIDATION_V1",
+  "logical_rollout_buffer_bytes": 6970933248,
+  "memory": {
+    "allocated_headroom_at_peak_bytes": 25728068096,
+    "baseline_allocated_bytes": 150370816,
+    "baseline_reserved_bytes": 301989888,
+    "device_total_bytes": 34190458880,
+    "free_bytes_after_rollout": 18229493760,
+    "peak_allocated_bytes": 8462390784,
+    "peak_reserved_bytes": 8956936192,
+    "ppo_memory_headroom_interpretation": "free/headroom with the complete rollout resident; no PPO update was run",
+    "reserved_headroom_at_peak_bytes": 25233522688
+  },
+  "model_tensor_sha256_before_after": [
+    "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3"
+  ],
+  "nexto_reported_timed_d2h_bytes": 0,
+  "nexto_reported_timed_h2d_bytes": 0,
+  "opponent_family_worlds_after_rollout": {
+    "current": 6568,
+    "historical": 3286,
+    "nexto": 11495,
+    "wisp": 11419
+  },
+  "optimizer_step_counters_before_after": [
+    [
+      103536
+    ],
+    [
+      103536
+    ]
+  ],
+  "optimizer_tensor_sha256_before_after": [
+    "46C5D80514908BF9498B455A93E195977234F84A8F0EE39811C921B463AF5FA0",
+    "46C5D80514908BF9498B455A93E195977234F84A8F0EE39811C921B463AF5FA0"
+  ],
+  "physics_hz": 120,
+  "physics_ticks_per_decision": 1,
+  "policy_hz": 120,
+  "rollout_horizon": 128,
+  "simulator_transfer_bytes": {
+    "d2h": 0,
+    "h2d": 0
+  },
+  "source_sha256_before_after": [
+    "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A",
+    "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A"
+  ],
+  "terminated_events": 0,
+  "timing": {
+    "other_adapter_sampling_observation_seconds": 5.07794762185961,
+    "physics_reward_seconds": 0.18776665663719178,
+    "rival_and_historical_policy_inference_seconds": 1.0556156215667725,
+    "rollout_wall_seconds": 6.321329900063574,
+    "trainable_agent_decisions_per_wall_second": 796510.8734396796,
+    "world_physics_ticks_per_wall_second": 663516.0743560967
+  },
+  "truncated_events": 0,
+  "verdict": "PASS_GREEN",
+  "wisp_source_specific_host_eta_note": "Pinned Wisp retains its accepted Windows CPU scalar ETA cache; this is not a RivalSim world-state or Rival-policy transfer and its cadence was not changed.",
+  "worlds": 32768
+}

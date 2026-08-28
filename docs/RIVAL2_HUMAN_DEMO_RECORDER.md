@@ -369,6 +369,7 @@ $session = "$env:APPDATA\bakkesmod\bakkesmod\data\rival2\human_demos\<session-uu
 .\.venv\Scripts\python.exe -m rivalsim.human_demo action-variation $session
 .\.venv\Scripts\python.exe -m rivalsim.human_demo action-variation $session1 $session2 $session3
 .\.venv\Scripts\python.exe -m rivalsim.human_demo mapping-report
+.\.venv\Scripts\python.exe -m rivalsim.human_demo action-alignment
 ```
 
 `validate` reports three distinct verdicts:
@@ -411,7 +412,7 @@ derivable, approximate, or unavailable. At this SDK/schema revision:
 | --- | ---: | --- |
 | exact/direct | 16 | Native boolean/contact value is already in the field's logical form. |
 | exactly derivable | 58 | Deterministic normalization, team transform, orientation, difference, or event derivation. |
-| approximately derivable | 102 | Boost-pad coverage, 30 Hz previous-action choice, and timer/state semantics that do not exactly match RivalSim. |
+| approximately derivable | 102 | Boost-pad coverage, the first-frame missing pre-session action, and timer/state semantics that do not exactly match RivalSim. |
 | unavailable | 6 | No exact source in the pinned SDK. |
 
 The six unavailable fields are:
@@ -428,7 +429,23 @@ opponent.sticky_ticks
 The full field-level report, including source and reason for all 182 fields, is produced by the
 command. An adapter must not fill unavailable values with plausible defaults.
 
-## 120 Hz to candidate 30 Hz diagnostic
+## Direct 120 Hz action alignment
+
+`action-alignment` emits the versioned action relation for the active V2 line:
+
+```text
+native Rocket League physics frame N
+-> frame.rival_action[N]
+-> RIVAL2_ACTION_V2_120HZ decision N
+```
+
+There is no averaging, subsampling, four-frame combination, or other temporal reduction. The
+action relation is exact and independent of the observation mapping report: approximate or
+unavailable observation fields remain explicitly classified and are never synthesized. The first
+recorded frame cannot provide the action from before the recording session; later contiguous
+frames provide the immediately preceding action required by `RIVAL2_OBS_V2_120HZ`.
+
+## Historical four-tick variation diagnostic
 
 `action-variation` retains the native frames, then examines nonoverlapping groups of four only when
 both recorder sequence and physics frame are contiguous. It reports:
@@ -440,8 +457,9 @@ both recorder sequence and physics frame are contiguous. It reports:
 - session class assembled from the match/freeplay/mechanic/opponent labels.
 
 Analog equality uses a configurable diagnostic epsilon (default `1e-4`); buttons require exact
-equality. The report deliberately leaves `decision` null. It does not select first-action,
-averaging, action chunks, rejection, or a higher policy rate.
+equality. The report deliberately leaves `decision` null. It is retained as historical evidence
+about what the former 30 Hz reduction problem would have lost; it does not alter the direct V2
+120 Hz target relation.
 
 When two or more session paths are supplied, the collection report aggregates independent windows
 by session/mechanic class and orders `classes_by_intra_window_variation` by the fraction containing
@@ -466,7 +484,7 @@ cannot be verified; do not replace it with synthetic data.
 8. Confirm a clean stop, zero queue drops/out-of-order/missing frames, one or more
    `local_car_rebind` events when addresses changed, nonzero `duplicate_hook_callbacks` only if each
    has a matching suppressed event, and `duplicate_frames_retained=0`.
-9. Run `validate`, `inspect`, and `action-variation` on the emitted UUID. Require
+9. Run `validate`, `inspect`, `action-alignment`, and `action-variation` on the emitted UUID. Require
    `container_valid=true`, `capture_complete=true`, `overall_demonstration_valid=true`, no material
    trailing uncovered time, active capture rate near the declared engine cadence, stable player ID,
    continuous sequence/physics identity after every rebind, exact hashes/CRCs, and exactly one human

@@ -10,12 +10,14 @@ import torch
 import warp as wp
 
 from rivalsim.constants import DOUBLEJUMP_MAX_DELAY
+from rivalsim.gameplay_120 import Rival2Gameplay120State
 from rivalsim.gameplay_v3 import Rival2GameplayV3State, default_threshold_path
 from rivalsim.kernels.rival2 import (
     PHYSICS_TICKS_PER_DECISION,
     REWARD_MODE_ACQUISITION,
     REWARD_MODE_BASE,
     REWARD_MODE_GAMEPLAY,
+    REWARD_MODE_GAMEPLAY_120_V1,
     REWARD_MODE_GAMEPLAY_V2,
     REWARD_MODE_GAMEPLAY_V3,
     REWARD_MODE_GOAL_ONLY,
@@ -43,8 +45,11 @@ from rivalsim.rival2_contracts import (
     OBS_FIELD_NAMES,
     ORANGE_PAD_REMAP,
     POSITION_SCALE,
+    RIVAL2_ACTION_V2_120HZ_VERSION,
     RIVAL2_EPISODE_VERSION,
+    RIVAL2_OBS_V2_120HZ_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
@@ -135,7 +140,7 @@ class Rival2EpisodeState:
 
 
 class Rival2WorldSim(CompleteWorldSim):
-    """CompleteWorldSim plus policy-neutral 30 Hz interval event accounting."""
+    """CompleteWorldSim plus contract-selected policy-interval accounting."""
 
     def __init__(self, *args: Any, reward_mode: int = REWARD_MODE_BASE, **kwargs: Any):
         if kwargs.get("auto_kickoff") not in (None, False):
@@ -149,6 +154,7 @@ class Rival2WorldSim(CompleteWorldSim):
             REWARD_MODE_GAMEPLAY,
             REWARD_MODE_GAMEPLAY_V2,
             REWARD_MODE_GAMEPLAY_V3,
+            REWARD_MODE_GAMEPLAY_120_V1,
         ):
             raise ValueError(f"unsupported Rival 2.0 reward mode: {self.reward_mode}")
         threshold_path = kwargs.pop("v3_threshold_path", None)
@@ -162,6 +168,11 @@ class Rival2WorldSim(CompleteWorldSim):
                 evidence_capacity=evidence_capacity,
             )
             if self.reward_mode == REWARD_MODE_GAMEPLAY_V3
+            else None
+        )
+        self.gameplay_120 = (
+            Rival2Gameplay120State(self)
+            if self.reward_mode == REWARD_MODE_GAMEPLAY_120_V1
             else None
         )
         state = self.rival2
@@ -189,10 +200,12 @@ class Rival2WorldSim(CompleteWorldSim):
     def logical_state_bytes(self) -> int:
         state = getattr(self, "rival2", None)
         gameplay_v3 = getattr(self, "gameplay_v3", None)
+        gameplay_120 = getattr(self, "gameplay_120", None)
         return (
             super().logical_state_bytes
             + (0 if state is None else state.logical_bytes)
             + (0 if gameplay_v3 is None else gameplay_v3.logical_bytes)
+            + (0 if gameplay_120 is None else gameplay_120.logical_bytes)
         )
 
     def begin_decision(self) -> None:
@@ -237,6 +250,8 @@ class Rival2WorldSim(CompleteWorldSim):
         )
         if self.gameplay_v3 is not None:
             self.gameplay_v3.begin_decision()
+        if self.gameplay_120 is not None:
+            self.gameplay_120.begin_decision()
 
     def _launch_tick(self) -> None:
         if self.reward_mode not in (
@@ -246,6 +261,7 @@ class Rival2WorldSim(CompleteWorldSim):
             REWARD_MODE_GAMEPLAY,
             REWARD_MODE_GAMEPLAY_V2,
             REWARD_MODE_GAMEPLAY_V3,
+            REWARD_MODE_GAMEPLAY_120_V1,
         ):
             raise ValueError(f"unsupported Rival 2.0 reward mode: {self.reward_mode}")
         super()._launch_tick()
@@ -273,6 +289,8 @@ class Rival2WorldSim(CompleteWorldSim):
             )
         if self.gameplay_v3 is not None:
             self.gameplay_v3.launch_tick()
+        if self.gameplay_120 is not None:
+            self.gameplay_120.launch_tick()
         wp.launch(
             rival2_accumulate_tick,
             dim=self.num_envs,
@@ -335,6 +353,8 @@ class Rival2WorldSim(CompleteWorldSim):
         )
         if self.gameplay_v3 is not None:
             self.gameplay_v3.compose_reward()
+        if self.gameplay_120 is not None:
+            self.gameplay_120.compose_reward()
 
     def _launch_physical_resets(self, mask: wp.array) -> None:
         """Apply the shared standard-kickoff physical reset relation."""
@@ -415,6 +435,8 @@ class Rival2WorldSim(CompleteWorldSim):
         )
         if self.gameplay_v3 is not None:
             self.gameplay_v3.reset(mask)
+        if self.gameplay_120 is not None:
+            self.gameplay_120.reset(mask)
 
     def apply_interval_resets(self) -> None:
         """Reset only completed worlds, without advancing physics or the clock."""
@@ -619,6 +641,20 @@ class Rival2TensorBridge:
                 "total_component",
             ):
                 self._bind(f"gameplay_v3.{name}", getattr(gameplay_v3, name))
+        gameplay_120 = self.sim.gameplay_120
+        if gameplay_120 is not None:
+            for name in (
+                "interval_bad_flip",
+                "interval_contest_exempt",
+                "interval_power_exempt",
+                "legitimate_touch_total",
+                "flip_touch_total",
+                "bad_flip_total",
+                "contest_exempt_total",
+                "power_exempt_total",
+                "bad_flip_component",
+            ):
+                self._bind(f"gameplay_120.{name}", getattr(gameplay_120, name))
         controls = self.sim.controls
         for name in ("throttle", "steer", "pitch", "yaw", "roll", "jump", "boost"):
             self._bind(f"control.{name}", getattr(controls, name))
@@ -873,7 +909,7 @@ class Rival2TensorBridge:
 
 
 class Rival2Env:
-    """30 Hz Rival 2.0 environment with no host data path."""
+    """Contract-selected Rival 2.0 environment with no host data path."""
 
     def __init__(
         self,
@@ -884,6 +920,8 @@ class Rival2Env:
         seed: int = 0,
         reward_version: str = RIVAL2_REWARD_VERSION,
         episode_version: str = RIVAL2_EPISODE_VERSION,
+        observation_version: str | None = None,
+        action_version: str | None = None,
         **world_kwargs: Any,
     ):
         if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
@@ -898,11 +936,31 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_V2
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_V3_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_V3
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_120_V1
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = episode_version
-        self.contract_hashes = contract_hashes_for_reward(reward_version, episode_version)
+        self.observation_version = observation_version or (
+            RIVAL2_OBS_V2_120HZ_VERSION
+            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
+            else "RIVAL2_OBS_V1"
+        )
+        self.action_version = action_version or (
+            RIVAL2_ACTION_V2_120HZ_VERSION
+            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
+            else "RIVAL2_ACTION_V1"
+        )
+        self.physics_hz = 120
+        self.policy_hz = 120 if self.action_version == RIVAL2_ACTION_V2_120HZ_VERSION else 30
+        self.physics_ticks_per_decision = 1 if self.policy_hz == 120 else PHYSICS_TICKS_PER_DECISION
+        self.contract_hashes = contract_hashes_for_reward(
+            reward_version,
+            episode_version,
+            observation_version=self.observation_version,
+            action_version=self.action_version,
+        )
         self.world = Rival2WorldSim(
             num_envs,
             collision_root,
@@ -938,9 +996,9 @@ class Rival2Env:
         self.world.begin_decision()
         emitted = self.bridge.set_actions(action)
         if tick_action_provider is None:
-            self.world.step(PHYSICS_TICKS_PER_DECISION)
+            self.world.step(self.physics_ticks_per_decision)
         else:
-            for tick in range(PHYSICS_TICKS_PER_DECISION):
+            for tick in range(self.physics_ticks_per_decision):
                 self.bridge.set_actions(tick_action_provider(tick))
                 self.world.step(1)
         if markers is not None:
@@ -998,6 +1056,8 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_V2
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_V3_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_V3
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_120_V1
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         if reward_mode == REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is None:
@@ -1006,8 +1066,19 @@ class Rival2Env:
             )
         if reward_mode != REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is not None:
             raise ValueError("Gameplay V3 native state cannot be removed in-place")
+        if reward_mode == REWARD_MODE_GAMEPLAY_120_V1 and self.world.gameplay_120 is None:
+            raise ValueError(
+                "Gameplay 120 V1 requires a freshly constructed 120 Hz environment"
+            )
+        if reward_mode != REWARD_MODE_GAMEPLAY_120_V1 and self.world.gameplay_120 is not None:
+            raise ValueError("Gameplay 120 V1 physical-guard state cannot be removed in-place")
         self.reward_version = reward_version
-        self.contract_hashes = contract_hashes_for_reward(reward_version, self.episode_version)
+        self.contract_hashes = contract_hashes_for_reward(
+            reward_version,
+            self.episode_version,
+            observation_version=self.observation_version,
+            action_version=self.action_version,
+        )
         self.world.reward_mode = reward_mode
 
     def step(self, action: torch.Tensor) -> Rival2Step:

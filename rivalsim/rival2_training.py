@@ -46,38 +46,69 @@ class HistoricalPolicyPool:
         policy_config: Rival2PolicyConfig,
         device: torch.device,
         bound: int = 16,
+        *,
+        default_policy_hz: int = 30,
+        default_action_version: str = "RIVAL2_ACTION_V1",
     ):
         self.policy_config = policy_config
         self.device = device
         self.bound = bound
+        self.default_policy_hz = int(default_policy_hz)
+        self.default_action_version = str(default_action_version)
         self.versions: list[int] = []
         self.policies: list[Rival2ActorCritic] = []
+        self.policy_hz: list[int] = []
+        self.action_versions: list[str] = []
         self.version_tensor = torch.empty(0, dtype=torch.int64, device=device)
 
     def _refresh_version_tensor(self) -> None:
         self.version_tensor = torch.as_tensor(self.versions, dtype=torch.int64, device=self.device)
 
-    def add(self, model: Rival2ActorCritic, version: int) -> int | None:
+    def add(
+        self,
+        model: Rival2ActorCritic,
+        version: int,
+        *,
+        policy_hz: int | None = None,
+        action_version: str | None = None,
+    ) -> int | None:
         frozen = copy.deepcopy(model).to(self.device).eval()
         frozen.requires_grad_(False)
         self.versions.append(int(version))
         self.policies.append(frozen)
+        self.policy_hz.append(int(policy_hz or self.default_policy_hz))
+        self.action_versions.append(str(action_version or self.default_action_version))
         evicted_version: int | None = None
         if len(self.versions) > self.bound:
             evicted_version = self.versions.pop(0)
             self.policies.pop(0)
+            self.policy_hz.pop(0)
+            self.action_versions.pop(0)
         self._refresh_version_tensor()
         return evicted_version
 
     def clear(self) -> None:
         self.versions.clear()
         self.policies.clear()
+        self.policy_hz.clear()
+        self.action_versions.clear()
         self._refresh_version_tensor()
 
     def checkpoint_state(self) -> list[dict[str, Any]]:
         return [
-            {"version": version, "model": policy.state_dict()}
-            for version, policy in zip(self.versions, self.policies, strict=True)
+            {
+                "version": version,
+                "model": policy.state_dict(),
+                "policy_hz": policy_hz,
+                "action_version": action_version,
+            }
+            for version, policy, policy_hz, action_version in zip(
+                self.versions,
+                self.policies,
+                self.policy_hz,
+                self.action_versions,
+                strict=True,
+            )
         ]
 
     def load_checkpoint_state(self, entries: list[dict[str, Any]]) -> None:
@@ -88,6 +119,10 @@ class HistoricalPolicyPool:
             policy.eval().requires_grad_(False)
             self.versions.append(int(entry["version"]))
             self.policies.append(policy)
+            self.policy_hz.append(int(entry.get("policy_hz", 30)))
+            self.action_versions.append(
+                str(entry.get("action_version", "RIVAL2_ACTION_V1"))
+            )
         self._refresh_version_tensor()
 
 
@@ -118,6 +153,8 @@ class Rival2Trainer:
             self.policy_config,
             self.device,
             self.self_play_config.historical_pool_bound,
+            default_policy_hz=env.policy_hz,
+            default_action_version=env.action_version,
         )
         self.opponent_assignment = torch.full(
             (env.num_envs,), -1, dtype=torch.int64, device=self.device
@@ -125,10 +162,18 @@ class Rival2Trainer:
         self.policy_version = 0
         self.iteration = 0
         self.total_agent_samples = 0
+        self.source_30hz_agent_decision_samples = 0
+        self.agent_decisions_120hz = 0
+        self.physical_physics_ticks_experienced = 0
         self.curriculum_transition: dict[str, Any] | None = None
 
     def add_historical_snapshot(self) -> None:
-        evicted_version = self.opponent_pool.add(self.model, self.policy_version)
+        evicted_version = self.opponent_pool.add(
+            self.model,
+            self.policy_version,
+            policy_hz=self.env.policy_hz,
+            action_version=self.env.action_version,
+        )
         if evicted_version is not None:
             self.opponent_assignment.masked_fill_(
                 self.opponent_assignment == evicted_version,
@@ -252,9 +297,18 @@ class Rival2Trainer:
                 observation = transition.observation
         self.env.observation = observation
         if active_world_mask is None:
-            self.total_agent_samples += config.rollout_horizon * self.env.num_envs * 2
+            decisions = config.rollout_horizon * self.env.num_envs * 2
+            self.total_agent_samples += decisions
         else:
-            self.total_agent_samples += int(active_agent_samples.item())
+            decisions = int(active_agent_samples.item())
+            self.total_agent_samples += decisions
+        if self.env.policy_hz == 120:
+            self.agent_decisions_120hz += decisions
+        self.physical_physics_ticks_experienced += (
+            config.rollout_horizon
+            * self.env.num_envs
+            * self.env.physics_ticks_per_decision
+        )
         return rollout
 
     def update(
@@ -345,11 +399,29 @@ class Rival2Trainer:
             "contract_hashes": dict(self.env.contract_hashes),
             "reward_version": self.env.reward_version,
             "episode_version": self.env.episode_version,
+            "observation_version": self.env.observation_version,
+            "action_version": self.env.action_version,
+            "physics_hz": self.env.physics_hz,
+            "policy_hz": self.env.policy_hz,
             "policy_config_hash": self.policy_config.content_hash,
             "ppo_config_hash": self.ppo_config.content_hash,
             "policy_version": self.policy_version,
             "iteration": self.iteration,
             "total_agent_samples": self.total_agent_samples,
+            "sample_accounting": {
+                "source_30hz_agent_decisions": self.source_30hz_agent_decision_samples,
+                "agent_decisions_120hz": self.agent_decisions_120hz,
+                "physical_physics_ticks_experienced": (
+                    self.physical_physics_ticks_experienced
+                ),
+                "simulated_world_seconds": (
+                    self.physical_physics_ticks_experienced / self.env.physics_hz
+                ),
+                "simulated_agent_seconds": (
+                    2 * self.physical_physics_ticks_experienced / self.env.physics_hz
+                ),
+                "decision_count_cross_cadence_comparable": False,
+            },
             "torch_cpu_rng_state": torch.get_rng_state(),
             "torch_cuda_rng_state": torch.cuda.get_rng_state(self.device),
             "policy_generator_state": self.policy_generator.get_state(),
@@ -383,6 +455,17 @@ class Rival2Trainer:
         self.policy_version = int(payload["policy_version"])
         self.iteration = int(payload["iteration"])
         self.total_agent_samples = int(payload["total_agent_samples"])
+        accounting = payload.get("sample_accounting", {})
+        self.source_30hz_agent_decision_samples = int(
+            accounting.get(
+                "source_30hz_agent_decisions",
+                self.total_agent_samples if self.env.policy_hz == 30 else 0,
+            )
+        )
+        self.agent_decisions_120hz = int(accounting.get("agent_decisions_120hz", 0))
+        self.physical_physics_ticks_experienced = int(
+            accounting.get("physical_physics_ticks_experienced", 0)
+        )
         self.self_play_config = Rival2SelfPlayConfig(**payload["self_play_config"])
         self.opponent_pool.bound = self.self_play_config.historical_pool_bound
         self.policy_generator.set_state(payload["policy_generator_state"].cpu())
@@ -405,6 +488,12 @@ class Rival2Trainer:
             raise ValueError("Rival 2.0 checkpoint reward version is incompatible")
         if payload.get("episode_version", "RIVAL2_EPISODE_V1") != self.env.episode_version:
             raise ValueError("Rival 2.0 checkpoint episode version is incompatible")
+        if payload.get("observation_version", "RIVAL2_OBS_V1") != self.env.observation_version:
+            raise ValueError("Rival 2.0 checkpoint observation version is incompatible")
+        if payload.get("action_version", "RIVAL2_ACTION_V1") != self.env.action_version:
+            raise ValueError("Rival 2.0 checkpoint action version is incompatible")
+        if int(payload.get("policy_hz", 30)) != self.env.policy_hz:
+            raise ValueError("Rival 2.0 checkpoint policy cadence is incompatible")
         self._restore_checkpoint_state(payload)
 
     def load_checkpoint_curriculum_transition(
