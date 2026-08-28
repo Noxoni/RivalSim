@@ -37,6 +37,7 @@ from rivalsim.gameplay_v3 import (  # noqa: E402
     CONTROL_RELATIVE_SPEED_MAX,
     CONTROL_RELEASE_BALL_DELTA_V_MIN,
     CONTROL_RELEASE_DISTANCE_MIN,
+    FLIP_CONTACT_FEATURE_COUNT,
     OUTCOME_NAMES,
     POWER_BALL_DELTA_V_MIN,
     POWER_ROTATIONAL_CLOSING_SPEED_MIN,
@@ -643,12 +644,10 @@ def _archived_synthetic_static_phase(collision_dir: Path) -> None:
             "cases": len(selected),
             "heldout_cases": len(heldout),
             "heldout_fp": sum(
-                row["class"] != "positive" and row["classified_positive"]
-                for row in heldout
+                row["class"] != "positive" and row["classified_positive"] for row in heldout
             ),
             "heldout_fn": sum(
-                row["class"] == "positive" and not row["classified_positive"]
-                for row in heldout
+                row["class"] == "positive" and not row["classified_positive"] for row in heldout
             ),
         }
     parity = {
@@ -1006,9 +1005,7 @@ def transition_rollout_phase(collision_dir: Path) -> None:
         ),
         "opponent_curriculum_config_exact": (
             trainer.opponent_curriculum
-            == Rival2OpponentCurriculumConfig(
-                **source["opponent_curriculum"]["config"]
-            )
+            == Rival2OpponentCurriculumConfig(**source["opponent_curriculum"]["config"])
         ),
         "historical_pool_exact": _object_digest(trainer.opponent_pool.checkpoint_state())
         == _object_digest(source["historical_opponents"]),
@@ -1166,18 +1163,14 @@ def shadow_phase(collision_dir: Path) -> None:
         device=trainer.device,
     )
     final_flags = torch.zeros_like(final_outcomes)
-    final_budget_hits = torch.zeros(
-        (SHADOW_WORLDS, 2), dtype=torch.int32, device=trainer.device
-    )
+    final_budget_hits = torch.zeros((SHADOW_WORLDS, 2), dtype=torch.int32, device=trainer.device)
     final_duplicates = torch.zeros(
         (SHADOW_WORLDS, 2, len(FAMILY_NAMES)),
         dtype=torch.int32,
         device=trainer.device,
     )
     final_rearms = torch.zeros_like(final_duplicates)
-    final_impossible = torch.zeros(
-        (SHADOW_WORLDS, 2), dtype=torch.int32, device=trainer.device
-    )
+    final_impossible = torch.zeros((SHADOW_WORLDS, 2), dtype=torch.int32, device=trainer.device)
     sums = {"mechanics_abs": 0.0, "bad_flip_abs": 0.0, "progress_abs": 0.0, "reward_abs": 0.0}
     active_decisions = 0
     observation = env.observation
@@ -1314,8 +1307,7 @@ def shadow_phase(collision_dir: Path) -> None:
         "created_utc": _utc_now(),
         "source": _source_metadata(),
         "evaluation_extract": (
-            "first 256 source assignment rows; exact source model/optimizer/RNG "
-            "restored in memory"
+            "first 256 source assignment rows; exact source model/optimizer/RNG restored in memory"
         ),
         "policy_and_opponents_frozen": True,
         "ppo_update_calls": 0,
@@ -1347,7 +1339,16 @@ def shadow_phase(collision_dir: Path) -> None:
     outcome_value = np.asarray(state.outcome_evidence_outcome.numpy()).reshape(SHADOW_WORLDS, 2, 8)
     outcome_tick = np.asarray(state.outcome_evidence_tick.numpy()).reshape(SHADOW_WORLDS, 2, 8)
     outcome_features = np.asarray(state.outcome_evidence_features.numpy()).reshape(
-        SHADOW_WORLDS, 2, 8, 8
+        SHADOW_WORLDS, 2, 8, FLIP_CONTACT_FEATURE_COUNT
+    )
+    outcome_self_tick = np.asarray(state.outcome_evidence_self_contact_tick.numpy()).reshape(
+        SHADOW_WORLDS, 2, 8
+    )
+    outcome_opponent_tick = np.asarray(
+        state.outcome_evidence_opponent_contact_tick.numpy()
+    ).reshape(SHADOW_WORLDS, 2, 8)
+    outcome_release_tick = np.asarray(state.outcome_evidence_control_release_tick.numpy()).reshape(
+        SHADOW_WORLDS, 2, 8
     )
     mechanics_evidence = []
     outcomes_evidence = []
@@ -1375,6 +1376,23 @@ def shadow_phase(collision_dir: Path) -> None:
                         "slot": slot,
                         "outcome": OUTCOME_NAMES[outcome],
                         "tick": int(outcome_tick[world, car, slot]),
+                        "self_contact_tick": int(outcome_self_tick[world, car, slot]),
+                        "opponent_contact_tick": int(outcome_opponent_tick[world, car, slot]),
+                        "control_release_tick": int(outcome_release_tick[world, car, slot]),
+                        "contact_order": (
+                            "opponent_before_self"
+                            if outcome_opponent_tick[world, car, slot]
+                            < outcome_self_tick[world, car, slot]
+                            and outcome_opponent_tick[world, car, slot] >= 0
+                            else "opponent_after_self"
+                            if outcome_opponent_tick[world, car, slot]
+                            > outcome_self_tick[world, car, slot]
+                            else "closest_representable_simultaneous"
+                            if outcome_opponent_tick[world, car, slot]
+                            == outcome_self_tick[world, car, slot]
+                            and outcome_opponent_tick[world, car, slot] >= 0
+                            else "no_associated_opponent_contact"
+                        ),
                         "features": outcome_features[world, car, slot].tolist(),
                     }
                 )
@@ -1412,9 +1430,7 @@ def shadow_phase(collision_dir: Path) -> None:
             "inspection": {
                 "mechanic_events_exported": len(exported_mechanics),
                 "classifier_outcomes_exported": len(exported_outcomes),
-                "represented_mechanics": sorted(
-                    {item["family"] for item in exported_mechanics}
-                ),
+                "represented_mechanics": sorted({item["family"] for item in exported_mechanics}),
                 "represented_classifier_outcomes": sorted(
                     {item["outcome"] for item in exported_outcomes}
                 ),

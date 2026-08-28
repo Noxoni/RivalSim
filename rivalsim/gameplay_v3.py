@@ -72,12 +72,7 @@ def flip_contact_candidate(
 ) -> bool:
     """Pure test/calibration form of the authoritative candidate conjunction."""
 
-    return bool(
-        touch_onset
-        and is_flipping
-        and has_flipped
-        and directional_torque_norm > 0.25
-    )
+    return bool(touch_onset and is_flipping and has_flipped and directional_torque_norm > 0.25)
 
 
 def primary_flip_outcome(
@@ -99,26 +94,34 @@ def primary_flip_outcome(
         return OUTCOME_EXEMPT_POWER_CONTACT
     return OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
 
+
 # Prospectively frozen before held-out evaluation from the deterministic
 # physical corpus emitted by the validation-correction harness.  These are
 # physical-identity separators, not quality scaling.
-CONTEST_CONTACT_WINDOW_TICKS = 8
-CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX = 86.60006713867188
-CONTEST_OPPONENT_DISTANCE_MAX = 430.46632385253906
-CONTEST_SELF_CLOSING_SPEED_MIN = 735.8017120361328
-CONTEST_OPPONENT_CLOSING_SPEED_MIN = 587.1069793701172
-CONTEST_TIME_TO_BALL_DELTA_MAX = 0.23604875229838973
+CONTEST_CONTACT_WINDOW_TICKS = 3
+CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX = 26.472905158996582
+CONTEST_OPPONENT_DISTANCE_MAX = 436.1062316894531
+CONTEST_SELF_CLOSING_SPEED_MIN = 727.6748657226562
+CONTEST_OPPONENT_CLOSING_SPEED_MIN = 590.4700012207031
+CONTEST_TIME_TO_BALL_DELTA_MAX = 0.23664760693567713
 
-POWER_TOTAL_CLOSING_SPEED_MIN = 95.32137298583984
-POWER_ROTATIONAL_CLOSING_SPEED_MIN = 163.89701080322266
-POWER_ROTATIONAL_SHARE_MIN = 0.25463866470010044
-POWER_BALL_DELTA_V_MIN = 303.62255859375
+POWER_TOTAL_CLOSING_SPEED_MIN = 95.31548309326172
+POWER_ROTATIONAL_CLOSING_SPEED_MIN = 164.38546752929688
+POWER_ROTATIONAL_SHARE_MIN = 0.2549042037005253
+POWER_BALL_DELTA_V_MIN = 303.5580596923828
 
-CONTROL_DISTANCE_MAX = 241.1681137084961
-CONTROL_RELATIVE_SPEED_MAX = 428.43893575668335
-CONTROL_HISTORY_TICKS_MIN = 6
-CONTROL_RELEASE_DISTANCE_MIN = 77.31824493408203
-CONTROL_RELEASE_BALL_DELTA_V_MIN = 163.416259765625
+CONTROL_DISTANCE_MAX = 278.92047119140625
+CONTROL_RELATIVE_SPEED_MAX = 853.1399946212769
+CONTROL_HISTORY_TICKS_MIN = 5
+CONTROL_RELEASE_WINDOW_TICKS = 5
+CONTROL_RELEASE_DISTANCE_MIN = 76.1766586303711
+CONTROL_RELEASE_OUTWARD_SPEED_MIN = 111.21610260009766
+CONTROL_RELEASE_BALL_DELTA_V_MIN = 163.4154052734375
+
+FLIP_CONTACT_FEATURE_COUNT = 16
+FLIP_CONTACT_RESOLUTION_WINDOW_TICKS = max(
+    CONTEST_CONTACT_WINDOW_TICKS, CONTROL_RELEASE_WINDOW_TICKS
+)
 
 
 def contest_convergence_exempt(
@@ -161,6 +164,7 @@ def controlled_flick_exempt(
     control_max_distance: float,
     control_max_relative_speed: float,
     release_distance: float,
+    release_outward_speed: float,
     ball_delta_v: float,
 ) -> bool:
     """Pure calibration/test form of the exemption-only control/release rule."""
@@ -170,6 +174,7 @@ def controlled_flick_exempt(
         and control_max_distance <= CONTROL_DISTANCE_MAX
         and control_max_relative_speed <= CONTROL_RELATIVE_SPEED_MAX
         and release_distance >= CONTROL_RELEASE_DISTANCE_MIN
+        and release_outward_speed >= CONTROL_RELEASE_OUTWARD_SPEED_MIN
         and ball_delta_v >= CONTROL_RELEASE_BALL_DELTA_V_MIN
     )
 
@@ -241,13 +246,16 @@ def _resolve_flip_candidate(
     car: int,
     env: int,
     tick: int,
-    current_distance: float,
     evidence_capacity: int,
     pending_active: wp.array(dtype=wp.int32),
     pending_recognized: wp.array(dtype=wp.int32),
     pending_controlled: wp.array(dtype=wp.int32),
     pending_contest: wp.array(dtype=wp.int32),
     pending_power: wp.array(dtype=wp.int32),
+    pending_control_release_captured: wp.array(dtype=wp.int32),
+    pending_self_contact_tick: wp.array(dtype=wp.int32),
+    pending_opponent_contact_tick: wp.array(dtype=wp.int32),
+    pending_control_release_tick: wp.array(dtype=wp.int32),
     pending_features: wp.array(dtype=wp.float32),
     interval_bad_flip: wp.array(dtype=wp.int32),
     interval_exemptions: wp.array(dtype=wp.int32),
@@ -256,16 +264,21 @@ def _resolve_flip_candidate(
     outcome_evidence_count: wp.array(dtype=wp.int32),
     outcome_evidence_outcome: wp.array(dtype=wp.int32),
     outcome_evidence_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_self_contact_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_opponent_contact_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_control_release_tick: wp.array(dtype=wp.int32),
     outcome_evidence_features: wp.array(dtype=wp.float32),
 ):
     outcome = OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
-    feature_base = car * 8
+    feature_base = car * FLIP_CONTACT_FEATURE_COUNT
     controlled = (
         pending_controlled[car] != 0
+        and pending_control_release_captured[car] != 0
         and pending_features[feature_base + 5] >= float(CONTROL_HISTORY_TICKS_MIN)
         and pending_features[feature_base + 6] <= CONTROL_DISTANCE_MAX
         and pending_features[feature_base + 7] <= CONTROL_RELATIVE_SPEED_MAX
-        and current_distance >= CONTROL_RELEASE_DISTANCE_MIN
+        and pending_features[feature_base + 13] >= CONTROL_RELEASE_DISTANCE_MIN
+        and pending_features[feature_base + 14] >= CONTROL_RELEASE_OUTWARD_SPEED_MIN
         and pending_features[feature_base + 4] >= CONTROL_RELEASE_BALL_DELTA_V_MIN
     )
     if pending_recognized[car] != 0:
@@ -300,8 +313,11 @@ def _resolve_flip_candidate(
             record = car * evidence_capacity + slot
             outcome_evidence_outcome[record] = outcome
             outcome_evidence_tick[record] = tick
-            record_features = record * 8
-            for feature in range(8):
+            outcome_evidence_self_contact_tick[record] = pending_self_contact_tick[car]
+            outcome_evidence_opponent_contact_tick[record] = pending_opponent_contact_tick[car]
+            outcome_evidence_control_release_tick[record] = pending_control_release_tick[car]
+            record_features = record * FLIP_CONTACT_FEATURE_COUNT
+            for feature in range(FLIP_CONTACT_FEATURE_COUNT):
                 outcome_evidence_features[record_features + feature] = pending_features[
                     feature_base + feature
                 ]
@@ -311,6 +327,10 @@ def _resolve_flip_candidate(
     pending_controlled[car] = 0
     pending_contest[car] = 0
     pending_power[car] = 0
+    pending_control_release_captured[car] = 0
+    pending_self_contact_tick[car] = -1
+    pending_opponent_contact_tick[car] = -1
+    pending_control_release_tick[car] = -1
 
 
 @wp.kernel(enable_backward=False)
@@ -409,14 +429,22 @@ def gameplay_v3_track_tick(
     control_max_distance: wp.array(dtype=wp.float32),
     control_max_relative_speed: wp.array(dtype=wp.float32),
     control_dodge_ticks: wp.array(dtype=wp.int32),
+    control_dodge_captured: wp.array(dtype=wp.int32),
     control_dodge_max_distance: wp.array(dtype=wp.float32),
     control_dodge_max_relative_speed: wp.array(dtype=wp.float32),
+    opponent_touch_latched: wp.array(dtype=wp.int32),
+    recent_opponent_contact_tick: wp.array(dtype=wp.int32),
+    recent_opponent_contact_ball_position: wp.array(dtype=wp.vec3),
     pending_active: wp.array(dtype=wp.int32),
     pending_age: wp.array(dtype=wp.int32),
     pending_recognized: wp.array(dtype=wp.int32),
     pending_controlled: wp.array(dtype=wp.int32),
     pending_contest: wp.array(dtype=wp.int32),
     pending_power: wp.array(dtype=wp.int32),
+    pending_control_release_captured: wp.array(dtype=wp.int32),
+    pending_self_contact_tick: wp.array(dtype=wp.int32),
+    pending_opponent_contact_tick: wp.array(dtype=wp.int32),
+    pending_control_release_tick: wp.array(dtype=wp.int32),
     pending_ball_position: wp.array(dtype=wp.vec3),
     pending_features: wp.array(dtype=wp.float32),
     interval_bad_flip: wp.array(dtype=wp.int32),
@@ -427,6 +455,9 @@ def gameplay_v3_track_tick(
     outcome_evidence_count: wp.array(dtype=wp.int32),
     outcome_evidence_outcome: wp.array(dtype=wp.int32),
     outcome_evidence_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_self_contact_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_opponent_contact_tick: wp.array(dtype=wp.int32),
+    outcome_evidence_control_release_tick: wp.array(dtype=wp.int32),
     outcome_evidence_features: wp.array(dtype=wp.float32),
 ):
     car = wp.tid()
@@ -493,6 +524,7 @@ def gameplay_v3_track_tick(
         # the relation during that rotation would erase genuine flick setup
         # before its terminal contact can be classified.
         control_dodge_ticks[car] = control_ticks[car]
+        control_dodge_captured[car] = 1
         control_dodge_max_distance[car] = control_max_distance[car]
         control_dodge_max_relative_speed[car] = control_max_relative_speed[car]
         air_ticks = wp.int32(wp.floor(dash_previous_air_time[car] * 120.0 + 0.5))
@@ -538,9 +570,7 @@ def gameplay_v3_track_tick(
                     surface = 3
             elif abs_nz <= SURFACE_WALL_NZ:
                 surface = 1
-            dash_surface_total[car * 4 + surface] = (
-                dash_surface_total[car * 4 + surface] + 1
-            )
+            dash_surface_total[car * 4 + surface] = dash_surface_total[car * 4 + surface] + 1
             if zap_stage[car] == 3:
                 zap_total[car] = zap_total[car] + 1
                 zap_stage[car] = 0
@@ -596,14 +626,12 @@ def gameplay_v3_track_tick(
     ):
         reset_pending_body[car] = support_body
         reset_pending_preflip[car] = wp.int32(
-            reset_previous_has_flipped[car] != 0
-            or reset_previous_has_double_jumped[car] != 0
+            reset_previous_has_flipped[car] != 0 or reset_previous_has_double_jumped[car] != 0
         )
     reset_completed_preflip = False
     pending_body = reset_pending_body[car]
-    pending_still_supported = (
-        (pending_body == 1 and ball_support >= 3)
-        or (pending_body == 2 and car_support >= 3)
+    pending_still_supported = (pending_body == 1 and ball_support >= 3) or (
+        pending_body == 2 and car_support >= 3
     )
     if pending_body != 0 and not pending_still_supported:
         if untimed != 0 and world_support == 0 and new_jump == 0:
@@ -637,6 +665,11 @@ def gameplay_v3_track_tick(
     other_reports = car_b_hit[env] if local == 0 else car_a_hit[env]
     touch_onset = reports != 0 and v3_touch_latched[car] == 0
     v3_touch_latched[car] = wp.int32(reports != 0)
+    opponent_touch_onset = other_reports != 0 and opponent_touch_latched[car] == 0
+    opponent_touch_latched[car] = wp.int32(other_reports != 0)
+    if opponent_touch_onset:
+        recent_opponent_contact_tick[car] = tick
+        recent_opponent_contact_ball_position[car] = ball_pos[env]
     distance = wp.length(ball_pos[env] - car_pos[car])
     relative_speed = wp.length(ball_vel[env] - car_vel[car])
 
@@ -644,25 +677,50 @@ def gameplay_v3_track_tick(
     # considered.  This preserves exactly-once outcomes while permitting a
     # separated re-contact to create a new candidate.
     if pending_active[car] != 0:
+        feature_base = car * FLIP_CONTACT_FEATURE_COUNT
+        candidate_age = tick - pending_self_contact_tick[car]
         if (
-            other_reports != 0
+            opponent_touch_onset
+            and candidate_age <= CONTEST_CONTACT_WINDOW_TICKS
             and wp.length(ball_pos[env] - pending_ball_position[car])
             <= CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX
         ):
             pending_contest[car] = 1
+            pending_opponent_contact_tick[car] = tick
+            pending_features[feature_base + 11] = float(tick - pending_self_contact_tick[car])
+            pending_features[feature_base + 12] = wp.length(
+                ball_pos[env] - pending_ball_position[car]
+            )
+        if (
+            pending_controlled[car] != 0
+            and pending_control_release_captured[car] == 0
+            and candidate_age > 0
+            and candidate_age <= CONTROL_RELEASE_WINDOW_TICKS
+        ):
+            release_direction = _safe_unit(ball_pos[env] - car_pos[car])
+            release_outward_speed = wp.dot(ball_vel[env] - car_vel[car], release_direction)
+            if release_outward_speed > 1.0:
+                pending_control_release_captured[car] = 1
+                pending_control_release_tick[car] = tick
+                pending_features[feature_base + 13] = distance
+                pending_features[feature_base + 14] = release_outward_speed
+                pending_features[feature_base + 15] = float(candidate_age)
         pending_age[car] = pending_age[car] + 1
-        if pending_age[car] >= CONTEST_CONTACT_WINDOW_TICKS or touch_onset:
+        if pending_age[car] >= FLIP_CONTACT_RESOLUTION_WINDOW_TICKS or touch_onset:
             _resolve_flip_candidate(
                 car,
                 env,
                 tick,
-                distance,
                 evidence_capacity,
                 pending_active,
                 pending_recognized,
                 pending_controlled,
                 pending_contest,
                 pending_power,
+                pending_control_release_captured,
+                pending_self_contact_tick,
+                pending_opponent_contact_tick,
+                pending_control_release_tick,
                 pending_features,
                 interval_bad_flip,
                 interval_exemptions,
@@ -671,6 +729,9 @@ def gameplay_v3_track_tick(
                 outcome_evidence_count,
                 outcome_evidence_outcome,
                 outcome_evidence_tick,
+                outcome_evidence_self_contact_tick,
+                outcome_evidence_opponent_contact_tick,
+                outcome_evidence_control_release_tick,
                 outcome_evidence_features,
             )
 
@@ -680,9 +741,7 @@ def gameplay_v3_track_tick(
             control_max_relative_speed[car] = relative_speed
         control_ticks[car] = control_ticks[car] + 1
         control_max_distance[car] = wp.max(control_max_distance[car], distance)
-        control_max_relative_speed[car] = wp.max(
-            control_max_relative_speed[car], relative_speed
-        )
+        control_max_relative_speed[car] = wp.max(control_max_relative_speed[car], relative_speed)
     elif reports == 0:
         control_ticks[car] = 0
         control_max_distance[car] = 0.0
@@ -692,9 +751,7 @@ def gameplay_v3_track_tick(
         legitimate_touch_total[car] = legitimate_touch_total[car] + 1
         torque = flip_rel_torque[car]
         active_directional_dodge = (
-            is_flipping[car] != 0
-            and has_flipped[car] != 0
-            and wp.length(torque) > 0.25
+            is_flipping[car] != 0 and has_flipped[car] != 0 and wp.length(torque) > 0.25
         )
         if active_directional_dodge:
             flip_touch_total[car] = flip_touch_total[car] + 1
@@ -705,21 +762,13 @@ def gameplay_v3_track_tick(
                 car_b_pre_velocity_bt[env] if local == 0 else car_a_pre_velocity_bt[env]
             )
             pre_ball_velocity_bt = (
-                car_a_pre_ball_velocity_bt[env]
-                if local == 0
-                else car_b_pre_ball_velocity_bt[env]
+                car_a_pre_ball_velocity_bt[env] if local == 0 else car_b_pre_ball_velocity_bt[env]
             )
             pre_angular = (
-                car_a_pre_angular_velocity[env]
-                if local == 0
-                else car_b_pre_angular_velocity[env]
+                car_a_pre_angular_velocity[env] if local == 0 else car_b_pre_angular_velocity[env]
             )
-            point_bt = (
-                car_a_contact_point_bt[env] if local == 0 else car_b_contact_point_bt[env]
-            )
-            ball_delta_vector = (
-                car_a_ball_delta_v[env] if local == 0 else car_b_ball_delta_v[env]
-            )
+            point_bt = car_a_contact_point_bt[env] if local == 0 else car_b_contact_point_bt[env]
+            ball_delta_vector = car_a_ball_delta_v[env] if local == 0 else car_b_ball_delta_v[env]
             pre_velocity = pre_velocity_bt * 50.0
             opponent_pre_velocity = opponent_pre_velocity_bt * 50.0
             pre_ball_velocity = pre_ball_velocity_bt * 50.0
@@ -735,9 +784,7 @@ def gameplay_v3_track_tick(
             self_direction = _safe_unit(ball_pos[env] - car_pos[car])
             opponent_direction = _safe_unit(ball_pos[env] - car_pos[other])
             self_closing = wp.dot(pre_velocity - pre_ball_velocity, self_direction)
-            opponent_closing = wp.dot(
-                opponent_pre_velocity - pre_ball_velocity, opponent_direction
-            )
+            opponent_closing = wp.dot(opponent_pre_velocity - pre_ball_velocity, opponent_direction)
             opponent_distance = wp.length(ball_pos[env] - car_pos[other])
             self_time = distance / wp.max(self_closing, 1.0e-6)
             opponent_time = opponent_distance / wp.max(opponent_closing, 1.0e-6)
@@ -757,7 +804,7 @@ def gameplay_v3_track_tick(
             captured_control_ticks = control_ticks[car]
             captured_control_distance = control_max_distance[car]
             captured_control_relative_speed = control_max_relative_speed[car]
-            if control_dodge_ticks[car] > 0:
+            if control_dodge_captured[car] != 0:
                 captured_control_ticks = control_dodge_ticks[car]
                 captured_control_distance = control_dodge_max_distance[car]
                 captured_control_relative_speed = control_dodge_max_relative_speed[car]
@@ -766,16 +813,31 @@ def gameplay_v3_track_tick(
                 and captured_control_distance <= CONTROL_DISTANCE_MAX
                 and captured_control_relative_speed <= CONTROL_RELATIVE_SPEED_MAX
             )
+            recent_tick = recent_opponent_contact_tick[car]
+            recent_age = tick - recent_tick
+            recent_displacement = wp.length(
+                ball_pos[env] - recent_opponent_contact_ball_position[car]
+            )
+            adjacent_recent_opponent_contact = (
+                recent_tick >= 0
+                and recent_age >= 0
+                and recent_age <= CONTEST_CONTACT_WINDOW_TICKS
+                and recent_displacement <= CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX
+            )
             pending_active[car] = 1
             pending_age[car] = 0
-            pending_recognized[car] = wp.int32(
-                recognized_this_contact or reset_completed_preflip
-            )
+            pending_recognized[car] = wp.int32(recognized_this_contact or reset_completed_preflip)
             pending_controlled[car] = wp.int32(controlled)
-            pending_contest[car] = wp.int32(other_reports != 0 or convergence)
+            pending_contest[car] = wp.int32(adjacent_recent_opponent_contact or convergence)
             pending_power[car] = wp.int32(power)
+            pending_control_release_captured[car] = 0
+            pending_self_contact_tick[car] = tick
+            pending_opponent_contact_tick[car] = wp.int32(
+                recent_tick if adjacent_recent_opponent_contact else -1
+            )
+            pending_control_release_tick[car] = -1
             pending_ball_position[car] = ball_pos[env]
-            feature_base = car * 8
+            feature_base = car * FLIP_CONTACT_FEATURE_COUNT
             pending_features[feature_base] = opponent_distance
             pending_features[feature_base + 1] = self_closing
             pending_features[feature_base + 2] = opponent_closing
@@ -784,10 +846,22 @@ def gameplay_v3_track_tick(
             pending_features[feature_base + 5] = float(captured_control_ticks)
             pending_features[feature_base + 6] = captured_control_distance
             pending_features[feature_base + 7] = captured_control_relative_speed
+            pending_features[feature_base + 8] = total_closing
+            pending_features[feature_base + 9] = rotational
+            pending_features[feature_base + 10] = rotational_share
+            pending_features[feature_base + 11] = 999.0
+            pending_features[feature_base + 12] = 9999.0
+            if adjacent_recent_opponent_contact:
+                pending_features[feature_base + 11] = wp.abs(float(recent_tick - tick))
+                pending_features[feature_base + 12] = recent_displacement
+            pending_features[feature_base + 13] = 0.0
+            pending_features[feature_base + 14] = 0.0
+            pending_features[feature_base + 15] = -1.0
         control_ticks[car] = 0
         control_max_distance[car] = 0.0
         control_max_relative_speed[car] = 0.0
         control_dodge_ticks[car] = 0
+        control_dodge_captured[car] = 0
         control_dodge_max_distance[car] = 0.0
         control_dodge_max_relative_speed[car] = 0.0
 
@@ -825,9 +899,7 @@ def gameplay_v3_compose_reward(
     paid_orange = wp.int32(0)
     for local in range(2):
         car = car_base + local
-        remaining = wp.max(
-            0, GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS - mechanics_paid_episode[car]
-        )
+        remaining = wp.max(0, GAMEPLAY_V3_MAX_PAID_MECHANICS_EVENTS - mechanics_paid_episode[car])
         paid = wp.min(interval_requested[car], remaining)
         interval_paid[car] = paid
         suppressed = interval_requested[car] - paid
@@ -851,9 +923,7 @@ def gameplay_v3_compose_reward(
         else:
             paid_orange = paid
 
-    mechanics = GAMEPLAY_V3_MECHANICS_EVENT_REWARD * float(
-        paid_blue - paid_orange
-    )
+    mechanics = GAMEPLAY_V3_MECHANICS_EVENT_REWARD * float(paid_blue - paid_orange)
     bad_flip = GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY * float(
         interval_bad_flip[car_base] - interval_bad_flip[car_base + 1]
     )
@@ -1000,14 +1070,21 @@ def gameplay_v3_reset_source_state(
     control_max_distance: wp.array(dtype=wp.float32),
     control_max_relative_speed: wp.array(dtype=wp.float32),
     control_dodge_ticks: wp.array(dtype=wp.int32),
+    control_dodge_captured: wp.array(dtype=wp.int32),
     control_dodge_max_distance: wp.array(dtype=wp.float32),
     control_dodge_max_relative_speed: wp.array(dtype=wp.float32),
+    opponent_touch_latched: wp.array(dtype=wp.int32),
+    recent_opponent_contact_tick: wp.array(dtype=wp.int32),
     pending_active: wp.array(dtype=wp.int32),
     pending_age: wp.array(dtype=wp.int32),
     pending_recognized: wp.array(dtype=wp.int32),
     pending_controlled: wp.array(dtype=wp.int32),
     pending_contest: wp.array(dtype=wp.int32),
     pending_power: wp.array(dtype=wp.int32),
+    pending_control_release_captured: wp.array(dtype=wp.int32),
+    pending_self_contact_tick: wp.array(dtype=wp.int32),
+    pending_opponent_contact_tick: wp.array(dtype=wp.int32),
+    pending_control_release_tick: wp.array(dtype=wp.int32),
     mechanics_paid_episode: wp.array(dtype=wp.int32),
     budget_exhausted_latched: wp.array(dtype=wp.int32),
 ):
@@ -1043,14 +1120,21 @@ def gameplay_v3_reset_source_state(
     control_max_distance[car] = 0.0
     control_max_relative_speed[car] = 0.0
     control_dodge_ticks[car] = 0
+    control_dodge_captured[car] = 0
     control_dodge_max_distance[car] = 0.0
     control_dodge_max_relative_speed[car] = 0.0
+    opponent_touch_latched[car] = 0
+    recent_opponent_contact_tick[car] = -1
     pending_active[car] = 0
     pending_age[car] = 0
     pending_recognized[car] = 0
     pending_controlled[car] = 0
     pending_contest[car] = 0
     pending_power[car] = 0
+    pending_control_release_captured[car] = 0
+    pending_self_contact_tick[car] = -1
+    pending_opponent_contact_tick[car] = -1
+    pending_control_release_tick[car] = -1
     mechanics_paid_episode[car] = 0
     budget_exhausted_latched[car] = 0
 
@@ -1190,9 +1274,7 @@ class Rival2GameplayV3State:
             # prevents all access.  Two constant-size sentinels replace the
             # per-car/per-event diagnostic buffers in production.
             self._disabled_evidence_int = wp.zeros(1, dtype=wp.int32, device=self.device)
-            self._disabled_evidence_float = wp.zeros(
-                1, dtype=wp.float32, device=self.device
-            )
+            self._disabled_evidence_float = wp.zeros(1, dtype=wp.float32, device=self.device)
             self.evidence_count = self._disabled_evidence_int
             self.evidence_family = self._disabled_evidence_int
             self.evidence_subtype = self._disabled_evidence_int
@@ -1246,16 +1328,24 @@ class Rival2GameplayV3State:
         floats("control_max_distance", self.car_count)
         floats("control_max_relative_speed", self.car_count)
         ints("control_dodge_ticks", self.car_count)
+        ints("control_dodge_captured", self.car_count)
         floats("control_dodge_max_distance", self.car_count)
         floats("control_dodge_max_relative_speed", self.car_count)
+        ints("opponent_touch_latched", self.car_count)
+        ints("recent_opponent_contact_tick", self.car_count, fill=-1)
+        vectors("recent_opponent_contact_ball_position", self.car_count)
         ints("pending_active", self.car_count)
         ints("pending_age", self.car_count)
         ints("pending_recognized", self.car_count)
         ints("pending_controlled", self.car_count)
         ints("pending_contest", self.car_count)
         ints("pending_power", self.car_count)
+        ints("pending_control_release_captured", self.car_count)
+        ints("pending_self_contact_tick", self.car_count, fill=-1)
+        ints("pending_opponent_contact_tick", self.car_count, fill=-1)
+        ints("pending_control_release_tick", self.car_count, fill=-1)
         vectors("pending_ball_position", self.car_count)
-        floats("pending_features", self.car_count * 8)
+        floats("pending_features", self.car_count * FLIP_CONTACT_FEATURE_COUNT)
         ints("interval_bad_flip", self.car_count)
         ints("interval_exemptions", self.car_count * 6)
         ints("outcome_total", self.car_count * 6)
@@ -1266,11 +1356,20 @@ class Rival2GameplayV3State:
             outcome_records = self.car_count * self.evidence_capacity
             ints("outcome_evidence_outcome", outcome_records)
             ints("outcome_evidence_tick", outcome_records, fill=-1)
-            floats("outcome_evidence_features", outcome_records * 8)
+            ints("outcome_evidence_self_contact_tick", outcome_records, fill=-1)
+            ints("outcome_evidence_opponent_contact_tick", outcome_records, fill=-1)
+            ints("outcome_evidence_control_release_tick", outcome_records, fill=-1)
+            floats(
+                "outcome_evidence_features",
+                outcome_records * FLIP_CONTACT_FEATURE_COUNT,
+            )
         else:
             self.outcome_evidence_count = self._disabled_evidence_int
             self.outcome_evidence_outcome = self._disabled_evidence_int
             self.outcome_evidence_tick = self._disabled_evidence_int
+            self.outcome_evidence_self_contact_tick = self._disabled_evidence_int
+            self.outcome_evidence_opponent_contact_tick = self._disabled_evidence_int
+            self.outcome_evidence_control_release_tick = self._disabled_evidence_int
             self.outcome_evidence_features = self._disabled_evidence_float
 
         floats("mechanics_component", self.num_worlds)
@@ -1505,14 +1604,22 @@ class Rival2GameplayV3State:
                 self.control_max_distance,
                 self.control_max_relative_speed,
                 self.control_dodge_ticks,
+                self.control_dodge_captured,
                 self.control_dodge_max_distance,
                 self.control_dodge_max_relative_speed,
+                self.opponent_touch_latched,
+                self.recent_opponent_contact_tick,
+                self.recent_opponent_contact_ball_position,
                 self.pending_active,
                 self.pending_age,
                 self.pending_recognized,
                 self.pending_controlled,
                 self.pending_contest,
                 self.pending_power,
+                self.pending_control_release_captured,
+                self.pending_self_contact_tick,
+                self.pending_opponent_contact_tick,
+                self.pending_control_release_tick,
                 self.pending_ball_position,
                 self.pending_features,
                 self.interval_bad_flip,
@@ -1523,6 +1630,9 @@ class Rival2GameplayV3State:
                 self.outcome_evidence_count,
                 self.outcome_evidence_outcome,
                 self.outcome_evidence_tick,
+                self.outcome_evidence_self_contact_tick,
+                self.outcome_evidence_opponent_contact_tick,
+                self.outcome_evidence_control_release_tick,
                 self.outcome_evidence_features,
             ],
             device=self.device,
@@ -1646,14 +1756,21 @@ class Rival2GameplayV3State:
                 self.control_max_distance,
                 self.control_max_relative_speed,
                 self.control_dodge_ticks,
+                self.control_dodge_captured,
                 self.control_dodge_max_distance,
                 self.control_dodge_max_relative_speed,
+                self.opponent_touch_latched,
+                self.recent_opponent_contact_tick,
                 self.pending_active,
                 self.pending_age,
                 self.pending_recognized,
                 self.pending_controlled,
                 self.pending_contest,
                 self.pending_power,
+                self.pending_control_release_captured,
+                self.pending_self_contact_tick,
+                self.pending_opponent_contact_tick,
+                self.pending_control_release_tick,
                 self.mechanics_paid_episode,
                 self.budget_exhausted_latched,
             ],
@@ -1674,7 +1791,21 @@ def default_threshold_path() -> Path:
 __all__ = [
     "CANONICAL_MECHANIC_COUNT",
     "CANONICAL_MECHANIC_NAMES",
+    "CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX",
     "CONTEST_CONTACT_WINDOW_TICKS",
+    "CONTEST_OPPONENT_CLOSING_SPEED_MIN",
+    "CONTEST_OPPONENT_DISTANCE_MAX",
+    "CONTEST_SELF_CLOSING_SPEED_MIN",
+    "CONTEST_TIME_TO_BALL_DELTA_MAX",
+    "CONTROL_DISTANCE_MAX",
+    "CONTROL_HISTORY_TICKS_MIN",
+    "CONTROL_RELATIVE_SPEED_MAX",
+    "CONTROL_RELEASE_BALL_DELTA_V_MIN",
+    "CONTROL_RELEASE_DISTANCE_MIN",
+    "CONTROL_RELEASE_OUTWARD_SPEED_MIN",
+    "CONTROL_RELEASE_WINDOW_TICKS",
+    "FLIP_CONTACT_FEATURE_COUNT",
+    "FLIP_CONTACT_RESOLUTION_WINDOW_TICKS",
     "OUTCOME_NAMES",
     "Rival2GameplayV3State",
     "contest_convergence_exempt",

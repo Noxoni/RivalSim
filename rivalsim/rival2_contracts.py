@@ -536,30 +536,40 @@ REWARD_GAMEPLAY_V3_CONTRACT: Final = {
             "new legitimate car-ball contact onset during active directional dodge: "
             "is_flipping and has_flipped and non-zero directional flip_rel_torque"
         ),
-        "pending_window_ticks_at_120_hz": 8,
-        "physical_exemption_classifier_v1": {
-            "corpus": "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V1",
+        "pending_window_ticks_at_120_hz": 5,
+        "physical_exemption_classifier_v2": {
+            "corpus": "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V2",
             "contest": {
-                "association_ball_displacement_max": 86.60006713867188,
-                "opponent_distance_max": 430.46632385253906,
-                "self_closing_speed_min": 735.8017120361328,
-                "opponent_closing_speed_min": 587.1069793701172,
-                "time_to_ball_delta_max": 0.23604875229838973,
+                "association_window_ticks_at_120_hz": 3,
+                "association_ball_displacement_max": 26.472905158996582,
+                "opponent_distance_max": 436.1062316894531,
+                "self_closing_speed_min": 727.6748657226562,
+                "opponent_closing_speed_min": 590.4700012207031,
+                "time_to_ball_delta_max": 0.23664760693567713,
                 "convergence_velocity_sample": "authoritative_pre_contact",
+                "contact_order": "order-neutral; opponent-before and opponent-after are equivalent",
+                "recent_opponent_contact_state": (
+                    "per-car legitimate opponent-contact onset tick and ball position"
+                ),
             },
             "dodge_powered_contact": {
-                "total_closing_speed_min": 95.32137298583984,
-                "rotational_closing_speed_min": 163.89701080322266,
-                "rotational_share_min": 0.25463866470010044,
-                "ball_delta_v_min": 303.62255859375,
+                "total_closing_speed_min": 95.31548309326172,
+                "rotational_closing_speed_min": 164.38546752929688,
+                "rotational_share_min": 0.2549042037005253,
+                "ball_delta_v_min": 303.5580596923828,
             },
             "controlled_flick": {
-                "control_history_ticks_min": 6,
-                "control_distance_max": 241.1681137084961,
-                "control_relative_speed_max": 428.43893575668335,
-                "release_distance_min": 77.31824493408203,
-                "release_ball_delta_v_min": 163.416259765625,
+                "control_history_ticks_min": 5,
+                "control_distance_max": 278.92047119140625,
+                "control_relative_speed_max": 853.1399946212769,
+                "release_window_ticks_at_120_hz": 5,
+                "release_distance_min": 76.1766586303711,
+                "release_outward_speed_min": 111.21610260009766,
+                "release_ball_delta_v_min": 163.4154052734375,
                 "control_snapshot": "frozen_at_directional_dodge_onset",
+                "release_snapshot": (
+                    "first post-contact outward-separation transition within release window"
+                ),
                 "positive_reward": 0.0,
             },
         },

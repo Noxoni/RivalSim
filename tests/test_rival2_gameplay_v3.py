@@ -26,6 +26,9 @@ from rivalsim.gameplay_v3 import (
     CONTROL_RELATIVE_SPEED_MAX,
     CONTROL_RELEASE_BALL_DELTA_V_MIN,
     CONTROL_RELEASE_DISTANCE_MIN,
+    CONTROL_RELEASE_OUTWARD_SPEED_MIN,
+    CONTROL_RELEASE_WINDOW_TICKS,
+    FLIP_CONTACT_RESOLUTION_WINDOW_TICKS,
     OUTCOME_EXEMPT_CONTESTED_50,
     OUTCOME_EXEMPT_CONTROLLED_FLICK,
     OUTCOME_EXEMPT_POWER_CONTACT,
@@ -69,7 +72,7 @@ from rivalsim.state import StateSnapshot
 
 EXPECTED_V1_HASH = "48AAC000B97D2652507F677184A3FE4F0A3A86CED136B680C933EFF33CD9F072"
 EXPECTED_V2_HASH = "4073E29C1013458D5784435061FE47C639525BE37E8CD519783889C69BA87D41"
-EXPECTED_V3_HASH = "AABCA03BEBCBFC2E74EE446452781F60AC43D8C3631151BDCB7E15D0FAE13508"
+EXPECTED_V3_HASH = "174D94E19B3F053E250147F98835C18CF65260A82E23B6E58F234F6E81E0D4E7"
 
 
 def _collision_root() -> Path | None:
@@ -102,12 +105,19 @@ def test_v3_contract_identity_and_historical_hashes_are_frozen() -> None:
 
 
 def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
-    assert CONTEST_CONTACT_WINDOW_TICKS == 8
-    assert pytest.approx(86.60006713867188) == CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX
-    assert pytest.approx(430.46632385253906) == CONTEST_OPPONENT_DISTANCE_MAX
-    assert pytest.approx(735.8017120361328) == CONTEST_SELF_CLOSING_SPEED_MIN
-    assert pytest.approx(587.1069793701172) == CONTEST_OPPONENT_CLOSING_SPEED_MIN
-    assert pytest.approx(0.23604875229838973) == CONTEST_TIME_TO_BALL_DELTA_MAX
+    assert CONTEST_CONTACT_WINDOW_TICKS == 3
+    assert CONTROL_RELEASE_WINDOW_TICKS == 5
+    assert FLIP_CONTACT_RESOLUTION_WINDOW_TICKS == 5
+    assert pytest.approx(26.472905158996582) == CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX
+    assert pytest.approx(436.1062316894531) == CONTEST_OPPONENT_DISTANCE_MAX
+    assert pytest.approx(727.6748657226562) == CONTEST_SELF_CLOSING_SPEED_MIN
+    assert pytest.approx(590.4700012207031) == CONTEST_OPPONENT_CLOSING_SPEED_MIN
+    assert pytest.approx(0.23664760693567713) == CONTEST_TIME_TO_BALL_DELTA_MAX
+    classifier = REWARD_GAMEPLAY_V3_CONTRACT["unnecessary_flip_through_contact"][
+        "physical_exemption_classifier_v2"
+    ]
+    assert classifier["contest"]["contact_order"].startswith("order-neutral")
+    assert classifier["controlled_flick"]["release_window_ticks_at_120_hz"] == 5
     assert contest_convergence_exempt(
         opponent_distance=CONTEST_OPPONENT_DISTANCE_MAX,
         self_closing_speed=CONTEST_SELF_CLOSING_SPEED_MIN,
@@ -143,6 +153,7 @@ def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
         control_max_distance=CONTROL_DISTANCE_MAX,
         control_max_relative_speed=CONTROL_RELATIVE_SPEED_MAX,
         release_distance=CONTROL_RELEASE_DISTANCE_MIN,
+        release_outward_speed=CONTROL_RELEASE_OUTWARD_SPEED_MIN,
         ball_delta_v=CONTROL_RELEASE_BALL_DELTA_V_MIN,
     )
     assert not controlled_flick_exempt(
@@ -150,38 +161,54 @@ def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
         control_max_distance=100.0,
         control_max_relative_speed=100.0,
         release_distance=300.0,
+        release_outward_speed=CONTROL_RELEASE_OUTWARD_SPEED_MIN,
         ball_delta_v=200.0,
     )
-    assert primary_flip_outcome(
-        recognized_mechanic=True,
-        controlled_flick=True,
-        contested_50=True,
-        power_contact=True,
-    ) == OUTCOME_EXEMPT_RECOGNIZED_MECHANIC
-    assert primary_flip_outcome(
-        recognized_mechanic=False,
-        controlled_flick=True,
-        contested_50=True,
-        power_contact=True,
-    ) == OUTCOME_EXEMPT_CONTROLLED_FLICK
-    assert primary_flip_outcome(
-        recognized_mechanic=False,
-        controlled_flick=False,
-        contested_50=True,
-        power_contact=True,
-    ) == OUTCOME_EXEMPT_CONTESTED_50
-    assert primary_flip_outcome(
-        recognized_mechanic=False,
-        controlled_flick=False,
-        contested_50=False,
-        power_contact=True,
-    ) == OUTCOME_EXEMPT_POWER_CONTACT
-    assert primary_flip_outcome(
-        recognized_mechanic=False,
-        controlled_flick=False,
-        contested_50=False,
-        power_contact=False,
-    ) == OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
+    assert (
+        primary_flip_outcome(
+            recognized_mechanic=True,
+            controlled_flick=True,
+            contested_50=True,
+            power_contact=True,
+        )
+        == OUTCOME_EXEMPT_RECOGNIZED_MECHANIC
+    )
+    assert (
+        primary_flip_outcome(
+            recognized_mechanic=False,
+            controlled_flick=True,
+            contested_50=True,
+            power_contact=True,
+        )
+        == OUTCOME_EXEMPT_CONTROLLED_FLICK
+    )
+    assert (
+        primary_flip_outcome(
+            recognized_mechanic=False,
+            controlled_flick=False,
+            contested_50=True,
+            power_contact=True,
+        )
+        == OUTCOME_EXEMPT_CONTESTED_50
+    )
+    assert (
+        primary_flip_outcome(
+            recognized_mechanic=False,
+            controlled_flick=False,
+            contested_50=False,
+            power_contact=True,
+        )
+        == OUTCOME_EXEMPT_POWER_CONTACT
+    )
+    assert (
+        primary_flip_outcome(
+            recognized_mechanic=False,
+            controlled_flick=False,
+            contested_50=False,
+            power_contact=False,
+        )
+        == OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
+    )
 
 
 @pytest.mark.skipif(not wp.is_cuda_available(), reason="CUDA required")
@@ -189,8 +216,10 @@ def test_v3_dash_reset_production_state_machine_source_exact() -> None:
     collision_root = _collision_root()
     if collision_root is None:
         pytest.skip("RocketSim collision meshes unavailable")
-    script = Path(__file__).resolve().parents[1] / "benchmarks" / (
-        "run_rival2_gameplay_v3_validation_correction.py"
+    script = (
+        Path(__file__).resolve().parents[1]
+        / "benchmarks"
+        / ("run_rival2_gameplay_v3_validation_correction.py")
     )
     output_dir = Path(".pytest_cache/rival2_gameplay_v3_source_exact")
     subprocess.run(
@@ -206,9 +235,7 @@ def test_v3_dash_reset_production_state_machine_source_exact() -> None:
         ],
         check=True,
     )
-    evidence = json.loads(
-        (output_dir / "dash_reset_source_exact.json").read_text(encoding="utf-8")
-    )
+    evidence = json.loads((output_dir / "dash_reset_source_exact.json").read_text(encoding="utf-8"))
     assert evidence["verdict"] == "PASS", evidence["failed"]
     assert evidence["case_count"] == 12
     assert evidence["passed"] == 12
@@ -231,12 +258,15 @@ def test_bad_flip_candidate_is_same_contact_active_directional_dodge_only(
     torque: float,
     expected: bool,
 ) -> None:
-    assert flip_contact_candidate(
-        touch_onset=touch,
-        is_flipping=flipping,
-        has_flipped=flipped,
-        directional_torque_norm=torque,
-    ) is expected
+    assert (
+        flip_contact_candidate(
+            touch_onset=touch,
+            is_flipping=flipping,
+            has_flipped=flipped,
+            directional_torque_norm=torque,
+        )
+        is expected
+    )
 
 
 def test_v3_reward_compose_budget_is_integer_exact_independent_and_zero_sum() -> None:

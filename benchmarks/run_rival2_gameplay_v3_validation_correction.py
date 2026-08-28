@@ -47,6 +47,8 @@ from benchmarks.run_rival2_mechanics_calibration import (
 from rivalsim import CompleteWorldSim, StateSnapshot
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
 from rivalsim.controls import ControlBatch
+from rivalsim.gameplay_v3 import FLIP_CONTACT_FEATURE_COUNT
+from rivalsim.kernels.rival2 import REWARD_MODE_GAMEPLAY_V3
 from rivalsim.rival2_contracts import (
     ACTION_CONTRACT_HASH,
     EPISODE_CONTRACT_HASH,
@@ -55,18 +57,19 @@ from rivalsim.rival2_contracts import (
     REWARD_GAMEPLAY_V3_CONTRACT_HASH,
     RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
 )
-from rivalsim.rival2_env import Rival2Env
+from rivalsim.rival2_env import Rival2Env, Rival2WorldSim
 
-STARTING_HEAD = "7e6356fc2ebeffdec4d76bf458df840de71ead34"
-PRIOR_ACCEPTED_EVIDENCE = "00a4865400291a5ff0a34925a966c0963f55d963"
-SEED = 2026082801
+STARTING_HEAD = "296095d478693bd11def97963827763cd34fad0b"
+PRIOR_ACCEPTED_EVIDENCE = "5efa83f331855ae86a8076b7c0c1a9dc8fae88c4"
+SEED = 2026082804
 DERIVATION_PER_CLASS = 16
 HELDOUT_PER_CLASS = 8
 CLASS_NAMES = ("positive", "near_miss", "ordinary_control")
 CLASSIFIERS = ("contest", "power_contact", "controlled_flick")
-OUTPUT_DIR = Path("results/rival2/gameplay_v3_validation_correction_v1")
-CORPUS_FORMAT = "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V1"
-DERIVATION_FORMAT = "RIVAL2_GAMEPLAY_V3_CLASSIFIER_DERIVATION_V1"
+CONTROL_RELEASE_SEARCH_MAX_TICKS = 8
+OUTPUT_DIR = Path("results/rival2/gameplay_v3_validation_correction_v2")
+CORPUS_FORMAT = "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V2"
+DERIVATION_FORMAT = "RIVAL2_GAMEPLAY_V3_CLASSIFIER_DERIVATION_V2"
 
 
 def _git(*args: str) -> str:
@@ -112,9 +115,7 @@ def _provenance() -> dict[str, Any]:
         "source_commit": _git("rev-parse", "HEAD"),
         "starting_handoff_commit": STARTING_HEAD,
         "prior_accepted_evidence_commit": PRIOR_ACCEPTED_EVIDENCE,
-        "simulator_source_sha256": {
-            path: _sha256(REPOSITORY_ROOT / path) for path in source_paths
-        },
+        "simulator_source_sha256": {path: _sha256(REPOSITORY_ROOT / path) for path in source_paths},
         "contract_hashes": {
             "RIVAL2_OBS_V1": OBSERVATION_SCHEMA_HASH,
             "RIVAL2_ACTION_V1": ACTION_CONTRACT_HASH,
@@ -149,8 +150,7 @@ def _rows(classifier: str, split: str) -> list[dict[str, Any]]:
                     ),
                     "seed": seed,
                     "initial_state_generator": (
-                        f"run_rival2_gameplay_v3_validation_correction.py::"
-                        f"_{classifier}_cases/v1"
+                        f"run_rival2_gameplay_v3_validation_correction.py::_{classifier}_cases/v2"
                     ),
                     "action_sequence_identity": "pending",
                     "scenario": {},
@@ -280,9 +280,7 @@ class DualTrace:
 
     def arrays(self) -> dict[str, np.ndarray]:
         return {
-            name: np.asarray(value)
-            for name, value in vars(self).items()
-            if isinstance(value, list)
+            name: np.asarray(value) for name, value in vars(self).items() if isinstance(value, list)
         }
 
 
@@ -315,11 +313,131 @@ def _run_dual(
     return trace.arrays()
 
 
+def _run_production_v3(
+    state: StateSnapshot,
+    ticks: int,
+    collision_root: str,
+    geometry: ArenaGeometry,
+    meshes: WarpArenaMeshes,
+    controller: Callable[[int, ControlBatch], None],
+) -> dict[str, np.ndarray]:
+    """Replay a physical batch through the production Gameplay V3 state machine."""
+
+    capacity = 4
+    sim = Rival2WorldSim(
+        state.num_envs,
+        collision_root,
+        initial=state,
+        geometry=geometry,
+        meshes=meshes,
+        auto_kickoff=False,
+        car_visitation_order="a_then_b",
+        reward_mode=REWARD_MODE_GAMEPLAY_V3,
+        v3_evidence_capacity=capacity,
+    )
+    for tick in range(ticks):
+        if tick % 4 == 0:
+            sim.begin_decision()
+        controls = ControlBatch.zeros(state.num_envs)
+        controller(tick, controls)
+        sim.set_controls(controls)
+        sim.step(1, synchronize=True)
+    detector = sim.gameplay_v3
+    assert detector is not None
+    worlds = state.num_envs
+    return {
+        "capacity": np.asarray(capacity),
+        "outcome_count": np.asarray(detector.outcome_evidence_count.numpy()).reshape(worlds, 2),
+        "outcome": np.asarray(detector.outcome_evidence_outcome.numpy()).reshape(
+            worlds, 2, capacity
+        ),
+        "resolution_tick": np.asarray(detector.outcome_evidence_tick.numpy()).reshape(
+            worlds, 2, capacity
+        ),
+        "self_contact_tick": np.asarray(
+            detector.outcome_evidence_self_contact_tick.numpy()
+        ).reshape(worlds, 2, capacity),
+        "opponent_contact_tick": np.asarray(
+            detector.outcome_evidence_opponent_contact_tick.numpy()
+        ).reshape(worlds, 2, capacity),
+        "control_release_tick": np.asarray(
+            detector.outcome_evidence_control_release_tick.numpy()
+        ).reshape(worlds, 2, capacity),
+        "features": np.asarray(detector.outcome_evidence_features.numpy()).reshape(
+            worlds, 2, capacity, FLIP_CONTACT_FEATURE_COUNT
+        ),
+        "outcome_total": np.asarray(detector.outcome_total.numpy()).reshape(worlds, 2, 6),
+        "exemption_flag_total": np.asarray(detector.exemption_flag_total.numpy()).reshape(
+            worlds, 2, 6
+        ),
+        "pending_active": np.asarray(detector.pending_active.numpy()).reshape(worlds, 2),
+        "pending_self_contact_tick": np.asarray(detector.pending_self_contact_tick.numpy()).reshape(
+            worlds, 2
+        ),
+        "impossible_total": np.asarray(detector.impossible_total.numpy()).reshape(worlds, 2),
+    }
+
+
+def _production_record(
+    runtime: dict[str, np.ndarray], index: int, physical_contact_tick: int
+) -> dict[str, Any]:
+    capacity = int(runtime["capacity"])
+    count = int(runtime["outcome_count"][index, 0])
+    if count > capacity:
+        raise RuntimeError(
+            f"production evidence capacity exceeded for world {index}: {count}>{capacity}"
+        )
+    selected = -1
+    for slot in range(count):
+        if int(runtime["self_contact_tick"][index, 0, slot]) == physical_contact_tick:
+            selected = slot
+            break
+    flags = runtime["exemption_flag_total"][index, 0]
+    record: dict[str, Any] = {
+        "candidate": selected >= 0,
+        "record_count": count,
+        "selected_record": selected,
+        "pending_after_replay": bool(runtime["pending_active"][index, 0]),
+        "pending_self_contact_tick_after_replay": int(
+            runtime["pending_self_contact_tick"][index, 0]
+        ),
+        "impossible_total": int(runtime["impossible_total"][index, 0]),
+        "exemption_flags": {
+            "recognized_mechanic": bool(flags[1]),
+            "controlled_flick": bool(flags[2]),
+            "contested_50": bool(flags[3]),
+            "power_contact": bool(flags[4]),
+        },
+        "outcome_totals": runtime["outcome_total"][index, 0].astype(int).tolist(),
+    }
+    if selected >= 0:
+        record.update(
+            {
+                "primary_outcome": int(runtime["outcome"][index, 0, selected]),
+                "resolution_tick": int(runtime["resolution_tick"][index, 0, selected]),
+                "self_contact_tick": int(runtime["self_contact_tick"][index, 0, selected]),
+                "opponent_contact_tick": int(runtime["opponent_contact_tick"][index, 0, selected]),
+                "control_release_tick": int(runtime["control_release_tick"][index, 0, selected]),
+                "features": runtime["features"][index, 0, selected].astype(float).tolist(),
+            }
+        )
+    else:
+        record.update(
+            {
+                "primary_outcome": 0,
+                "resolution_tick": -1,
+                "self_contact_tick": -1,
+                "opponent_contact_tick": -1,
+                "control_release_tick": -1,
+                "features": [],
+            }
+        )
+    return record
+
+
 def _onsets(mask: np.ndarray) -> np.ndarray:
     active = mask != 0
-    return np.flatnonzero(
-        active & ~np.concatenate((np.zeros(1, dtype=bool), active[:-1]))
-    )
+    return np.flatnonzero(active & ~np.concatenate((np.zeros(1, dtype=bool), active[:-1])))
 
 
 def _contest_cases(
@@ -339,55 +457,88 @@ def _contest_cases(
     dodge_pitch = np.full(count, -1.0, dtype=np.float32)
     for index, row in enumerate(rows):
         local = int(row["class_index"])
-        rng = np.random.default_rng(int(row["seed"]))
-        jitter = float(rng.uniform(-3.0, 3.0))
-        state.car_pos[index, 0] = (-310.0 - jitter, 0.0, 48.0)
-        state.car_vel[index, 0] = (720.0 + 7.0 * (local % 5), 0.0, 0.0)
+        state.car_pos[index, 0] = (-310.0, 0.0, 48.0)
+        state.car_vel[index, 0] = (720.0, 0.0, 0.0)
         state.car_quat[index, 0] = _quat_from_euler(0.0, 0.0, 0.0)
         kind = ""
+        opponent_yaw = math.pi
         if row["class"] == "positive":
             kind = (
-                "simultaneous_two_car_50",
-                "opponent_contact_just_before_self",
-                "opponent_contact_just_after_self",
-                "genuine_converging_challenge",
+                "closest_physically_representable_simultaneous_contest",
+                "measured_opponent_before_self_contest",
+                "measured_opponent_after_self_contest",
+                "convergence_only_challenge",
             )[local % 4]
-            if kind == "simultaneous_two_car_50":
-                opponent_x, opponent_speed, opponent_y = 310.0 + jitter, -720.0, 0.0
-            elif kind == "opponent_contact_just_before_self":
-                opponent_x, opponent_speed, opponent_y = 292.0 + jitter, -720.0, 0.0
-            elif kind == "opponent_contact_just_after_self":
-                opponent_x, opponent_speed, opponent_y = 330.0 + jitter, -720.0, 0.0
+            variant = (local // 4) % 6
+            if kind == "closest_physically_representable_simultaneous_contest":
+                opponent_x, opponent_speed = (
+                    (285.0, -900.0),
+                    (290.0, -900.0),
+                    (295.0, -960.0),
+                    (300.0, -1020.0),
+                    (305.0, -1020.0),
+                    (285.0, -900.0),
+                )[variant]
+                opponent_y = 0.0
+            elif kind == "measured_opponent_before_self_contest":
+                opponent_x, opponent_speed = (
+                    (280.0, -900.0),
+                    (285.0, -960.0),
+                    (290.0, -960.0),
+                    (295.0, -1020.0),
+                    (280.0, -900.0),
+                    (285.0, -960.0),
+                )[variant]
+                opponent_y = 0.0
+            elif kind == "measured_opponent_after_self_contest":
+                opponent_x, opponent_speed = (
+                    (300.0, -900.0),
+                    (300.0, -960.0),
+                    (285.0, -1020.0),
+                    (290.0, -1020.0),
+                    (305.0, -960.0),
+                    (300.0, -900.0),
+                )[variant]
+                opponent_y = 0.0
             else:
-                opponent_x, opponent_speed, opponent_y = 430.0 + jitter, -980.0, 35.0
+                opponent_x = 430.0 + 4.0 * (variant % 3)
+                opponent_speed = -980.0 - 15.0 * (variant % 2)
+                opponent_y = 35.0 + 3.0 * (variant % 2)
         elif row["class"] == "near_miss":
             kind = (
                 "distant_opponent",
                 "nearby_opponent_moving_away",
                 "nearby_nonconverging_opponent",
                 "opponent_behind_play",
-                "delayed_unrelated_opponent_contact",
+                "delayed_unrelated_opponent_contact_before",
+                "delayed_unrelated_opponent_contact_after",
                 "uncontested_loose_ball_flip_through",
                 "self_not_converging",
                 "mismatched_arrival_times",
-            )[local % 8]
+                "nearby_stationary_noncontest",
+            )[local % 10]
             if kind == "distant_opponent":
-                opponent_x, opponent_speed, opponent_y = 900.0 + jitter, -250.0, 0.0
+                opponent_x, opponent_speed, opponent_y = 900.0, -250.0, 0.0
             elif kind == "nearby_opponent_moving_away":
-                opponent_x, opponent_speed, opponent_y = 350.0 + jitter, 450.0, 0.0
+                opponent_x, opponent_speed, opponent_y = 350.0, 450.0, 0.0
             elif kind == "nearby_nonconverging_opponent":
-                opponent_x, opponent_speed, opponent_y = 330.0 + jitter, 0.0, 310.0
+                opponent_x, opponent_speed, opponent_y = 330.0, 0.0, 310.0
             elif kind == "opponent_behind_play":
-                opponent_x, opponent_speed, opponent_y = -620.0 + jitter, 350.0, 0.0
-            elif kind == "delayed_unrelated_opponent_contact":
-                opponent_x, opponent_speed, opponent_y = 390.0 + jitter, -720.0, 0.0
+                opponent_x, opponent_speed, opponent_y = -620.0, 350.0, 0.0
+            elif kind == "delayed_unrelated_opponent_contact_before":
+                opponent_x, opponent_speed, opponent_y = 0.0, 600.0, -220.0
+                opponent_yaw = math.pi / 2.0
+            elif kind == "delayed_unrelated_opponent_contact_after":
+                opponent_x, opponent_speed, opponent_y = 390.0, -720.0, 0.0
             elif kind == "uncontested_loose_ball_flip_through":
                 opponent_x, opponent_speed, opponent_y = 1800.0, 0.0, 1000.0
             elif kind == "self_not_converging":
                 state.ball_vel[index] = (800.0, 0.0, 0.0)
                 opponent_x, opponent_speed, opponent_y = 0.0, 0.0, 350.0
-            else:
+            elif kind == "mismatched_arrival_times":
                 opponent_x, opponent_speed, opponent_y = 0.0, 0.0, 250.0
+            else:
+                opponent_x, opponent_speed, opponent_y = 340.0, 0.0, 0.0
         else:
             kind = (
                 "ordinary_uncontested_forward_flip",
@@ -404,14 +555,18 @@ def _contest_cases(
             else:
                 opponent_x, opponent_speed, opponent_y = 2200.0, 0.0, -1000.0
         state.car_pos[index, 1] = (opponent_x, opponent_y, 48.0)
-        state.car_vel[index, 1] = (opponent_speed, 0.0, 0.0)
+        state.car_vel[index, 1] = (
+            (0.0, opponent_speed, 0.0)
+            if kind == "delayed_unrelated_opponent_contact_before"
+            else (opponent_speed, 0.0, 0.0)
+        )
         if kind == "nearby_nonconverging_opponent":
             state.car_vel[index, 1] = (0.0, opponent_y, 0.0)
         elif kind == "self_not_converging":
             state.car_vel[index, 1] = (0.0, -900.0, 0.0)
         elif kind == "mismatched_arrival_times":
             state.car_vel[index, 1] = (0.0, -300.0, 0.0)
-        state.car_quat[index, 1] = _quat_from_euler(0.0, 0.0, math.pi)
+        state.car_quat[index, 1] = _quat_from_euler(0.0, 0.0, opponent_yaw)
         row["scenario"] = {
             "kind": kind,
             "initial_self_position": state.car_pos[index, 0].tolist(),
@@ -429,6 +584,7 @@ def _contest_cases(
             controls.pitch[:, 0] = dodge_pitch
 
     trace = _run_dual(state, 90, collision_root, geometry, meshes, controller)
+    production = _run_production_v3(state, 100, collision_root, geometry, meshes, controller)
     for index, row in enumerate(rows):
         self_ticks = _onsets(trace["hit"][:, index, 0])
         opponent_ticks = _onsets(trace["hit"][:, index, 1])
@@ -442,9 +598,7 @@ def _contest_cases(
             if opponent_before.size:
                 candidates.append(int(opponent_before[-1]))
             opponent_tick = (
-                min(candidates, key=lambda value: abs(value - self_tick))
-                if candidates
-                else -1
+                min(candidates, key=lambda value: abs(value - self_tick)) if candidates else -1
             )
             # Convergence is a pre-contact identity.  Post-contact velocity is
             # already changed by the very collision being classified and can
@@ -463,9 +617,7 @@ def _contest_cases(
             self_distance = float(np.linalg.norm(ball - self_position))
             opponent_distance = float(np.linalg.norm(ball - opponent_position))
             self_closing = float(np.dot(self_velocity - ball_velocity, self_direction))
-            opponent_closing = float(
-                np.dot(opponent_velocity - ball_velocity, opponent_direction)
-            )
+            opponent_closing = float(np.dot(opponent_velocity - ball_velocity, opponent_direction))
             self_ttb = self_distance / max(self_closing, 1.0e-6)
             opponent_ttb = opponent_distance / max(opponent_closing, 1.0e-6)
             separation = abs(opponent_tick - self_tick) if opponent_tick >= 0 else 999
@@ -492,11 +644,45 @@ def _contest_cases(
             separation = 999
             displacement = 9999.0
             active_dodge = False
+        contact_order = (
+            "no_adjacent_opponent_contact"
+            if opponent_tick < 0
+            else "opponent_before_self"
+            if opponent_tick < self_tick
+            else "opponent_after_self"
+            if opponent_tick > self_tick
+            else "closest_representable_simultaneous"
+        )
+        if row["class"] == "positive":
+            kind = row["scenario"]["kind"]
+            if kind == "measured_opponent_before_self_contest" and not opponent_tick < self_tick:
+                raise RuntimeError(
+                    f"{row['scenario_id']}: measured order is not opponent-before-self"
+                )
+            if kind == "measured_opponent_after_self_contest" and not opponent_tick > self_tick:
+                raise RuntimeError(
+                    f"{row['scenario_id']}: measured order is not opponent-after-self"
+                )
+            if kind == "closest_physically_representable_simultaneous_contest" and not (
+                opponent_tick >= 0 and abs(opponent_tick - self_tick) <= 1
+            ):
+                raise RuntimeError(
+                    f"{row['scenario_id']}: no closest-representable simultaneous contact"
+                )
+            if (
+                kind == "convergence_only_challenge"
+                and opponent_tick >= 0
+                and abs(opponent_tick - self_tick) <= 1
+            ):
+                raise RuntimeError(
+                    f"{row['scenario_id']}: convergence-only case has adjacent contact"
+                )
         row["measured_contact_ticks"] = {
             "self_onsets": self_ticks.astype(int).tolist(),
             "opponent_onsets": opponent_ticks.astype(int).tolist(),
             "selected_self": self_tick,
             "selected_opponent": opponent_tick,
+            "measured_order": contact_order,
         }
         row["features"] = {
             "legitimate_self_contact": float(self_tick >= 0),
@@ -511,6 +697,7 @@ def _contest_cases(
             "adjacent_contact_separation_ticks": float(separation),
             "adjacent_ball_displacement": displacement,
         }
+        row["production_runtime"] = _production_record(production, index, self_tick)
     return rows
 
 
@@ -627,6 +814,7 @@ def _dodge_contact_cases(
             dodge_pitch[index] = 1.0
             if classifier == "controlled_flick":
                 if kind == "loose_ball_flip_through":
+                    dodge_tick[index] = 4
                     offset = np.asarray((-520.0, 0.0, 135.0), dtype=np.float32)
                     relative_velocity = np.asarray((1700.0, 0.0, 0.0), dtype=np.float32)
                 elif kind == "kickoff_or_50_flip_contact":
@@ -729,48 +917,84 @@ def _dodge_contact_cases(
         controls.yaw[active, 0] = dodge_yaw[active]
 
     trace = _run(state, 70, collision_root, geometry, meshes, controller)
+    production = _run_production_v3(state, 80, collision_root, geometry, meshes, controller)
     touch_onsets = _touch_onsets(trace["hit"])
     for index, row in enumerate(rows):
         touches = touch_onsets[index]
         tick = int(touches[0]) if touches.size else -1
+        flipped = trace["has_flipped"][:, index] != 0
+        flip_onsets = np.flatnonzero(
+            flipped & ~np.concatenate((np.zeros(1, dtype=bool), flipped[:-1]))
+        )
+        measured_flip_onset = int(flip_onsets[0]) if flip_onsets.size else -1
         if tick >= 0:
-            power = _musty_contact_features(
-                trace, index, tick, dodge_tick=int(dodge_tick[index])
-            )
+            power = _musty_contact_features(trace, index, tick, dodge_tick=int(dodge_tick[index]))
             contact_world_array = trace["contact_point"][tick, index] * 50.0
             contact_offset = contact_world_array - trace["car_pos"][tick, index]
-            direction = _unit(
-                trace["ball_pos"][tick, index] - trace["car_pos"][tick, index]
-            )
+            direction = _unit(trace["ball_pos"][tick, index] - trace["car_pos"][tick, index])
             pre_velocity_array = trace["pre_car_vel"][tick, index] * 50.0
             pre_ball_velocity_array = trace["pre_ball_vel"][tick, index] * 50.0
-            rotational_velocity = np.cross(
-                trace["pre_car_ang"][tick, index], contact_offset
-            )
+            rotational_velocity = np.cross(trace["pre_car_ang"][tick, index], contact_offset)
             rotational = max(float(np.dot(rotational_velocity, direction)), 0.0)
             translational = max(
                 float(np.dot(pre_velocity_array - pre_ball_velocity_array, direction)),
                 0.0,
             )
             total = rotational + translational
-            control_stop = min(int(dodge_tick[index]), tick)
+            # Production freezes the accumulated relation immediately before
+            # the authoritative has_flipped transition is observed.
+            control_stop = (
+                min(measured_flip_onset - 1, tick - 1) if measured_flip_onset >= 0 else tick - 1
+            )
+            # Production initializes continuous state from the injected state,
+            # then samples control history after each completed physics tick.
+            # Index zero is the injection snapshot and is deliberately absent.
             distances = np.linalg.norm(
-                trace["ball_pos"][: control_stop + 1, index]
-                - trace["car_pos"][: control_stop + 1, index],
+                trace["ball_pos"][1 : control_stop + 1, index]
+                - trace["car_pos"][1 : control_stop + 1, index],
                 axis=1,
             )
             relative_speeds = np.linalg.norm(
-                trace["ball_vel"][: control_stop + 1, index]
-                - trace["car_vel"][: control_stop + 1, index],
+                trace["ball_vel"][1 : control_stop + 1, index]
+                - trace["car_vel"][1 : control_stop + 1, index],
                 axis=1,
             )
-            release_tick = min(tick + 2, trace["ball_pos"].shape[0] - 1)
-            release_distance = float(
-                np.linalg.norm(
-                    trace["ball_pos"][release_tick, index]
-                    - trace["car_pos"][release_tick, index]
-                )
+            release_stop = min(
+                tick + CONTROL_RELEASE_SEARCH_MAX_TICKS,
+                trace["ball_pos"].shape[0] - 1,
             )
+            release_distance_series = []
+            release_outward_speed_series = []
+            for release_sample_tick in range(tick, release_stop + 1):
+                release_offset = (
+                    trace["ball_pos"][release_sample_tick, index]
+                    - trace["car_pos"][release_sample_tick, index]
+                )
+                release_direction = _unit(release_offset)
+                release_relative_velocity = (
+                    trace["ball_vel"][release_sample_tick, index]
+                    - trace["car_vel"][release_sample_tick, index]
+                )
+                release_distance_series.append(float(np.linalg.norm(release_offset)))
+                release_outward_speed_series.append(
+                    float(np.dot(release_relative_velocity, release_direction))
+                )
+            release_age = next(
+                (
+                    age
+                    for age in range(1, len(release_outward_speed_series))
+                    if release_outward_speed_series[age] > 1.0
+                ),
+                CONTROL_RELEASE_SEARCH_MAX_TICKS + 1,
+            )
+            if release_age <= CONTROL_RELEASE_SEARCH_MAX_TICKS:
+                release_tick = tick + release_age
+                release_distance = release_distance_series[release_age]
+                release_outward_speed = release_outward_speed_series[release_age]
+            else:
+                release_tick = -1
+                release_distance = 0.0
+                release_outward_speed = 0.0
             active_dodge = bool(
                 trace["is_flipping"][tick, index]
                 and trace["has_flipped"][tick, index]
@@ -783,15 +1007,20 @@ def _dodge_contact_cases(
         else:
             power = _empty_musty_features()
             rotational = translational = total = 0.0
-            distances = np.asarray((9999.0,), dtype=np.float32)
-            relative_speeds = np.asarray((9999.0,), dtype=np.float32)
+            distances = np.asarray((), dtype=np.float32)
+            relative_speeds = np.asarray((), dtype=np.float32)
             release_tick = -1
             release_distance = 0.0
+            release_outward_speed = 0.0
+            release_age = CONTROL_RELEASE_SEARCH_MAX_TICKS + 1
+            release_distance_series = []
+            release_outward_speed_series = []
             active_dodge = False
             contact_point = contact_normal = v_linear = omega_cross_r = [0.0, 0.0, 0.0]
         row["measured_contact_ticks"] = {
             "self_onsets": touches.astype(int).tolist(),
             "selected_contact": tick,
+            "measured_flip_onset": measured_flip_onset,
             "release_measurement": release_tick,
         }
         row["features"] = {
@@ -807,13 +1036,20 @@ def _dodge_contact_cases(
             "v_linear": v_linear,
             "omega_cross_r": omega_cross_r,
             "precontact_observed_ticks": float(len(distances)),
-            "precontact_max_distance": float(np.max(distances)),
-            "precontact_max_relative_speed": float(np.max(relative_speeds)),
+            "precontact_max_distance": float(np.max(distances)) if len(distances) else 0.0,
+            "precontact_max_relative_speed": (
+                float(np.max(relative_speeds)) if len(relative_speeds) else 0.0
+            ),
             "precontact_distance_series": distances.astype(float).tolist(),
             "precontact_relative_speed_series": relative_speeds.astype(float).tolist(),
             "release_distance": release_distance,
+            "release_outward_speed": release_outward_speed,
+            "release_transition_age_ticks": float(release_age),
+            "release_distance_series": release_distance_series,
+            "release_outward_speed_series": release_outward_speed_series,
             "release_ball_delta_v": power["ball_delta_v"],
         }
+        row["production_runtime"] = _production_record(production, index, tick)
     return rows
 
 
@@ -901,8 +1137,7 @@ def _boundary(
 
 def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str, Any]:
     by_classifier = {
-        name: [row for row in rows if row["classifier"] == name]
-        for name in CLASSIFIERS
+        name: [row for row in rows if row["classifier"] == name] for name in CLASSIFIERS
     }
     payload: dict[str, Any] = {
         "format": DERIVATION_FORMAT,
@@ -921,12 +1156,15 @@ def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str,
     contest_positive = [row for row in contest if row["class"] == "positive"]
     contest_negative = [row for row in contest if row["class"] != "positive"]
     adjacent_positive = (
-        "simultaneous_two_car_50",
-        "opponent_contact_just_before_self",
-        "opponent_contact_just_after_self",
+        "closest_physically_representable_simultaneous_contest",
+        "measured_opponent_before_self_contest",
+        "measured_opponent_after_self_contest",
     )
-    convergence_positive = ("genuine_converging_challenge",)
-    delayed_negative = ("delayed_unrelated_opponent_contact",)
+    convergence_positive = ("convergence_only_challenge",)
+    delayed_negative = (
+        "delayed_unrelated_opponent_contact_before",
+        "delayed_unrelated_opponent_contact_after",
+    )
     contest_boundaries = [
         _boundary(
             name="CONTEST_CONTACT_WINDOW_TICKS",
@@ -986,7 +1224,8 @@ def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str,
             negatives=contest_negative,
             positive_kinds=convergence_positive,
             negative_kinds=(
-                "delayed_unrelated_opponent_contact",
+                "delayed_unrelated_opponent_contact_before",
+                "delayed_unrelated_opponent_contact_after",
                 "mismatched_arrival_times",
             ),
         ),
@@ -1060,7 +1299,6 @@ def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str,
             negative_kinds=(
                 "loose_ball_flip_through",
                 "directional_dodge_with_no_release",
-                "ordinary_loose_ball_contact",
             ),
         ),
         _boundary(
@@ -1069,15 +1307,34 @@ def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str,
             direction="max",
             positives=controlled_positive,
             negatives=controlled_negative,
+            negative_kinds=("loose_ball_flip_through",),
+        ),
+        _boundary(
+            name="CONTROL_RELEASE_WINDOW_TICKS",
+            feature="release_transition_age_ticks",
+            direction="max",
+            positives=controlled_positive,
+            negatives=controlled_negative,
             negative_kinds=(
-                "loose_ball_flip_through",
-                "ordinary_loose_ball_contact",
-                "ordinary_forward_flip_drive_through",
+                "controlled_looking_no_dodge_release",
+                "ordinary_no_release_control_relation",
             ),
+            integer=True,
         ),
         _boundary(
             name="CONTROL_RELEASE_DISTANCE_MIN",
             feature="release_distance",
+            direction="min",
+            positives=controlled_positive,
+            negatives=controlled_negative,
+            negative_kinds=(
+                "controlled_looking_no_dodge_release",
+                "ordinary_no_release_control_relation",
+            ),
+        ),
+        _boundary(
+            name="CONTROL_RELEASE_OUTWARD_SPEED_MIN",
+            feature="release_outward_speed",
             direction="min",
             positives=controlled_positive,
             negatives=controlled_negative,
@@ -1105,16 +1362,10 @@ def _derive(rows: list[dict[str, Any]], provenance: dict[str, Any]) -> dict[str,
         ("controlled_flick", controlled_boundaries),
     ):
         classifier_rows = by_classifier[classifier]
-        feature_names = sorted(
-            {
-                boundary["feature"]
-                for boundary in boundaries
-            }
-        )
+        feature_names = sorted({boundary["feature"] for boundary in boundaries})
         payload["classifiers"][classifier] = {
             "derivation_counts": {
-                name: sum(row["class"] == name for row in classifier_rows)
-                for name in CLASS_NAMES
+                name: sum(row["class"] == name for row in classifier_rows) for name in CLASS_NAMES
             },
             "boundaries": boundaries,
             "all_measured_derivation_values": {
@@ -1149,20 +1400,16 @@ def _classify(row: dict[str, Any], thresholds: dict[str, float | int]) -> bool:
             <= thresholds["CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX"]
         )
         convergence = (
-            features["opponent_ball_distance"]
-            <= thresholds["CONTEST_OPPONENT_DISTANCE_MAX"]
-            and features["self_closing_speed"]
-            >= thresholds["CONTEST_SELF_CLOSING_SPEED_MIN"]
+            features["opponent_ball_distance"] <= thresholds["CONTEST_OPPONENT_DISTANCE_MAX"]
+            and features["self_closing_speed"] >= thresholds["CONTEST_SELF_CLOSING_SPEED_MIN"]
             and features["opponent_closing_speed"]
             >= thresholds["CONTEST_OPPONENT_CLOSING_SPEED_MIN"]
-            and features["time_to_ball_delta"]
-            <= thresholds["CONTEST_TIME_TO_BALL_DELTA_MAX"]
+            and features["time_to_ball_delta"] <= thresholds["CONTEST_TIME_TO_BALL_DELTA_MAX"]
         )
         return bool(adjacent or convergence)
     if row["classifier"] == "power_contact":
         return bool(
-            features["total_closing_speed"]
-            >= thresholds["POWER_TOTAL_CLOSING_SPEED_MIN"]
+            features["total_closing_speed"] >= thresholds["POWER_TOTAL_CLOSING_SPEED_MIN"]
             and features["rotational_closing_contribution"]
             >= thresholds["POWER_ROTATIONAL_CLOSING_SPEED_MIN"]
             and features["rotational_share"] >= thresholds["POWER_ROTATIONAL_SHARE_MIN"]
@@ -1171,17 +1418,15 @@ def _classify(row: dict[str, Any], thresholds: dict[str, float | int]) -> bool:
     return bool(
         features["precontact_observed_ticks"] >= thresholds["CONTROL_HISTORY_TICKS_MIN"]
         and features["precontact_max_distance"] <= thresholds["CONTROL_DISTANCE_MAX"]
-        and features["precontact_max_relative_speed"]
-        <= thresholds["CONTROL_RELATIVE_SPEED_MAX"]
+        and features["precontact_max_relative_speed"] <= thresholds["CONTROL_RELATIVE_SPEED_MAX"]
+        and features["release_transition_age_ticks"] <= thresholds["CONTROL_RELEASE_WINDOW_TICKS"]
         and features["release_distance"] >= thresholds["CONTROL_RELEASE_DISTANCE_MIN"]
-        and features["release_ball_delta_v"]
-        >= thresholds["CONTROL_RELEASE_BALL_DELTA_V_MIN"]
+        and features["release_outward_speed"] >= thresholds["CONTROL_RELEASE_OUTWARD_SPEED_MIN"]
+        and features["release_ball_delta_v"] >= thresholds["CONTROL_RELEASE_BALL_DELTA_V_MIN"]
     )
 
 
-def _confusion(
-    rows: list[dict[str, Any]], thresholds: dict[str, float | int]
-) -> dict[str, Any]:
+def _confusion(rows: list[dict[str, Any]], thresholds: dict[str, float | int]) -> dict[str, Any]:
     predictions = []
     tp = tn = fp = fn = 0
     for row in rows:
@@ -1219,15 +1464,11 @@ def _derive_phase(collision_root: str, output_dir: Path) -> None:
     derivation = _derive(rows, provenance)
     thresholds = derivation["thresholds"]
     derivation["derivation_confusion"] = {
-        classifier: _confusion(
-            [row for row in rows if row["classifier"] == classifier], thresholds
-        )
+        classifier: _confusion([row for row in rows if row["classifier"] == classifier], thresholds)
         for classifier in CLASSIFIERS
     }
     failed = [
-        name
-        for name, result in derivation["derivation_confusion"].items()
-        if not result["pass"]
+        name for name, result in derivation["derivation_confusion"].items() if not result["pass"]
     ]
     if failed:
         raise RuntimeError(f"derivation classification failed: {failed}")
@@ -1267,9 +1508,7 @@ def _heldout_phase(collision_root: str, output_dir: Path) -> None:
         },
         "provenance": provenance,
     }
-    failed = [
-        name for name, result in heldout["confusion"].items() if not result["pass"]
-    ]
+    failed = [name for name, result in heldout["confusion"].items() if not result["pass"]]
     if failed:
         _write_json(output_dir / "classifier_heldout.json", heldout)
         raise RuntimeError(f"untouched heldout classification failed: {failed}")
@@ -1281,6 +1520,330 @@ def _heldout_phase(collision_root: str, output_dir: Path) -> None:
     _write_jsonl(output_dir / "classifier_trace_corpus.jsonl", derivation_rows + rows)
     _write_json(output_dir / "classifier_heldout.json", heldout)
     print(json.dumps({key: value["pass"] for key, value in heldout["confusion"].items()}))
+
+
+def _runtime_parity_phase(output_dir: Path) -> None:
+    derivation = json.loads(
+        (output_dir / "classifier_threshold_derivation.json").read_text(encoding="utf-8")
+    )
+    thresholds = derivation["thresholds"]
+    rows = [
+        json.loads(line)
+        for line in (output_dir / "classifier_trace_corpus.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line
+    ]
+    if len(rows) != 216:
+        raise RuntimeError(f"runtime parity requires exactly 216 rows, found {len(rows)}")
+
+    flag_name = {
+        "contest": "contested_50",
+        "power_contact": "power_contact",
+        "controlled_flick": "controlled_flick",
+    }
+    feature_map = {
+        "contest": (
+            (0, "opponent_ball_distance"),
+            (1, "self_closing_speed"),
+            (2, "opponent_closing_speed"),
+            (3, "time_to_ball_delta"),
+            (11, "runtime_adjacent_contact_separation_ticks"),
+            (12, "runtime_adjacent_ball_displacement"),
+        ),
+        "power_contact": (
+            (4, "ball_delta_v"),
+            (8, "total_closing_speed"),
+            (9, "rotational_closing_contribution"),
+            (10, "rotational_share"),
+        ),
+        "controlled_flick": (
+            (4, "release_ball_delta_v"),
+            (5, "precontact_observed_ticks"),
+            (6, "precontact_max_distance"),
+            (7, "precontact_max_relative_speed"),
+            (13, "release_distance"),
+            (14, "release_outward_speed"),
+            (15, "release_transition_age_ticks"),
+        ),
+    }
+    parity_rows: list[dict[str, Any]] = []
+    failures: list[dict[str, Any]] = []
+    maximum_abs_error: dict[str, float] = {}
+    for row in rows:
+        runtime = row["production_runtime"]
+        features = row["features"]
+        classifier = row["classifier"]
+        legitimate = bool(
+            features.get("legitimate_contact", features.get("legitimate_self_contact", 0.0))
+        )
+        expected_candidate = legitimate and bool(features["active_directional_dodge"])
+        offline = _classify(row, thresholds)
+        expected_label = row["class"] == "positive"
+        runtime_result = bool(runtime["exemption_flags"][flag_name[classifier]])
+        checks: dict[str, bool] = {
+            "physical_label_matches_frozen_offline": offline == expected_label,
+            "production_candidate_matches_physical_conjunction": (
+                bool(runtime["candidate"]) == expected_candidate
+            ),
+            "production_classifier_matches_frozen_offline": runtime_result == offline,
+            "no_impossible_transition": runtime["impossible_total"] == 0,
+            "no_unresolved_candidate": not runtime["pending_after_replay"],
+        }
+        comparisons: dict[str, Any] = {}
+        if runtime["candidate"]:
+            expected_control_ticks = 0
+            expected_control_distance = 0.0
+            expected_control_relative_speed = 0.0
+            if classifier == "controlled_flick":
+                for sample_distance, sample_relative_speed in zip(
+                    features["precontact_distance_series"],
+                    features["precontact_relative_speed_series"],
+                    strict=True,
+                ):
+                    if (
+                        sample_distance <= thresholds["CONTROL_DISTANCE_MAX"]
+                        and sample_relative_speed <= thresholds["CONTROL_RELATIVE_SPEED_MAX"]
+                    ):
+                        if expected_control_ticks == 0:
+                            expected_control_distance = sample_distance
+                            expected_control_relative_speed = sample_relative_speed
+                        expected_control_ticks += 1
+                        expected_control_distance = max(expected_control_distance, sample_distance)
+                        expected_control_relative_speed = max(
+                            expected_control_relative_speed, sample_relative_speed
+                        )
+                    else:
+                        expected_control_ticks = 0
+                        expected_control_distance = 0.0
+                        expected_control_relative_speed = 0.0
+            checks["self_contact_tick_matches"] = runtime["self_contact_tick"] == features.get(
+                "selected_contact_tick",
+                row["measured_contact_ticks"].get(
+                    "selected_contact",
+                    row["measured_contact_ticks"].get("selected_self", -1),
+                ),
+            )
+            for runtime_index, feature_name in feature_map[classifier]:
+                expected_name = feature_name
+                if feature_name == "runtime_adjacent_contact_separation_ticks":
+                    associated = (
+                        features["adjacent_contact_separation_ticks"]
+                        <= thresholds["CONTEST_CONTACT_WINDOW_TICKS"]
+                        and features["adjacent_ball_displacement"]
+                        <= thresholds["CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX"]
+                    )
+                    expected = (
+                        features["adjacent_contact_separation_ticks"] if associated else 999.0
+                    )
+                elif feature_name == "runtime_adjacent_ball_displacement":
+                    associated = (
+                        features["adjacent_contact_separation_ticks"]
+                        <= thresholds["CONTEST_CONTACT_WINDOW_TICKS"]
+                        and features["adjacent_ball_displacement"]
+                        <= thresholds["CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX"]
+                    )
+                    expected = features["adjacent_ball_displacement"] if associated else 9999.0
+                elif classifier == "controlled_flick" and feature_name in (
+                    "precontact_observed_ticks",
+                    "precontact_max_distance",
+                    "precontact_max_relative_speed",
+                ):
+                    expected = {
+                        "precontact_observed_ticks": float(expected_control_ticks),
+                        "precontact_max_distance": expected_control_distance,
+                        "precontact_max_relative_speed": expected_control_relative_speed,
+                    }[feature_name]
+                elif classifier == "controlled_flick" and feature_name in (
+                    "release_distance",
+                    "release_outward_speed",
+                    "release_transition_age_ticks",
+                ):
+                    controlled_setup = (
+                        expected_control_ticks >= thresholds["CONTROL_HISTORY_TICKS_MIN"]
+                    )
+                    release_captured = (
+                        controlled_setup
+                        and features["release_transition_age_ticks"]
+                        <= thresholds["CONTROL_RELEASE_WINDOW_TICKS"]
+                    )
+                    if release_captured:
+                        expected = float(features[feature_name])
+                    elif feature_name == "release_transition_age_ticks":
+                        expected = -1.0
+                    else:
+                        expected = 0.0
+                else:
+                    expected = float(features[feature_name])
+                actual = float(runtime["features"][runtime_index])
+                absolute_error = abs(actual - expected)
+                tolerance = max(1.0e-3, 2.0e-6 * max(abs(expected), 1.0))
+                parity = absolute_error <= tolerance
+                comparisons[expected_name] = {
+                    "physical_calibration": expected,
+                    "production": actual,
+                    "absolute_error": absolute_error,
+                    "tolerance": tolerance,
+                    "pass": parity,
+                }
+                maximum_abs_error[expected_name] = max(
+                    maximum_abs_error.get(expected_name, 0.0), absolute_error
+                )
+                checks[f"feature:{expected_name}"] = parity
+
+        record = {
+            "scenario_id": row["scenario_id"],
+            "split": row["split"],
+            "classifier": classifier,
+            "physical_class": row["class"],
+            "scenario_kind": row["scenario"]["kind"],
+            "expected_physical_label": expected_label,
+            "frozen_offline_result": offline,
+            "production_candidate": runtime["candidate"],
+            "production_primary_outcome": runtime["primary_outcome"],
+            "production_exemption_flags": runtime["exemption_flags"],
+            "physical_contact_ticks": row["measured_contact_ticks"],
+            "production_ticks": {
+                "resolution": runtime["resolution_tick"],
+                "self_contact": runtime["self_contact_tick"],
+                "opponent_contact": runtime["opponent_contact_tick"],
+                "control_release": runtime["control_release_tick"],
+            },
+            "feature_comparisons": comparisons,
+            "checks": checks,
+            "pass": all(checks.values()),
+        }
+        parity_rows.append(record)
+        if not record["pass"]:
+            failures.append(record)
+
+    heldout_rows = [row for row in parity_rows if row["split"] == "heldout"]
+    heldout_fp = sum(
+        not row["expected_physical_label"]
+        and row["production_exemption_flags"][flag_name[row["classifier"]]]
+        for row in heldout_rows
+    )
+    heldout_fn = sum(
+        row["expected_physical_label"]
+        and not row["production_exemption_flags"][flag_name[row["classifier"]]]
+        for row in heldout_rows
+    )
+    source = (REPOSITORY_ROOT / "rivalsim" / "gameplay_v3.py").read_text(encoding="utf-8")
+    order_neutral_checks = {
+        "recent_opponent_contact_only_affirms_contest": (
+            "pending_contest[car] = wp.int32(" in source
+            and "adjacent_recent_opponent_contact or convergence" in source
+        ),
+        "penalty_only_follows_unnecessary_primary_outcome": (
+            "if outcome == OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT:" in source
+        ),
+        "no_opponent_first_negative_symbol_in_runtime": "opponent_first" not in source,
+    }
+    payload = {
+        "format": "RIVAL2_GAMEPLAY_V3_PRODUCTION_RUNTIME_PARITY_V2",
+        "created_utc": _utc_now(),
+        "row_count": len(parity_rows),
+        "derivation_rows": sum(row["split"] == "derivation" for row in parity_rows),
+        "heldout_rows": len(heldout_rows),
+        "float_tolerance": "max(1e-3 absolute, 2e-6 relative)",
+        "maximum_absolute_feature_error": maximum_abs_error,
+        "heldout_false_positive": heldout_fp,
+        "heldout_false_negative": heldout_fn,
+        "contact_order_is_exemption_only": order_neutral_checks,
+        "rows": parity_rows,
+        "failures": failures,
+    }
+    payload["verdict"] = (
+        "PASS"
+        if not failures
+        and heldout_fp == 0
+        and heldout_fn == 0
+        and all(order_neutral_checks.values())
+        else "BLOCKED"
+    )
+    _write_json(output_dir / "production_runtime_parity.json", payload)
+
+    contest_positive = [
+        row
+        for row in parity_rows
+        if row["classifier"] == "contest" and row["expected_physical_label"]
+    ]
+    contest_categories = {
+        "opponent_before_self": "measured_opponent_before_self_contest",
+        "opponent_after_self": "measured_opponent_after_self_contest",
+        "closest_representable_simultaneous": (
+            "closest_physically_representable_simultaneous_contest"
+        ),
+        "convergence_only": "convergence_only_challenge",
+    }
+    order_counts = {
+        split: {
+            category: sum(
+                row["split"] == split and row["scenario_kind"] == scenario_kind
+                for row in contest_positive
+            )
+            for category, scenario_kind in contest_categories.items()
+        }
+        for split in ("derivation", "heldout")
+    }
+    contest_payload = {
+        "format": "RIVAL2_GAMEPLAY_V3_CONTEST_ORDER_EVIDENCE_V2",
+        "created_utc": _utc_now(),
+        "semantics": (
+            "opponent-before, opponent-after, and closest-representable simultaneous "
+            "contacts are order-neutral affirmative contest exemptions"
+        ),
+        "positive_order_counts": order_counts,
+        "positive_rows": contest_positive,
+        "negative_reward_or_penalty_from_contact_order": False,
+        "source_checks": order_neutral_checks,
+        "verdict": "PASS"
+        if all(order_neutral_checks.values())
+        and all(row["pass"] for row in contest_positive)
+        and all(order_counts[split]["opponent_before_self"] > 0 for split in order_counts)
+        and all(order_counts[split]["opponent_after_self"] > 0 for split in order_counts)
+        else "BLOCKED",
+    }
+    _write_json(output_dir / "contest_order_evidence.json", contest_payload)
+
+    controlled_rows = [
+        row
+        for row in parity_rows
+        if row["classifier"] == "controlled_flick"
+        and (
+            row["expected_physical_label"] or row["production_exemption_flags"]["controlled_flick"]
+        )
+    ]
+    controlled_payload = {
+        "format": "RIVAL2_GAMEPLAY_V3_CONTROLLED_RELEASE_EVIDENCE_V2",
+        "created_utc": _utc_now(),
+        "sampling_identity": (
+            "first post-contact sample within the separately calibrated release window "
+            "meeting frozen distance and outward-speed boundaries"
+        ),
+        "release_window_ticks": thresholds["CONTROL_RELEASE_WINDOW_TICKS"],
+        "release_distance_min": thresholds["CONTROL_RELEASE_DISTANCE_MIN"],
+        "release_outward_speed_min": thresholds["CONTROL_RELEASE_OUTWARD_SPEED_MIN"],
+        "rows": controlled_rows,
+        "verdict": "PASS" if all(row["pass"] for row in controlled_rows) else "BLOCKED",
+    }
+    _write_json(output_dir / "controlled_release_evidence.json", controlled_payload)
+    if (
+        payload["verdict"] != "PASS"
+        or contest_payload["verdict"] != "PASS"
+        or controlled_payload["verdict"] != "PASS"
+    ):
+        raise RuntimeError(f"production runtime parity failed for {len(failures)} rows")
+    print(
+        json.dumps(
+            {
+                "rows": len(parity_rows),
+                "heldout_fp": heldout_fp,
+                "heldout_fn": heldout_fn,
+                "contest_orders": order_counts,
+            }
+        )
+    )
 
 
 class _SourceExactHarness:
@@ -1528,18 +2091,14 @@ def run_dash_reset_source_exact(collision_root: str) -> dict[str, Any]:
     _, car = _reset_case(collision_root, face=-7, support_wheels=3)
     cases["car_reset_three_other_car_support_wheels"] = {
         "observed": car,
-        "pass": car["pending_after_support"] == 2
-        and car["reset_completion_total"] == 1,
+        "pass": car["pending_after_support"] == 2 and car["reset_completion_total"] == 1,
     }
     _, too_few = _reset_case(collision_root, face=-6, support_wheels=2)
     cases["reset_two_support_wheels_rejects"] = {
         "observed": too_few,
-        "pass": too_few["pending_after_support"] == 0
-        and too_few["reset_completion_total"] == 0,
+        "pass": too_few["pending_after_support"] == 0 and too_few["reset_completion_total"] == 0,
     }
-    _, unchanged = _reset_case(
-        collision_root, face=-6, support_wheels=3, previous_untimed=1
-    )
+    _, unchanged = _reset_case(collision_root, face=-6, support_wheels=3, previous_untimed=1)
     cases["unchanged_untimed_resource_rejects"] = {
         "observed": unchanged,
         "pass": unchanged["pending_after_support"] == 0
@@ -1615,12 +2174,9 @@ def _reward_phase(collision_root: str, output_dir: Path) -> None:
     thresholds = derivation["thresholds"]
     from rivalsim import gameplay_v3 as gameplay_v3_module
 
-    runtime_thresholds = {
-        name: getattr(gameplay_v3_module, name) for name in sorted(thresholds)
-    }
+    runtime_thresholds = {name: getattr(gameplay_v3_module, name) for name in sorted(thresholds)}
     runtime_parity = {
-        name: float(runtime_thresholds[name]) == float(value)
-        for name, value in thresholds.items()
+        name: float(runtime_thresholds[name]) == float(value) for name, value in thresholds.items()
     }
     env = Rival2Env(
         64,
@@ -1746,9 +2302,7 @@ def _regression_phase(collision_root: str, output_dir: Path) -> None:
         }
     validation_sources = (
         REPOSITORY_ROOT / "benchmarks" / "run_rival2_gameplay_v3_validation.py",
-        REPOSITORY_ROOT
-        / "benchmarks"
-        / "run_rival2_gameplay_v3_validation_correction.py",
+        REPOSITORY_ROOT / "benchmarks" / "run_rival2_gameplay_v3_validation_correction.py",
     )
     forbidden = ("trainer.update", "train_iteration", "optimizer.step")
 
@@ -1789,8 +2343,7 @@ def _regression_phase(collision_root: str, output_dir: Path) -> None:
     }
     payload["verdict"] = (
         "PASS"
-        if all(record["pass"] for record in records.values())
-        and not any(source_scan.values())
+        if all(record["pass"] for record in records.values()) and not any(source_scan.values())
         else "BLOCKED"
     )
     _write_json(output_dir / "regression_tests.json", payload)
@@ -1849,7 +2402,14 @@ def main() -> int:
     parser.add_argument("--probe", action="store_true")
     parser.add_argument(
         "--phase",
-        choices=("derive", "heldout", "source-exact", "reward", "regression"),
+        choices=(
+            "derive",
+            "heldout",
+            "runtime-parity",
+            "source-exact",
+            "reward",
+            "regression",
+        ),
     )
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     args = parser.parse_args()
@@ -1862,6 +2422,9 @@ def main() -> int:
     if args.phase == "heldout":
         _heldout_phase(args.collision_root, args.output_dir)
         return 0
+    if args.phase == "runtime-parity":
+        _runtime_parity_phase(args.output_dir)
+        return 0
     if args.phase == "source-exact":
         _source_exact_phase(args.collision_root, args.output_dir)
         return 0
@@ -1871,7 +2434,7 @@ def main() -> int:
     if args.phase == "regression":
         _regression_phase(args.collision_root, args.output_dir)
         return 0
-    raise RuntimeError("choose --phase derive or --phase heldout")
+    raise RuntimeError("choose a validation phase")
 
 
 if __name__ == "__main__":
