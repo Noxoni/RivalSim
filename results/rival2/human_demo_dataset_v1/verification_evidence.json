@@ -1,0 +1,93 @@
+{
+  "adapter_contract": {
+    "action_contract_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "action_version": "RIVAL2_ACTION_V2_120HZ",
+    "observation_contract_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "observation_version": "RIVAL2_OBS_V2_120HZ"
+  },
+  "authority": {
+    "commit": "08a55e8326940271689847b316fa096a7fed3c71",
+    "review_format": "RIVALRL_HUMAN_DEMO_REVIEW_V2"
+  },
+  "dataset_counts": {
+    "excluded_ambiguous_attempts": 14,
+    "excluded_failed_attempts": 71,
+    "exact_action_target_frames": 114311,
+    "exact_observation_usable_frames": 0,
+    "gameplay_source_frames": 58306,
+    "mechanic_source_frames": 56005,
+    "mechanic_splits": {
+      "test": {
+        "attempts": 16,
+        "frames": 8199
+      },
+      "train": {
+        "attempts": 77,
+        "frames": 39275
+      },
+      "validation": {
+        "attempts": 17,
+        "frames": 8531
+      }
+    }
+  },
+  "deterministic_rebuild": {
+    "artifact_manifest_sha256": "2087B16F8D33B14A1CA4E092710266A508EF3B6631791DD105FA2A2660174017",
+    "command": ".\\.venv\\Scripts\\python.exe benchmarks\\build_rival2_human_demo_dataset_v1.py --output-dir .tools\\human_demo_dataset_v1_rebuild_20260828_02",
+    "dataset_manifest_sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55",
+    "files_compared": [
+      "README.md",
+      "adapter_audit.json",
+      "artifact_manifest.json",
+      "dataset_manifest.json",
+      "sampling_metadata.json",
+      "statistics.json"
+    ],
+    "result": "all byte-identical"
+  },
+  "exact_observation_gate": {
+    "blocked": true,
+    "fail_closed": true,
+    "fabricated_values": false,
+    "recurring_blockers": [
+      "34 canonical boost-pad active states and cooldown timers",
+      "RivalSim-only car jump, flip, demolition, air, boost, and policy-memory state/timers",
+      "exact lifecycle episode-age and no-touch-age origins",
+      "opponent and opponent-relative fields in single-car Freeplay",
+      "nonunique native wheel indices on a small set of frames",
+      "previous action only at real recording, reset, rebind, respawn, or discontinuity boundaries"
+    ],
+    "unavailable_values_filled": false,
+    "verdict": "BLOCKED_EXACT_OBSERVATION_SOURCE_INCOMPLETE"
+  },
+  "format": "RIVAL2_HUMAN_DEMO_DATASET_VERIFICATION_EVIDENCE_V1",
+  "no_learning_boundary": {
+    "behavior_cloning_performed": false,
+    "mechanic_detector_defined": false,
+    "model_mutated": false,
+    "optimizer_step_performed": false,
+    "ppo_performed": false,
+    "reward_changed": false,
+    "training_performed": false
+  },
+  "source_and_split_verification": {
+    "command": ".\\.venv\\Scripts\\python.exe benchmarks\\build_rival2_human_demo_dataset_v1.py --verify-only",
+    "gameplay_region_count": 22,
+    "mechanic_attempt_count": 110,
+    "result": "valid",
+    "source_session_count": 18
+  },
+  "tests": {
+    "environment_note": "The default per-user pytest temp root was inaccessible; the clean passing run used a new repository-local --basetemp path.",
+    "focused_command": ".\\.venv\\Scripts\\pytest.exe -q --basetemp .tools\\pytest_human_adapter_20260828_03 tests\\test_human_demo_training_adapter.py tests\\test_human_demo_recording.py",
+    "focused_result": {
+      "failed": 0,
+      "passed": 29,
+      "skipped": 1,
+      "skip_reason": "optional native C++ encoder fixture path was not configured"
+    },
+    "lint_command": ".\\.venv\\Scripts\\ruff.exe check rivalsim\\human_demo\\__init__.py rivalsim\\human_demo\\training_adapter.py benchmarks\\build_rival2_human_demo_dataset_v1.py tests\\test_human_demo_training_adapter.py",
+    "lint_result": "all checks passed"
+  },
+  "verdict": "DATASET_FREEZE_AND_READ_ONLY_ADAPTER_VALID_BUT_EXACT_OBSERVATION_SAMPLES_BLOCKED"
+}
