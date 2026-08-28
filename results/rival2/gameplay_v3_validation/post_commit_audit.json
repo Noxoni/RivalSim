@@ -1,0 +1,88 @@
+{
+  "audit_target_commit": "e160ee18be6db64f6c8b0fc609599cd48708f9b1",
+  "created_utc": "2026-08-28T02:23:33.0805731Z",
+  "findings": [
+    {
+      "evidence": [
+        "rivalsim/kernels/rival2.py",
+        "tests/test_rival2_gameplay_v3.py",
+        "results/rival2/gameplay_v3_validation/reward_reconstruction.json"
+      ],
+      "finding": 1,
+      "name": "Gameplay V3 retained Gameplay event accumulation",
+      "result": "PASS",
+      "summary": "The committed V3 dispatch enters the authoritative boost-use, small/full-pad, and save accumulator; deterministic V1/V3 cases match those events while V3 touch remains zero."
+    },
+    {
+      "evidence": [
+        "rivalsim/kernels/rival2.py",
+        "rivalsim/rival2_env.py",
+        "tests/test_rival2_gameplay_v3.py",
+        "results/rival2/gameplay_v3_validation/kernel_abi_smoke.json"
+      ],
+      "finding": 2,
+      "name": "Explicit V3 reward branch and fail-closed unknown mode",
+      "result": "PASS",
+      "summary": "V1/V2 retain their explicit shared historical branch, V3 has a distinct branch, and unsupported modes raise before ordinary stepping."
+    },
+    {
+      "evidence": [
+        "rivalsim/rival2_contracts.py",
+        "rivalsim/rival2_env.py",
+        "rivalsim/kernels/rival2.py",
+        "rivalsim/rival2_opponent_curriculum.py",
+        "results/rival2/gameplay_v3_validation/contract.json",
+        "results/rival2/gameplay_v3_validation/checkpoint_transition.json"
+      ],
+      "finding": 3,
+      "name": "Every V3 identity and dispatch site",
+      "result": "PASS",
+      "summary": "The committed contract/hash lookup, constructor, setter, optional state/bridge, non-renumbering mode 5 kernel branch, validator, and checkpoint transition all dispatch V3 explicitly; strict V2-to-V3 loading rejects."
+    },
+    {
+      "evidence": [
+        "benchmarks/run_rival2_gameplay_v3_validation.py",
+        "results/rival2/gameplay_v3_validation/memory_smoke.json",
+        "results/rival2/gameplay_v3_validation/checkpoint_transition.json",
+        "results/rival2/gameplay_v3_validation/shadow_gate_summary.json"
+      ],
+      "finding": 4,
+      "name": "Disposable rollout and shadow state",
+      "result": "PASS",
+      "summary": "The validator contains no PPO/optimizer update call or checkpoint save, separates source and disposable sample counters, preserves model/optimizer/iteration/policy, and rehashes the source checkpoint after validation."
+    },
+    {
+      "evidence": [
+        "tests/test_rival2_gameplay_v3.py",
+        "results/rival2/gameplay_v3_validation/kernel_abi_smoke.json"
+      ],
+      "finding": 5,
+      "name": "V1/V2/V3 environment construction matrix",
+      "result": "PASS",
+      "summary": "All three identities construct and step with (N,2,182) observations; V1/V2 have no V3 state or bridge binding and V3 has both."
+    },
+    {
+      "evidence": [
+        "rivalsim/gameplay_v3.py",
+        "rivalsim/rival2_env.py",
+        "results/rival2/gameplay_v3_validation/memory_smoke.json"
+      ],
+      "finding": 6,
+      "name": "Array-derived V3 logical memory",
+      "result": "PASS",
+      "summary": "The committed production inventory derives 316670188 logical bytes from 107 actual Warp arrays at 131072 worlds, allocates no calibration evidence buffers, and records allocator deltas separately."
+    },
+    {
+      "evidence": [
+        "rivalsim/rival2_env.py",
+        "results/rival2/gameplay_v3_validation/kernel_abi_smoke.json"
+      ],
+      "finding": 7,
+      "name": "Inherited capture API remains untouched",
+      "result": "PASS",
+      "summary": "The committed source diff contains no capture/invalidation changes; the audited training step still launches the V3 detector directly after physics and before reward accumulation/composition."
+    }
+  ],
+  "schema_version": 1,
+  "verdict": "PASS"
+}
