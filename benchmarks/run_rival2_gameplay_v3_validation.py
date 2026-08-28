@@ -1432,11 +1432,14 @@ def parse_args() -> argparse.Namespace:
             os.environ.get("RIVALSIM_COLLISION_DIR", r"G:\dev\RLBot-Rival\bot\collision_meshes")
         ),
     )
+    parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR)
     return parser.parse_args()
 
 
 def main() -> None:
+    global RESULTS_DIR
     args = parse_args()
+    RESULTS_DIR = args.output_dir.resolve()
     if not SOURCE_CHECKPOINT.is_file() or _sha256(SOURCE_CHECKPOINT) != SOURCE_SHA256:
         raise RuntimeError("selected plus_120 checkpoint identity mismatch")
     if args.phase == "static":

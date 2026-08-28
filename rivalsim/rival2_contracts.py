@@ -536,7 +536,33 @@ REWARD_GAMEPLAY_V3_CONTRACT: Final = {
             "new legitimate car-ball contact onset during active directional dodge: "
             "is_flipping and has_flipped and non-zero directional flip_rel_torque"
         ),
-        "pending_window_ticks_at_120_hz": 2,
+        "pending_window_ticks_at_120_hz": 8,
+        "physical_exemption_classifier_v1": {
+            "corpus": "RIVAL2_GAMEPLAY_V3_PHYSICAL_CLASSIFIER_TRACE_V1",
+            "contest": {
+                "association_ball_displacement_max": 86.60006713867188,
+                "opponent_distance_max": 430.46632385253906,
+                "self_closing_speed_min": 735.8017120361328,
+                "opponent_closing_speed_min": 587.1069793701172,
+                "time_to_ball_delta_max": 0.23604875229838973,
+                "convergence_velocity_sample": "authoritative_pre_contact",
+            },
+            "dodge_powered_contact": {
+                "total_closing_speed_min": 95.32137298583984,
+                "rotational_closing_speed_min": 163.89701080322266,
+                "rotational_share_min": 0.25463866470010044,
+                "ball_delta_v_min": 303.62255859375,
+            },
+            "controlled_flick": {
+                "control_history_ticks_min": 6,
+                "control_distance_max": 241.1681137084961,
+                "control_relative_speed_max": 428.43893575668335,
+                "release_distance_min": 77.31824493408203,
+                "release_ball_delta_v_min": 163.416259765625,
+                "control_snapshot": "frozen_at_directional_dodge_onset",
+                "positive_reward": 0.0,
+            },
+        },
         "primary_precedence": [
             "EXEMPT_RECOGNIZED_MECHANIC",
             "EXEMPT_CONTROLLED_FLICK",

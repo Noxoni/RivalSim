@@ -99,26 +99,26 @@ def primary_flip_outcome(
         return OUTCOME_EXEMPT_POWER_CONTACT
     return OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
 
-# Prospectively frozen from the deterministic calibration corpus emitted by
-# benchmarks/run_rival2_gameplay_v3_validation.py.  These are physical-identity
-# separators, not quality scaling.
-CONTEST_CONTACT_WINDOW_TICKS = 2
-CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX = 300.0
-CONTEST_OPPONENT_DISTANCE_MAX = 500.0
-CONTEST_SELF_CLOSING_SPEED_MIN = 150.0
-CONTEST_OPPONENT_CLOSING_SPEED_MIN = 150.0
-CONTEST_TIME_TO_BALL_DELTA_MAX = 0.12
+# Prospectively frozen before held-out evaluation from the deterministic
+# physical corpus emitted by the validation-correction harness.  These are
+# physical-identity separators, not quality scaling.
+CONTEST_CONTACT_WINDOW_TICKS = 8
+CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX = 86.60006713867188
+CONTEST_OPPONENT_DISTANCE_MAX = 430.46632385253906
+CONTEST_SELF_CLOSING_SPEED_MIN = 735.8017120361328
+CONTEST_OPPONENT_CLOSING_SPEED_MIN = 587.1069793701172
+CONTEST_TIME_TO_BALL_DELTA_MAX = 0.23604875229838973
 
-POWER_TOTAL_CLOSING_SPEED_MIN = 300.0
-POWER_ROTATIONAL_CLOSING_SPEED_MIN = 100.0
-POWER_ROTATIONAL_SHARE_MIN = 0.18
-POWER_BALL_DELTA_V_MIN = 175.0
+POWER_TOTAL_CLOSING_SPEED_MIN = 95.32137298583984
+POWER_ROTATIONAL_CLOSING_SPEED_MIN = 163.89701080322266
+POWER_ROTATIONAL_SHARE_MIN = 0.25463866470010044
+POWER_BALL_DELTA_V_MIN = 303.62255859375
 
-CONTROL_DISTANCE_MAX = 220.0
-CONTROL_RELATIVE_SPEED_MAX = 260.0
-CONTROL_HISTORY_TICKS_MIN = 4
-CONTROL_RELEASE_DISTANCE_MIN = 245.0
-CONTROL_RELEASE_BALL_DELTA_V_MIN = 120.0
+CONTROL_DISTANCE_MAX = 241.1681137084961
+CONTROL_RELATIVE_SPEED_MAX = 428.43893575668335
+CONTROL_HISTORY_TICKS_MIN = 6
+CONTROL_RELEASE_DISTANCE_MIN = 77.31824493408203
+CONTROL_RELEASE_BALL_DELTA_V_MIN = 163.416259765625
 
 
 def contest_convergence_exempt(
@@ -363,6 +363,8 @@ def gameplay_v3_track_tick(
     car_b_hit: wp.array(dtype=wp.int32),
     car_a_pre_velocity_bt: wp.array(dtype=wp.vec3),
     car_b_pre_velocity_bt: wp.array(dtype=wp.vec3),
+    car_a_pre_ball_velocity_bt: wp.array(dtype=wp.vec3),
+    car_b_pre_ball_velocity_bt: wp.array(dtype=wp.vec3),
     car_a_pre_angular_velocity: wp.array(dtype=wp.vec3),
     car_b_pre_angular_velocity: wp.array(dtype=wp.vec3),
     car_a_contact_point_bt: wp.array(dtype=wp.vec3),
@@ -406,6 +408,9 @@ def gameplay_v3_track_tick(
     control_ticks: wp.array(dtype=wp.int32),
     control_max_distance: wp.array(dtype=wp.float32),
     control_max_relative_speed: wp.array(dtype=wp.float32),
+    control_dodge_ticks: wp.array(dtype=wp.int32),
+    control_dodge_max_distance: wp.array(dtype=wp.float32),
+    control_dodge_max_relative_speed: wp.array(dtype=wp.float32),
     pending_active: wp.array(dtype=wp.int32),
     pending_age: wp.array(dtype=wp.int32),
     pending_recognized: wp.array(dtype=wp.int32),
@@ -483,6 +488,13 @@ def gameplay_v3_track_tick(
     if pending_tick >= 0 and tick - pending_tick > DASH_LANDING_TICKS:
         pending_tick = -1
     if new_flip:
+        # Freeze the physically controlled relation at dodge onset.  Center
+        # velocity naturally diverges during the release rotation; clearing
+        # the relation during that rotation would erase genuine flick setup
+        # before its terminal contact can be classified.
+        control_dodge_ticks[car] = control_ticks[car]
+        control_dodge_max_distance[car] = control_max_distance[car]
+        control_dodge_max_relative_speed[car] = control_max_relative_speed[car]
         air_ticks = wp.int32(wp.floor(dash_previous_air_time[car] * 120.0 + 0.5))
         if (
             prior_mask == 0
@@ -689,6 +701,14 @@ def gameplay_v3_track_tick(
             pre_velocity_bt = (
                 car_a_pre_velocity_bt[env] if local == 0 else car_b_pre_velocity_bt[env]
             )
+            opponent_pre_velocity_bt = (
+                car_b_pre_velocity_bt[env] if local == 0 else car_a_pre_velocity_bt[env]
+            )
+            pre_ball_velocity_bt = (
+                car_a_pre_ball_velocity_bt[env]
+                if local == 0
+                else car_b_pre_ball_velocity_bt[env]
+            )
             pre_angular = (
                 car_a_pre_angular_velocity[env]
                 if local == 0
@@ -701,19 +721,23 @@ def gameplay_v3_track_tick(
                 car_a_ball_delta_v[env] if local == 0 else car_b_ball_delta_v[env]
             )
             pre_velocity = pre_velocity_bt * 50.0
+            opponent_pre_velocity = opponent_pre_velocity_bt * 50.0
+            pre_ball_velocity = pre_ball_velocity_bt * 50.0
             contact_world = point_bt * 50.0
             offset = contact_world - car_pos[car]
             direction = _safe_unit(ball_pos[env] - car_pos[car])
             rotational = wp.max(wp.dot(wp.cross(pre_angular, offset), direction), 0.0)
-            translational = wp.max(wp.dot(pre_velocity - ball_vel[env], direction), 0.0)
+            translational = wp.max(wp.dot(pre_velocity - pre_ball_velocity, direction), 0.0)
             total_closing = rotational + translational
             rotational_share = rotational / wp.max(total_closing, 1.0e-6)
             ball_delta = wp.length(ball_delta_vector)
 
             self_direction = _safe_unit(ball_pos[env] - car_pos[car])
             opponent_direction = _safe_unit(ball_pos[env] - car_pos[other])
-            self_closing = wp.dot(car_vel[car] - ball_vel[env], self_direction)
-            opponent_closing = wp.dot(car_vel[other] - ball_vel[env], opponent_direction)
+            self_closing = wp.dot(pre_velocity - pre_ball_velocity, self_direction)
+            opponent_closing = wp.dot(
+                opponent_pre_velocity - pre_ball_velocity, opponent_direction
+            )
             opponent_distance = wp.length(ball_pos[env] - car_pos[other])
             self_time = distance / wp.max(self_closing, 1.0e-6)
             opponent_time = opponent_distance / wp.max(opponent_closing, 1.0e-6)
@@ -730,10 +754,17 @@ def gameplay_v3_track_tick(
                 and rotational_share >= POWER_ROTATIONAL_SHARE_MIN
                 and ball_delta >= POWER_BALL_DELTA_V_MIN
             )
+            captured_control_ticks = control_ticks[car]
+            captured_control_distance = control_max_distance[car]
+            captured_control_relative_speed = control_max_relative_speed[car]
+            if control_dodge_ticks[car] > 0:
+                captured_control_ticks = control_dodge_ticks[car]
+                captured_control_distance = control_dodge_max_distance[car]
+                captured_control_relative_speed = control_dodge_max_relative_speed[car]
             controlled = (
-                control_ticks[car] >= CONTROL_HISTORY_TICKS_MIN
-                and control_max_distance[car] <= CONTROL_DISTANCE_MAX
-                and control_max_relative_speed[car] <= CONTROL_RELATIVE_SPEED_MAX
+                captured_control_ticks >= CONTROL_HISTORY_TICKS_MIN
+                and captured_control_distance <= CONTROL_DISTANCE_MAX
+                and captured_control_relative_speed <= CONTROL_RELATIVE_SPEED_MAX
             )
             pending_active[car] = 1
             pending_age[car] = 0
@@ -750,12 +781,15 @@ def gameplay_v3_track_tick(
             pending_features[feature_base + 2] = opponent_closing
             pending_features[feature_base + 3] = time_delta
             pending_features[feature_base + 4] = ball_delta
-            pending_features[feature_base + 5] = float(control_ticks[car])
-            pending_features[feature_base + 6] = control_max_distance[car]
-            pending_features[feature_base + 7] = control_max_relative_speed[car]
+            pending_features[feature_base + 5] = float(captured_control_ticks)
+            pending_features[feature_base + 6] = captured_control_distance
+            pending_features[feature_base + 7] = captured_control_relative_speed
         control_ticks[car] = 0
         control_max_distance[car] = 0.0
         control_max_relative_speed[car] = 0.0
+        control_dodge_ticks[car] = 0
+        control_dodge_max_distance[car] = 0.0
+        control_dodge_max_relative_speed[car] = 0.0
 
     dash_previous_on_ground[car] = on_ground[car]
     dash_previous_has_jumped[car] = has_jumped[car]
@@ -965,6 +999,9 @@ def gameplay_v3_reset_source_state(
     control_ticks: wp.array(dtype=wp.int32),
     control_max_distance: wp.array(dtype=wp.float32),
     control_max_relative_speed: wp.array(dtype=wp.float32),
+    control_dodge_ticks: wp.array(dtype=wp.int32),
+    control_dodge_max_distance: wp.array(dtype=wp.float32),
+    control_dodge_max_relative_speed: wp.array(dtype=wp.float32),
     pending_active: wp.array(dtype=wp.int32),
     pending_age: wp.array(dtype=wp.int32),
     pending_recognized: wp.array(dtype=wp.int32),
@@ -1005,6 +1042,9 @@ def gameplay_v3_reset_source_state(
     control_ticks[car] = 0
     control_max_distance[car] = 0.0
     control_max_relative_speed[car] = 0.0
+    control_dodge_ticks[car] = 0
+    control_dodge_max_distance[car] = 0.0
+    control_dodge_max_relative_speed[car] = 0.0
     pending_active[car] = 0
     pending_age[car] = 0
     pending_recognized[car] = 0
@@ -1205,6 +1245,9 @@ class Rival2GameplayV3State:
         ints("control_ticks", self.car_count)
         floats("control_max_distance", self.car_count)
         floats("control_max_relative_speed", self.car_count)
+        ints("control_dodge_ticks", self.car_count)
+        floats("control_dodge_max_distance", self.car_count)
+        floats("control_dodge_max_relative_speed", self.car_count)
         ints("pending_active", self.car_count)
         ints("pending_age", self.car_count)
         ints("pending_recognized", self.car_count)
@@ -1416,6 +1459,8 @@ class Rival2GameplayV3State:
                 world.car_ball_b.hit_this_tick,
                 world.car_ball.pre_car_velocity_bt,
                 world.car_ball_b.pre_car_velocity_bt,
+                world.car_ball.pre_ball_velocity_bt,
+                world.car_ball_b.pre_ball_velocity_bt,
                 world.car_ball.pre_car_angular_velocity,
                 world.car_ball_b.pre_car_angular_velocity,
                 world.car_ball.contact_point_a_bt,
@@ -1459,6 +1504,9 @@ class Rival2GameplayV3State:
                 self.control_ticks,
                 self.control_max_distance,
                 self.control_max_relative_speed,
+                self.control_dodge_ticks,
+                self.control_dodge_max_distance,
+                self.control_dodge_max_relative_speed,
                 self.pending_active,
                 self.pending_age,
                 self.pending_recognized,
@@ -1597,6 +1645,9 @@ class Rival2GameplayV3State:
                 self.control_ticks,
                 self.control_max_distance,
                 self.control_max_relative_speed,
+                self.control_dodge_ticks,
+                self.control_dodge_max_distance,
+                self.control_dodge_max_relative_speed,
                 self.pending_active,
                 self.pending_age,
                 self.pending_recognized,

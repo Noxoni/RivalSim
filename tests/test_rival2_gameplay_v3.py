@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import inspect
+import json
 import math
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -12,12 +15,26 @@ import warp as wp
 
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
 from rivalsim.gameplay_v3 import (
+    CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX,
     CONTEST_CONTACT_WINDOW_TICKS,
+    CONTEST_OPPONENT_CLOSING_SPEED_MIN,
+    CONTEST_OPPONENT_DISTANCE_MAX,
+    CONTEST_SELF_CLOSING_SPEED_MIN,
+    CONTEST_TIME_TO_BALL_DELTA_MAX,
+    CONTROL_DISTANCE_MAX,
+    CONTROL_HISTORY_TICKS_MIN,
+    CONTROL_RELATIVE_SPEED_MAX,
+    CONTROL_RELEASE_BALL_DELTA_V_MIN,
+    CONTROL_RELEASE_DISTANCE_MIN,
     OUTCOME_EXEMPT_CONTESTED_50,
     OUTCOME_EXEMPT_CONTROLLED_FLICK,
     OUTCOME_EXEMPT_POWER_CONTACT,
     OUTCOME_EXEMPT_RECOGNIZED_MECHANIC,
     OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT,
+    POWER_BALL_DELTA_V_MIN,
+    POWER_ROTATIONAL_CLOSING_SPEED_MIN,
+    POWER_ROTATIONAL_SHARE_MIN,
+    POWER_TOTAL_CLOSING_SPEED_MIN,
     Rival2GameplayV3State,
     contest_convergence_exempt,
     controlled_flick_exempt,
@@ -52,6 +69,7 @@ from rivalsim.state import StateSnapshot
 
 EXPECTED_V1_HASH = "48AAC000B97D2652507F677184A3FE4F0A3A86CED136B680C933EFF33CD9F072"
 EXPECTED_V2_HASH = "4073E29C1013458D5784435061FE47C639525BE37E8CD519783889C69BA87D41"
+EXPECTED_V3_HASH = "AABCA03BEBCBFC2E74EE446452781F60AC43D8C3631151BDCB7E15D0FAE13508"
 
 
 def _collision_root() -> Path | None:
@@ -69,7 +87,7 @@ def _collision_root() -> Path | None:
 def test_v3_contract_identity_and_historical_hashes_are_frozen() -> None:
     assert REWARD_GAMEPLAY_V1_CONTRACT_HASH == EXPECTED_V1_HASH
     assert REWARD_GAMEPLAY_V2_CONTRACT_HASH == EXPECTED_V2_HASH
-    assert len(REWARD_GAMEPLAY_V3_CONTRACT_HASH) == 64
+    assert REWARD_GAMEPLAY_V3_CONTRACT_HASH == EXPECTED_V3_HASH
     assert REWARD_GAMEPLAY_V3_CONTRACT["unconditional_unique_touch"] == 0.0
     assert REWARD_GAMEPLAY_V3_CONTRACT["gameplay_v2_standalone_double_dash_reward"] == 0.0
     assert REWARD_GAMEPLAY_V3_CONTRACT["mechanics"]["event_reward"] == 0.005
@@ -84,17 +102,22 @@ def test_v3_contract_identity_and_historical_hashes_are_frozen() -> None:
 
 
 def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
-    assert CONTEST_CONTACT_WINDOW_TICKS == 2
+    assert CONTEST_CONTACT_WINDOW_TICKS == 8
+    assert pytest.approx(86.60006713867188) == CONTEST_ASSOCIATION_BALL_DISPLACEMENT_MAX
+    assert pytest.approx(430.46632385253906) == CONTEST_OPPONENT_DISTANCE_MAX
+    assert pytest.approx(735.8017120361328) == CONTEST_SELF_CLOSING_SPEED_MIN
+    assert pytest.approx(587.1069793701172) == CONTEST_OPPONENT_CLOSING_SPEED_MIN
+    assert pytest.approx(0.23604875229838973) == CONTEST_TIME_TO_BALL_DELTA_MAX
     assert contest_convergence_exempt(
-        opponent_distance=500.0,
-        self_closing_speed=150.0,
-        opponent_closing_speed=150.0,
-        time_to_ball_delta=0.12,
+        opponent_distance=CONTEST_OPPONENT_DISTANCE_MAX,
+        self_closing_speed=CONTEST_SELF_CLOSING_SPEED_MIN,
+        opponent_closing_speed=CONTEST_OPPONENT_CLOSING_SPEED_MIN,
+        time_to_ball_delta=CONTEST_TIME_TO_BALL_DELTA_MAX,
     )
     assert not contest_convergence_exempt(
-        opponent_distance=500.01,
-        self_closing_speed=400.0,
-        opponent_closing_speed=400.0,
+        opponent_distance=CONTEST_OPPONENT_DISTANCE_MAX + 0.01,
+        self_closing_speed=1000.0,
+        opponent_closing_speed=1000.0,
         time_to_ball_delta=0.01,
     )
     assert not contest_convergence_exempt(
@@ -104,26 +127,26 @@ def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
         time_to_ball_delta=0.01,
     )
     assert power_contact_exempt(
-        total_closing_speed=300.0,
-        rotational_closing_speed=100.0,
-        rotational_share=0.18,
-        ball_delta_v=175.0,
+        total_closing_speed=POWER_TOTAL_CLOSING_SPEED_MIN,
+        rotational_closing_speed=POWER_ROTATIONAL_CLOSING_SPEED_MIN,
+        rotational_share=POWER_ROTATIONAL_SHARE_MIN,
+        ball_delta_v=POWER_BALL_DELTA_V_MIN,
     )
     assert not power_contact_exempt(
         total_closing_speed=800.0,
-        rotational_closing_speed=99.99,
+        rotational_closing_speed=POWER_ROTATIONAL_CLOSING_SPEED_MIN - 0.01,
         rotational_share=0.5,
         ball_delta_v=500.0,
     )
     assert controlled_flick_exempt(
-        control_ticks=4,
-        control_max_distance=220.0,
-        control_max_relative_speed=260.0,
-        release_distance=245.0,
-        ball_delta_v=120.0,
+        control_ticks=CONTROL_HISTORY_TICKS_MIN,
+        control_max_distance=CONTROL_DISTANCE_MAX,
+        control_max_relative_speed=CONTROL_RELATIVE_SPEED_MAX,
+        release_distance=CONTROL_RELEASE_DISTANCE_MIN,
+        ball_delta_v=CONTROL_RELEASE_BALL_DELTA_V_MIN,
     )
     assert not controlled_flick_exempt(
-        control_ticks=3,
+        control_ticks=CONTROL_HISTORY_TICKS_MIN - 1,
         control_max_distance=100.0,
         control_max_relative_speed=100.0,
         release_distance=300.0,
@@ -159,6 +182,36 @@ def test_v3_classifier_calibration_boundaries_and_primary_precedence() -> None:
         contested_50=False,
         power_contact=False,
     ) == OUTCOME_UNNECESSARY_FLIP_THROUGH_CONTACT
+
+
+@pytest.mark.skipif(not wp.is_cuda_available(), reason="CUDA required")
+def test_v3_dash_reset_production_state_machine_source_exact() -> None:
+    collision_root = _collision_root()
+    if collision_root is None:
+        pytest.skip("RocketSim collision meshes unavailable")
+    script = Path(__file__).resolve().parents[1] / "benchmarks" / (
+        "run_rival2_gameplay_v3_validation_correction.py"
+    )
+    output_dir = Path(".pytest_cache/rival2_gameplay_v3_source_exact")
+    subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--collision-root",
+            str(collision_root),
+            "--phase",
+            "source-exact",
+            "--output-dir",
+            str(output_dir),
+        ],
+        check=True,
+    )
+    evidence = json.loads(
+        (output_dir / "dash_reset_source_exact.json").read_text(encoding="utf-8")
+    )
+    assert evidence["verdict"] == "PASS", evidence["failed"]
+    assert evidence["case_count"] == 12
+    assert evidence["passed"] == 12
 
 
 @pytest.mark.parametrize(

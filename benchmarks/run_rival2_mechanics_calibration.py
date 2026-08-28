@@ -177,6 +177,7 @@ class Trace:
         self.contact_point: list[np.ndarray] = []
         self.pre_car_vel: list[np.ndarray] = []
         self.pre_car_ang: list[np.ndarray] = []
+        self.pre_ball_vel: list[np.ndarray] = []
         self.ball_delta_v: list[np.ndarray] = []
         self.actions: list[np.ndarray] = []
 
@@ -252,6 +253,9 @@ class Trace:
         self.contact_point.append(pair_point[:, 0].copy())
         self.pre_car_vel.append(pre_vel[:, 0].copy())
         self.pre_car_ang.append(pre_ang[:, 0].copy())
+        self.pre_ball_vel.append(
+            np.asarray(sim.car_ball.pre_ball_velocity_bt.numpy()).copy()
+        )
         self.ball_delta_v.append(delta_v[:, 0].copy())
         self.actions.append(
             np.stack(
