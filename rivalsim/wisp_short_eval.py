@@ -22,6 +22,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
@@ -32,6 +33,12 @@ from rivalsim.rival2_policy import (
     sample_hybrid_action,
 )
 from third_party.wisp75b.adapter import WispPolicyAdapter, WispStateTensors
+
+SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS = (
+    RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+)
 
 
 class WispShortEpisodeRunner:
@@ -81,11 +88,8 @@ class WispShortEpisodeRunner:
             raise RuntimeError("Rival checkpoint SHA-256 mismatch")
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         checkpoint_reward = payload.get("reward_version")
-        if checkpoint_reward not in (
-            RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
-            RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
-        ):
-            raise RuntimeError("Wisp evaluator requires a Gameplay V1/V2 checkpoint")
+        if checkpoint_reward not in SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS:
+            raise RuntimeError("Wisp evaluator requires a Gameplay V1/V2/V3 checkpoint")
         if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
             raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
         policy_config = Rival2PolicyConfig(**payload["policy_config"])

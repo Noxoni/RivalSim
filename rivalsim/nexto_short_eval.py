@@ -30,6 +30,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_EPISODE_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
@@ -54,6 +55,11 @@ PHYSICS_HZ = 120
 RIVAL_CADENCE_TICKS = 4
 NEXTO_CADENCE_TICKS = 8
 DEFAULT_DASH_EVENT_CAPACITY = 64
+SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS = (
+    RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+)
 POST_LANDING_SAMPLE_TICKS = 4
 
 # These are prospective operational classification windows, not hidden engine
@@ -1039,11 +1045,8 @@ class NextoShortEpisodeRunner:
         if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
             raise RuntimeError("unsupported Rival checkpoint format")
         checkpoint_reward = payload.get("reward_version")
-        if checkpoint_reward not in (
-            RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
-            RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
-        ):
-            raise RuntimeError("short evaluator requires a Gameplay V1/V2 checkpoint")
+        if checkpoint_reward not in SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS:
+            raise RuntimeError("short evaluator requires a Gameplay V1/V2/V3 checkpoint")
         if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
             raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
         policy_config = Rival2PolicyConfig(**payload["policy_config"])
