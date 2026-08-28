@@ -1,0 +1,41 @@
+{
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_VERIFICATION_V1",
+  "verified_utc": "2026-08-28T19:56:15.738Z",
+  "source_selection": {
+    "source_root": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos",
+    "mode": "explicit_session_ids",
+    "session_count": 18,
+    "selection_is_recorded_in": "index.json#/session_selection"
+  },
+  "commands": [
+    {
+      "command": ".venv\\Scripts\\ruff.exe check benchmarks\\review_rival2_human_demos.py tests\\test_human_demo_review.py",
+      "exit_code": 0,
+      "result": "All checks passed."
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe -m pytest tests\\test_human_demo_review.py tests\\test_human_demo_recording.py -q --basetemp G:\\dev\\RivalSim\\.tools\\pytest-human-review-20260828-3",
+      "exit_code": 0,
+      "result": "25 passed, 1 skipped in 2.65s",
+      "skip_reason": "Optional native C++ fixture test requires RIVALREC_CPP_FIXTURE after building the native format fixture."
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe benchmarks\\review_rival2_human_demos.py --output-dir results\\rival2\\human_demo_review_v2 --verify-only",
+      "exit_code": 0,
+      "result": {
+        "attempt_count": 195,
+        "errors": [],
+        "generated_artifact_count_before_this_evidence_record": 40,
+        "session_count": 18,
+        "source_file_count": 121,
+        "valid": true
+      }
+    }
+  ],
+  "authority_boundary": {
+    "behavior_cloning_performed": false,
+    "mechanic_rewards_assigned": false,
+    "new_mechanic_detector_defined": false,
+    "training_performed": false
+  }
+}

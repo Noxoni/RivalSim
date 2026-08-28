@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
+
+import pytest
 
 from benchmarks.review_rival2_human_demos import (
     _assign_outcome_groups,
     _segment_attempts,
+    _select_session_dirs,
 )
 
 HUMAN_ID = "human-1"
@@ -105,3 +110,32 @@ def test_single_contact_attempt_is_not_artificially_top_quartile() -> None:
 
     assert not report["relative_quartile_comparison_available"]
     assert attempts[0]["outcome_group"]["name"] == "ambiguous_middle_physical_outcome"
+
+
+def _session_dir(root: Path, session_id: str, capture_start_utc: str) -> Path:
+    session_dir = root / session_id
+    session_dir.mkdir()
+    (session_dir / "manifest.json").write_text(
+        json.dumps({"capture_start_utc": capture_start_utc}),
+        encoding="utf-8",
+    )
+    return session_dir
+
+
+def test_explicit_session_selection_is_exact_and_chronological(tmp_path: Path) -> None:
+    later = _session_dir(tmp_path, "later", "2026-08-28T19:01:00Z")
+    earlier = _session_dir(tmp_path, "earlier", "2026-08-28T19:00:00Z")
+    _session_dir(tmp_path, "unselected", "2026-08-28T18:59:00Z")
+
+    selected = _select_session_dirs(tmp_path, [later.name, earlier.name])
+
+    assert selected == [earlier, later]
+
+
+def test_explicit_session_selection_rejects_missing_or_duplicate_ids(tmp_path: Path) -> None:
+    present = _session_dir(tmp_path, "present", "2026-08-28T19:00:00Z")
+
+    with pytest.raises(ValueError, match="requested session directories not found: missing"):
+        _select_session_dirs(tmp_path, [present.name, "missing"])
+    with pytest.raises(ValueError, match="duplicate --session-id values: present"):
+        _select_session_dirs(tmp_path, [present.name, present.name])

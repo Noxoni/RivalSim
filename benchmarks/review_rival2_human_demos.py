@@ -1134,13 +1134,41 @@ def _markdown_report(index: dict[str, Any], groupings: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def run(source_root: Path, output_dir: Path) -> dict[str, Any]:
-    session_dirs = sorted(
-        [path for path in source_root.iterdir() if (path / "manifest.json").is_file()],
+def _select_session_dirs(
+    source_root: Path, session_ids: Sequence[str] | None = None
+) -> list[Path]:
+    available = {
+        path.name: path
+        for path in source_root.iterdir()
+        if path.is_dir() and (path / "manifest.json").is_file()
+    }
+    if session_ids:
+        requested = [str(session_id) for session_id in session_ids]
+        duplicates = sorted(
+            session_id for session_id, count in Counter(requested).items() if count > 1
+        )
+        if duplicates:
+            raise ValueError(f"duplicate --session-id values: {', '.join(duplicates)}")
+        missing = sorted(set(requested) - set(available))
+        if missing:
+            raise ValueError(f"requested session directories not found: {', '.join(missing)}")
+        selected = [available[session_id] for session_id in requested]
+    else:
+        selected = list(available.values())
+    return sorted(
+        selected,
         key=lambda path: json.loads((path / "manifest.json").read_text(encoding="utf-8")).get(
             "capture_start_utc", ""
         ),
     )
+
+
+def run(
+    source_root: Path,
+    output_dir: Path,
+    session_ids: Sequence[str] | None = None,
+) -> dict[str, Any]:
+    session_dirs = _select_session_dirs(source_root, session_ids)
     output_dir.mkdir(parents=True, exist_ok=True)
     reports: list[dict[str, Any]] = []
     attempts_by_session: dict[str, list[dict[str, Any]]] = {}
@@ -1203,6 +1231,10 @@ def run(source_root: Path, output_dir: Path) -> dict[str, Any]:
         "format": FORMAT,
         "generated_utc": generated_utc,
         "source_root": str(source_root.resolve()),
+        "session_selection": {
+            "mode": "explicit_session_ids" if session_ids else "all_sessions",
+            "session_ids": [path.name for path in session_dirs],
+        },
         "review_script": str(script_path),
         "review_script_sha256": _sha256(script_path),
         "session_count": len(index_rows),
@@ -1402,6 +1434,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("results/rival2/human_demo_review_v1"),
     )
+    parser.add_argument(
+        "--session-id",
+        action="append",
+        default=[],
+        help=(
+            "Review only this session directory under --source-root. Repeat for an exact "
+            "cohort; missing or duplicate values fail loudly."
+        ),
+    )
     parser.add_argument("--verify-only", action="store_true")
     return parser
 
@@ -1412,7 +1453,11 @@ def main(argv: list[str] | None = None) -> int:
         verification = verify_review(args.output_dir.resolve())
         print(json.dumps(verification, sort_keys=True))
         return 0 if verification["valid"] else 1
-    index = run(args.source_root.resolve(), args.output_dir.resolve())
+    index = run(
+        args.source_root.resolve(),
+        args.output_dir.resolve(),
+        session_ids=args.session_id or None,
+    )
     print(
         json.dumps(
             {

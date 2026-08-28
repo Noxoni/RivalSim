@@ -1,0 +1,178 @@
+{
+  "attempt_count": 9,
+  "attempt_quality_summary": {
+    "attempt_count": 9,
+    "complete_human_car_coverage_attempt_count": 9,
+    "generic_recovery_observed_count": 9,
+    "human_contact_attempt_count": 6,
+    "invalid_action_attempt_count": 0,
+    "missing_tick_attempt_count": 0,
+    "noncontiguous_attempt_count": 0
+  },
+  "authority_boundary": {
+    "all_attempts_preserved": true,
+    "behavior_cloning_performed": false,
+    "mechanic_rewards_assigned": false,
+    "new_mechanic_detector_defined": false,
+    "training_performed": false
+  },
+  "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
+  "capture_end_utc": "2026-08-28T19:13:09.388Z",
+  "capture_start_utc": "2026-08-28T19:12:21.518Z",
+  "classification": "freeplay_mechanic_practice",
+  "declared_label": "powerflick",
+  "declared_mechanic_label": "powerflick",
+  "declared_opponent_label": "",
+  "declared_session_type": "freeplay",
+  "event_count": 625,
+  "event_counts": {
+    "ball_touch": 589,
+    "duplicate_hook_callback_suppressed": 6,
+    "goal": 4,
+    "jump_onset": 17,
+    "kickoff_or_round_reset": 3,
+    "local_car_rebind": 3,
+    "respawn": 3
+  },
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "frame_count": 5207,
+  "gameplay_summary": null,
+  "ingestion_eligible_under_current_validator": false,
+  "local_player": {
+    "name": "Noxoni",
+    "player_id": 257,
+    "stable_id": "Steam|76561199043547232|0",
+    "team": 0
+  },
+  "map": "stadium_day_p",
+  "marker_count": 1,
+  "markers": [
+    {
+      "engine_physics_time": 679.092,
+      "game_time_seconds": 679.405,
+      "kind": "marker",
+      "monotonic_ns": 1280970964042600,
+      "physics_frame": 81491,
+      "sequence_boundary": 5207,
+      "text": "clean_attempt",
+      "utc_ns": 1787944387620740500
+    }
+  ],
+  "outcome_grouping": {
+    "comparison_metric": "primary_contact_ball_delta_velocity_magnitude_12_ticks",
+    "comparison_value_count": 6,
+    "contact_attempt_fraction": 0.6666666666666666,
+    "contact_oriented_by_evidence": true,
+    "counts": {
+      "ambiguous_middle_physical_outcome": 1,
+      "limited_evidence_no_measured_human_contact": 3,
+      "limited_or_failed_physical_outcome_candidate": 1,
+      "stronger_physical_outcome_candidate": 4
+    },
+    "policy": "Relative descriptive triage only. Buckets are not mechanic detectors, success labels, rewards, or training targets; all attempts remain preserved.",
+    "relative_quartile_comparison_available": true,
+    "version": "DESCRIPTIVE_RELATIVE_OUTCOME_V1",
+    "within_session_q25": 990.1319525102816,
+    "within_session_q75": 1184.2513315581352
+  },
+  "plugin_build": "1.0.1",
+  "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
+  "review_scope": "new_demonstration",
+  "rocket_league_build": "260811.1257.524913",
+  "segmentation_audit": {
+    "anchor_count": 17,
+    "attempt_count": 9,
+    "hard_boundary_indices": [
+      0,
+      1091,
+      1778,
+      3655,
+      5207
+    ],
+    "maximum_attempt_ticks": 960,
+    "minimum_post_activity_ticks": 24,
+    "minimum_recovery_world_contact_wheels": 2,
+    "policy": "Label-agnostic activity segmentation: local-human native jump-onset anchors; physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded recovery separates attempts. No mechanic detector is used.",
+    "pre_roll_ticks": 60,
+    "recovery_run_ticks": 24,
+    "unsegmented_policy": "No synthetic attempt is created when no native jump onset exists.",
+    "version": "GENERIC_ACTIVITY_RECOVERY_V1"
+  },
+  "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+  "source_directory": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+  "source_file_set_sha256": "2BEBC58B9D7354FA8019DDF77C3C5374000EFC8B502B1C140CA5B5CA514D7F0A",
+  "source_files": [
+    {
+      "bytes": 2790072,
+      "path": "chunks/000000.rvr",
+      "sha256": "1EC13F0CD28EC2DB0399394D0981B3073C50852D4F9B307405B78D7B9666C610"
+    },
+    {
+      "bytes": 1245497,
+      "path": "chunks/000001.rvr",
+      "sha256": "023BA18A62C7A7BD577A7B79EB2A53A9114730556A54D9EB15AEA0170447944C"
+    },
+    {
+      "bytes": 290390,
+      "path": "events.jsonl",
+      "sha256": "E53AA10881E258912A76EEDC6ADBD1C21E3D2C9F12FEEB051FE8C94350112D9E"
+    },
+    {
+      "bytes": 3262,
+      "path": "manifest.json",
+      "sha256": "2D009DB35D53F7A5AC4E6D394804A05466050FF7D2C1E4EF8372CA91451F3378"
+    },
+    {
+      "bytes": 207,
+      "path": "markers.jsonl",
+      "sha256": "C214F7F2F168E19612FB41EF9152CA82B41A65B19D7DFB80A49C7780A1A21DC7"
+    }
+  ],
+  "validation": {
+    "active_capture_duration": 43.38330078125,
+    "active_capture_end": 677.308349609375,
+    "active_capture_end_physics_frame": 81277,
+    "active_capture_rate_hz": 120.02314038424743,
+    "active_capture_start": 633.925048828125,
+    "active_capture_start_physics_frame": 76071,
+    "capture_complete": false,
+    "capture_completeness_valid": false,
+    "clean_termination": true,
+    "complete_chunks": 2,
+    "completeness_errors": [
+      "active simulation continues beyond the final demonstration frame: 425 physics ticks, 3.54168701 engine seconds"
+    ],
+    "container_valid": true,
+    "duplicate_physics_frame_count": 0,
+    "duplicate_sequence_count": 0,
+    "errors": [],
+    "final_event_engine_time": 680.85,
+    "final_event_physics_frame": 81702,
+    "final_frame_engine_time": 677.308349609375,
+    "final_frame_physics_frame": 81277,
+    "final_marker_engine_time": 679.092,
+    "final_marker_physics_frame": 81491,
+    "first_sequence": 0,
+    "frame_count": 5207,
+    "invalid_action_frames": 0,
+    "invalid_human_car_frames": 0,
+    "last_sequence": 5206,
+    "manifest_hashes_valid": true,
+    "missing_physics_frame_count": 0,
+    "missing_sequence_count": 0,
+    "out_of_order_physics_frame_count": 0,
+    "out_of_order_sequence_count": 0,
+    "overall_demonstration_valid": false,
+    "partial_chunks": 0,
+    "sequence_gap_count": 0,
+    "session_dir": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+    "session_stop_engine_time": 680.8500366210938,
+    "session_stop_physics_frame": 81702,
+    "session_wall_duration": 47.8684767,
+    "session_wide_capture_rate_hz": 108.7772237381433,
+    "trailing_uncovered_engine_seconds": 3.54168701171875,
+    "trailing_uncovered_physics_ticks": 425,
+    "valid": false,
+    "warnings": []
+  }
+}
