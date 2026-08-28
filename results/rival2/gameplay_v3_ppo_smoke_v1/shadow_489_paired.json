@@ -1,0 +1,200 @@
+{
+  "checks": {
+    "exact_256_episodes": true,
+    "finite_metrics": true,
+    "iteration_unchanged": true,
+    "model_unchanged": true,
+    "no_update_called": true,
+    "optimizer_unchanged": true,
+    "policy_checkpoint_byte_identical": true,
+    "policy_version_unchanged": true,
+    "sample_counter_unchanged": true,
+    "source_checkpoint_byte_identical": true
+  },
+  "created_utc": "2026-08-28T15:02:26.551348+00:00",
+  "evaluation_extract": "first 256 source assignment rows; exact source model/optimizer/RNG restored in memory",
+  "evaluation_policy": {
+    "iteration": 489,
+    "model_sha256": "7AE3ADDF505E9E6EE0AF22A819EB5090EF397BDF728DCD4DB289B5E6EE18B0AB",
+    "path": "G:/dev/RivalSim-runs/gameplay-v3-ppo-smoke-20260828-c564af9/checkpoints/rival2_gameplay_v3_smoke_iteration_489_resume.pt",
+    "policy_version": 489,
+    "sha256": "10D97428B3F1CC2E307040314D1DD1A924BD82975D4B88C0F73C3FC2716DCF54",
+    "total_agent_samples": 3711438222
+  },
+  "identity": {
+    "counters_after": [
+      479,
+      479,
+      3655854038
+    ],
+    "counters_before": [
+      479,
+      479,
+      3655854038
+    ],
+    "model_after": "7AE3ADDF505E9E6EE0AF22A819EB5090EF397BDF728DCD4DB289B5E6EE18B0AB",
+    "model_before": "7AE3ADDF505E9E6EE0AF22A819EB5090EF397BDF728DCD4DB289B5E6EE18B0AB",
+    "optimizer_after": "D328AF07BF933DB4EA964F1E307ACF9A620D0C117EC228C68C108CCC2AF2A47C",
+    "optimizer_before": "D328AF07BF933DB4EA964F1E307ACF9A620D0C117EC228C68C108CCC2AF2A47C"
+  },
+  "metrics": {
+    "active_world_decisions": 127038,
+    "bad_flip_absolute_gameplay_reward_ratio": 0.0029037028301955848,
+    "bad_flip_mean_abs_penalty_per_decision": 6.179253322403296e-05,
+    "bad_flip_progress_ratio": 0.02677676195840496,
+    "budget_hit_player_episode_fraction": 0.0,
+    "car_minutes": 141.15333333333334,
+    "duplicate_suppression": {
+      "breezi": 0,
+      "ground_carry": 0,
+      "half_flip": 0,
+      "musty": 0,
+      "pinch": 1,
+      "pogo": 0,
+      "possession": 0,
+      "redirect": 35,
+      "speedflip": 0
+    },
+    "episodes": 256,
+    "exemption_flags": {
+      "EXEMPT_CONTESTED_50": 718,
+      "EXEMPT_CONTROLLED_FLICK": 258,
+      "EXEMPT_POWER_CONTACT": 20,
+      "EXEMPT_RECOGNIZED_MECHANIC": 2
+    },
+    "exemption_rates_per_flip_touch": {
+      "EXEMPT_CONTESTED_50": 0.4138328530259366,
+      "EXEMPT_CONTROLLED_FLICK": 0.14870317002881844,
+      "EXEMPT_POWER_CONTACT": 0.011527377521613832,
+      "EXEMPT_RECOGNIZED_MECHANIC": 0.0011527377521613833
+    },
+    "flip_active_touches_per_min": 12.291597789637747,
+    "flip_touch_all_touch_fraction": 0.6325191396281443,
+    "impossible_count": 0,
+    "mechanic_detected": {
+      "ball_reset": 6,
+      "breezi": 0,
+      "car_reset": 3,
+      "half_flip": 2,
+      "musty": 2,
+      "pinch": 15,
+      "pogo": 156,
+      "redirect": 519,
+      "speedflip": 17,
+      "successful_dash": 92
+    },
+    "mechanic_detected_per_min": {
+      "ball_reset": 0.04250696641949653,
+      "breezi": 0.0,
+      "car_reset": 0.021253483209748264,
+      "half_flip": 0.014168988806498842,
+      "musty": 0.014168988806498842,
+      "pinch": 0.10626741604874132,
+      "pogo": 1.1051811269069096,
+      "redirect": 3.6768525952864497,
+      "speedflip": 0.12043640485524017,
+      "successful_dash": 0.6517734850989467
+    },
+    "mechanic_paid": {
+      "ball_reset": 6,
+      "breezi": 0,
+      "car_reset": 3,
+      "half_flip": 2,
+      "musty": 2,
+      "pinch": 15,
+      "pogo": 156,
+      "redirect": 519,
+      "speedflip": 17,
+      "successful_dash": 92
+    },
+    "mechanics_absolute_gameplay_reward_ratio": 0.0014537009007982908,
+    "mechanics_mean_abs_reward_per_decision": 3.093562477408698e-05,
+    "mechanics_progress_ratio": 0.013405436181213072,
+    "movement_action_telemetry": {
+      "analog_saturation_fraction": {
+        "pitch": 0.03985815267872605,
+        "roll": 0.0103354901682961,
+        "steer": 0.010528345849273446,
+        "throttle": 0.07897636927533494,
+        "yaw": 0.005856515373352855
+      },
+      "mean_absolute": {
+        "boost": 0.5085132007745714,
+        "handbrake": 0.3124852406366599,
+        "jump": 0.2824548560273304,
+        "pitch": 0.5136514464081264,
+        "roll": 0.4102236706080229,
+        "steer": 0.37688925770774795,
+        "throttle": 0.6296454463150367,
+        "yaw": 0.39921551804746946
+      },
+      "nonzero_fraction": {
+        "boost": 0.5085132007745714,
+        "handbrake": 0.3124852406366599,
+        "jump": 0.2824548560273304,
+        "pitch": 1.0,
+        "roll": 1.0,
+        "steer": 1.0,
+        "throttle": 1.0,
+        "yaw": 0.9999960641697759
+      }
+    },
+    "no_touch_behavior": {
+      "hard_time_truncations": 18,
+      "no_touch_episode_fraction": 0.0078125,
+      "no_touch_truncations": 2
+    },
+    "progress_mean_abs_reward_per_decision": 0.002307692517863867,
+    "rearms": {
+      "breezi": 0,
+      "ground_carry": 0,
+      "half_flip": 2,
+      "musty": 2,
+      "pinch": 14,
+      "pogo": 155,
+      "possession": 0,
+      "redirect": 518,
+      "speedflip": 17
+    },
+    "reward_component_mean_abs_per_active_world_decision": {
+      "boost_pickups": 1.908090512676541e-05,
+      "boost_use": 1.0210330333463876e-05,
+      "demos": 5.510162395746256e-06,
+      "goals": 0.018577118657409596,
+      "mechanics": 3.093562477408698e-05,
+      "progress": 0.002307692517863867,
+      "saves": 0.00037193595617059463,
+      "speed": 1.922206283518646e-05,
+      "supersonic": 1.827642045101365e-05,
+      "unnecessary_flip": 6.179253322403296e-05
+    },
+    "scoring_behavior": {
+      "goal_episode_fraction": 0.921875,
+      "goal_episodes": 236,
+      "opponent_goals": 109,
+      "rival_goal_share": 0.538135593220339,
+      "rival_goals": 127
+    },
+    "theoretical_paid_mechanics_per_min": 5.75260945543853,
+    "total_mean_abs_reward_per_decision": 0.02131736401306382,
+    "touches_per_min": 19.432768148113162,
+    "unnecessary_flip_contacts_per_min": 5.703017994615784,
+    "unnecessary_flip_touch_fraction": 0.46397694524495675
+  },
+  "paired_policy_only_evaluation": true,
+  "policy_and_opponents_frozen": true,
+  "ppo_update_calls": 0,
+  "schema_version": 1,
+  "source": {
+    "episode_version": "RIVAL2_EPISODE_V1",
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "iteration": 479,
+    "path": "G:/dev/RivalSim-runs/opponent-curriculum-v1-safe-20260827-b2af03d/checkpoints/rival2_opponent_curriculum_plus_120_resume.pt",
+    "policy_version": 479,
+    "reward_version": "RIVAL2_REWARD_GAMEPLAY_V2",
+    "sha256": "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A",
+    "total_agent_samples": 3655854038,
+    "worlds": 131072
+  },
+  "verdict": "PASS"
+}

@@ -1,0 +1,477 @@
+{
+  "additional_samples": 55584184,
+  "checks": {
+    "all_checkpoint_audits_green": true,
+    "all_training_rows_green": true,
+    "all_value_loss_isolation_green": true,
+    "baseline_committed_pass": true,
+    "baseline_contact_metrics_reproduced": true,
+    "baseline_reproduction_pass": true,
+    "checkpoint_iterations_exact": true,
+    "final_checkpoint_exists": true,
+    "final_checkpoint_hash_exact": true,
+    "hard_guard_not_fired": true,
+    "iterations_exact": true,
+    "max_completed_kl_safe": true,
+    "max_minibatch_kl_safe": true,
+    "native_shadow_pass": true,
+    "paired_shadow_pass": true,
+    "paired_shadow_policy_489": true,
+    "run_complete": true,
+    "source_hash_exact": true,
+    "source_unchanged": true,
+    "stopped_exactly_489": true,
+    "ten_checkpoints": true,
+    "ten_rows": true
+  },
+  "comparison": {
+    "behavior_change_mechanism": {
+      "classification": "both",
+      "fewer_flip_active_contacts": true,
+      "greater_legitimate_share": true
+    },
+    "created_utc": "2026-08-28T15:08:18.573422+00:00",
+    "exemptions": {
+      "EXEMPT_CONTESTED_50": {
+        "rate_per_flip_touch": {
+          "absolute_change": 0.015468367044628173,
+          "iteration_479": 0.3983644859813084,
+          "iteration_489": 0.4138328530259366,
+          "relative_change": 0.03882968384223373
+        },
+        "raw_count": {
+          "absolute_change": 36.0,
+          "iteration_479": 682.0,
+          "iteration_489": 718.0,
+          "relative_change": 0.05278592375366564
+        }
+      },
+      "EXEMPT_CONTROLLED_FLICK": {
+        "rate_per_flip_touch": {
+          "absolute_change": -0.00024542810202268783,
+          "iteration_479": 0.14894859813084113,
+          "iteration_489": 0.14870317002881844,
+          "relative_change": -0.0016477369045602153
+        },
+        "raw_count": {
+          "absolute_change": 3.0,
+          "iteration_479": 255.0,
+          "iteration_489": 258.0,
+          "relative_change": 0.0117647058823529
+        }
+      },
+      "EXEMPT_POWER_CONTACT": {
+        "rate_per_flip_touch": {
+          "absolute_change": 0.0027656952786231787,
+          "iteration_479": 0.008761682242990653,
+          "iteration_489": 0.011527377521613832,
+          "relative_change": 0.3156580211335256
+        },
+        "raw_count": {
+          "absolute_change": 5.0,
+          "iteration_479": 15.0,
+          "iteration_489": 20.0,
+          "relative_change": 0.33333333333333326
+        }
+      },
+      "EXEMPT_RECOGNIZED_MECHANIC": {
+        "rate_per_flip_touch": {
+          "absolute_change": -0.0005995986964367475,
+          "iteration_479": 0.0017523364485981308,
+          "iteration_489": 0.0011527377521613833,
+          "relative_change": -0.3421709894332372
+        },
+        "raw_count": {
+          "absolute_change": -1.0,
+          "iteration_479": 3.0,
+          "iteration_489": 2.0,
+          "relative_change": -0.33333333333333337
+        }
+      }
+    },
+    "mechanics": {
+      "detected_total": {
+        "absolute_change": -39.0,
+        "iteration_479": 851.0,
+        "iteration_489": 812.0,
+        "relative_change": -0.04582843713278495
+      },
+      "iteration_479_detected": {
+        "ball_reset": 10,
+        "breezi": 0,
+        "car_reset": 2,
+        "half_flip": 1,
+        "musty": 3,
+        "pinch": 21,
+        "pogo": 181,
+        "redirect": 509,
+        "speedflip": 12,
+        "successful_dash": 112
+      },
+      "iteration_479_paid": {
+        "ball_reset": 10,
+        "breezi": 0,
+        "car_reset": 2,
+        "half_flip": 1,
+        "musty": 3,
+        "pinch": 21,
+        "pogo": 181,
+        "redirect": 509,
+        "speedflip": 12,
+        "successful_dash": 109
+      },
+      "iteration_489_detected": {
+        "ball_reset": 6,
+        "breezi": 0,
+        "car_reset": 3,
+        "half_flip": 2,
+        "musty": 2,
+        "pinch": 15,
+        "pogo": 156,
+        "redirect": 519,
+        "speedflip": 17,
+        "successful_dash": 92
+      },
+      "iteration_489_paid": {
+        "ball_reset": 6,
+        "breezi": 0,
+        "car_reset": 3,
+        "half_flip": 2,
+        "musty": 2,
+        "pinch": 15,
+        "pogo": 156,
+        "redirect": 519,
+        "speedflip": 17,
+        "successful_dash": 92
+      },
+      "paid_total": {
+        "absolute_change": -36.0,
+        "iteration_479": 848.0,
+        "iteration_489": 812.0,
+        "relative_change": -0.04245283018867929
+      }
+    },
+    "method": "iteration-479 evaluation context and RNG with only the iteration-489 model substituted; 256 natural short episodes, frozen policy/opponents, no update",
+    "metrics": {
+      "bad_flip_absolute_gameplay_reward_ratio": {
+        "absolute_change": -3.663049588663097e-05,
+        "iteration_479": 0.0029403333260822158,
+        "iteration_489": 0.0029037028301955848,
+        "relative_change": -0.01245793990827515
+      },
+      "bad_flip_progress_ratio": {
+        "absolute_change": -0.0005647903590563046,
+        "iteration_479": 0.027341552317461264,
+        "iteration_489": 0.02677676195840496,
+        "relative_change": -0.02065685051450461
+      },
+      "flip_active_touches_per_min": {
+        "absolute_change": -0.34267414896205395,
+        "iteration_479": 12.6342719385998,
+        "iteration_489": 12.291597789637747,
+        "relative_change": -0.02712258772229903
+      },
+      "mechanics_absolute_gameplay_reward_ratio": {
+        "absolute_change": -4.379228121165961e-05,
+        "iteration_479": 0.0014974931820099504,
+        "iteration_489": 0.0014537009007982908,
+        "relative_change": -0.02924372660774399
+      },
+      "mechanics_progress_ratio": {
+        "absolute_change": -0.0005194436335259189,
+        "iteration_479": 0.013924879814738991,
+        "iteration_489": 0.013405436181213072,
+        "relative_change": -0.03730327589442506
+      },
+      "touches_per_min": {
+        "absolute_change": -0.6403741842416615,
+        "iteration_479": 20.073142332354823,
+        "iteration_489": 19.432768148113162,
+        "relative_change": -0.03190203973243777
+      },
+      "unnecessary_flip_contacts_per_min": {
+        "absolute_change": -0.3705835272695168,
+        "iteration_479": 6.073601521885301,
+        "iteration_489": 5.703017994615784,
+        "relative_change": -0.061015449553971424
+      },
+      "unnecessary_flip_touch_fraction": {
+        "absolute_change": -0.01674735382046383,
+        "iteration_479": 0.4807242990654206,
+        "iteration_489": 0.46397694524495675,
+        "relative_change": -0.034837751811220063
+      }
+    },
+    "movement_action_telemetry": {
+      "analog_saturation_fraction": {
+        "pitch": {
+          "absolute_change": -0.0017886977730836515,
+          "iteration_479": 0.0416468504518097,
+          "iteration_489": 0.03985815267872605,
+          "relative_change": -0.04294917271483434
+        },
+        "roll": {
+          "absolute_change": 0.001848683667484318,
+          "iteration_479": 0.008486806500811782,
+          "iteration_489": 0.0103354901682961,
+          "relative_change": 0.2178303072312875
+        },
+        "steer": {
+          "absolute_change": 0.00028267945046733974,
+          "iteration_479": 0.010245666398806107,
+          "iteration_489": 0.010528345849273446,
+          "relative_change": 0.027590147820963473
+        },
+        "throttle": {
+          "absolute_change": -0.001389998371482709,
+          "iteration_479": 0.08036636764681765,
+          "iteration_489": 0.07897636927533494,
+          "relative_change": -0.0172957720024286
+        },
+        "yaw": {
+          "absolute_change": -0.0009985283316506707,
+          "iteration_479": 0.006855043705003526,
+          "iteration_489": 0.005856515373352855,
+          "relative_change": -0.14566330640924152
+        }
+      },
+      "mean_absolute": {
+        "boost": {
+          "absolute_change": -0.007091043448660295,
+          "iteration_479": 0.5156042442232317,
+          "iteration_489": 0.5085132007745714,
+          "relative_change": -0.013752880291633574
+        },
+        "handbrake": {
+          "absolute_change": -0.008931031072345164,
+          "iteration_479": 0.32141627170900505,
+          "iteration_489": 0.3124852406366599,
+          "relative_change": -0.027786493275084978
+        },
+        "jump": {
+          "absolute_change": -0.0014636706302618152,
+          "iteration_479": 0.2839185266575922,
+          "iteration_489": 0.2824548560273304,
+          "relative_change": -0.005155248752142905
+        },
+        "pitch": {
+          "absolute_change": -0.0028771050315301583,
+          "iteration_479": 0.5165285514396566,
+          "iteration_489": 0.5136514464081264,
+          "relative_change": -0.00557007937607934
+        },
+        "roll": {
+          "absolute_change": 0.004126046813333839,
+          "iteration_479": 0.40609762379468906,
+          "iteration_489": 0.4102236706080229,
+          "relative_change": 0.010160233824514586
+        },
+        "steer": {
+          "absolute_change": 0.0002981482610125985,
+          "iteration_479": 0.37659110944673535,
+          "iteration_489": 0.37688925770774795,
+          "relative_change": 0.0007917028669386372
+        },
+        "throttle": {
+          "absolute_change": -0.004971897944619497,
+          "iteration_479": 0.6346173442596562,
+          "iteration_489": 0.6296454463150367,
+          "relative_change": -0.007834481659841352
+        },
+        "yaw": {
+          "absolute_change": -0.006048206160052583,
+          "iteration_479": 0.40526372420752205,
+          "iteration_489": 0.39921551804746946,
+          "relative_change": -0.014924124215360268
+        }
+      },
+      "nonzero_fraction": {
+        "boost": {
+          "absolute_change": -0.007091043448660295,
+          "iteration_479": 0.5156042442232317,
+          "iteration_489": 0.5085132007745714,
+          "relative_change": -0.013752880291633574
+        },
+        "handbrake": {
+          "absolute_change": -0.008931031072345164,
+          "iteration_479": 0.32141627170900505,
+          "iteration_489": 0.3124852406366599,
+          "relative_change": -0.027786493275084978
+        },
+        "jump": {
+          "absolute_change": -0.0014636706302618152,
+          "iteration_479": 0.2839185266575922,
+          "iteration_489": 0.2824548560273304,
+          "relative_change": -0.005155248752142905
+        },
+        "pitch": {
+          "absolute_change": 4.0999065221702935e-06,
+          "iteration_479": 0.9999959000934778,
+          "iteration_489": 1.0,
+          "relative_change": 4.099923331501998e-06
+        },
+        "roll": {
+          "absolute_change": 0.0,
+          "iteration_479": 1.0,
+          "iteration_489": 1.0,
+          "relative_change": 0.0
+        },
+        "steer": {
+          "absolute_change": 0.0,
+          "iteration_479": 1.0,
+          "iteration_489": 1.0,
+          "relative_change": 0.0
+        },
+        "throttle": {
+          "absolute_change": 0.0,
+          "iteration_479": 1.0,
+          "iteration_489": 1.0,
+          "relative_change": 0.0
+        },
+        "yaw": {
+          "absolute_change": 1.6407629810366586e-07,
+          "iteration_479": 0.9999959000934778,
+          "iteration_489": 0.9999960641697759,
+          "relative_change": 1.6407697089881879e-07
+        }
+      }
+    },
+    "no_touch_behavior": {
+      "hard_time_truncations": {
+        "absolute_change": 3.0,
+        "iteration_479": 15.0,
+        "iteration_489": 18.0,
+        "relative_change": 0.19999999999999996
+      },
+      "no_touch_episode_fraction": {
+        "absolute_change": 0.0078125,
+        "iteration_479": 0.0,
+        "iteration_489": 0.0078125,
+        "relative_change": null
+      },
+      "no_touch_truncations": {
+        "absolute_change": 2.0,
+        "iteration_479": 0.0,
+        "iteration_489": 2.0,
+        "relative_change": null
+      }
+    },
+    "schema_version": 1,
+    "scoring_behavior": {
+      "goal_episode_fraction": {
+        "absolute_change": -0.01953125,
+        "iteration_479": 0.94140625,
+        "iteration_489": 0.921875,
+        "relative_change": -0.020746887966805017
+      },
+      "rival_goal_share": {
+        "absolute_change": 0.002865883676770542,
+        "iteration_479": 0.5352697095435685,
+        "iteration_489": 0.538135593220339,
+        "relative_change": 0.005354092760478268
+      }
+    }
+  },
+  "created_utc": "2026-08-28T15:08:18.584822+00:00",
+  "evaluation_implementation_commit": "d18da26af095802adea575eb3dcfaddd45ba654e",
+  "final_checkpoint": {
+    "agent_decision_samples": 3711438222,
+    "audit": {
+      "checks": {
+        "adaptive_lr_scope_update_local": true,
+        "adaptive_schema_v2": true,
+        "contracts_exact": true,
+        "critic_lr_exact": true,
+        "curriculum_state_present": true,
+        "curriculum_transition_present": true,
+        "episode_exact": true,
+        "format_exact": true,
+        "historical_pool_present": true,
+        "iteration_exact": true,
+        "model_finite": true,
+        "next_update_policy_lr_exact": true,
+        "opponent_assignments_present": true,
+        "optimizer_finite": true,
+        "policy_lr_rearmed": true,
+        "policy_version_exact": true,
+        "retention_present": true,
+        "reward_v3_exact": true,
+        "sample_counter_exact": true,
+        "split_optimizer": true
+      },
+      "verdict": "PASS_GREEN"
+    },
+    "historical_pool_versions": [
+      0,
+      30,
+      60,
+      90,
+      120,
+      180,
+      240,
+      300,
+      359,
+      389,
+      419,
+      449,
+      479
+    ],
+    "iteration": 489,
+    "path": "G:/dev/RivalSim-runs/gameplay-v3-ppo-smoke-20260828-c564af9/checkpoints/rival2_gameplay_v3_smoke_iteration_489_resume.pt",
+    "policy_version": 489,
+    "repository_path": "checkpoints/rival2/gameplay_v3_smoke/rival2_gameplay_v3_iteration_489_resume.pt",
+    "sha256": "10D97428B3F1CC2E307040314D1DD1A924BD82975D4B88C0F73C3FC2716DCF54",
+    "size_bytes": 69293539
+  },
+  "gameplay_regressions": {
+    "goal_episode_fraction_relative": -0.020746887966805017,
+    "interpretation": "modest touch/goal-ended/mechanics-rate softening to monitor; no broad mechanics, scoring, movement, or touch-acquisition collapse",
+    "mechanics_paid_total_relative": -0.04245283018867929,
+    "no_touch_truncations": {
+      "absolute_change": 2.0,
+      "iteration_479": 0.0,
+      "iteration_489": 2.0,
+      "relative_change": null
+    },
+    "touches_per_min_relative": -0.03190203973243777
+  },
+  "new_training_sample_count": 3711438222,
+  "ppo_safety": {
+    "early_stop_updates": [
+      480,
+      481,
+      482,
+      483
+    ],
+    "hard_safety_guard_fired": false,
+    "maximum_accepted_minibatch_kl": 0.019690245389938354,
+    "maximum_completed_update_mean_kl": 0.018175333738327026,
+    "maximum_retention_mean_kl": 0.01940411888062954,
+    "total_accepted_optimizer_steps": 1055,
+    "total_lr_backoffs": 14,
+    "total_optimizer_step_proposals": 1073,
+    "total_transactional_retries": 18
+  },
+  "recommendation": "CONTINUE_GAMEPLAY_V3_TRAINING",
+  "recommendation_reason": "PPO remained stable, both V3 terms stayed small, unnecessary flip-through rate and fraction declined, and legitimate mechanics/exemptions remained active. Continue only under the existing gates while monitoring the modest touch-rate, no-touch, and selected mechanics declines.",
+  "schema_version": 1,
+  "source_checkpoint": {
+    "agent_decision_samples": 3655854038,
+    "byte_identical_after_run": true,
+    "iteration": 479,
+    "path": "G:/dev/RivalSim-runs/opponent-curriculum-v1-safe-20260827-b2af03d/checkpoints/rival2_opponent_curriculum_plus_120_resume.pt",
+    "policy_version": 479,
+    "sha256": "3B994E118A9498713DC6115D38F061958A900EA8F4D00CE568F916942E851D9A"
+  },
+  "status": "GAMEPLAY_V3_BOUNDED_PPO_SMOKE_COMPLETE",
+  "training_aggregate": {
+    "bad_flip_to_absolute_gameplay_reward": 0.0038407287140410596,
+    "bad_flip_to_progress": 0.032968501209311024,
+    "maximum_per_update_bad_flip_to_gameplay": 0.05872894505200156,
+    "maximum_per_update_mechanics_to_gameplay": 0.07406828608053911,
+    "mechanics_to_absolute_gameplay_reward": 0.0014937206647169718,
+    "mechanics_to_progress": 0.01282197603831279
+  },
+  "training_implementation_commit": "c564af9d31aa618c6eb39cf10a5451bd2cabc9ff",
+  "verdict": "PASS_GREEN"
+}
