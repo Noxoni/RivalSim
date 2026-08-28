@@ -1302,6 +1302,7 @@ def finalize_blocked() -> dict[str, Any]:
     artifacts = _artifact_manifest(
         [
             FROZEN_CONFIG,
+            RESULT_ROOT / "blocked_baseline_profiles.json",
             RESULT_ROOT / "corpus_manifest.json",
             RESULT_ROOT / "evidence.json",
             RESULT_ROOT / "failed_training_evidence.json",
@@ -1314,6 +1315,75 @@ def finalize_blocked() -> dict[str, Any]:
     )
     _write_json(ROOT / RESULT_ROOT / "artifact_manifest.json", artifacts)
     return verify()
+
+
+def baseline_only(args: argparse.Namespace) -> dict[str, Any]:
+    config, config_identity = _load_config()
+    bootstrap_payload, policy_config, bootstrap_identity = _load_bootstrap(config)
+    observations, regenerated, split = _build_rollout_corpus(
+        config,
+        bootstrap_payload,
+        bootstrap_identity,
+        device=args.device,
+    )
+    committed = json.loads(
+        (ROOT / RESULT_ROOT / "corpus_manifest.json").read_text(encoding="utf-8")
+    )
+    if regenerated["identity_sha256"] != committed["identity_sha256"]:
+        raise RuntimeError("read-only baseline regeneration changed corpus identity")
+    teacher = Rival2ActorCritic(policy_config).to(args.device)
+    teacher.load_state_dict(bootstrap_payload["model"])
+    teacher.eval().requires_grad_(False)
+    student = Rival2ActorCritic(policy_config).to(args.device)
+    student.load_state_dict(bootstrap_payload["model"])
+    student.eval().requires_grad_(False)
+    gameplay_quality = torch_profile_quality(
+        DegradationProfile.GAMEPLAY, device=args.device
+    )
+    freeplay_quality = torch_profile_quality(
+        DegradationProfile.FREEPLAY, device=args.device
+    )
+    worlds_per_batch = int(config["training"]["worlds_per_minibatch"])
+    validation = _evaluate_worlds(
+        teacher,
+        student,
+        observations,
+        split["validation"],
+        worlds_per_batch=worlds_per_batch,
+        gameplay_quality=gameplay_quality,
+        freeplay_quality=freeplay_quality,
+        policy_config=policy_config,
+    )
+    test = _evaluate_worlds(
+        teacher,
+        student,
+        observations,
+        split["test"],
+        worlds_per_batch=worlds_per_batch,
+        gameplay_quality=gameplay_quality,
+        freeplay_quality=freeplay_quality,
+        policy_config=policy_config,
+    )
+    result = {
+        "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_BLOCKED_BASELINES_V1",
+        "frozen_config": config_identity,
+        "corpus_identity_sha256": regenerated["identity_sha256"],
+        "deterministic_regeneration_matches_failed_run": True,
+        "validation": validation,
+        "test": test,
+        "student_model_tensor_sha256": tensor_tree_sha256(student.state_dict()),
+        "student_byte_identical_to_teacher": tensor_tree_sha256(student.state_dict())
+        == tensor_tree_sha256(teacher.state_dict())
+        == bootstrap_identity["model_tensor_sha256"],
+        "supervised_optimizer_constructed": False,
+        "optimizer_steps": 0,
+        "human_behavior_cloning_performed": False,
+        "ppo_performed": False,
+        "bootstrap_unchanged": file_sha256(ROOT / bootstrap_identity["path"])
+        == bootstrap_identity["sha256"],
+    }
+    _write_json(ROOT / RESULT_ROOT / "blocked_baseline_profiles.json", result)
+    return result
 
 
 def parse_args() -> argparse.Namespace:
@@ -1333,7 +1403,19 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--verify-only", action="store_true")
     parser.add_argument("--finalize-blocked", action="store_true")
+    parser.add_argument("--baseline-only", action="store_true")
     return parser.parse_args()
+
+
+def _configure_cuda(device: str) -> None:
+    if not torch.cuda.is_available() or not wp.is_cuda_available():
+        raise RuntimeError("CUDA PyTorch and Warp are required")
+    torch.cuda.set_device(device)
+    torch.manual_seed(2026082823)
+    torch.cuda.manual_seed_all(2026082823)
+    torch.set_float32_matmul_precision("highest")
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
 
 
 def main() -> int:
@@ -1342,18 +1424,18 @@ def main() -> int:
         result = verify()
     elif args.finalize_blocked:
         result = finalize_blocked()
+    elif args.baseline_only:
+        _configure_cuda(args.device)
+        result = baseline_only(args)
     else:
-        if not torch.cuda.is_available() or not wp.is_cuda_available():
-            raise RuntimeError("CUDA PyTorch and Warp are required")
-        torch.cuda.set_device(args.device)
-        torch.manual_seed(2026082823)
-        torch.cuda.manual_seed_all(2026082823)
-        torch.set_float32_matmul_precision("highest")
-        torch.backends.cuda.matmul.allow_tf32 = False
-        torch.backends.cudnn.allow_tf32 = False
+        _configure_cuda(args.device)
         result = run(args)
     print(json.dumps(result, indent=2, sort_keys=True))
-    return 0 if result.get("valid", result.get("verdict") == "PASS") else 1
+    if "valid" in result:
+        return 0 if result["valid"] else 1
+    if "verdict" in result:
+        return 0 if result["verdict"] == "PASS" else 1
+    return 0
 
 
 if __name__ == "__main__":

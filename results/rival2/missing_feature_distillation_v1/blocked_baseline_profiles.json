@@ -1,0 +1,653 @@
+{
+  "bootstrap_unchanged": true,
+  "corpus_identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+  "deterministic_regeneration_matches_failed_run": true,
+  "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_BLOCKED_BASELINES_V1",
+  "frozen_config": {
+    "git_blob_oid": "2699787c2fe4aa3a9e4cde7cabae5d5a5833da25",
+    "path": "results/rival2/missing_feature_distillation_v1/frozen_config.json",
+    "required_parent": "9fbef28ba08e9df6598e2d14bf339e306a055934",
+    "required_parent_is_ancestor": true,
+    "sha256": "5F20CE9FDE854A99405D53864FB1FB72F9B28FA4EC882F8D4C675DF627A16955"
+  },
+  "human_behavior_cloning_performed": false,
+  "optimizer_steps": 0,
+  "ppo_performed": false,
+  "student_byte_identical_to_teacher": true,
+  "student_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+  "supervised_optimizer_constructed": false,
+  "test": {
+    "freeplay_degraded": {
+      "actor_channel_kl": {
+        "boost": 0.018365909968129666,
+        "handbrake": 0.16082782035271206,
+        "jump": 0.5299940670922576,
+        "pitch": 4.0243988176799235,
+        "roll": 0.8405674715248739,
+        "steer": 18.895876034971486,
+        "throttle": 1.8740778187625757,
+        "yaw": 0.5719323575878638
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 407.395263671875,
+      "actor_mean_kl": 26.916040359417913,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.6324577331542969,
+            "mean": 0.18926428258419037,
+            "min": -1.9942457675933838,
+            "std": 0.5547319650650024
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.059522032737732,
+            "mean": -0.033605195581912994,
+            "min": -0.9137882590293884,
+            "std": 0.3426634967327118
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.2102824449539185,
+            "mean": 0.22129008173942566,
+            "min": -1.3933007717132568,
+            "std": 0.44935041666030884
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4244204759597778,
+            "mean": 0.7906970381736755,
+            "min": -1.4337424039840698,
+            "std": 0.3258165717124939
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4125877618789673,
+            "mean": 0.07949209958314896,
+            "min": -0.8644672632217407,
+            "std": 0.2947210967540741
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9723488688468933,
+            "saturation_fraction": 0.7461307048797607,
+            "std": 0.14666330814361572
+          },
+          "handbrake": {
+            "mean": 0.4232296943664551,
+            "saturation_fraction": 0.3821771442890167,
+            "std": 0.4149458706378937
+          },
+          "jump": {
+            "mean": 0.4474867582321167,
+            "saturation_fraction": 0.651621401309967,
+            "std": 0.47447142004966736
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.9434770941734314
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.0649663209915161
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.7260385751724243
+          },
+          "throttle": {
+            "at_max_fraction": 0.00017641898011788726,
+            "at_min_fraction": 0.0,
+            "mean": -1.227729320526123
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.7554659247398376
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 1.5316013060294167,
+      "value_max_absolute_drift": 9.174056053161621,
+      "value_rmse": 1.9450701936508594
+    },
+    "full": {
+      "actor_channel_kl": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "steer": 0.0,
+        "throttle": 0.0,
+        "yaw": 0.0
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 0.0,
+      "actor_mean_kl": 0.0,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.640545129776001,
+            "mean": 0.609586238861084,
+            "min": -2.823307752609253,
+            "std": 0.9486684799194336
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.5595678091049194,
+            "mean": -0.23412784934043884,
+            "min": -1.6003137826919556,
+            "std": 0.3339666426181793
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4669599533081055,
+            "mean": 0.38154399394989014,
+            "min": -1.087723731994629,
+            "std": 0.3479190766811371
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.0228142738342285,
+            "mean": 1.2654967308044434,
+            "min": -0.6777941584587097,
+            "std": 0.22466081380844116
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.2313990592956543,
+            "mean": -0.2434261441230774,
+            "min": -1.3401260375976562,
+            "std": 0.3456653356552124
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9822248220443726,
+            "saturation_fraction": 0.970281720161438,
+            "std": 0.12770168483257294
+          },
+          "handbrake": {
+            "mean": 0.44688108563423157,
+            "saturation_fraction": 0.3351173996925354,
+            "std": 0.41704535484313965
+          },
+          "jump": {
+            "mean": 0.5397657752037048,
+            "saturation_fraction": 0.45696568489074707,
+            "std": 0.46753767132759094
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.717585563659668
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.245976448059082
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.8165000677108765
+          },
+          "throttle": {
+            "at_max_fraction": 0.0007295163231901824,
+            "at_min_fraction": 0.0,
+            "mean": -1.181436538696289
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1231715679168701
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 0.0,
+      "value_max_absolute_drift": 0.0,
+      "value_rmse": 0.0
+    },
+    "gameplay_degraded": {
+      "actor_channel_kl": {
+        "boost": 0.0170552550855118,
+        "handbrake": 0.5429388773233963,
+        "jump": 0.08225516338773278,
+        "pitch": 2.0710194517571567,
+        "roll": 0.3341366270529194,
+        "steer": 3.0034792553479983,
+        "throttle": 0.23326962365949885,
+        "yaw": 0.43773554737043335
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 138.3922576904297,
+      "actor_mean_kl": 6.721889836925684,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.4764790534973145,
+            "mean": 0.7072756886482239,
+            "min": -2.501920223236084,
+            "std": 0.8553248643875122
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4047176837921143,
+            "mean": -0.06678737699985504,
+            "min": -1.4524812698364258,
+            "std": 0.3259461224079132
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.1107430458068848,
+            "mean": 0.12714189291000366,
+            "min": -1.4005688428878784,
+            "std": 0.32825809717178345
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.9793628454208374,
+            "mean": 1.1438957452774048,
+            "min": -0.7634510397911072,
+            "std": 0.2378562092781067
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.0694206953048706,
+            "mean": -0.1546359807252884,
+            "min": -1.4040489196777344,
+            "std": 0.38042977452278137
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.988684892654419,
+            "saturation_fraction": 0.9788190126419067,
+            "std": 0.09876398742198944
+          },
+          "handbrake": {
+            "mean": 0.1941986083984375,
+            "saturation_fraction": 0.4109918475151062,
+            "std": 0.3002159297466278
+          },
+          "jump": {
+            "mean": 0.5124707818031311,
+            "saturation_fraction": 0.5862557888031006,
+            "std": 0.47425100207328796
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0001621147384867072,
+            "at_min_fraction": 0.0,
+            "mean": -1.5748493671417236
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.8732442259788513
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2843339443206787
+          },
+          "throttle": {
+            "at_max_fraction": 8.10573692433536e-05,
+            "at_min_fraction": 0.0,
+            "mean": -0.855896532535553
+          },
+          "yaw": {
+            "at_max_fraction": 7.390524842776358e-05,
+            "at_min_fraction": 0.0,
+            "mean": -0.42698967456817627
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 3.153950919092229,
+      "value_max_absolute_drift": 10.741518020629883,
+      "value_rmse": 3.541518006948731
+    }
+  },
+  "validation": {
+    "freeplay_degraded": {
+      "actor_channel_kl": {
+        "boost": 0.017912059722239193,
+        "handbrake": 0.1588665063256784,
+        "jump": 0.5600091912668581,
+        "pitch": 3.983657804319762,
+        "roll": 0.8329096082001152,
+        "steer": 20.178445452264363,
+        "throttle": 1.8449411354379244,
+        "yaw": 0.5772337274723094
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 397.3936767578125,
+      "actor_mean_kl": 28.153975849075945,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.5878808498382568,
+            "mean": 0.17905375361442566,
+            "min": -1.9942457675933838,
+            "std": 0.5606452226638794
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.1162514686584473,
+            "mean": -0.03501110523939133,
+            "min": -0.9441023468971252,
+            "std": 0.34316208958625793
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.1387313604354858,
+            "mean": 0.21013927459716797,
+            "min": -1.423755407333374,
+            "std": 0.45234760642051697
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4244204759597778,
+            "mean": 0.7917059063911438,
+            "min": -1.8013113737106323,
+            "std": 0.3290545344352722
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4327765703201294,
+            "mean": 0.07424866408109665,
+            "min": -0.9354780912399292,
+            "std": 0.30146336555480957
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.971579909324646,
+            "saturation_fraction": 0.7459244728088379,
+            "std": 0.14879484474658966
+          },
+          "handbrake": {
+            "mean": 0.42598697543144226,
+            "saturation_fraction": 0.38283872604370117,
+            "std": 0.41802552342414856
+          },
+          "jump": {
+            "mean": 0.4420509338378906,
+            "saturation_fraction": 0.651531994342804,
+            "std": 0.4732999801635742
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 2.2648382582701743e-05,
+            "at_min_fraction": 0.0,
+            "mean": -0.9348680973052979
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.059666395187378
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.7231721878051758
+          },
+          "throttle": {
+            "at_max_fraction": 0.00026820454513654113,
+            "at_min_fraction": 0.0,
+            "mean": -1.2178266048431396
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.74908846616745
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 1.5284160466175236,
+      "value_max_absolute_drift": 9.076189994812012,
+      "value_rmse": 1.9409002734489742
+    },
+    "full": {
+      "actor_channel_kl": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.0,
+        "roll": 0.0,
+        "steer": 0.0,
+        "throttle": 0.0,
+        "yaw": 0.0
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 0.0,
+      "actor_mean_kl": 0.0,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.686436891555786,
+            "mean": 0.5925371646881104,
+            "min": -2.9809796810150146,
+            "std": 0.9530934691429138
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.589837670326233,
+            "mean": -0.2301560342311859,
+            "min": -1.482479453086853,
+            "std": 0.3427412211894989
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.4756094217300415,
+            "mean": 0.3708776831626892,
+            "min": -1.0738165378570557,
+            "std": 0.34989795088768005
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.0248026847839355,
+            "mean": 1.2660393714904785,
+            "min": -1.291818380355835,
+            "std": 0.22801999747753143
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.274214506149292,
+            "mean": -0.2503361403942108,
+            "min": -1.3965884447097778,
+            "std": 0.3540228605270386
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9815568923950195,
+            "saturation_fraction": 0.9704176187515259,
+            "std": 0.13019120693206787
+          },
+          "handbrake": {
+            "mean": 0.4478839933872223,
+            "saturation_fraction": 0.33313387632369995,
+            "std": 0.41810840368270874
+          },
+          "jump": {
+            "mean": 0.5383246541023254,
+            "saturation_fraction": 0.45638635754585266,
+            "std": 0.46690958738327026
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.7184786796569824
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.2568858861923218
+          },
+          "steer": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.8221065998077393
+          },
+          "throttle": {
+            "at_max_fraction": 0.0008534864173270762,
+            "at_min_fraction": 0.0,
+            "mean": -1.175248146057129
+          },
+          "yaw": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -1.1217468976974487
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 0.0,
+      "value_max_absolute_drift": 0.0,
+      "value_rmse": 0.0
+    },
+    "gameplay_degraded": {
+      "actor_channel_kl": {
+        "boost": 0.017215939749658637,
+        "handbrake": 0.5289137045493896,
+        "jump": 0.08360966597165063,
+        "pitch": 2.0750672774304695,
+        "roll": 0.3403491979697364,
+        "steer": 2.9035476437784893,
+        "throttle": 0.23277195001252365,
+        "yaw": 0.4374042134987788
+      },
+      "actor_finite": true,
+      "actor_max_sample_kl": 97.09481048583984,
+      "actor_mean_kl": 6.618879553963944,
+      "sample_count": 838912,
+      "student_actor_output": {
+        "analog_mean": {
+          "pitch": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 2.4372036457061768,
+            "mean": 0.6920551657676697,
+            "min": -2.729496717453003,
+            "std": 0.8597995638847351
+          },
+          "roll": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.3407255411148071,
+            "mean": -0.06381639838218689,
+            "min": -1.4265921115875244,
+            "std": 0.3336787223815918
+          },
+          "steer": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.105582594871521,
+            "mean": 0.11955567449331284,
+            "min": -1.374754786491394,
+            "std": 0.33208543062210083
+          },
+          "throttle": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.9770371913909912,
+            "mean": 1.1451791524887085,
+            "min": -1.232435703277588,
+            "std": 0.24178935587406158
+          },
+          "yaw": {
+            "absolute_ge_5_fraction": 0.0,
+            "max": 1.0824416875839233,
+            "mean": -0.1642291396856308,
+            "min": -1.4122676849365234,
+            "std": 0.39261943101882935
+          }
+        },
+        "button_probability": {
+          "boost": {
+            "mean": 0.9879712462425232,
+            "saturation_fraction": 0.9793923497200012,
+            "std": 0.10222749412059784
+          },
+          "handbrake": {
+            "mean": 0.2002571076154709,
+            "saturation_fraction": 0.4076172411441803,
+            "std": 0.3061903417110443
+          },
+          "jump": {
+            "mean": 0.5098267793655396,
+            "saturation_fraction": 0.5851209759712219,
+            "std": 0.47360819578170776
+          }
+        },
+        "finite": true,
+        "log_std": {
+          "pitch": {
+            "at_max_fraction": 0.00011681797332130373,
+            "at_min_fraction": 0.0,
+            "mean": -1.5744901895523071
+          },
+          "roll": {
+            "at_max_fraction": 0.0,
+            "at_min_fraction": 0.0,
+            "mean": -0.8806148171424866
+          },
+          "steer": {
+            "at_max_fraction": 4.2912724893540144e-05,
+            "at_min_fraction": 0.0,
+            "mean": -1.293967366218567
+          },
+          "throttle": {
+            "at_max_fraction": 9.893767128232867e-05,
+            "at_min_fraction": 0.0,
+            "mean": -0.8476954102516174
+          },
+          "yaw": {
+            "at_max_fraction": 4.05286846216768e-05,
+            "at_min_fraction": 0.0,
+            "mean": -0.4264935851097107
+          }
+        },
+        "sample_count": 838912
+      },
+      "value_finite": true,
+      "value_mae": 3.1248056262158603,
+      "value_max_absolute_drift": 10.15519905090332,
+      "value_rmse": 3.5181090923377334
+    }
+  }
+}

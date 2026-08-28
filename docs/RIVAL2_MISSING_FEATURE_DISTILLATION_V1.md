@@ -103,3 +103,8 @@ unchanged, and the human files/splits remain unchanged. Human post-distillation 
 run because no guard-accepted distilled student exists. V1 thresholds were not weakened. Any retry
 with finer-grained transactional guarding or stronger retention enforcement requires a new
 prospectively frozen authority version.
+
+A separate read-only deterministic regeneration recorded the held-out test baselines without
+constructing an optimizer: gameplay-degraded actor KL `6.721889837`, Freeplay-degraded actor KL
+`26.916040359`, full-observation actor KL `0`, and full-observation value RMSE `0`. Post-distillation
+values are unavailable rather than imputed because the guard rejected every candidate.
