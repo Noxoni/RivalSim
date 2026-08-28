@@ -808,7 +808,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         raise RuntimeError("adapter optimization requires HEAD persisted on origin/main")
     torch.manual_seed(int(config["training"]["seed"]))
     np.random.seed(int(config["training"]["seed"]))
-    torch.use_deterministic_algorithms(True)
     bootstrap_payload, policy_config, bootstrap_identity = _load_bootstrap(config)
     bootstrap_path = ROOT / config["authority"]["bootstrap_checkpoint"]
     bootstrap_bytes_before = bootstrap_path.read_bytes()
@@ -828,6 +827,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     }
     if not all(corpus_checks.values()):
         raise RuntimeError(f"authoritative V1 corpus regeneration changed: {corpus_checks}")
+    # The frozen curriculum collector contains CUDA bincount, which PyTorch marks as
+    # lacking a deterministic implementation. Corpus identity is enforced by its full
+    # canonical tensor hash; strict deterministic algorithms govern adapter training.
+    torch.use_deterministic_algorithms(True)
     policy = Rival2ActorCritic(policy_config).to(args.device)
     policy.load_state_dict(bootstrap_payload["model"])
     policy.eval()
