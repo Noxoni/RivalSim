@@ -170,11 +170,11 @@ def _gpu_memory() -> dict[str, int]:
     }
 
 
-def _source_metadata() -> dict[str, Any]:
-    payload = torch.load(SOURCE_CHECKPOINT, map_location="cpu", weights_only=False)
+def _source_metadata(checkpoint: Path = SOURCE_CHECKPOINT) -> dict[str, Any]:
+    payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
     return {
-        "path": SOURCE_CHECKPOINT.as_posix(),
-        "sha256": _sha256(SOURCE_CHECKPOINT),
+        "path": checkpoint.as_posix(),
+        "sha256": _sha256(checkpoint),
         "format": payload["format"],
         "reward_version": payload["reward_version"],
         "episode_version": payload["episode_version"],
@@ -1127,9 +1127,14 @@ def _slice_source_for_shadow(source: dict[str, Any], worlds: int) -> dict[str, A
     return result
 
 
-def shadow_phase(collision_dir: Path) -> None:
-    source_sha_before = _sha256(SOURCE_CHECKPOINT)
-    source = torch.load(SOURCE_CHECKPOINT, map_location="cpu", weights_only=False)
+def shadow_phase(
+    collision_dir: Path,
+    *,
+    checkpoint: Path = SOURCE_CHECKPOINT,
+    expected_checkpoint_sha256: str = SOURCE_SHA256,
+) -> None:
+    source_sha_before = _sha256(checkpoint)
+    source = torch.load(checkpoint, map_location="cpu", weights_only=False)
     env = _make_env(SHADOW_WORLDS, collision_dir, evidence_capacity=8)
     trainer = _make_trainer(env, source)
     slim = _slice_source_for_shadow(source, SHADOW_WORLDS)
@@ -1253,7 +1258,7 @@ def shadow_phase(collision_dir: Path) -> None:
     }
     model_after = _tensor_digest(trainer.model.state_dict())
     optimizer_after = _object_digest(trainer.optimizer.state_dict())
-    source_sha_after = _sha256(SOURCE_CHECKPOINT)
+    source_sha_after = _sha256(checkpoint)
     metrics = {
         "episodes": completed_count,
         "active_world_decisions": active_decisions,
@@ -1298,14 +1303,16 @@ def shadow_phase(collision_dir: Path) -> None:
         "iteration_unchanged": trainer.iteration == counters_before[0],
         "policy_version_unchanged": trainer.policy_version == counters_before[1],
         "sample_counter_unchanged": trainer.total_agent_samples == counters_before[2],
-        "source_checkpoint_byte_identical": source_sha_before == source_sha_after == SOURCE_SHA256,
+        "source_checkpoint_byte_identical": source_sha_before
+        == source_sha_after
+        == expected_checkpoint_sha256,
         "no_update_called": True,
         "finite_metrics": all(np.isfinite(value) for value in sums.values()),
     }
     summary = {
         "schema_version": 1,
         "created_utc": _utc_now(),
-        "source": _source_metadata(),
+        "source": _source_metadata(checkpoint),
         "evaluation_extract": (
             "first 256 source assignment rows; exact source model/optimizer/RNG restored in memory"
         ),
@@ -1455,6 +1462,8 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument("--output-dir", type=Path, default=RESULTS_DIR)
+    parser.add_argument("--checkpoint", type=Path, default=SOURCE_CHECKPOINT)
+    parser.add_argument("--checkpoint-sha256", default=SOURCE_SHA256)
     return parser.parse_args()
 
 
@@ -1462,14 +1471,22 @@ def main() -> None:
     global RESULTS_DIR
     args = parse_args()
     RESULTS_DIR = args.output_dir.resolve()
-    if not SOURCE_CHECKPOINT.is_file() or _sha256(SOURCE_CHECKPOINT) != SOURCE_SHA256:
-        raise RuntimeError("selected plus_120 checkpoint identity mismatch")
+    checkpoint = args.checkpoint.resolve()
+    expected_checkpoint_sha256 = str(args.checkpoint_sha256).upper()
+    if not checkpoint.is_file() or _sha256(checkpoint) != expected_checkpoint_sha256:
+        raise RuntimeError("selected checkpoint identity mismatch")
     if args.phase == "memory":
         memory_phase(args.collision_dir)
     elif args.phase == "transition-rollout":
+        if checkpoint != SOURCE_CHECKPOINT.resolve() or expected_checkpoint_sha256 != SOURCE_SHA256:
+            raise RuntimeError("transition-rollout is fixed to the preserved V2 source checkpoint")
         transition_rollout_phase(args.collision_dir)
     else:
-        shadow_phase(args.collision_dir)
+        shadow_phase(
+            args.collision_dir,
+            checkpoint=checkpoint,
+            expected_checkpoint_sha256=expected_checkpoint_sha256,
+        )
 
 
 if __name__ == "__main__":
