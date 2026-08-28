@@ -2,6 +2,16 @@
 
 RivalSim is an experimental **GPU-native Rocket League 1v1 transition engine** intended to accelerate training for [Noxoni/Rival](https://github.com/Noxoni/Rival).
 
+## Native human demonstration recorder
+
+The repository includes a production-oriented, read-only BakkesMod plugin that records the exact
+native Rocket League `ControllerInput` and synchronized game state at the physics input-application
+cadence. It supports continuous local/RLBot match demonstrations and Freeplay mechanic sessions,
+uses a crash-recoverable lossless chunk format, and includes deterministic Python validation,
+current 182-field observation-coverage reporting, and four-tick action-variation diagnostics. It
+does not train Rival, modify rewards or physics, inject controls, or automate gameplay. See
+[the complete recorder guide](docs/RIVAL2_HUMAN_DEMO_RECORDER.md).
+
 The project is deliberately narrower than RocketSim. The target is standard Soccar 1v1 only:
 
 - two cars;
