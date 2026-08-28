@@ -26,10 +26,13 @@ in this order:
 
 1. `README.md`
 2. `AUDIT_FINDINGS.md`
-3. `IMPLEMENTATION_SPEC.md`
-4. `TRAINING_SAFETY_GATES.md`
-5. `ACCEPTANCE_CRITERIA.md`
-6. this file
+3. `POST_COMMIT_AUDIT.md`
+4. `IMPLEMENTATION_SPEC.md`
+5. `TRAINING_SAFETY_GATES.md`
+6. `ACCEPTANCE_CRITERIA.md`
+7. this file
+
+`POST_COMMIT_AUDIT.md` is mandatory and supplements/overrides earlier package wording where it is more specific. It records hazards found only after the first package commit was re-opened from Git and checked again against source.
 
 Then read every mechanics authority/calibration document and machine-readable artifact referenced by `README.md`.
 
@@ -66,6 +69,13 @@ Allocate V3 detector state only for Gameplay V3 worlds. Do not bloat or alter hi
 Do not copy calibration evidence buffers into production state.
 
 Preserve historical Gameplay V2 strict-double-dash code exactly. Gameplay V3 needs its own successful-dash detector because the old V2 tracker does not enforce the calibrated tangent-speed success requirement.
+
+Also explicitly close the two reward-dispatch hazards in `POST_COMMIT_AUDIT.md`:
+
+- V3 must still accumulate retained Gameplay boost-use/pad/save event state;
+- V3 must have an explicit reward branch and must not fall through the current broad Gameplay `else`.
+
+Audit every V3 reward dispatch site listed in the post-commit audit.
 
 ## 5. Reward-ready scope is frozen for this task
 
@@ -159,11 +169,11 @@ The 256-episode shadow gate must likewise be no-learning and disposable.
 
 Do not declare READY based only on small tests.
 
-On the intended training GPU, run the exact-scale gates from `TRAINING_SAFETY_GATES.md`:
+On the intended training GPU, run the exact-scale gates from `TRAINING_SAFETY_GATES.md` and the added post-commit memory/state rules:
 
 - construct Gameplay V3 at `131,072` worlds;
 - execute one complete four-physics-tick / 30 Hz decision;
-- report logical and actual CUDA memory impact;
+- report logical and actual CUDA memory impact from the actual production arrays;
 - run one horizon-32 mixed-opponent rollout collection with the real production world count/configuration and **no PPO update**;
 - destroy the disposable validation state cleanly.
 
@@ -206,13 +216,14 @@ Return `BLOCKED` if any required gate fails, including:
 - exact 131,072-world smoke fails;
 - checkpoint source/transition cannot be proven safe;
 - reward reconstruction fails;
+- any `POST_COMMIT_AUDIT.md` finding is not closed;
 - a live training process cannot be safely isolated from the implementation work.
 
 Do not work around a safety gate by weakening it.
 
 ## 14. Final return
 
-Return the complete reviewer package enumerated in `ACCEPTANCE_CRITERIA.md`, including final commit SHA and one final verdict only:
+Return the complete reviewer package enumerated in `ACCEPTANCE_CRITERIA.md`, plus an explicit PASS/BLOCKED line for every finding in `POST_COMMIT_AUDIT.md`, including final commit SHA and one final verdict only:
 
 `GAMEPLAY_V3_READY_FOR_REVIEW`
 

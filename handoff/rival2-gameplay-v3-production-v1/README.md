@@ -6,6 +6,8 @@ Package version: `rival2-gameplay-v3-production-v1`
 
 Audited baseline commit: `0228a833e90d2db2715f8b79b65f6cbdc59fefbc`
 
+Post-commit package audit: **completed**. `POST_COMMIT_AUDIT.md` is mandatory and records the additional source-level hazards found only after re-opening the first committed package from Git.
+
 ## BLUF
 
 Implement **one** immutable reward transition to `RIVAL2_REWARD_GAMEPLAY_V3` that combines:
@@ -19,18 +21,22 @@ Do **not** start PPO training in this task. The task ends after implementation, 
 
 ## Why this package exists
 
-The change is large enough that a superficially correct implementation can still crash or corrupt training through kernel ABI mismatches, bad reset ordering, duplicated rewards, oversized GPU state, or checkpoint/reward-version incompatibility.
+The change is large enough that a superficially correct implementation can still crash or corrupt training through kernel ABI mismatches, bad reset ordering, duplicated rewards, oversized GPU state, reward-mode fallthrough, skipped retained Gameplay event accumulation, or checkpoint/reward-version incompatibility.
 
-The current code was audited before this handoff was written. Important facts:
+The current code was audited before this handoff was written and then the committed package was audited again. Important facts:
 
 - `Rival2WorldSim._launch_tick()` executes authoritative physics first, then the Gameplay V2 strict-double-dash tracker, then `rival2_accumulate_tick()`.
 - `rival2_accumulate_tick()` owns the current unique-touch latch/count and computes the 30 Hz reward on tick four.
 - Gameplay V2's standalone strict-double-dash reward is embedded directly in that reward path.
+- the current Gameplay event-accounting block that accumulates boost-use, pad-pickup, and save state is explicitly gated to Gameplay V1/V2 modes; V3 must be added deliberately or those retained terms can disappear silently.
+- the current reward branch ends in a broad Gameplay `else`; a new numerical mode can fall through unless V3 dispatch is explicit and unsupported modes fail closed.
 - The calibrated mechanics system is currently a **read-only post-physics observer** attached by wrapping `world._launch_tick`; it is not production reward code.
 - The calibration observer allocates diagnostic/evidence storage that must not be copied wholesale into the 131,072-world training path.
 - `Rival2Trainer.load_checkpoint()` is contract-strict. Reward changes require an explicit curriculum-transition path.
 - The mixed-opponent trainer checkpoint contains additional curriculum RNG, adapter temporal state, adaptive PPO state, split optimizer state, and retention corpus state that must not be silently lost.
 - Published mixed-opponent training uses `131,072` worlds and the short `RIVAL2_EPISODE_V1` lifecycle.
+
+See `AUDIT_FINDINGS.md` and `POST_COMMIT_AUDIT.md` for the complete code-path findings.
 
 ## Known latest accepted source candidate
 
@@ -50,7 +56,7 @@ This is a **candidate**, not permission to guess. Before validation, Codex must 
 
 For this task, use this order:
 
-1. this package;
+1. this handoff package, including mandatory `POST_COMMIT_AUDIT.md`;
 2. `docs/RIVAL2_MECHANICS_CALIBRATION_TARGETED_CORRECTION_V1.md` and committed calibration artifacts;
 3. `docs/RIVAL2_MECHANICS_CALIBRATION_IMPLEMENTATION_V0_1.md`;
 4. `docs/RIVAL2_MECHANICS_REWARD_CONTRACT_V0_1.md`;
@@ -121,6 +127,8 @@ Do not rewrite V1/V2 arithmetic to share a new generalized branch if doing so ca
 Read every file before implementation:
 
 - `README.md` — scope and authority;
+- `AUDIT_FINDINGS.md` — pre-package source audit;
+- `POST_COMMIT_AUDIT.md` — mandatory second-pass committed-package corrections;
 - `IMPLEMENTATION_SPEC.md` — exact V3 architecture and reward semantics;
 - `TRAINING_SAFETY_GATES.md` — checkpoint, GPU, kernel, reset, and crash-prevention gates;
 - `ACCEPTANCE_CRITERIA.md` — tests/evidence required before READY;
