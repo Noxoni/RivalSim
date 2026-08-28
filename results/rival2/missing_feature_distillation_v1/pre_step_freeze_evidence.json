@@ -1,0 +1,39 @@
+{
+  "authority": {
+    "bridge_quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "bridge_version": "RIVAL2_HUMAN_DEMO_BC_OBSERVATION_BRIDGE_V1",
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "required_parent": "9fbef28ba08e9df6598e2d14bf339e306a055934"
+  },
+  "checks": {
+    "bootstrap_hash_exact": true,
+    "frozen_config_hash_exact": true,
+    "human_behavior_cloning_performed": false,
+    "human_demo_exact_adapter_unchanged": true,
+    "human_demo_frozen_splits_modified": false,
+    "human_recordings_modified": false,
+    "mechanic_detector_modified": false,
+    "ppo_optimizer_step_performed": false,
+    "ppo_performed": false,
+    "reward_modified": false,
+    "supervised_optimizer_constructed": false,
+    "supervised_optimizer_steps_before_freeze_commit": 0
+  },
+  "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_PRE_STEP_FREEZE_EVIDENCE_V1",
+  "frozen_config": {
+    "path": "results/rival2/missing_feature_distillation_v1/frozen_config.json",
+    "sha256": "5F20CE9FDE854A99405D53864FB1FB72F9B28FA4EC882F8D4C675DF627A16955"
+  },
+  "implementation_sha256": {
+    "benchmarks/run_rival2_missing_feature_distillation.py": "935604BE84F8493F1B9B5992421CE832000BE486614659ACF7BFD00FE4909061",
+    "rivalsim/human_demo/bc_observation_bridge.py": "01642DC44423FDAE2A0C209EFA0C1C3AD60FF55465340EA3E18F7CF390656479",
+    "rivalsim/human_demo/missing_feature_distillation.py": "E88C62B272DADD7E5574C70434FD1B1827AA3514D558C1E3EF3AC45C65BF7675",
+    "tests/test_missing_feature_distillation.py": "3AA8C1D29A43A31ED9160C6D2523023ACE9D13ACADA725F64BA3B5C4E888D3EB"
+  },
+  "tests": {
+    "focused_pytest": "23 passed",
+    "ruff": "passed"
+  },
+  "verdict": "FROZEN_BEFORE_FIRST_SUPERVISED_OPTIMIZER_STEP"
+}

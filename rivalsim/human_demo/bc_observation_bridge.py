@@ -14,7 +14,7 @@ import json
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import asdict, dataclass
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from itertools import pairwise
 from pathlib import Path
 from typing import Any
@@ -62,6 +62,13 @@ class FieldQuality(IntEnum):
     APPROXIMATE = 1
     EXACT_DERIVED = 2
     EXACT_DIRECT = 3
+
+
+class DegradationProfile(StrEnum):
+    """Explicit simulator views matching the two committed human-demo domains."""
+
+    GAMEPLAY = "gameplay"
+    FREEPLAY = "freeplay"
 
 
 _QUALITY_LABELS = {
@@ -210,6 +217,22 @@ GLOBAL_QUALITY_MASK = np.asarray(
     [row.quality for row in FIELD_QUALITY_SPECS], dtype=np.uint8
 )
 GLOBAL_QUALITY_MASK.flags.writeable = False
+
+
+def degradation_quality_mask(
+    profile: DegradationProfile | str = DegradationProfile.GAMEPLAY,
+) -> np.ndarray:
+    """Return the non-promoting quality mask for one bridge domain profile."""
+
+    selected = DegradationProfile(profile)
+    quality = GLOBAL_QUALITY_MASK.copy()
+    if selected is DegradationProfile.FREEPLAY:
+        for index, field in enumerate(OBS_FIELD_NAMES):
+            if field.startswith("opponent.") or field.startswith("relative.opponent"):
+                quality[index] = int(FieldQuality.UNAVAILABLE)
+    if bool(np.any(quality > GLOBAL_QUALITY_MASK)):
+        raise RuntimeError("degradation profile promoted field quality")
+    return _readonly(quality)
 
 
 def _canonical_hash(value: object) -> str:
@@ -560,6 +583,8 @@ class BCBridgeTrajectoryAdapter:
 
 def degrade_simulator_observations(
     true_observations: np.ndarray,
+    *,
+    profile: DegradationProfile | str = DegradationProfile.GAMEPLAY,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Apply the BC availability contract to complete authoritative observations.
 
@@ -575,7 +600,8 @@ def degrade_simulator_observations(
         raise ValueError("simulator observations must have shape [N, 182]")
     if not bool(np.isfinite(source).all()):
         raise ValueError("simulator observations contain nonfinite values")
-    quality = np.broadcast_to(GLOBAL_QUALITY_MASK, source.shape).copy()
+    profile_quality = degradation_quality_mask(profile)
+    quality = np.broadcast_to(profile_quality, source.shape).copy()
     degraded = source.copy()
     degraded[quality == int(FieldQuality.UNAVAILABLE)] = NEUTRAL_UNAVAILABLE_VALUE
     return _readonly(degraded), _readonly(quality)
@@ -589,6 +615,52 @@ class DistillationObjectiveResult:
     teacher_actor: torch.Tensor
     student_actor: torch.Tensor
     unavailable_fraction: torch.Tensor
+
+
+def hybrid_actor_channel_kl(
+    teacher_actor: torch.Tensor,
+    student_actor: torch.Tensor,
+    *,
+    policy_config: Rival2PolicyConfig | None = None,
+) -> torch.Tensor:
+    """Exact per-channel teacher-to-student KL for Rival's hybrid actor."""
+
+    if teacher_actor.shape != student_actor.shape:
+        raise ValueError("teacher/student actor output shapes differ")
+    if teacher_actor.ndim != 2 or teacher_actor.shape[1] != 13:
+        raise ValueError("paired actor outputs must have shape [N, 13]")
+    config = policy_config or Rival2PolicyConfig()
+
+    teacher_mean = teacher_actor[:, :5]
+    teacher_log_std = teacher_actor[:, 5:10].clamp(
+        config.log_std_min, config.log_std_max
+    )
+    student_mean = student_actor[:, :5]
+    student_log_std = student_actor[:, 5:10].clamp(
+        config.log_std_min, config.log_std_max
+    )
+    teacher_variance = torch.exp(2.0 * teacher_log_std)
+    student_variance = torch.exp(2.0 * student_log_std)
+    analog_kl = (
+        student_log_std
+        - teacher_log_std
+        + (
+            teacher_variance
+            + (teacher_mean - student_mean).square()
+        )
+        / (2.0 * student_variance)
+        - 0.5
+    )
+
+    teacher_logits = teacher_actor[:, 10:13]
+    student_logits = student_actor[:, 10:13]
+    teacher_probability = torch.sigmoid(teacher_logits)
+    button_kl = teacher_probability * (
+        F.logsigmoid(teacher_logits) - F.logsigmoid(student_logits)
+    ) + (1.0 - teacher_probability) * (
+        F.logsigmoid(-teacher_logits) - F.logsigmoid(-student_logits)
+    )
+    return torch.cat((analog_kl, button_kl), dim=-1).clamp_min(0.0)
 
 
 def actor_distribution_distillation_objective(
@@ -624,36 +696,11 @@ def actor_distribution_distillation_objective(
         teacher_actor = teacher_actor.detach()
     student_actor, _student_value = student_model(degraded_observation)
 
-    teacher_mean = teacher_actor[:, :5]
-    teacher_log_std = teacher_actor[:, 5:10].clamp(
-        config.log_std_min, config.log_std_max
+    channel_kl = hybrid_actor_channel_kl(
+        teacher_actor,
+        student_actor,
+        policy_config=config,
     )
-    student_mean = student_actor[:, :5]
-    student_log_std = student_actor[:, 5:10].clamp(
-        config.log_std_min, config.log_std_max
-    )
-    teacher_variance = torch.exp(2.0 * teacher_log_std)
-    student_variance = torch.exp(2.0 * student_log_std)
-    analog_kl = (
-        student_log_std
-        - teacher_log_std
-        + (
-            teacher_variance
-            + (teacher_mean - student_mean).square()
-        )
-        / (2.0 * student_variance)
-        - 0.5
-    )
-
-    teacher_logits = teacher_actor[:, 10:13]
-    student_logits = student_actor[:, 10:13]
-    teacher_probability = torch.sigmoid(teacher_logits)
-    button_kl = teacher_probability * (
-        F.logsigmoid(teacher_logits) - F.logsigmoid(student_logits)
-    ) + (1.0 - teacher_probability) * (
-        F.logsigmoid(-teacher_logits) - F.logsigmoid(-student_logits)
-    )
-    channel_kl = torch.cat((analog_kl, button_kl), dim=-1).clamp_min(0.0)
     per_sample = channel_kl.sum(dim=-1)
     unavailable = (quality == int(FieldQuality.UNAVAILABLE)).to(torch.float32).mean()
     return DistillationObjectiveResult(
@@ -696,12 +743,15 @@ __all__ = [
     "GLOBAL_QUALITY_MASK",
     "BCBridgeSample",
     "BCBridgeTrajectoryAdapter",
+    "DegradationProfile",
     "DistillationObjectiveResult",
     "FieldQuality",
     "TrajectoryReconstructionState",
     "actor_distribution_distillation_objective",
     "bridge_contract",
     "bridge_human_frame",
+    "degradation_quality_mask",
     "degrade_simulator_observations",
     "field_quality_contract",
+    "hybrid_actor_channel_kl",
 ]

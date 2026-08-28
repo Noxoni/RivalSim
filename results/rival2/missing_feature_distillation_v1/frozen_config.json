@@ -1,0 +1,98 @@
+{
+  "acceptance": {
+    "freeplay_degraded_minimum_relative_kl_reduction": 0.4,
+    "full_observation_actor_mean_kl_max": 0.01,
+    "full_observation_value_rmse_max": 0.05,
+    "gameplay_degraded_mean_kl_max": 2.9,
+    "gameplay_degraded_minimum_relative_kl_reduction": 0.7,
+    "maximum_analog_mean_absolute": 5.0,
+    "maximum_button_probability_saturation_fraction": 0.95,
+    "maximum_log_std_clamp_fraction": 0.95,
+    "no_nonfinite": true
+  },
+  "authority": {
+    "bridge_quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "bridge_version": "RIVAL2_HUMAN_DEMO_BC_OBSERVATION_BRIDGE_V1",
+    "bootstrap_checkpoint": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "required_parent": "9fbef28ba08e9df6598e2d14bf339e306a055934"
+  },
+  "corpus": {
+    "car_perspectives_per_world": 2,
+    "collision_mesh_directory": "G:/dev/RLBot-Rival/bot/collision_meshes",
+    "decisions_per_world": 128,
+    "kickoff_layout_rule": "(world_index + corpus_seed) modulo 5",
+    "physics_hz": 120,
+    "physics_ticks_per_decision": 1,
+    "policy_hz": 120,
+    "seed": 2026082821,
+    "split": {
+      "algorithm": "numpy PCG64 permutation of world indices",
+      "seed": 2026082822,
+      "test_worlds": 3277,
+      "train_worlds": 26214,
+      "validation_worlds": 3277
+    },
+    "stochastic_actions": true,
+    "worlds": 32768
+  },
+  "degraded_profiles": {
+    "freeplay": {
+      "approximate_fields": 22,
+      "exact_direct_fields": 8,
+      "exactly_derivable_fields": 36,
+      "opponent_context": "unavailable",
+      "unavailable_fields": 116
+    },
+    "gameplay": {
+      "approximate_fields": 34,
+      "exact_direct_fields": 16,
+      "exactly_derivable_fields": 58,
+      "unavailable_fields": 74
+    },
+    "neutral_unavailable_value": 0.0
+  },
+  "format": "RIVAL2_MISSING_FEATURE_DISTILLATION_FROZEN_CONFIG_V1",
+  "human_post_distillation_evaluation": {
+    "expected_bc_usable_frames": 114311,
+    "human_optimizer_steps": 0,
+    "inference_batch_size": 8192,
+    "source_manifest": "results/rival2/human_demo_dataset_v1/dataset_manifest.json"
+  },
+  "retention_guard": {
+    "full_actor_max_channel_kl": 0.01,
+    "full_actor_max_sample_kl": 2.0,
+    "full_actor_mean_kl": 0.02,
+    "full_value_max_absolute_drift": 0.5,
+    "full_value_rmse": 0.075,
+    "nonfinite_allowed": false,
+    "source": "results/rival2/120hz_transition_v1/retention_corpus_120hz.pt",
+    "source_sha256": "C4957B06847E7F61B5DC313ABAC58CD2FE8AB696561C7A4898C6ACFF219DACDC"
+  },
+  "training": {
+    "critic_full_retention_weight": 1.0,
+    "early_stopping_material_relative_improvement": 0.005,
+    "early_stopping_patience_validations": 6,
+    "freeplay_degraded_actor_kl_weight": 0.5,
+    "full_actor_retention_weight": 2.0,
+    "gameplay_degraded_actor_kl_weight": 0.5,
+    "gradient_clip_norm": 1.0,
+    "initial_learning_rate": 0.0001,
+    "lr_backoff_factor": 0.5,
+    "lr_plateau_patience_validations": 3,
+    "max_accepted_optimizer_steps": 1600,
+    "max_epochs": 8,
+    "max_guard_retries_per_interval": 3,
+    "minimum_learning_rate": 0.0000125,
+    "optimizer": "torch.optim.Adam",
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "optimizer_epsilon": 1e-08,
+    "seed": 2026082823,
+    "validation_interval_optimizer_steps": 64,
+    "worlds_per_minibatch": 128
+  }
+}

@@ -8,10 +8,12 @@ import torch
 from rivalsim.human_demo.bc_observation_bridge import (
     FIELD_QUALITY_SPECS,
     GLOBAL_QUALITY_MASK,
+    DegradationProfile,
     FieldQuality,
     TrajectoryReconstructionState,
     actor_distribution_distillation_objective,
     bridge_human_frame,
+    degradation_quality_mask,
     degrade_simulator_observations,
     field_quality_contract,
 )
@@ -224,6 +226,18 @@ def test_simulator_degradation_uses_neutral_only_with_unavailable_mask() -> None
     np.testing.assert_array_equal(quality[0], GLOBAL_QUALITY_MASK)
     assert not degraded.flags.writeable
     assert not quality.flags.writeable
+
+
+def test_freeplay_profile_masks_real_opponent_without_promoting_fields() -> None:
+    gameplay = degradation_quality_mask(DegradationProfile.GAMEPLAY)
+    freeplay = degradation_quality_mask(DegradationProfile.FREEPLAY)
+
+    assert np.bincount(gameplay, minlength=4).tolist() == [74, 34, 58, 16]
+    assert np.bincount(freeplay, minlength=4).tolist() == [116, 22, 36, 8]
+    assert np.all(freeplay <= gameplay)
+    for index, field in enumerate(OBS_FIELD_NAMES):
+        if field.startswith("opponent.") or field.startswith("relative.opponent"):
+            assert freeplay[index] == FieldQuality.UNAVAILABLE
 
 
 def test_distillation_interface_is_finite_training_ready_and_nonmutating() -> None:
