@@ -1,0 +1,62 @@
+{
+  "architecture_change_required": false,
+  "backward_called": false,
+  "format": "RIVAL2_HUMAN_DEMO_BC_BRIDGE_DISTILLATION_INTERFACE_AUDIT_V1",
+  "model_gradients_unchanged": true,
+  "model_parameters_byte_identical": true,
+  "objective": "teacher true observation to student degraded observation actor KL",
+  "optimizer_constructed": false,
+  "optimizer_step_called": false,
+  "paired_sample_count": 512,
+  "policy_config_after": {
+    "activation": "silu",
+    "actor_outputs": 13,
+    "autocast": false,
+    "dtype": "float32",
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+    "log_std_max": 1.0,
+    "log_std_min": -5.0,
+    "obs_dim": 182
+  },
+  "policy_config_before": {
+    "activation": "silu",
+    "actor_outputs": 13,
+    "autocast": false,
+    "dtype": "float32",
+    "hidden_dim": 512,
+    "hidden_layers": 3,
+    "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+    "log_std_max": 1.0,
+    "log_std_min": -5.0,
+    "obs_dim": 182
+  },
+  "student_final_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+  "student_full_observation_functional_parity": true,
+  "student_initial_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+  "teacher_model": {
+    "checkpoint_sha256_after": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "checkpoint_sha256_before": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "iteration": 479,
+    "model_tensor_sha256_after": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "model_tensor_sha256_before": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "path": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "policy_version": 479
+  },
+  "teacher_student_kl_by_action_channel": {
+    "boost": 0.5579589605331421,
+    "handbrake": 0.5002381205558777,
+    "jump": 0.38184356689453125,
+    "pitch": 1.4481985569000244,
+    "roll": 0.7868304252624512,
+    "steer": 2.3673107624053955,
+    "throttle": 1.4322395324707031,
+    "yaw": 2.1674880981445312
+  },
+  "teacher_student_max_sample_kl": 100.98945617675781,
+  "teacher_student_mean_kl": 9.642108917236328,
+  "teacher_student_modules_independent": true,
+  "training_ready_interface": true,
+  "unavailable_feature_fraction": 0.4065934121608734
+}

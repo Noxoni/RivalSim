@@ -1,0 +1,1866 @@
+{
+  "array_artifacts": [
+    {
+      "bytes": 372864,
+      "dtype": "float32",
+      "file_sha256": "33A555A168B97129768ADF10AB2F08BB6DE9DAE48F4AA63E7A3FEAE085DDD928",
+      "path": "simulator_corpus/true_observations.npy",
+      "shape": [
+        512,
+        182
+      ],
+      "tensor_sha256": "B644725AC21051BE8DD56127266A94BCA97F9643BE7E8317347F34B0AA4BBA7E"
+    },
+    {
+      "bytes": 372864,
+      "dtype": "float32",
+      "file_sha256": "83DA14E0108548B964DD3EB4BE06378B72B277331A8851ACD5EE2A447A053594",
+      "path": "simulator_corpus/degraded_observations.npy",
+      "shape": [
+        512,
+        182
+      ],
+      "tensor_sha256": "0BBFB25A65B09B8B11610F2A5588F690D87570DD00C2FFA0DC9EC25F0A9E5C5E"
+    },
+    {
+      "bytes": 93312,
+      "dtype": "uint8",
+      "file_sha256": "EBDE5CB8E819D1EA5669BF724957C4C590F5ADE0E480AFD07D1D5C3B01E205F5",
+      "path": "simulator_corpus/quality_mask.npy",
+      "shape": [
+        512,
+        182
+      ],
+      "tensor_sha256": "DA87A42D3D961815B9DCB97A8EF817DC0C96E1060BBBD0F6F118C572705AC4E8"
+    },
+    {
+      "bytes": 26752,
+      "dtype": "float32",
+      "file_sha256": "B228C66DCDA31726E504EA7678BBAF4C588687C7E8EA128B06F9D159570B07A3",
+      "path": "simulator_corpus/teacher_actor.npy",
+      "shape": [
+        512,
+        13
+      ],
+      "tensor_sha256": "4C1C65ED051917B1FBDF4891F40359AE0FE1E9CC62A98BDEC5C786FDB4D46454"
+    },
+    {
+      "bytes": 26752,
+      "dtype": "float32",
+      "file_sha256": "E860106C8EFD273F3D5E6DEE69ADCBEBB1D109FA882EA9347BD09159584FC8DE",
+      "path": "simulator_corpus/student_actor.npy",
+      "shape": [
+        512,
+        13
+      ],
+      "tensor_sha256": "0DFA3CA3F384F27B0F927C104836540338F22C4636FA9FDC3A407F75C42D1DAD"
+    }
+  ],
+  "bridge_contract": {
+    "action_contract_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "action_dtype": "float32",
+    "action_shape": [
+      8
+    ],
+    "action_version": "RIVAL2_ACTION_V2_120HZ",
+    "architecture_change_required": false,
+    "neutral_value_is_exact": false,
+    "observation_contract_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "observation_dtype": "float32",
+    "observation_shape": [
+      182
+    ],
+    "observation_version": "RIVAL2_OBS_V2_120HZ",
+    "quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "quality_dtype": "uint8",
+    "quality_shape": [
+      182
+    ],
+    "quality_usage": "retained alongside input for auditing and future sampling/loss analysis",
+    "quality_version": "RIVAL2_HUMAN_DEMO_FIELD_QUALITY_V1",
+    "student_model_input": "masked neutral-domain float32[182]",
+    "version": "RIVAL2_HUMAN_DEMO_BC_OBSERVATION_BRIDGE_V1"
+  },
+  "degradation_semantics": "Simulator values are the numerical targets of deterministic human reconstruction. Non-unavailable values are retained with their non-promoted quality class; unavailable values use neutral zero plus quality=unavailable. Error therefore measures missing-feature loss, not cross-engine semantic error.",
+  "error_by_field_group": {
+    "ball": {
+      "field_count": 9,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "boost_pads": {
+      "field_count": 68,
+      "mae": 0.4925121536571035,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.5,
+      "rmse": 0.6997940971318619
+    },
+    "lifecycle": {
+      "field_count": 7,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "opponent_car": {
+      "field_count": 39,
+      "mae": 0.01811857209875784,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.023036858974358976,
+      "rmse": 0.12967495661570494
+    },
+    "previous_action": {
+      "field_count": 8,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "relative": {
+      "field_count": 12,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "self_car": {
+      "field_count": 39,
+      "mae": 0.017847721574817583,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.022435897435897436,
+      "rmse": 0.1281650486830543
+    }
+  },
+  "error_by_global_quality": {
+    "approximate_semantically_reconstructed": {
+      "field_count": 34,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "exact_direct": {
+      "field_count": 16,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "exactly_derivable": {
+      "field_count": 58,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    "unavailable": {
+      "field_count": 74,
+      "mae": 0.4715339446209795,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.4834248310810811,
+      "rmse": 0.6837578402030074
+    }
+  },
+  "format": "RIVAL2_HUMAN_DEMO_BC_BRIDGE_SIMULATOR_CALIBRATION_V1",
+  "overall_error": {
+    "mae": 0.19172259286787077,
+    "max_abs": 1.0,
+    "nonzero_fraction": 0.1965573489010989,
+    "rmse": 0.43599598003800083
+  },
+  "per_field_error": [
+    {
+      "field": "ball.position.x",
+      "global_classification": "exactly_derivable",
+      "index": 0,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.position.y",
+      "global_classification": "exactly_derivable",
+      "index": 1,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.position.z",
+      "global_classification": "exactly_derivable",
+      "index": 2,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.linear_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 3,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.linear_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 4,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.linear_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 5,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.angular_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 6,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.angular_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 7,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "ball.angular_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 8,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.position.x",
+      "global_classification": "exactly_derivable",
+      "index": 9,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.position.y",
+      "global_classification": "exactly_derivable",
+      "index": 10,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.position.z",
+      "global_classification": "exactly_derivable",
+      "index": 11,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.linear_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 12,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.linear_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 13,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.linear_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 14,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.forward.x",
+      "global_classification": "exactly_derivable",
+      "index": 15,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.forward.y",
+      "global_classification": "exactly_derivable",
+      "index": 16,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.forward.z",
+      "global_classification": "exactly_derivable",
+      "index": 17,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.up.x",
+      "global_classification": "exactly_derivable",
+      "index": 18,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.up.y",
+      "global_classification": "exactly_derivable",
+      "index": 19,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.up.z",
+      "global_classification": "exactly_derivable",
+      "index": 20,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.angular_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 21,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.angular_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 22,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.angular_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 23,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.boost",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 24,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.on_ground",
+      "global_classification": "exact_direct",
+      "index": 25,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.has_jumped",
+      "global_classification": "exact_direct",
+      "index": 26,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.is_jumping",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 27,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.has_double_jumped",
+      "global_classification": "exact_direct",
+      "index": 28,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.has_flipped",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 29,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.is_flipping",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 30,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.jump_available",
+      "global_classification": "exactly_derivable",
+      "index": 31,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.dodge_available",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 32,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.is_demoed",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 33,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.demo_timer_remaining",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 34,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.wheel_contact.front_left",
+      "global_classification": "exact_direct",
+      "index": 35,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.wheel_contact.front_right",
+      "global_classification": "exact_direct",
+      "index": 36,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.wheel_contact.back_left",
+      "global_classification": "exact_direct",
+      "index": 37,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.wheel_contact.back_right",
+      "global_classification": "exact_direct",
+      "index": 38,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.jump_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 39,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.air_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 40,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.air_time_since_jump",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 41,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.flip_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 42,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.boosting_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 43,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.time_since_boosted",
+      "global_classification": "unavailable",
+      "index": 44,
+      "mae": 0.6883951279996836,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.849609375,
+      "rmse": 0.7977997381263756
+    },
+    {
+      "field": "self.is_supersonic",
+      "global_classification": "exact_direct",
+      "index": 45,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "self.supersonic_time",
+      "global_classification": "unavailable",
+      "index": 46,
+      "mae": 0.007666013418202056,
+      "max_abs": 0.7083330154418945,
+      "nonzero_fraction": 0.025390625,
+      "rmse": 0.06434661062359097
+    },
+    {
+      "field": "self.sticky_ticks",
+      "global_classification": "unavailable",
+      "index": 47,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.position.x",
+      "global_classification": "exactly_derivable",
+      "index": 48,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.position.y",
+      "global_classification": "exactly_derivable",
+      "index": 49,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.position.z",
+      "global_classification": "exactly_derivable",
+      "index": 50,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.linear_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 51,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.linear_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 52,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.linear_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 53,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.forward.x",
+      "global_classification": "exactly_derivable",
+      "index": 54,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.forward.y",
+      "global_classification": "exactly_derivable",
+      "index": 55,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.forward.z",
+      "global_classification": "exactly_derivable",
+      "index": 56,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.up.x",
+      "global_classification": "exactly_derivable",
+      "index": 57,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.up.y",
+      "global_classification": "exactly_derivable",
+      "index": 58,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.up.z",
+      "global_classification": "exactly_derivable",
+      "index": 59,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.angular_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 60,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.angular_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 61,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.angular_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 62,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.boost",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 63,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.on_ground",
+      "global_classification": "exact_direct",
+      "index": 64,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.has_jumped",
+      "global_classification": "exact_direct",
+      "index": 65,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.is_jumping",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 66,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.has_double_jumped",
+      "global_classification": "exact_direct",
+      "index": 67,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.has_flipped",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 68,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.is_flipping",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 69,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.jump_available",
+      "global_classification": "exactly_derivable",
+      "index": 70,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.dodge_available",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 71,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.is_demoed",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 72,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.demo_timer_remaining",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 73,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.wheel_contact.front_left",
+      "global_classification": "exact_direct",
+      "index": 74,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.wheel_contact.front_right",
+      "global_classification": "exact_direct",
+      "index": 75,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.wheel_contact.back_left",
+      "global_classification": "exact_direct",
+      "index": 76,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.wheel_contact.back_right",
+      "global_classification": "exact_direct",
+      "index": 77,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.jump_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 78,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.air_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 79,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.air_time_since_jump",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 80,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.flip_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 81,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.boosting_time",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 82,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.time_since_boosted",
+      "global_classification": "unavailable",
+      "index": 83,
+      "mae": 0.7007649364240933,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.86328125,
+      "rmse": 0.8088359350597406
+    },
+    {
+      "field": "opponent.is_supersonic",
+      "global_classification": "exact_direct",
+      "index": 84,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "opponent.supersonic_time",
+      "global_classification": "unavailable",
+      "index": 85,
+      "mae": 0.00585937542746251,
+      "max_abs": 0.5083332061767578,
+      "nonzero_fraction": 0.03515625,
+      "rmse": 0.039907527036241675
+    },
+    {
+      "field": "opponent.sticky_ticks",
+      "global_classification": "unavailable",
+      "index": 86,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_position.x",
+      "global_classification": "exactly_derivable",
+      "index": 87,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_position.y",
+      "global_classification": "exactly_derivable",
+      "index": 88,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_position.z",
+      "global_classification": "exactly_derivable",
+      "index": 89,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 90,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 91,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.ball_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 92,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_position.x",
+      "global_classification": "exactly_derivable",
+      "index": 93,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_position.y",
+      "global_classification": "exactly_derivable",
+      "index": 94,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_position.z",
+      "global_classification": "exactly_derivable",
+      "index": 95,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_velocity.x",
+      "global_classification": "exactly_derivable",
+      "index": 96,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_velocity.y",
+      "global_classification": "exactly_derivable",
+      "index": 97,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "relative.opponent_velocity.z",
+      "global_classification": "exactly_derivable",
+      "index": 98,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "boost_pad.0.active",
+      "global_classification": "unavailable",
+      "index": 99,
+      "mae": 0.978515625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.978515625,
+      "rmse": 0.9891994869590258
+    },
+    {
+      "field": "boost_pad.0.cooldown",
+      "global_classification": "unavailable",
+      "index": 100,
+      "mae": 0.015931062458548695,
+      "max_abs": 0.9833335876464844,
+      "nonzero_fraction": 0.021484375,
+      "rmse": 0.11501615651738668
+    },
+    {
+      "field": "boost_pad.1.active",
+      "global_classification": "unavailable",
+      "index": 101,
+      "mae": 0.984375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.984375,
+      "rmse": 0.9921567416492215
+    },
+    {
+      "field": "boost_pad.1.cooldown",
+      "global_classification": "unavailable",
+      "index": 102,
+      "mae": 0.010053783771581948,
+      "max_abs": 0.9933334589004517,
+      "nonzero_fraction": 0.015625,
+      "rmse": 0.08637553032472245
+    },
+    {
+      "field": "boost_pad.2.active",
+      "global_classification": "unavailable",
+      "index": 103,
+      "mae": 0.990234375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.990234375,
+      "rmse": 0.9951052080056662
+    },
+    {
+      "field": "boost_pad.2.cooldown",
+      "global_classification": "unavailable",
+      "index": 104,
+      "mae": 0.009184579248540103,
+      "max_abs": 0.9925001263618469,
+      "nonzero_fraction": 0.009765625,
+      "rmse": 0.0931682794489243
+    },
+    {
+      "field": "boost_pad.3.active",
+      "global_classification": "unavailable",
+      "index": 105,
+      "mae": 0.986328125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.986328125,
+      "rmse": 0.993140536379419
+    },
+    {
+      "field": "boost_pad.3.cooldown",
+      "global_classification": "unavailable",
+      "index": 106,
+      "mae": 0.008709382906090468,
+      "max_abs": 0.9133346676826477,
+      "nonzero_fraction": 0.013671875,
+      "rmse": 0.07860479787084143
+    },
+    {
+      "field": "boost_pad.4.active",
+      "global_classification": "unavailable",
+      "index": 107,
+      "mae": 0.970703125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.970703125,
+      "rmse": 0.9852426731521529
+    },
+    {
+      "field": "boost_pad.4.cooldown",
+      "global_classification": "unavailable",
+      "index": 108,
+      "mae": 0.017684077203739434,
+      "max_abs": 0.9508340954780579,
+      "nonzero_fraction": 0.029296875,
+      "rmse": 0.10937582911133907
+    },
+    {
+      "field": "boost_pad.5.active",
+      "global_classification": "unavailable",
+      "index": 109,
+      "mae": 0.994140625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.994140625,
+      "rmse": 0.9970660083464885
+    },
+    {
+      "field": "boost_pad.5.cooldown",
+      "global_classification": "unavailable",
+      "index": 110,
+      "mae": 0.005061861127614975,
+      "max_abs": 0.9458341598510742,
+      "nonzero_fraction": 0.005859375,
+      "rmse": 0.06645895095330281
+    },
+    {
+      "field": "boost_pad.6.active",
+      "global_classification": "unavailable",
+      "index": 111,
+      "mae": 0.9453125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.9453125,
+      "rmse": 0.9722718241315028
+    },
+    {
+      "field": "boost_pad.6.cooldown",
+      "global_classification": "unavailable",
+      "index": 112,
+      "mae": 0.02533337655768264,
+      "max_abs": 0.9416658878326416,
+      "nonzero_fraction": 0.0546875,
+      "rmse": 0.12624853233829597
+    },
+    {
+      "field": "boost_pad.7.active",
+      "global_classification": "unavailable",
+      "index": 113,
+      "mae": 0.978515625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.978515625,
+      "rmse": 0.9891994869590258
+    },
+    {
+      "field": "boost_pad.7.cooldown",
+      "global_classification": "unavailable",
+      "index": 114,
+      "mae": 0.009879460289084818,
+      "max_abs": 0.9979166388511658,
+      "nonzero_fraction": 0.021484375,
+      "rmse": 0.08510406590131918
+    },
+    {
+      "field": "boost_pad.8.active",
+      "global_classification": "unavailable",
+      "index": 115,
+      "mae": 0.99609375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.99609375,
+      "rmse": 0.998044963916957
+    },
+    {
+      "field": "boost_pad.8.cooldown",
+      "global_classification": "unavailable",
+      "index": 116,
+      "mae": 0.0011555742239579558,
+      "max_abs": 0.5187435746192932,
+      "nonzero_fraction": 0.00390625,
+      "rmse": 0.023150780676919527
+    },
+    {
+      "field": "boost_pad.9.active",
+      "global_classification": "unavailable",
+      "index": 117,
+      "mae": 0.978515625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.978515625,
+      "rmse": 0.9891994869590258
+    },
+    {
+      "field": "boost_pad.9.cooldown",
+      "global_classification": "unavailable",
+      "index": 118,
+      "mae": 0.011747138138161972,
+      "max_abs": 0.908332109451294,
+      "nonzero_fraction": 0.021484375,
+      "rmse": 0.09114004446960032
+    },
+    {
+      "field": "boost_pad.10.active",
+      "global_classification": "unavailable",
+      "index": 119,
+      "mae": 0.99609375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.99609375,
+      "rmse": 0.998044963916957
+    },
+    {
+      "field": "boost_pad.10.cooldown",
+      "global_classification": "unavailable",
+      "index": 120,
+      "mae": 0.0034708600724115968,
+      "max_abs": 0.9208322763442993,
+      "nonzero_fraction": 0.00390625,
+      "rmse": 0.055570423663637986
+    },
+    {
+      "field": "boost_pad.11.active",
+      "global_classification": "unavailable",
+      "index": 121,
+      "mae": 0.9375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.9375,
+      "rmse": 0.9682458365518543
+    },
+    {
+      "field": "boost_pad.11.cooldown",
+      "global_classification": "unavailable",
+      "index": 122,
+      "mae": 0.029748219898010575,
+      "max_abs": 0.9666662216186523,
+      "nonzero_fraction": 0.0625,
+      "rmse": 0.1381615926007949
+    },
+    {
+      "field": "boost_pad.12.active",
+      "global_classification": "unavailable",
+      "index": 123,
+      "mae": 0.99609375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.99609375,
+      "rmse": 0.998044963916957
+    },
+    {
+      "field": "boost_pad.12.cooldown",
+      "global_classification": "unavailable",
+      "index": 124,
+      "mae": 0.0034586528781801462,
+      "max_abs": 0.9333324432373047,
+      "nonzero_fraction": 0.00390625,
+      "rmse": 0.05541942464467614
+    },
+    {
+      "field": "boost_pad.13.active",
+      "global_classification": "unavailable",
+      "index": 125,
+      "mae": 0.998046875,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.998046875,
+      "rmse": 0.9990229601966113
+    },
+    {
+      "field": "boost_pad.13.cooldown",
+      "global_classification": "unavailable",
+      "index": 126,
+      "mae": 0.0015340113313868642,
+      "max_abs": 0.7854138016700745,
+      "nonzero_fraction": 0.001953125,
+      "rmse": 0.034710714074900985
+    },
+    {
+      "field": "boost_pad.14.active",
+      "global_classification": "unavailable",
+      "index": 127,
+      "mae": 0.939453125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.939453125,
+      "rmse": 0.9692539012044264
+    },
+    {
+      "field": "boost_pad.14.cooldown",
+      "global_classification": "unavailable",
+      "index": 128,
+      "mae": 0.026476715469470946,
+      "max_abs": 0.8020806908607483,
+      "nonzero_fraction": 0.060546875,
+      "rmse": 0.12270861287494372
+    },
+    {
+      "field": "boost_pad.15.active",
+      "global_classification": "unavailable",
+      "index": 129,
+      "mae": 0.96484375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.96484375,
+      "rmse": 0.982264602843857
+    },
+    {
+      "field": "boost_pad.15.cooldown",
+      "global_classification": "unavailable",
+      "index": 130,
+      "mae": 0.020226890279445797,
+      "max_abs": 0.954166054725647,
+      "nonzero_fraction": 0.03515625,
+      "rmse": 0.11753039705703892
+    },
+    {
+      "field": "boost_pad.16.active",
+      "global_classification": "unavailable",
+      "index": 131,
+      "mae": 0.98828125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.98828125,
+      "rmse": 0.9941233575366791
+    },
+    {
+      "field": "boost_pad.16.cooldown",
+      "global_classification": "unavailable",
+      "index": 132,
+      "mae": 0.006217394839040935,
+      "max_abs": 0.9124988317489624,
+      "nonzero_fraction": 0.01171875,
+      "rmse": 0.06538798369929373
+    },
+    {
+      "field": "boost_pad.17.active",
+      "global_classification": "unavailable",
+      "index": 133,
+      "mae": 0.8359375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.8359375,
+      "rmse": 0.9142961773954871
+    },
+    {
+      "field": "boost_pad.17.cooldown",
+      "global_classification": "unavailable",
+      "index": 134,
+      "mae": 0.0931348835033532,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.1640625,
+      "rmse": 0.26159614674285786
+    },
+    {
+      "field": "boost_pad.18.active",
+      "global_classification": "unavailable",
+      "index": 135,
+      "mae": 0.986328125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.986328125,
+      "rmse": 0.993140536379419
+    },
+    {
+      "field": "boost_pad.18.cooldown",
+      "global_classification": "unavailable",
+      "index": 136,
+      "mae": 0.006957940058782697,
+      "max_abs": 0.9499993324279785,
+      "nonzero_fraction": 0.013671875,
+      "rmse": 0.06785824016843513
+    },
+    {
+      "field": "boost_pad.19.active",
+      "global_classification": "unavailable",
+      "index": 137,
+      "mae": 0.9765625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.9765625,
+      "rmse": 0.9882117688026185
+    },
+    {
+      "field": "boost_pad.19.cooldown",
+      "global_classification": "unavailable",
+      "index": 138,
+      "mae": 0.012748097418807447,
+      "max_abs": 0.9791663885116577,
+      "nonzero_fraction": 0.0234375,
+      "rmse": 0.09280127139664499
+    },
+    {
+      "field": "boost_pad.20.active",
+      "global_classification": "unavailable",
+      "index": 139,
+      "mae": 0.974609375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.974609375,
+      "rmse": 0.9872230624332071
+    },
+    {
+      "field": "boost_pad.20.cooldown",
+      "global_classification": "unavailable",
+      "index": 140,
+      "mae": 0.012878291519882623,
+      "max_abs": 0.8645815253257751,
+      "nonzero_fraction": 0.025390625,
+      "rmse": 0.09096271528678176
+    },
+    {
+      "field": "boost_pad.21.active",
+      "global_classification": "unavailable",
+      "index": 141,
+      "mae": 0.994140625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.994140625,
+      "rmse": 0.9970660083464885
+    },
+    {
+      "field": "boost_pad.21.cooldown",
+      "global_classification": "unavailable",
+      "index": 142,
+      "mae": 0.002648894558660686,
+      "max_abs": 0.7062460780143738,
+      "nonzero_fraction": 0.005859375,
+      "rmse": 0.040137124284455046
+    },
+    {
+      "field": "boost_pad.22.active",
+      "global_classification": "unavailable",
+      "index": 143,
+      "mae": 0.80078125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.80078125,
+      "rmse": 0.8948638164547721
+    },
+    {
+      "field": "boost_pad.22.cooldown",
+      "global_classification": "unavailable",
+      "index": 144,
+      "mae": 0.11808999512868468,
+      "max_abs": 0.9916665554046631,
+      "nonzero_fraction": 0.19921875,
+      "rmse": 0.29549215024118447
+    },
+    {
+      "field": "boost_pad.23.active",
+      "global_classification": "unavailable",
+      "index": 145,
+      "mae": 0.98828125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.98828125,
+      "rmse": 0.9941233575366791
+    },
+    {
+      "field": "boost_pad.23.cooldown",
+      "global_classification": "unavailable",
+      "index": 146,
+      "mae": 0.006376083998475224,
+      "max_abs": 0.9062487483024597,
+      "nonzero_fraction": 0.01171875,
+      "rmse": 0.0649239190001114
+    },
+    {
+      "field": "boost_pad.24.active",
+      "global_classification": "unavailable",
+      "index": 147,
+      "mae": 0.912109375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.912109375,
+      "rmse": 0.9550441743710079
+    },
+    {
+      "field": "boost_pad.24.cooldown",
+      "global_classification": "unavailable",
+      "index": 148,
+      "mae": 0.05323040354778641,
+      "max_abs": 0.9937499165534973,
+      "nonzero_fraction": 0.087890625,
+      "rmse": 0.19433415586299613
+    },
+    {
+      "field": "boost_pad.25.active",
+      "global_classification": "unavailable",
+      "index": 149,
+      "mae": 0.927734375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.927734375,
+      "rmse": 0.9631896879639026
+    },
+    {
+      "field": "boost_pad.25.cooldown",
+      "global_classification": "unavailable",
+      "index": 150,
+      "mae": 0.03225058265161351,
+      "max_abs": 0.9604161381721497,
+      "nonzero_fraction": 0.072265625,
+      "rmse": 0.1368591063301185
+    },
+    {
+      "field": "boost_pad.26.active",
+      "global_classification": "unavailable",
+      "index": 151,
+      "mae": 0.998046875,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.998046875,
+      "rmse": 0.9990229601966113
+    },
+    {
+      "field": "boost_pad.26.cooldown",
+      "global_classification": "unavailable",
+      "index": 152,
+      "mae": 0.00039061257848516107,
+      "max_abs": 0.19999364018440247,
+      "nonzero_fraction": 0.001953125,
+      "rmse": 0.008838553698035836
+    },
+    {
+      "field": "boost_pad.27.active",
+      "global_classification": "unavailable",
+      "index": 153,
+      "mae": 0.994140625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.994140625,
+      "rmse": 0.9970660083464885
+    },
+    {
+      "field": "boost_pad.27.cooldown",
+      "global_classification": "unavailable",
+      "index": 154,
+      "mae": 0.0014525994629366323,
+      "max_abs": 0.5124934911727905,
+      "nonzero_fraction": 0.005859375,
+      "rmse": 0.02402313595282029
+    },
+    {
+      "field": "boost_pad.28.active",
+      "global_classification": "unavailable",
+      "index": 155,
+      "mae": 0.947265625,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.947265625,
+      "rmse": 0.9732757188998398
+    },
+    {
+      "field": "boost_pad.28.cooldown",
+      "global_classification": "unavailable",
+      "index": 156,
+      "mae": 0.029996489407494664,
+      "max_abs": 0.9145821928977966,
+      "nonzero_fraction": 0.052734375,
+      "rmse": 0.13974326069848456
+    },
+    {
+      "field": "boost_pad.29.active",
+      "global_classification": "unavailable",
+      "index": 157,
+      "mae": 0.990234375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.990234375,
+      "rmse": 0.9951052080056662
+    },
+    {
+      "field": "boost_pad.29.cooldown",
+      "global_classification": "unavailable",
+      "index": 158,
+      "mae": 0.0079304768005386,
+      "max_abs": 0.9916665554046631,
+      "nonzero_fraction": 0.009765625,
+      "rmse": 0.08145095450716743
+    },
+    {
+      "field": "boost_pad.30.active",
+      "global_classification": "unavailable",
+      "index": 159,
+      "mae": 0.986328125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.986328125,
+      "rmse": 0.993140536379419
+    },
+    {
+      "field": "boost_pad.30.cooldown",
+      "global_classification": "unavailable",
+      "index": 160,
+      "mae": 0.008508247323334217,
+      "max_abs": 0.9333324432373047,
+      "nonzero_fraction": 0.013671875,
+      "rmse": 0.0800338057840838
+    },
+    {
+      "field": "boost_pad.31.active",
+      "global_classification": "unavailable",
+      "index": 161,
+      "mae": 0.990234375,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.990234375,
+      "rmse": 0.9951052080056662
+    },
+    {
+      "field": "boost_pad.31.cooldown",
+      "global_classification": "unavailable",
+      "index": 162,
+      "mae": 0.006957972072996199,
+      "max_abs": 0.8687482476234436,
+      "nonzero_fraction": 0.009765625,
+      "rmse": 0.07253824552033226
+    },
+    {
+      "field": "boost_pad.32.active",
+      "global_classification": "unavailable",
+      "index": 163,
+      "mae": 0.98046875,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.98046875,
+      "rmse": 0.9901862198596787
+    },
+    {
+      "field": "boost_pad.32.cooldown",
+      "global_classification": "unavailable",
+      "index": 164,
+      "mae": 0.012902764545287937,
+      "max_abs": 0.9374991655349731,
+      "nonzero_fraction": 0.01953125,
+      "rmse": 0.10012898782874981
+    },
+    {
+      "field": "boost_pad.33.active",
+      "global_classification": "unavailable",
+      "index": 165,
+      "mae": 0.9453125,
+      "max_abs": 1.0,
+      "nonzero_fraction": 0.9453125,
+      "rmse": 0.9722718241315028
+    },
+    {
+      "field": "boost_pad.33.cooldown",
+      "global_classification": "unavailable",
+      "index": 166,
+      "mae": 0.026936573412967846,
+      "max_abs": 0.9416658878326416,
+      "nonzero_fraction": 0.0546875,
+      "rmse": 0.1312052762056807
+    },
+    {
+      "field": "previous_action.throttle",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 167,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.steer",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 168,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.pitch",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 169,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.yaw",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 170,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.roll",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 171,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.jump",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 172,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.boost",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 173,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "previous_action.handbrake",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 174,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.kickoff_reset",
+      "global_classification": "exactly_derivable",
+      "index": 175,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.self_touch_event",
+      "global_classification": "exactly_derivable",
+      "index": 176,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.opponent_touch_event",
+      "global_classification": "exactly_derivable",
+      "index": 177,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.self_demoed_event",
+      "global_classification": "exactly_derivable",
+      "index": 178,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.opponent_demoed_event",
+      "global_classification": "exactly_derivable",
+      "index": 179,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.episode_age",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 180,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    },
+    {
+      "field": "lifecycle.no_touch_age",
+      "global_classification": "approximate_semantically_reconstructed",
+      "index": 181,
+      "mae": 0.0,
+      "max_abs": 0.0,
+      "nonzero_fraction": 0.0,
+      "rmse": 0.0
+    }
+  ],
+  "source": {
+    "collection": {
+      "agent_observations_considered": 4194304,
+      "all_five_kickoff_layouts": true,
+      "decisions_per_world": 2048,
+      "migrated_iteration_479_actor_on_both_sides": true,
+      "optimizer_steps": 0,
+      "physics_hz": 120,
+      "physics_ticks_per_decision": 1,
+      "policy_hz": 120,
+      "seed": 2026082812,
+      "stochastic_actions": true,
+      "training_performed": false,
+      "worlds": 1024
+    },
+    "file_sha256": "C4957B06847E7F61B5DC313ABAC58CD2FE8AB696561C7A4898C6ACFF219DACDC",
+    "identity": "RIVAL2_RETENTION_120HZ_FROM_ITERATION_479_V1",
+    "observation_count": 512,
+    "observation_shape": [
+      512,
+      182
+    ],
+    "observation_tensor_sha256": "BED4DD26268A667251B944844544306734E0E44E54AB31689B4DE782FC0965FA",
+    "path": "results/rival2/120hz_transition_v1/retention_corpus_120hz.pt",
+    "source_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "state_coverage": {
+      "heading_octant_counts": [
+        52,
+        35,
+        12,
+        7,
+        44,
+        137,
+        178,
+        47
+      ],
+      "occupied_heading_octants_of_8": 8,
+      "occupied_x_field_regions_of_3": 3,
+      "occupied_y_field_regions_of_3": 3,
+      "self_position_x_min_max_uu": [
+        -4076.6650390625,
+        4071.849853515625
+      ],
+      "self_position_y_min_max_uu": [
+        -5236.166015625,
+        5047.99365234375
+      ],
+      "self_position_z_min_max_uu": [
+        15.967395782470703,
+        869.4953002929688
+      ]
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "artifact_manifest_sha256": "5B1285363458A94828F106E469E6249831ED83502206A89439F76845C1449305",
+  "authority": {
+    "base_commit": "4d8064d6260a87be458f5cbf11f2f882ebe65c07",
+    "exact_adapter_git_blob_oid": "158b3da2504e9c1e1fbe9a82b539769d673d74be",
+    "exact_adapter_sha256": "1B6D01C223419C2C3A686CAB3F012F8D80CA9E77922E8E8AC3AB9C96D2B8DD61",
+    "exact_adapter_unchanged": true
+  },
+  "deterministic_rebuild": {
+    "canonical_artifact_count": 12,
+    "canonical_artifact_manifest_sha256": "5B1285363458A94828F106E469E6249831ED83502206A89439F76845C1449305",
+    "difference_count": 0,
+    "independent_artifact_count": 12,
+    "independent_artifact_manifest_sha256": "5B1285363458A94828F106E469E6249831ED83502206A89439F76845C1449305",
+    "independent_rebuild_directory_committed": false,
+    "valid": true
+  },
+  "field_quality": {
+    "approximate_semantically_reconstructed": 34,
+    "exact_direct": 16,
+    "exactly_derivable": 58,
+    "field_count": 182,
+    "quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "unavailable": 74
+  },
+  "format": "RIVAL2_HUMAN_DEMO_BC_BRIDGE_VERIFICATION_EVIDENCE_V1",
+  "human_corpus": {
+    "action_mismatch_frame_count": 0,
+    "bc_usable_frame_count": 114311,
+    "exact_audit_usable_frame_count": 0,
+    "failed_or_ambiguous_attempts_added_to_positive_cohort": false,
+    "gameplay_frame_count": 58306,
+    "mechanic_attempt_count": 110,
+    "mechanic_frame_count": 56005,
+    "source_hashes_unchanged": true,
+    "split_statistics": {
+      "test": {
+        "gameplay_frames": 3808,
+        "mechanic_attempts": 16,
+        "mechanic_frames": 8199
+      },
+      "train": {
+        "gameplay_frames": 47347,
+        "mechanic_attempts": 77,
+        "mechanic_frames": 39275
+      },
+      "validation": {
+        "gameplay_frames": 7151,
+        "mechanic_attempts": 17,
+        "mechanic_frames": 8531
+      }
+    }
+  },
+  "no_learning_boundary": {
+    "backward_called": false,
+    "behavior_cloning_performed": false,
+    "mechanic_detector_changed": false,
+    "model_mutated": false,
+    "optimizer_constructed": false,
+    "optimizer_step_called": false,
+    "ppo_performed": false,
+    "reward_changed": false
+  },
+  "simulator_calibration": {
+    "architecture_change_required": false,
+    "bootstrap_checkpoint_sha256_before_after": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256_before_after": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "observation_count": 512,
+    "overall_mae": 0.19172259286787077,
+    "overall_rmse": 0.43599598003800083,
+    "pad_group_mae": 0.4925121536571035,
+    "pad_group_rmse": 0.6997940971318619,
+    "student_full_observation_functional_parity": true,
+    "teacher_student_max_sample_kl": 100.98945617675781,
+    "teacher_student_mean_kl": 9.642108917236328,
+    "teacher_student_modules_independent": true,
+    "true_observation_tensor_sha256": "BED4DD26268A667251B944844544306734E0E44E54AB31689B4DE782FC0965FA",
+    "unavailable_field_mae": 0.4715339446209795,
+    "unavailable_field_rmse": 0.6837578402030074
+  },
+  "tests": {
+    "commands": [
+      ".\\.venv\\Scripts\\ruff.exe check rivalsim\\human_demo\\bc_observation_bridge.py benchmarks\\build_rival2_human_demo_bc_bridge_v1.py tests\\test_human_demo_bc_observation_bridge.py",
+      ".\\.venv\\Scripts\\pytest.exe -q --basetemp .tools\\pytest_human_bc_bridge_20260828_03 tests\\test_human_demo_bc_observation_bridge.py tests\\test_human_demo_training_adapter.py tests\\test_human_demo_recording.py",
+      ".\\.venv\\Scripts\\python.exe benchmarks\\build_rival2_human_demo_bc_bridge_v1.py --verify-only"
+    ],
+    "focused_pytest": "37 passed, 1 skipped",
+    "optional_skip_reason": "RIVALREC_CPP_FIXTURE was not set for the optional native C++ encoder fixture",
+    "ruff": "passed",
+    "verify_only": "passed: 11 manifested payload artifacts, 0 errors"
+  },
+  "verdict": "RIVAL2_HUMAN_DEMO_BC_OBSERVATION_BRIDGE_VALID"
+}
