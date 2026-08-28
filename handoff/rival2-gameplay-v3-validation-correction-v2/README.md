@@ -4,69 +4,97 @@ Status: **final production/runtime-parity correction; NOT training authorization
 
 Reviewed source/evidence commit: `5efa83f331855ae86a8076b7c0c1a9dc8fae88c4`
 
+## User clarification — authoritative
+
+**Contact order is never a penalty condition.**
+
+Gameplay V3 must never penalize Rival merely because the opponent touched the ball first.
+
+In a normal controlled 50, allowing the opponent to put the ball into Rival and then taking the later/last contact can be the correct play. Therefore:
+
+- opponent-first -> Rival contact, when both contacts belong to the same physical contest, is `EXEMPT_CONTESTED_50`;
+- Rival-first -> opponent contact, when both contacts belong to the same physical contest, is also `EXEMPT_CONTESTED_50`;
+- closest physically representable simultaneous contact is also `EXEMPT_CONTESTED_50`;
+- contact order by itself has **zero negative reward meaning**;
+- there is no first-touch/last-touch penalty;
+- there is no reward for beating the opponent to the ball merely because Rival touched first.
+
+The only negative event remains `UNNECESSARY_FLIP_THROUGH_CONTACT`: Rival performs an active directional dodge through a ball contact that is not a legitimate contest, dodge-powered contact, controlled flick, or recognized same-contact mechanic.
+
+Recent-opponent-contact state is required only so production can recognize an opponent-first 50 and **suppress** that penalty. It must never create a penalty.
+
+This clarification overrides any earlier wording that could be read as treating opponent-before-self as undesirable.
+
 ## BLUF
 
-The V1 correction successfully replaced the synthetic classifier rows with real deterministic RivalSim physics traces, derived the thresholds prospectively, passed held-out classification, closed the dash/reset source-exact gate, and reran the exact-scale runtime validation.
+The V1 correction successfully replaced the synthetic classifier rows with real deterministic RivalSim physics traces, derived thresholds prospectively, passed held-out classification, closed the dash/reset source-exact gate, and reran exact-scale runtime validation.
 
 Do **not** undo that work.
 
-Two remaining mismatches prevent training authorization:
+Two runtime/calibration mismatches remain:
 
-1. the contest corpus does not actually contain the claimed opponent-contact-before-self physical ordering, while production cannot remember a prior opponent ball contact;
-2. controlled-flick `release_distance` is calibrated at contact +2 physics ticks but production evaluates current car-ball distance when the shared contest pending window resolves at up to 8 ticks.
+1. contest association must recognize both physical contact orders so legitimate opponent-first 50s are protected;
+2. controlled-flick `release_distance` is calibrated at contact +2 physics ticks while production evaluates current car-ball distance when the shared contest pending window resolves at up to 8 ticks.
 
 The correction must align the physical corpus and production state machine exactly, then prove end-to-end runtime parity on the complete 216-trace classifier corpus.
 
-## Finding 1 — contest contact association is not bidirectional
+## Finding 1 — contest association must protect either contact order
 
-The committed physical corpus exposes a labeling/topology mismatch.
+The committed V1 physical corpus exposes a scenario-label/topology mismatch.
 
 For example:
 
 - `contest-positive-D01` is named `opponent_contact_just_before_self`, but measured contact ticks are self `18`, opponent `21`;
-- `contest-positive-H17` has the same pattern: self `18`, opponent `21`.
+- `contest-positive-H17` has the same measured order: self `18`, opponent `21`.
 
-The physical event therefore has the opponent contacting **after** Rival, not before.
+Those traces are opponent-after-self events despite their names.
 
-Current production `gameplay_v3_track_tick` creates `pending_active` only when Rival's flip-touch candidate occurs. It can mark a later `other_reports` contact during the pending window, but it has no authoritative recent-opponent-contact tick/ball-position state to associate an opponent contact which genuinely happened shortly **before** Rival's candidate.
+Current production creates `pending_active` only when Rival's flip-touch candidate occurs. It can associate a later opponent contact during the pending window, but it cannot currently associate a legitimate opponent contact that happened shortly **before** Rival's candidate.
 
-A true opponent-first 50 can therefore be penalized unless the independent convergence classifier also happens to pass.
+That is a problem because an opponent-first 50 is a legitimate contest and must be exempt from the anti-flip penalty.
 
 ### Required correction
 
-Implement symmetric adjacent-contact association at 120 Hz.
+Implement symmetric adjacent-contact **exemption** association at 120 Hz.
 
-A valid design should retain minimal GPU-resident recent legitimate ball-contact state per car/world, sufficient to answer at candidate creation:
+Retain minimal GPU-resident recent legitimate opponent ball-contact state sufficient to answer at Rival candidate creation:
 
-- did the opponent have a legitimate ball-contact onset within the calibrated association window immediately before this contact?;
+- did the opponent have a legitimate ball-contact onset within the calibrated association window immediately before Rival's contact?;
 - is the ball displacement from that opponent contact within the calibrated association displacement boundary?;
 
-Then retain the existing forward pending check for opponent contacts occurring after Rival's contact.
+If yes, mark the candidate as contested. This is affirmative exemption evidence.
 
-Do not use a broad proximity substitute.
+Retain the existing forward pending check for opponent contacts occurring after Rival's contact.
 
-Do not alter the historical Rival touch latch.
+Rules:
 
-The association must remain same-event bounded and must reset cleanly at episode reset.
+- opponent-first associated contact -> `EXEMPT_CONTESTED_50`;
+- opponent-after associated contact -> `EXEMPT_CONTESTED_50`;
+- order must not affect reward sign or desirability;
+- do not use broad opponent proximity as a substitute;
+- do not alter the historical Rival touch latch;
+- association must be same-event bounded and reset cleanly on episode reset.
 
 ### Physical corpus correction
 
 Regenerate/revise contest traces so scenario names are verified against **measured** contact order, not intended initial geometry.
 
-Required positive physical order classes:
+Required positive physical classes:
 
 - same-tick or closest physically representable simultaneous contest;
 - measured opponent-before-self: `opponent_tick < self_tick`;
 - measured opponent-after-self: `opponent_tick > self_tick`;
 - convergence-only challenge where adjacent opponent contact is absent.
 
-If exact same-tick dual contact is not representable because of authoritative serial collision ordering, document the closest physically meaningful simultaneous-contest topology rather than falsely naming it same-tick.
+For every ordered-contact positive, assert measured ordering before accepting the trace.
 
-For every ordered-contact positive, assert the measured ordering before accepting the trace into the corpus.
+At least one derivation and one untouched held-out positive must exist for both actual opponent-before-self and opponent-after-self order. Prefer several while preserving the 24-positive class total.
+
+If exact same-tick dual contact is not representable because of authoritative serial collision ordering, document the closest physically meaningful simultaneous topology instead of naming it same-tick.
 
 Retain hard delayed/unrelated contact negatives on both sides of the candidate where feasible.
 
-Re-derive contact-association window/displacement if the corrected corpus changes the extrema. Do not preserve 8 ticks / 86.600067 uu by default.
+Re-derive the association window/displacement if corrected measured-order traces change the extrema. Do not preserve `8 ticks / 86.600067 uu` by default.
 
 ## Finding 2 — controlled-flick release timing differs between calibration and production
 
@@ -76,9 +104,9 @@ The V1 correction physical calibration computes:
 
 and derives `CONTROL_RELEASE_DISTANCE_MIN` from that measurement.
 
-Production does not evaluate that same quantity at +2. A flip-touch candidate remains pending for the shared contest window and `_resolve_flip_candidate` evaluates the **current** car-ball distance when the candidate resolves. `CONTEST_CONTACT_WINDOW_TICKS` is now 8.
+Production does not evaluate that same quantity at +2. A flip-touch candidate remains pending for the shared contest window and `_resolve_flip_candidate` evaluates the current car-ball distance when the candidate resolves. `CONTEST_CONTACT_WINDOW_TICKS` is currently 8.
 
-Therefore `CONTROL_RELEASE_DISTANCE_MIN = 77.3182449341` is not calibrated for the quantity production actually uses.
+Therefore the calibrated release threshold and runtime quantity are not yet the same measurement.
 
 ### Required correction
 
@@ -86,55 +114,55 @@ Make controlled-flick release identity explicit and identical in calibration and
 
 Preferred architecture:
 
-- give controlled flick its own bounded release-evaluation state/window rather than accidentally inheriting the contest-association timeout;
-- derive that release window from physical traces if a numerical timing boundary is needed;
-- capture the same release evidence production will evaluate (distance and/or a stronger physical exit-from-control feature) at the exact same event/time definition;
-- let the overall flip candidate remain pending long enough for contest association without changing the already-captured controlled-flick release evidence.
+- give controlled flick its own bounded release-evaluation state/window rather than inheriting contest timeout semantics;
+- derive any release timing boundary from physical traces;
+- capture the same distance/outward-motion/release evidence production will evaluate at the exact same event/time definition;
+- allow the overall candidate to remain pending for contest association without losing the already-captured controlled-flick release evidence.
 
-Alternative: if production deliberately evaluates release at the final contest-resolution tick, recalibrate every controlled-flick trace using that exact runtime timing and re-derive the threshold. Do not retain +2-derived constants against +8 runtime semantics.
+Alternative: deliberately evaluate controlled release at final contest resolution and recalibrate every controlled-flick trace using that exact timing. Do not retain +2-derived constants against +8 runtime semantics.
 
 The classifier must still prove:
 
-- real controlled relation before the dodge;
+- real controlled relation before dodge;
 - active directional dodge;
 - legitimate dodge contact;
 - meaningful ball transfer;
 - physical release from the pre-dodge controlled relation.
 
-It remains exemption-only and pays zero mechanics reward.
+Controlled flick remains exemption-only and pays zero positive mechanics reward.
 
-Do not make release identity trivially true merely because time passed after a contact. If absolute distance is insufficient to distinguish release, add an outward relative-motion/state-transition feature from the physical traces rather than broadening the exemption.
+If absolute distance is insufficient, add an outward relative-motion/state-transition feature from real traces rather than broadening the exemption.
 
 ## Mandatory end-to-end production parity gate
 
-The prior correction held-out gate applies an offline `_classify(row, thresholds)` function to extracted features. That is useful but insufficient to prove the production state machine computes the same classification.
+Offline `_classify(row, thresholds)` confusion matrices are insufficient by themselves.
 
-After this correction, run every physical classifier trace through the actual production Gameplay V3 detector path using the recorded initial state/action sequence.
+After correction, replay every physical classifier scenario through the actual production Gameplay V3 detector/state machine using its recorded initial state/action sequence.
 
 For all 216 traces compare:
 
 - expected physical label;
-- offline frozen classifier result;
+- frozen offline result;
 - production candidate existence;
 - production primary outcome;
 - applicable exemption flags;
-- contact/completion ticks;
+- contact/completion/order ticks;
 - captured production feature values versus calibration-extracted features at the defined sampling ticks.
 
 Required:
 
 - production/offline feature parity within documented float tolerance;
-- production outcome matches frozen physical label for the calibrated classifier under test;
-- held-out FP=0/FN=0 remains true **through the production runtime state machine**, not only offline feature replay.
+- production outcome matches the frozen physical label for the classifier under test;
+- held-out FP=0/FN=0 through the production runtime state machine, not only offline replay.
 
-For contest traces, explicitly report counts by measured contact order:
+For contest positives explicitly report measured counts for:
 
 - opponent-before-self;
 - opponent-after-self;
 - simultaneous/closest representable;
 - convergence-only.
 
-At least one derivation and one held-out positive must exist for both actual before-self and after-self ordering. Prefer more than one; preserve the 24-positive class total.
+Again: **both valid contact orders are exemptions. Neither is a penalty condition.**
 
 ## Preserve already-green work
 
@@ -150,8 +178,9 @@ Do not change unless required by these two fixes:
 - 30 Hz policy / 120 Hz physics cadence;
 - checkpoint/mixed-PPO architecture;
 - opponent mix;
-- V3 memory layout except the minimal arrays required for bidirectional contest/release state.
+- V3 memory layout except minimal arrays required for contest/release state.
 
+Do not add first-touch reward, last-touch reward, or any contact-order shaping.
 Do not optimize the V3 state broadly.
 
 ## Rerun requirements
@@ -161,7 +190,7 @@ Production code/state and likely contract semantics will change, so rerun:
 1. corrected physical derivation + separately frozen held-out classifier corpus;
 2. full 216-trace production-runtime parity gate;
 3. focused Gameplay V2/V3/reward/mechanics/curriculum tests;
-4. dash/reset source-exact gate (regression only; no redesign);
+4. dash/reset source-exact gate as regression only;
 5. immutable V3 contract/hash update if classifier topology/timing is encoded in the contract;
 6. checkpoint transition validation;
 7. exact reward reconstruction;
@@ -195,12 +224,14 @@ Additionally export bounded evidence for:
 
 - real opponent-before-self contest exemptions;
 - real opponent-after-self contest exemptions;
-- controlled-flick exemptions with the exact calibrated release evidence/tick;
+- controlled-flick exemptions with exact calibrated release evidence/tick;
 - unnecessary flip contacts near each classifier boundary.
+
+Verify there is **no counter, reward component, penalty, or feature whose meaning is "opponent touched first" as a negative outcome.**
 
 ## Machine evidence
 
-Publish under a new immutable directory:
+Publish under:
 
 `results/rival2/gameplay_v3_validation_correction_v2/`
 
@@ -229,10 +260,12 @@ Bind artifacts to committed blobs/content as before.
 
 Return `BLOCKED` rather than training if:
 
-- true opponent-before-self physical contests cannot be represented/protected;
+- legitimate opponent-first physical contests are not protected as contest exemptions;
+- legitimate opponent-after physical contests are not protected as contest exemptions;
+- any contact-order-specific negative reward/penalty is introduced;
 - production and offline classifier results differ on the physical corpus;
 - controlled-flick release identity cannot be aligned cleanly;
-- the corrected held-out classifier produces FP/FN;
+- corrected held-out classifier produces FP/FN;
 - V1/V2 hashes change;
 - reward reconstruction fails;
 - exact-scale smoke fails;
