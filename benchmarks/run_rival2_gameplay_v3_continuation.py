@@ -774,6 +774,10 @@ def aggregate_training_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _is_hard_stop(summary: dict[str, Any]) -> bool:
+    return str(summary.get("status", "")).startswith("STOPPED_")
+
+
 def _relative_change(before: float, after: float) -> float | None:
     return None if before == 0.0 else after / before - 1.0
 
@@ -807,7 +811,6 @@ def _write_report(summary: dict[str, Any]) -> None:
         f"`{aggregate['bad_flip_to_absolute_gameplay_reward']:.9f}`.",
         f"- Mechanics / progress: `{aggregate['mechanics_to_progress']:.9f}`.",
         f"- Bad flip / progress: `{aggregate['bad_flip_to_progress']:.9f}`.",
-        "",
         "## Fixed-context Gameplay V3 shadows",
         "",
         "| iteration | touches/min | flip touches/min | bad/min | bad/flip | "
@@ -816,8 +819,14 @@ def _write_report(summary: dict[str, Any]) -> None:
     ]
     for item in summary["shadow_curve"]:
         metrics = item["metrics"]
-        scoring = metrics["scoring_behavior"]
-        no_touch = metrics["no_touch_behavior"]
+        scoring = metrics.get("scoring_behavior")
+        no_touch = metrics.get("no_touch_behavior")
+        goal_share = (
+            "n/a" if scoring is None else f"{scoring['rival_goal_share']:.6f}"
+        )
+        no_touch_fraction = (
+            "n/a" if no_touch is None else f"{no_touch['no_touch_episode_fraction']:.6f}"
+        )
         lines.append(
             f"| {item['iteration']} | {metrics['touches_per_min']:.6f} | "
             f"{metrics['flip_active_touches_per_min']:.6f} | "
@@ -825,8 +834,7 @@ def _write_report(summary: dict[str, Any]) -> None:
             f"{metrics['unnecessary_flip_touch_fraction']:.6f} | "
             f"{metrics['mechanics_progress_ratio']:.6f} | "
             f"{metrics['bad_flip_progress_ratio']:.6f} | "
-            f"{scoring['rival_goal_share']:.6f} | "
-            f"{no_touch['no_touch_episode_fraction']:.6f} |"
+            f"{goal_share} | {no_touch_fraction} |"
         )
     lines.extend(
         [
@@ -841,6 +849,379 @@ def _write_report(summary: dict[str, Any]) -> None:
     )
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+
+
+def _write_hard_stop_report(summary: dict[str, Any]) -> None:
+    aggregate = summary["training_aggregate"]
+    diagnostic = summary["hard_safety_failure"]["diagnostic"]
+    lines = [
+        "# Rival2 Gameplay V3 production continuation (+120 target)",
+        "",
+        f"Status: `{summary['status']}`.",
+        "",
+        f"Source: iteration `{SOURCE_ITERATION}` / `{SOURCE_SHA256}`.",
+        "",
+        f"Last accepted model: iteration `{summary['final_iteration']}` / "
+        f"`{summary['final_checkpoint']['sha256']}`.",
+        "",
+        "The configured hard PPO safety boundary fired on proposed update "
+        f"`{diagnostic['rejected_iteration']}`. Training stopped immediately; the "
+        "guard was not weakened and no later update ran.",
+        "",
+        "## Hard-stop diagnostic",
+        "",
+        f"- Reason: `{diagnostic['reason']}`.",
+        f"- Post-step minibatch KL: `{diagnostic['post_step_approx_kl']:.9f}` "
+        f"(hard limit `{diagnostic['minibatch_kl_limit']:.9f}`).",
+        f"- Retention mean KL: `{diagnostic['retention_mean_kl']:.9f}`.",
+        f"- Transactional rollback completed: "
+        f"`{diagnostic['transactional_rollback_completed']}`.",
+        f"- Parameters restored exactly: "
+        f"`{diagnostic['transactional_step_restore']['parameters_exact']}`.",
+        f"- Optimizer restored exactly: "
+        f"`{diagnostic['transactional_step_restore']['optimizer_state_exact']}`.",
+        f"- Adam counters restored exactly: "
+        f"`{diagnostic['transactional_step_restore']['adam_step_counters_exact']}`.",
+        "",
+        "## Accepted-update PPO safety",
+        "",
+        f"- Accepted updates: `{aggregate['accepted_updates']}`.",
+        f"- Maximum accepted minibatch KL: `{aggregate['maximum_accepted_minibatch_kl']:.9f}`.",
+        f"- Maximum completed-update mean KL: "
+        f"`{aggregate['maximum_completed_update_mean_kl']:.9f}`.",
+        f"- Maximum retention mean KL: `{aggregate['maximum_retention_mean_kl']:.9f}`.",
+        f"- Retention-budget early stops: "
+        f"`{len(aggregate['retention_budget_early_stop_updates'])}`.",
+        "",
+        "## Reward scale across accepted updates",
+        "",
+        f"- Mechanics / absolute gameplay: "
+        f"`{aggregate['mechanics_to_absolute_gameplay_reward']:.9f}`.",
+        f"- Bad flip / absolute gameplay: "
+        f"`{aggregate['bad_flip_to_absolute_gameplay_reward']:.9f}`.",
+        f"- Mechanics / progress: `{aggregate['mechanics_to_progress']:.9f}`.",
+        f"- Bad flip / progress: `{aggregate['bad_flip_to_progress']:.9f}`.",
+        f"- Maximum single-update mechanics / gameplay: "
+        f"`{summary['reward_scale_extrema']['mechanics']['ratio']:.9f}` at iteration "
+        f"`{summary['reward_scale_extrema']['mechanics']['iteration']}`.",
+        f"- Maximum single-update bad flip / gameplay: "
+        f"`{summary['reward_scale_extrema']['unnecessary_flip']['ratio']:.9f}` at "
+        f"iteration `{summary['reward_scale_extrema']['unnecessary_flip']['iteration']}`.",
+        "",
+        "The mechanics maximum occurred on the first fresh-simulator rollout after "
+        "the +90 boundary. That rollout had no ball touch, no progress component, "
+        "and no completed episode, but did detect 7,580 pogo events. This boundary "
+        "transition is an investigation signal; it is not presented as ordinary "
+        "steady-state reward composition.",
+        "",
+        "## Completed fixed-context Gameplay V3 shadows",
+        "",
+        "| iteration | touches/min | flip touches/min | bad/min | bad/flip | "
+        "mechanics/progress | bad/progress | Rival goal share | no-touch |",
+        "|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for item in summary["shadow_curve"]:
+        metrics = item["metrics"]
+        scoring = metrics.get("scoring_behavior")
+        no_touch = metrics.get("no_touch_behavior")
+        goal_share = (
+            "n/a" if scoring is None else f"{scoring['rival_goal_share']:.6f}"
+        )
+        no_touch_fraction = (
+            "n/a" if no_touch is None else f"{no_touch['no_touch_episode_fraction']:.6f}"
+        )
+        lines.append(
+            f"| {item['iteration']} | {metrics['touches_per_min']:.6f} | "
+            f"{metrics['flip_active_touches_per_min']:.6f} | "
+            f"{metrics['unnecessary_flip_contacts_per_min']:.6f} | "
+            f"{metrics['unnecessary_flip_touch_fraction']:.6f} | "
+            f"{metrics['mechanics_progress_ratio']:.6f} | "
+            f"{metrics['bad_flip_progress_ratio']:.6f} | "
+            f"{goal_share} | {no_touch_fraction} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Scheduled checkpoint/evaluation boundaries at iterations 519, 549, and "
+            "579 completed green. The iteration-609 boundary was not reached.",
+            "",
+        ]
+    )
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+
+
+def finalize_failure(args: argparse.Namespace) -> dict[str, Any]:
+    work_dir = args.work_dir.resolve()
+    failure = _read_json(work_dir / "hard_safety_failure.json")
+    if not _is_hard_stop(failure):
+        raise RuntimeError("failure finalization requires a recorded hard stop")
+    rows = _read_jsonl(work_dir / "training_curve.jsonl")
+    checkpoints = _read_json(work_dir / "checkpoints.json")
+    evaluations = _read_json(work_dir / "evaluation_curve.json")
+    accepted = int(failure["last_accepted_iteration"]) - SOURCE_ITERATION
+    if [int(row["offset"]) for row in rows] != list(range(1, accepted + 1)):
+        raise RuntimeError("hard-stop training ledger is not an exact accepted prefix")
+    if [int(row["iteration"]) for row in rows] != list(
+        range(SOURCE_ITERATION + 1, SOURCE_ITERATION + accepted + 1)
+    ):
+        raise RuntimeError("hard-stop iteration ledger is not an exact accepted prefix")
+    if any(row.get("verdict") != "PASS_GREEN" for row in rows):
+        raise RuntimeError("hard-stop training ledger contains a non-green accepted row")
+    completed_offsets = [offset for offset in CHECKPOINT_OFFSETS if offset <= accepted]
+    if [int(item["offset"]) for item in checkpoints] != completed_offsets:
+        raise RuntimeError("hard-stop checkpoint ledger is not the exact completed prefix")
+    if [int(item["checkpoint_offset"]) for item in evaluations] != completed_offsets:
+        raise RuntimeError("hard-stop evaluation ledger is not the exact completed prefix")
+    for checkpoint in checkpoints:
+        path = Path(checkpoint["path"])
+        if not path.is_file() or _sha256(path) != checkpoint["sha256"]:
+            raise RuntimeError("hard-stop checkpoint hash audit failed")
+    if any(item.get("verdict") != "PASS_GREEN" for item in evaluations):
+        raise RuntimeError("hard-stop evaluation ledger contains a non-green boundary")
+
+    restored = failure["restored_checkpoint"]
+    restored_path = Path(restored["path"])
+    if not restored_path.is_file() or _sha256(restored_path) != restored["sha256"]:
+        raise RuntimeError("restored hard-stop checkpoint identity mismatch")
+    payload = torch.load(restored_path, map_location="cpu", weights_only=False)
+    rates = {
+        group.get("name"): float(group["lr"]) for group in payload["optimizer"]["param_groups"]
+    }
+    diagnostic = failure["diagnostic"]
+    restored_checks = {
+        "format_exact": payload["format"] == "RIVAL2_CHECKPOINT_V1",
+        "iteration_exact": int(payload["iteration"]) == int(failure["last_accepted_iteration"]),
+        "policy_version_exact": int(payload["policy_version"])
+        == int(failure["last_accepted_iteration"]),
+        "sample_counter_exact": int(payload["total_agent_samples"])
+        == int(restored["agent_decision_samples"]),
+        "reward_v3_exact": payload["reward_version"] == RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+        "episode_exact": payload["episode_version"] == RIVAL2_EPISODE_VERSION,
+        "contracts_exact": payload["contract_hashes"]
+        == contract_hashes_for_reward(RIVAL2_REWARD_GAMEPLAY_V3_VERSION, RIVAL2_EPISODE_VERSION),
+        "model_finite": _nested_finite(payload["model"]),
+        "optimizer_finite": _nested_finite(payload["optimizer"]),
+        "split_optimizer": len(payload["optimizer"]["param_groups"]) == 2,
+        "policy_lr_rearmed": rates.get("policy") == 0.0001,
+        "critic_lr_exact": rates.get("critic") == 0.0003,
+        "opponent_curriculum_present": payload.get("opponent_curriculum") is not None,
+        "historical_pool_present": bool(payload.get("historical_opponents")),
+        "transactional_rollback_completed": bool(
+            diagnostic["transactional_rollback_completed"]
+        ),
+        "parameters_restored_exact": bool(
+            diagnostic["transactional_step_restore"]["parameters_exact"]
+        ),
+        "optimizer_restored_exact": bool(
+            diagnostic["transactional_step_restore"]["optimizer_state_exact"]
+        ),
+        "adam_counters_restored_exact": bool(
+            diagnostic["transactional_step_restore"]["adam_step_counters_exact"]
+        ),
+    }
+    if not all(restored_checks.values()):
+        failed = [name for name, passed in restored_checks.items() if not passed]
+        raise RuntimeError(f"restored hard-stop checkpoint audit failed: {failed}")
+
+    aggregate = aggregate_training_rows(rows)
+    aggregate["hard_safety_guard_fired"] = True
+    mechanics_extreme = max(
+        rows,
+        key=lambda row: float(
+            row["reward_and_behavior_telemetry"]["ratios"][
+                "mechanics_reward_to_absolute_gameplay_reward"
+            ]
+        ),
+    )
+    bad_flip_extreme = max(
+        rows,
+        key=lambda row: float(
+            row["reward_and_behavior_telemetry"]["ratios"][
+                "unnecessary_flip_penalty_to_absolute_gameplay_reward"
+            ]
+        ),
+    )
+    reward_scale_extrema = {
+        "mechanics": {
+            "iteration": int(mechanics_extreme["iteration"]),
+            "ratio": float(
+                mechanics_extreme["reward_and_behavior_telemetry"]["ratios"][
+                    "mechanics_reward_to_absolute_gameplay_reward"
+                ]
+            ),
+            "touches": int(
+                mechanics_extreme["reward_and_behavior_telemetry"][
+                    "raw_counts_and_activity"
+                ]["touches"]
+            ),
+            "progress_absolute_blue_sum": float(
+                mechanics_extreme["reward_and_behavior_telemetry"]["reward_contributions"][
+                    "progress"
+                ]["absolute_blue_sum"]
+            ),
+            "completed_player_episodes": int(
+                mechanics_extreme["reward_and_behavior_telemetry"][
+                    "raw_counts_and_activity"
+                ]["completed_player_episodes"]
+            ),
+            "pogo_detected": int(
+                mechanics_extreme["reward_and_behavior_telemetry"]["mechanics"]["detected"][
+                    "pogo"
+                ]
+            ),
+        },
+        "unnecessary_flip": {
+            "iteration": int(bad_flip_extreme["iteration"]),
+            "ratio": float(
+                bad_flip_extreme["reward_and_behavior_telemetry"]["ratios"][
+                    "unnecessary_flip_penalty_to_absolute_gameplay_reward"
+                ]
+            ),
+        },
+    }
+    baseline = _read_json(BASELINE_SHADOW)
+    shadow_curve = [
+        {
+            "iteration": SOURCE_ITERATION,
+            "checkpoint_sha256": SOURCE_SHA256,
+            "metrics": baseline["metrics"],
+        },
+        *(
+            {
+                "iteration": int(item["checkpoint_iteration"]),
+                "checkpoint_sha256": item["checkpoint_sha256"],
+                "metrics": item["paired_v3_shadow"]["metrics"],
+            }
+            for item in evaluations
+        ),
+    ]
+    repository_failure_checkpoint = (
+        REPO_ROOT
+        / "checkpoints"
+        / "rival2"
+        / "gameplay_v3_continuation"
+        / f"rival2_gameplay_v3_iteration_{payload['iteration']}_restored_resume.pt"
+    )
+    repository_failure_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(restored_path, repository_failure_checkpoint)
+    final_checkpoint = {
+        **restored,
+        "repository_path": repository_failure_checkpoint.relative_to(REPO_ROOT).as_posix(),
+        "repository_sha256": _sha256(repository_failure_checkpoint),
+        "repository_size_bytes": repository_failure_checkpoint.stat().st_size,
+        "audit": {"checks": restored_checks, "verdict": "PASS_GREEN"},
+    }
+    checks = {
+        "source_checkpoint_byte_identical": _sha256(SOURCE_CHECKPOINT) == SOURCE_SHA256,
+        "exact_accepted_prefix": len(rows) == accepted and 0 <= accepted <= ADDITIONAL_UPDATES,
+        "last_accepted_iteration_exact": int(payload["iteration"])
+        == int(failure["last_accepted_iteration"]),
+        "rejected_iteration_exact": int(diagnostic["rejected_iteration"])
+        == int(failure["last_accepted_iteration"]) + 1,
+        "completed_boundary_checkpoint_prefix_exact": len(checkpoints)
+        == len(completed_offsets),
+        "completed_boundary_evaluation_prefix_exact": len(evaluations)
+        == len(completed_offsets),
+        "all_checkpoint_audits_green": all(
+            item["audit"]["verdict"] == "PASS_GREEN" for item in checkpoints
+        ),
+        "all_evaluations_green": all(item["verdict"] == "PASS_GREEN" for item in evaluations),
+        "all_value_loss_isolation_green": all(
+            row["ppo_safety_summary"]["value_loss_to_policy_trunk_gradient_exact_zero"]
+            and row["ppo_safety_summary"]["value_loss_to_actor_gradient_exact_zero"]
+            for row in rows
+        ),
+        "hard_guard_fired": float(diagnostic["post_step_approx_kl"])
+        > float(diagnostic["minibatch_kl_limit"]),
+        "transactional_restore_exact": all(
+            bool(value) for value in diagnostic["transactional_step_restore"].values()
+        ),
+        "no_later_training_performed": bool(failure["no_later_training_performed"]),
+        "final_repository_checkpoint_exact": final_checkpoint["repository_sha256"]
+        == final_checkpoint["sha256"],
+    }
+    if not all(checks.values()):
+        failed = [name for name, passed in checks.items() if not passed]
+        raise RuntimeError(f"hard-stop finalization failed: {failed}")
+    summary = {
+        "schema_version": SCHEMA_VERSION,
+        "created_utc": _utc_now(),
+        "status": (
+            "STOPPED_HARD_SAFETY_GUARD_AT_PROPOSED_UPDATE_"
+            f"{diagnostic['rejected_iteration']}"
+        ),
+        "verdict": "BLOCKED_HARD_SAFETY_GUARD",
+        "implementation_commit": _read_json(work_dir / "launch_gate.json")["head"],
+        "source_checkpoint": {
+            "path": SOURCE_CHECKPOINT.resolve().as_posix(),
+            "sha256": SOURCE_SHA256,
+            "iteration": SOURCE_ITERATION,
+            "policy_version": SOURCE_ITERATION,
+            "agent_decision_samples": SOURCE_SAMPLES,
+            "byte_identical_after_run": _sha256(SOURCE_CHECKPOINT) == SOURCE_SHA256,
+        },
+        "final_checkpoint": final_checkpoint,
+        "final_iteration": int(payload["iteration"]),
+        "final_policy_version": int(payload["policy_version"]),
+        "final_agent_decision_samples": int(payload["total_agent_samples"]),
+        "additional_agent_decision_samples": int(payload["total_agent_samples"])
+        - SOURCE_SAMPLES,
+        "accepted_additional_updates": accepted,
+        "target_additional_updates": ADDITIONAL_UPDATES,
+        "completed_checkpoint_offsets": completed_offsets,
+        "unreached_checkpoint_offsets": [
+            offset for offset in CHECKPOINT_OFFSETS if offset not in completed_offsets
+        ],
+        "training_aggregate": aggregate,
+        "reward_scale_extrema": reward_scale_extrema,
+        "shadow_curve": shadow_curve,
+        "hard_safety_failure": failure,
+        "checks": checks,
+    }
+
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    _write_json(work_dir / "run_summary.json", summary)
+    _write_json(RESULTS_DIR / "run_summary.json", summary)
+    _write_json(RESULTS_DIR / "hard_safety_failure.json", failure)
+    _write_json(RESULTS_DIR / "checkpoints.json", checkpoints)
+    _write_json(RESULTS_DIR / "evaluation_curve.json", evaluations)
+    _write_json(
+        RESULTS_DIR / "ppo_safety_summary.json",
+        _read_json(work_dir / "ppo_safety_summary.json"),
+    )
+    _write_json(RESULTS_DIR / "training_aggregate.json", aggregate)
+    shutil.copy2(work_dir / "training_curve.jsonl", RESULTS_DIR / "training_curve.jsonl")
+    shutil.copy2(work_dir / "launch_gate.json", RESULTS_DIR / "launch_gate.json")
+    shutil.copy2(work_dir / "snapshot_records.json", RESULTS_DIR / "snapshot_records.json")
+    for offset in (0, 30, 60, 90):
+        shutil.copy2(
+            work_dir / f"resume_gate_{offset:03d}.json",
+            RESULTS_DIR / f"resume_gate_{offset:03d}.json",
+        )
+    _write_hard_stop_report(summary)
+    manifest_paths = [
+        *sorted(path for path in RESULTS_DIR.iterdir() if path.is_file()),
+        repository_failure_checkpoint,
+        REPORT_PATH,
+    ]
+    manifest = {
+        "schema_version": SCHEMA_VERSION,
+        "created_utc": _utc_now(),
+        "artifacts": [
+            {
+                "path": path.relative_to(REPO_ROOT).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": _sha256(path),
+            }
+            for path in manifest_paths
+            if path.name != "artifact_manifest.json"
+        ],
+        "integrity_verdict": "PASS_GREEN",
+        "campaign_verdict": "BLOCKED_HARD_SAFETY_GUARD",
+    }
+    _write_json(RESULTS_DIR / "artifact_manifest.json", manifest)
+    return summary
 
 
 def finalize(args: argparse.Namespace) -> dict[str, Any]:
@@ -1003,7 +1384,9 @@ def finalize(args: argparse.Namespace) -> dict[str, Any]:
     return summary
 
 
-def _run_child(args: argparse.Namespace, mode: str, **extra: Any) -> None:
+def _run_child(
+    args: argparse.Namespace, mode: str, **extra: Any
+) -> subprocess.CompletedProcess[bytes]:
     command = [
         sys.executable,
         str(Path(__file__).resolve()),
@@ -1017,7 +1400,7 @@ def _run_child(args: argparse.Namespace, mode: str, **extra: Any) -> None:
     ]
     for name, value in extra.items():
         command.extend([f"--{name.replace('_', '-')}", str(value)])
-    subprocess.run(command, cwd=REPO_ROOT, check=True)
+    return subprocess.run(command, cwd=REPO_ROOT, check=False)
 
 
 def run_all(args: argparse.Namespace) -> dict[str, Any]:
@@ -1036,7 +1419,13 @@ def run_all(args: argparse.Namespace) -> dict[str, Any]:
             for item in checkpoints
         )
         if not checkpoint_done:
-            _run_child(args, "train-segment", resume_offset=resume_offset)
+            completed = _run_child(args, "train-segment", resume_offset=resume_offset)
+            run_summary_path = work_dir / "run_summary.json"
+            if run_summary_path.is_file():
+                run_summary = _read_json(run_summary_path)
+                if _is_hard_stop(run_summary):
+                    return finalize_failure(args)
+            completed.check_returncode()
         evaluations = (
             _read_json(work_dir / "evaluation_curve.json")
             if (work_dir / "evaluation_curve.json").is_file()
@@ -1048,7 +1437,8 @@ def run_all(args: argparse.Namespace) -> dict[str, Any]:
             for item in evaluations
         )
         if not evaluation_done:
-            _run_child(args, "evaluate-boundary", boundary_offset=boundary_offset)
+            completed = _run_child(args, "evaluate-boundary", boundary_offset=boundary_offset)
+            completed.check_returncode()
     return finalize(args)
 
 
@@ -1056,7 +1446,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "mode",
-        choices=("run", "train-segment", "evaluate-boundary", "finalize"),
+        choices=("run", "train-segment", "evaluate-boundary", "finalize", "finalize-failure"),
     )
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument(
@@ -1085,8 +1475,10 @@ def main() -> int:
         result = train_segment(args)
     elif args.mode == "evaluate-boundary":
         result = evaluate_boundary(args)
-    else:
+    elif args.mode == "finalize":
         result = finalize(args)
+    else:
+        result = finalize_failure(args)
     print(json.dumps(result, indent=2), flush=True)
     return 0 if result.get("verdict", "PASS_GREEN") == "PASS_GREEN" else 2
 

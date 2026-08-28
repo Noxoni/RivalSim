@@ -1,0 +1,219 @@
+{
+  "created_utc": "2026-08-28T16:16:29.314978+00:00",
+  "diagnostic": {
+    "completed_update_mean_kl_limit": 0.05,
+    "minibatch_kl_limit": 0.1,
+    "minibatch_samples": 65536,
+    "minibatch_start": 0,
+    "mixed_ppo_safety_config": {
+      "critic_learning_rate": 0.0003,
+      "initial_policy_learning_rate": 0.0001,
+      "minimum_policy_learning_rate": 2.5e-05,
+      "policy_learning_rate_backoff": 0.5,
+      "retention_corpus_size": 512,
+      "retention_soft_mean_kl_target": 0.02,
+      "soft_minibatch_kl_target": 0.02
+    },
+    "optimizer_step_index": 0,
+    "post_step_approx_kl": 0.19976964592933655,
+    "pre_step_approx_kl": 0.0,
+    "pre_update_agent_decision_samples": 4215355170,
+    "reason": "minibatch_kl_limit_exceeded",
+    "rejected_iteration": 581,
+    "restored_iteration": 580,
+    "restored_policy_version": 580,
+    "retention_mean_kl": 0.08104191720485687,
+    "retry_index": 0,
+    "transactional_rollback_completed": true,
+    "transactional_step_restore": {
+      "adam_step_counters_exact": true,
+      "optimizer_state_exact": true,
+      "parameters_exact": true
+    }
+  },
+  "last_accepted_iteration": 580,
+  "no_later_training_performed": true,
+  "restored_checkpoint": {
+    "agent_decision_samples": 4215355170,
+    "iteration": 580,
+    "path": "G:/dev/RivalSim-runs/gameplay-v3-continuation-20260828-e6692be/failures/pre_update_581_restored_resume.pt",
+    "policy_version": 580,
+    "sha256": "F3CBD88FE611FC7D8C69FDD6E7D1203336167BC96A92E0E0111F9C8B64916FC6",
+    "size_bytes": 77286527
+  },
+  "rollout_telemetry": {
+    "absolute_gameplay_reward_sum": 5531.684617850508,
+    "absolute_total_reward_sum": 5564.794872859072,
+    "action_activity": {
+      "analog_saturation_fraction": {
+        "pitch": 0.02853548526763916,
+        "roll": 0.001150369644165039,
+        "steer": 0.007346391677856445,
+        "throttle": 0.06332564353942871,
+        "yaw": 0.002261638641357422
+      },
+      "mean_absolute": {
+        "boost": 0.8398555517196655,
+        "handbrake": 0.29818713665008545,
+        "jump": 0.4755347967147827,
+        "pitch": 0.5027984420780187,
+        "roll": 0.3684547857866357,
+        "steer": 0.35198020072686936,
+        "throttle": 0.7350343131282914,
+        "yaw": 0.3726815421906699
+      },
+      "nonzero_fraction": {
+        "boost": 0.8398555517196655,
+        "handbrake": 0.29818713665008545,
+        "jump": 0.4755347967147827,
+        "pitch": 0.9999991655349731,
+        "roll": 0.9999979734420776,
+        "steer": 0.9999984502792358,
+        "throttle": 0.9999995231628418,
+        "yaw": 0.9999984502792358
+      }
+    },
+    "ball_contact": {
+      "car_minutes": 4660.337777777778,
+      "exemption_flags": {
+        "EXEMPT_CONTESTED_50": 90207,
+        "EXEMPT_CONTROLLED_FLICK": 1947,
+        "EXEMPT_POWER_CONTACT": 66,
+        "EXEMPT_RECOGNIZED_MECHANIC": 0
+      },
+      "flip_active_touches_per_min": 28.928804397583008,
+      "primary_outcomes": {
+        "EXEMPT_CONTESTED_50": 89245,
+        "EXEMPT_CONTROLLED_FLICK": 1947,
+        "EXEMPT_POWER_CONTACT": 23,
+        "EXEMPT_RECOGNIZED_MECHANIC": 0,
+        "UNNECESSARY_FLIP_THROUGH_CONTACT": 22584
+      },
+      "total_flip_active_touch_count": 134818,
+      "touches_per_min": 29.30002212524414,
+      "unnecessary_flip_through_contacts_per_min": 4.846000671386719,
+      "unnecessary_flip_through_fraction": 0.16751472355323474
+    },
+    "definitions": {
+      "absolute_gameplay_reward": "absolute Blue reward after subtracting V3 mechanics and bad-flip components",
+      "budget_fraction": "completed player episodes in this update whose persistent episode tracker observed the native budget-exhausted onset",
+      "pre_reset_capture": "all native event/state/component counts are read after reward composition and before selective kickoff reset; no terminal-world events are lost",
+      "progress_raw_activity": "nonzero intervals and reconstructed absolute ball-Y uu",
+      "reward_contribution": "native zero-sum Blue component; Orange is its exact negation, so absolute two-player sums are exactly twice these values and ratios are unchanged",
+      "speed_raw_activity": "world decisions with nonzero competitive speed component"
+    },
+    "mechanics": {
+      "detected": {
+        "ball_reset": 251,
+        "breezi": 0,
+        "car_reset": 0,
+        "half_flip": 0,
+        "musty": 0,
+        "pinch": 625,
+        "pogo": 1101,
+        "redirect": 6012,
+        "speedflip": 5,
+        "successful_dash": 2806
+      },
+      "paid": {
+        "ball_reset": 251,
+        "breezi": 0,
+        "car_reset": 0,
+        "half_flip": 0,
+        "musty": 0,
+        "pinch": 625,
+        "pogo": 1101,
+        "redirect": 6012,
+        "speedflip": 5,
+        "successful_dash": 2806
+      }
+    },
+    "ratios": {
+      "bad_flip_penalty_to_progress": 0.2982478229083832,
+      "mechanics_reward_to_absolute_gameplay_reward": 0.008930371542949553,
+      "mechanics_reward_to_progress": 0.06796495272476302,
+      "player_episode_fraction_hitting_mechanics_budget": 0.0,
+      "unnecessary_flip_penalty_to_absolute_gameplay_reward": 0.039188784272886724
+    },
+    "raw_counts_and_activity": {
+      "big_pad_pickups": 0.0,
+      "boost_use_player_decisions": 2711164.0,
+      "completed_player_episodes": 0.0,
+      "completed_player_episodes_hitting_mechanics_budget": 0.0,
+      "demo_events": 6.0,
+      "flip_active_touches": 134818,
+      "goal_events": 0.0,
+      "mechanics_budget_hit_onsets": 0,
+      "mechanics_detected": 10800,
+      "mechanics_paid": 10800,
+      "player_decisions": 8388608.0,
+      "progress_abs_ball_y_uu": 7442894.733434115,
+      "progress_nonzero_world_decisions": 209248.0,
+      "save_events": 5761.0,
+      "small_pad_pickups": 161743.0,
+      "speed_abs_normalized_net_units": 504762.9472404329,
+      "speed_nonzero_world_decisions": 4151254.0,
+      "supersonic_player_decisions": 2523243.0,
+      "touches": 136548,
+      "unnecessary_flip_contacts": 22584,
+      "world_decisions": 4194304.0
+    },
+    "reward_contributions": {
+      "boost_pickups": {
+        "absolute_blue_sum": 132.29700628377032,
+        "mean_absolute_per_world_decision": 3.1542064257567004e-05,
+        "signed_blue_sum": 0.359000017051585
+      },
+      "boost_use": {
+        "absolute_blue_sum": 70.02369823105255,
+        "mean_absolute_per_world_decision": 1.6694950635684144e-05,
+        "signed_blue_sum": 0.02409999939118279
+      },
+      "demos": {
+        "absolute_blue_sum": 0.6000000089406967,
+        "mean_absolute_per_world_decision": 1.430511495925657e-07,
+        "signed_blue_sum": -0.20000000298023224
+      },
+      "goals": {
+        "absolute_blue_sum": 0.0,
+        "mean_absolute_per_world_decision": 0.0,
+        "signed_blue_sum": 0.0
+      },
+      "mechanics": {
+        "absolute_blue_sum": 49.399998895823956,
+        "mean_absolute_per_world_decision": 1.1777877544361104e-05,
+        "signed_blue_sum": 0.3799999915063381
+      },
+      "progress": {
+        "absolute_blue_sum": 726.8451888119253,
+        "mean_absolute_per_world_decision": 0.00017329339714334613,
+        "signed_blue_sum": 15.645281254151627
+      },
+      "saves": {
+        "absolute_blue_sum": 4320.75,
+        "mean_absolute_per_world_decision": 0.0010301470756530762,
+        "signed_blue_sum": -134.25
+      },
+      "speed": {
+        "absolute_blue_sum": 50.47629472404328,
+        "mean_absolute_per_world_decision": 1.2034486466418094e-05,
+        "signed_blue_sum": 0.20783211167415663
+      },
+      "supersonic": {
+        "absolute_blue_sum": 304.1585923163075,
+        "mean_absolute_per_world_decision": 7.251705940158545e-05,
+        "signed_blue_sum": 0.5141999870102154
+      },
+      "unnecessary_flip": {
+        "absolute_blue_sum": 216.77999515458941,
+        "mean_absolute_per_world_decision": 5.168437842240081e-05,
+        "signed_blue_sum": -4.799999892711639
+      }
+    },
+    "schema_version": 1
+  },
+  "schema_version": 1,
+  "source_checkpoint_byte_identical": true,
+  "status": "STOPPED_HARD_SAFETY_GUARD",
+  "target_iteration": 581
+}

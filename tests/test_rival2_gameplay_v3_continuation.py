@@ -5,6 +5,7 @@ from benchmarks.run_rival2_gameplay_v3_continuation import (
     CHECKPOINT_OFFSETS,
     FINAL_ITERATION,
     SOURCE_ITERATION,
+    _is_hard_stop,
     aggregate_training_rows,
 )
 from rivalsim.nexto_short_eval import (
@@ -110,6 +111,12 @@ def test_continuation_uses_prior_30_update_boundary_cadence() -> None:
 def test_compact_evaluators_accept_gameplay_v3_checkpoints() -> None:
     assert RIVAL2_REWARD_GAMEPLAY_V3_VERSION in NEXTO_SUPPORTED_REWARDS
     assert RIVAL2_REWARD_GAMEPLAY_V3_VERSION in WISP_SUPPORTED_REWARDS
+
+
+def test_campaign_wrapper_recognizes_recorded_hard_stops() -> None:
+    assert _is_hard_stop({"status": "STOPPED_HARD_SAFETY_GUARD"})
+    assert _is_hard_stop({"status": "STOPPED_POST_UPDATE_INTEGRITY_FAILURE"})
+    assert not _is_hard_stop({"status": "PAUSED_FOR_30_UPDATE_BOUNDARY_EVALUATION"})
 
 
 def test_training_aggregate_uses_raw_sums_not_mean_of_ratios() -> None:

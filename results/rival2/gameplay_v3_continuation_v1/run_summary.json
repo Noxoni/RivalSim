@@ -1,0 +1,949 @@
+{
+  "accepted_additional_updates": 91,
+  "additional_agent_decision_samples": 503916948,
+  "checks": {
+    "all_checkpoint_audits_green": true,
+    "all_evaluations_green": true,
+    "all_value_loss_isolation_green": true,
+    "completed_boundary_checkpoint_prefix_exact": true,
+    "completed_boundary_evaluation_prefix_exact": true,
+    "exact_accepted_prefix": true,
+    "final_repository_checkpoint_exact": true,
+    "hard_guard_fired": true,
+    "last_accepted_iteration_exact": true,
+    "no_later_training_performed": true,
+    "rejected_iteration_exact": true,
+    "source_checkpoint_byte_identical": true,
+    "transactional_restore_exact": true
+  },
+  "completed_checkpoint_offsets": [
+    30,
+    60,
+    90
+  ],
+  "created_utc": "2026-08-28T16:27:10.146083+00:00",
+  "final_agent_decision_samples": 4215355170,
+  "final_checkpoint": {
+    "agent_decision_samples": 4215355170,
+    "audit": {
+      "checks": {
+        "adam_counters_restored_exact": true,
+        "contracts_exact": true,
+        "critic_lr_exact": true,
+        "episode_exact": true,
+        "format_exact": true,
+        "historical_pool_present": true,
+        "iteration_exact": true,
+        "model_finite": true,
+        "opponent_curriculum_present": true,
+        "optimizer_finite": true,
+        "optimizer_restored_exact": true,
+        "parameters_restored_exact": true,
+        "policy_lr_rearmed": true,
+        "policy_version_exact": true,
+        "reward_v3_exact": true,
+        "sample_counter_exact": true,
+        "split_optimizer": true,
+        "transactional_rollback_completed": true
+      },
+      "verdict": "PASS_GREEN"
+    },
+    "iteration": 580,
+    "path": "G:/dev/RivalSim-runs/gameplay-v3-continuation-20260828-e6692be/failures/pre_update_581_restored_resume.pt",
+    "policy_version": 580,
+    "repository_path": "checkpoints/rival2/gameplay_v3_continuation/rival2_gameplay_v3_iteration_580_restored_resume.pt",
+    "repository_sha256": "F3CBD88FE611FC7D8C69FDD6E7D1203336167BC96A92E0E0111F9C8B64916FC6",
+    "repository_size_bytes": 77286527,
+    "sha256": "F3CBD88FE611FC7D8C69FDD6E7D1203336167BC96A92E0E0111F9C8B64916FC6",
+    "size_bytes": 77286527
+  },
+  "final_iteration": 580,
+  "final_policy_version": 580,
+  "hard_safety_failure": {
+    "created_utc": "2026-08-28T16:16:29.314978+00:00",
+    "diagnostic": {
+      "completed_update_mean_kl_limit": 0.05,
+      "minibatch_kl_limit": 0.1,
+      "minibatch_samples": 65536,
+      "minibatch_start": 0,
+      "mixed_ppo_safety_config": {
+        "critic_learning_rate": 0.0003,
+        "initial_policy_learning_rate": 0.0001,
+        "minimum_policy_learning_rate": 2.5e-05,
+        "policy_learning_rate_backoff": 0.5,
+        "retention_corpus_size": 512,
+        "retention_soft_mean_kl_target": 0.02,
+        "soft_minibatch_kl_target": 0.02
+      },
+      "optimizer_step_index": 0,
+      "post_step_approx_kl": 0.19976964592933655,
+      "pre_step_approx_kl": 0.0,
+      "pre_update_agent_decision_samples": 4215355170,
+      "reason": "minibatch_kl_limit_exceeded",
+      "rejected_iteration": 581,
+      "restored_iteration": 580,
+      "restored_policy_version": 580,
+      "retention_mean_kl": 0.08104191720485687,
+      "retry_index": 0,
+      "transactional_rollback_completed": true,
+      "transactional_step_restore": {
+        "adam_step_counters_exact": true,
+        "optimizer_state_exact": true,
+        "parameters_exact": true
+      }
+    },
+    "last_accepted_iteration": 580,
+    "no_later_training_performed": true,
+    "restored_checkpoint": {
+      "agent_decision_samples": 4215355170,
+      "iteration": 580,
+      "path": "G:/dev/RivalSim-runs/gameplay-v3-continuation-20260828-e6692be/failures/pre_update_581_restored_resume.pt",
+      "policy_version": 580,
+      "sha256": "F3CBD88FE611FC7D8C69FDD6E7D1203336167BC96A92E0E0111F9C8B64916FC6",
+      "size_bytes": 77286527
+    },
+    "rollout_telemetry": {
+      "absolute_gameplay_reward_sum": 5531.684617850508,
+      "absolute_total_reward_sum": 5564.794872859072,
+      "action_activity": {
+        "analog_saturation_fraction": {
+          "pitch": 0.02853548526763916,
+          "roll": 0.001150369644165039,
+          "steer": 0.007346391677856445,
+          "throttle": 0.06332564353942871,
+          "yaw": 0.002261638641357422
+        },
+        "mean_absolute": {
+          "boost": 0.8398555517196655,
+          "handbrake": 0.29818713665008545,
+          "jump": 0.4755347967147827,
+          "pitch": 0.5027984420780187,
+          "roll": 0.3684547857866357,
+          "steer": 0.35198020072686936,
+          "throttle": 0.7350343131282914,
+          "yaw": 0.3726815421906699
+        },
+        "nonzero_fraction": {
+          "boost": 0.8398555517196655,
+          "handbrake": 0.29818713665008545,
+          "jump": 0.4755347967147827,
+          "pitch": 0.9999991655349731,
+          "roll": 0.9999979734420776,
+          "steer": 0.9999984502792358,
+          "throttle": 0.9999995231628418,
+          "yaw": 0.9999984502792358
+        }
+      },
+      "ball_contact": {
+        "car_minutes": 4660.337777777778,
+        "exemption_flags": {
+          "EXEMPT_CONTESTED_50": 90207,
+          "EXEMPT_CONTROLLED_FLICK": 1947,
+          "EXEMPT_POWER_CONTACT": 66,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0
+        },
+        "flip_active_touches_per_min": 28.928804397583008,
+        "primary_outcomes": {
+          "EXEMPT_CONTESTED_50": 89245,
+          "EXEMPT_CONTROLLED_FLICK": 1947,
+          "EXEMPT_POWER_CONTACT": 23,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0,
+          "UNNECESSARY_FLIP_THROUGH_CONTACT": 22584
+        },
+        "total_flip_active_touch_count": 134818,
+        "touches_per_min": 29.30002212524414,
+        "unnecessary_flip_through_contacts_per_min": 4.846000671386719,
+        "unnecessary_flip_through_fraction": 0.16751472355323474
+      },
+      "definitions": {
+        "absolute_gameplay_reward": "absolute Blue reward after subtracting V3 mechanics and bad-flip components",
+        "budget_fraction": "completed player episodes in this update whose persistent episode tracker observed the native budget-exhausted onset",
+        "pre_reset_capture": "all native event/state/component counts are read after reward composition and before selective kickoff reset; no terminal-world events are lost",
+        "progress_raw_activity": "nonzero intervals and reconstructed absolute ball-Y uu",
+        "reward_contribution": "native zero-sum Blue component; Orange is its exact negation, so absolute two-player sums are exactly twice these values and ratios are unchanged",
+        "speed_raw_activity": "world decisions with nonzero competitive speed component"
+      },
+      "mechanics": {
+        "detected": {
+          "ball_reset": 251,
+          "breezi": 0,
+          "car_reset": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 625,
+          "pogo": 1101,
+          "redirect": 6012,
+          "speedflip": 5,
+          "successful_dash": 2806
+        },
+        "paid": {
+          "ball_reset": 251,
+          "breezi": 0,
+          "car_reset": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 625,
+          "pogo": 1101,
+          "redirect": 6012,
+          "speedflip": 5,
+          "successful_dash": 2806
+        }
+      },
+      "ratios": {
+        "bad_flip_penalty_to_progress": 0.2982478229083832,
+        "mechanics_reward_to_absolute_gameplay_reward": 0.008930371542949553,
+        "mechanics_reward_to_progress": 0.06796495272476302,
+        "player_episode_fraction_hitting_mechanics_budget": 0.0,
+        "unnecessary_flip_penalty_to_absolute_gameplay_reward": 0.039188784272886724
+      },
+      "raw_counts_and_activity": {
+        "big_pad_pickups": 0.0,
+        "boost_use_player_decisions": 2711164.0,
+        "completed_player_episodes": 0.0,
+        "completed_player_episodes_hitting_mechanics_budget": 0.0,
+        "demo_events": 6.0,
+        "flip_active_touches": 134818,
+        "goal_events": 0.0,
+        "mechanics_budget_hit_onsets": 0,
+        "mechanics_detected": 10800,
+        "mechanics_paid": 10800,
+        "player_decisions": 8388608.0,
+        "progress_abs_ball_y_uu": 7442894.733434115,
+        "progress_nonzero_world_decisions": 209248.0,
+        "save_events": 5761.0,
+        "small_pad_pickups": 161743.0,
+        "speed_abs_normalized_net_units": 504762.9472404329,
+        "speed_nonzero_world_decisions": 4151254.0,
+        "supersonic_player_decisions": 2523243.0,
+        "touches": 136548,
+        "unnecessary_flip_contacts": 22584,
+        "world_decisions": 4194304.0
+      },
+      "reward_contributions": {
+        "boost_pickups": {
+          "absolute_blue_sum": 132.29700628377032,
+          "mean_absolute_per_world_decision": 3.1542064257567004e-05,
+          "signed_blue_sum": 0.359000017051585
+        },
+        "boost_use": {
+          "absolute_blue_sum": 70.02369823105255,
+          "mean_absolute_per_world_decision": 1.6694950635684144e-05,
+          "signed_blue_sum": 0.02409999939118279
+        },
+        "demos": {
+          "absolute_blue_sum": 0.6000000089406967,
+          "mean_absolute_per_world_decision": 1.430511495925657e-07,
+          "signed_blue_sum": -0.20000000298023224
+        },
+        "goals": {
+          "absolute_blue_sum": 0.0,
+          "mean_absolute_per_world_decision": 0.0,
+          "signed_blue_sum": 0.0
+        },
+        "mechanics": {
+          "absolute_blue_sum": 49.399998895823956,
+          "mean_absolute_per_world_decision": 1.1777877544361104e-05,
+          "signed_blue_sum": 0.3799999915063381
+        },
+        "progress": {
+          "absolute_blue_sum": 726.8451888119253,
+          "mean_absolute_per_world_decision": 0.00017329339714334613,
+          "signed_blue_sum": 15.645281254151627
+        },
+        "saves": {
+          "absolute_blue_sum": 4320.75,
+          "mean_absolute_per_world_decision": 0.0010301470756530762,
+          "signed_blue_sum": -134.25
+        },
+        "speed": {
+          "absolute_blue_sum": 50.47629472404328,
+          "mean_absolute_per_world_decision": 1.2034486466418094e-05,
+          "signed_blue_sum": 0.20783211167415663
+        },
+        "supersonic": {
+          "absolute_blue_sum": 304.1585923163075,
+          "mean_absolute_per_world_decision": 7.251705940158545e-05,
+          "signed_blue_sum": 0.5141999870102154
+        },
+        "unnecessary_flip": {
+          "absolute_blue_sum": 216.77999515458941,
+          "mean_absolute_per_world_decision": 5.168437842240081e-05,
+          "signed_blue_sum": -4.799999892711639
+        }
+      },
+      "schema_version": 1
+    },
+    "schema_version": 1,
+    "source_checkpoint_byte_identical": true,
+    "status": "STOPPED_HARD_SAFETY_GUARD",
+    "target_iteration": 581
+  },
+  "implementation_commit": "e6692be45d8608a0367616ed3d9a4d08c74aa85f",
+  "reward_scale_extrema": {
+    "mechanics": {
+      "completed_player_episodes": 0,
+      "iteration": 580,
+      "pogo_detected": 7580,
+      "progress_absolute_blue_sum": 0.0,
+      "ratio": 0.16354895865164673,
+      "touches": 0
+    },
+    "unnecessary_flip": {
+      "iteration": 552,
+      "ratio": 0.05245266520269157
+    }
+  },
+  "schema_version": 1,
+  "shadow_curve": [
+    {
+      "checkpoint_sha256": "10D97428B3F1CC2E307040314D1DD1A924BD82975D4B88C0F73C3FC2716DCF54",
+      "iteration": 489,
+      "metrics": {
+        "active_world_decisions": 127240,
+        "bad_flip_mean_abs_penalty_per_decision": 6.460232469283984e-05,
+        "bad_flip_progress_ratio": 0.027324970592062826,
+        "budget_hit_player_episode_fraction": 0.0,
+        "car_minutes": 141.37777777777777,
+        "duplicate_suppression": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 1,
+          "pogo": 0,
+          "possession": 0,
+          "redirect": 19,
+          "speedflip": 0
+        },
+        "episodes": 256,
+        "exemption_flags": {
+          "EXEMPT_CONTESTED_50": 730,
+          "EXEMPT_CONTROLLED_FLICK": 273,
+          "EXEMPT_POWER_CONTACT": 33,
+          "EXEMPT_RECOGNIZED_MECHANIC": 2
+        },
+        "exemption_rates_per_flip_touch": {
+          "EXEMPT_CONTESTED_50": 0.40286975717439294,
+          "EXEMPT_CONTROLLED_FLICK": 0.15066225165562913,
+          "EXEMPT_POWER_CONTACT": 0.018211920529801324,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0.0011037527593818985
+        },
+        "flip_active_touches_per_min": 12.816724300534425,
+        "flip_touch_all_touch_fraction": 0.6763717805151176,
+        "impossible_count": 0,
+        "mechanic_detected": {
+          "ball_reset": 10,
+          "breezi": 0,
+          "car_reset": 3,
+          "half_flip": 3,
+          "musty": 2,
+          "pinch": 24,
+          "pogo": 193,
+          "redirect": 490,
+          "speedflip": 19,
+          "successful_dash": 101
+        },
+        "mechanic_detected_per_min": {
+          "ball_reset": 0.07073247406475952,
+          "breezi": 0.0,
+          "car_reset": 0.021219742219427854,
+          "half_flip": 0.021219742219427854,
+          "musty": 0.014146494812951903,
+          "pinch": 0.16975793775542283,
+          "pogo": 1.3651367494498587,
+          "redirect": 3.4658912291732165,
+          "speedflip": 0.13439170072304307,
+          "successful_dash": 0.7143979880540711
+        },
+        "mechanic_paid": {
+          "ball_reset": 10,
+          "breezi": 0,
+          "car_reset": 3,
+          "half_flip": 3,
+          "musty": 2,
+          "pinch": 24,
+          "pogo": 193,
+          "redirect": 490,
+          "speedflip": 19,
+          "successful_dash": 101
+        },
+        "mechanics_mean_abs_reward_per_decision": 3.179031670449553e-05,
+        "mechanics_progress_ratio": 0.013446411923919242,
+        "progress_mean_abs_reward_per_decision": 0.002364223027255703,
+        "rearms": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 3,
+          "musty": 2,
+          "pinch": 23,
+          "pogo": 193,
+          "possession": 0,
+          "redirect": 490,
+          "speedflip": 19
+        },
+        "theoretical_paid_mechanics_per_min": 5.976894058472179,
+        "total_mean_abs_reward_per_decision": 0.021937779491947786,
+        "touches_per_min": 18.949229801949073,
+        "unnecessary_flip_contacts_per_min": 6.012260295504559,
+        "unnecessary_flip_touch_fraction": 0.46909492273730685
+      }
+    },
+    {
+      "checkpoint_sha256": "F39D7FCF3AD9C2CA8F6609CA46462CFC7812448076584DD3313655EC596113E6",
+      "iteration": 519,
+      "metrics": {
+        "active_world_decisions": 138293,
+        "bad_flip_absolute_gameplay_reward_ratio": 0.002979565372380879,
+        "bad_flip_mean_abs_penalty_per_decision": 5.9945187201997694e-05,
+        "bad_flip_progress_ratio": 0.02428558610276342,
+        "budget_hit_player_episode_fraction": 0.001953125,
+        "car_minutes": 153.65888888888887,
+        "duplicate_suppression": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 2,
+          "pogo": 0,
+          "possession": 0,
+          "redirect": 23,
+          "speedflip": 0
+        },
+        "episodes": 256,
+        "exemption_flags": {
+          "EXEMPT_CONTESTED_50": 719,
+          "EXEMPT_CONTROLLED_FLICK": 270,
+          "EXEMPT_POWER_CONTACT": 28,
+          "EXEMPT_RECOGNIZED_MECHANIC": 2
+        },
+        "exemption_rates_per_flip_touch": {
+          "EXEMPT_CONTESTED_50": 0.3959251101321586,
+          "EXEMPT_CONTROLLED_FLICK": 0.1486784140969163,
+          "EXEMPT_POWER_CONTACT": 0.015418502202643172,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0.0011013215859030838
+        },
+        "flip_active_touches_per_min": 11.818385601585042,
+        "flip_touch_all_touch_fraction": 0.5772409408773045,
+        "impossible_count": 0,
+        "mechanic_detected": {
+          "ball_reset": 8,
+          "breezi": 0,
+          "car_reset": 4,
+          "half_flip": 5,
+          "musty": 2,
+          "pinch": 31,
+          "pogo": 189,
+          "redirect": 550,
+          "speedflip": 25,
+          "successful_dash": 116
+        },
+        "mechanic_detected_per_min": {
+          "ball_reset": 0.05206337269420724,
+          "breezi": 0.0,
+          "car_reset": 0.02603168634710362,
+          "half_flip": 0.03253960793387952,
+          "musty": 0.01301584317355181,
+          "pinch": 0.20174556919005304,
+          "pogo": 1.229997179900646,
+          "redirect": 3.5793568727267475,
+          "speedflip": 0.1626980396693976,
+          "successful_dash": 0.7549189040660049
+        },
+        "mechanic_paid": {
+          "ball_reset": 8,
+          "breezi": 0,
+          "car_reset": 4,
+          "half_flip": 5,
+          "musty": 2,
+          "pinch": 31,
+          "pogo": 189,
+          "redirect": 550,
+          "speedflip": 25,
+          "successful_dash": 116
+        },
+        "mechanics_absolute_gameplay_reward_ratio": 0.001617375657797585,
+        "mechanics_mean_abs_reward_per_decision": 3.253960711228078e-05,
+        "mechanics_progress_ratio": 0.013182766910252516,
+        "movement_action_telemetry": {
+          "analog_saturation_fraction": {
+            "pitch": 0.03510300593667069,
+            "roll": 0.008463913574801328,
+            "steer": 0.009631723948428338,
+            "throttle": 0.08065484153210936,
+            "yaw": 0.005408805941009306
+          },
+          "mean_absolute": {
+            "boost": 0.4936258523569523,
+            "handbrake": 0.31564504349460926,
+            "jump": 0.2822883298503901,
+            "pitch": 0.5023698902823885,
+            "roll": 0.4023281006553985,
+            "steer": 0.36818102159226623,
+            "throttle": 0.6283376001626584,
+            "yaw": 0.3958877836492949
+          },
+          "nonzero_fraction": {
+            "boost": 0.4936258523569523,
+            "handbrake": 0.31564504349460926,
+            "jump": 0.2822883298503901,
+            "pitch": 1.0,
+            "roll": 1.0,
+            "steer": 1.0,
+            "throttle": 1.0,
+            "yaw": 1.0
+          }
+        },
+        "no_touch_behavior": {
+          "hard_time_truncations": 18,
+          "no_touch_episode_fraction": 0.0,
+          "no_touch_truncations": 0
+        },
+        "progress_mean_abs_reward_per_decision": 0.0024683442659502717,
+        "rearms": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 5,
+          "musty": 2,
+          "pinch": 31,
+          "pogo": 189,
+          "possession": 0,
+          "redirect": 550,
+          "speedflip": 23
+        },
+        "reward_component_mean_abs_per_active_world_decision": {
+          "boost_pickups": 1.976238871183908e-05,
+          "boost_use": 9.871793482829329e-06,
+          "demos": 3.615512046528607e-06,
+          "goals": 0.01720983708502961,
+          "mechanics": 3.253960711228078e-05,
+          "progress": 0.0024683442659502717,
+          "saves": 0.0004175916351514538,
+          "speed": 1.9741850609431953e-05,
+          "supersonic": 1.9653922307282203e-05,
+          "unnecessary_flip": 5.9945187201997694e-05
+        },
+        "scoring_behavior": {
+          "goal_episode_fraction": 0.9296875,
+          "goal_episodes": 238,
+          "opponent_goals": 114,
+          "rival_goal_share": 0.5210084033613446,
+          "rival_goals": 124
+        },
+        "theoretical_paid_mechanics_per_min": 6.052367075701591,
+        "total_mean_abs_reward_per_decision": 0.020155979269175686,
+        "touches_per_min": 20.473921311996996,
+        "unnecessary_flip_contacts_per_min": 5.564272956693398,
+        "unnecessary_flip_touch_fraction": 0.4708149779735683
+      }
+    },
+    {
+      "checkpoint_sha256": "B935CC38AE84AD9E1A8484FABA2493C1C059BB0543FC9D190BFA9B68B3BE6BAA",
+      "iteration": 549,
+      "metrics": {
+        "active_world_decisions": 134496,
+        "bad_flip_absolute_gameplay_reward_ratio": 0.003127629275262484,
+        "bad_flip_mean_abs_penalty_per_decision": 6.423982711942734e-05,
+        "bad_flip_progress_ratio": 0.02693612258990918,
+        "budget_hit_player_episode_fraction": 0.001953125,
+        "car_minutes": 149.44,
+        "duplicate_suppression": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 0,
+          "pogo": 0,
+          "possession": 0,
+          "redirect": 17,
+          "speedflip": 0
+        },
+        "episodes": 256,
+        "exemption_flags": {
+          "EXEMPT_CONTESTED_50": 760,
+          "EXEMPT_CONTROLLED_FLICK": 232,
+          "EXEMPT_POWER_CONTACT": 22,
+          "EXEMPT_RECOGNIZED_MECHANIC": 4
+        },
+        "exemption_rates_per_flip_touch": {
+          "EXEMPT_CONTESTED_50": 0.40970350404312667,
+          "EXEMPT_CONTROLLED_FLICK": 0.12506738544474394,
+          "EXEMPT_POWER_CONTACT": 0.011859838274932614,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0.00215633423180593
+        },
+        "flip_active_touches_per_min": 12.413008565310493,
+        "flip_touch_all_touch_fraction": 0.6383344803854095,
+        "impossible_count": 0,
+        "mechanic_detected": {
+          "ball_reset": 3,
+          "breezi": 0,
+          "car_reset": 3,
+          "half_flip": 2,
+          "musty": 4,
+          "pinch": 27,
+          "pogo": 183,
+          "redirect": 580,
+          "speedflip": 21,
+          "successful_dash": 92
+        },
+        "mechanic_detected_per_min": {
+          "ball_reset": 0.02007494646680942,
+          "breezi": 0.0,
+          "car_reset": 0.02007494646680942,
+          "half_flip": 0.013383297644539615,
+          "musty": 0.02676659528907923,
+          "pinch": 0.1806745182012848,
+          "pogo": 1.2245717344753748,
+          "redirect": 3.8811563169164884,
+          "speedflip": 0.14052462526766596,
+          "successful_dash": 0.6156316916488223
+        },
+        "mechanic_paid": {
+          "ball_reset": 3,
+          "breezi": 0,
+          "car_reset": 3,
+          "half_flip": 2,
+          "musty": 4,
+          "pinch": 27,
+          "pogo": 183,
+          "redirect": 580,
+          "speedflip": 21,
+          "successful_dash": 92
+        },
+        "mechanics_absolute_gameplay_reward_ratio": 0.001587344259443586,
+        "mechanics_mean_abs_reward_per_decision": 3.26031993664318e-05,
+        "mechanics_progress_ratio": 0.013670705765207002,
+        "movement_action_telemetry": {
+          "analog_saturation_fraction": {
+            "pitch": 0.035718534380204614,
+            "roll": 0.009000267665952891,
+            "steer": 0.008059719248156079,
+            "throttle": 0.07910644182726624,
+            "yaw": 0.004483404710920771
+          },
+          "mean_absolute": {
+            "boost": 0.47412190697121104,
+            "handbrake": 0.3169945574589579,
+            "jump": 0.2897595467523198,
+            "pitch": 0.5042317467169939,
+            "roll": 0.3964267634286126,
+            "steer": 0.3651014895491618,
+            "throttle": 0.6309733641401507,
+            "yaw": 0.39108903120541405
+          },
+          "nonzero_fraction": {
+            "boost": 0.47412190697121104,
+            "handbrake": 0.3169945574589579,
+            "jump": 0.2897595467523198,
+            "pitch": 1.0,
+            "roll": 0.999996282417321,
+            "steer": 0.9999925648346419,
+            "throttle": 1.0,
+            "yaw": 1.0
+          }
+        },
+        "no_touch_behavior": {
+          "hard_time_truncations": 18,
+          "no_touch_episode_fraction": 0.0,
+          "no_touch_truncations": 0
+        },
+        "progress_mean_abs_reward_per_decision": 0.0023848951126875582,
+        "rearms": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 2,
+          "musty": 4,
+          "pinch": 27,
+          "pogo": 183,
+          "possession": 0,
+          "redirect": 577,
+          "speedflip": 20
+        },
+        "reward_component_mean_abs_per_active_world_decision": {
+          "boost_pickups": 1.9829586173702773e-05,
+          "boost_use": 1.00880318948797e-05,
+          "demos": 7.435165468870161e-07,
+          "goals": 0.0176956935522246,
+          "mechanics": 3.26031993664318e-05,
+          "progress": 0.0023848951126875582,
+          "saves": 0.00044053354746609563,
+          "speed": 1.996184858763756e-05,
+          "supersonic": 1.9661550389299224e-05,
+          "unnecessary_flip": 6.423982711942734e-05
+        },
+        "scoring_behavior": {
+          "goal_episode_fraction": 0.9296875,
+          "goal_episodes": 238,
+          "opponent_goals": 131,
+          "rival_goal_share": 0.4495798319327731,
+          "rival_goals": 107
+        },
+        "theoretical_paid_mechanics_per_min": 6.122858672376874,
+        "total_mean_abs_reward_per_decision": 0.02057885733512174,
+        "touches_per_min": 19.44593147751606,
+        "unnecessary_flip_contacts_per_min": 5.995717344753747,
+        "unnecessary_flip_touch_fraction": 0.4830188679245283
+      }
+    },
+    {
+      "checkpoint_sha256": "4834ACA72C3B5F075612512BCD8D511C341C700F76CD220FA31CD604146F136A",
+      "iteration": 579,
+      "metrics": {
+        "active_world_decisions": 134723,
+        "bad_flip_absolute_gameplay_reward_ratio": 0.0032652099317541654,
+        "bad_flip_mean_abs_penalty_per_decision": 6.776867915946783e-05,
+        "bad_flip_progress_ratio": 0.028879406088367136,
+        "budget_hit_player_episode_fraction": 0.0,
+        "car_minutes": 149.69222222222223,
+        "duplicate_suppression": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 0,
+          "musty": 0,
+          "pinch": 1,
+          "pogo": 0,
+          "possession": 0,
+          "redirect": 15,
+          "speedflip": 0
+        },
+        "episodes": 256,
+        "exemption_flags": {
+          "EXEMPT_CONTESTED_50": 745,
+          "EXEMPT_CONTROLLED_FLICK": 240,
+          "EXEMPT_POWER_CONTACT": 18,
+          "EXEMPT_RECOGNIZED_MECHANIC": 2
+        },
+        "exemption_rates_per_flip_touch": {
+          "EXEMPT_CONTESTED_50": 0.39087093389296956,
+          "EXEMPT_CONTROLLED_FLICK": 0.1259181532004197,
+          "EXEMPT_POWER_CONTACT": 0.00944386149003148,
+          "EXEMPT_RECOGNIZED_MECHANIC": 0.001049317943336831
+        },
+        "flip_active_touches_per_min": 12.73279247047646,
+        "flip_touch_all_touch_fraction": 0.6685373553139249,
+        "impossible_count": 0,
+        "mechanic_detected": {
+          "ball_reset": 9,
+          "breezi": 0,
+          "car_reset": 9,
+          "half_flip": 8,
+          "musty": 2,
+          "pinch": 25,
+          "pogo": 197,
+          "redirect": 582,
+          "speedflip": 25,
+          "successful_dash": 98
+        },
+        "mechanic_detected_per_min": {
+          "ball_reset": 0.06012336423624771,
+          "breezi": 0.0,
+          "car_reset": 0.06012336423624771,
+          "half_flip": 0.053442990432220186,
+          "musty": 0.013360747608055046,
+          "pinch": 0.16700934510068807,
+          "pogo": 1.316033639393422,
+          "redirect": 3.8879775539440184,
+          "speedflip": 0.16700934510068807,
+          "successful_dash": 0.6546766327946972
+        },
+        "mechanic_paid": {
+          "ball_reset": 9,
+          "breezi": 0,
+          "car_reset": 9,
+          "half_flip": 8,
+          "musty": 2,
+          "pinch": 25,
+          "pogo": 197,
+          "redirect": 582,
+          "speedflip": 25,
+          "successful_dash": 98
+        },
+        "mechanics_absolute_gameplay_reward_ratio": 0.0016540630842727454,
+        "mechanics_mean_abs_reward_per_decision": 3.432969787868418e-05,
+        "mechanics_progress_ratio": 0.014629491060266099,
+        "movement_action_telemetry": {
+          "analog_saturation_fraction": {
+            "pitch": 0.032681873176814646,
+            "roll": 0.007734388337551866,
+            "steer": 0.0069513000749686395,
+            "throttle": 0.08558672238593262,
+            "yaw": 0.004691106937939327
+          },
+          "mean_absolute": {
+            "boost": 0.4699383178818761,
+            "handbrake": 0.30632854078368205,
+            "jump": 0.28702226049004254,
+            "pitch": 0.5072002219777474,
+            "roll": 0.3975295703766654,
+            "steer": 0.3599636589974309,
+            "throttle": 0.6364061796823419,
+            "yaw": 0.39180076948157094
+          },
+          "nonzero_fraction": {
+            "boost": 0.4699383178818761,
+            "handbrake": 0.30632854078368205,
+            "jump": 0.28702226049004254,
+            "pitch": 1.0,
+            "roll": 1.0,
+            "steer": 1.0,
+            "throttle": 1.0,
+            "yaw": 0.99999628868122
+          }
+        },
+        "no_touch_behavior": {
+          "hard_time_truncations": 14,
+          "no_touch_episode_fraction": 0.0,
+          "no_touch_truncations": 0
+        },
+        "progress_mean_abs_reward_per_decision": 0.0023466091702891915,
+        "rearms": {
+          "breezi": 0,
+          "ground_carry": 0,
+          "half_flip": 8,
+          "musty": 2,
+          "pinch": 25,
+          "pogo": 197,
+          "possession": 0,
+          "redirect": 577,
+          "speedflip": 25
+        },
+        "reward_component_mean_abs_per_active_world_decision": {
+          "boost_pickups": 1.9120714549934267e-05,
+          "boost_use": 9.853922019030282e-06,
+          "demos": 2.22679130119095e-06,
+          "goals": 0.017962782895274008,
+          "mechanics": 3.432969787868418e-05,
+          "progress": 0.0023466091702891915,
+          "saves": 0.00042309034092174314,
+          "speed": 1.962143264123921e-05,
+          "supersonic": 1.8319068672127143e-05,
+          "unnecessary_flip": 6.776867915946783e-05
+        },
+        "scoring_behavior": {
+          "goal_episode_fraction": 0.9453125,
+          "goal_episodes": 242,
+          "opponent_goals": 116,
+          "rival_goal_share": 0.5206611570247934,
+          "rival_goals": 126
+        },
+        "theoretical_paid_mechanics_per_min": 6.379756982846285,
+        "total_mean_abs_reward_per_decision": 0.02079502192760046,
+        "touches_per_min": 19.045745715282468,
+        "unnecessary_flip_contacts_per_min": 6.3129532448060095,
+        "unnecessary_flip_touch_fraction": 0.49580272822665267
+      }
+    }
+  ],
+  "source_checkpoint": {
+    "agent_decision_samples": 3711438222,
+    "byte_identical_after_run": true,
+    "iteration": 489,
+    "path": "G:/dev/RivalSim/checkpoints/rival2/gameplay_v3_smoke/rival2_gameplay_v3_iteration_489_resume.pt",
+    "policy_version": 489,
+    "sha256": "10D97428B3F1CC2E307040314D1DD1A924BD82975D4B88C0F73C3FC2716DCF54"
+  },
+  "status": "STOPPED_HARD_SAFETY_GUARD_AT_PROPOSED_UPDATE_581",
+  "target_additional_updates": 120,
+  "training_aggregate": {
+    "absolute_gameplay_reward_sum": 8065252.911827331,
+    "accepted_optimizer_steps": 12871,
+    "accepted_updates": 91,
+    "bad_flip_to_absolute_gameplay_reward": 0.003001067632175,
+    "bad_flip_to_progress": 0.027070668927988737,
+    "hard_safety_guard_fired": true,
+    "maximum_accepted_minibatch_kl": 0.019802354276180267,
+    "maximum_completed_update_mean_kl": 0.01860574632883072,
+    "maximum_retention_mean_kl": 0.019957421347498894,
+    "maximum_single_update_bad_flip_to_gameplay": 0.05245266520269157,
+    "maximum_single_update_mechanics_to_gameplay": 0.16354895865164673,
+    "mechanics": {
+      "detected": {
+        "ball_reset": 26518,
+        "breezi": 0,
+        "car_reset": 11805,
+        "half_flip": 8171,
+        "musty": 7819,
+        "pinch": 52277,
+        "pogo": 477290,
+        "redirect": 1416740,
+        "speedflip": 38224,
+        "successful_dash": 247243
+      },
+      "paid": {
+        "ball_reset": 26496,
+        "breezi": 0,
+        "car_reset": 11804,
+        "half_flip": 8170,
+        "musty": 7818,
+        "pinch": 52271,
+        "pogo": 477227,
+        "redirect": 1416685,
+        "speedflip": 38215,
+        "successful_dash": 247190
+      }
+    },
+    "mechanics_to_absolute_gameplay_reward": 0.0013637662543750852,
+    "mechanics_to_progress": 0.012301643712239544,
+    "optimizer_step_proposals": 13003,
+    "policy_learning_rate_backoffs": 115,
+    "raw_counts_and_activity": {
+      "big_pad_pickups": 687326.0,
+      "boost_use_player_decisions": 159213649.0,
+      "completed_player_episodes": 1401784.0,
+      "completed_player_episodes_hitting_mechanics_budget": 121.0,
+      "demo_events": 12439.0,
+      "flip_active_touches": 5299184.0,
+      "goal_events": 700657.0,
+      "mechanics_budget_hit_onsets": 398.0,
+      "mechanics_detected": 2286087.0,
+      "mechanics_paid": 2285876.0,
+      "player_decisions": 763363328.0,
+      "progress_abs_ball_y_uu": 9155767222.42726,
+      "progress_nonzero_world_decisions": 306638280.0,
+      "save_events": 205308.0,
+      "small_pad_pickups": 5601889.0,
+      "speed_abs_normalized_net_units": 75959231.36422925,
+      "speed_nonzero_world_decisions": 381262915.0,
+      "supersonic_player_decisions": 51690723.0,
+      "touches": 8041679.0,
+      "unnecessary_flip_contacts": 2513857.0,
+      "world_decisions": 381681664.0
+    },
+    "retention_budget_early_stop_updates": [
+      490,
+      491,
+      492,
+      493,
+      511,
+      520,
+      527,
+      547,
+      548,
+      550,
+      551,
+      552,
+      553,
+      554,
+      558,
+      566,
+      580
+    ],
+    "reward_absolute_blue_sums": {
+      "boost_pickups": 8324.99315514334,
+      "boost_use": 4279.677541886249,
+      "demos": 1243.9000185355544,
+      "goals": 7006570.0,
+      "mechanics": 10999.11975415051,
+      "progress": 894117.8928151621,
+      "saves": 153949.5,
+      "speed": 7595.923136422925,
+      "supersonic": 7787.304003276149,
+      "unnecessary_flip": 24204.36945899017
+    },
+    "schema_version": 1,
+    "transactional_retries": 132
+  },
+  "unreached_checkpoint_offsets": [
+    120
+  ],
+  "verdict": "BLOCKED_HARD_SAFETY_GUARD"
+}
