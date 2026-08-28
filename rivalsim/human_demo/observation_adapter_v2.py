@@ -125,7 +125,7 @@ class NativePadOverlayV2:
     maximum_xy_error_uu: float
 
 
-def canonical_pad_index(position: Any, *, maximum_xy_error_uu: float = 1.0) -> tuple[int, float]:
+def canonical_pad_index(position: Any, *, maximum_xy_error_uu: float = 4.0) -> tuple[int, float]:
     """Map a native pad position by canonical physical XY, never pointer order."""
 
     value = np.asarray(position, dtype=np.float64)

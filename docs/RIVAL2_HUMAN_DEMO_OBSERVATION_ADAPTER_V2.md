@@ -65,7 +65,9 @@ rolls back before failing. Human actions are never inputs or targets.
 The `nexto_1v1` event stream has authoritative pickup callbacks. The JSON event itself carries a
 transient pointer but no position or canonical index; however, the recorder's event-backed frame
 state retains that same stable pickup identity with its native position, respawn delay, and derived
-cooldown after the pad's first observed pickup. The V2 pipeline maps those XY positions uniquely to
+cooldown after the pad's first observed pickup. Across all 33 observed native positions, the maximum
+XY offset from canonical geometry is 2 units and the minimum distance to the second-nearest pad is
+over 1,060 units. The V2 pipeline therefore maps within a conservative 4-unit tolerance to
 RivalSim's canonical 34-pad Soccar geometry. It then overlays the supported active/cooldown pair
 after learned imputation, applying the orange-perspective pad remap when required.
 

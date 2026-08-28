@@ -186,6 +186,9 @@ def test_native_pad_position_maps_by_geometry_and_preserves_unknown_pads() -> No
     assert overlay.values[field["boost_pad.17.cooldown"]] == 0.5
     assert overlay.supported.sum() == 2
     assert not overlay.supported[field["boost_pad.16.active"]]
+    offset_physical, offset_error = canonical_pad_index((1788.0, -2302.0, 64.08))
+    assert offset_physical == 15
+    assert offset_error == 2.0
 
 
 def test_native_pad_overlay_respects_orange_canonical_remap() -> None:
