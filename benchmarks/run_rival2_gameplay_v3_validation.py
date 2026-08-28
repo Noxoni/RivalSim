@@ -240,7 +240,13 @@ def _confusion(cases: list[dict[str, Any]], predict: Any) -> dict[str, int]:
     return counts
 
 
-def static_phase(collision_dir: Path) -> None:
+def _archived_synthetic_static_phase(collision_dir: Path) -> None:
+    """Preserve the superseded evidence generator for historical reproducibility only.
+
+    This function intentionally has no CLI dispatch. Gameplay V3 classifier
+    calibration must use run_rival2_gameplay_v3_validation_correction.py, whose
+    derivation and held-out phases measure physical simulator traces.
+    """
     created = _utc_now()
     contract = {
         "schema_version": 1,
@@ -1424,7 +1430,7 @@ def shadow_phase(collision_dir: Path) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("phase", choices=("static", "memory", "transition-rollout", "shadow"))
+    parser.add_argument("phase", choices=("memory", "transition-rollout", "shadow"))
     parser.add_argument(
         "--collision-dir",
         type=Path,
@@ -1442,9 +1448,7 @@ def main() -> None:
     RESULTS_DIR = args.output_dir.resolve()
     if not SOURCE_CHECKPOINT.is_file() or _sha256(SOURCE_CHECKPOINT) != SOURCE_SHA256:
         raise RuntimeError("selected plus_120 checkpoint identity mismatch")
-    if args.phase == "static":
-        static_phase(args.collision_dir)
-    elif args.phase == "memory":
+    if args.phase == "memory":
         memory_phase(args.collision_dir)
     elif args.phase == "transition-rollout":
         transition_rollout_phase(args.collision_dir)

@@ -13,6 +13,7 @@ which requires an already-written frozen derivation artifact.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import math
@@ -1694,6 +1695,110 @@ def _reward_phase(collision_root: str, output_dir: Path) -> None:
     print(json.dumps({"reward": reward["verdict"], "contract": contract["sha256"]}))
 
 
+def _regression_phase(collision_root: str, output_dir: Path) -> None:
+    environment = dict(os.environ)
+    environment["RIVALSIM_COLLISION_DIR"] = collision_root
+    environment["PYTHONPATH"] = str(REPOSITORY_ROOT)
+    python = Path(sys.executable)
+    ruff = python.parent / "ruff.exe"
+    pytest = python.parent / "pytest.exe"
+    commands = {
+        "ruff_changed_python": [
+            str(ruff),
+            "check",
+            "benchmarks/run_rival2_gameplay_v3_validation.py",
+            "benchmarks/run_rival2_gameplay_v3_validation_correction.py",
+            "benchmarks/run_rival2_mechanics_calibration.py",
+            "rivalsim/gameplay_v3.py",
+            "rivalsim/rival2_contracts.py",
+            "tests/test_rival2_gameplay_v3.py",
+        ],
+        "focused_pytest": [
+            str(pytest),
+            "-q",
+            "tests/test_rival2_gameplay_v2.py",
+            "tests/test_rival2_gameplay_v3.py",
+            "tests/test_rival2_gameplay_reward.py",
+            "tests/test_rival2_mechanics_calibration.py",
+            "tests/test_rival2_opponent_curriculum.py",
+            "--basetemp",
+            r"G:\dev\RivalSim-runs\pytest-gameplay-v3-validation-correction-evidence",
+        ],
+    }
+    records: dict[str, Any] = {}
+    for name, command in commands.items():
+        started = datetime.now(UTC)
+        completed = subprocess.run(
+            command,
+            cwd=REPOSITORY_ROOT,
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        records[name] = {
+            "command": command,
+            "exit_code": completed.returncode,
+            "elapsed_seconds": (datetime.now(UTC) - started).total_seconds(),
+            "stdout": completed.stdout,
+            "stderr": completed.stderr,
+            "pass": completed.returncode == 0,
+        }
+    validation_sources = (
+        REPOSITORY_ROOT / "benchmarks" / "run_rival2_gameplay_v3_validation.py",
+        REPOSITORY_ROOT
+        / "benchmarks"
+        / "run_rival2_gameplay_v3_validation_correction.py",
+    )
+    forbidden = ("trainer.update", "train_iteration", "optimizer.step")
+
+    def qualified_name(node: ast.expr) -> str:
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Attribute):
+            parent = qualified_name(node.value)
+            return f"{parent}.{node.attr}" if parent else node.attr
+        return ""
+
+    source_scan: dict[str, list[dict[str, Any]]] = {name: [] for name in forbidden}
+    for path in validation_sources:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            call_name = qualified_name(node.func)
+            for forbidden_name in forbidden:
+                if call_name == forbidden_name or call_name.endswith(f".{forbidden_name}"):
+                    source_scan[forbidden_name].append(
+                        {
+                            "path": str(path.relative_to(REPOSITORY_ROOT)),
+                            "line": node.lineno,
+                            "call": call_name,
+                        }
+                    )
+    payload = {
+        "format": "RIVAL2_GAMEPLAY_V3_VALIDATION_CORRECTION_REGRESSION_V1",
+        "created_utc": _utc_now(),
+        "implementation_commit": _git("rev-parse", "HEAD"),
+        "commands": records,
+        "forbidden_training_call_source_scan": source_scan,
+        "full_simulator_suite_run": False,
+        "focused_scope_authority": (
+            "validation-correction README and original acceptance focused command set"
+        ),
+    }
+    payload["verdict"] = (
+        "PASS"
+        if all(record["pass"] for record in records.values())
+        and not any(source_scan.values())
+        else "BLOCKED"
+    )
+    _write_json(output_dir / "regression_tests.json", payload)
+    if payload["verdict"] != "PASS":
+        raise RuntimeError("focused regression or no-training source scan failed")
+    print(json.dumps({name: row["pass"] for name, row in records.items()}))
+
+
 def _probe(collision_root: str) -> None:
     provenance = _provenance()
     rows = _generate_split("derivation", collision_root, provenance)
@@ -1743,7 +1848,8 @@ def main() -> int:
     )
     parser.add_argument("--probe", action="store_true")
     parser.add_argument(
-        "--phase", choices=("derive", "heldout", "source-exact", "reward")
+        "--phase",
+        choices=("derive", "heldout", "source-exact", "reward", "regression"),
     )
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     args = parser.parse_args()
@@ -1761,6 +1867,9 @@ def main() -> int:
         return 0
     if args.phase == "reward":
         _reward_phase(args.collision_root, args.output_dir)
+        return 0
+    if args.phase == "regression":
+        _regression_phase(args.collision_root, args.output_dir)
         return 0
     raise RuntimeError("choose --phase derive or --phase heldout")
 
