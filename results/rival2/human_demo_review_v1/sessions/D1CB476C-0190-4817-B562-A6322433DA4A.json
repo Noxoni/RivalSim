@@ -1,0 +1,164 @@
+{
+  "attempt_count": 7,
+  "attempt_quality_summary": {
+    "attempt_count": 7,
+    "complete_human_car_coverage_attempt_count": 7,
+    "generic_recovery_observed_count": 4,
+    "human_contact_attempt_count": 7,
+    "invalid_action_attempt_count": 0,
+    "missing_tick_attempt_count": 0,
+    "noncontiguous_attempt_count": 0
+  },
+  "authority_boundary": {
+    "all_attempts_preserved": true,
+    "behavior_cloning_performed": false,
+    "mechanic_rewards_assigned": false,
+    "new_mechanic_detector_defined": false,
+    "training_performed": false
+  },
+  "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
+  "capture_end_utc": "2026-08-28T18:11:17.828Z",
+  "capture_start_utc": "2026-08-28T18:10:42.763Z",
+  "classification": "freeplay_mechanic_practice",
+  "declared_label": "180 flick",
+  "declared_mechanic_label": "180 flick",
+  "declared_opponent_label": "",
+  "declared_session_type": "freeplay",
+  "event_count": 295,
+  "event_counts": {
+    "ball_touch": 272,
+    "duplicate_hook_callback_suppressed": 2,
+    "goal": 2,
+    "jump_onset": 16,
+    "kickoff_or_round_reset": 1,
+    "local_car_rebind": 1,
+    "respawn": 1
+  },
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "frame_count": 3982,
+  "gameplay_summary": null,
+  "ingestion_eligible_under_current_validator": false,
+  "local_player": {
+    "name": "Noxoni",
+    "player_id": 257,
+    "stable_id": "Steam|76561199043547232|0",
+    "team": 0
+  },
+  "map": "stadium_day_p",
+  "marker_count": 0,
+  "markers": [],
+  "outcome_grouping": {
+    "comparison_metric": "primary_contact_ball_delta_velocity_magnitude_12_ticks",
+    "comparison_value_count": 7,
+    "contact_attempt_fraction": 1.0,
+    "contact_oriented_by_evidence": true,
+    "counts": {
+      "ambiguous_middle_physical_outcome": 1,
+      "limited_or_failed_physical_outcome_candidate": 4,
+      "stronger_physical_outcome_candidate": 2
+    },
+    "policy": "Relative descriptive triage only. Buckets are not mechanic detectors, success labels, rewards, or training targets; all attempts remain preserved.",
+    "relative_quartile_comparison_available": true,
+    "version": "DESCRIPTIVE_RELATIVE_OUTCOME_V1",
+    "within_session_q25": 612.0446731153598,
+    "within_session_q75": 985.6331894450152
+  },
+  "plugin_build": "1.0.1",
+  "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
+  "review_scope": "new_demonstration",
+  "rocket_league_build": "260811.1257.524913",
+  "segmentation_audit": {
+    "anchor_count": 16,
+    "attempt_count": 7,
+    "hard_boundary_indices": [
+      0,
+      2247,
+      3982
+    ],
+    "maximum_attempt_ticks": 960,
+    "minimum_post_activity_ticks": 24,
+    "minimum_recovery_world_contact_wheels": 2,
+    "policy": "Label-agnostic activity segmentation: local-human native jump-onset anchors; physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded recovery separates attempts. No mechanic detector is used.",
+    "pre_roll_ticks": 60,
+    "recovery_run_ticks": 24,
+    "unsegmented_policy": "No synthetic attempt is created when no native jump onset exists.",
+    "version": "GENERIC_ACTIVITY_RECOVERY_V1"
+  },
+  "session_uuid": "D1CB476C-0190-4817-B562-A6322433DA4A",
+  "source_directory": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\D1CB476C-0190-4817-B562-A6322433DA4A",
+  "source_file_set_sha256": "8764E0BC8910CD466AAD56EF3E34A32C40C8FA2AC95A3EFC1AC4FD490B0FE4D9",
+  "source_files": [
+    {
+      "bytes": 2790072,
+      "path": "chunks/000000.rvr",
+      "sha256": "FEF7D7953D38502573341EF96FB1E1062551C19911503C0433C3C6435FEA84A0"
+    },
+    {
+      "bytes": 296122,
+      "path": "chunks/000001.rvr",
+      "sha256": "6914E2EB6541EE8E93226120349E612718A6882B8D7E087BE8C9A7FB406EB86F"
+    },
+    {
+      "bytes": 135703,
+      "path": "events.jsonl",
+      "sha256": "6CA7D3CE66A3DAB8941B9DE3A7AB89770463C7ED6A35CD31B4CBFB4CA7A3FE0C"
+    },
+    {
+      "bytes": 3245,
+      "path": "manifest.json",
+      "sha256": "DC5019D1469DDB183356E8BFE3A622430E73F928482D1D326EE5650CCF8630E6"
+    },
+    {
+      "bytes": 0,
+      "path": "markers.jsonl",
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    }
+  ],
+  "validation": {
+    "active_capture_duration": 33.17498779296875,
+    "active_capture_end": 848.5833740234375,
+    "active_capture_end_physics_frame": 101830,
+    "active_capture_rate_hz": 120.03018734626218,
+    "active_capture_start": 815.4083862304688,
+    "active_capture_start_physics_frame": 97849,
+    "capture_complete": false,
+    "capture_completeness_valid": false,
+    "clean_termination": true,
+    "complete_chunks": 2,
+    "completeness_errors": [
+      "active simulation continues beyond the final demonstration frame: 184 physics ticks, 1.5333252 engine seconds"
+    ],
+    "container_valid": true,
+    "duplicate_physics_frame_count": 0,
+    "duplicate_sequence_count": 0,
+    "errors": [],
+    "final_event_engine_time": 850.025,
+    "final_event_physics_frame": 102003,
+    "final_frame_engine_time": 848.5833740234375,
+    "final_frame_physics_frame": 101830,
+    "final_marker_engine_time": null,
+    "final_marker_physics_frame": null,
+    "first_sequence": 0,
+    "frame_count": 3982,
+    "invalid_action_frames": 0,
+    "invalid_human_car_frames": 0,
+    "last_sequence": 3981,
+    "manifest_hashes_valid": true,
+    "missing_physics_frame_count": 0,
+    "missing_sequence_count": 0,
+    "out_of_order_physics_frame_count": 0,
+    "out_of_order_sequence_count": 0,
+    "overall_demonstration_valid": false,
+    "partial_chunks": 0,
+    "sequence_gap_count": 0,
+    "session_dir": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\D1CB476C-0190-4817-B562-A6322433DA4A",
+    "session_stop_engine_time": 850.11669921875,
+    "session_stop_physics_frame": 102014,
+    "session_wall_duration": 35.0643113,
+    "session_wide_capture_rate_hz": 113.56276089187013,
+    "trailing_uncovered_engine_seconds": 1.5333251953125,
+    "trailing_uncovered_physics_ticks": 184,
+    "valid": false,
+    "warnings": []
+  }
+}

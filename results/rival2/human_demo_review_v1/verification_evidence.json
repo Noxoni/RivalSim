@@ -1,0 +1,35 @@
+{
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_VERIFICATION_V1",
+  "verified_utc": "2026-08-28T18:58:37.046Z",
+  "commands": [
+    {
+      "command": ".venv\\Scripts\\ruff.exe check benchmarks\\review_rival2_human_demos.py tests\\test_human_demo_review.py",
+      "exit_code": 0,
+      "result": "All checks passed."
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe -m pytest tests\\test_human_demo_review.py tests\\test_human_demo_recording.py -q --basetemp G:\\dev\\RivalSim\\.tools\\pytest-human-review-20260828-2",
+      "exit_code": 0,
+      "result": "23 passed, 1 skipped in 1.65s",
+      "skip_reason": "Optional native C++ fixture test requires RIVALREC_CPP_FIXTURE after building the native format fixture."
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe benchmarks\\review_rival2_human_demos.py --verify-only",
+      "exit_code": 0,
+      "result": {
+        "attempt_count": 158,
+        "errors": [],
+        "generated_artifact_count_before_this_evidence_record": 40,
+        "session_count": 19,
+        "source_file_count": 107,
+        "valid": true
+      }
+    }
+  ],
+  "authority_boundary": {
+    "behavior_cloning_performed": false,
+    "mechanic_rewards_assigned": false,
+    "new_mechanic_detector_defined": false,
+    "training_performed": false
+  }
+}
