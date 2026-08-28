@@ -1,0 +1,111 @@
+{
+  "acceptance": {
+    "all_114311_human_outputs_finite": true,
+    "bootstrap_byte_identical": true,
+    "freeplay_meaningful_reconstruction_relative_improvement_min": 0.2,
+    "full_observation_actor_kl_exact": 0.0,
+    "full_observation_value_drift_exact": 0.0,
+    "gameplay_actor_kl_max": 3.360944918462842,
+    "gameplay_actor_kl_relative_reduction_min": 0.5,
+    "gameplay_baseline_actor_kl": 6.721889836925684,
+    "gameplay_baseline_absolute_tolerance": 2e-06,
+    "gameplay_reconstruction_relative_improvement_min": 0.2,
+    "human_actions_unchanged": true,
+    "no_nonfinite": true,
+    "no_quality_promotion": true,
+    "pad_reconstruction_relative_improvement_min": 0.2
+  },
+  "adapter": {
+    "activation": "silu",
+    "approximate_residual_limit": 1.0,
+    "dtype": "float32",
+    "hidden_dim": 256,
+    "hidden_layers": 2,
+    "initialization": "orthogonal_sqrt2_zero_output",
+    "input": "degraded_float32_182_plus_quality_float32_182_plus_two_profile_bits",
+    "output": "repaired_float32_182_in_exact_RIVAL2_OBS_V2_120HZ_order",
+    "profile_features": 2,
+    "recurrent": false,
+    "version": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
+  },
+  "authority": {
+    "bootstrap_checkpoint": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "bridge_quality_contract_sha256": "49A6D3C09A3DD5C88263850CF816804FBF3B2BAAED28154F1C46EADED6B1D9BC",
+    "bridge_version": "RIVAL2_HUMAN_DEMO_BC_OBSERVATION_BRIDGE_V1",
+    "exact_adapter_sha256": "1B6D01C223419C2C3A686CAB3F012F8D80CA9E77922E8E8AC3AB9C96D2B8DD61",
+    "human_dataset_manifest": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+    "human_dataset_manifest_sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55",
+    "required_parent": "10489acfb6396eaaf33844f149aa26e865d84af7",
+    "v1_evidence_immutable": true,
+    "v1_result_root": "results/rival2/missing_feature_distillation_v1"
+  },
+  "corpus": {
+    "car_perspectives_per_world": 2,
+    "collision_mesh_directory": "G:/dev/RLBot-Rival/bot/collision_meshes",
+    "decisions_per_world": 128,
+    "expected_identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+    "expected_observation_tensor_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+    "kickoff_layout_rule": "(world_index + corpus_seed) modulo 5",
+    "physics_hz": 120,
+    "physics_ticks_per_decision": 1,
+    "policy_hz": 120,
+    "seed": 2026082821,
+    "split": {
+      "algorithm": "numpy PCG64 permutation of world indices",
+      "seed": 2026082822,
+      "test_worlds": 3277,
+      "train_worlds": 26214,
+      "validation_worlds": 3277
+    },
+    "stochastic_actions": true,
+    "worlds": 32768
+  },
+  "domain_rules": {
+    "approximate_fields": "bounded residual only and classification remains approximate",
+    "exact_direct_and_derived_fields": "hard copy from degraded input",
+    "freeplay_actor_kl": false,
+    "freeplay_opponent_fields": "hard neutral nuisance context and excluded from reconstruction",
+    "full_authoritative_path": "structural parameter-independent adapter bypass",
+    "quality_promotion": false,
+    "unavailable_fields": "bounded learned imputation and classification remains unavailable"
+  },
+  "format": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_FROZEN_CONFIG_V2",
+  "human_validation": {
+    "expected_frame_count": 114311,
+    "inference_batch_size": 8192,
+    "mechanic_profile": "freeplay",
+    "nexto_1v1_profile": "gameplay",
+    "optimizer_steps": 0
+  },
+  "native_boost_pad_gate": {
+    "allow_pointer_sorting": false,
+    "canonical_pad_count": 34,
+    "implement_only_if_native_event_or_frame_has_position": true,
+    "nearby_car_position_is_not_authoritative_pad_identity": true,
+    "unknown_history_must_remain_unavailable": true
+  },
+  "training": {
+    "approximate_residual_weight": 1.0,
+    "early_stopping_material_relative_improvement": 0.0025,
+    "early_stopping_patience_epochs": 2,
+    "freeplay_reconstruction_weight": 2.0,
+    "gameplay_actor_kl_weight": 0.5,
+    "gameplay_reconstruction_weight": 4.0,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0005,
+    "max_epochs": 5,
+    "max_optimizer_steps": 1025,
+    "optimizer": "torch.optim.AdamW",
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "optimizer_epsilon": 1e-08,
+    "seed": 2026082824,
+    "transactional_nonfinite_check_every_step": true,
+    "weight_decay": 1e-05,
+    "worlds_per_minibatch": 128
+  }
+}
