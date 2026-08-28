@@ -49,12 +49,15 @@ from rivalsim.human_demo.observation_adapter_v2 import (  # noqa: E402
     HumanDemoObservationAdapterV2,
     ObservationAdapterConfig,
     adapter_objective,
+    apply_native_pad_overlay,
+    canonical_pad_index,
     expected_quality,
     meaningful_reconstruction_mask,
+    native_pad_overlay,
 )
 from rivalsim.human_demo.reader import SessionReader  # noqa: E402
 from rivalsim.rival2_120hz_transition import tensor_tree_sha256  # noqa: E402
-from rivalsim.rival2_contracts import ACTION_NAMES, OBS_FIELD_NAMES  # noqa: E402
+from rivalsim.rival2_contracts import ACTION_NAMES, OBS_DIM, OBS_FIELD_NAMES  # noqa: E402
 from rivalsim.rival2_policy import Rival2ActorCritic  # noqa: E402
 
 FROZEN_CONFIG = Path("results/rival2/human_demo_observation_adapter_v2/frozen_config.json")
@@ -572,7 +575,16 @@ def _audit_native_boost_pads(source_root: Path) -> dict[str, Any]:
     pickup_events = 0
     pickup_with_position = 0
     pickup_with_canonical_index = 0
+    spawn_events = 0
     pickup_callers: set[str] = set()
+    resolved_pickup_events = 0
+    mapped_pad_rows = 0
+    unmapped_pad_rows = 0
+    maximum_xy_error = 0.0
+    discovered_physical_indices: set[int] = set()
+    stable_mapping: dict[str, int] = {}
+    stable_mapping_conflicts = 0
+    cooldown_quality_counts: dict[int, int] = defaultdict(int)
     sessions = []
     for source in dataset["source_verification"]:
         session_uuid = str(source["session_uuid"])
@@ -585,8 +597,24 @@ def _audit_native_boost_pads(source_root: Path) -> dict[str, Any]:
             if rows:
                 frames_with_pad_rows += 1
                 local_rows += len(rows)
+            for row in rows:
+                stable_key = f"{session_uuid}:{row.get('stable_id', '')}"
+                try:
+                    physical, error = canonical_pad_index(row.get("position"))
+                except ValueError:
+                    unmapped_pad_rows += 1
+                    continue
+                mapped_pad_rows += 1
+                maximum_xy_error = max(maximum_xy_error, error)
+                discovered_physical_indices.add(physical)
+                cooldown_quality_counts[int(row.get("cooldown_quality", 0))] += 1
+                previous = stable_mapping.setdefault(stable_key, physical)
+                if previous != physical:
+                    stable_mapping_conflicts += 1
         local_pickups = 0
         for event in reader.iter_events():
+            if event.get("kind") == "boost_pad_spawn":
+                spawn_events += 1
             if event.get("kind") != "boost_pad_pickup":
                 continue
             local_pickups += 1
@@ -597,6 +625,9 @@ def _audit_native_boost_pads(source_root: Path) -> dict[str, Any]:
                 pickup_with_position += 1
             if keys & {"canonical_index", "pad_index", "boost_pad_index"}:
                 pickup_with_canonical_index += 1
+            stable_key = f"{session_uuid}:{event.get('actor_id', '')}"
+            if stable_key in stable_mapping:
+                resolved_pickup_events += 1
         total_frames += local_frames
         pad_rows += local_rows
         sessions.append(
@@ -608,9 +639,10 @@ def _audit_native_boost_pads(source_root: Path) -> dict[str, Any]:
             }
         )
     mapping_supported = bool(
-        pickup_events
-        and pickup_with_position == pickup_events
-        and pickup_with_canonical_index == pickup_events
+        pad_rows > 0
+        and mapped_pad_rows == pad_rows
+        and stable_mapping_conflicts == 0
+        and len(discovered_physical_indices) > 0
     )
     return {
         "format": "RIVAL2_NATIVE_BOOST_PAD_OBSERVABILITY_AUDIT_V2",
@@ -620,18 +652,33 @@ def _audit_native_boost_pads(source_root: Path) -> dict[str, Any]:
         "frames_with_native_pad_rows": frames_with_pad_rows,
         "native_pad_row_count": pad_rows,
         "boost_pad_pickup_event_count": pickup_events,
+        "boost_pad_spawn_event_count": spawn_events,
         "pickup_event_distinct_runtime_pointer_count": len(pickup_callers),
+        "pickup_events_resolved_via_positioned_frame_row": resolved_pickup_events,
         "pickup_events_with_position": pickup_with_position,
         "pickup_events_with_canonical_index": pickup_with_canonical_index,
+        "mapped_native_pad_rows": mapped_pad_rows,
+        "unmapped_native_pad_rows": unmapped_pad_rows,
+        "maximum_canonical_xy_error_uu": maximum_xy_error,
+        "stable_pointer_position_conflicts": stable_mapping_conflicts,
+        "canonical_physical_indices_discovered": sorted(discovered_physical_indices),
+        "canonical_physical_indices_never_observed": sorted(
+            set(range(34)) - discovered_physical_indices
+        ),
+        "cooldown_quality_counts": dict(sorted(cooldown_quality_counts.items())),
         "deterministic_position_to_index_mapping_supported": mapping_supported,
+        "deterministic_position_to_index_mapping_implemented": mapping_supported,
+        "event_timed_pickup_and_respawn_overlay_implemented": mapping_supported,
         "pointer_sorting_used": False,
         "nearby_car_heuristic_used": False,
         "bridge_quality_promoted": False,
+        "committed_input_quality_mask_changed": False,
+        "source_supported_overlay_quality": "approximate_event_timed",
         "outcome": (
-            "implemented deterministic canonical mapping"
+            "implemented deterministic XY-to-canonical mapping and event-timed "
+            "pickup/respawn overlay; undiscovered pads and pre-pickup history remain unknown"
             if mapping_supported
-            else "canonical position mapping is impossible from the committed native files; "
-            "pad state remains unavailable and is learned only by the masked adapter"
+            else "canonical position mapping is unavailable; pad state remains unavailable"
         ),
         "sessions": sessions,
     }
@@ -670,6 +717,8 @@ def _evaluate_human(
     device = next(adapter.parameters()).device
     buffers: dict[AdapterProfile, list[np.ndarray]] = defaultdict(list)
     quality_buffers: dict[AdapterProfile, list[np.ndarray]] = defaultdict(list)
+    pad_value_buffers: dict[AdapterProfile, list[np.ndarray]] = defaultdict(list)
+    pad_support_buffers: dict[AdapterProfile, list[np.ndarray]] = defaultdict(list)
     counts = {"gameplay": 0, "freeplay": 0}
     quality_counts = np.zeros(4, dtype=np.int64)
     exact_derived_unchanged = True
@@ -679,6 +728,9 @@ def _evaluate_human(
     action_before = hashlib.sha256()
     action_after = hashlib.sha256()
     actor_outputs: dict[str, list[torch.Tensor]] = defaultdict(list)
+    source_supported_pad_values = 0
+    source_supported_pad_frames = 0
+    mapped_physical_pad_indices: set[int] = set()
 
     def flush(profile: AdapterProfile) -> None:
         nonlocal exact_derived_unchanged, qualities_unchanged, outputs_finite
@@ -689,6 +741,9 @@ def _evaluate_human(
         quality_before = quality_np.copy()
         quality = torch.from_numpy(quality_np).to(device=device)
         repaired = adapter(source, quality, profile=profile)
+        pad_values = torch.from_numpy(np.stack(pad_value_buffers[profile])).to(device=device)
+        pad_supported = torch.from_numpy(np.stack(pad_support_buffers[profile])).to(device=device)
+        repaired = apply_native_pad_overlay(repaired, pad_values, pad_supported)
         exact = quality >= int(FieldQuality.EXACT_DERIVED)
         exact_derived_unchanged = exact_derived_unchanged and bool(
             torch.equal(repaired.masked_select(exact), source.masked_select(exact))
@@ -703,9 +758,21 @@ def _evaluate_human(
         actor_outputs[profile.value].append(actor.cpu())
         buffers[profile].clear()
         quality_buffers[profile].clear()
+        pad_value_buffers[profile].clear()
+        pad_support_buffers[profile].clear()
 
     for session_uuid in sorted(spans):
         trajectory = BCBridgeTrajectoryAdapter(source_root / session_uuid)
+        contains_gameplay = any(
+            profiles[identity] is AdapterProfile.GAMEPLAY
+            for identity, _start, _end in spans[session_uuid]
+        )
+        native_frames = (
+            iter(SessionReader(source_root / session_uuid).iter_frames())
+            if contains_gameplay
+            else None
+        )
+        native_frame = next(native_frames, None) if native_frames is not None else None
         for identity, sample in trajectory.iter_spans(spans[session_uuid]):
             if not sample.bc_usable:
                 raise RuntimeError(f"accepted human sample became unusable: {identity}")
@@ -719,8 +786,27 @@ def _evaluate_human(
                 sample.action_unchanged_from_exact_adapter
             )
             quality_counts += np.bincount(quality, minlength=4)
+            if profile is AdapterProfile.GAMEPLAY:
+                while native_frame is not None and int(native_frame["sequence"]) < int(
+                    sample.sequence
+                ):
+                    native_frame = next(native_frames, None)
+                if native_frame is None or int(native_frame["sequence"]) != int(sample.sequence):
+                    raise RuntimeError("native pad overlay lost gameplay sequence alignment")
+                overlay = native_pad_overlay(native_frame)
+                pad_values = np.asarray(overlay.values).copy()
+                pad_supported = np.asarray(overlay.supported).copy()
+                supported_count = int(pad_supported.sum())
+                source_supported_pad_values += supported_count
+                source_supported_pad_frames += int(supported_count > 0)
+                mapped_physical_pad_indices.update(overlay.mapped_physical_indices)
+            else:
+                pad_values = np.zeros(OBS_DIM, dtype=np.float32)
+                pad_supported = np.zeros(OBS_DIM, dtype=np.bool_)
             buffers[profile].append(observation)
             quality_buffers[profile].append(quality)
+            pad_value_buffers[profile].append(pad_values)
+            pad_support_buffers[profile].append(pad_supported)
             counts[profile.value] += 1
             if len(buffers[profile]) >= batch_size:
                 flush(profile)
@@ -748,6 +834,11 @@ def _evaluate_human(
         "exact_and_derived_fields_byte_unchanged": exact_derived_unchanged,
         "quality_masks_byte_unchanged": qualities_unchanged,
         "quality_promotions": 0,
+        "source_supported_native_pad_value_count": source_supported_pad_values,
+        "source_supported_native_pad_frame_count": source_supported_pad_frames,
+        "source_supported_native_pad_physical_indices": sorted(mapped_physical_pad_indices),
+        "native_pad_overlay_classification": "approximate_event_timed_separate_from_committed_mask",
+        "native_pad_prehistory_fabricated": False,
         "all_adapter_and_actor_outputs_finite": outputs_finite,
         "actor_output_statistics": {
             profile: actor_output_statistics(torch.cat(rows))
@@ -800,6 +891,24 @@ def _artifact_manifest(paths: list[Path]) -> dict[str, Any]:
         "files": rows,
         "file_set_sha256": canonical_sha256(rows),
     }
+
+
+def _integrity_valid(integrity: dict[str, Any]) -> bool:
+    positive = (
+        "bootstrap_checkpoint_byte_identical",
+        "bootstrap_model_byte_identical",
+        "bootstrap_requires_grad_false",
+        "bootstrap_gradients_absent",
+        "historical_ppo_optimizer_untouched",
+        "adapter_optimizer_is_fresh",
+        "human_behavior_cloning_absent",
+        "human_optimizer_steps_zero",
+    )
+    return bool(
+        all(bool(integrity[name]) for name in positive)
+        and not integrity["adapter_checkpoint_contains_rival_model"]
+        and not integrity["v1_evidence_modified"]
+    )
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
@@ -889,12 +998,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "human_optimizer_steps_zero": human["human_optimizer_steps"] == 0,
         "v1_evidence_modified": False,
     }
+    integrity["valid"] = _integrity_valid(integrity)
     accepted = (
         acceptance["accepted"]
         and human["valid"]
         and all(corpus_checks.values())
-        and all(integrity.values())
+        and integrity["valid"]
         and not pad_audit["bridge_quality_promoted"]
+        and pad_audit["deterministic_position_to_index_mapping_implemented"]
     )
     checkpoint_path = ROOT / CHECKPOINT
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1021,9 +1132,126 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     return evidence
 
 
+def finalize_existing(args: argparse.Namespace) -> dict[str, Any]:
+    """Re-run source-side audits without another simulator or optimizer step."""
+
+    config, config_identity = _load_config()
+    bootstrap_payload, policy_config, bootstrap_identity = _load_bootstrap(config)
+    checkpoint_path = ROOT / CHECKPOINT
+    checkpoint_sha_before = file_sha256(checkpoint_path)
+    payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    if payload.get("format") != OBSERVATION_ADAPTER_CHECKPOINT_FORMAT:
+        raise ValueError("existing adapter checkpoint format changed")
+    if payload.get("adapter_version") != OBSERVATION_ADAPTER_VERSION:
+        raise ValueError("existing adapter checkpoint version changed")
+    if (
+        payload["authority"]["bootstrap_checkpoint_sha256"] != bootstrap_identity["sha256"]
+        or payload["authority"]["bridge_quality_contract_sha256"] != FIELD_QUALITY_CONTRACT_SHA256
+        or payload["authority"]["frozen_config_sha256"] != config_identity["sha256"]
+    ):
+        raise ValueError("existing adapter checkpoint authority binding changed")
+    adapter = HumanDemoObservationAdapterV2(_adapter_config(config)).to(args.device)
+    adapter.load_state_dict(payload["adapter"])
+    adapter.eval()
+    policy = Rival2ActorCritic(policy_config).to(args.device)
+    policy.load_state_dict(bootstrap_payload["model"])
+    policy.eval()
+    policy.requires_grad_(False)
+    evidence_path = ROOT / RESULT_ROOT / "evidence.json"
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    pad_audit = _audit_native_boost_pads(args.human_source_root)
+    human = _evaluate_human(adapter, policy, config, args.human_source_root)
+    integrity = evidence["integrity"]
+    integrity.update(
+        {
+            "bootstrap_checkpoint_byte_identical": file_sha256(
+                ROOT / config["authority"]["bootstrap_checkpoint"]
+            )
+            == config["authority"]["bootstrap_checkpoint_sha256"],
+            "bootstrap_model_byte_identical": tensor_tree_sha256(policy.state_dict())
+            == config["authority"]["bootstrap_model_tensor_sha256"],
+            "bootstrap_requires_grad_false": all(
+                not parameter.requires_grad for parameter in policy.parameters()
+            ),
+            "bootstrap_gradients_absent": all(
+                parameter.grad is None for parameter in policy.parameters()
+            ),
+            "historical_ppo_optimizer_untouched": tensor_tree_sha256(bootstrap_payload["optimizer"])
+            == evidence["integrity"]["historical_ppo_optimizer_sha256_before_after"][0],
+            "adapter_checkpoint_contains_rival_model": "model" in payload,
+            "adapter_optimizer_is_fresh": payload["optimizer_provenance"]["fresh_for_adapter"],
+            "human_behavior_cloning_absent": not human["behavior_cloning_performed"],
+            "human_optimizer_steps_zero": human["human_optimizer_steps"] == 0,
+            "v1_evidence_modified": False,
+        }
+    )
+    integrity["valid"] = _integrity_valid(integrity)
+    accepted = bool(
+        evidence["acceptance"]["accepted"]
+        and human["valid"]
+        and all(evidence["corpus_checks"].values())
+        and integrity["valid"]
+        and pad_audit["deterministic_position_to_index_mapping_implemented"]
+        and not pad_audit["bridge_quality_promoted"]
+    )
+    evidence.update(
+        {
+            "generated_utc": datetime.now(UTC).isoformat(),
+            "verdict": "PASS" if accepted else "BLOCKED",
+            "native_boost_pad_audit": pad_audit,
+            "human_audit": human,
+            "integrity": integrity,
+            "post_training_finalization": {
+                "adapter_optimizer_steps": 0,
+                "human_optimizer_steps": 0,
+                "simulator_rollout_repeated": False,
+                "simulator_training_repeated": False,
+                "checkpoint_sha256_before_after": [
+                    checkpoint_sha_before,
+                    file_sha256(checkpoint_path),
+                ],
+                "reason": "apply required deterministic native-pad evidence overlay and "
+                "correct boolean evidence aggregation",
+            },
+        }
+    )
+    _write_json(ROOT / RESULT_ROOT / "native_boost_pad_audit.json", pad_audit)
+    _write_json(ROOT / RESULT_ROOT / "human_inference_audit.json", human)
+    _write_json(evidence_path, evidence)
+    manifest_paths = [
+        CHECKPOINT,
+        RESULT_ROOT / "corpus_manifest.json",
+        RESULT_ROOT / "evidence.json",
+        RESULT_ROOT / "frozen_config.json",
+        RESULT_ROOT / "human_inference_audit.json",
+        RESULT_ROOT / "native_boost_pad_audit.json",
+        RESULT_ROOT / "simulator_test_metrics.json",
+        RESULT_ROOT / "training_curve.json",
+    ]
+    _write_json(
+        ROOT / RESULT_ROOT / "artifact_manifest.json",
+        _artifact_manifest(manifest_paths),
+    )
+    print(
+        json.dumps(
+            {
+                "verdict": evidence["verdict"],
+                "checkpoint_sha256": checkpoint_sha_before,
+                "gameplay_kl_before": evidence["acceptance"]["gameplay_actor_kl_before"],
+                "gameplay_kl_after": evidence["acceptance"]["gameplay_actor_kl_after"],
+                "human_frames": human["frame_count"],
+                "source_supported_pad_values": human["source_supported_native_pad_value_count"],
+            },
+            indent=2,
+        )
+    )
+    return evidence
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--finalize-existing", action="store_true")
     parser.add_argument(
         "--human-source-root",
         type=Path,
@@ -1033,7 +1261,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    evidence = run(parse_args())
+    args = parse_args()
+    evidence = finalize_existing(args) if args.finalize_existing else run(args)
     return 0 if evidence["verdict"] == "PASS" else 1
 
 

@@ -14,9 +14,12 @@ from rivalsim.human_demo.observation_adapter_v2 import (
     HumanDemoObservationAdapterV2,
     ObservationAdapterConfig,
     adapter_objective,
+    apply_native_pad_overlay,
+    canonical_pad_index,
     expected_quality,
+    native_pad_overlay,
 )
-from rivalsim.rival2_contracts import OBS_DIM
+from rivalsim.rival2_contracts import OBS_DIM, OBS_FIELD_NAMES, ORANGE_PAD_REMAP
 from rivalsim.rival2_policy import Rival2ActorCritic, Rival2PolicyConfig
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,9 +27,10 @@ FROZEN_CONFIG_SHA256 = "227AFE90C5678E299851C30D14F9CA914C1B05D679BA2D67440248DE
 
 
 def test_observation_adapter_v2_frozen_config_hash() -> None:
-    assert file_sha256(
-        ROOT / "results/rival2/human_demo_observation_adapter_v2/frozen_config.json"
-    ) == FROZEN_CONFIG_SHA256
+    assert (
+        file_sha256(ROOT / "results/rival2/human_demo_observation_adapter_v2/frozen_config.json")
+        == FROZEN_CONFIG_SHA256
+    )
 
 
 def test_full_authoritative_path_is_parameter_independent_exact_bypass() -> None:
@@ -148,3 +152,61 @@ def test_adapter_initialization_and_rebuild_are_deterministic() -> None:
         left.state_dict().values(), right.state_dict().values(), strict=True
     ):
         torch.testing.assert_close(left_value, right_value, atol=0, rtol=0)
+
+
+def _pad_frame(*, team: int, position: tuple[float, float, float]) -> dict[str, object]:
+    return {
+        "cars": [
+            {
+                "team": team,
+                "flags": {"is_local_human": True},
+            }
+        ],
+        "boost_pads": [
+            {
+                "stable_id": "pickup:1234",
+                "position": position,
+                "respawn_delay": 4.0,
+                "cooldown_remaining": 2.0,
+                "cooldown_quality": 1,
+            }
+        ],
+    }
+
+
+def test_native_pad_position_maps_by_geometry_and_preserves_unknown_pads() -> None:
+    field = {name: index for index, name in enumerate(OBS_FIELD_NAMES)}
+    physical, error = canonical_pad_index((0.0, -1024.0, 64.08))
+    assert physical == 17
+    assert error == 0.0
+    overlay = native_pad_overlay(_pad_frame(team=0, position=(0.0, -1024.0, 64.08)))
+
+    assert overlay.mapped_physical_indices == (17,)
+    assert overlay.values[field["boost_pad.17.active"]] == 0.0
+    assert overlay.values[field["boost_pad.17.cooldown"]] == 0.5
+    assert overlay.supported.sum() == 2
+    assert not overlay.supported[field["boost_pad.16.active"]]
+
+
+def test_native_pad_overlay_respects_orange_canonical_remap() -> None:
+    field = {name: index for index, name in enumerate(OBS_FIELD_NAMES)}
+    physical = 17
+    agent_index = ORANGE_PAD_REMAP.index(physical)
+    overlay = native_pad_overlay(_pad_frame(team=1, position=(0.0, -1024.0, 64.08)))
+
+    assert overlay.supported[field[f"boost_pad.{agent_index}.active"]]
+    assert overlay.supported[field[f"boost_pad.{agent_index}.cooldown"]]
+
+
+def test_native_pad_overlay_overrides_only_supported_fields() -> None:
+    source = torch.randn(2, OBS_DIM)
+    values = torch.zeros_like(source)
+    supported = torch.zeros_like(source, dtype=torch.bool)
+    supported[:, 10] = True
+    values[:, 10] = 0.25
+
+    result = apply_native_pad_overlay(source, values, supported)
+
+    torch.testing.assert_close(result[:, 10], torch.full((2,), 0.25), atol=0, rtol=0)
+    torch.testing.assert_close(result[:, :10], source[:, :10], atol=0, rtol=0)
+    torch.testing.assert_close(result[:, 11:], source[:, 11:], atol=0, rtol=0)

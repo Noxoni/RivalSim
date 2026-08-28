@@ -62,14 +62,19 @@ rolls back before failing. Human actions are never inputs or targets.
 
 ## Native boost-pad observability boundary
 
-The committed native schema can represent boost-pad rows, and RivalSim has canonical 34-pad Soccar
-positions. The source recordings, however, contain no populated per-frame boost-pad row. The
-`nexto_1v1` event stream has authoritative pickup callbacks, but their payloads contain only a
-transient runtime pickup pointer: no pad position, canonical index, or contacting car. Thus there is
-no native position to map to canonical geometry. Pointer sorting and nearby-car guesses are
-explicitly forbidden. No existing field quality is promoted, no missing pre-session history is
-fabricated, and pad state remains unavailable for masked imputation. The complete measured audit
-is stored in `native_boost_pad_audit.json`.
+The `nexto_1v1` event stream has authoritative pickup callbacks. The JSON event itself carries a
+transient pointer but no position or canonical index; however, the recorder's event-backed frame
+state retains that same stable pickup identity with its native position, respawn delay, and derived
+cooldown after the pad's first observed pickup. The V2 pipeline maps those XY positions uniquely to
+RivalSim's canonical 34-pad Soccar geometry. It then overlays the supported active/cooldown pair
+after learned imputation, applying the orange-perspective pad remap when required.
+
+The overlay is deliberately conservative. It is classified separately as approximate event-timed
+support because the cooldown is derived from pickup time and respawn delay. The committed 182-field
+input-quality mask remains unchanged and is not promoted. A pad before its first observed pickup,
+and any pad never observed, stays unavailable and retains the adapter's imputation. Pointer sorting,
+nearby-car guesses, and fabricated pre-session history are forbidden. The complete measured mapping,
+coverage, conflicts, and remaining unknown indices are stored in `native_boost_pad_audit.json`.
 
 ## Frozen validation gates
 
@@ -90,6 +95,8 @@ unchanged.
   tests\test_human_demo_bc_observation_bridge.py `
   tests\test_missing_feature_distillation.py
 .\.venv\Scripts\python.exe benchmarks\run_rival2_human_demo_observation_adapter_v2.py
+.\.venv\Scripts\python.exe benchmarks\run_rival2_human_demo_observation_adapter_v2.py `
+  --finalize-existing
 ```
 
 The detailed run evidence, simulator reconstruction/KL metrics, pad audit, human inference audit,

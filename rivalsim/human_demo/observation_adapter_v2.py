@@ -14,6 +14,7 @@ from dataclasses import asdict, dataclass
 from enum import StrEnum
 from typing import Any
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -24,7 +25,8 @@ from rivalsim.human_demo.bc_observation_bridge import (
     degradation_quality_mask,
     hybrid_actor_channel_kl,
 )
-from rivalsim.rival2_contracts import OBS_DIM, OBS_FIELD_NAMES
+from rivalsim.kernels.boost_pad import SOCCAR_PAD_POSITIONS
+from rivalsim.rival2_contracts import OBS_DIM, OBS_FIELD_NAMES, ORANGE_PAD_REMAP
 from rivalsim.rival2_policy import Rival2ActorCritic, Rival2PolicyConfig
 
 OBSERVATION_ADAPTER_VERSION = "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
@@ -109,6 +111,112 @@ def _bounded_zero_one_indices() -> tuple[int, ...]:
 
 
 ZERO_ONE_INDICES = _bounded_zero_one_indices()
+_FIELD_INDEX = {field: index for index, field in enumerate(OBS_FIELD_NAMES)}
+
+
+@dataclass(frozen=True, slots=True)
+class NativePadOverlayV2:
+    """Conservative per-frame pad evidence kept separate from the committed mask."""
+
+    values: np.ndarray
+    supported: np.ndarray
+    support_quality: np.ndarray
+    mapped_physical_indices: tuple[int, ...]
+    maximum_xy_error_uu: float
+
+
+def canonical_pad_index(position: Any, *, maximum_xy_error_uu: float = 1.0) -> tuple[int, float]:
+    """Map a native pad position by canonical physical XY, never pointer order."""
+
+    value = np.asarray(position, dtype=np.float64)
+    if value.shape != (3,) or not np.isfinite(value).all():
+        raise ValueError("native boost-pad position must be a finite xyz vector")
+    delta = SOCCAR_PAD_POSITIONS[:, :2].astype(np.float64) - value[:2]
+    distances = np.linalg.norm(delta, axis=1)
+    order = np.argsort(distances, kind="stable")
+    best = int(order[0])
+    error = float(distances[best])
+    if error > maximum_xy_error_uu:
+        raise ValueError(
+            f"native boost-pad position has no canonical XY match: {position}, error={error}"
+        )
+    if len(order) > 1 and distances[order[1]] <= maximum_xy_error_uu:
+        raise ValueError("native boost-pad position has an ambiguous canonical XY match")
+    return best, error
+
+
+def native_pad_overlay(frame: dict[str, Any]) -> NativePadOverlayV2:
+    """Recover only event-observed pad state; prehistory and unseen pads stay unknown.
+
+    The recorder retains a pad after its first authoritative pickup callback. Its XY
+    position identifies the canonical physical pad. Cooldown is the recorder's
+    event-timed reconstruction, so both active and cooldown support are conservatively
+    labelled approximate in this separate overlay rather than promoted in the committed
+    BC quality mask.
+    """
+
+    humans = [car for car in frame.get("cars", ()) if car.get("flags", {}).get("is_local_human")]
+    if len(humans) != 1:
+        raise ValueError("native pad reconstruction requires one unique local human car")
+    team = int(humans[0].get("team", -1))
+    if team not in (0, 1):
+        raise ValueError("native pad reconstruction requires blue or orange team identity")
+    physical_to_agent = (
+        tuple(range(34))
+        if team == 0
+        else tuple(ORANGE_PAD_REMAP.index(index) for index in range(34))
+    )
+    values = np.zeros(OBS_DIM, dtype=np.float32)
+    supported = np.zeros(OBS_DIM, dtype=np.bool_)
+    support_quality = np.zeros(OBS_DIM, dtype=np.uint8)
+    mapped: list[int] = []
+    maximum_error = 0.0
+    seen: set[int] = set()
+    for row in frame.get("boost_pads", ()):
+        physical, error = canonical_pad_index(row.get("position"))
+        if physical in seen:
+            raise ValueError(f"duplicate native row for canonical boost pad {physical}")
+        seen.add(physical)
+        mapped.append(physical)
+        maximum_error = max(maximum_error, error)
+        agent_pad = physical_to_agent[physical]
+        respawn_delay = float(row.get("respawn_delay", 0.0))
+        cooldown_remaining = float(row.get("cooldown_remaining", 0.0))
+        if not np.isfinite(respawn_delay) or not np.isfinite(cooldown_remaining):
+            raise ValueError("native boost-pad timer is nonfinite")
+        if respawn_delay <= 0.0:
+            # A pad without an observed authoritative respawn delay remains unknown.
+            continue
+        cooldown = np.float32(np.clip(cooldown_remaining / respawn_delay, 0.0, 1.0))
+        active = np.float32(cooldown <= np.float32(1e-6))
+        for suffix, value in (("active", active), ("cooldown", cooldown)):
+            index = _FIELD_INDEX[f"boost_pad.{agent_pad}.{suffix}"]
+            values[index] = value
+            supported[index] = True
+            support_quality[index] = int(FieldQuality.APPROXIMATE)
+    for value in (values, supported, support_quality):
+        value.flags.writeable = False
+    return NativePadOverlayV2(
+        values=values,
+        supported=supported,
+        support_quality=support_quality,
+        mapped_physical_indices=tuple(sorted(mapped)),
+        maximum_xy_error_uu=maximum_error,
+    )
+
+
+def apply_native_pad_overlay(
+    repaired: torch.Tensor,
+    values: torch.Tensor,
+    supported: torch.Tensor,
+) -> torch.Tensor:
+    """Apply source-supported pad values after learned imputation."""
+
+    if repaired.shape != values.shape or repaired.shape != supported.shape:
+        raise ValueError("native pad overlay tensors must match repaired observations")
+    if repaired.device != values.device or repaired.device != supported.device:
+        raise ValueError("native pad overlay tensors must share a device")
+    return torch.where(supported.to(torch.bool), values.to(repaired.dtype), repaired)
 
 
 class HumanDemoObservationAdapterV2(nn.Module):
@@ -357,9 +465,13 @@ __all__ = [
     "AdapterObjective",
     "AdapterProfile",
     "HumanDemoObservationAdapterV2",
+    "NativePadOverlayV2",
     "ObservationAdapterConfig",
     "adapter_objective",
+    "apply_native_pad_overlay",
+    "canonical_pad_index",
     "expected_quality",
     "meaningful_reconstruction_mask",
+    "native_pad_overlay",
     "validate_quality_not_promoted",
 ]
