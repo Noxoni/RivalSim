@@ -191,7 +191,8 @@ def _build_rollout_corpus(
     )
     bootstrap_path = ROOT / config["authority"]["bootstrap_checkpoint"]
     trainer.load_checkpoint(bootstrap_path)
-    trainer.initialize_curriculum_assignments()
+    if bool((trainer.opponent_family < 0).any()):
+        raise RuntimeError("bootstrap did not restore complete curriculum assignments")
     model_before = tensor_tree_sha256(trainer.model.state_dict())
     optimizer_before = tensor_tree_sha256(trainer.optimizer.state_dict())
     iteration_before = trainer.iteration
