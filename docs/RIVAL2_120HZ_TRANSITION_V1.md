@@ -71,7 +71,7 @@ cache reachable from the 120 Hz trainer is explicitly scoped to historical 30 Hz
 ## Clean gameplay reward
 
 Event rewards retain their physical-event magnitude: goal `10`, demolition `0.1`, small pad
-`0.01`, large pad `0.03`, save `0.25`, and unnecessary flip-through contact `-0.01`. Ordinary
+`0.001`, large pad `0.005`, save `0.75`, and unnecessary flip-through contact `-0.01`. Ordinary
 touch remains `0`. Progress retains coefficient `0.5` and is computed from actual one-tick ball
 displacement.
 
