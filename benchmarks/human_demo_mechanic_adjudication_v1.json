@@ -1,0 +1,177 @@
+{
+  "format": "SOURCE_BOUND_MECHANIC_BC_ADJUDICATION_V1",
+  "policy": "Offline source-bound review of the declared mechanic using native 120 Hz state, applied action, and event evidence. Success means high-confidence demonstration suitable for later behavior-cloning curation. Ambiguous and failed attempts remain preserved. This is not a production detector, reward, or training label.",
+  "sessions": {
+    "1ED91132-BEF2-4B18-8872-364E7893B89A": {
+      "label": "wavedash",
+      "source_file_set_sha256": "B2ED6B4F8454B52E2DBEBD355EFC7B09CA4E4B0DC41AA663B85203F6541B336C",
+      "attempt_count": 4,
+      "criterion": "Directional dodge at or immediately before a partial-wheel landing, followed by stable surface contact and positive tangent-speed transfer.",
+      "success_attempts": [1, 2, 3, 4],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "151E5828-251B-420D-8798-EE14B3A204C5": {
+      "label": "zapdash",
+      "source_file_set_sha256": "35A6A86773B3512323858719E32CA29A2590317D9C87EDEF20DF038D57C07FC9",
+      "attempt_count": 7,
+      "criterion": "Jump onset from the required non-flat landing support topology followed by the zapdash landing/dodge sequence and positive tangent-speed transfer.",
+      "success_attempts": [],
+      "ambiguous_attempts": [1, 2, 3, 4, 5, 6, 7],
+      "attempt_notes": {
+        "*": "No attempt has source-exact evidence for the required zapdash support topology. Some contain landing-dash motion, so they are retained as ambiguous rather than promoted to behavior-cloning success."
+      }
+    },
+    "529360F1-9944-42E9-BDB4-9C39C29CD2A3": {
+      "label": "walldash",
+      "source_file_set_sha256": "BF701EC47F3C966415F8755306B4CCF3698CAE98550E89F9AB1169AFD61A6F29",
+      "attempt_count": 5,
+      "criterion": "Directional dodge while supported on a wall-like contact plane, followed by continued wall support and positive wall-tangent speed transfer.",
+      "success_attempts": [1, 2, 3],
+      "ambiguous_attempts": [],
+      "attempt_notes": {
+        "4": "No qualifying wall-supported dodge sequence.",
+        "5": "Wall sequence occurs but loses tangent speed instead of transferring it."
+      }
+    },
+    "8104A81F-9570-4E8D-9EF5-D310FFE78528": {
+      "label": "musty",
+      "source_file_set_sha256": "8FA370D53D3B34B491FE1E757164120B8F5A2951C25AD4BEEADAD9BB5E4870EE",
+      "attempt_count": 11,
+      "criterion": "Controlled ball setup, backward dodge, dodge-aged contact, positive rotational scoop contribution and sweep closure, and meaningful ball momentum transfer.",
+      "success_attempts": [1, 2, 10],
+      "ambiguous_attempts": [3, 11],
+      "attempt_notes": {
+        "3": "Near-boundary rotational scoop contribution; preserve for later manual/video-correlated review.",
+        "11": "Strong ball velocity change but insufficient source-exact rotational share and scoop closure for high-confidence promotion."
+      }
+    },
+    "E9068B84-AABB-4EFE-B8F6-F028419DE642": {
+      "label": "breezi",
+      "source_file_set_sha256": "F1C18F0EB29E80AD41ACA9FB791D35E21EED6C709350993799239FDA0D1C045D",
+      "attempt_count": 9,
+      "criterion": "Continuous controlled roll/yaw setup into a terminal Musty-like backward-dodge scoop with positive rotational contribution and meaningful ball momentum transfer.",
+      "success_attempts": [1, 4, 7],
+      "ambiguous_attempts": [6, 9],
+      "attempt_notes": {
+        "6": "Continuous setup is present, but the terminal contacts split momentum and miss one terminal scoop boundary.",
+        "9": "Continuous setup is present, but the terminal contacts split momentum and miss one terminal scoop boundary."
+      }
+    },
+    "24A888CE-9F8A-4FBB-8FC9-F26730314ACF": {
+      "label": "groundtoairdribble",
+      "source_file_set_sha256": "243C94216A923A5EE271AD7908E0D2D7CB953A4A9BBBBDE3314689FAA552FB62",
+      "attempt_count": 46,
+      "criterion": "A grounded human contact produces at least +100 uu/s vertical ball-velocity change, followed in the same reset-bounded attempt by a distinct airborne human touch with zero world-contact wheels.",
+      "success_attempts": [1, 2, 5, 6, 7, 8, 10, 11, 13, 14, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 39, 40, 41, 42, 43, 44, 46],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3": {
+      "label": "powerflick",
+      "source_file_set_sha256": "2BEBC58B9D7354FA8019DDF77C3C5374000EFC8B502B1C140CA5B5CA514D7F0A",
+      "attempt_count": 9,
+      "criterion": "Controlled pre-dodge possession, backward or back-diagonal dodge release, dodge-proximate human contact, and meaningful ball momentum transfer.",
+      "success_attempts": [1, 3, 5, 7, 8],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "B6B93AB6-A20C-4AF6-8BAD-6E17624BDFB9": {
+      "label": "forward45fastflick",
+      "source_file_set_sha256": "7588735F6070681D080426CD96E7040A8A68AC33DA71F94814F03368746F15FC",
+      "attempt_count": 1,
+      "criterion": "Controlled ball setup followed by a prompt forward-diagonal dodge contact, off-axis orientation change, and meaningful ball momentum transfer.",
+      "success_attempts": [1],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "ED4D364B-DA86-483C-A668-4FAC04887F3A": {
+      "label": "forward45highflick",
+      "source_file_set_sha256": "3F4A94516475951C0BD5C10440627FD095F2FDD9681634CF2A8E006FDD7F573C",
+      "attempt_count": 3,
+      "criterion": "Controlled ball setup followed by a forward-diagonal dodge contact, off-axis orientation change, and strong upward ball outcome.",
+      "success_attempts": [2, 3],
+      "ambiguous_attempts": [],
+      "attempt_notes": {
+        "1": "No source-exact dodge-driven terminal contact."
+      }
+    },
+    "F4B86029-AB4E-4725-AFF8-590C71F722D0": {
+      "label": "forward45delayed",
+      "source_file_set_sha256": "6F3C52AE3781D3DFF1BECC91F34B6B085ACF58E26EE154EA05ED9F8464376CC8",
+      "attempt_count": 1,
+      "criterion": "Delayed controlled setup followed by a forward-diagonal dodge contact, off-axis orientation change, and meaningful upward ball outcome.",
+      "success_attempts": [1],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE": {
+      "label": "powerflickdelayed",
+      "source_file_set_sha256": "084850CC9F5610DA064C877939B0C7F9D1F0BC72BE533BA843CA079E08B94C8F",
+      "attempt_count": 3,
+      "criterion": "Delayed controlled setup followed by backward or back-diagonal dodge contact and strong ball momentum transfer.",
+      "success_attempts": [1, 2, 3],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "A3B739EF-71DD-4825-AB72-17662B81D173": {
+      "label": "180flick",
+      "source_file_set_sha256": "2B46DE280252A96B3E90324DE8D0BA89B8020134FFE7E96A074F0998DE8247B9",
+      "attempt_count": 1,
+      "criterion": "Controlled setup, approximately 180-degree yaw reorientation, backward-dodge contact, and meaningful ball momentum transfer.",
+      "success_attempts": [1],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "B919DC95-DDD0-4C92-A908-F4C9C9D93C93": {
+      "label": "flipreset",
+      "source_file_set_sha256": "901352B92D9E0212CCC5CAFAFDA1DA94FC8E0DFFD90EB886496EA851A7CE3CC1",
+      "attempt_count": 7,
+      "criterion": "Airborne multi-wheel ball-region contact with zero world wheel contacts and a source-exact has-flip false-to-true resource transition, followed by separation.",
+      "success_attempts": [2, 3, 4, 5, 7],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "3B97377E-EFFD-43C5-B8D3-E59BE304D9CC": {
+      "label": "aerialdribble",
+      "source_file_set_sha256": "E5D099F6A3C6A69687A2839823466399B8623BF8574F72BB9C605B8475912BB3",
+      "attempt_count": 23,
+      "criterion": "At least two distinct human ball-touch episodes while the local car is airborne with zero world-contact wheels in one reset-bounded attempt.",
+      "success_attempts": [1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 23],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "5D36C080-1C98-4191-AED8-DD5B7C37F5BB": {
+      "label": "ceilingpinch",
+      "source_file_set_sha256": "0DF209A101E1334928070CE7493957F55E7985B02C75D6778A7914A0139492E3",
+      "attempt_count": 35,
+      "criterion": "Human ball contact within 40 uu of the Soccar ceiling support plane and at least 506.5468 uu/s exact 12-tick ball-velocity change.",
+      "success_attempts": [1, 2, 3, 7, 12, 21, 22, 23, 25, 28, 31, 33, 35],
+      "ambiguous_attempts": [20],
+      "attempt_notes": {
+        "20": "Ceiling geometry is present, but measured 12-tick velocity transfer is below the high-confidence boundary."
+      }
+    },
+    "513F33EB-27E7-430D-A3DD-035DA8912B2F": {
+      "label": "wallpinch",
+      "source_file_set_sha256": "3DF186F067C55D87216772BD7588E6942567402F984C2B8BE747C111F7D62991",
+      "attempt_count": 6,
+      "criterion": "Human ball contact within 40 uu of a Soccar side/back wall support plane and at least 506.5468 uu/s exact 12-tick ball-velocity change.",
+      "success_attempts": [1, 2, 3, 4, 5, 6],
+      "ambiguous_attempts": [],
+      "attempt_notes": {}
+    },
+    "3B0EDCE9-E093-44EC-8D08-A378873600C0": {
+      "label": "groundpinch",
+      "source_file_set_sha256": "1FBFD7DCF504901B6DF4535508180AE020D374F852D02BDD23D04FE130232E73",
+      "attempt_count": 24,
+      "criterion": "Human ball contact within 40 uu of the Soccar ground support plane and at least 506.5468 uu/s exact 12-tick ball-velocity change.",
+      "success_attempts": [3, 7, 9, 12, 15, 17, 24],
+      "ambiguous_attempts": [5, 20],
+      "attempt_notes": {
+        "5": "Strong transfer but closest measured ground gap is approximately 40.9 uu, just outside the high-confidence boundary.",
+        "20": "Strong transfer but closest measured ground gap is approximately 65 uu, so pinch geometry is not source-exact enough for promotion."
+      }
+    }
+  }
+}

@@ -5,7 +5,8 @@
     "all_attempts_preserved": true,
     "behavior_cloning_performed": false,
     "mechanic_rewards_assigned": false,
-    "new_mechanic_detector_defined": false,
+    "production_mechanic_detector_defined": false,
+    "source_bound_behavior_cloning_candidate_selection_performed": false,
     "training_performed": false
   },
   "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
@@ -16,19 +17,18 @@
   "declared_mechanic_label": "",
   "declared_opponent_label": "nexto_1v1",
   "declared_session_type": "match",
-  "event_count": 1968,
+  "event_count": 1967,
   "event_counts": {
     "ball_touch": 968,
     "boost_pad_pickup": 348,
     "duplicate_hook_callback_suppressed": 1,
     "goal": 19,
-    "identity_failure": 1,
     "jump_onset": 553,
     "kickoff_or_round_reset": 20,
     "local_car_rebind": 19,
     "respawn": 39
   },
-  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V2",
   "frame_count": 58306,
   "gameplay_summary": {
     "attempt_segmentation_applied": false,
@@ -62,7 +62,6 @@
       "boost_pad_pickup": 348,
       "duplicate_hook_callback_suppressed": 1,
       "goal": 19,
-      "identity_failure": 1,
       "jump_onset": 553,
       "kickoff_or_round_reset": 20,
       "local_car_rebind": 19,
@@ -97,7 +96,6 @@
       "total_game_time_played": 0.0
     }
   },
-  "ingestion_eligible_under_current_validator": false,
   "local_player": {
     "name": "Noxoni",
     "player_id": 257,
@@ -107,10 +105,271 @@
   "map": "Stadium_P",
   "marker_count": 0,
   "markers": [],
+  "mechanic_assessment_summary": null,
   "outcome_grouping": null,
+  "paired_stream_assessment": {
+    "interpretation": "Global engine physics-frame identifiers may jump across native lifecycle resets. No missing action tick is synthesized. Each such jump is a hard segment boundary.",
+    "lifecycle_explained_global_frame_id_gap_count": 2547,
+    "lifecycle_gap_episode_count": 19,
+    "lifecycle_gaps": [
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 226,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 1755,
+        "resumed_physics_frame": 1982,
+        "segmentation_boundary_index": 869
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 105,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 3325,
+        "resumed_physics_frame": 3431,
+        "segmentation_boundary_index": 2213
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 12,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 5685,
+        "resumed_physics_frame": 5698,
+        "segmentation_boundary_index": 4468
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 45,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 8998,
+        "resumed_physics_frame": 9044,
+        "segmentation_boundary_index": 7769
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 43,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 11152,
+        "resumed_physics_frame": 11196,
+        "segmentation_boundary_index": 9878
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 14,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 14110,
+        "resumed_physics_frame": 14125,
+        "segmentation_boundary_index": 12793
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 30,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 16007,
+        "resumed_physics_frame": 16038,
+        "segmentation_boundary_index": 14676
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 84,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 19455,
+        "resumed_physics_frame": 19540,
+        "segmentation_boundary_index": 18094
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 30,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 24531,
+        "resumed_physics_frame": 24562,
+        "segmentation_boundary_index": 23086
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 277,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 26248,
+        "resumed_physics_frame": 26526,
+        "segmentation_boundary_index": 24773
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 52,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 28989,
+        "resumed_physics_frame": 29042,
+        "segmentation_boundary_index": 27237
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 700,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 33422,
+        "resumed_physics_frame": 34123,
+        "segmentation_boundary_index": 31618
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 143,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 39831,
+        "resumed_physics_frame": 39975,
+        "segmentation_boundary_index": 37327
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 28,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 42669,
+        "resumed_physics_frame": 42698,
+        "segmentation_boundary_index": 40022
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 265,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 46670,
+        "resumed_physics_frame": 46936,
+        "segmentation_boundary_index": 43995
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 41,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 48514,
+        "resumed_physics_frame": 48556,
+        "segmentation_boundary_index": 45574
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 31,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 52351,
+        "resumed_physics_frame": 52383,
+        "segmentation_boundary_index": 49370
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 84,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 55040,
+        "resumed_physics_frame": 55125,
+        "segmentation_boundary_index": 52028
+      },
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 337,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 57687,
+        "resumed_physics_frame": 58025,
+        "segmentation_boundary_index": 54591
+      }
+    ],
+    "match_ended_in_paired_frames": true,
+    "paired_event_count": 1967,
+    "paired_marker_count": 0,
+    "paired_state_action_frame_count": 58306,
+    "post_match_identity_shutdown": true,
+    "review_usable": true,
+    "strict_capture_complete": false,
+    "strict_recorder_validation_valid": false,
+    "structural_checks": {
+      "all_global_frame_id_gaps_lifecycle_explained": true,
+      "at_least_one_paired_frame": true,
+      "authoritative_action_values_valid": true,
+      "complete_chunk_prefix": true,
+      "container_valid": true,
+      "manifest_hashes_valid": true,
+      "recorder_queue_drops_zero": true,
+      "recorder_sequence_contiguous": true,
+      "unique_human_car_on_every_frame": true
+    },
+    "unexplained_global_frame_id_gap_count": 0,
+    "unpaired_event_count": 1,
+    "unpaired_marker_count": 0,
+    "unpaired_tail_policy": "Events and markers outside the first-to-last captured action frame are retained as metadata but excluded from attempt anchors, boundaries, and paired telemetry.",
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
+  },
   "plugin_build": "1.0.1",
   "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
   "review_scope": "new_demonstration",
+  "review_usable": true,
   "rocket_league_build": "260811.1257.524913",
   "segmentation_audit": null,
   "session_uuid": "CD6E7DB1-2761-4B8B-BD37-F21C7F135722",
@@ -218,6 +477,26 @@
       "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
     }
   ],
+  "strict_recorder_validation_valid": false,
+  "unpaired_tail": {
+    "events": [
+      {
+        "actor_id": "Unknown|0|0",
+        "caller": "0x1a5d0d5b040",
+        "engine_physics_time": 514.5,
+        "game_time_seconds": 515.166,
+        "kind": "identity_failure",
+        "monotonic_ns": 1283083039568600,
+        "physics_frame": 61740,
+        "reason": "GetLocalCar or GetPlayerController returned null",
+        "sequence_boundary": 58306,
+        "unreal_event": "Function TAGame.Car_TA.SetVehicleInput",
+        "utc_ns": 1787946499696266600
+      }
+    ],
+    "excluded_from_segmentation_and_attempt_telemetry": true,
+    "markers": []
+  },
   "validation": {
     "active_capture_duration": 507.1000323295593,
     "active_capture_end": 514.49169921875,

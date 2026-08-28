@@ -6,6 +6,9 @@
     "generic_recovery_observed_count": 5,
     "human_contact_attempt_count": 9,
     "invalid_action_attempt_count": 0,
+    "mechanic_ambiguous_count": 2,
+    "mechanic_failure_count": 4,
+    "mechanic_success_count": 3,
     "missing_tick_attempt_count": 0,
     "noncontiguous_attempt_count": 0
   },
@@ -13,7 +16,8 @@
     "all_attempts_preserved": true,
     "behavior_cloning_performed": false,
     "mechanic_rewards_assigned": false,
-    "new_mechanic_detector_defined": false,
+    "production_mechanic_detector_defined": false,
+    "source_bound_behavior_cloning_candidate_selection_performed": true,
     "training_performed": false
   },
   "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
@@ -24,9 +28,9 @@
   "declared_mechanic_label": "breezi",
   "declared_opponent_label": "",
   "declared_session_type": "freeplay",
-  "event_count": 274,
+  "event_count": 271,
   "event_counts": {
-    "ball_touch": 237,
+    "ball_touch": 234,
     "duplicate_hook_callback_suppressed": 6,
     "goal": 3,
     "jump_onset": 19,
@@ -34,10 +38,9 @@
     "local_car_rebind": 3,
     "respawn": 3
   },
-  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V2",
   "frame_count": 4781,
   "gameplay_summary": null,
-  "ingestion_eligible_under_current_validator": false,
   "local_player": {
     "name": "Noxoni",
     "player_id": 257,
@@ -58,6 +61,51 @@
       "utc_ns": 1787944030233747100
     }
   ],
+  "mechanic_assessment_summary": {
+    "behavior_cloning_candidate_count": 3,
+    "behavior_cloning_candidates": [
+      {
+        "attempt_id": "E9068B84-AABB-4EFE-B8F6-F028419DE642:0001",
+        "attempt_number": 1,
+        "completion_physics_frame": 34891,
+        "end_physics_frame": 34983,
+        "end_sequence": 638,
+        "start_physics_frame": 34670,
+        "start_sequence": 325
+      },
+      {
+        "attempt_id": "E9068B84-AABB-4EFE-B8F6-F028419DE642:0004",
+        "attempt_number": 4,
+        "completion_physics_frame": 36015,
+        "end_physics_frame": 36124,
+        "end_sequence": 1779,
+        "start_physics_frame": 35774,
+        "start_sequence": 1429
+      },
+      {
+        "attempt_id": "E9068B84-AABB-4EFE-B8F6-F028419DE642:0007",
+        "attempt_number": 7,
+        "completion_physics_frame": 37658,
+        "end_physics_frame": 37813,
+        "end_sequence": 3468,
+        "start_physics_frame": 37415,
+        "start_sequence": 3070
+      }
+    ],
+    "counts": {
+      "ambiguous": 2,
+      "failure": 4,
+      "success": 3
+    },
+    "criterion": "Continuous controlled roll/yaw setup into a terminal Musty-like backward-dodge scoop with positive rotational contribution and meaningful ball momentum transfer.",
+    "source_binding": {
+      "adjudication_file": "G:\\dev\\RivalSim\\benchmarks\\human_demo_mechanic_adjudication_v1.json",
+      "adjudication_file_sha256": "56296E161A12AB2F9A4D7B4EF2A187D0A4945CF893ED0D70FF07C99A83207622",
+      "session_uuid": "E9068B84-AABB-4EFE-B8F6-F028419DE642",
+      "source_file_set_sha256": "F1C18F0EB29E80AD41ACA9FB791D35E21EED6C709350993799239FDA0D1C045D"
+    },
+    "version": "SOURCE_BOUND_MECHANIC_BC_ADJUDICATION_V1"
+  },
   "outcome_grouping": {
     "comparison_metric": "primary_contact_ball_delta_velocity_magnitude_12_ticks",
     "comparison_value_count": 9,
@@ -73,9 +121,40 @@
     "within_session_q25": 463.308791051579,
     "within_session_q75": 856.3931725509595
   },
+  "paired_stream_assessment": {
+    "interpretation": "Global engine physics-frame identifiers may jump across native lifecycle resets. No missing action tick is synthesized. Each such jump is a hard segment boundary.",
+    "lifecycle_explained_global_frame_id_gap_count": 0,
+    "lifecycle_gap_episode_count": 0,
+    "lifecycle_gaps": [],
+    "match_ended_in_paired_frames": false,
+    "paired_event_count": 271,
+    "paired_marker_count": 1,
+    "paired_state_action_frame_count": 4781,
+    "post_match_identity_shutdown": false,
+    "review_usable": true,
+    "strict_capture_complete": false,
+    "strict_recorder_validation_valid": false,
+    "structural_checks": {
+      "all_global_frame_id_gaps_lifecycle_explained": true,
+      "at_least_one_paired_frame": true,
+      "authoritative_action_values_valid": true,
+      "complete_chunk_prefix": true,
+      "container_valid": true,
+      "manifest_hashes_valid": true,
+      "recorder_queue_drops_zero": true,
+      "recorder_sequence_contiguous": true,
+      "unique_human_car_on_every_frame": true
+    },
+    "unexplained_global_frame_id_gap_count": 0,
+    "unpaired_event_count": 3,
+    "unpaired_marker_count": 0,
+    "unpaired_tail_policy": "Events and markers outside the first-to-last captured action frame are retained as metadata but excluded from attempt anchors, boundaries, and paired telemetry.",
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
+  },
   "plugin_build": "1.0.1",
   "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
   "review_scope": "new_demonstration",
+  "review_usable": true,
   "rocket_league_build": "260811.1257.524913",
   "segmentation_audit": {
     "anchor_count": 19,
@@ -90,11 +169,11 @@
     "maximum_attempt_ticks": 960,
     "minimum_post_activity_ticks": 24,
     "minimum_recovery_world_contact_wheels": 2,
-    "policy": "Label-agnostic activity segmentation: local-human native jump-onset anchors; physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded recovery separates attempts. No mechanic detector is used.",
+    "policy": "Local-human native jump-onset activity anchors are grouped only within a continuous paired state/action region. Native reset, respawn, local-car rebind, and global physics-frame discontinuities are hard boundaries. Sustained two-wheel grounded recovery separates attempts. The declared mechanic does not change segmentation.",
     "pre_roll_ticks": 60,
     "recovery_run_ticks": 24,
     "unsegmented_policy": "No synthetic attempt is created when no native jump onset exists.",
-    "version": "GENERIC_ACTIVITY_RECOVERY_V1"
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
   },
   "session_uuid": "E9068B84-AABB-4EFE-B8F6-F028419DE642",
   "source_directory": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\E9068B84-AABB-4EFE-B8F6-F028419DE642",
@@ -126,6 +205,85 @@
       "sha256": "B49A762331AA88213BC8B6A3208C59DDBFE9B044390F4B45D5B4E1DED33D0464"
     }
   ],
+  "strict_recorder_validation_valid": false,
+  "unpaired_tail": {
+    "events": [
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1da8f0750c0",
+        "caller": "0x1db0f6f90c0",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 326.742,
+        "game_time_seconds": 327.186,
+        "hit_location": [
+          1766.3,
+          -3652.04,
+          198.222
+        ],
+        "hit_normal": [
+          -0.704579,
+          0.679489,
+          -0.204603
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280615326400100,
+        "physics_frame": 39209,
+        "sequence_boundary": 4781,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944031983098100
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1da8f0750c0",
+        "caller": "0x1db0f6f90c0",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 326.75,
+        "game_time_seconds": 327.195,
+        "hit_location": [
+          1775.64,
+          -3653.05,
+          195.782
+        ],
+        "hit_normal": [
+          -0.703682,
+          0.680095,
+          -0.205675
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280615335110800,
+        "physics_frame": 39210,
+        "sequence_boundary": 4781,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944031991808600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1da8f0750c0",
+        "caller": "0x1db0f6f90c0",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 326.758,
+        "game_time_seconds": 327.203,
+        "hit_location": [
+          1784.54,
+          -3654.69,
+          194.043
+        ],
+        "hit_normal": [
+          -0.708321,
+          0.676764,
+          -0.200677
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280615343069900,
+        "physics_frame": 39211,
+        "sequence_boundary": 4781,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944031999767700
+      }
+    ],
+    "excluded_from_segmentation_and_attempt_telemetry": true,
+    "markers": []
+  },
   "validation": {
     "active_capture_duration": 39.833343505859375,
     "active_capture_end": 326.04168701171875,

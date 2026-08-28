@@ -6,6 +6,9 @@
     "generic_recovery_observed_count": 3,
     "human_contact_attempt_count": 3,
     "invalid_action_attempt_count": 0,
+    "mechanic_ambiguous_count": 0,
+    "mechanic_failure_count": 0,
+    "mechanic_success_count": 3,
     "missing_tick_attempt_count": 0,
     "noncontiguous_attempt_count": 0
   },
@@ -13,7 +16,8 @@
     "all_attempts_preserved": true,
     "behavior_cloning_performed": false,
     "mechanic_rewards_assigned": false,
-    "new_mechanic_detector_defined": false,
+    "production_mechanic_detector_defined": false,
+    "source_bound_behavior_cloning_candidate_selection_performed": true,
     "training_performed": false
   },
   "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
@@ -33,10 +37,9 @@
     "local_car_rebind": 1,
     "respawn": 1
   },
-  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V2",
   "frame_count": 2485,
   "gameplay_summary": null,
-  "ingestion_eligible_under_current_validator": false,
   "local_player": {
     "name": "Noxoni",
     "player_id": 257,
@@ -46,6 +49,49 @@
   "map": "stadium_day_p",
   "marker_count": 0,
   "markers": [],
+  "mechanic_assessment_summary": {
+    "behavior_cloning_candidate_count": 3,
+    "behavior_cloning_candidates": [
+      {
+        "attempt_id": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE:0001",
+        "attempt_number": 1,
+        "completion_physics_frame": 92417,
+        "end_physics_frame": 92672,
+        "end_sequence": 835,
+        "start_physics_frame": 92282,
+        "start_sequence": 445
+      },
+      {
+        "attempt_id": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE:0002",
+        "attempt_number": 2,
+        "completion_physics_frame": 93004,
+        "end_physics_frame": 93211,
+        "end_sequence": 1374,
+        "start_physics_frame": 92877,
+        "start_sequence": 1040
+      },
+      {
+        "attempt_id": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE:0003",
+        "attempt_number": 3,
+        "completion_physics_frame": 93521,
+        "end_physics_frame": 94007,
+        "end_sequence": 2170,
+        "start_physics_frame": 93367,
+        "start_sequence": 1530
+      }
+    ],
+    "counts": {
+      "success": 3
+    },
+    "criterion": "Delayed controlled setup followed by backward or back-diagonal dodge contact and strong ball momentum transfer.",
+    "source_binding": {
+      "adjudication_file": "G:\\dev\\RivalSim\\benchmarks\\human_demo_mechanic_adjudication_v1.json",
+      "adjudication_file_sha256": "56296E161A12AB2F9A4D7B4EF2A187D0A4945CF893ED0D70FF07C99A83207622",
+      "session_uuid": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE",
+      "source_file_set_sha256": "084850CC9F5610DA064C877939B0C7F9D1F0BC72BE533BA843CA079E08B94C8F"
+    },
+    "version": "SOURCE_BOUND_MECHANIC_BC_ADJUDICATION_V1"
+  },
   "outcome_grouping": {
     "comparison_metric": "primary_contact_ball_delta_velocity_magnitude_12_ticks",
     "comparison_value_count": 3,
@@ -61,9 +107,53 @@
     "within_session_q25": 946.5984310090416,
     "within_session_q75": 1189.419257876317
   },
+  "paired_stream_assessment": {
+    "interpretation": "Global engine physics-frame identifiers may jump across native lifecycle resets. No missing action tick is synthesized. Each such jump is a hard segment boundary.",
+    "lifecycle_explained_global_frame_id_gap_count": 184,
+    "lifecycle_gap_episode_count": 1,
+    "lifecycle_gaps": [
+      {
+        "explained_by_lifecycle_transition": true,
+        "global_engine_frame_ids_skipped": 184,
+        "lifecycle_event_kinds": [
+          "kickoff_or_round_reset",
+          "local_car_rebind",
+          "respawn"
+        ],
+        "previous_physics_frame": 94007,
+        "resumed_physics_frame": 94192,
+        "segmentation_boundary_index": 2171
+      }
+    ],
+    "match_ended_in_paired_frames": false,
+    "paired_event_count": 236,
+    "paired_marker_count": 0,
+    "paired_state_action_frame_count": 2485,
+    "post_match_identity_shutdown": false,
+    "review_usable": true,
+    "strict_capture_complete": false,
+    "strict_recorder_validation_valid": false,
+    "structural_checks": {
+      "all_global_frame_id_gaps_lifecycle_explained": true,
+      "at_least_one_paired_frame": true,
+      "authoritative_action_values_valid": true,
+      "complete_chunk_prefix": true,
+      "container_valid": true,
+      "manifest_hashes_valid": true,
+      "recorder_queue_drops_zero": true,
+      "recorder_sequence_contiguous": true,
+      "unique_human_car_on_every_frame": true
+    },
+    "unexplained_global_frame_id_gap_count": 0,
+    "unpaired_event_count": 0,
+    "unpaired_marker_count": 0,
+    "unpaired_tail_policy": "Events and markers outside the first-to-last captured action frame are retained as metadata but excluded from attempt anchors, boundaries, and paired telemetry.",
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
+  },
   "plugin_build": "1.0.1",
   "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
   "review_scope": "new_demonstration",
+  "review_usable": true,
   "rocket_league_build": "260811.1257.524913",
   "segmentation_audit": {
     "anchor_count": 7,
@@ -76,11 +166,11 @@
     "maximum_attempt_ticks": 960,
     "minimum_post_activity_ticks": 24,
     "minimum_recovery_world_contact_wheels": 2,
-    "policy": "Label-agnostic activity segmentation: local-human native jump-onset anchors; physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded recovery separates attempts. No mechanic detector is used.",
+    "policy": "Local-human native jump-onset activity anchors are grouped only within a continuous paired state/action region. Native reset, respawn, local-car rebind, and global physics-frame discontinuities are hard boundaries. Sustained two-wheel grounded recovery separates attempts. The declared mechanic does not change segmentation.",
     "pre_roll_ticks": 60,
     "recovery_run_ticks": 24,
     "unsegmented_policy": "No synthetic attempt is created when no native jump onset exists.",
-    "version": "GENERIC_ACTIVITY_RECOVERY_V1"
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
   },
   "session_uuid": "FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE",
   "source_directory": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\FF4ABCAB-659F-462C-A6B4-3DDA3E4260BE",
@@ -107,6 +197,12 @@
       "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
     }
   ],
+  "strict_recorder_validation_valid": false,
+  "unpaired_tail": {
+    "events": [],
+    "excluded_from_segmentation_and_attempt_telemetry": true,
+    "markers": []
+  },
   "validation": {
     "active_capture_duration": 22.23333740234375,
     "active_capture_end": 787.5416870117188,

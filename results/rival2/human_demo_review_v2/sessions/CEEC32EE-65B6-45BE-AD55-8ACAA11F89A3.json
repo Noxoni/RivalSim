@@ -6,6 +6,9 @@
     "generic_recovery_observed_count": 9,
     "human_contact_attempt_count": 6,
     "invalid_action_attempt_count": 0,
+    "mechanic_ambiguous_count": 0,
+    "mechanic_failure_count": 4,
+    "mechanic_success_count": 5,
     "missing_tick_attempt_count": 0,
     "noncontiguous_attempt_count": 0
   },
@@ -13,7 +16,8 @@
     "all_attempts_preserved": true,
     "behavior_cloning_performed": false,
     "mechanic_rewards_assigned": false,
-    "new_mechanic_detector_defined": false,
+    "production_mechanic_detector_defined": false,
+    "source_bound_behavior_cloning_candidate_selection_performed": true,
     "training_performed": false
   },
   "bakkesmod_sdk_revision": "479e8f571cf554b25f4eeb64d611dec4133edcaf",
@@ -24,9 +28,9 @@
   "declared_mechanic_label": "powerflick",
   "declared_opponent_label": "",
   "declared_session_type": "freeplay",
-  "event_count": 625,
+  "event_count": 562,
   "event_counts": {
-    "ball_touch": 589,
+    "ball_touch": 526,
     "duplicate_hook_callback_suppressed": 6,
     "goal": 4,
     "jump_onset": 17,
@@ -34,10 +38,9 @@
     "local_car_rebind": 3,
     "respawn": 3
   },
-  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V1",
+  "format": "RIVALRL_HUMAN_DEMO_REVIEW_V2",
   "frame_count": 5207,
   "gameplay_summary": null,
-  "ingestion_eligible_under_current_validator": false,
   "local_player": {
     "name": "Noxoni",
     "player_id": 257,
@@ -45,19 +48,70 @@
     "team": 0
   },
   "map": "stadium_day_p",
-  "marker_count": 1,
-  "markers": [
-    {
-      "engine_physics_time": 679.092,
-      "game_time_seconds": 679.405,
-      "kind": "marker",
-      "monotonic_ns": 1280970964042600,
-      "physics_frame": 81491,
-      "sequence_boundary": 5207,
-      "text": "clean_attempt",
-      "utc_ns": 1787944387620740500
-    }
-  ],
+  "marker_count": 0,
+  "markers": [],
+  "mechanic_assessment_summary": {
+    "behavior_cloning_candidate_count": 5,
+    "behavior_cloning_candidates": [
+      {
+        "attempt_id": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3:0001",
+        "attempt_number": 1,
+        "completion_physics_frame": 76693,
+        "end_physics_frame": 76829,
+        "end_sequence": 758,
+        "start_physics_frame": 76577,
+        "start_sequence": 506
+      },
+      {
+        "attempt_id": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3:0003",
+        "attempt_number": 3,
+        "completion_physics_frame": 77604,
+        "end_physics_frame": 77810,
+        "end_sequence": 1739,
+        "start_physics_frame": 77472,
+        "start_sequence": 1401
+      },
+      {
+        "attempt_id": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3:0005",
+        "attempt_number": 5,
+        "completion_physics_frame": 79263,
+        "end_physics_frame": 79409,
+        "end_sequence": 3338,
+        "start_physics_frame": 79148,
+        "start_sequence": 3077
+      },
+      {
+        "attempt_id": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3:0007",
+        "attempt_number": 7,
+        "completion_physics_frame": 80290,
+        "end_physics_frame": 80372,
+        "end_sequence": 4301,
+        "start_physics_frame": 79959,
+        "start_sequence": 3888
+      },
+      {
+        "attempt_id": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3:0008",
+        "attempt_number": 8,
+        "completion_physics_frame": 80724,
+        "end_physics_frame": 80945,
+        "end_sequence": 4874,
+        "start_physics_frame": 80597,
+        "start_sequence": 4526
+      }
+    ],
+    "counts": {
+      "failure": 4,
+      "success": 5
+    },
+    "criterion": "Controlled pre-dodge possession, backward or back-diagonal dodge release, dodge-proximate human contact, and meaningful ball momentum transfer.",
+    "source_binding": {
+      "adjudication_file": "G:\\dev\\RivalSim\\benchmarks\\human_demo_mechanic_adjudication_v1.json",
+      "adjudication_file_sha256": "56296E161A12AB2F9A4D7B4EF2A187D0A4945CF893ED0D70FF07C99A83207622",
+      "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
+      "source_file_set_sha256": "2BEBC58B9D7354FA8019DDF77C3C5374000EFC8B502B1C140CA5B5CA514D7F0A"
+    },
+    "version": "SOURCE_BOUND_MECHANIC_BC_ADJUDICATION_V1"
+  },
   "outcome_grouping": {
     "comparison_metric": "primary_contact_ball_delta_velocity_magnitude_12_ticks",
     "comparison_value_count": 6,
@@ -75,9 +129,40 @@
     "within_session_q25": 990.1319525102816,
     "within_session_q75": 1184.2513315581352
   },
+  "paired_stream_assessment": {
+    "interpretation": "Global engine physics-frame identifiers may jump across native lifecycle resets. No missing action tick is synthesized. Each such jump is a hard segment boundary.",
+    "lifecycle_explained_global_frame_id_gap_count": 0,
+    "lifecycle_gap_episode_count": 0,
+    "lifecycle_gaps": [],
+    "match_ended_in_paired_frames": false,
+    "paired_event_count": 562,
+    "paired_marker_count": 0,
+    "paired_state_action_frame_count": 5207,
+    "post_match_identity_shutdown": false,
+    "review_usable": true,
+    "strict_capture_complete": false,
+    "strict_recorder_validation_valid": false,
+    "structural_checks": {
+      "all_global_frame_id_gaps_lifecycle_explained": true,
+      "at_least_one_paired_frame": true,
+      "authoritative_action_values_valid": true,
+      "complete_chunk_prefix": true,
+      "container_valid": true,
+      "manifest_hashes_valid": true,
+      "recorder_queue_drops_zero": true,
+      "recorder_sequence_contiguous": true,
+      "unique_human_car_on_every_frame": true
+    },
+    "unexplained_global_frame_id_gap_count": 0,
+    "unpaired_event_count": 63,
+    "unpaired_marker_count": 1,
+    "unpaired_tail_policy": "Events and markers outside the first-to-last captured action frame are retained as metadata but excluded from attempt anchors, boundaries, and paired telemetry.",
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
+  },
   "plugin_build": "1.0.1",
   "recorder_git_sha": "e0347d0fd20cfa25ce47610e2b505231aa0e4041",
   "review_scope": "new_demonstration",
+  "review_usable": true,
   "rocket_league_build": "260811.1257.524913",
   "segmentation_audit": {
     "anchor_count": 17,
@@ -92,11 +177,11 @@
     "maximum_attempt_ticks": 960,
     "minimum_post_activity_ticks": 24,
     "minimum_recovery_world_contact_wheels": 2,
-    "policy": "Label-agnostic activity segmentation: local-human native jump-onset anchors; physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded recovery separates attempts. No mechanic detector is used.",
+    "policy": "Local-human native jump-onset activity anchors are grouped only within a continuous paired state/action region. Native reset, respawn, local-car rebind, and global physics-frame discontinuities are hard boundaries. Sustained two-wheel grounded recovery separates attempts. The declared mechanic does not change segmentation.",
     "pre_roll_ticks": 60,
     "recovery_run_ticks": 24,
     "unsegmented_policy": "No synthetic attempt is created when no native jump onset exists.",
-    "version": "GENERIC_ACTIVITY_RECOVERY_V1"
+    "version": "RESET_AWARE_PAIRED_STATE_ACTION_V2"
   },
   "session_uuid": "CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
   "source_directory": "C:\\Users\\patri\\AppData\\Roaming\\bakkesmod\\bakkesmod\\data\\rival2\\human_demos\\CEEC32EE-65B6-45BE-AD55-8ACAA11F89A3",
@@ -128,6 +213,1536 @@
       "sha256": "C214F7F2F168E19612FB41EF9152CA82B41A65B19D7DFB80A49C7780A1A21DC7"
     }
   ],
+  "strict_recorder_validation_valid": false,
+  "unpaired_tail": {
+    "events": [
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 678.108,
+        "game_time_seconds": 678.419,
+        "hit_location": [
+          1125.44,
+          4468.72,
+          56.1581
+        ],
+        "hit_normal": [
+          0.735869,
+          0.562564,
+          -0.376853
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280969977339600,
+        "physics_frame": 81373,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944386634037600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 678.9,
+        "game_time_seconds": 679.21,
+        "hit_location": [
+          1320.12,
+          4047.43,
+          56.4671
+        ],
+        "hit_normal": [
+          -0.00135541,
+          0.0094428,
+          -0.999955
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280970769054000,
+        "physics_frame": 81468,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387425752000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 678.908,
+        "game_time_seconds": 679.218,
+        "hit_location": [
+          1321.05,
+          4040.08,
+          56.0313
+        ],
+        "hit_normal": [
+          -0.00192698,
+          0.0119652,
+          -0.999927
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280970777010200,
+        "physics_frame": 81469,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387433708000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.075,
+        "game_time_seconds": 679.385,
+        "hit_location": [
+          1340.3,
+          3888.97,
+          56.5914
+        ],
+        "hit_normal": [
+          -0.00351418,
+          0.0100486,
+          -0.999943
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280970943826400,
+        "physics_frame": 81489,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387600524500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.083,
+        "game_time_seconds": 679.394,
+        "hit_location": [
+          1341.83,
+          3881.99,
+          56.3963
+        ],
+        "hit_normal": [
+          -0.000417193,
+          0.0133763,
+          -0.99991
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280970952093100,
+        "physics_frame": 81490,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387608790800
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.275,
+        "game_time_seconds": 679.586,
+        "hit_location": [
+          1366.66,
+          3701.37,
+          56.5482
+        ],
+        "hit_normal": [
+          -0.00048233,
+          0.0097844,
+          -0.999952
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971143586700,
+        "physics_frame": 81513,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387800284700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.283,
+        "game_time_seconds": 679.594,
+        "hit_location": [
+          1367.32,
+          3694.26,
+          56.3165
+        ],
+        "hit_normal": [
+          -0.00169796,
+          0.0135675,
+          -0.999907
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971152360800,
+        "physics_frame": 81514,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387809058600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.333,
+        "game_time_seconds": 679.643,
+        "hit_location": [
+          1371.05,
+          3648.09,
+          56.1049
+        ],
+        "hit_normal": [
+          -0.00291948,
+          0.0159938,
+          -0.999868
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971201671300,
+        "physics_frame": 81520,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387858369100
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.342,
+        "game_time_seconds": 679.652,
+        "hit_location": [
+          1371.71,
+          3640.62,
+          56.023
+        ],
+        "hit_normal": [
+          -0.00238451,
+          0.0169777,
+          -0.999853
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971210411700,
+        "physics_frame": 81521,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387867109600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.408,
+        "game_time_seconds": 679.718,
+        "hit_location": [
+          1375.63,
+          3577.71,
+          56.1606
+        ],
+        "hit_normal": [
+          -0.000676842,
+          0.0135327,
+          -0.999908
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971276597800,
+        "physics_frame": 81529,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387933295900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.417,
+        "game_time_seconds": 679.727,
+        "hit_location": [
+          1376.17,
+          3570.1,
+          56.0746
+        ],
+        "hit_normal": [
+          3.84964e-06,
+          0.0143564,
+          -0.999897
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971285368900,
+        "physics_frame": 81530,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944387942066700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.533,
+        "game_time_seconds": 679.844,
+        "hit_location": [
+          1379.36,
+          3460.41,
+          56.2634
+        ],
+        "hit_normal": [
+          -0.00497214,
+          0.0516791,
+          -0.998651
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971402052500,
+        "physics_frame": 81544,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388058750500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.542,
+        "game_time_seconds": 679.853,
+        "hit_location": [
+          1379.72,
+          3453.02,
+          56.1063
+        ],
+        "hit_normal": [
+          -0.00435116,
+          0.0589259,
+          -0.998253
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971410267000,
+        "physics_frame": 81545,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388066964900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.658,
+        "game_time_seconds": 679.968,
+        "hit_location": [
+          1380.67,
+          3348.62,
+          56.2272
+        ],
+        "hit_normal": [
+          0.0014029,
+          0.216064,
+          -0.976378
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971527275800,
+        "physics_frame": 81559,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388183973800
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.667,
+        "game_time_seconds": 679.976,
+        "hit_location": [
+          1380.06,
+          3341.14,
+          56.1281
+        ],
+        "hit_normal": [
+          -0.00249564,
+          0.226282,
+          -0.974059
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971535173300,
+        "physics_frame": 81560,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388191871200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.767,
+        "game_time_seconds": 680.077,
+        "hit_location": [
+          1378.45,
+          3246.83,
+          56.1388
+        ],
+        "hit_normal": [
+          0.0448639,
+          0.349333,
+          -0.935924
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971635024100,
+        "physics_frame": 81572,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388291722000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.775,
+        "game_time_seconds": 680.086,
+        "hit_location": [
+          1377.92,
+          3238.19,
+          55.9931
+        ],
+        "hit_normal": [
+          0.0475382,
+          0.353447,
+          -0.934246
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971643518700,
+        "physics_frame": 81573,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388300217000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.783,
+        "game_time_seconds": 680.095,
+        "hit_location": [
+          1376.44,
+          3219.88,
+          55.8148
+        ],
+        "hit_normal": [
+          0.0523498,
+          0.358651,
+          -0.932003
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971652325600,
+        "physics_frame": 81574,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388309023400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.792,
+        "game_time_seconds": 680.102,
+        "hit_location": [
+          1375.59,
+          3210.83,
+          55.7889
+        ],
+        "hit_normal": [
+          0.0547372,
+          0.36386,
+          -0.929844
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971660072600,
+        "physics_frame": 81575,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388316770200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.85,
+        "game_time_seconds": 680.161,
+        "hit_location": [
+          1368.3,
+          3144.12,
+          55.9464
+        ],
+        "hit_normal": [
+          0.0647258,
+          0.383293,
+          -0.921356
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971718762700,
+        "physics_frame": 81582,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388375460500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.858,
+        "game_time_seconds": 680.169,
+        "hit_location": [
+          1367.31,
+          3134.26,
+          55.8913
+        ],
+        "hit_normal": [
+          0.0666114,
+          0.384349,
+          -0.920781
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971726730200,
+        "physics_frame": 81583,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388383428000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.892,
+        "game_time_seconds": 680.203,
+        "hit_location": [
+          1363.85,
+          3103.94,
+          55.8238
+        ],
+        "hit_normal": [
+          0.0704444,
+          0.386825,
+          -0.919459
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971760454500,
+        "physics_frame": 81587,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388417152700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.925,
+        "game_time_seconds": 680.236,
+        "hit_location": [
+          1358.57,
+          3062.4,
+          55.8431
+        ],
+        "hit_normal": [
+          0.0726096,
+          0.38818,
+          -0.918719
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971793242700,
+        "physics_frame": 81591,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388449940700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 679.992,
+        "game_time_seconds": 680.303,
+        "hit_location": [
+          1346.5,
+          2975.39,
+          55.9225
+        ],
+        "hit_normal": [
+          0.0726528,
+          0.382203,
+          -0.921218
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971859939100,
+        "physics_frame": 81599,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388516636900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680,
+        "game_time_seconds": 680.311,
+        "hit_location": [
+          1344.93,
+          2964.21,
+          55.8853
+        ],
+        "hit_normal": [
+          0.0725957,
+          0.380237,
+          -0.922036
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971868418100,
+        "physics_frame": 81600,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388525116300
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.042,
+        "game_time_seconds": 680.353,
+        "hit_location": [
+          1336.48,
+          2907.06,
+          55.9673
+        ],
+        "hit_normal": [
+          0.0709226,
+          0.371362,
+          -0.925776
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971910366800,
+        "physics_frame": 81605,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388567064800
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.05,
+        "game_time_seconds": 680.361,
+        "hit_location": [
+          1334.79,
+          2895.55,
+          55.9208
+        ],
+        "hit_normal": [
+          0.0705808,
+          0.368912,
+          -0.926781
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971918181700,
+        "physics_frame": 81606,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388574879800
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.1,
+        "game_time_seconds": 680.411,
+        "hit_location": [
+          1323.9,
+          2823.84,
+          55.9909
+        ],
+        "hit_normal": [
+          0.0670693,
+          0.34955,
+          -0.934514
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971968282400,
+        "physics_frame": 81612,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388624980400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.108,
+        "game_time_seconds": 680.42,
+        "hit_location": [
+          1322.07,
+          2811.82,
+          55.9355
+        ],
+        "hit_normal": [
+          0.0664701,
+          0.345798,
+          -0.935952
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280971976871400,
+        "physics_frame": 81613,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388633569300
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.158,
+        "game_time_seconds": 680.47,
+        "hit_location": [
+          1310.54,
+          2737.51,
+          55.998
+        ],
+        "hit_normal": [
+          0.0622623,
+          0.322708,
+          -0.944449
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972026859500,
+        "physics_frame": 81619,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388683557400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.167,
+        "game_time_seconds": 680.479,
+        "hit_location": [
+          1308.62,
+          2724.97,
+          55.9491
+        ],
+        "hit_normal": [
+          0.0614898,
+          0.317663,
+          -0.946208
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972035350200,
+        "physics_frame": 81620,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388692048000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.233,
+        "game_time_seconds": 680.546,
+        "hit_location": [
+          1292.36,
+          2621.97,
+          56.1055
+        ],
+        "hit_normal": [
+          0.0538443,
+          0.279216,
+          -0.958718
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972101835900,
+        "physics_frame": 81628,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388758533900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.242,
+        "game_time_seconds": 680.554,
+        "hit_location": [
+          1290.34,
+          2608.9,
+          56.0317
+        ],
+        "hit_normal": [
+          0.052841,
+          0.27287,
+          -0.960599
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972110338500,
+        "physics_frame": 81629,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388767036500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.35,
+        "game_time_seconds": 680.662,
+        "hit_location": [
+          1260.94,
+          2426.57,
+          56.266
+        ],
+        "hit_normal": [
+          0.0400927,
+          0.248481,
+          -0.967807
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972218397600,
+        "physics_frame": 81642,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388875095500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.358,
+        "game_time_seconds": 680.67,
+        "hit_location": [
+          1258.99,
+          2412.76,
+          56.0689
+        ],
+        "hit_normal": [
+          0.0391642,
+          0.238762,
+          -0.970288
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972226635600,
+        "physics_frame": 81643,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388883333500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.367,
+        "game_time_seconds": 680.678,
+        "hit_location": [
+          1257.05,
+          2399.4,
+          55.9507
+        ],
+        "hit_normal": [
+          0.0386954,
+          0.235822,
+          -0.971026
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972234868700,
+        "physics_frame": 81644,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388891566400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.375,
+        "game_time_seconds": 680.687,
+        "hit_location": [
+          1255.09,
+          2386.06,
+          55.8825
+        ],
+        "hit_normal": [
+          0.0380269,
+          0.233327,
+          -0.971655
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972243390800,
+        "physics_frame": 81645,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388900088500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.425,
+        "game_time_seconds": 680.736,
+        "hit_location": [
+          1245.06,
+          2318.02,
+          55.9378
+        ],
+        "hit_normal": [
+          0.0339917,
+          0.218169,
+          -0.975319
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972293227000,
+        "physics_frame": 81651,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388949924900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.467,
+        "game_time_seconds": 680.779,
+        "hit_location": [
+          1234.87,
+          2247.68,
+          55.9961
+        ],
+        "hit_normal": [
+          0.0285084,
+          0.190642,
+          -0.981246
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972335531900,
+        "physics_frame": 81656,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388992229700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.475,
+        "game_time_seconds": 680.787,
+        "hit_location": [
+          1232.89,
+          2233.54,
+          55.9671
+        ],
+        "hit_normal": [
+          0.0277083,
+          0.184852,
+          -0.982376
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972343288600,
+        "physics_frame": 81657,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944388999986300
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.55,
+        "game_time_seconds": 680.862,
+        "hit_location": [
+          1214.68,
+          2104.19,
+          56.1964
+        ],
+        "hit_normal": [
+          0.0201707,
+          0.140466,
+          -0.98988
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972418784400,
+        "physics_frame": 81666,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389075482300
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.558,
+        "game_time_seconds": 680.871,
+        "hit_location": [
+          1212.69,
+          2089.75,
+          56.1216
+        ],
+        "hit_normal": [
+          0.0194383,
+          0.134707,
+          -0.990695
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972427308200,
+        "physics_frame": 81667,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389084005900
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.617,
+        "game_time_seconds": 680.929,
+        "hit_location": [
+          1198.72,
+          1988.91,
+          56.1594
+        ],
+        "hit_normal": [
+          0.0165074,
+          0.11497,
+          -0.993232
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972485462300,
+        "physics_frame": 81674,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389142160400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.625,
+        "game_time_seconds": 680.937,
+        "hit_location": [
+          1196.74,
+          1974.46,
+          56.0812
+        ],
+        "hit_normal": [
+          0.0160138,
+          0.110969,
+          -0.993695
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972493648600,
+        "physics_frame": 81675,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389150346400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.633,
+        "game_time_seconds": 680.946,
+        "hit_location": [
+          1194.76,
+          1960.02,
+          56.0351
+        ],
+        "hit_normal": [
+          0.0157177,
+          0.108639,
+          -0.993957
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972502289300,
+        "physics_frame": 81676,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389158987100
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.642,
+        "game_time_seconds": 680.954,
+        "hit_location": [
+          1192.79,
+          1945.59,
+          56.0195
+        ],
+        "hit_normal": [
+          0.0154134,
+          0.106408,
+          -0.994203
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972510208900,
+        "physics_frame": 81677,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389166906700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.658,
+        "game_time_seconds": 680.971,
+        "hit_location": [
+          1188.83,
+          1916.75,
+          56.0363
+        ],
+        "hit_normal": [
+          0.0150671,
+          0.104145,
+          -0.994448
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972526597900,
+        "physics_frame": 81679,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389183295600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.667,
+        "game_time_seconds": 680.98,
+        "hit_location": [
+          1186.86,
+          1902.31,
+          56.0112
+        ],
+        "hit_normal": [
+          0.0147764,
+          0.102054,
+          -0.994669
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972535499600,
+        "physics_frame": 81680,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389192197400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.675,
+        "game_time_seconds": 680.987,
+        "hit_location": [
+          1184.89,
+          1887.87,
+          56.0016
+        ],
+        "hit_normal": [
+          0.0145515,
+          0.100554,
+          -0.994825
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972543370100,
+        "physics_frame": 81681,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389200067700
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.683,
+        "game_time_seconds": 680.996,
+        "hit_location": [
+          1182.91,
+          1873.42,
+          55.9832
+        ],
+        "hit_normal": [
+          0.0142814,
+          0.0988073,
+          -0.995004
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972552180800,
+        "physics_frame": 81682,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389208878400
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.692,
+        "game_time_seconds": 681.005,
+        "hit_location": [
+          1180.94,
+          1858.99,
+          55.9852
+        ],
+        "hit_normal": [
+          0.0141263,
+          0.097909,
+          -0.995095
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972560418400,
+        "physics_frame": 81683,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389217116000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.7,
+        "game_time_seconds": 681.013,
+        "hit_location": [
+          1178.97,
+          1844.55,
+          55.9745
+        ],
+        "hit_normal": [
+          0.0139221,
+          0.0967083,
+          -0.995215
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972568636500,
+        "physics_frame": 81684,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389225334200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.717,
+        "game_time_seconds": 681.029,
+        "hit_location": [
+          1175.02,
+          1815.68,
+          55.9862
+        ],
+        "hit_normal": [
+          0.0136523,
+          0.0952871,
+          -0.995356
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972584881400,
+        "physics_frame": 81686,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389241579200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.725,
+        "game_time_seconds": 681.038,
+        "hit_location": [
+          1173.04,
+          1801.23,
+          55.9576
+        ],
+        "hit_normal": [
+          0.0134769,
+          0.094473,
+          -0.995436
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972593331900,
+        "physics_frame": 81687,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389250030000
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.733,
+        "game_time_seconds": 681.046,
+        "hit_location": [
+          1171.05,
+          1786.6,
+          55.9476
+        ],
+        "hit_normal": [
+          0.0131754,
+          0.0925867,
+          -0.995618
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972601838400,
+        "physics_frame": 81688,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389258536200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.742,
+        "game_time_seconds": 681.055,
+        "hit_location": [
+          1169.05,
+          1772.03,
+          55.928
+        ],
+        "hit_normal": [
+          0.0129237,
+          0.0911805,
+          -0.995751
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972610157900,
+        "physics_frame": 81689,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389266855600
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.75,
+        "game_time_seconds": 681.064,
+        "hit_location": [
+          1167.07,
+          1757.47,
+          55.9366
+        ],
+        "hit_normal": [
+          0.012799,
+          0.0906023,
+          -0.995805
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972618894600,
+        "physics_frame": 81690,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389275592300
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.758,
+        "game_time_seconds": 681.072,
+        "hit_location": [
+          1165.09,
+          1742.9,
+          55.9314
+        ],
+        "hit_normal": [
+          0.0126288,
+          0.0897441,
+          -0.995885
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972627188400,
+        "physics_frame": 81691,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389283886100
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.767,
+        "game_time_seconds": 681.08,
+        "hit_location": [
+          1163,
+          1727.67,
+          55.9519
+        ],
+        "hit_normal": [
+          0.011852,
+          0.084524,
+          -0.996351
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972635557100,
+        "physics_frame": 81692,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389292254800
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.775,
+        "game_time_seconds": 681.088,
+        "hit_location": [
+          1160.98,
+          1712.84,
+          55.964
+        ],
+        "hit_normal": [
+          0.0115232,
+          0.0823801,
+          -0.996534
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972643192600,
+        "physics_frame": 81693,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389299890200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.8,
+        "game_time_seconds": 681.114,
+        "hit_location": [
+          1154.86,
+          1667.72,
+          56.0588
+        ],
+        "hit_normal": [
+          0.0102083,
+          0.0731326,
+          -0.99727
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972668793800,
+        "physics_frame": 81696,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389325491500
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.808,
+        "game_time_seconds": 681.122,
+        "hit_location": [
+          1152.82,
+          1652.62,
+          56.056
+        ],
+        "hit_normal": [
+          0.00972506,
+          0.0697245,
+          -0.997519
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972676940600,
+        "physics_frame": 81697,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389333638200
+      },
+      {
+        "actor_id": "Steam|76561199043547232|0",
+        "ball_address": "0x1db0f5bb040",
+        "caller": "0x1db059e0100",
+        "contacting_car_id": "Steam|76561199043547232|0",
+        "engine_physics_time": 680.85,
+        "game_time_seconds": 681.164,
+        "hit_location": [
+          1142.47,
+          1575.98,
+          56.1659
+        ],
+        "hit_normal": [
+          0.00703745,
+          0.0504272,
+          -0.998703
+        ],
+        "kind": "ball_touch",
+        "monotonic_ns": 1280972718654800,
+        "physics_frame": 81702,
+        "sequence_boundary": 5207,
+        "unreal_event": "Function TAGame.Car_TA.OnHitBall",
+        "utc_ns": 1787944389375352600
+      }
+    ],
+    "excluded_from_segmentation_and_attempt_telemetry": true,
+    "markers": [
+      {
+        "engine_physics_time": 679.092,
+        "game_time_seconds": 679.405,
+        "kind": "marker",
+        "monotonic_ns": 1280970964042600,
+        "physics_frame": 81491,
+        "sequence_boundary": 5207,
+        "text": "clean_attempt",
+        "utc_ns": 1787944387620740500
+      }
+    ]
+  },
   "validation": {
     "active_capture_duration": 43.38330078125,
     "active_capture_end": 677.308349609375,

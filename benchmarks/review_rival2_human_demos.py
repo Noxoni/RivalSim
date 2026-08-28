@@ -1,14 +1,14 @@
-"""Review native Rival 2.0 human demonstrations without labeling mechanics.
+"""Review native Rival 2.0 human demonstrations for later behavior cloning.
 
-This tool is intentionally an evidence/indexing pass, not a mechanic detector.  It:
+The review keeps the recorder's strict completeness diagnostics, but separately decides
+whether the paired state/action stream is usable.  Native reset, respawn, and local-car
+rebind discontinuities are segmentation boundaries rather than invented missing samples;
+events after the final captured action are unpaired tail metadata and are excluded.
 
-* validates every native recorder session and binds the review to source hashes;
-* classifies only the user-declared workflow (gameplay, mechanic practice, smoke);
-* segments freeplay practice with generic 120 Hz activity/recovery evidence; and
-* records descriptive physical outcomes without rewards or success labels.
-
-The relative outcome buckets are triage aids.  They do not assert that the session's
-named mechanic occurred, and they are not suitable as reward or training labels.
+Freeplay attempts are segmented from native 120 Hz evidence.  A source-bound offline
+adjudication then identifies high-confidence successful demonstrations for later behavior
+cloning while preserving failures and ambiguous attempts.  This is not a production
+mechanic detector, reward definition, behavior-cloning run, or training run.
 """
 
 from __future__ import annotations
@@ -29,9 +29,11 @@ from typing import Any
 from rivalsim.human_demo import SessionReader
 from rivalsim.human_demo.format import ACTION_NAMES
 
-FORMAT = "RIVALRL_HUMAN_DEMO_REVIEW_V1"
-SEGMENTATION_VERSION = "GENERIC_ACTIVITY_RECOVERY_V1"
+FORMAT = "RIVALRL_HUMAN_DEMO_REVIEW_V2"
+SEGMENTATION_VERSION = "RESET_AWARE_PAIRED_STATE_ACTION_V2"
 OUTCOME_GROUPING_VERSION = "DESCRIPTIVE_RELATIVE_OUTCOME_V1"
+MECHANIC_ASSESSMENT_VERSION = "SOURCE_BOUND_MECHANIC_BC_ADJUDICATION_V1"
+ADJUDICATION_PATH = Path(__file__).with_name("human_demo_mechanic_adjudication_v1.json")
 PRE_ROLL_TICKS = 60
 RECOVERY_RUN_TICKS = 24
 MIN_RECOVERY_WHEEL_CONTACTS = 2
@@ -40,6 +42,12 @@ MAX_ATTEMPT_TICKS = 960
 TOUCH_OUTCOME_TICKS = 12
 POST_ATTEMPT_EVENT_HORIZON_TICKS = 360
 HARD_BOUNDARY_KINDS = {
+    "kickoff_or_round_reset",
+    "freeplay_reset",
+    "local_car_rebind",
+    "respawn",
+}
+LIFECYCLE_GAP_KINDS = {
     "kickoff_or_round_reset",
     "freeplay_reset",
     "local_car_rebind",
@@ -91,6 +99,14 @@ def _sub(a: Sequence[float], b: Sequence[float]) -> list[float]:
 
 def _dot(a: Sequence[float], b: Sequence[float]) -> float:
     return sum(float(x) * float(y) for x, y in zip(a, b, strict=True))
+
+
+def _cross(a: Sequence[float], b: Sequence[float]) -> list[float]:
+    return [
+        float(a[1]) * float(b[2]) - float(a[2]) * float(b[1]),
+        float(a[2]) * float(b[0]) - float(a[0]) * float(b[2]),
+        float(a[0]) * float(b[1]) - float(a[1]) * float(b[0]),
+    ]
 
 
 def _norm(value: Sequence[float]) -> float:
@@ -182,14 +198,136 @@ def _event_index(event: dict[str, Any], physics_frames: Sequence[int]) -> int | 
     physics = int(event.get("physics_frame", -1))
     if physics < 0 or not physics_frames:
         return None
+    if physics < physics_frames[0] or physics > physics_frames[-1]:
+        return None
     index = bisect.bisect_left(physics_frames, physics)
     if index >= len(physics_frames):
-        return len(physics_frames) - 1
+        return None
     if index > 0 and abs(physics_frames[index - 1] - physics) < abs(
         physics_frames[index] - physics
     ):
         return index - 1
     return index
+
+
+def _paired_records(
+    records: Sequence[dict[str, Any]], physics_frames: Sequence[int]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split records into frame-paired evidence and unpaired pre/post-capture metadata."""
+
+    if not physics_frames:
+        return [], list(records)
+    first, last = physics_frames[0], physics_frames[-1]
+    paired = [
+        record
+        for record in records
+        if first <= int(record.get("physics_frame", -1)) <= last
+    ]
+    unpaired = [record for record in records if record not in paired]
+    return paired, unpaired
+
+
+def _paired_stream_assessment(
+    manifest: dict[str, Any],
+    validation: dict[str, Any],
+    frames: Sequence[dict[str, Any]],
+    events: Sequence[dict[str, Any]],
+    markers: Sequence[dict[str, Any]],
+) -> dict[str, Any]:
+    """Assess usable paired samples without weakening strict recorder diagnostics."""
+
+    physics = [int(frame["physics_frame"]) for frame in frames]
+    paired_events, unpaired_events = _paired_records(events, physics)
+    paired_markers, unpaired_markers = _paired_records(markers, physics)
+    gaps: list[dict[str, Any]] = []
+    unexplained_ticks = 0
+    for index in range(1, len(frames)):
+        previous = int(frames[index - 1]["physics_frame"])
+        current = int(frames[index]["physics_frame"])
+        missing = max(0, current - previous - 1)
+        if not missing:
+            continue
+        lifecycle = sorted(
+            {
+                str(event.get("kind", ""))
+                for event in paired_events
+                if previous < int(event.get("physics_frame", -1)) <= current
+                and str(event.get("kind", "")) in LIFECYCLE_GAP_KINDS
+            }
+        )
+        explained = bool(lifecycle)
+        if not explained:
+            unexplained_ticks += missing
+        gaps.append(
+            {
+                "previous_physics_frame": previous,
+                "resumed_physics_frame": current,
+                "global_engine_frame_ids_skipped": missing,
+                "explained_by_lifecycle_transition": explained,
+                "lifecycle_event_kinds": lifecycle,
+                "segmentation_boundary_index": index,
+            }
+        )
+
+    match_ended_in_paired_frames = any(
+        bool(frame.get("match", {}).get("flags", {}).get("match_ended")) for frame in frames
+    )
+    queue_drops = int(manifest.get("queue_dropped_frame_count", 0) or 0)
+    structural_checks = {
+        "container_valid": bool(validation.get("container_valid")),
+        "manifest_hashes_valid": bool(validation.get("manifest_hashes_valid")),
+        "complete_chunk_prefix": int(validation.get("partial_chunks", 0)) == 0,
+        "recorder_sequence_contiguous": (
+            int(validation.get("missing_sequence_count", 0)) == 0
+            and int(validation.get("sequence_gap_count", 0)) == 0
+            and int(validation.get("duplicate_sequence_count", 0)) == 0
+            and int(validation.get("out_of_order_sequence_count", 0)) == 0
+        ),
+        "authoritative_action_values_valid": int(validation.get("invalid_action_frames", 0)) == 0,
+        "unique_human_car_on_every_frame": (
+            int(validation.get("invalid_human_car_frames", 0)) == 0
+        ),
+        "recorder_queue_drops_zero": queue_drops == 0,
+        "all_global_frame_id_gaps_lifecycle_explained": unexplained_ticks == 0,
+        "at_least_one_paired_frame": bool(frames),
+    }
+    review_usable = all(structural_checks.values())
+    post_match_identity_shutdown = bool(
+        review_usable
+        and match_ended_in_paired_frames
+        and not bool(validation.get("clean_termination"))
+        and str(manifest.get("termination_reason", "")).startswith("local_human_identity_lost")
+    )
+    return {
+        "version": SEGMENTATION_VERSION,
+        "review_usable": review_usable,
+        "paired_state_action_frame_count": len(frames),
+        "strict_recorder_validation_valid": bool(validation.get("valid")),
+        "strict_capture_complete": bool(validation.get("capture_complete")),
+        "structural_checks": structural_checks,
+        "lifecycle_gap_episode_count": len(gaps),
+        "lifecycle_explained_global_frame_id_gap_count": sum(
+            row["global_engine_frame_ids_skipped"]
+            for row in gaps
+            if row["explained_by_lifecycle_transition"]
+        ),
+        "unexplained_global_frame_id_gap_count": unexplained_ticks,
+        "lifecycle_gaps": gaps,
+        "paired_event_count": len(paired_events),
+        "unpaired_event_count": len(unpaired_events),
+        "paired_marker_count": len(paired_markers),
+        "unpaired_marker_count": len(unpaired_markers),
+        "unpaired_tail_policy": (
+            "Events and markers outside the first-to-last captured action frame are retained "
+            "as metadata but excluded from attempt anchors, boundaries, and paired telemetry."
+        ),
+        "match_ended_in_paired_frames": match_ended_in_paired_frames,
+        "post_match_identity_shutdown": post_match_identity_shutdown,
+        "interpretation": (
+            "Global engine physics-frame identifiers may jump across native lifecycle resets. "
+            "No missing action tick is synthesized. Each such jump is a hard segment boundary."
+        ),
+    }
 
 
 def _hard_boundaries(
@@ -310,9 +448,11 @@ def _segment_attempts(
     audit = {
         "version": SEGMENTATION_VERSION,
         "policy": (
-            "Label-agnostic activity segmentation: local-human native jump-onset anchors; "
-            "physics/reset/respawn/rebind hard boundaries; sustained two-wheel grounded "
-            "recovery separates attempts. No mechanic detector is used."
+            "Local-human native jump-onset activity anchors are grouped only within a "
+            "continuous paired state/action region. Native reset, respawn, local-car rebind, "
+            "and global physics-frame discontinuities are hard boundaries. Sustained "
+            "two-wheel grounded recovery separates attempts. The declared mechanic does not "
+            "change segmentation."
         ),
         "pre_roll_ticks": PRE_ROLL_TICKS,
         "recovery_run_ticks": RECOVERY_RUN_TICKS,
@@ -736,6 +876,414 @@ def _attempt_telemetry(
     }
 
 
+def _dodge_onsets(frames: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    onsets: list[dict[str, Any]] = []
+    for index, frame in enumerate(frames):
+        car = _human(frame)
+        previous = _human(frames[index - 1]) if index else None
+        if car is None:
+            continue
+        dodge_active = bool(car.get("dodge_component", {}).get("active"))
+        flip_active = bool(car.get("flip_component", {}).get("active"))
+        double_jumped = bool(car.get("flags", {}).get("double_jumped"))
+        jump_pressed = bool(frame.get("native_input", {}).get("jump"))
+        started = bool(
+            (
+                dodge_active
+                and not bool(previous and previous.get("dodge_component", {}).get("active"))
+            )
+            or (
+                double_jumped
+                and not bool(previous and previous.get("flags", {}).get("double_jumped"))
+            )
+            or (
+                flip_active
+                and not bool(previous and previous.get("flip_component", {}).get("active"))
+            )
+            or (
+                jump_pressed
+                and not bool(
+                    index and frames[index - 1].get("native_input", {}).get("jump")
+                )
+                and int(car.get("num_wheel_world_contacts", 0)) <= 2
+            )
+        )
+        if not started:
+            continue
+        native = frame.get("native_input", {})
+        onsets.append(
+            {
+                "index": index,
+                "physics_frame": int(frame["physics_frame"]),
+                "dodge_direction": _vec(car.get("dodge_component", {}).get("direction")),
+                "native_dodge_forward": _finite(native.get("dodge_forward")),
+                "native_dodge_strafe": _finite(native.get("dodge_strafe")),
+                "world_contact_wheel_count": int(car.get("num_wheel_world_contacts", 0)),
+                "on_ground": bool(car.get("flags", {}).get("on_ground")),
+                "planar_speed_uu_per_s": _planar_speed(car),
+            }
+        )
+    return onsets
+
+
+def _closest_soccar_surface(ball_position: Sequence[float]) -> dict[str, Any]:
+    ball_radius = 92.75
+    x, y, z = (float(value) for value in ball_position)
+    gaps = {
+        "ground": abs(z - ball_radius),
+        "ceiling": abs((2044.0 - z) - ball_radius),
+        "side_wall": abs((4096.0 - abs(x)) - ball_radius),
+        "back_wall": abs((5120.0 - abs(y)) - ball_radius),
+    }
+    surface = min(gaps, key=gaps.__getitem__)
+    return {
+        "surface": surface,
+        "surface_gap_uu": gaps[surface],
+        "all_surface_gaps_uu": gaps,
+        "geometry_assumption": (
+            "Standard Soccar center planes: x=+-4096, y=+-5120, z=0/2044; "
+            "native ball radius 92.75 uu. Curved corners are not approximated."
+        ),
+    }
+
+
+def _mechanic_physical_evidence(
+    attempt: dict[str, Any],
+    span: dict[str, Any],
+    frames: Sequence[dict[str, Any]],
+) -> dict[str, Any]:
+    """Extract auditable native evidence; this does not decide the mechanic verdict."""
+
+    selected = frames[int(span["start_index"]) : int(span["end_index"]) + 1]
+    physics_to_local = {int(frame["physics_frame"]): index for index, frame in enumerate(selected)}
+    onsets = _dodge_onsets(selected)
+    contact_rows: list[dict[str, Any]] = []
+    airborne_touch_frames: list[int] = []
+    grounded_touch_frames: list[int] = []
+    for contact_index, contact in enumerate(attempt["ball_outcome"]["contacts"]):
+        physics = int(contact["contact_physics_frame"])
+        local_index = physics_to_local.get(physics)
+        frame = selected[local_index] if local_index is not None else None
+        car = _human(frame) if frame else None
+        ball = frame.get("ball") if frame else None
+        latest_onset = next(
+            (onset for onset in reversed(onsets) if onset["physics_frame"] <= physics), None
+        )
+        surface = _closest_soccar_surface(ball["position"]) if ball else None
+        rotational_closing = None
+        rotational_share = None
+        yaw_from_dodge = None
+        if car and ball:
+            geometry = contact.get("contact_geometry") or {}
+            hit_location = geometry.get("hit_location") or ball.get("position")
+            lever = _sub(hit_location, car["position"])
+            direction = _unit(_sub(ball["position"], car["position"]))
+            if direction is not None:
+                rotational_velocity = _cross(car.get("angular_velocity", [0.0, 0.0, 0.0]), lever)
+                rotational_closing = _dot(rotational_velocity, direction)
+                linear_closing = _dot(
+                    _sub(
+                        car.get("linear_velocity", [0.0, 0.0, 0.0]),
+                        ball.get("linear_velocity", [0.0, 0.0, 0.0]),
+                    ),
+                    direction,
+                )
+                positive_total = max(0.0, rotational_closing) + max(0.0, linear_closing)
+                rotational_share = (
+                    max(0.0, rotational_closing) / positive_total if positive_total > 1e-9 else 0.0
+                )
+            if latest_onset is not None:
+                onset_frame = selected[int(latest_onset["index"])]
+                onset_car = _human(onset_frame)
+                if onset_car is not None:
+                    onset_yaw = _rotator_degrees(onset_car.get("rotation", [0, 0, 0]))[1]
+                    contact_yaw = _rotator_degrees(car.get("rotation", [0, 0, 0]))[1]
+                    yaw_from_dodge = _wrapped_degrees_delta(onset_yaw, contact_yaw)
+        world_contacts = int(car.get("num_wheel_world_contacts", 0)) if car else None
+        airborne = bool(car and not car.get("flags", {}).get("on_ground") and world_contacts == 0)
+        if airborne:
+            airborne_touch_frames.append(physics)
+        elif car and (car.get("flags", {}).get("on_ground") or (world_contacts or 0) > 0):
+            grounded_touch_frames.append(physics)
+        delta_velocity = contact.get("ball_delta_velocity_12_ticks")
+        row = {
+            "contact_index": contact_index,
+            "physics_frame": physics,
+            "airborne_zero_world_wheels": airborne,
+            "world_contact_wheel_count": world_contacts,
+            "ball_velocity_delta_12_ticks_uu_per_s": delta_velocity,
+            "ball_velocity_delta_magnitude_12_ticks_uu_per_s": contact.get(
+                "ball_delta_velocity_magnitude_12_ticks"
+            ),
+            "ball_vertical_velocity_delta_12_ticks_uu_per_s": (
+                float(delta_velocity[2]) if delta_velocity is not None else None
+            ),
+            "ball_outgoing_vertical_velocity_12_ticks_uu_per_s": (
+                contact.get("ball_after_12_ticks", {}).get("linear_velocity", [None, None, None])[2]
+                if contact.get("ball_after_12_ticks")
+                else None
+            ),
+            "closest_soccar_surface": surface,
+            "latest_dodge_onset": latest_onset,
+            "dodge_age_ticks_at_contact": (
+                physics - int(latest_onset["physics_frame"]) if latest_onset else None
+            ),
+            "yaw_change_from_dodge_to_contact_degrees": yaw_from_dodge,
+            "rotational_closing_contribution_uu_per_s": rotational_closing,
+            "rotational_closing_fraction": rotational_share,
+        }
+        contact_rows.append(row)
+
+    reset_acquisitions: list[dict[str, Any]] = []
+    for index in range(1, len(selected)):
+        previous_car = _human(selected[index - 1])
+        car = _human(selected[index])
+        if previous_car is None or car is None:
+            continue
+        if previous_car.get("flags", {}).get("has_flip") or not car.get("flags", {}).get(
+            "has_flip"
+        ):
+            continue
+        car_to_ball = _sub(selected[index]["ball"]["position"], car["position"])
+        world_contacts = int(car.get("num_wheel_world_contacts", 0))
+        all_contacts = int(car.get("num_wheel_contacts", 0))
+        distance = _norm(car_to_ball)
+        if (
+            world_contacts != 0
+            or all_contacts < 3
+            or distance > 140.0
+            or car.get("flags", {}).get("on_ground")
+        ):
+            continue
+        reset_acquisitions.append(
+            {
+                "physics_frame": int(selected[index]["physics_frame"]),
+                "has_flip_false_to_true": True,
+                "world_contact_wheel_count": world_contacts,
+                "all_wheel_contact_count": all_contacts,
+                "car_ball_center_distance_uu": distance,
+                "airborne": not bool(car.get("flags", {}).get("on_ground")),
+                "jumped_after_transition": bool(car.get("flags", {}).get("jumped")),
+                "double_jumped_after_transition": bool(
+                    car.get("flags", {}).get("double_jumped")
+                ),
+            }
+        )
+
+    dash_outcomes: list[dict[str, Any]] = []
+    for onset in onsets:
+        onset_index = int(onset["index"])
+        landing_index = next(
+            (
+                index
+                for index in range(onset_index, min(len(selected), onset_index + 7))
+                if (_human(selected[index]) or {}).get("num_wheel_world_contacts", 0) >= 1
+            ),
+            None,
+        )
+        if landing_index is None:
+            continue
+        before_car = _human(selected[max(0, onset_index - 1)])
+        after_car = _human(selected[min(len(selected) - 1, landing_index + 6)])
+        if before_car is None or after_car is None:
+            continue
+        landing_car = _human(selected[landing_index])
+        world_normals = [
+            _vec(wheel.get("contact_normal"))
+            for wheel in (landing_car or {}).get("wheels", [])
+            if wheel.get("has_world_contact") and _vec(wheel.get("contact_normal")) is not None
+        ]
+        normal = (
+            _unit([sum(values) for values in zip(*world_normals, strict=True)])
+            if world_normals
+            else None
+        )
+
+        def tangent_speed(
+            car: dict[str, Any], contact_normal: list[float] | None = normal
+        ) -> float | None:
+            if contact_normal is None:
+                return None
+            velocity = _vec(car.get("linear_velocity"))
+            if velocity is None:
+                return None
+            normal_speed = _dot(velocity, contact_normal)
+            tangent = _sub(
+                velocity, [normal_speed * value for value in contact_normal]
+            )
+            return _norm(tangent)
+
+        before_tangent = tangent_speed(before_car)
+        after_tangent = tangent_speed(after_car)
+        dash_outcomes.append(
+            {
+                "dodge_onset_physics_frame": onset["physics_frame"],
+                "landing_physics_frame": int(selected[landing_index]["physics_frame"]),
+                "ticks_to_stable_landing": landing_index - onset_index,
+                "world_contact_wheels_at_onset": onset["world_contact_wheel_count"],
+                "planar_speed_change_through_landing_uu_per_s": (
+                    _planar_speed(after_car) - _planar_speed(before_car)
+                ),
+                "surface_contact_normal": normal,
+                "surface_tangent_speed_change_uu_per_s": (
+                    after_tangent - before_tangent
+                    if before_tangent is not None and after_tangent is not None
+                    else None
+                ),
+            }
+        )
+
+    ground_to_air_pairs: list[dict[str, Any]] = []
+    for index, contact in enumerate(contact_rows):
+        if contact["physics_frame"] not in grounded_touch_frames:
+            continue
+        vertical_delta = contact["ball_vertical_velocity_delta_12_ticks_uu_per_s"]
+        outgoing_vertical = contact["ball_outgoing_vertical_velocity_12_ticks_uu_per_s"]
+        if vertical_delta is None or outgoing_vertical is None:
+            continue
+        if float(vertical_delta) < 100.0 or float(outgoing_vertical) <= 0.0:
+            continue
+        later_air = next(
+            (row for row in contact_rows[index + 1 :] if row["airborne_zero_world_wheels"]),
+            None,
+        )
+        if later_air:
+            ground_to_air_pairs.append(
+                {
+                    "ground_pop_physics_frame": contact["physics_frame"],
+                    "ground_pop_vertical_delta_uu_per_s": vertical_delta,
+                    "first_later_air_touch_physics_frame": later_air["physics_frame"],
+                    "ticks_from_pop_to_air_touch": (
+                        later_air["physics_frame"] - contact["physics_frame"]
+                    ),
+                }
+            )
+
+    return {
+        "version": MECHANIC_ASSESSMENT_VERSION,
+        "native_dodge_onsets": onsets,
+        "dash_landing_outcomes": dash_outcomes,
+        "contacts": contact_rows,
+        "airborne_zero_world_wheel_touch_episode_count": len(airborne_touch_frames),
+        "airborne_zero_world_wheel_touch_physics_frames": airborne_touch_frames,
+        "grounded_touch_physics_frames": grounded_touch_frames,
+        "ground_to_air_pop_followup_pairs": ground_to_air_pairs,
+        "flip_resource_reacquisitions": reset_acquisitions,
+    }
+
+
+def _load_adjudication() -> dict[str, Any]:
+    document = json.loads(ADJUDICATION_PATH.read_text(encoding="utf-8"))
+    if document.get("format") != MECHANIC_ASSESSMENT_VERSION:
+        raise ValueError(f"unexpected mechanic adjudication format: {document.get('format')}")
+    return document
+
+
+def _attach_mechanic_assessments(
+    attempts: list[dict[str, Any]],
+    spans: Sequence[dict[str, Any]],
+    frames: Sequence[dict[str, Any]],
+    *,
+    session_uuid: str,
+    label: str,
+    source_file_set_sha256: str,
+    adjudication: dict[str, Any],
+) -> dict[str, Any]:
+    session = adjudication.get("sessions", {}).get(session_uuid)
+    if session is None:
+        raise ValueError(f"missing source-bound mechanic adjudication: {session_uuid}")
+    if str(session.get("label")) != label:
+        raise ValueError(f"adjudication label mismatch for {session_uuid}")
+    if str(session.get("source_file_set_sha256")) != source_file_set_sha256:
+        raise ValueError(f"adjudication source hash mismatch for {session_uuid}")
+    if int(session.get("attempt_count", -1)) != len(attempts):
+        raise ValueError(f"adjudication attempt-count mismatch for {session_uuid}")
+    successes = {int(value) for value in session.get("success_attempts", [])}
+    ambiguous = {int(value) for value in session.get("ambiguous_attempts", [])}
+    if successes & ambiguous:
+        raise ValueError(f"overlapping success/ambiguous adjudication for {session_uuid}")
+    expected = set(range(1, len(attempts) + 1))
+    if not successes | ambiguous <= expected:
+        raise ValueError(f"out-of-range adjudication attempt for {session_uuid}")
+
+    notes = session.get("attempt_notes", {})
+    counts: Counter[str] = Counter()
+    candidates = []
+    for attempt, span in zip(attempts, spans, strict=True):
+        number = int(attempt["attempt_number"])
+        verdict = (
+            "success"
+            if number in successes
+            else "ambiguous"
+            if number in ambiguous
+            else "failure"
+        )
+        evidence = _mechanic_physical_evidence(attempt, span, frames)
+        completion_physics = None
+        label_key = str(attempt["declared_label"]).lower()
+        if label_key == "flipreset" and evidence["flip_resource_reacquisitions"]:
+            completion_physics = evidence["flip_resource_reacquisitions"][0]["physics_frame"]
+        elif label_key == "groundtoairdribble" and evidence["ground_to_air_pop_followup_pairs"]:
+            completion_physics = evidence["ground_to_air_pop_followup_pairs"][0][
+                "first_later_air_touch_physics_frame"
+            ]
+        elif label_key in {"wavedash", "walldash", "zapdash"} and evidence[
+            "dash_landing_outcomes"
+        ]:
+            completion_physics = evidence["dash_landing_outcomes"][0][
+                "landing_physics_frame"
+            ]
+        elif evidence["contacts"]:
+            completion_physics = max(
+                evidence["contacts"],
+                key=lambda row: float(
+                    row.get("ball_velocity_delta_magnitude_12_ticks_uu_per_s") or -1.0
+                ),
+            )["physics_frame"]
+        note = str(notes.get(str(number), notes.get("*", "")))
+        assessment = {
+            "version": MECHANIC_ASSESSMENT_VERSION,
+            "verdict": verdict,
+            "behavior_cloning_eligible": verdict == "success",
+            "criterion": str(session["criterion"]),
+            "adjudication_note": note,
+            "completion_physics_frame": completion_physics if verdict == "success" else None,
+            "representative_evidence_physics_frame": completion_physics,
+            "evidence": evidence,
+            "policy": (
+                "Source-bound offline adjudication for this exact recording. It selects "
+                "high-confidence examples for later curation; it is not a production detector."
+            ),
+        }
+        attempt["mechanic_assessment"] = assessment
+        counts[verdict] += 1
+        if verdict == "success":
+            candidates.append(
+                {
+                    "attempt_id": attempt["attempt_id"],
+                    "attempt_number": number,
+                    "start_sequence": attempt["segmentation"]["start_sequence"],
+                    "end_sequence": attempt["segmentation"]["end_sequence"],
+                    "start_physics_frame": attempt["segmentation"]["start_physics_frame"],
+                    "end_physics_frame": attempt["segmentation"]["end_physics_frame"],
+                    "completion_physics_frame": completion_physics,
+                }
+            )
+    return {
+        "version": MECHANIC_ASSESSMENT_VERSION,
+        "criterion": str(session["criterion"]),
+        "counts": dict(sorted(counts.items())),
+        "behavior_cloning_candidate_count": len(candidates),
+        "behavior_cloning_candidates": candidates,
+        "source_binding": {
+            "session_uuid": session_uuid,
+            "source_file_set_sha256": source_file_set_sha256,
+            "adjudication_file": str(ADJUDICATION_PATH.resolve()),
+            "adjudication_file_sha256": _sha256(ADJUDICATION_PATH),
+        },
+    }
+
+
 def _percentile(values: Sequence[float], fraction: float) -> float | None:
     if not values:
         return None
@@ -914,6 +1462,10 @@ def _review_session(
     events = list(reader.iter_events())
     markers = list(reader.iter_markers())
     manifest = reader.manifest
+    physics = [int(frame["physics_frame"]) for frame in frames]
+    paired_events, unpaired_events = _paired_records(events, physics)
+    paired_markers, unpaired_markers = _paired_records(markers, physics)
+    paired_stream = _paired_stream_assessment(manifest, validation, frames, events, markers)
     classification, scope = _session_class(manifest)
     human = manifest.get("local_player", {})
     human_id = str(human.get("stable_id", ""))
@@ -923,12 +1475,21 @@ def _review_session(
         or manifest.get("label")
         or "unlabeled"
     )
-    event_counts = Counter(str(event.get("kind", "unknown")) for event in events)
+    event_counts = Counter(str(event.get("kind", "unknown")) for event in paired_events)
+    source_files = _source_files(session_dir)
+    source_digest = (
+        hashlib.sha256(
+            "".join(f"{row['path']}:{row['sha256']}\n" for row in source_files).encode("utf-8")
+        )
+        .hexdigest()
+        .upper()
+    )
     attempts: list[dict[str, Any]] = []
     segmentation_audit = None
     outcome_grouping = None
+    mechanic_assessment_summary = None
     if classification == "freeplay_mechanic_practice":
-        spans, segmentation_audit = _segment_attempts(frames, events, human_id)
+        spans, segmentation_audit = _segment_attempts(frames, paired_events, human_id)
         attempts = [
             _attempt_telemetry(
                 str(manifest.get("session_uuid", session_dir.name)),
@@ -936,15 +1497,24 @@ def _review_session(
                 attempt_number,
                 span,
                 frames,
-                events,
+                paired_events,
                 human_id,
             )
             for attempt_number, span in enumerate(spans, 1)
         ]
+        mechanic_assessment_summary = _attach_mechanic_assessments(
+            attempts,
+            spans,
+            frames,
+            session_uuid=str(manifest.get("session_uuid", session_dir.name)),
+            label=label,
+            source_file_set_sha256=source_digest,
+            adjudication=_load_adjudication(),
+        )
         outcome_grouping = _assign_outcome_groups(attempts)
         _write_jsonl(output_dir / "attempts" / f"{session_dir.name}.jsonl", attempts)
     gameplay_summary = (
-        _match_summary(frames, events, human_id) if classification == "gameplay" else None
+        _match_summary(frames, paired_events, human_id) if classification == "gameplay" else None
     )
     attempt_quality_summary = None
     if attempts:
@@ -972,15 +1542,16 @@ def _review_session(
             "complete_human_car_coverage_attempt_count": sum(
                 bool(attempt["data_quality"]["complete_human_car_coverage"]) for attempt in attempts
             ),
+            "mechanic_success_count": sum(
+                attempt["mechanic_assessment"]["verdict"] == "success" for attempt in attempts
+            ),
+            "mechanic_ambiguous_count": sum(
+                attempt["mechanic_assessment"]["verdict"] == "ambiguous" for attempt in attempts
+            ),
+            "mechanic_failure_count": sum(
+                attempt["mechanic_assessment"]["verdict"] == "failure" for attempt in attempts
+            ),
         }
-    source_files = _source_files(session_dir)
-    source_digest = (
-        hashlib.sha256(
-            "".join(f"{row['path']}:{row['sha256']}\n" for row in source_files).encode("utf-8")
-        )
-        .hexdigest()
-        .upper()
-    )
     report = {
         "format": FORMAT,
         "session_uuid": str(manifest.get("session_uuid", session_dir.name)),
@@ -1002,21 +1573,30 @@ def _review_session(
         "bakkesmod_sdk_revision": manifest.get("bakkesmod_sdk_revision"),
         "local_player": human,
         "validation": validation,
-        "ingestion_eligible_under_current_validator": bool(validation["valid"]),
+        "strict_recorder_validation_valid": bool(validation["valid"]),
+        "paired_stream_assessment": paired_stream,
+        "review_usable": bool(paired_stream["review_usable"]),
         "frame_count": len(frames),
-        "event_count": len(events),
-        "marker_count": len(markers),
+        "event_count": len(paired_events),
+        "marker_count": len(paired_markers),
         "event_counts": dict(sorted(event_counts.items())),
-        "markers": markers,
+        "markers": paired_markers,
+        "unpaired_tail": {
+            "events": unpaired_events,
+            "markers": unpaired_markers,
+            "excluded_from_segmentation_and_attempt_telemetry": True,
+        },
         "segmentation_audit": segmentation_audit,
         "attempt_count": len(attempts),
         "attempt_quality_summary": attempt_quality_summary,
         "outcome_grouping": outcome_grouping,
+        "mechanic_assessment_summary": mechanic_assessment_summary,
         "gameplay_summary": gameplay_summary,
         "authority_boundary": {
             "training_performed": False,
             "behavior_cloning_performed": False,
-            "new_mechanic_detector_defined": False,
+            "production_mechanic_detector_defined": False,
+            "source_bound_behavior_cloning_candidate_selection_performed": bool(attempts),
             "mechanic_rewards_assigned": False,
             "all_attempts_preserved": True,
         },
@@ -1027,23 +1607,23 @@ def _review_session(
 
 def _markdown_report(index: dict[str, Any], groupings: dict[str, Any]) -> str:
     lines = [
-        "# Rival 2.0 human-demo review V1",
+        "# Rival 2.0 human-demo review V2",
         "",
         f"Generated: `{index['generated_utc']}`",
         "",
         (
-            "This is an inventory, integrity review, generic activity segmentation, and "
-            "descriptive physical-outcome pass. It does not train, behavior-clone, detect "
-            "named mechanics, judge mechanic correctness, or assign rewards. Relative "
-            "outcome buckets are review candidates only; successful and failed evidence "
-            "is preserved together."
+            "This is an inventory, paired-stream integrity review, reset-aware segmentation, "
+            "and source-bound mechanic adjudication pass. It identifies high-confidence "
+            "demonstrations for later behavior-cloning curation, but does not behavior-clone, "
+            "train, define a production mechanic detector, or assign rewards. Successful, "
+            "failed, and ambiguous evidence is preserved together."
         ),
         "",
         "## Inventory and validation",
         "",
         (
-            "| Session | Class | Declared label | Frames | Attempts | Ingestion-safe | "
-            "Principal validation issue |"
+            "| Session | Class | Declared label | Frames | Attempts | Review-usable | "
+            "Strict recorder diagnostic |"
         ),
         "|---|---|---:|---:|---:|---:|---|",
     ]
@@ -1052,49 +1632,47 @@ def _markdown_report(index: dict[str, Any], groupings: dict[str, Any]) -> str:
         lines.append(
             f"| `{session['session_uuid']}` | {session['classification']} | "
             f"{session['declared_label']} | {session['frame_count']} | "
-            f"{session['attempt_count']} | {str(session['ingestion_eligible']).lower()} | {issue} |"
+            f"{session['attempt_count']} | {str(session['review_usable']).lower()} | {issue} |"
         )
     lines.extend(
         [
             "",
-            "## Generic segmentation authority",
+            "## Reset-aware segmentation authority",
             "",
             (
                 f"Version: `{SEGMENTATION_VERSION}`. Local-human native jump-onset events "
-                "are activity anchors. Recorder sequence/physics discontinuities and native "
-                "reset, respawn, and local-car rebind events are hard boundaries. A sustained "
+                "are activity anchors. Global physics-frame discontinuities and native reset, "
+                "respawn, and local-car rebind events are hard boundaries. A sustained "
                 f"{RECOVERY_RUN_TICKS}-tick period with at least "
                 f"{MIN_RECOVERY_WHEEL_CONTACTS} world-contact wheels, "
                 "grounded state, and inactive jump/dodge/flip components separates attempts. "
-                "The rule never branches on the declared mechanic label."
+                "The segmentation rule never branches on the declared mechanic label. Events "
+                "after the last paired action frame are excluded rather than clamped onto it."
             ),
             "",
-            "## Descriptive outcome groupings",
-            "",
-            (
-                "Contact-oriented sessions are selected only when at least 25% of generic "
-                "segments contain a native local-human ball-touch episode. Their review "
-                "extremes use exact 12-tick ball velocity change, goal timing, and sustained "
-                "recovery. Other sessions use within-session planar speed gain and sustained "
-                "recovery. Quartiles are computed independently inside each recording. "
-                "These are not training labels or named-mechanic detectors."
-            ),
+            "## Mechanic-specific source-bound adjudication",
             "",
             (
-                "| Label | Attempts | Stronger candidate | Limited/failed candidate | "
-                "No measured human contact | Ambiguous |"
+                "Each exact source recording is reviewed against a declared-mechanic physical "
+                "criterion using native 120 Hz state, effective action, and event evidence. "
+                "Only high-confidence successes are listed as later behavior-cloning "
+                "candidates. This adjudication is not a reusable production detector."
             ),
-            "|---|---:|---:|---:|---:|---:|",
+            "",
+            (
+                "| Label | Attempts | BC candidates | Failed | Ambiguous |"
+            ),
+            "|---|---:|---:|---:|---:|",
         ]
     )
-    for row in groupings["sessions"]:
-        counts = row["counts"]
+    for row in index["sessions"]:
+        if row["classification"] != "freeplay_mechanic_practice":
+            continue
+        counts = row["mechanic_verdict_counts"]
         lines.append(
             f"| {row['declared_label']} | {row['attempt_count']} | "
-            f"{counts.get('stronger_physical_outcome_candidate', 0)} | "
-            f"{counts.get('limited_or_failed_physical_outcome_candidate', 0)} | "
-            f"{counts.get('limited_evidence_no_measured_human_contact', 0)} | "
-            f"{counts.get('ambiguous_middle_physical_outcome', 0)} |"
+            f"{counts.get('success', 0)} | {counts.get('failure', 0)} | "
+            f"{counts.get('ambiguous', 0)} |"
         )
     lines.extend(
         [
@@ -1108,12 +1686,14 @@ def _markdown_report(index: dict[str, Any], groupings: dict[str, Any]) -> str:
             "- `validation.json` preserves every validator verdict and diagnostic.",
             (
                 "- `sessions/*.json` contains session metadata, classification, validation, "
-                "event inventory, segmentation audit, and grouping criteria."
+                "paired-stream verdict, event inventory, segmentation audit, and criteria."
             ),
             (
-                "- `attempts/*.jsonl` preserves each generic attempt with raw timing "
-                "references and physical outcome telemetry."
+                "- `attempts/*.jsonl` preserves every attempt with raw timing references, "
+                "physical outcome telemetry, and its source-bound adjudication."
             ),
+            "- `mechanic_assessments.json` summarizes criteria and all verdict counts.",
+            "- `behavior_cloning_candidates.json` contains only high-confidence source spans.",
             "- `groupings.json` is a compact descriptive grouping index.",
             "- `artifact_manifest.json` hashes the generated review package.",
             "- Re-run `python benchmarks/review_rival2_human_demos.py --verify-only` "
@@ -1122,11 +1702,12 @@ def _markdown_report(index: dict[str, Any], groupings: dict[str, Any]) -> str:
             "## Known evidence boundary",
             "",
             (
-                "A readable source prefix is still reviewed when the current validator "
-                "rejects the complete demonstration. Those sessions remain "
-                "`ingestion_eligible_under_current_validator=false`. Missing physics ticks "
-                "are never synthesized, invalid native action values are not clamped, and "
-                "incomplete termination is not upgraded to success."
+                "The strict recorder completeness verdict is retained unchanged as a diagnostic. "
+                "The review verdict instead asks whether every retained frame has a valid paired "
+                "state/action and whether global frame-ID gaps are explained by native lifecycle "
+                "events. No tick is synthesized. The Nexto match is complete at the captured "
+                "match-ended state even though a later post-match car-spawn callback caused a "
+                "local-human identity shutdown."
             ),
             "",
         ]
@@ -1183,6 +1764,8 @@ def run(
     validation_rows = []
     inventory_rows = []
     grouping_rows = []
+    mechanic_rows = []
+    behavior_cloning_candidates = []
     for report in reports:
         validation = report["validation"]
         row = {
@@ -1193,13 +1776,40 @@ def run(
             "capture_start_utc": report["capture_start_utc"],
             "frame_count": report["frame_count"],
             "attempt_count": report["attempt_count"],
-            "ingestion_eligible": report["ingestion_eligible_under_current_validator"],
+            "review_usable": report["review_usable"],
+            "strict_recorder_validation_valid": report["strict_recorder_validation_valid"],
             "container_valid": validation["container_valid"],
             "clean_termination": validation["clean_termination"],
             "capture_complete": validation["capture_complete"],
             "missing_physics_frame_count": validation["missing_physics_frame_count"],
             "validation_errors": validation["errors"],
             "completeness_errors": validation["completeness_errors"],
+            "lifecycle_gap_episode_count": report["paired_stream_assessment"][
+                "lifecycle_gap_episode_count"
+            ],
+            "lifecycle_explained_global_frame_id_gap_count": report[
+                "paired_stream_assessment"
+            ]["lifecycle_explained_global_frame_id_gap_count"],
+            "unexplained_global_frame_id_gap_count": report["paired_stream_assessment"][
+                "unexplained_global_frame_id_gap_count"
+            ],
+            "unpaired_event_count": report["paired_stream_assessment"][
+                "unpaired_event_count"
+            ],
+            "unpaired_marker_count": report["paired_stream_assessment"][
+                "unpaired_marker_count"
+            ],
+            "match_ended_in_paired_frames": report["paired_stream_assessment"][
+                "match_ended_in_paired_frames"
+            ],
+            "post_match_identity_shutdown": report["paired_stream_assessment"][
+                "post_match_identity_shutdown"
+            ],
+            "mechanic_verdict_counts": (
+                report["mechanic_assessment_summary"]["counts"]
+                if report["mechanic_assessment_summary"]
+                else {}
+            ),
         }
         index_rows.append(row)
         validation_rows.append(
@@ -1226,6 +1836,27 @@ def run(
                     **report["outcome_grouping"],
                 }
             )
+        if report["mechanic_assessment_summary"] is not None:
+            summary = report["mechanic_assessment_summary"]
+            mechanic_rows.append(
+                {
+                    "session_uuid": report["session_uuid"],
+                    "declared_label": report["declared_label"],
+                    "attempt_count": report["attempt_count"],
+                    "criterion": summary["criterion"],
+                    "counts": summary["counts"],
+                    "source_binding": summary["source_binding"],
+                }
+            )
+            behavior_cloning_candidates.extend(
+                {
+                    **candidate,
+                    "session_uuid": report["session_uuid"],
+                    "declared_label": report["declared_label"],
+                    "source_file_set_sha256": report["source_file_set_sha256"],
+                }
+                for candidate in summary["behavior_cloning_candidates"]
+            )
     demo_rows = [row for row in index_rows if row["review_scope"] == "new_demonstration"]
     index = {
         "format": FORMAT,
@@ -1245,14 +1876,27 @@ def run(
             row["classification"] == "freeplay_mechanic_practice" for row in demo_rows
         ),
         "mechanic_attempt_count": sum(row["attempt_count"] for row in demo_rows),
-        "invalid_new_demonstration_session_count": sum(
-            not row["ingestion_eligible"] for row in demo_rows
+        "unusable_new_demonstration_session_count": sum(
+            not row["review_usable"] for row in demo_rows
+        ),
+        "strict_recorder_validation_failure_count": sum(
+            not row["strict_recorder_validation_valid"] for row in demo_rows
+        ),
+        "behavior_cloning_candidate_count": len(behavior_cloning_candidates),
+        "mechanic_verdict_counts": dict(
+            sorted(
+                sum(
+                    (Counter(row["mechanic_verdict_counts"]) for row in demo_rows),
+                    Counter(),
+                ).items()
+            )
         ),
         "sessions": index_rows,
         "authority_boundary": {
             "training_performed": False,
             "behavior_cloning_performed": False,
-            "new_mechanic_detector_defined": False,
+            "production_mechanic_detector_defined": False,
+            "source_bound_behavior_cloning_candidate_selection_performed": True,
             "mechanic_rewards_assigned": False,
             "raw_success_and_failure_evidence_preserved": True,
         },
@@ -1277,6 +1921,33 @@ def run(
         {"format": FORMAT, "sessions": validation_rows},
     )
     _write_json(output_dir / "groupings.json", groupings)
+    _write_json(
+        output_dir / "mechanic_assessments.json",
+        {
+            "format": FORMAT,
+            "version": MECHANIC_ASSESSMENT_VERSION,
+            "adjudication_file": str(ADJUDICATION_PATH.resolve()),
+            "adjudication_file_sha256": _sha256(ADJUDICATION_PATH),
+            "sessions": mechanic_rows,
+            "all_attempts_preserved": True,
+            "production_detector": False,
+        },
+    )
+    _write_json(
+        output_dir / "behavior_cloning_candidates.json",
+        {
+            "format": FORMAT,
+            "version": MECHANIC_ASSESSMENT_VERSION,
+            "candidate_count": len(behavior_cloning_candidates),
+            "candidates": behavior_cloning_candidates,
+            "training_performed": False,
+            "behavior_cloning_performed": False,
+            "use_restriction": (
+                "Candidate source spans only. A later adapter must still define observation, "
+                "action-window, split, and training semantics."
+            ),
+        },
+    )
     (output_dir / "REVIEW.md").write_text(
         _markdown_report(index, groupings), encoding="utf-8", newline="\n"
     )
@@ -1330,6 +2001,19 @@ def verify_review(output_dir: Path) -> dict[str, Any]:
     inventory_by_uuid = {str(row["session_uuid"]): row for row in inventory.get("sessions", [])}
     grouping = json.loads((output_dir / "groupings.json").read_text(encoding="utf-8"))
     grouping_by_uuid = {str(row["session_uuid"]): row for row in grouping.get("sessions", [])}
+    mechanic = json.loads(
+        (output_dir / "mechanic_assessments.json").read_text(encoding="utf-8")
+    )
+    mechanic_by_uuid = {str(row["session_uuid"]): row for row in mechanic.get("sessions", [])}
+    candidates_document = json.loads(
+        (output_dir / "behavior_cloning_candidates.json").read_text(encoding="utf-8")
+    )
+    if mechanic.get("adjudication_file_sha256") != _sha256(ADJUDICATION_PATH):
+        errors.append("mechanic adjudication file hash mismatch")
+    candidate_ids = {
+        str(row["attempt_id"]) for row in candidates_document.get("candidates", [])
+    }
+    observed_candidate_ids: set[str] = set()
     attempt_total = 0
     seen_attempt_ids: set[str] = set()
     for session in index.get("sessions", []):
@@ -1340,7 +2024,10 @@ def verify_review(output_dir: Path) -> dict[str, Any]:
             "all_attempts_preserved": True,
             "behavior_cloning_performed": False,
             "mechanic_rewards_assigned": False,
-            "new_mechanic_detector_defined": False,
+            "production_mechanic_detector_defined": False,
+            "source_bound_behavior_cloning_candidate_selection_performed": bool(
+                session_report["attempt_count"]
+            ),
             "training_performed": False,
         }:
             errors.append(f"authority-boundary mismatch: {session_uuid}")
@@ -1398,6 +2085,26 @@ def verify_review(output_dir: Path) -> dict[str, Any]:
             previous_end = end
             if attempt["outcome_group"] is None:
                 errors.append(f"missing descriptive outcome group: {attempt_id}")
+            assessment = attempt.get("mechanic_assessment")
+            if assessment is None:
+                errors.append(f"missing mechanic assessment: {attempt_id}")
+            elif assessment.get("verdict") not in {"success", "failure", "ambiguous"}:
+                errors.append(f"invalid mechanic verdict: {attempt_id}")
+            elif bool(assessment.get("behavior_cloning_eligible")) != (
+                assessment.get("verdict") == "success"
+            ):
+                errors.append(f"behavior-cloning eligibility mismatch: {attempt_id}")
+            elif assessment.get("behavior_cloning_eligible"):
+                observed_candidate_ids.add(attempt_id)
+                quality = attempt["data_quality"]
+                if (
+                    int(quality["noncontiguous_adjacent_frame_count"]) != 0
+                    or int(quality["invalid_rival_action_frame_count"]) != 0
+                    or not bool(quality["complete_human_car_coverage"])
+                ):
+                    errors.append(
+                        f"behavior-cloning candidate has invalid paired span: {attempt_id}"
+                    )
         attempt_total += len(attempts)
         if expected_attempts:
             grouping_row = grouping_by_uuid.get(session_uuid)
@@ -1405,11 +2112,22 @@ def verify_review(output_dir: Path) -> dict[str, Any]:
                 errors.append(f"outcome grouping missing: {session_uuid}")
             elif sum(int(value) for value in grouping_row["counts"].values()) != len(attempts):
                 errors.append(f"outcome grouping count mismatch: {session_uuid}")
+            mechanic_row = mechanic_by_uuid.get(session_uuid)
+            if mechanic_row is None:
+                errors.append(f"mechanic assessment summary missing: {session_uuid}")
+            elif sum(int(value) for value in mechanic_row["counts"].values()) != len(attempts):
+                errors.append(f"mechanic assessment count mismatch: {session_uuid}")
 
     if attempt_total != int(index["mechanic_attempt_count"]):
         errors.append(
             f"global attempt count mismatch: {attempt_total} != {index['mechanic_attempt_count']}"
         )
+    if observed_candidate_ids != candidate_ids:
+        errors.append("behavior-cloning candidate index does not match successful attempts")
+    if len(candidate_ids) != int(index["behavior_cloning_candidate_count"]):
+        errors.append("behavior-cloning candidate count does not match index")
+    if len(candidate_ids) != int(candidates_document.get("candidate_count", -1)):
+        errors.append("behavior-cloning candidate count does not match candidate document")
     return {
         "format": FORMAT,
         "valid": not errors,
@@ -1432,7 +2150,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("results/rival2/human_demo_review_v1"),
+        default=Path("results/rival2/human_demo_review_v2"),
     )
     parser.add_argument(
         "--session-id",
@@ -1465,7 +2183,11 @@ def main(argv: list[str] | None = None) -> int:
                 "sessions": index["session_count"],
                 "new_demonstrations": index["new_demonstration_session_count"],
                 "mechanic_attempts": index["mechanic_attempt_count"],
-                "invalid_new_demonstrations": index["invalid_new_demonstration_session_count"],
+                "review_usable_new_demonstrations": (
+                    index["new_demonstration_session_count"]
+                    - index["unusable_new_demonstration_session_count"]
+                ),
+                "behavior_cloning_candidates": index["behavior_cloning_candidate_count"],
             },
             sort_keys=True,
         )
