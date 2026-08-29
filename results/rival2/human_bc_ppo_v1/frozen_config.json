@@ -1,0 +1,116 @@
+{
+  "format": "RIVAL2_HUMAN_BC_PPO_CAMPAIGN_CONFIG_V1",
+  "required_parent": "a8d0bfc98077b4c194ad3438640fd79ed2b5b788",
+  "human_bc_parent": {
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V1",
+    "accepted_step": 160,
+    "source_iteration": 479,
+    "source_policy_version": 479
+  },
+  "provenance_bootstrap": {
+    "path": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "historical_optimizer_state": "provenance_only_not_restored",
+    "historical_policy_pool": "preserved"
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "observation_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "action_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "reward": "RIVAL2_REWARD_GAMEPLAY_120_V1",
+    "reward_sha256": "0D4C9A78803BBAF851AB4FDD7D9AC4196AB08E42B51DC0A173A1EAEC066AFAED",
+    "ppo": "RIVAL2_PPO_120HZ_V1",
+    "ppo_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "ppo_config_sha256": "02A4FBC09D79AD3BA677C3D2F942FE4719DA621EE87E4417D28318BFECA87F93"
+  },
+  "runtime": {
+    "worlds": 32768,
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "physics_ticks_per_policy_action": 1,
+    "rollout_horizon": 128
+  },
+  "ppo": {
+    "gamma": 0.9987476493904754,
+    "gae_lambda": 0.9872585449014338,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0.0,
+    "max_gradient_norm": 0.5,
+    "epochs": 2,
+    "minibatch_size": 65536
+  },
+  "opponents": {
+    "current_probability": 0.8,
+    "historical_probability": 0.2,
+    "nexto_probability": 0.0,
+    "wisp_probability": 0.0,
+    "historical_pool_bound": 16,
+    "legacy_policy_hz": 30,
+    "legacy_action_hold_ticks": 4,
+    "new_snapshot_policy_hz": 120,
+    "new_snapshot_action_version": "RIVAL2_ACTION_V2_120HZ"
+  },
+  "fresh_optimizer": {
+    "restore_historical_adam": false,
+    "policy_shared_trunk_learning_rate": 0.0001,
+    "critic_head_learning_rate": 0.0003,
+    "policy_update_local_backoff": [
+      0.0001,
+      0.00005,
+      0.000025
+    ],
+    "reset_policy_learning_rate_each_update": true
+  },
+  "safety": {
+    "soft_minibatch_kl_target": 0.02,
+    "soft_retention_mean_kl_target": 0.02,
+    "hard_minibatch_kl_guard": 0.1,
+    "hard_completed_update_mean_kl_guard": 0.05,
+    "transactional_rollback": true,
+    "finite_model_and_gradient_checks": true,
+    "family_local_advantage_normalization": true,
+    "value_loss_isolated_from_policy_trunk": true,
+    "retention_reference": "human_bc_v1_parent"
+  },
+  "reward_gate": {
+    "unconditional_touch_reward": 0.0,
+    "unnecessary_flip_through_contact_penalty": -0.01,
+    "allowed_exemptions": [
+      "EXEMPT_CONTESTED_50",
+      "EXEMPT_POWER_CONTACT"
+    ],
+    "recognized_mechanic_exemption": false,
+    "controlled_flick_exemption": false,
+    "named_mechanics_reward": 0.0,
+    "named_mechanics_hot_path": false,
+    "generic_jump_penalty": 0.0,
+    "generic_flip_penalty": 0.0
+  },
+  "campaign": {
+    "mode": "bounded_wall_clock",
+    "training_duration_hours": 10.0,
+    "checkpoint_every_accepted_updates": 30,
+    "historical_snapshot_every_accepted_updates": 30,
+    "original_plus_120_boundary_is_not_a_stop": true,
+    "campaign_seed": 2026082907,
+    "curriculum_seed": 2026082908,
+    "retention_rollout_only_before_first_update": true,
+    "large_post_training_evaluation": false,
+    "operational_failure_policy": "investigate_and_resume_within_the_original_wall_clock_deadline",
+    "capability_reward_or_hard_safety_failure_policy": "stop_and_report_without_weakening_the_gate"
+  },
+  "prohibited": [
+    "additional_human_behavior_cloning",
+    "nexto_training_opponents",
+    "wisp_training_opponents",
+    "human_demo_observation_adapter_in_rivalsim_ppo",
+    "named_or_inferred_mechanic_detectors",
+    "named_mechanic_reward_or_exemption",
+    "gameplay_v3_hot_path",
+    "historical_iteration_479_adam_restore"
+  ]
+}

@@ -11,7 +11,11 @@ from typing import Any
 import numpy as np
 import torch
 
-from rivalsim.rival2_contracts import RIVAL2_REWARD_GAMEPLAY_V3_VERSION
+from rivalsim.rival2_contracts import (
+    CAR_LINEAR_SPEED_SCALE,
+    OBS_FIELD_NAMES,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+)
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_mixed_ppo import (
     Rival2MixedPPOSafetyConfig,
@@ -99,6 +103,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         )
         self.historical_policy_evaluation_calls = 0
         self.last_rollout_curriculum_metrics: dict[str, Any] | None = None
+        self.last_rollout_gameplay_metrics: dict[str, Any] | None = None
         self.mixed_ppo_safety: Rival2MixedPPOSafetyConfig | None = None
         self.optimizer_migration_proof: dict[str, Any] | None = None
         self.retention_observations: torch.Tensor | None = None
@@ -362,6 +367,51 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         family_rival_wins = torch.zeros(4, dtype=torch.int64, device=self.device)
         family_opponent_wins = torch.zeros(4, dtype=torch.int64, device=self.device)
         family_trainable_reward = torch.zeros(4, dtype=torch.float64, device=self.device)
+        gameplay_120 = self.env.world.gameplay_120
+        gameplay_counter_names = (
+            "legitimate_touch_total",
+            "flip_touch_total",
+            "bad_flip_total",
+            "contest_exempt_total",
+            "power_exempt_total",
+        )
+        gameplay_counter_before = (
+            {}
+            if gameplay_120 is None
+            else {
+                name: self.env.bridge.views[f"gameplay_120.{name}"].clone()
+                for name in gameplay_counter_names
+            }
+        )
+        component_views = (
+            ("v1_goal_component", "rival2.v1_goal_component"),
+            ("v1_progress_component", "rival2.v1_progress_component"),
+            ("v1_touch_component", "rival2.v1_touch_component"),
+            ("v1_demo_component", "rival2.v1_demo_component"),
+            ("speed_component", "rival2.speed_component"),
+            ("supersonic_component", "rival2.supersonic_component"),
+            ("boost_use_component", "rival2.boost_use_component"),
+            ("boost_pickup_component", "rival2.boost_pickup_component"),
+            ("save_component", "rival2.save_component"),
+            ("strict_double_dash_component", "rival2.strict_double_dash_component"),
+            ("unnecessary_flip_component", "gameplay_120.bad_flip_component"),
+        )
+        component_signed_sum = {
+            name: torch.zeros((), dtype=torch.float64, device=self.device)
+            for name, _view in component_views
+        }
+        component_absolute_sum = {
+            name: torch.zeros((), dtype=torch.float64, device=self.device)
+            for name, _view in component_views
+        }
+        no_touch_truncations = torch.zeros((), dtype=torch.int64, device=self.device)
+        hard_limit_truncations = torch.zeros((), dtype=torch.int64, device=self.device)
+        trainable_action_samples = torch.zeros((), dtype=torch.int64, device=self.device)
+        analog_saturation_count = torch.zeros((), dtype=torch.int64, device=self.device)
+        normalized_speed_sum = torch.zeros((), dtype=torch.float64, device=self.device)
+        normalized_speed_square_sum = torch.zeros((), dtype=torch.float64, device=self.device)
+        velocity_start = OBS_FIELD_NAMES.index("self.linear_velocity.x")
+        no_touch_index = OBS_FIELD_NAMES.index("lifecycle.no_touch_age")
         self.model.eval()
         for _ in range(config.rollout_horizon):
             with torch.no_grad():
@@ -377,6 +427,39 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                     )
                 active_agent_samples += train_mask.sum()
                 transition = self._step_with_frozen_opponents(action)
+                if gameplay_120 is not None:
+                    for name, view in component_views:
+                        component = self.env.bridge.views[view].to(torch.float64)
+                        component_signed_sum[name] += component.sum()
+                        component_absolute_sum[name] += component.abs().sum()
+                    no_touch_terminal = transition.truncated & (
+                        transition.transition_observation[:, 0, no_touch_index]
+                        >= 1.0 - 1.0e-6
+                    )
+                    no_touch_truncations += no_touch_terminal.sum()
+                    hard_limit_truncations += (
+                        transition.truncated & ~no_touch_terminal
+                    ).sum()
+                    selected_action = train_mask.unsqueeze(-1)
+                    trainable_action_samples += train_mask.sum()
+                    analog_saturation_count += (
+                        (transition.emitted_action[..., :5].abs() > 0.95)
+                        & selected_action
+                    ).sum()
+                    normalized_velocity = observation[
+                        ..., velocity_start : velocity_start + 3
+                    ]
+                    normalized_speed = torch.linalg.vector_norm(
+                        normalized_velocity, dim=-1
+                    )
+                    normalized_speed_sum += torch.where(
+                        train_mask, normalized_speed, torch.zeros_like(normalized_speed)
+                    ).sum(dtype=torch.float64)
+                    normalized_speed_square_sum += torch.where(
+                        train_mask,
+                        normalized_speed.square(),
+                        torch.zeros_like(normalized_speed),
+                    ).sum(dtype=torch.float64)
                 active_family = self.opponent_family
                 family_world_decisions += torch.bincount(active_family, minlength=4)
                 family_trainable_samples.scatter_add_(
@@ -454,6 +537,67 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             OPPONENT_NAMES[index]: float(family_trainable_reward[index].item())
             for index in range(4)
         }
+        if gameplay_120 is None:
+            self.last_rollout_gameplay_metrics = None
+        else:
+            counter_deltas = {
+                name: int(
+                    (
+                        self.env.bridge.views[f"gameplay_120.{name}"]
+                        - gameplay_counter_before[name]
+                    )
+                    .sum(dtype=torch.int64)
+                    .item()
+                )
+                for name in gameplay_counter_names
+            }
+            physical_player_minutes = (
+                config.rollout_horizon * self.env.num_envs * 2 / (120.0 * 60.0)
+            )
+            action_count = int(trainable_action_samples.item())
+            speed_mean = float(normalized_speed_sum.item()) / max(action_count, 1)
+            speed_second = float(normalized_speed_square_sum.item()) / max(action_count, 1)
+            self.last_rollout_gameplay_metrics = {
+                "physical_player_minutes": physical_player_minutes,
+                "touches_per_minute": (
+                    counter_deltas["legitimate_touch_total"] / physical_player_minutes
+                ),
+                "flip_active_touches_per_minute": (
+                    counter_deltas["flip_touch_total"] / physical_player_minutes
+                ),
+                "unnecessary_flip_contacts_per_minute": (
+                    counter_deltas["bad_flip_total"] / physical_player_minutes
+                ),
+                "unnecessary_fraction_of_flip_active_contacts": (
+                    counter_deltas["bad_flip_total"]
+                    / max(counter_deltas["flip_touch_total"], 1)
+                ),
+                "physical_contact_counts": counter_deltas,
+                "no_touch_truncations": int(no_touch_truncations.item()),
+                "hard_limit_truncations": int(hard_limit_truncations.item()),
+                "trusted_reward_component_signed_sum": {
+                    name: float(value.item()) for name, value in component_signed_sum.items()
+                },
+                "trusted_reward_component_absolute_sum": {
+                    name: float(value.item()) for name, value in component_absolute_sum.items()
+                },
+                "trainable_action_samples": action_count,
+                "analog_action_saturation_fraction": (
+                    int(analog_saturation_count.item()) / max(action_count * 5, 1)
+                ),
+                "mean_normalized_movement_speed": speed_mean,
+                "std_normalized_movement_speed": max(
+                    speed_second - speed_mean * speed_mean, 0.0
+                )
+                ** 0.5,
+                "mean_movement_speed_uu_per_second": (
+                    speed_mean * CAR_LINEAR_SPEED_SCALE
+                ),
+                "named_mechanics_hot_path_absent": self.env.world.gameplay_v3 is None,
+                "named_mechanics_arrays": gameplay_120.memory_inventory()[
+                    "named_mechanics_arrays"
+                ],
+            }
         return rollout
 
     def enable_safe_mixed_ppo(

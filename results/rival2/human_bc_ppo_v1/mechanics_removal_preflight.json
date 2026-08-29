@@ -1,0 +1,279 @@
+{
+  "bootstrap_provenance": {
+    "bytes": 50047057,
+    "path": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350"
+  },
+  "checks": {
+    "active_action_hash_exact": true,
+    "active_observation_hash_exact": true,
+    "active_ppo_config_exact": true,
+    "active_ppo_contract_exact": true,
+    "active_reward_contract_exact": true,
+    "active_reward_hash_exact": true,
+    "bc_checkpoint_sha256_exact": true,
+    "bc_source_model_loaded_exactly": true,
+    "bootstrap_checkpoint_sha256_exact": true,
+    "clean_reward_mode": true,
+    "controlled_flick_arrays_zero": true,
+    "controlled_flick_exemption_false": true,
+    "current_current_majority_realized": true,
+    "finite_observations_actions_rewards": true,
+    "fresh_optimizer_learning_rates_exact": true,
+    "fresh_optimizer_source_state_empty": true,
+    "fresh_split_optimizer_state_empty": true,
+    "gameplay_120_physical_guard_allocated": true,
+    "gameplay_v3_not_allocated": true,
+    "generic_flip_penalty_zero": true,
+    "generic_jump_penalty_zero": true,
+    "historical_strict_dash_reward_zero": true,
+    "historical_strict_dash_tracker_inactive": true,
+    "human_demo_adapter_not_used": true,
+    "legacy_pool_cadence_unchanged": true,
+    "model_unchanged_by_preflight": true,
+    "named_mechanics_arrays_zero": true,
+    "named_mechanics_hot_path_false": true,
+    "named_mechanics_reward_zero": true,
+    "nexto_assignments_zero": true,
+    "nexto_probability_zero": true,
+    "nexto_trainable_samples_zero": true,
+    "nexto_wisp_adapters_never_called": true,
+    "no_additional_behavior_cloning": true,
+    "no_optimizer_steps": true,
+    "only_two_physical_exemptions": true,
+    "ordinary_touch_reward_component_zero": true,
+    "physics_120_policy_120_hold_one": true,
+    "recognized_mechanic_exemption_false": true,
+    "required_parent_is_ancestor": true,
+    "unconditional_touch_reward_zero": true,
+    "wisp_assignments_zero": true,
+    "wisp_probability_zero": true,
+    "wisp_trainable_samples_zero": true
+  },
+  "created_utc": "2026-08-29T03:28:32.695240+00:00",
+  "format": "RIVAL2_HUMAN_BC_PPO_MECHANICS_REMOVAL_PREFLIGHT_V1",
+  "fresh_optimizer_transition": {
+    "checks": {
+      "all_parameter_adam_state_exact": true,
+      "all_parameter_step_counters_exact": true,
+      "critic_group_identity_exact": true,
+      "critic_learning_rate_exact": true,
+      "every_parameter_present": true,
+      "named_state_digest_exact": true,
+      "policy_group_identity_exact": true,
+      "policy_learning_rate_exact": true,
+      "two_parameter_groups": true
+    },
+    "destination_group_count": 2,
+    "destination_groups": [
+      {
+        "learning_rate": 0.0001,
+        "name": "policy",
+        "parameter_count": 8
+      },
+      {
+        "learning_rate": 0.0003,
+        "name": "critic",
+        "parameter_count": 2
+      }
+    ],
+    "destination_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+    "destination_step_counter_by_parameter": {
+      "actor.bias": null,
+      "actor.weight": null,
+      "critic.bias": null,
+      "critic.weight": null,
+      "trunk.0.bias": null,
+      "trunk.0.weight": null,
+      "trunk.2.bias": null,
+      "trunk.2.weight": null,
+      "trunk.4.bias": null,
+      "trunk.4.weight": null
+    },
+    "parameter_count": 10,
+    "schema_version": 1,
+    "source_group_count": 1,
+    "source_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+    "source_step_counter_by_parameter": {
+      "actor.bias": null,
+      "actor.weight": null,
+      "critic.bias": null,
+      "critic.weight": null,
+      "trunk.0.bias": null,
+      "trunk.0.weight": null,
+      "trunk.2.bias": null,
+      "trunk.2.weight": null,
+      "trunk.4.bias": null,
+      "trunk.4.weight": null
+    },
+    "state_exact_by_parameter": {
+      "actor.bias": true,
+      "actor.weight": true,
+      "critic.bias": true,
+      "critic.weight": true,
+      "trunk.0.bias": true,
+      "trunk.0.weight": true,
+      "trunk.2.bias": true,
+      "trunk.2.weight": true,
+      "trunk.4.bias": true,
+      "trunk.4.weight": true
+    },
+    "step_counter_exact_by_parameter": {
+      "actor.bias": true,
+      "actor.weight": true,
+      "critic.bias": true,
+      "critic.weight": true,
+      "trunk.0.bias": true,
+      "trunk.0.weight": true,
+      "trunk.2.bias": true,
+      "trunk.2.weight": true,
+      "trunk.4.bias": true,
+      "trunk.4.weight": true
+    },
+    "verdict": "PASS_GREEN"
+  },
+  "frozen_config": {
+    "bytes": 4237,
+    "path": "results/rival2/human_bc_ppo_v1/frozen_config.json",
+    "sha256": "DB1A52143604A90F289C645DB28988568B9A3D74F584F8B8D04C8F6EF492D84E"
+  },
+  "git_head": "a8d0bfc98077b4c194ad3438640fd79ed2b5b788",
+  "human_bc_parent": {
+    "bytes": 7563365,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "optimizer_steps": 0,
+  "origin_main": "a8d0bfc98077b4c194ad3438640fd79ed2b5b788",
+  "runtime_smoke": {
+    "curriculum": {
+      "opponent_wins": {
+        "current": 0,
+        "historical": 0,
+        "nexto": 0,
+        "wisp": 0
+      },
+      "rival_wins": {
+        "current": 0,
+        "historical": 0,
+        "nexto": 0,
+        "wisp": 0
+      },
+      "terminated_episodes": {
+        "current": 0,
+        "historical": 0,
+        "nexto": 0,
+        "wisp": 0
+      },
+      "trainable_agent_samples": {
+        "current": 99328,
+        "historical": 15872,
+        "nexto": 0,
+        "wisp": 0
+      },
+      "trainable_reward_sum": {
+        "current": 0.0,
+        "historical": -0.014765665714146017,
+        "nexto": 0.0,
+        "wisp": 0.0
+      },
+      "truncated_episodes": {
+        "current": 0,
+        "historical": 0,
+        "nexto": 0,
+        "wisp": 0
+      },
+      "world_decisions": {
+        "current": 49664,
+        "historical": 15872,
+        "nexto": 0,
+        "wisp": 0
+      }
+    },
+    "family_worlds_after_rollout": {
+      "current": 388,
+      "historical": 124,
+      "nexto": 0,
+      "wisp": 0
+    },
+    "gameplay": {
+      "analog_action_saturation_fraction": 0.029506944444444443,
+      "flip_active_touches_per_minute": 0.0,
+      "hard_limit_truncations": 0,
+      "mean_movement_speed_uu_per_second": 1050.685575383864,
+      "mean_normalized_movement_speed": 0.45681981538428873,
+      "named_mechanics_arrays": 0,
+      "named_mechanics_hot_path_absent": true,
+      "no_touch_truncations": 0,
+      "physical_contact_counts": {
+        "bad_flip_total": 0,
+        "contest_exempt_total": 0,
+        "flip_touch_total": 0,
+        "legitimate_touch_total": 0,
+        "power_exempt_total": 0
+      },
+      "physical_player_minutes": 18.204444444444444,
+      "std_normalized_movement_speed": 0.2190880408115546,
+      "touches_per_minute": 0.0,
+      "trainable_action_samples": 115200,
+      "trusted_reward_component_absolute_sum": {
+        "boost_pickup_component": 0.5530000262660906,
+        "boost_use_component": 0.03768749904793367,
+        "save_component": 0.0,
+        "speed_component": 0.1035153316134975,
+        "strict_double_dash_component": 0.0,
+        "supersonic_component": 0.0,
+        "unnecessary_flip_component": 0.0,
+        "v1_demo_component": 0.0,
+        "v1_goal_component": 0.0,
+        "v1_progress_component": 0.0,
+        "v1_touch_component": 0.0
+      },
+      "trusted_reward_component_signed_sum": {
+        "boost_pickup_component": 0.003000000142492354,
+        "boost_use_component": 0.005962499849374581,
+        "save_component": 0.0,
+        "speed_component": -0.0051887592244818734,
+        "strict_double_dash_component": 0.0,
+        "supersonic_component": 0.0,
+        "unnecessary_flip_component": 0.0,
+        "v1_demo_component": 0.0,
+        "v1_goal_component": 0.0,
+        "v1_progress_component": 0.0,
+        "v1_touch_component": 0.0
+      },
+      "unnecessary_flip_contacts_per_minute": 0.0,
+      "unnecessary_fraction_of_flip_active_contacts": 0.0
+    },
+    "gameplay_120_memory_inventory": {
+      "arrays": {
+        "bad_flip_component": 2048,
+        "bad_flip_total": 4096,
+        "contest_exempt_total": 4096,
+        "flip_touch_total": 4096,
+        "interval_bad_flip": 4096,
+        "interval_contest_exempt": 4096,
+        "interval_power_exempt": 4096,
+        "legitimate_touch_total": 4096,
+        "opponent_touch_latched": 4096,
+        "pending_active": 4096,
+        "pending_age": 4096,
+        "pending_ball_position": 12288,
+        "pending_contest": 4096,
+        "pending_power": 4096,
+        "pending_self_contact_tick": 4096,
+        "power_exempt_total": 4096,
+        "recent_opponent_contact_ball_position": 12288,
+        "recent_opponent_contact_tick": 4096,
+        "touch_latched": 4096
+      },
+      "controlled_flick_arrays": 0,
+      "logical_bytes": 92160,
+      "named_mechanics_arrays": 0
+    },
+    "horizon": 128,
+    "reward_mode": 6,
+    "worlds": 512
+  },
+  "verdict": "PASS_GREEN"
+}

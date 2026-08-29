@@ -625,7 +625,11 @@ def _final_mixed_diagnostics(
             for index, name in enumerate(ACTION_CHANNEL_NAMES)
         },
         "family_empirical_kl": {
-            name: float((family_kl_sum[index] / family_count[index]).item())
+            name: (
+                None
+                if int(family_count[index].item()) == 0
+                else float((family_kl_sum[index] / family_count[index]).item())
+            )
             for index, name in enumerate(family_names)
         },
     }
