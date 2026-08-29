@@ -10,9 +10,10 @@
     "nexto_wisp_zero": true,
     "no_behavior_cloning": true,
     "pre_step_authority_committed_and_pushed": true,
-    "retention_rollout_only": true
+    "retention_rollout_only": true,
+    "warmup_authority_committed_and_pushed": true
   },
-  "created_utc": "2026-08-29T03:29:20.602909+00:00",
+  "created_utc": "2026-08-29T03:51:49.138555+00:00",
   "format": "RIVAL2_HUMAN_BC_V1_TO_120HZ_PPO_TRANSITION_EVIDENCE_V1",
   "fresh_optimizer": {
     "checks": {
@@ -29,7 +30,7 @@
     "destination_group_count": 2,
     "destination_groups": [
       {
-        "learning_rate": 0.0001,
+        "learning_rate": 1.25e-05,
         "name": "policy",
         "parameter_count": 8
       },
@@ -94,7 +95,7 @@
     },
     "verdict": "PASS_GREEN"
   },
-  "git_head_before_first_step": "96506aca2d05b62b923c43dcc530500dfe3312b7",
+  "git_head_before_first_step": "27688faec0d6ad2247f889e46e7e8e23a620c50f",
   "human_bc_parent": {
     "bytes": 7563365,
     "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
@@ -177,7 +178,7 @@
       "retention_source_is_bc_parent": true,
       "wisp_samples_zero": true
     },
-    "created_utc": "2026-08-29T03:29:20.601730+00:00",
+    "created_utc": "2026-08-29T03:51:49.137496+00:00",
     "format": "RIVAL2_HUMAN_BC_PPO_RETENTION_INITIALIZATION_V1",
     "optimizer_steps": 0,
     "optimizer_transition": {
@@ -195,7 +196,7 @@
       "destination_group_count": 2,
       "destination_groups": [
         {
-          "learning_rate": 0.0001,
+          "learning_rate": 1.25e-05,
           "name": "policy",
           "parameter_count": 8
         },
@@ -303,7 +304,8 @@
         "unique_source_indices": true
       },
       "dtype": "torch.float32",
-      "observation_contract": "RIVAL2_OBS_V1",
+      "observation_contract": "RIVAL2_OBS_V2_120HZ",
+      "observation_contract_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
       "observation_count": 512,
       "observation_dimension": 182,
       "schema_version": 1,

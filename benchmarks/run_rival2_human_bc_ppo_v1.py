@@ -43,7 +43,7 @@ from rivalsim.rival2_mixed_ppo import (  # noqa: E402
     Rival2MixedPPOSafetyConfig,
     mixed_optimizer_learning_rates,
     probe_fresh_adam_first_minibatch,
-    reset_policy_learning_rate_for_new_update,
+    set_policy_learning_rate,
 )
 from rivalsim.rival2_opponent_curriculum import (  # noqa: E402
     OPPONENT_NAMES,
@@ -580,6 +580,26 @@ def warmup_safety_config(starting_policy_lr: float, *, active: bool) -> Rival2Mi
         ),
         retention_corpus_size=512,
     )
+
+
+def install_cross_update_safety_config(
+    trainer: Rival2OpponentCurriculumTrainer,
+    config: Rival2MixedPPOSafetyConfig,
+) -> dict[str, float]:
+    """Arm an authorized warmup rate without touching parameter-owned Adam state."""
+
+    before = mixed_optimizer_learning_rates(trainer.optimizer)
+    if before["critic"] != config.critic_learning_rate:
+        raise ValueError("critic LR changed during warmup reconfiguration")
+    trainer.mixed_ppo_safety = config
+    set_policy_learning_rate(trainer.optimizer, config.initial_policy_learning_rate)
+    after = mixed_optimizer_learning_rates(trainer.optimizer)
+    if after != {
+        "policy": config.initial_policy_learning_rate,
+        "critic": config.critic_learning_rate,
+    }:
+        raise RuntimeError("warmup cross-update learning-rate arm failed")
+    return after
 
 
 def advance_warmup_state(
@@ -1199,8 +1219,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         update_safety = warmup_safety_config(
             starting_policy_lr, active=bool(warmup_state["active"])
         )
-        trainer.mixed_ppo_safety = update_safety
-        reset_policy_learning_rate_for_new_update(trainer.optimizer, update_safety)
+        install_cross_update_safety_config(trainer, update_safety)
         rollout_start = time.perf_counter()
         rollout = trainer.collect_rollout()
         try:
@@ -1239,8 +1258,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             float(warmup_state["next_update_starting_policy_lr"]),
             active=bool(warmup_state["active"]),
         )
-        trainer.mixed_ppo_safety = next_safety
-        reset_policy_learning_rate_for_new_update(trainer.optimizer, next_safety)
+        install_cross_update_safety_config(trainer, next_safety)
         trainer.curriculum_transition["warmup_state"] = dict(warmup_state)
         row = summarize_update(offset, trainer, wall_seconds)
         row["transition_warmup"] = {

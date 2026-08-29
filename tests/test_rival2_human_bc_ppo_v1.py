@@ -8,7 +8,10 @@ import pytest
 import torch
 import warp as wp
 
-from benchmarks.run_rival2_human_bc_ppo_v1 import advance_warmup_state
+from benchmarks.run_rival2_human_bc_ppo_v1 import (
+    advance_warmup_state,
+    install_cross_update_safety_config,
+)
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
 from rivalsim.rival2_120hz_transition import tensor_tree_sha256
 from rivalsim.rival2_contracts import (
@@ -180,6 +183,19 @@ def test_clean_runtime_monitor_and_fresh_optimizer_gate(arena_assets) -> None:
         "policy": 1.0e-4,
         "critic": 3.0e-4,
     }
+    install_cross_update_safety_config(
+        trainer,
+        Rival2MixedPPOSafetyConfig(
+            initial_policy_learning_rate=1.25e-5,
+            critic_learning_rate=3.0e-4,
+            minimum_policy_learning_rate=1.5625e-6,
+        ),
+    )
+    assert mixed_optimizer_learning_rates(trainer.optimizer) == {
+        "policy": 1.25e-5,
+        "critic": 3.0e-4,
+    }
+    assert len(trainer.optimizer.state) == 0
     rollout = trainer.collect_rollout()
     metrics = trainer.last_rollout_gameplay_metrics
     curriculum = trainer.last_rollout_curriculum_metrics

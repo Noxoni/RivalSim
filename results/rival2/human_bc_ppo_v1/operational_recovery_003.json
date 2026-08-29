@@ -1,0 +1,48 @@
+{
+  "format": "RIVAL2_HUMAN_BC_PPO_OPERATIONAL_RECOVERY_V1",
+  "classification": "operational_cross_update_lr_reconfiguration",
+  "reward_or_capability_failure": false,
+  "hard_safety_guard_fired": false,
+  "last_accepted_ppo_offset": 3,
+  "rolling_checkpoint": {
+    "path": "G:/dev/RivalSim-runs/human-bc-ppo-v1-safe-10h-20260829/rolling/rival2_human_bc_ppo_latest.pt",
+    "bytes": 50043327,
+    "sha256": "60ED9B5EF72426EB69C41A2B4D41BC02984BED6B75F5F4B5026DEB9697C90216"
+  },
+  "accepted_update_safety": [
+    {
+      "offset": 1,
+      "starting_policy_lr": 0.0000125,
+      "maximum_minibatch_kl": 0.006440497003495693,
+      "completed_update_mean_kl": 0.00246256310492754,
+      "backoffs": 0,
+      "retention_early_stop": false
+    },
+    {
+      "offset": 2,
+      "starting_policy_lr": 0.000025,
+      "maximum_minibatch_kl": 0.005872389301657677,
+      "completed_update_mean_kl": 0.00391096156090498,
+      "backoffs": 0,
+      "retention_early_stop": false
+    },
+    {
+      "offset": 3,
+      "starting_policy_lr": 0.00005,
+      "maximum_minibatch_kl": 0.012250551953911781,
+      "completed_update_mean_kl": 0.006089324131608009,
+      "backoffs": 0,
+      "retention_early_stop": false
+    }
+  ],
+  "error": "policy learning rate is outside the authorized adaptive range",
+  "cause": "After an accepted update, the PPO runtime rearmed the just-completed update's starting LR. When the prospective warmup state selected a different next-update range, the generic same-configuration reset validator rejected the old rearmed LR before setting the new authorized LR.",
+  "correction": "The cross-update warmup installer now verifies critic LR, changes only the policy-group LR to the already-authorized next starting value, and leaves all parameter-owned Adam state untouched. The production per-update reset validator remains unchanged and still enforces the active update's range.",
+  "resume": {
+    "use_original_wall_clock_deadline": true,
+    "warmup_next_starting_policy_lr": 0.0001,
+    "fresh_adam_state_preserved": true,
+    "resume_from_offset": 3
+  },
+  "verdict": "RECOVERABLE_OPERATIONAL_FAILURE"
+}
