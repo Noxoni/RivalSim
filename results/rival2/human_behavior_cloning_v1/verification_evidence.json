@@ -1,0 +1,43 @@
+{
+  "artifact_manifest_verification": {
+    "bad_file_count": 0,
+    "file_count": 13,
+    "metadata_and_checkpoint_hashes_exact": true
+  },
+  "checkpoint": {
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V1",
+    "historical_ppo_optimizer_loaded": false,
+    "human_bc_resumable": true,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "ppo_resumable": false,
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_VERIFICATION_EVIDENCE_V1",
+  "post_training_mutation_boundaries": {
+    "mechanic_detector_changes": 0,
+    "native_recording_mutations": 0,
+    "optimizer_steps_during_verification": 0,
+    "ppo_updates": 0,
+    "reward_changes": 0,
+    "test_split_reopened": false
+  },
+  "quality_checks": [
+    {
+      "command": ".venv\\Scripts\\python.exe -m ruff check rivalsim/human_demo/behavior_cloning.py benchmarks/run_rival2_human_behavior_cloning_v1.py benchmarks/finalize_rival2_human_behavior_cloning_v1.py tests/test_human_demo_behavior_cloning.py",
+      "result": "All checks passed",
+      "verdict": "PASS"
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe -m pytest tests/test_human_demo_behavior_cloning.py tests/test_human_demo_observation_adapter_v2.py tests/test_human_demo_bc_observation_bridge.py tests/test_human_demo_training_adapter.py tests/test_missing_feature_distillation.py -q",
+      "passed": 37,
+      "result": "37 passed in 2.06s",
+      "verdict": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "no whitespace errors",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": "PASS"
+}

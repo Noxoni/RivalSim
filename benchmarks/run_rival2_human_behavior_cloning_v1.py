@@ -975,7 +975,7 @@ def _mixed_opponent_sanity(
         "concedes_per_simulated_minute": concedes / simulated_minutes,
         "truncations": truncations,
         "no_touch_truncations": no_touch,
-        "mean_self_speed_uu_per_s": movement_speed_sum / action_rows,
+        "mean_normalized_self_speed": movement_speed_sum / action_rows,
         "analog_saturation_fraction": analog_saturated / (action_rows * 5.0),
         "button_activation_fraction": button_sum / (action_rows * 3.0),
         "all_finite": all(
@@ -1223,8 +1223,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "selected": gameplay_final,
         "touch_rate_ratio": gameplay_final["touches_per_simulated_minute"]
         / max(gameplay_baseline["touches_per_simulated_minute"], 1e-12),
-        "mean_speed_ratio": gameplay_final["mean_self_speed_uu_per_s"]
-        / max(gameplay_baseline["mean_self_speed_uu_per_s"], 1e-12),
+        "mean_speed_ratio": gameplay_final["mean_normalized_self_speed"]
+        / max(gameplay_baseline["mean_normalized_self_speed"], 1e-12),
         "analog_saturation_absolute_change": gameplay_final["analog_saturation_fraction"]
         - gameplay_baseline["analog_saturation_fraction"],
         "goal_rate_change": gameplay_final["goals_per_simulated_minute"]
@@ -1415,6 +1415,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     _write_json(ROOT / RESULT_ROOT / "evidence.json", evidence)
     artifact_paths = [
         Path(config["checkpoint"]["path"]),
+        RESULT_ROOT / "REVIEW.md",
         RESULT_ROOT / "closed_loop_mechanic_evaluation.json",
         RESULT_ROOT / "corpus_manifest.json",
         RESULT_ROOT / "evidence.json",
@@ -1425,6 +1426,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         RESULT_ROOT / "pre_step_preflight.json",
         RESULT_ROOT / "simulator_retention_test.json",
         RESULT_ROOT / "training_curve.json",
+        RESULT_ROOT / "verification_evidence.json",
     ]
     _write_json(ROOT / RESULT_ROOT / "artifact_manifest.json", _artifact_manifest(artifact_paths))
     print(
