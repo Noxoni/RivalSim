@@ -1,0 +1,54 @@
+{
+  "accepted_optimizer_steps": 0,
+  "checks": {
+    "anchor_reproduced": true,
+    "bc_model_unchanged_by_rollouts": true,
+    "bc_parent_sha256_unchanged": true,
+    "candidate_order_exact": true,
+    "every_probe_rolled_back_completely": true,
+    "fresh_optimizer_unchanged_and_empty": true,
+    "highest_passing_lr_selected": true,
+    "mechanics_preflight_preserved": true,
+    "model_restored_after_every_probe": true,
+    "no_ppo_update_accepted": true,
+    "policy_generator_restored": true,
+    "required_parent_is_ancestor": true,
+    "same_first_minibatch_for_every_candidate": true
+  },
+  "created_utc": "2026-08-29T03:51:02.405847+00:00",
+  "critic_learning_rate": 0.0003,
+  "format": "RIVAL2_HUMAN_BC_FRESH_PPO_WARMUP_AUTHORITY_V1",
+  "human_bc_parent": {
+    "bytes": 7563365,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "mechanics_removal_preflight": {
+    "bytes": 9103,
+    "path": "results/rival2/human_bc_ppo_v1/mechanics_removal_preflight.json",
+    "sha256": "583EE6CEB4F0E13B8CC366E47DDDF638D992390126DAA1327E4EB31CD139E8D3"
+  },
+  "required_parent": "90faba5918abefc032089c331c074a66b2391b9d",
+  "selected_initial_policy_lr": 1.25e-05,
+  "training_authorized_only_after_this_file_is_committed_and_pushed": true,
+  "transition_lr_sweep": {
+    "bytes": 29429,
+    "path": "results/rival2/human_bc_ppo_v1/transition_lr_sweep.json",
+    "sha256": "3D55EB642A945C1250360F3E7A2EC4A9A772F6E8E774E880FB514F238EBF4EB6"
+  },
+  "verdict": "PASS_GREEN",
+  "warmup_schedule": {
+    "begin_each_update_at_last_successfully_accepted_starting_lr": true,
+    "clean_update_next_lr_multiplier_max": 2.0,
+    "hard_completed_update_mean_kl_guard": 0.05,
+    "hard_minibatch_kl_guard": 0.1,
+    "increase_forbidden_after_backoff_or_retention_early_stop": true,
+    "normal_mode_after_consecutive_clean_1e-4_updates": 2,
+    "normal_mode_backoff_floor": 2.5e-05,
+    "normal_mode_update_start_lr": 0.0001,
+    "normal_policy_lr_cap": 0.0001,
+    "soft_minibatch_kl_target": 0.02,
+    "soft_retention_mean_kl_target": 0.02,
+    "transition_backoff_floor": 1.5625e-06
+  }
+}
