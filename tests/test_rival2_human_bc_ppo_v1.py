@@ -8,7 +8,9 @@ import pytest
 import torch
 import warp as wp
 
+from benchmarks.run_rival2_human_bc_ppo_v1 import advance_warmup_state
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes
+from rivalsim.rival2_120hz_transition import tensor_tree_sha256
 from rivalsim.rival2_contracts import (
     REWARD_GAMEPLAY_120_V1_CONTRACT,
     RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
@@ -17,6 +19,7 @@ from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_mixed_ppo import (
     Rival2MixedPPOSafetyConfig,
     mixed_optimizer_learning_rates,
+    probe_fresh_adam_first_minibatch,
 )
 from rivalsim.rival2_opponent_curriculum import (
     Rival2OpponentCurriculumConfig,
@@ -68,6 +71,52 @@ def test_clean_reward_contract_has_no_named_mechanic_signal_or_exemption() -> No
     assert contract["bad_flip_guard"]["controlled_flick_exemption"] is False
     assert contract["bad_flip_guard"]["generic_jump_penalty"] == 0.0
     assert contract["bad_flip_guard"]["generic_flip_penalty"] == 0.0
+
+
+def test_transition_warmup_doubles_only_after_clean_updates() -> None:
+    state = {
+        "active": True,
+        "selected_initial_policy_lr": 1.25e-5,
+        "next_update_starting_policy_lr": 1.25e-5,
+        "warmup_updates_completed": 0,
+        "consecutive_clean_updates_at_1e-4": 0,
+        "normal_production_operation_start_offset": None,
+    }
+    clean = {
+        "policy_learning_rate_backoffs": 0,
+        "ppo_early_stop": False,
+        "policy_learning_rate_end": 1.25e-5,
+    }
+    state = advance_warmup_state(state, clean, accepted_offset=1)
+    assert state["next_update_starting_policy_lr"] == 2.5e-5
+    clean["policy_learning_rate_end"] = 2.5e-5
+    state = advance_warmup_state(state, clean, accepted_offset=2)
+    assert state["next_update_starting_policy_lr"] == 5.0e-5
+    clean["policy_learning_rate_end"] = 5.0e-5
+    state = advance_warmup_state(state, clean, accepted_offset=3)
+    assert state["next_update_starting_policy_lr"] == 1.0e-4
+    clean["policy_learning_rate_end"] = 1.0e-4
+    state = advance_warmup_state(state, clean, accepted_offset=4)
+    assert state["active"] is True
+    state = advance_warmup_state(state, clean, accepted_offset=5)
+    assert state["active"] is False
+    assert state["normal_production_operation_start_offset"] == 6
+
+    backoff_state = {
+        **state,
+        "active": True,
+        "next_update_starting_policy_lr": 2.5e-5,
+        "consecutive_clean_updates_at_1e-4": 0,
+    }
+    backed_off = {
+        "policy_learning_rate_backoffs": 1,
+        "ppo_early_stop": False,
+        "policy_learning_rate_end": 1.25e-5,
+    }
+    backoff_state = advance_warmup_state(
+        backoff_state, backed_off, accepted_offset=6
+    )
+    assert backoff_state["next_update_starting_policy_lr"] == 1.25e-5
 
 
 @pytest.fixture(scope="module")
@@ -196,3 +245,22 @@ def test_retention_metadata_binds_the_active_observation_contract(arena_assets) 
     assert summary["observation_contract_sha256"] == env.contract_hashes[
         "RIVAL2_OBS_V2_120HZ"
     ]
+    model_before = tensor_tree_sha256(trainer.model.state_dict())
+    optimizer_before = tensor_tree_sha256(trainer.optimizer.state_dict())
+    generator_before = trainer.policy_generator.get_state().clone()
+    probe = probe_fresh_adam_first_minibatch(
+        trainer.model,
+        rollout,
+        trainer.ppo_config,
+        retention_observations=trainer.retention_observations,
+        family_names=("current", "historical", "nexto", "wisp"),
+        generator=trainer.policy_generator,
+        policy_learning_rate=1.5625e-6,
+        critic_learning_rate=3.0e-4,
+        policy_config=trainer.policy_config,
+    )
+    assert probe["rollback_complete"] is True
+    assert probe["value_loss_isolated_from_policy_trunk_and_actor"] is True
+    assert tensor_tree_sha256(trainer.model.state_dict()) == model_before
+    assert tensor_tree_sha256(trainer.optimizer.state_dict()) == optimizer_before
+    assert torch.equal(trainer.policy_generator.get_state(), generator_before)

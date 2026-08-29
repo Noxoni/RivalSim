@@ -42,6 +42,8 @@ from rivalsim.rival2_env import REWARD_MODE_GAMEPLAY_120_V1, Rival2Env  # noqa: 
 from rivalsim.rival2_mixed_ppo import (  # noqa: E402
     Rival2MixedPPOSafetyConfig,
     mixed_optimizer_learning_rates,
+    probe_fresh_adam_first_minibatch,
+    reset_policy_learning_rate_for_new_update,
 )
 from rivalsim.rival2_opponent_curriculum import (  # noqa: E402
     OPPONENT_NAMES,
@@ -62,6 +64,8 @@ RESULTS_DIR = REPO_ROOT / "results/rival2/human_bc_ppo_v1"
 CONFIG_PATH = RESULTS_DIR / "frozen_config.json"
 PREFLIGHT_PATH = RESULTS_DIR / "mechanics_removal_preflight.json"
 PRE_STEP_AUTHORITY_PATH = RESULTS_DIR / "pre_step_authority.json"
+TRANSITION_SWEEP_PATH = RESULTS_DIR / "transition_lr_sweep.json"
+WARMUP_AUTHORITY_PATH = RESULTS_DIR / "warmup_transition_authority.json"
 TRANSITION_PATH = RESULTS_DIR / "transition.json"
 RETENTION_PATH = RESULTS_DIR / "retention_corpus.json"
 CURVE_PATH = RESULTS_DIR / "training_curve.jsonl"
@@ -72,7 +76,7 @@ FINAL_CHECKPOINT = (
     / "checkpoints/rival2/human_bc_ppo_v1/rival2_human_bc_ppo_10h.pt"
 )
 
-REQUIRED_PARENT = "a8d0bfc98077b4c194ad3438640fd79ed2b5b788"
+REQUIRED_PARENT = "90faba5918abefc032089c331c074a66b2391b9d"
 BC_CHECKPOINT = REPO_ROOT / "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt"
 BC_SHA256 = "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
 BOOTSTRAP_CHECKPOINT = (
@@ -82,11 +86,23 @@ BOOTSTRAP_CHECKPOINT = (
 BOOTSTRAP_SHA256 = "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350"
 WORLD_COUNT = 32_768
 TRAINING_DURATION_SECONDS = 10 * 60 * 60
-CHECKPOINT_INTERVAL = 30
+CHECKPOINT_OFFSETS = (30,)
+HISTORICAL_SNAPSHOT_INTERVAL = 30
 CAMPAIGN_SEED = 2_026_082_907
 CURRICULUM_SEED = 2_026_082_908
 KL_GUARD = Rival2KLGuardConfig(0.10, 0.05)
 SAFETY = Rival2MixedPPOSafetyConfig()
+TRANSITION_LR_CANDIDATES = (
+    2.5e-5,
+    1.25e-5,
+    6.25e-6,
+    3.125e-6,
+    1.5625e-6,
+)
+TRANSITION_LR_FLOOR = TRANSITION_LR_CANDIDATES[-1]
+REJECTED_ANCHOR_LR = 1.0e-4
+REJECTED_ANCHOR_MINIBATCH_KL = 0.414318710565567
+REJECTED_ANCHOR_RETENTION_KL = 0.12192033976316452
 
 
 def parse_args() -> argparse.Namespace:
@@ -98,6 +114,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--transition-sweep-only", action="store_true")
     parser.add_argument(
         "--work-dir",
         type=Path,
@@ -551,6 +568,279 @@ def require_committed_preflight() -> dict[str, Any]:
     return {"preflight": preflight, "authority": authority, "checks": checks}
 
 
+def warmup_safety_config(starting_policy_lr: float, *, active: bool) -> Rival2MixedPPOSafetyConfig:
+    return Rival2MixedPPOSafetyConfig(
+        initial_policy_learning_rate=starting_policy_lr,
+        critic_learning_rate=3.0e-4,
+        soft_minibatch_kl_target=0.02,
+        retention_soft_mean_kl_target=0.02,
+        policy_learning_rate_backoff=0.5,
+        minimum_policy_learning_rate=(
+            TRANSITION_LR_FLOOR if active else 2.5e-5
+        ),
+        retention_corpus_size=512,
+    )
+
+
+def advance_warmup_state(
+    state: dict[str, Any], diagnostics: dict[str, Any], *, accepted_offset: int
+) -> dict[str, Any]:
+    result = dict(state)
+    if not result["active"]:
+        result["next_update_starting_policy_lr"] = 1.0e-4
+        return result
+    starting_lr = float(result["next_update_starting_policy_lr"])
+    clean = (
+        int(diagnostics["policy_learning_rate_backoffs"]) == 0
+        and not bool(diagnostics["ppo_early_stop"])
+    )
+    result["warmup_updates_completed"] = int(result["warmup_updates_completed"]) + 1
+    result["last_accepted_offset"] = accepted_offset
+    result["last_update_starting_policy_lr"] = starting_lr
+    result["last_update_policy_lr_end"] = float(
+        diagnostics["policy_learning_rate_end"]
+    )
+    result["last_update_required_backoff"] = not clean
+    result["last_update_retention_early_stop"] = bool(diagnostics["ppo_early_stop"])
+    if clean and starting_lr == 1.0e-4:
+        result["consecutive_clean_updates_at_1e-4"] = int(
+            result["consecutive_clean_updates_at_1e-4"]
+        ) + 1
+    elif starting_lr != 1.0e-4 or not clean:
+        result["consecutive_clean_updates_at_1e-4"] = 0
+
+    if int(result["consecutive_clean_updates_at_1e-4"]) >= 2:
+        result["active"] = False
+        result["normal_production_operation_start_offset"] = accepted_offset + 1
+        result["next_update_starting_policy_lr"] = 1.0e-4
+    elif clean:
+        result["next_update_starting_policy_lr"] = min(starting_lr * 2.0, 1.0e-4)
+    else:
+        result["next_update_starting_policy_lr"] = float(
+            diagnostics["policy_learning_rate_end"]
+        )
+    return result
+
+
+def run_transition_sweep(args: argparse.Namespace) -> dict[str, Any]:
+    committed_preflight = require_committed_preflight()
+    _config, bc, bootstrap = load_authority()
+    geometry, meshes = load_geometry(args.collision_dir, args.device)
+    trainer = build_trainer(
+        worlds=WORLD_COUNT,
+        horizon=128,
+        collision_dir=args.collision_dir,
+        geometry=geometry,
+        meshes=meshes,
+        device=args.device,
+        bc=bc,
+        bootstrap=bootstrap,
+    )
+    model_before = tensor_tree_sha256(trainer.model.state_dict())
+    optimizer_proof = trainer.enable_safe_mixed_ppo(SAFETY)
+    retention_rollout = trainer.collect_rollout()
+    retention_summary = trainer.initialize_retention_corpus_from_rollout(
+        retention_rollout,
+        source_identity={
+            "identity": "HUMAN_BC_V1_STEP_160_TRANSITION_SWEEP_PARENT",
+            "checkpoint_sha256": BC_SHA256,
+            "model_tensor_sha256": model_before,
+        },
+    )
+    first_training_rollout = trainer.collect_rollout()
+    first_training_rollout.compute_gae(trainer.ppo_config)
+    torch.cuda.synchronize(trainer.device)
+    model_after_rollouts = tensor_tree_sha256(trainer.model.state_dict())
+    optimizer_before_sweep = tensor_tree_sha256(trainer.optimizer.state_dict())
+    generator_before_sweep = tensor_tree_sha256(trainer.policy_generator.get_state())
+
+    anchor = probe_fresh_adam_first_minibatch(
+        trainer.model,
+        first_training_rollout,
+        trainer.ppo_config,
+        retention_observations=trainer.retention_observations,
+        family_names=OPPONENT_NAMES,
+        generator=trainer.policy_generator,
+        policy_learning_rate=REJECTED_ANCHOR_LR,
+        critic_learning_rate=3.0e-4,
+        policy_config=trainer.policy_config,
+        gae_ready=True,
+    )
+    candidates: list[dict[str, Any]] = []
+    selected: dict[str, Any] | None = None
+    for learning_rate in TRANSITION_LR_CANDIDATES:
+        candidate = probe_fresh_adam_first_minibatch(
+            trainer.model,
+            first_training_rollout,
+            trainer.ppo_config,
+            retention_observations=trainer.retention_observations,
+            family_names=OPPONENT_NAMES,
+            generator=trainer.policy_generator,
+            policy_learning_rate=learning_rate,
+            critic_learning_rate=3.0e-4,
+            policy_config=trainer.policy_config,
+            gae_ready=True,
+        )
+        candidates.append(candidate)
+        if selected is None and candidate["passes_transition_gate"]:
+            selected = candidate
+    torch.cuda.synchronize(trainer.device)
+
+    anchor_checks = {
+        "minibatch_kl_reproduced": abs(
+            anchor["post_step_minibatch_kl"] - REJECTED_ANCHOR_MINIBATCH_KL
+        )
+        <= 1.0e-7,
+        "retention_kl_reproduced": abs(
+            anchor["retention_mean_kl"] - REJECTED_ANCHOR_RETENTION_KL
+        )
+        <= 1.0e-7,
+        "anchor_rejected": not anchor["passes_transition_gate"],
+    }
+    checks = {
+        "required_parent_is_ancestor": git_is_ancestor(REQUIRED_PARENT, "HEAD"),
+        "mechanics_preflight_preserved": all(committed_preflight["checks"].values()),
+        "bc_parent_sha256_unchanged": sha256(BC_CHECKPOINT) == BC_SHA256,
+        "bc_model_unchanged_by_rollouts": model_before == model_after_rollouts,
+        "anchor_reproduced": all(anchor_checks.values()),
+        "same_first_minibatch_for_every_candidate": len(
+            {
+                anchor["minibatch_index_sha256"],
+                *(candidate["minibatch_index_sha256"] for candidate in candidates),
+            }
+        )
+        == 1,
+        "candidate_order_exact": [
+            candidate["policy_learning_rate"] for candidate in candidates
+        ]
+        == list(TRANSITION_LR_CANDIDATES),
+        "every_probe_rolled_back_completely": anchor["rollback_complete"]
+        and all(candidate["rollback_complete"] for candidate in candidates),
+        "model_restored_after_every_probe": tensor_tree_sha256(
+            trainer.model.state_dict()
+        )
+        == model_before,
+        "fresh_optimizer_unchanged_and_empty": tensor_tree_sha256(
+            trainer.optimizer.state_dict()
+        )
+        == optimizer_before_sweep
+        and len(trainer.optimizer.state) == 0,
+        "policy_generator_restored": tensor_tree_sha256(
+            trainer.policy_generator.get_state()
+        )
+        == generator_before_sweep,
+        "no_ppo_update_accepted": trainer.iteration == 479
+        and trainer.policy_version == 480,
+        "highest_passing_lr_selected": selected is not None
+        and selected["policy_learning_rate"]
+        == next(
+            (
+                candidate["policy_learning_rate"]
+                for candidate in candidates
+                if candidate["passes_transition_gate"]
+            ),
+            None,
+        ),
+    }
+    report = {
+        "format": "RIVAL2_HUMAN_BC_FRESH_ADAM_LR_SWEEP_V1",
+        "created_utc": utc_now(),
+        "git_head": git("rev-parse", "HEAD"),
+        "human_bc_parent": artifact(BC_CHECKPOINT),
+        "frozen_config": artifact(CONFIG_PATH),
+        "mechanics_removal_preflight": artifact(PREFLIGHT_PATH),
+        "optimizer_transition": optimizer_proof,
+        "retention": retention_summary,
+        "exact_first_rollout": {
+            "trainable_samples": int(first_training_rollout.train_mask.sum().item()),
+            "curriculum": trainer.last_rollout_curriculum_metrics,
+            "gameplay": trainer.last_rollout_gameplay_metrics,
+            "policy_generator_state_sha256": generator_before_sweep,
+        },
+        "rejected_1e-4_anchor": anchor,
+        "rejected_anchor_checks": anchor_checks,
+        "candidates_descending": candidates,
+        "selected_initial_policy_lr": (
+            None if selected is None else selected["policy_learning_rate"]
+        ),
+        "accepted_optimizer_steps": 0,
+        "checks": checks,
+        "verdict": "PASS_GREEN" if all(checks.values()) else "BLOCKED",
+    }
+    write_json(TRANSITION_SWEEP_PATH, json_safe(report))
+    authority = {
+        "format": "RIVAL2_HUMAN_BC_FRESH_PPO_WARMUP_AUTHORITY_V1",
+        "created_utc": utc_now(),
+        "required_parent": REQUIRED_PARENT,
+        "human_bc_parent": artifact(BC_CHECKPOINT),
+        "mechanics_removal_preflight": artifact(PREFLIGHT_PATH),
+        "transition_lr_sweep": artifact(TRANSITION_SWEEP_PATH),
+        "selected_initial_policy_lr": report["selected_initial_policy_lr"],
+        "critic_learning_rate": 3.0e-4,
+        "warmup_schedule": {
+            "begin_each_update_at_last_successfully_accepted_starting_lr": True,
+            "clean_update_next_lr_multiplier_max": 2.0,
+            "normal_policy_lr_cap": 1.0e-4,
+            "transition_backoff_floor": TRANSITION_LR_FLOOR,
+            "soft_minibatch_kl_target": 0.02,
+            "soft_retention_mean_kl_target": 0.02,
+            "hard_minibatch_kl_guard": 0.10,
+            "hard_completed_update_mean_kl_guard": 0.05,
+            "increase_forbidden_after_backoff_or_retention_early_stop": True,
+            "normal_mode_after_consecutive_clean_1e-4_updates": 2,
+            "normal_mode_update_start_lr": 1.0e-4,
+            "normal_mode_backoff_floor": 2.5e-5,
+        },
+        "training_authorized_only_after_this_file_is_committed_and_pushed": True,
+        "accepted_optimizer_steps": 0,
+        "checks": checks,
+        "verdict": report["verdict"],
+    }
+    write_json(WARMUP_AUTHORITY_PATH, authority)
+    del first_training_rollout, retention_rollout, trainer
+    gc.collect()
+    torch.cuda.empty_cache()
+    if report["verdict"] != "PASS_GREEN":
+        raise RuntimeError(f"fresh-Adam transition sweep blocked: {checks}")
+    return report
+
+
+def require_committed_warmup_authority() -> dict[str, Any]:
+    if not TRANSITION_SWEEP_PATH.exists() or not WARMUP_AUTHORITY_PATH.exists():
+        raise RuntimeError("fresh-Adam transition sweep authority is missing")
+    sweep = json.loads(TRANSITION_SWEEP_PATH.read_text(encoding="utf-8"))
+    authority = json.loads(WARMUP_AUTHORITY_PATH.read_text(encoding="utf-8"))
+    selected = authority.get("selected_initial_policy_lr")
+    checks = {
+        "sweep_pass": sweep.get("verdict") == "PASS_GREEN",
+        "authority_pass": authority.get("verdict") == "PASS_GREEN",
+        "sweep_hash_matches_authority": sha256(TRANSITION_SWEEP_PATH)
+        == authority["transition_lr_sweep"]["sha256"],
+        "selected_lr_is_authorized_candidate": selected in TRANSITION_LR_CANDIDATES,
+        "selected_lr_matches_sweep": selected
+        == sweep.get("selected_initial_policy_lr"),
+        "sweep_tracked": bool(
+            git("ls-files", "--", str(TRANSITION_SWEEP_PATH.relative_to(REPO_ROOT)))
+        ),
+        "authority_tracked": bool(
+            git("ls-files", "--", str(WARMUP_AUTHORITY_PATH.relative_to(REPO_ROOT)))
+        ),
+        "clean_worktree": git("status", "--porcelain") == "",
+        "head_pushed_to_origin_main": git("rev-parse", "HEAD")
+        == git("rev-parse", "origin/main"),
+        "required_parent_is_ancestor": git_is_ancestor(REQUIRED_PARENT, "HEAD"),
+        "bc_checkpoint_unchanged": sha256(BC_CHECKPOINT) == BC_SHA256,
+    }
+    if not all(checks.values()):
+        raise RuntimeError(f"warmup authority is not committed and pushed: {checks}")
+    return {
+        "sweep": sweep,
+        "authority": authority,
+        "selected_initial_policy_lr": float(selected),
+        "checks": checks,
+    }
+
+
 def summarize_update(
     offset: int,
     trainer: Rival2OpponentCurriculumTrainer,
@@ -596,6 +886,46 @@ def summarize_update(
     if not all(hard_checks.values()):
         raise RuntimeError(f"post-update campaign guard failed: {hard_checks}")
     goal_events = round(component_abs["v1_goal_component"] / 10.0)
+    ppo_safety_keys = (
+        "schema_version",
+        "mode",
+        "safety_config",
+        "safety_config_hash",
+        "trainable_sample_count",
+        "expected_optimizer_steps",
+        "accepted_optimizer_steps",
+        "optimizer_step_proposals",
+        "optimizer_step_retries",
+        "policy_learning_rate_backoffs",
+        "policy_learning_rate_scope",
+        "policy_learning_rate_before_update_reset",
+        "policy_learning_rate_update_start_reset_applied",
+        "policy_learning_rate_start",
+        "policy_learning_rate_end",
+        "policy_learning_rate_after_update_rearm",
+        "next_update_policy_learning_rate",
+        "critic_learning_rate_start_end",
+        "ppo_early_stop",
+        "ppo_early_stop_reason",
+        "maximum_post_step_minibatch_kl",
+        "completed_update_mean_kl",
+        "retention_corpus_mean_kl",
+        "retention_reference_actor_sha256",
+        "retention_kl_by_action_channel",
+        "rollout_analytic_kl_by_action_channel",
+        "family_empirical_kl",
+        "maximum_gradient_norms",
+        "family_statistics",
+        "retry_log",
+        "checks",
+        "verdict",
+    )
+    ppo_safety = {key: diagnostics[key] for key in ppo_safety_keys}
+    ppo_safety["per_minibatch_accepted_step_log_persisted"] = False
+    ppo_safety["per_minibatch_log_omission_reason"] = (
+        "bounded 10-hour evidence; aggregate counts, maxima, channel KL, retries, "
+        "gradients, and all guard checks are retained"
+    )
     return json_safe(
         {
             "accepted_ppo_offset": offset,
@@ -607,7 +937,7 @@ def summarize_update(
             "goal_events": goal_events,
             "curriculum": curriculum,
             "gameplay": gameplay,
-            "ppo_safety": diagnostics,
+            "ppo_safety": ppo_safety,
             "post_update_checks": hard_checks,
         }
     )
@@ -674,7 +1004,9 @@ def save_external_checkpoint(
 def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     if args.work_dir is None:
         raise ValueError("training requires an explicit external --work-dir")
-    authority = require_committed_preflight()
+    preflight_authority = require_committed_preflight()
+    warmup_authority = require_committed_warmup_authority()
+    selected_initial_lr = warmup_authority["selected_initial_policy_lr"]
     config, bc, bootstrap = load_authority()
     geometry, meshes = load_geometry(args.collision_dir, args.device)
     trainer = build_trainer(
@@ -692,12 +1024,16 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     milestone_records: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
     start_offset = 0
+    warmup_state: dict[str, Any]
 
     if args.resume:
         if not rolling.exists():
             raise RuntimeError("--resume selected but rolling checkpoint does not exist")
         trainer.load_checkpoint(rolling)
         start_offset = int(trainer.curriculum_transition["accepted_ppo_offset"])
+        warmup_state = dict(trainer.curriculum_transition["warmup_state"])
+        if float(warmup_state["selected_initial_policy_lr"]) != selected_initial_lr:
+            raise RuntimeError("rolling checkpoint warmup authority is incompatible")
         if CURVE_PATH.exists():
             rows = [json.loads(line) for line in CURVE_PATH.read_text().splitlines() if line]
         if len(rows) != start_offset:
@@ -711,7 +1047,8 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             )
         model_hash_before = tensor_tree_sha256(trainer.model.state_dict())
         empty_optimizer_before = len(trainer.optimizer.state) == 0
-        optimizer_proof = trainer.enable_safe_mixed_ppo(SAFETY)
+        initial_safety = warmup_safety_config(selected_initial_lr, active=True)
+        optimizer_proof = trainer.enable_safe_mixed_ppo(initial_safety)
         if not empty_optimizer_before or len(trainer.optimizer.state) != 0:
             raise RuntimeError("fresh PPO optimizer unexpectedly contains Adam moments")
         rollout = trainer.collect_rollout()
@@ -758,7 +1095,24 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             "verdict": "PASS_GREEN",
         }
         write_json(RETENTION_PATH, json_safe(retention_record))
-        trainer.curriculum_transition["pre_step_authority"] = authority["authority"]
+        warmup_state = {
+            "format": "RIVAL2_HUMAN_BC_FRESH_PPO_WARMUP_STATE_V1",
+            "active": True,
+            "selected_initial_policy_lr": selected_initial_lr,
+            "next_update_starting_policy_lr": selected_initial_lr,
+            "transition_backoff_floor": TRANSITION_LR_FLOOR,
+            "warmup_updates_completed": 0,
+            "consecutive_clean_updates_at_1e-4": 0,
+            "normal_production_operation_start_offset": None,
+            "last_accepted_offset": 0,
+        }
+        trainer.curriculum_transition["pre_step_authority"] = preflight_authority[
+            "authority"
+        ]
+        trainer.curriculum_transition["warmup_transition_authority"] = (
+            warmup_authority["authority"]
+        )
+        trainer.curriculum_transition["warmup_state"] = warmup_state
         trainer.curriculum_transition["retention_initialization"] = json_safe(
             retention_record
         )
@@ -795,7 +1149,10 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             ],
             "checks": {
                 "pre_step_authority_committed_and_pushed": all(
-                    authority["checks"].values()
+                    preflight_authority["checks"].values()
+                ),
+                "warmup_authority_committed_and_pushed": all(
+                    warmup_authority["checks"].values()
                 ),
                 "fresh_optimizer": empty_optimizer_before
                 and len(trainer.optimizer.state) == 0,
@@ -835,6 +1192,15 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     offset = start_offset
     while time.time() < float(campaign_state["campaign_deadline_unix_seconds"]):
         offset += 1
+        warmup_before_update = dict(warmup_state)
+        starting_policy_lr = float(
+            warmup_state["next_update_starting_policy_lr"]
+        )
+        update_safety = warmup_safety_config(
+            starting_policy_lr, active=bool(warmup_state["active"])
+        )
+        trainer.mixed_ppo_safety = update_safety
+        reset_policy_learning_rate_for_new_update(trainer.optimizer, update_safety)
         rollout_start = time.perf_counter()
         rollout = trainer.collect_rollout()
         try:
@@ -862,15 +1228,33 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             break
         torch.cuda.synchronize(trainer.device)
         wall_seconds = time.perf_counter() - rollout_start
+        if trainer.last_adaptive_ppo_diagnostics is None:
+            raise RuntimeError("accepted update omitted adaptive PPO diagnostics")
+        warmup_state = advance_warmup_state(
+            warmup_state,
+            trainer.last_adaptive_ppo_diagnostics,
+            accepted_offset=offset,
+        )
+        next_safety = warmup_safety_config(
+            float(warmup_state["next_update_starting_policy_lr"]),
+            active=bool(warmup_state["active"]),
+        )
+        trainer.mixed_ppo_safety = next_safety
+        reset_policy_learning_rate_for_new_update(trainer.optimizer, next_safety)
+        trainer.curriculum_transition["warmup_state"] = dict(warmup_state)
         row = summarize_update(offset, trainer, wall_seconds)
+        row["transition_warmup"] = {
+            "before_update": warmup_before_update,
+            "after_update": dict(warmup_state),
+        }
         rows.append(row)
         append_jsonl(CURVE_PATH, row)
-        if offset % CHECKPOINT_INTERVAL == 0:
+        if offset % HISTORICAL_SNAPSHOT_INTERVAL == 0:
             trainer.add_historical_snapshot()
         rolling_artifact = save_external_checkpoint(
             trainer, rolling, accepted_offset=offset
         )
-        if offset % CHECKPOINT_INTERVAL == 0:
+        if offset in CHECKPOINT_OFFSETS:
             milestone_path = milestone_dir / f"rival2_human_bc_ppo_plus_{offset:03d}.pt"
             milestone_artifact = save_external_checkpoint(
                 trainer, milestone_path, accepted_offset=offset
@@ -975,7 +1359,10 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             campaign_elapsed_seconds
         )
         trainer.curriculum_transition["hard_safety_status"] = hard_safety_status
-        trainer.curriculum_transition["checkpoint_interval"] = CHECKPOINT_INTERVAL
+        trainer.curriculum_transition["checkpoint_offsets"] = list(CHECKPOINT_OFFSETS)
+        trainer.curriculum_transition["historical_snapshot_interval"] = (
+            HISTORICAL_SNAPSHOT_INTERVAL
+        )
         trainer.curriculum_transition["historical_policy_pool_final"] = [
             {
                 "version": version,
@@ -1120,7 +1507,12 @@ def main() -> int:
     args = parse_args()
     if not torch.cuda.is_available() or not args.device.startswith("cuda"):
         raise RuntimeError("the authoritative campaign requires CUDA")
-    report = run_preflight(args) if args.preflight_only else run_campaign(args)
+    if args.preflight_only:
+        report = run_preflight(args)
+    elif args.transition_sweep_only:
+        report = run_transition_sweep(args)
+    else:
+        report = run_campaign(args)
     print(json.dumps({"verdict": report["verdict"]}, sort_keys=True), flush=True)
     return 0
 

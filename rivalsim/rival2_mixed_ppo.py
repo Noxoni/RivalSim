@@ -662,6 +662,295 @@ def _parameter_step_norms(
     return output
 
 
+def probe_fresh_adam_first_minibatch(
+    model: Rival2ActorCritic,
+    rollout: Rival2RolloutBuffer,
+    ppo_config: Rival2PPOConfig,
+    *,
+    retention_observations: torch.Tensor,
+    family_names: tuple[str, ...],
+    generator: torch.Generator,
+    policy_learning_rate: float,
+    critic_learning_rate: float,
+    policy_config: Rival2PolicyConfig | None = None,
+    gae_ready: bool = False,
+) -> dict[str, Any]:
+    """Measure and fully roll back one exact fresh-Adam PPO minibatch proposal.
+
+    This transition diagnostic uses the production mixed-PPO objective,
+    family-local advantage normalization, critic isolation, gradient clipping,
+    and action KL definitions. Model, optimizer, generator, and global RNG state
+    are restored before it returns; it never accepts a training step.
+    """
+
+    if not math.isfinite(policy_learning_rate) or policy_learning_rate <= 0.0:
+        raise ValueError("probe policy learning rate must be finite and positive")
+    if not math.isfinite(critic_learning_rate) or critic_learning_rate <= 0.0:
+        raise ValueError("probe critic learning rate must be finite and positive")
+    policy_config = policy_config or model.config
+    if not gae_ready:
+        rollout.compute_gae(ppo_config)
+    if rollout.opponent_family is None:
+        raise ValueError("mixed PPO rollout has no authoritative opponent-family identity")
+    if retention_observations.shape != (512, OBS_DIM):
+        raise ValueError("probe retention observation corpus shape mismatch")
+
+    indices = torch.nonzero(rollout.train_mask.reshape(-1), as_tuple=False).squeeze(-1)
+    if indices.numel() == 0:
+        raise RuntimeError("mixed PPO rollout contains no trainable samples")
+    observation = rollout.observations.reshape(-1, OBS_DIM).index_select(0, indices)
+    action = rollout.actions.reshape(-1, 8).index_select(0, indices)
+    pre_tanh = rollout.pre_tanh.reshape(-1, 5).index_select(0, indices)
+    old_log_probability = rollout.old_log_probability.reshape(-1).index_select(0, indices)
+    returns = rollout.returns.reshape(-1).index_select(0, indices)
+    raw_advantage = rollout.advantages.reshape(-1).index_select(0, indices)
+    family = rollout.opponent_family.reshape(-1).index_select(0, indices)
+    advantage, family_statistics = _family_normalize(raw_advantage, family, family_names)
+
+    model_device = next(model.parameters()).device
+    model_before = copy.deepcopy(model.state_dict())
+    gradients_before = [
+        None if parameter.grad is None else parameter.grad.detach().clone()
+        for parameter in model.parameters()
+    ]
+    model_training_before = model.training
+    generator_before = generator.get_state().clone()
+    cpu_rng_before = torch.get_rng_state().clone()
+    cuda_rng_before = (
+        torch.cuda.get_rng_state(model_device).clone()
+        if model_device.type == "cuda"
+        else None
+    )
+    optimizer = make_empty_mixed_optimizer(
+        model,
+        policy_learning_rate=policy_learning_rate,
+        critic_learning_rate=critic_learning_rate,
+    )
+    transaction = _snapshot_transaction(model, optimizer)
+    result: dict[str, Any] | None = None
+    try:
+        model.train()
+        behavior_model = copy.deepcopy(model).eval().requires_grad_(False)
+        with torch.no_grad():
+            retention_reference, _ = behavior_model(retention_observations)
+        permutation = torch.randperm(
+            indices.numel(), device=rollout.device, generator=generator
+        )
+        batch = permutation[: ppo_config.minibatch_size]
+        batch_observation = observation.index_select(0, batch)
+        batch_action = action.index_select(0, batch)
+        batch_pre_tanh = pre_tanh.index_select(0, batch)
+        batch_old_log_probability = old_log_probability.index_select(0, batch)
+        batch_advantage = advantage.index_select(0, batch)
+        batch_returns = returns.index_select(0, batch)
+        with torch.no_grad():
+            behavior_actor, _ = behavior_model(batch_observation)
+
+        trunk_parameters = list(model.trunk.parameters())
+        actor_parameters = list(model.actor.parameters())
+        critic_parameters = list(model.critic.parameters())
+        hidden = model.trunk(batch_observation)
+        actor_output = model.actor(hidden)
+        value = model.critic(hidden.detach()).squeeze(-1)
+        new_log_probability = hybrid_log_probability(
+            actor_output,
+            batch_action,
+            config=policy_config,
+            pre_tanh=batch_pre_tanh,
+        )
+        log_ratio = new_log_probability - batch_old_log_probability
+        ratio = torch.exp(log_ratio)
+        unclipped = ratio * batch_advantage
+        clipped = ratio.clamp(
+            1.0 - ppo_config.clip_range, 1.0 + ppo_config.clip_range
+        ) * batch_advantage
+        policy_loss = -torch.minimum(unclipped, clipped).mean()
+        value_loss = 0.5 * (value - batch_returns).square().mean()
+        entropy = hybrid_entropy(actor_output, policy_config).mean()
+        actor_objective = policy_loss - ppo_config.entropy_coefficient * entropy
+        weighted_value_loss = ppo_config.value_loss_coefficient * value_loss
+
+        optimizer.zero_grad(set_to_none=True)
+        actor_objective.backward(retain_graph=True)
+        trunk_gradient_after_policy = [
+            None if parameter.grad is None else parameter.grad.detach().clone()
+            for parameter in trunk_parameters
+        ]
+        actor_gradient_after_policy = [
+            None if parameter.grad is None else parameter.grad.detach().clone()
+            for parameter in actor_parameters
+        ]
+        policy_trunk_gradient_norm = _gradient_norm(trunk_parameters)
+        actor_head_gradient_norm = _gradient_norm(actor_parameters)
+        critic_gradients = torch.autograd.grad(
+            weighted_value_loss,
+            critic_parameters,
+            retain_graph=False,
+            allow_unused=False,
+        )
+        for parameter, gradient in zip(
+            critic_parameters, critic_gradients, strict=True
+        ):
+            parameter.grad = gradient
+        value_loss_isolated = all(
+            (before is None and parameter.grad is None)
+            or (
+                before is not None
+                and parameter.grad is not None
+                and torch.equal(before, parameter.grad)
+            )
+            for parameter, before in zip(
+                trunk_parameters, trunk_gradient_after_policy, strict=True
+            )
+        ) and all(
+            (before is None and parameter.grad is None)
+            or (
+                before is not None
+                and parameter.grad is not None
+                and torch.equal(before, parameter.grad)
+            )
+            for parameter, before in zip(
+                actor_parameters, actor_gradient_after_policy, strict=True
+            )
+        )
+        critic_head_gradient_norm = _gradient_norm(critic_parameters)
+        raw_gradient_norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), ppo_config.max_gradient_norm
+        )
+        post_clip_gradient_norm = _gradient_norm(list(model.parameters()))
+        parameter_before = _parameter_group_snapshot(model)
+        optimizer.step()
+        parameter_step_norms = _parameter_step_norms(model, parameter_before)
+
+        with torch.no_grad():
+            post_actor, post_value = model(batch_observation)
+            post_log_probability = hybrid_log_probability(
+                post_actor,
+                batch_action,
+                config=policy_config,
+                pre_tanh=batch_pre_tanh,
+            )
+            post_log_ratio = post_log_probability - batch_old_log_probability
+            post_step_kl = (
+                (torch.exp(post_log_ratio) - 1.0) - post_log_ratio
+            ).mean()
+            minibatch_channel = _analytic_channel_kl(
+                behavior_actor, post_actor, policy_config
+            ).mean(dim=0)
+            retention_actor, retention_value = model(retention_observations)
+            retention_channel = _analytic_channel_kl(
+                retention_reference, retention_actor, policy_config
+            ).mean(dim=0)
+            retention_mean_kl = retention_channel.sum()
+        model_finite = all(
+            bool(torch.isfinite(parameter).all().item())
+            for parameter in model.parameters()
+        )
+        output_finite = bool(
+            torch.isfinite(post_actor).all()
+            and torch.isfinite(post_value).all()
+            and torch.isfinite(retention_actor).all()
+            and torch.isfinite(retention_value).all()
+            and torch.isfinite(post_step_kl)
+            and torch.isfinite(retention_mean_kl)
+        )
+        post_kl = float(post_step_kl.item())
+        retention_kl = float(retention_mean_kl.item())
+        finite = bool(
+            model_finite
+            and output_finite
+            and torch.isfinite(raw_gradient_norm)
+            and torch.isfinite(post_clip_gradient_norm)
+        )
+        result = {
+            "policy_learning_rate": policy_learning_rate,
+            "critic_learning_rate": critic_learning_rate,
+            "trainable_sample_count": int(indices.numel()),
+            "minibatch_samples": int(batch.numel()),
+            "minibatch_index_sha256": hashlib.sha256(
+                batch.detach().cpu().contiguous().numpy().tobytes()
+            )
+            .hexdigest()
+            .upper(),
+            "family_statistics": family_statistics,
+            "policy_loss": float(policy_loss.item()),
+            "value_loss": float(value_loss.item()),
+            "post_step_minibatch_kl": post_kl,
+            "retention_mean_kl": retention_kl,
+            "minibatch_kl_by_action_channel": {
+                name: float(minibatch_channel[index].item())
+                for index, name in enumerate(ACTION_CHANNEL_NAMES)
+            },
+            "retention_kl_by_action_channel": {
+                name: float(retention_channel[index].item())
+                for index, name in enumerate(ACTION_CHANNEL_NAMES)
+            },
+            "raw_gradient_norm": float(raw_gradient_norm.item()),
+            "post_clip_gradient_norm": float(post_clip_gradient_norm.item()),
+            "policy_trunk_gradient_norm": float(policy_trunk_gradient_norm.item()),
+            "actor_head_gradient_norm": float(actor_head_gradient_norm.item()),
+            "critic_head_gradient_norm": float(critic_head_gradient_norm.item()),
+            "parameter_step_norms": parameter_step_norms,
+            "value_loss_isolated_from_policy_trunk_and_actor": value_loss_isolated,
+            "model_parameters_finite": model_finite,
+            "outputs_finite": output_finite,
+            "passes_soft_minibatch_kl": post_kl <= 0.02,
+            "passes_soft_retention_kl": retention_kl <= 0.02,
+            "passes_hard_minibatch_kl": post_kl < 0.10,
+            "passes_finite_guard": finite,
+        }
+        result["passes_transition_gate"] = bool(
+            result["passes_soft_minibatch_kl"]
+            and result["passes_soft_retention_kl"]
+            and result["passes_hard_minibatch_kl"]
+            and result["passes_finite_guard"]
+            and value_loss_isolated
+        )
+    finally:
+        rollback_checks = _restore_transaction_exact(model, optimizer, transaction)
+        for parameter, gradient in zip(
+            model.parameters(), gradients_before, strict=True
+        ):
+            parameter.grad = None if gradient is None else gradient.clone()
+        generator.set_state(generator_before)
+        torch.set_rng_state(cpu_rng_before)
+        if cuda_rng_before is not None:
+            torch.cuda.set_rng_state(cuda_rng_before, model_device)
+        model.train(model_training_before)
+        rollback_checks.update(
+            {
+                "model_state_exact": _nested_exact(model_before, model.state_dict()),
+                "model_gradients_exact": all(
+                    (before is None and parameter.grad is None)
+                    or (
+                        before is not None
+                        and parameter.grad is not None
+                        and torch.equal(before, parameter.grad)
+                    )
+                    for parameter, before in zip(
+                        model.parameters(), gradients_before, strict=True
+                    )
+                ),
+                "generator_state_exact": torch.equal(
+                    generator_before, generator.get_state()
+                ),
+                "global_cpu_rng_state_exact": torch.equal(
+                    cpu_rng_before, torch.get_rng_state()
+                ),
+                "global_cuda_rng_state_exact": cuda_rng_before is None
+                or torch.equal(cuda_rng_before, torch.cuda.get_rng_state(model_device)),
+            }
+        )
+        if result is not None:
+            result["rollback_checks"] = rollback_checks
+            result["rollback_complete"] = all(rollback_checks.values())
+    if result is None:
+        raise RuntimeError("fresh-Adam transition probe produced no result")
+    if not result["rollback_complete"]:
+        raise RuntimeError(f"fresh-Adam transition probe rollback failed: {result}")
+    return result
+
+
 def ppo_update_mixed_curriculum(
     model: Rival2ActorCritic,
     optimizer: torch.optim.Optimizer,
@@ -1219,6 +1508,7 @@ __all__ = [
     "migrate_adam_to_mixed_groups",
     "mixed_optimizer_learning_rates",
     "ppo_update_mixed_curriculum",
+    "probe_fresh_adam_first_minibatch",
     "reset_policy_learning_rate_for_new_update",
     "retention_observation_sha256",
     "set_policy_learning_rate",
