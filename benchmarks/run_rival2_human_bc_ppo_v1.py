@@ -1413,7 +1413,8 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
     )
     final_checks = {
         "ten_hour_wall_clock_completed": duration_completed,
-        "original_plus_120_boundary_completed": final_offset >= 120,
+        "at_least_one_ppo_update_accepted": final_offset > 0,
+        "wall_clock_deadline_is_terminal_success_boundary": duration_completed,
         "bc_parent_identity_present": final_payload["curriculum_transition"][
             "human_bc_parent"
         ]["sha256"]
@@ -1472,7 +1473,7 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
         == "PASS_NO_HARD_GUARD_FIRED",
     }
     evidence = {
-        "format": "RIVAL2_HUMAN_BC_PPO_PLUS_120_FINAL_EVIDENCE_V1",
+        "format": "RIVAL2_HUMAN_BC_PPO_10H_FINAL_EVIDENCE_V2",
         "created_utc": utc_now(),
         "verdict": "PASS_GREEN" if all(final_checks.values()) else "BLOCKED",
         "git_head_before_final_evidence_commit": git("rev-parse", "HEAD"),

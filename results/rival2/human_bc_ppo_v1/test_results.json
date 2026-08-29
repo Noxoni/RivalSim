@@ -1,5 +1,5 @@
 {
-  "format": "RIVAL2_HUMAN_BC_PPO_TEST_RESULTS_V1",
+  "format": "RIVAL2_HUMAN_BC_PPO_TEST_RESULTS_V2",
   "command": ".venv/Scripts/python.exe -m pytest tests/test_rival2_human_bc_ppo_v1.py tests/test_rival2_120hz.py tests/test_rival2_mixed_ppo.py tests/test_rival2_opponent_curriculum.py -q",
   "passed": 17,
   "failed": 0,
@@ -8,5 +8,28 @@
   "ruff_command": ".venv/Scripts/ruff.exe check rivalsim/rival2_opponent_curriculum.py benchmarks/run_rival2_human_bc_ppo_v1.py tests/test_rival2_human_bc_ppo_v1.py",
   "ruff_verdict": "PASS",
   "git_diff_check": "PASS",
+  "final_validation": {
+    "command": ".venv/Scripts/python.exe -m pytest -q tests/test_rival2_human_bc_ppo_v1.py tests/test_rival2_120hz.py tests/test_rival2_mixed_ppo.py",
+    "passed": 18,
+    "failed": 0,
+    "warnings": 15,
+    "ruff_command": ".venv/Scripts/python.exe -m ruff check benchmarks/run_rival2_human_bc_ppo_v1.py tests/test_rival2_human_bc_ppo_v1.py rivalsim/rival2_mixed_ppo.py",
+    "ruff_verdict": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "final_checkpoint_sanity": {
+    "sha256": "C75F08F91E2FF29D78C15A67B5DE85BDF0B0A548E0268FFDB0CF29C272750067",
+    "iteration": 4546,
+    "policy_version": 4547,
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "human_bc_parent_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+    "fresh_optimizer": true,
+    "historical_optimizer_restored": false,
+    "campaign_completed": true,
+    "model_finite": true,
+    "historical_pool_size": 16,
+    "rng_state_present": true
+  },
   "verdict": "PASS_GREEN"
 }

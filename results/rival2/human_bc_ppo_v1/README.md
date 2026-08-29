@@ -45,13 +45,30 @@ and campaign telemetry.
 
 ## Outcome
 
-The mechanics-removal gate passed and was pushed before training. The first
-fresh-Adam minibatch proposal then produced KL 0.414318710565567, exceeding the
-frozen 0.10 hard guard. Retention KL was 0.12192033976316452. Transactional
-rollback restored model parameters, optimizer state, and Adam step counters
-exactly; no PPO update was accepted and no campaign checkpoint was selected.
+The original `1e-4` fresh-Adam proposal reproduced its KL rejection exactly and
+was rolled back. The frozen same-minibatch transition sweep selected `1.25e-5`,
+the highest candidate satisfying both `0.02` soft limits. The transition
+authority was committed and pushed before the first accepted PPO step.
 
-This is classified as a policy-displacement/capability safety failure, not a
-reward-path or operational failure. Training remains stopped. See
-`failure_analysis.json` for the full evidence and the prospective next-step
-recommendation.
+The wall-clock campaign then completed 36,008.227 seconds and accepted 4,067
+PPO updates. No hard safety guard fired. There were 84 allowed soft retention
+early-stops, 2,447 LR backoffs, and 2,531 transactional retries. The maximum
+accepted minibatch KL was 0.0199983064, the maximum retention KL was
+0.0199981406, and the maximum completed-update mean KL was 0.0217673108, below
+the unchanged 0.05 hard completed-update guard.
+
+The transition warmup remained active through the final update because the
+policy did not complete two consecutive clean `1e-4` updates. It therefore
+never entered the normal production reset rule; this is recorded as a bounded
+adaptive outcome, not silently relabeled as normal `1e-4` operation.
+
+Across first-100 versus last-100 update windows, touches rose from 16.5118 to
+19.1980 per minute, goals rose from 1,307.98 to 1,424.92 per update, movement
+speed rose by 65.73 uu/s, and no-touch truncations fell from 6.38 to 4.14 per
+update. Unnecessary flip contacts rose from 7.5577 to 8.7754 per minute while
+their fraction of flip-active contacts fell from 0.6172 to 0.5421. This mixed
+ball-contact result should be judged visually before more training.
+
+The final resumable checkpoint and the +30 milestone are stored in Git. See
+`FINAL_AUDIT.md`, `final_evidence.json`, `checkpoint_milestones.json`, and the
+full `training_curve.jsonl` for the reviewer package.

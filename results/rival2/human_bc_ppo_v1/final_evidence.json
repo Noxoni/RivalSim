@@ -1,15 +1,200 @@
 {
-  "format": "RIVAL2_HUMAN_BC_PPO_BLOCKED_BEFORE_FIRST_ACCEPTED_UPDATE_V1",
-  "verdict": "BLOCKED",
-  "human_bc_parent_path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
-  "human_bc_parent_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
-  "final_accepted_ppo_offset": 0,
-  "final_checkpoint": null,
-  "mechanics_removal_preflight": "PASS_GREEN",
-  "hard_safety_status": "FAIL_HARD_GUARD_FIRED_AND_ROLLED_BACK_EXACTLY",
-  "hard_safety_reason": "first proposed minibatch KL 0.414318710565567 exceeded frozen hard limit 0.10",
-  "touches_goals_no_touch_trend": null,
-  "unnecessary_flip_contact_trend": null,
-  "ten_hour_campaign_completed": false,
-  "recommendation": "Stop and establish prospective optimizer-transition authority before another PPO attempt; do not weaken the hard guard."
+  "campaign_duration_seconds": 36000,
+  "campaign_elapsed_seconds": 36008.22745871544,
+  "checks": {
+    "adaptive_safety_state_present": true,
+    "all_new_snapshots_are_120hz": true,
+    "at_least_one_ppo_update_accepted": true,
+    "bc_parent_identity_present": true,
+    "contracts_exact": true,
+    "fresh_optimizer_has_steps": true,
+    "fresh_ppo_optimizer_recorded": true,
+    "historical_pool_bounded": true,
+    "named_mechanics_absent_every_update": true,
+    "nexto_wisp_never_sampled": true,
+    "no_hard_safety_guard": true,
+    "not_historical_optimizer_continuation": true,
+    "physics_hz_120": true,
+    "policy_hz_120": true,
+    "rng_state_present": true,
+    "ten_hour_wall_clock_completed": true,
+    "wall_clock_deadline_is_terminal_success_boundary": true
+  },
+  "created_utc": "2026-08-29T13:51:57.708075+00:00",
+  "final_accepted_ppo_offset": 4067,
+  "final_checkpoint": {
+    "bytes": 57568813,
+    "path": "checkpoints/rival2/human_bc_ppo_v1/rival2_human_bc_ppo_10h.pt",
+    "sha256": "C75F08F91E2FF29D78C15A67B5DE85BDF0B0A548E0268FFDB0CF29C272750067"
+  },
+  "final_iteration": 4546,
+  "final_policy_version": 4547,
+  "format": "RIVAL2_HUMAN_BC_PPO_10H_FINAL_EVIDENCE_V2",
+  "fresh_optimizer_step_counters": [
+    932294
+  ],
+  "final_audit": {
+    "bytes": 4656,
+    "path": "results/rival2/human_bc_ppo_v1/FINAL_AUDIT.md",
+    "sha256": "BB5746DE949379D2084C66543C7B2C2D3E68185B2CE571B4D3040088C99E538D"
+  },
+  "final_validation": {
+    "bytes": 1710,
+    "path": "results/rival2/human_bc_ppo_v1/test_results.json",
+    "sha256": "699B1FBE7343BC9B54AC0015CC1358E900DE4ED5F74C318DFFE59287117FD0F8"
+  },
+  "checkpoint_manifest": {
+    "bytes": 2632,
+    "path": "results/rival2/human_bc_ppo_v1/checkpoint_milestones.json",
+    "sha256": "697C3F8AF206775743932EBB4EE75F66CFEDFE150E799E177BA60CD262D1CFE0"
+  },
+  "git_head_before_final_evidence_commit": "ac7664b46add7244dfdeb9caa8c8a7209dfb1a7e",
+  "hard_safety_rejection": null,
+  "hard_safety_status": "PASS_NO_HARD_GUARD_FIRED",
+  "human_bc_parent": {
+    "bytes": 7563365,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "mechanics_removal_preflight": {
+    "bytes": 9103,
+    "path": "results/rival2/human_bc_ppo_v1/mechanics_removal_preflight.json",
+    "sha256": "583EE6CEB4F0E13B8CC366E47DDDF638D992390126DAA1327E4EB31CD139E8D3"
+  },
+  "milestones": [
+    {
+      "accepted_ppo_offset": 30,
+      "bytes": 52553133,
+      "historical_pool": [
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 0
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 30
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 60
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 90
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 120
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 180
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 240
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 300
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 359
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 389
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 419
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 449
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V1",
+          "policy_hz": 30,
+          "version": 479
+        },
+        {
+          "action_version": "RIVAL2_ACTION_V2_120HZ",
+          "policy_hz": 120,
+          "version": 510
+        }
+      ],
+      "iteration": 509,
+      "path": "G:\\dev\\RivalSim-runs\\human-bc-ppo-v1-safe-10h-20260829\\milestones\\rival2_human_bc_ppo_plus_030.pt",
+      "policy_version": 510,
+      "sha256": "E96774DE139156AE6C055E65033383CD50071F2BA73506C6D87F70DCAAD92B0D"
+    }
+  ],
+  "ppo_safety_summary": {
+    "maximum_completed_update_mean_kl": 0.021767310798168182,
+    "maximum_post_step_minibatch_kl": 0.019998306408524513,
+    "total_lr_backoffs": 2447,
+    "total_transactional_retries": 2531,
+    "updates_with_soft_early_stop": 84
+  },
+  "sample_accounting": {
+    "agent_decisions_120hz": 30733257575,
+    "decision_count_cross_cadence_comparable": false,
+    "physical_physics_ticks_experienced": 17062428672,
+    "simulated_agent_seconds": 284373811.2,
+    "simulated_world_seconds": 142186905.6,
+    "source_30hz_agent_decisions": 3655854038
+  },
+  "small_sanity_scope": "the final training rollout supplied finite-output, action-saturation, movement, touch, scoring, no-touch, and termination sanity telemetry; no large opponent evaluation was run",
+  "trend_first_10_vs_last_10": {
+    "analog_action_saturation_fraction": {
+      "delta": -0.002470248476877601,
+      "first_10_mean": 0.02442066119555019,
+      "last_10_mean": 0.02195041271867259
+    },
+    "goals_per_update": {
+      "delta": 1116.3,
+      "first_10_mean": 320.2,
+      "last_10_mean": 1436.5
+    },
+    "movement_speed_uu_per_second": {
+      "delta": 33.84122359839694,
+      "first_10_mean": 1109.353540856848,
+      "last_10_mean": 1143.194764455245
+    },
+    "no_touch_truncations_per_update": {
+      "delta": 5.2,
+      "first_10_mean": 0.0,
+      "last_10_mean": 5.2
+    },
+    "touches_per_minute": {
+      "delta": -0.1871967315673828,
+      "first_10_mean": 19.36065673828125,
+      "last_10_mean": 19.173460006713867
+    },
+    "unnecessary_flip_contacts_per_minute": {
+      "delta": 0.10188102722167969,
+      "first_10_mean": 8.693618774414062,
+      "last_10_mean": 8.795499801635742
+    },
+    "unnecessary_fraction_of_flip_active_contacts": {
+      "delta": 0.01886345591664762,
+      "first_10_mean": 0.5231310930582354,
+      "last_10_mean": 0.541994548974883
+    }
+  },
+  "verdict": "PASS_GREEN"
 }
