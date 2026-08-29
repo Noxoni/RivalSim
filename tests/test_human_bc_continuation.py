@@ -12,6 +12,7 @@ from rivalsim.human_demo.missing_feature_distillation import file_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = ROOT / "results/rival2/human_bc_continuation_v1/frozen_config.json"
+V2_CONFIG_PATH = ROOT / "results/rival2/human_bc_continuation_v2/frozen_config.json"
 
 
 def _healthy_actor_statistics() -> dict[str, object]:
@@ -71,3 +72,13 @@ def test_distribution_guard_accepts_health_and_rejects_collapse() -> None:
     result = _distribution_guard(human, config)
     assert not result["accepted"]
     assert not result["checks"]["mechanic.analog.roll.nonconstant"]
+
+
+def test_v2_separates_best_selection_from_plateau_materiality() -> None:
+    config = json.loads(V2_CONFIG_PATH.read_text(encoding="utf-8"))
+    assert config["selection"]["best_checkpoint_update"] == (
+        "any_strict_combined_score_improvement"
+    )
+    assert config["selection"]["material_delta_controls"] == "plateau patience only"
+    assert config["selection"]["minimum_human_family_relative_improvement"] == 0.01
+    assert config["authority"]["step_192_candidate_test_access_before_v2"] == 0

@@ -1,0 +1,86 @@
+{
+  "authority": {
+    "base_bc_config": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+    "base_bc_config_sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4",
+    "base_bc_evidence": "results/rival2/human_behavior_cloning_v1/evidence.json",
+    "base_bc_evidence_sha256": "31BEAA23CC5291644B9BA9C48437304CE9BB129048D50D6B09134079FABD9FE7",
+    "failed_v1_evidence": "results/rival2/human_bc_continuation_v1/evidence.json",
+    "failed_v1_evidence_sha256": "24585C3C083FFCD484E629404B322866120A654DAFB84286351A6A4F9447CA05",
+    "observation_adapter_checkpoint": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+    "observation_adapter_checkpoint_sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+    "required_parent": "e51d9992cd38cc6489bb0470e3d7d9dc81cfe441",
+    "source_checkpoint": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "source_checkpoint_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+    "source_model_tensor_sha256": "872731CA5FD5FE148242A709D954CD1FFEF5249075811E79A15B93420AF0DAD7",
+    "source_selected_accepted_step": 160,
+    "step_192_candidate_test_access_before_v2": 0
+  },
+  "checkpoint": {
+    "format": "RIVAL2_HUMAN_BC_CONTINUATION_CHECKPOINT_V2",
+    "historical_ppo_optimizer_resumable": false,
+    "path": "checkpoints/rival2/human_bc_continuation_v2/rival2_human_bc_continuation_v2.pt",
+    "save_every_accepted_validation_boundary": true
+  },
+  "continuation": {
+    "emergency_max_additional_accepted_steps": 8192,
+    "emergency_max_is_normal_stop": false,
+    "guard_rejection_stop": "stop after the frozen transactional retry budget is exhausted",
+    "parent_checkpoint_is_initial_candidate": true,
+    "plateau_stop": "six consecutive accepted validation boundaries without a material score improvement",
+    "selection_requires_new_material_improvement": true,
+    "test_access": "accepted continuation candidate once after final validation selection; never for tuning",
+    "validation_driven": true
+  },
+  "distribution_guard": {
+    "maximum_analog_actor_absolute_ge_5_fraction": 0.95,
+    "maximum_button_probability_saturation_fraction": 0.95,
+    "maximum_log_std_clamp_fraction": 0.95,
+    "minimum_nonconstant_channel_std": 0.01,
+    "nonfinite_allowed": false
+  },
+  "format": "RIVAL2_HUMAN_BC_CONTINUATION_FROZEN_CONFIG_V2",
+  "inherit_exactly_from_base_bc_v1": {
+    "human_action_objective": true,
+    "human_dataset_and_source_hashes": true,
+    "human_train_validation_test_splits": true,
+    "mechanic_aware_sampling": true,
+    "observation_action_contracts": true,
+    "observation_adapter": true,
+    "sampling_family_proportions": true,
+    "simulator_retention_corpus_and_splits": true,
+    "simulator_retention_hard_limits": true,
+    "simulator_retention_objective": true,
+    "validation_interval": true
+  },
+  "optimizer": {
+    "continuation_seed": 2026082901,
+    "historical_ppo_optimizer_loaded": false,
+    "minimum_learning_rate": 0.00000375,
+    "resume_fresh_supervised_adamw_state": true,
+    "source_checkpoint_rng_state_available": false,
+    "transactional_backoff_factor": 0.5,
+    "transactional_backoff_rule": "retry r uses interval-start LR multiplied by 0.5^r after exact rollback",
+    "transactional_retries_per_interval": 3
+  },
+  "prohibited": {
+    "closed_loop_mechanic_framework": true,
+    "mechanic_definition_change": true,
+    "mechanic_reward_or_detector_change": true,
+    "observation_action_contract_change": true,
+    "ppo": true,
+    "raw_recording_or_review_mutation": true,
+    "reward_change": true,
+    "rocket_league_to_rivalsim_mechanic_reconstruction": true
+  },
+  "selection": {
+    "best_checkpoint_update": "any_strict_combined_score_improvement",
+    "candidate_score": "inherited V1 absolute validation score against the frozen bootstrap-human baseline plus simulator-retention KL",
+    "early_stopping_material_score_improvement": 0.0025,
+    "early_stopping_patience_validations": 6,
+    "material_delta_controls": "plateau patience only",
+    "minimum_human_family_relative_improvement": 0.01,
+    "requires_action_distribution_health": true,
+    "requires_both_human_families_improve_over_parent": true,
+    "requires_frozen_hard_retention_guard": true
+  }
+}

@@ -118,6 +118,11 @@ def _load_base_config(config: dict[str, Any]) -> tuple[dict[str, Any], dict[str,
         )
         == authority["observation_adapter_checkpoint_sha256"],
     }
+    if "failed_v1_evidence" in authority:
+        checks["failed_v1_evidence_sha256_exact"] = (
+            file_sha256(ROOT / authority["failed_v1_evidence"])
+            == authority["failed_v1_evidence_sha256"]
+        )
     if not all(checks.values()):
         raise ValueError(f"continuation parent authority failed: {checks}")
     return (
@@ -587,10 +592,28 @@ def _train_continuation(
                     proposed_steps=proposed_steps,
                     candidate=candidate,
                 )
-                if (
+                score_improvement = best_score - float(candidate["selection_score"])
+                materially_better = score_improvement >= material_delta
+                strictly_better = score_improvement > 1e-12
+                update_mode = continuation_config["selection"].get(
+                    "best_checkpoint_update", "material_score_improvement_only"
+                )
+                select_better = bool(
                     candidate["eligible_for_selection"]
-                    and candidate["selection_score"] < best_score - material_delta
+                    and (
+                        materially_better
+                        if update_mode == "material_score_improvement_only"
+                        else strictly_better
+                    )
+                )
+                if update_mode not in (
+                    "material_score_improvement_only",
+                    "any_strict_combined_score_improvement",
                 ):
+                    raise ValueError(f"unknown best-checkpoint update mode: {update_mode}")
+                candidate["score_improvement_over_previous_best"] = score_improvement
+                candidate["material_plateau_improvement"] = materially_better
+                if select_better:
                     best_score = float(candidate["selection_score"])
                     best_candidate = copy.deepcopy(candidate)
                     _save_state(
@@ -603,6 +626,7 @@ def _train_continuation(
                         proposed_steps=proposed_steps,
                         candidate=candidate,
                     )
+                if materially_better and candidate["eligible_for_selection"]:
                     no_improvement = 0
                 else:
                     no_improvement += 1
@@ -836,6 +860,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     selected_model = _cpu_tree(student.state_dict())
     selected_optimizer = _cpu_tree(optimizer.state_dict())
     selected_additional = int(training["selected_additional_accepted_steps"])
+    minimum_parent_improvement = float(
+        continuation_config["selection"].get("minimum_human_family_relative_improvement", 0.0)
+    )
     checks = {
         "selected_new_material_checkpoint": bool(training["selected_new_checkpoint"]),
         "selected_additional_steps_positive": selected_additional > 0,
@@ -847,11 +874,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "gameplay_validation_improved_over_parent": training["selected_candidate"].get(
             "gameplay_rmse_ratio_to_parent", 1.0
         )
-        < 1.0,
+        <= 1.0 - minimum_parent_improvement,
         "mechanic_validation_improved_over_parent": training["selected_candidate"].get(
             "mechanic_rmse_ratio_to_parent", 1.0
         )
-        < 1.0,
+        <= 1.0 - minimum_parent_improvement,
         "not_emergency_ceiling": not training["emergency_ceiling_reached"],
         "all_outputs_finite": bool(test_parent["finite"] and test_selected["finite"]),
     }
