@@ -1,0 +1,157 @@
+{
+  "acceptance": {
+    "gameplay_complete_action_rmse_relative_improvement_min": 0.05,
+    "gameplay_sanity_action_saturation_absolute_increase_max": 0.1,
+    "gameplay_sanity_mean_speed_relative_floor": 0.65,
+    "gameplay_sanity_touch_rate_relative_floor": 0.5,
+    "mechanic_complete_action_rmse_relative_improvement_min": 0.05,
+    "mechanic_labels_improved_fraction_min": 0.6,
+    "mechanic_labels_nonregressed_fraction_min": 0.8,
+    "mechanic_label_nonregression_relative_tolerance": 0.02,
+    "no_nonfinite": true,
+    "required_closed_loop_capability_where_exactly_representable": true
+  },
+  "authority": {
+    "adapter_checkpoint": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+    "adapter_checkpoint_sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+    "adapter_tensor_sha256": "797E7139C485C692C2280F1CB126B9D1D682F1A8911C63AC46A4008042364863",
+    "bootstrap_checkpoint": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "bootstrap_checkpoint_sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350",
+    "bootstrap_model_tensor_sha256": "1AA50DC45E9E0FDD0B24510A26781787742BBE8C8ED5FF6B77FD72BEC3EFA8C3",
+    "human_dataset_manifest": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+    "human_dataset_manifest_sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55",
+    "human_sampling_metadata": "results/rival2/human_demo_dataset_v1/sampling_metadata.json",
+    "human_sampling_metadata_sha256": "E6F9EE5CFCB94BD0DCAB0F019D4789CA52248DA86FD9379787D8D28170297624",
+    "mechanic_adjudication": "benchmarks/human_demo_mechanic_adjudication_v1.json",
+    "mechanic_adjudication_sha256": "56296E161A12AB2F9A4D7B4EF2A187D0A4945CF893ED0D70FF07C99A83207622",
+    "required_parent": "1fbfc1bddf77ebdf4c2f8cc66405f8a0998f81f5",
+    "source_review_commit": "08a55e8326940271689847b316fa096a7fed3c71"
+  },
+  "checkpoint": {
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V1",
+    "historical_ppo_optimizer_resumable": false,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "save_every_accepted_validation_boundary": true
+  },
+  "closed_loop": {
+    "exact_mechanic_start_required": true,
+    "mechanic_source_bound_adjudication_evaluation_only": true,
+    "native_to_simulator_cross_engine_approximation_is_not_exact": true,
+    "sanity_decisions_per_world": 256,
+    "sanity_policy": "stochastic frozen production mixed-opponent curriculum",
+    "sanity_seed": 2026082831,
+    "sanity_worlds": 32768
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_FROZEN_CONFIG_V1",
+  "human_data": {
+    "action_contract": "RIVAL2_ACTION_V2_120HZ",
+    "action_rate_hz": 120,
+    "expected_gameplay_frames": {
+      "test": 3808,
+      "train": 47347,
+      "validation": 7151
+    },
+    "expected_mechanic_attempts": {
+      "test": 16,
+      "train": 77,
+      "validation": 17
+    },
+    "expected_mechanic_frames": {
+      "test": 8199,
+      "train": 39275,
+      "validation": 8531
+    },
+    "failed_and_ambiguous_positive_training": false,
+    "mechanic_split_unit": "whole attempt",
+    "observation_adapter": "native -> committed BC bridge -> frozen observation adapter V2",
+    "observation_contract": "RIVAL2_OBS_V2_120HZ",
+    "test_access": "once after one best validation checkpoint is selected"
+  },
+  "objective": {
+    "analog": "SmoothL1(tanh(actor_mean), exact_native_action)",
+    "analog_weight": 1.0,
+    "button": "BCEWithLogits(raw_actor_logit, exact_native_action)",
+    "button_weight": 0.25,
+    "critic": "detached frozen-teacher value regression on authoritative simulator observations",
+    "human_log_std_retention_weight": 0.05,
+    "human_log_std_target": "frozen bootstrap actor log_std on the same repaired human observation",
+    "simulator_actor_retention_weight": 2.0,
+    "simulator_critic_retention_weight": 1.0,
+    "smooth_l1_beta": 0.1
+  },
+  "retention": {
+    "corpus": {
+      "car_perspectives_per_world": 2,
+      "collision_mesh_directory": "G:/dev/RLBot-Rival/bot/collision_meshes",
+      "decisions_per_world": 128,
+      "expected_identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+      "expected_observation_tensor_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+      "physics_hz": 120,
+      "policy_hz": 120,
+      "seed": 2026082821,
+      "split": {
+        "algorithm": "numpy PCG64 permutation of whole world indices",
+        "seed": 2026082822,
+        "test_worlds": 3277,
+        "train_worlds": 26214,
+        "validation_worlds": 3277
+      },
+      "worlds": 32768
+    },
+    "hard_guard": {
+      "actor_max_channel_kl": 0.01,
+      "actor_max_sample_kl": 2.0,
+      "actor_mean_kl": 0.02,
+      "critic_max_absolute_drift": 0.5,
+      "critic_rmse": 0.075,
+      "nonfinite_allowed": false
+    },
+    "soft_actor_mean_kl": 0.01,
+    "validation_subset": {
+      "selection": "first 512 indices in the frozen whole-world validation permutation",
+      "worlds": 512
+    },
+    "worlds_per_training_minibatch": 16,
+    "worlds_per_validation_batch": 64
+  },
+  "sampling": {
+    "gameplay_frames_per_step": 1024,
+    "gameplay_sampling": "uniform over train frames",
+    "maximum_mechanic_frame_oversampling_ratio": 4.0,
+    "mechanic_frames_per_step": 1024,
+    "mechanic_hierarchy": [
+      "label",
+      "attempt",
+      "frame"
+    ],
+    "mechanic_natural_frame_fraction": 0.9,
+    "mechanic_uniform_label_fraction": 0.1,
+    "separate_gameplay_and_mechanic_families": true
+  },
+  "selection": {
+    "candidate_score": "mean(gameplay_complete_rmse_ratio, mechanic_complete_rmse_ratio) + 0.10 * simulator_actor_mean_kl / soft_limit",
+    "early_stopping_material_score_improvement": 0.0025,
+    "early_stopping_patience_validations": 6,
+    "requires_both_human_families_improve": true,
+    "requires_hard_retention_guard": true,
+    "test_used_for_selection": false
+  },
+  "training": {
+    "fresh_optimizer": "torch.optim.AdamW",
+    "gradient_clip_norm": 1.0,
+    "initial_learning_rate": 0.00003,
+    "lr_backoff_factor": 0.5,
+    "max_accepted_optimizer_steps": 512,
+    "max_guard_retries_per_interval": 3,
+    "minimum_learning_rate": 0.00000375,
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "optimizer_epsilon": 1e-08,
+    "seed": 2026082830,
+    "transactional_nonfinite_check_every_step": true,
+    "validation_interval_optimizer_steps": 32,
+    "weight_decay": 0.00001
+  }
+}
