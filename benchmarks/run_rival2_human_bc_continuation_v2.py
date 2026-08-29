@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-import benchmarks.run_rival2_human_bc_continuation_v1 as runner
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import benchmarks.run_rival2_human_bc_continuation_v1 as runner  # noqa: E402
 
 runner.CONTINUATION_VERSION = "RIVAL2_HUMAN_BC_CONTINUATION_V2"
 runner.CONTINUATION_CHECKPOINT_FORMAT = "RIVAL2_HUMAN_BC_CONTINUATION_CHECKPOINT_V2"
