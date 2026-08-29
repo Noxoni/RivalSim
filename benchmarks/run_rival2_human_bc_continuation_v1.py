@@ -1050,7 +1050,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     artifact_paths = [
         Path(continuation_config["checkpoint"]["path"]),
         RESULT_ROOT / "README.md",
-        RESULT_ROOT / "REVIEW.md",
         RESULT_ROOT / "corpus_manifest.json",
         RESULT_ROOT / "evidence.json",
         RESULT_ROOT / "final_test_metrics.json",
@@ -1059,8 +1058,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         RESULT_ROOT / "pre_step_preflight.json",
         RESULT_ROOT / "simulator_retention_test.json",
         RESULT_ROOT / "training_curve.json",
-        RESULT_ROOT / "verification_evidence.json",
     ]
+    for optional_post_run_artifact in ("REVIEW.md", "verification_evidence.json"):
+        optional_path = ROOT / RESULT_ROOT / optional_post_run_artifact
+        if optional_path.is_file():
+            artifact_paths.append(RESULT_ROOT / optional_post_run_artifact)
     _write_json(ROOT / RESULT_ROOT / "artifact_manifest.json", _artifact_manifest(artifact_paths))
     print(
         json.dumps(
