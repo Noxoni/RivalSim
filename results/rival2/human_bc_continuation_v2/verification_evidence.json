@@ -1,0 +1,102 @@
+{
+  "accepted_boundary": {
+    "additional_accepted_steps": 32,
+    "cumulative_step": 192,
+    "gameplay_validation_rmse_after": 0.5499602556228638,
+    "gameplay_validation_rmse_before": 0.5600362420082092,
+    "mechanic_validation_rmse_after": 0.5246223211288452,
+    "mechanic_validation_rmse_before": 0.5355024933815002,
+    "retention_actor_mean_kl": 0.004958888399414718,
+    "retention_critic_max_absolute_drift": 0.4957442283630371,
+    "retention_guard_accepted": true,
+    "selected": true,
+    "selection_score_after": 0.9172371760057916,
+    "selection_score_before": 0.9174817773822057
+  },
+  "checkpoint_validation": {
+    "continuation_proposed_optimizer_steps": 160,
+    "cumulative_accepted_optimizer_steps": 192,
+    "format": "RIVAL2_HUMAN_BC_CONTINUATION_CHECKPOINT_V2",
+    "fresh_supervised_optimizer_present": true,
+    "human_bc_resumable": true,
+    "loadable": true,
+    "model_present": true,
+    "ppo_resumable": false,
+    "rng_state_present": true
+  },
+  "final_acceptance": {
+    "accepted": false,
+    "failed_check": "simulator_test_retention.critic_max_absolute_drift",
+    "frozen_limit": 0.5,
+    "observed": 0.5182976722717285
+  },
+  "format": "RIVAL2_HUMAN_BC_CONTINUATION_VERIFICATION_EVIDENCE_V2",
+  "integrity": {
+    "adapter_checkpoint_unchanged": true,
+    "native_source_hashes_unchanged": true,
+    "parent_checkpoint_unchanged": true,
+    "test_access_before_selection": false,
+    "test_access_count_this_task": 1
+  },
+  "mechanic_sampling": {
+    "gameplay_batch_fraction": 0.5,
+    "maximum_realized_oversampling_ratio": 3.0722898230088496,
+    "oversampling_cap": 4.0,
+    "uniform_label_fraction": 0.1
+  },
+  "post_selection_guard_stop": {
+    "attempted_cumulative_step": 224,
+    "failed_check": "critic_max_absolute_drift",
+    "learning_rate_attempts": [
+      {
+        "critic_max_absolute_drift": 0.5892395973205566,
+        "learning_rate": 0.00003
+      },
+      {
+        "critic_max_absolute_drift": 0.5515842437744141,
+        "learning_rate": 0.000015
+      },
+      {
+        "critic_max_absolute_drift": 0.5476627349853516,
+        "learning_rate": 0.0000075
+      },
+      {
+        "critic_max_absolute_drift": 0.526914119720459,
+        "learning_rate": 0.00000375
+      }
+    ],
+    "stopped_by_guard": true,
+    "transactional_restores_from_saved_boundary": 4,
+    "validation_plateaued": false
+  },
+  "prohibited_work": {
+    "closed_loop_mechanic_framework": false,
+    "mechanic_definition_change": false,
+    "observation_action_contract_change": false,
+    "ppo": false,
+    "raw_recording_mutation": false,
+    "reward_change": false,
+    "rocket_league_to_rivalsim_mechanic_reconstruction": false
+  },
+  "selected_checkpoint": {
+    "additional_accepted_steps": 32,
+    "model_tensor_sha256": "894BC076FDE0D08E6CEAFB397A642062E3FC1DB4F586D0A7079947E518977747",
+    "path": "checkpoints/rival2/human_bc_continuation_v2/rival2_human_bc_continuation_v2.pt",
+    "sha256": "ABFD4C0CCD3B1F18C876A22969ADAC5FA4D917B710039F6BBEBBF9590D041655"
+  },
+  "test_metrics": {
+    "gameplay_rmse_after": 0.535649836063385,
+    "gameplay_rmse_before": 0.5419303178787231,
+    "mechanic_rmse_after": 0.5467718839645386,
+    "mechanic_rmse_before": 0.559705376625061,
+    "simulator_actor_mean_kl": 0.0050083039635960055,
+    "simulator_critic_max_absolute_drift": 0.5182976722717285,
+    "simulator_retention_guard_accepted": false
+  },
+  "tests": {
+    "artifact_manifest_exact": true,
+    "focused_passed": 41,
+    "ruff": "PASS"
+  },
+  "verdict": "BLOCKED"
+}
