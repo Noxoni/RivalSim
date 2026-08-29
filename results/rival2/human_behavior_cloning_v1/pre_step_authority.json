@@ -1,0 +1,48 @@
+{
+  "authority_checks": {
+    "adapter_checkpoint_sha256_exact": true,
+    "bootstrap_checkpoint_sha256_exact": true,
+    "failed_or_ambiguous_in_positive_cohort": false,
+    "human_dataset_manifest_sha256_exact": true,
+    "human_sampling_metadata_sha256_exact": true,
+    "mechanic_adjudication_sha256_exact": true,
+    "native_source_file_sets_unchanged": true,
+    "whole_attempt_splits_disjoint": true
+  },
+  "config": {
+    "git_blob_oid": "4bc422d42ed413d2fe1cf8d1943b3b84e2710172",
+    "path": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+    "pre_step_git_commit": "c9c4881e76ec124f8f212d0b64826a5d17d99695",
+    "pre_step_origin_main": "c9c4881e76ec124f8f212d0b64826a5d17d99695",
+    "sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4"
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_PRE_STEP_AUTHORITY_V1",
+  "generated_utc": "2026-08-29T00:17:50.996893+00:00",
+  "human_split_counts": {
+    "test": {
+      "gameplay_frames": 3808,
+      "mechanic_attempts": 16,
+      "mechanic_frames": 8199
+    },
+    "train": {
+      "gameplay_frames": 47347,
+      "mechanic_attempts": 77,
+      "mechanic_frames": 39275
+    },
+    "validation": {
+      "gameplay_frames": 7151,
+      "mechanic_attempts": 17,
+      "mechanic_frames": 8531
+    }
+  },
+  "native_source_session_count": 18,
+  "optimizer_steps": 0,
+  "ppo_updates": 0,
+  "required_parent": "1fbfc1bddf77ebdf4c2f8cc66405f8a0998f81f5",
+  "tests": {
+    "command": ".venv\\Scripts\\python.exe -m pytest tests/test_human_demo_behavior_cloning.py tests/test_human_demo_observation_adapter_v2.py tests/test_human_demo_bc_observation_bridge.py tests/test_human_demo_training_adapter.py tests/test_missing_feature_distillation.py -q",
+    "passed": 37,
+    "verdict": "PASS"
+  },
+  "valid": true
+}

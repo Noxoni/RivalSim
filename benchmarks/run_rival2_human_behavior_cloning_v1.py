@@ -1421,6 +1421,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         RESULT_ROOT / "final_test_metrics.json",
         RESULT_ROOT / "frozen_config.json",
         RESULT_ROOT / "gameplay_sanity.json",
+        RESULT_ROOT / "pre_step_authority.json",
         RESULT_ROOT / "pre_step_preflight.json",
         RESULT_ROOT / "simulator_retention_test.json",
         RESULT_ROOT / "training_curve.json",
