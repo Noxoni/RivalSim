@@ -1,0 +1,78 @@
+{
+  "format": "RIVAL2_HUMAN_BC_PPO_FIRST_UPDATE_FAILURE_ANALYSIS_V1",
+  "verdict": "BLOCKED",
+  "pre_step_git_commit": "96506aca2d05b62b923c43dcc530500dfe3312b7",
+  "pre_step_origin_main_verified": true,
+  "human_bc_parent": {
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256_before_after": [
+      "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+      "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+    ]
+  },
+  "mechanics_removal_preflight": {
+    "path": "results/rival2/human_bc_ppo_v1/mechanics_removal_preflight.json",
+    "sha256": "583EE6CEB4F0E13B8CC366E47DDDF638D992390126DAA1327E4EB31CD139E8D3",
+    "verdict": "PASS_GREEN",
+    "checks_passed": 44,
+    "checks_total": 44
+  },
+  "transition": {
+    "path": "results/rival2/human_bc_ppo_v1/transition.json",
+    "sha256": "D10C00E4274CCABCDD16A580F76DC62A7A68F757999E8545A81C4719B517D187",
+    "fresh_split_adam_state_empty_before_first_proposal": true,
+    "policy_learning_rate": 0.0001,
+    "critic_learning_rate": 0.0003,
+    "historical_iteration_479_adam_restored": false,
+    "human_bc_adam_restored": false,
+    "retention_reference_checkpoint_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "attempt": {
+    "attempted_ppo_offset": 1,
+    "accepted_ppo_offset": 0,
+    "optimizer_step_index": 0,
+    "minibatch_samples": 65536,
+    "pre_step_approx_kl": 0.0,
+    "proposed_post_step_approx_kl": 0.414318710565567,
+    "hard_minibatch_kl_limit": 0.1,
+    "hard_limit_multiple": 4.14318710565567,
+    "proposed_retention_mean_kl": 0.12192033976316452,
+    "soft_retention_mean_kl_target": 0.02,
+    "retention_target_multiple": 6.096016988158226,
+    "reason": "minibatch_kl_limit_exceeded"
+  },
+  "rollback": {
+    "transactional_rollback_completed": true,
+    "parameters_exact": true,
+    "optimizer_state_exact": true,
+    "adam_step_counters_exact": true,
+    "restored_iteration": 479,
+    "restored_policy_version": 480,
+    "accepted_checkpoint_created": false,
+    "rolling_checkpoint_created": false
+  },
+  "classification": {
+    "reward_path_failure": false,
+    "mechanics_signal_failure": false,
+    "nexto_or_wisp_contamination": false,
+    "nonfinite_failure": false,
+    "operational_runtime_failure": false,
+    "policy_capability_or_safety_failure": true,
+    "explanation": "The first fresh-Adam policy proposal displaced the Human BC V1 actor far beyond the frozen hard KL boundary. The guard fired before the soft retry path, as required, and restored the transaction exactly. Continuing would require changing the prospectively frozen optimizer-transition behavior or learning-rate authority and could materially alter the policy."
+  },
+  "retention_metadata_note": {
+    "recorded_summary_label": "RIVAL2_OBS_V1",
+    "actual_environment_observation_contract": "RIVAL2_OBS_V2_120HZ",
+    "actual_environment_observation_contract_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "effect_on_tensors": "none; the 512 retained tensors came directly from the authoritative 120 Hz environment",
+    "correction": "The retention summary builder now overwrites its legacy default label with the active environment observation contract and hash. No optimizer step is involved."
+  },
+  "training_outcome": {
+    "ten_hour_campaign_completed": false,
+    "touches_goals_no_touch_trend": null,
+    "unnecessary_flip_contact_trend": null,
+    "reason_no_trend": "No PPO update was accepted, so reporting a before-to-after training trend would be fabricated.",
+    "final_checkpoint": null
+  },
+  "recommendation": "Stop. Preserve Human BC V1 as the selected model. If PPO restart is still desired, establish a new prospective transition authority and run rollback-only learning-rate displacement diagnostics before authorizing training. A likely candidate is a lower fresh-Adam policy LR or a prospectively defined hard-violation retry protocol, but neither may be selected or tuned against this opened failure without explicit authorization. Do not weaken the 0.10 hard minibatch KL guard."
+}

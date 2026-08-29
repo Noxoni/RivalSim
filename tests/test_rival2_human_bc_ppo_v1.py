@@ -153,3 +153,46 @@ def test_clean_runtime_monitor_and_fresh_optimizer_gate(arena_assets) -> None:
     assert torch.isfinite(rollout.actions).all()
     assert torch.isfinite(rollout.rewards).all()
     assert len(trainer.optimizer.state) == 0
+
+
+def test_retention_metadata_binds_the_active_observation_contract(arena_assets) -> None:
+    root, geometry, meshes = arena_assets
+    env = Rival2Env(
+        256,
+        root,
+        geometry=geometry,
+        meshes=meshes,
+        device="cuda:0",
+        seed=2026082910,
+        reward_version=RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+        car_visitation_order="a_then_b",
+    )
+    trainer = Rival2OpponentCurriculumTrainer(
+        env,
+        ppo_config=Rival2PPOConfig(
+            entropy_coefficient=0.0,
+            rollout_horizon=2,
+            minibatch_size=256,
+            epochs=1,
+        ),
+        opponent_curriculum=Rival2OpponentCurriculumConfig(
+            nexto_probability=0.0,
+            wisp_probability=0.0,
+            current_probability=1.0,
+            historical_probability=0.0,
+            seed=2026082911,
+        ),
+        seed=2026082910,
+    )
+    trainer.curriculum_transition = {"identity": "TEST"}
+    trainer.initialize_curriculum_assignments()
+    trainer.enable_safe_mixed_ppo(Rival2MixedPPOSafetyConfig())
+    rollout = trainer.collect_rollout()
+    summary = trainer.initialize_retention_corpus_from_rollout(
+        rollout,
+        source_identity={"identity": "TEST_120HZ_PARENT"},
+    )
+    assert summary["observation_contract"] == "RIVAL2_OBS_V2_120HZ"
+    assert summary["observation_contract_sha256"] == env.contract_hashes[
+        "RIVAL2_OBS_V2_120HZ"
+    ]

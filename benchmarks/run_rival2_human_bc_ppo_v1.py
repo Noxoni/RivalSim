@@ -845,9 +845,16 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
             write_json(
                 RESULTS_DIR / "hard_safety_rejection.json",
                 {
+                    "format": "RIVAL2_HUMAN_BC_PPO_HARD_SAFETY_REJECTION_V1",
                     "created_utc": utc_now(),
                     "attempted_offset": offset,
                     "last_accepted_offset": offset - 1,
+                    "rollout_curriculum": trainer.last_rollout_curriculum_metrics,
+                    "rollout_gameplay": trainer.last_rollout_gameplay_metrics,
+                    "source_checkpoint_sha256_after_rejection": sha256(BC_CHECKPOINT),
+                    "transactional_policy_state_restored": bool(
+                        error.diagnostics.get("transactional_rollback_completed")
+                    ),
                     "diagnostics": rejection,
                 },
             )
@@ -931,7 +938,26 @@ def run_campaign(args: argparse.Namespace) -> dict[str, Any]:
 
     final_offset = len(rows)
     if final_offset == 0:
-        raise RuntimeError("campaign produced no accepted PPO update")
+        evidence = {
+            "format": "RIVAL2_HUMAN_BC_PPO_BLOCKED_BEFORE_FIRST_ACCEPTED_UPDATE_V1",
+            "created_utc": utc_now(),
+            "verdict": "BLOCKED",
+            "human_bc_parent": artifact(BC_CHECKPOINT),
+            "final_accepted_ppo_offset": 0,
+            "final_checkpoint": None,
+            "mechanics_removal_preflight": artifact(PREFLIGHT_PATH),
+            "hard_safety_status": hard_safety_status,
+            "hard_safety_rejection": rejection,
+            "touches_goals_no_touch_trend": None,
+            "unnecessary_flip_contact_trend": None,
+            "ten_hour_campaign_completed": False,
+            "recommendation": (
+                "stop and establish prospective optimizer-transition authority; "
+                "do not weaken or tune against the fired hard guard"
+            ),
+        }
+        write_json(FINAL_EVIDENCE_PATH, evidence)
+        return evidence
     campaign_elapsed_seconds = (
         time.time() - float(campaign_state["campaign_started_unix_seconds"])
     )

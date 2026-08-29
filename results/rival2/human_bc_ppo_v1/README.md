@@ -42,3 +42,16 @@ launch, named-mechanic rewards are zero, and named/controlled-flick exemptions
 are disabled. The older Gameplay V2 strict-dash detector is also not launched in
 the active reward mode and its component must remain exactly zero in preflight
 and campaign telemetry.
+
+## Outcome
+
+The mechanics-removal gate passed and was pushed before training. The first
+fresh-Adam minibatch proposal then produced KL 0.414318710565567, exceeding the
+frozen 0.10 hard guard. Retention KL was 0.12192033976316452. Transactional
+rollback restored model parameters, optimizer state, and Adam step counters
+exactly; no PPO update was accepted and no campaign checkpoint was selected.
+
+This is classified as a policy-displacement/capability safety failure, not a
+reward-path or operational failure. Training remains stopped. See
+`failure_analysis.json` for the full evidence and the prospective next-step
+recommendation.

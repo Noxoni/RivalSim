@@ -640,6 +640,10 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         )
         summary.update(
             {
+                "observation_contract": self.env.observation_version,
+                "observation_contract_sha256": self.env.contract_hashes[
+                    self.env.observation_version
+                ],
                 "source_iteration": self.iteration,
                 "source_policy_version": self.policy_version,
                 "source_agent_decision_samples_after_rollout": self.total_agent_samples,

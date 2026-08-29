@@ -1,0 +1,12 @@
+{
+  "format": "RIVAL2_HUMAN_BC_PPO_TEST_RESULTS_V1",
+  "command": ".venv/Scripts/python.exe -m pytest tests/test_rival2_human_bc_ppo_v1.py tests/test_rival2_120hz.py tests/test_rival2_mixed_ppo.py tests/test_rival2_opponent_curriculum.py -q",
+  "passed": 17,
+  "failed": 0,
+  "skipped": 3,
+  "skipped_reason": "three legacy opponent-curriculum tests require RIVALSIM_COLLISION_DIR in their fixture; the new campaign CUDA tests and 120 Hz tests used the verified local Soccar assets and passed",
+  "ruff_command": ".venv/Scripts/ruff.exe check rivalsim/rival2_opponent_curriculum.py benchmarks/run_rival2_human_bc_ppo_v1.py tests/test_rival2_human_bc_ppo_v1.py",
+  "ruff_verdict": "PASS",
+  "git_diff_check": "PASS",
+  "verdict": "PASS_GREEN"
+}

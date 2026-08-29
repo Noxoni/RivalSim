@@ -1,0 +1,327 @@
+{
+  "bootstrap_provenance": {
+    "bytes": 50047057,
+    "path": "checkpoints/rival2/120hz_bootstrap/rival2_120hz_from_iteration_479.pt",
+    "sha256": "ADAF8D015C340CAFAE857B7253FBBDE3A6C842C4EA0BB091B31F8B1C210ED350"
+  },
+  "checks": {
+    "fresh_optimizer": true,
+    "human_demo_adapter_not_used": true,
+    "nexto_wisp_zero": true,
+    "no_behavior_cloning": true,
+    "pre_step_authority_committed_and_pushed": true,
+    "retention_rollout_only": true
+  },
+  "created_utc": "2026-08-29T03:29:20.602909+00:00",
+  "format": "RIVAL2_HUMAN_BC_V1_TO_120HZ_PPO_TRANSITION_EVIDENCE_V1",
+  "fresh_optimizer": {
+    "checks": {
+      "all_parameter_adam_state_exact": true,
+      "all_parameter_step_counters_exact": true,
+      "critic_group_identity_exact": true,
+      "critic_learning_rate_exact": true,
+      "every_parameter_present": true,
+      "named_state_digest_exact": true,
+      "policy_group_identity_exact": true,
+      "policy_learning_rate_exact": true,
+      "two_parameter_groups": true
+    },
+    "destination_group_count": 2,
+    "destination_groups": [
+      {
+        "learning_rate": 0.0001,
+        "name": "policy",
+        "parameter_count": 8
+      },
+      {
+        "learning_rate": 0.0003,
+        "name": "critic",
+        "parameter_count": 2
+      }
+    ],
+    "destination_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+    "destination_step_counter_by_parameter": {
+      "actor.bias": null,
+      "actor.weight": null,
+      "critic.bias": null,
+      "critic.weight": null,
+      "trunk.0.bias": null,
+      "trunk.0.weight": null,
+      "trunk.2.bias": null,
+      "trunk.2.weight": null,
+      "trunk.4.bias": null,
+      "trunk.4.weight": null
+    },
+    "parameter_count": 10,
+    "schema_version": 1,
+    "source_group_count": 1,
+    "source_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+    "source_step_counter_by_parameter": {
+      "actor.bias": null,
+      "actor.weight": null,
+      "critic.bias": null,
+      "critic.weight": null,
+      "trunk.0.bias": null,
+      "trunk.0.weight": null,
+      "trunk.2.bias": null,
+      "trunk.2.weight": null,
+      "trunk.4.bias": null,
+      "trunk.4.weight": null
+    },
+    "state_exact_by_parameter": {
+      "actor.bias": true,
+      "actor.weight": true,
+      "critic.bias": true,
+      "critic.weight": true,
+      "trunk.0.bias": true,
+      "trunk.0.weight": true,
+      "trunk.2.bias": true,
+      "trunk.2.weight": true,
+      "trunk.4.bias": true,
+      "trunk.4.weight": true
+    },
+    "step_counter_exact_by_parameter": {
+      "actor.bias": true,
+      "actor.weight": true,
+      "critic.bias": true,
+      "critic.weight": true,
+      "trunk.0.bias": true,
+      "trunk.0.weight": true,
+      "trunk.2.bias": true,
+      "trunk.2.weight": true,
+      "trunk.4.bias": true,
+      "trunk.4.weight": true
+    },
+    "verdict": "PASS_GREEN"
+  },
+  "git_head_before_first_step": "96506aca2d05b62b923c43dcc530500dfe3312b7",
+  "human_bc_parent": {
+    "bytes": 7563365,
+    "path": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874"
+  },
+  "initial_historical_pool": [
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 0
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 30
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 60
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 90
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 120
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 180
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 240
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 300
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 359
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 389
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 419
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 449
+    },
+    {
+      "action_version": "RIVAL2_ACTION_V1",
+      "policy_hz": 30,
+      "version": 479
+    }
+  ],
+  "optimizer_steps": 0,
+  "retention": {
+    "checks": {
+      "fresh_optimizer_unchanged": true,
+      "model_unchanged": true,
+      "nexto_samples_zero": true,
+      "optimizer_state_still_empty": true,
+      "retention_source_is_bc_parent": true,
+      "wisp_samples_zero": true
+    },
+    "created_utc": "2026-08-29T03:29:20.601730+00:00",
+    "format": "RIVAL2_HUMAN_BC_PPO_RETENTION_INITIALIZATION_V1",
+    "optimizer_steps": 0,
+    "optimizer_transition": {
+      "checks": {
+        "all_parameter_adam_state_exact": true,
+        "all_parameter_step_counters_exact": true,
+        "critic_group_identity_exact": true,
+        "critic_learning_rate_exact": true,
+        "every_parameter_present": true,
+        "named_state_digest_exact": true,
+        "policy_group_identity_exact": true,
+        "policy_learning_rate_exact": true,
+        "two_parameter_groups": true
+      },
+      "destination_group_count": 2,
+      "destination_groups": [
+        {
+          "learning_rate": 0.0001,
+          "name": "policy",
+          "parameter_count": 8
+        },
+        {
+          "learning_rate": 0.0003,
+          "name": "critic",
+          "parameter_count": 2
+        }
+      ],
+      "destination_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+      "destination_step_counter_by_parameter": {
+        "actor.bias": null,
+        "actor.weight": null,
+        "critic.bias": null,
+        "critic.weight": null,
+        "trunk.0.bias": null,
+        "trunk.0.weight": null,
+        "trunk.2.bias": null,
+        "trunk.2.weight": null,
+        "trunk.4.bias": null,
+        "trunk.4.weight": null
+      },
+      "parameter_count": 10,
+      "schema_version": 1,
+      "source_group_count": 1,
+      "source_named_state_sha256": "96FDC00B16DD55F260A638FBD8CCA06F324BCD194D537A78C43D5E279D3A9ECC",
+      "source_step_counter_by_parameter": {
+        "actor.bias": null,
+        "actor.weight": null,
+        "critic.bias": null,
+        "critic.weight": null,
+        "trunk.0.bias": null,
+        "trunk.0.weight": null,
+        "trunk.2.bias": null,
+        "trunk.2.weight": null,
+        "trunk.4.bias": null,
+        "trunk.4.weight": null
+      },
+      "state_exact_by_parameter": {
+        "actor.bias": true,
+        "actor.weight": true,
+        "critic.bias": true,
+        "critic.weight": true,
+        "trunk.0.bias": true,
+        "trunk.0.weight": true,
+        "trunk.2.bias": true,
+        "trunk.2.weight": true,
+        "trunk.4.bias": true,
+        "trunk.4.weight": true
+      },
+      "step_counter_exact_by_parameter": {
+        "actor.bias": true,
+        "actor.weight": true,
+        "critic.bias": true,
+        "critic.weight": true,
+        "trunk.0.bias": true,
+        "trunk.0.weight": true,
+        "trunk.2.bias": true,
+        "trunk.2.weight": true,
+        "trunk.4.bias": true,
+        "trunk.4.weight": true
+      },
+      "verdict": "PASS_GREEN"
+    },
+    "rollout_only_agent_decisions": 7554304,
+    "summary": {
+      "category_counts": {
+        "airborne": {
+          "available_before_exclusion": 268448,
+          "requested": 96,
+          "selected": 96
+        },
+        "field_position_orientation_diversity": {
+          "available_before_exclusion": 7554032,
+          "requested": 240,
+          "selected": 240
+        },
+        "near_ball_interaction": {
+          "available_before_exclusion": 0,
+          "requested": 96,
+          "selected": 0
+        },
+        "ordinary_ground_play": {
+          "available_before_exclusion": 1944263,
+          "requested": 96,
+          "selected": 96
+        },
+        "possession_ball_approach": {
+          "available_before_exclusion": 0,
+          "requested": 96,
+          "selected": 0
+        },
+        "recovery": {
+          "available_before_exclusion": 3533338,
+          "requested": 80,
+          "selected": 80
+        }
+      },
+      "checks": {
+        "finite": true,
+        "fixed_count_exact": true,
+        "observation_dimension_exact": true,
+        "source_observations_authoritative": true,
+        "trainable_samples_only": true,
+        "unique_source_indices": true
+      },
+      "dtype": "torch.float32",
+      "observation_contract": "RIVAL2_OBS_V1",
+      "observation_count": 512,
+      "observation_dimension": 182,
+      "schema_version": 1,
+      "selection": "fixed deterministic category order and evenly-spaced candidate indices",
+      "sha256": "6FA56DE7CC6A9F24F20D8720E824A8A2A04919275434407B5CAE2D69B8A076EC",
+      "source": "authoritative trainable observations from the healthy source-policy rollout",
+      "source_agent_decision_samples_after_rollout": 7554304,
+      "source_identity": {
+        "checkpoint_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+        "identity": "HUMAN_BC_V1_STEP_160_PPO_PARENT",
+        "model_tensor_sha256": "872731CA5FD5FE148242A709D954CD1FFEF5249075811E79A15B93420AF0DAD7",
+        "optimizer": "fresh_empty_split_adam"
+      },
+      "source_iteration": 479,
+      "source_policy_version": 480,
+      "verdict": "PASS_GREEN"
+    },
+    "verdict": "PASS_GREEN"
+  },
+  "verdict": "PASS_GREEN"
+}
