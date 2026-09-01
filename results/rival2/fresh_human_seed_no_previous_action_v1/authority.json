@@ -1,0 +1,116 @@
+{
+  "created_utc": "2026-09-01T19:06:08.577136+00:00",
+  "forbidden": {
+    "existing_bc_or_ppo_checkpoint_load": true,
+    "human_previous_action_as_policy_input": true,
+    "mechanic_labels_in_objective_sampling_selection_stopping": true,
+    "mechanic_practice_data": true,
+    "nexto_training": true,
+    "old_policy_teacher_or_retention": true,
+    "ppo_or_reward_optimization": true,
+    "previous_rival_checkpoint_load": true
+  },
+  "format": "RIVAL2_FRESH_HUMAN_SEED_NO_PREVIOUS_ACTION_V1_AUTHORITY",
+  "lineage": {
+    "fresh_random_initialization": true,
+    "initial_model_tensor_sha256": "D30C918CAF2CAE62567176E04C17813129D0B8B91FAEEAFC065786CE6C4C0F1E",
+    "initialization_seed": 2026090106,
+    "prior_rival_checkpoint_allowed": false,
+    "prior_rival_checkpoint_loaded": false
+  },
+  "package_commit": "38BDD501BECC0F6BA0867EABB205F25D05E0F31C",
+  "policy_config": {
+    "content_hash": "43C2A0850E1F1D04671C6DCE564784DF103656F1194B0E915FA1B89164CA9BE1",
+    "values": {
+      "activation": "silu",
+      "actor_outputs": 13,
+      "autocast": false,
+      "dtype": "float32",
+      "hidden_dim": 512,
+      "hidden_layers": 3,
+      "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+      "log_std_max": 1.0,
+      "log_std_min": -5.0,
+      "obs_dim": 182,
+      "zero_previous_action_inputs": true
+    }
+  },
+  "source_split_manifest": "results/rival2/fresh_human_seed_no_previous_action_v1/source_split_manifest.json",
+  "source_split_manifest_sha256": "35C3AB6A88415E810D49BD801508BBACF34897D30068F607DED395F02A946392",
+  "stage1": {
+    "frozen": [
+      "critic_head",
+      "actor_log_std_rows_5_9"
+    ],
+    "log_std_rows": {
+      "bias": -1.0,
+      "weight": 0.0
+    },
+    "maximum_steps": 30000,
+    "minimum_plateau_step": 5000,
+    "objective": "mean_squared_error_over_exact_8_channel_action",
+    "optimizer": {
+      "batch_size": 4096,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "epsilon": 1e-08,
+      "gradient_clip": 1.0,
+      "learning_rate": 0.0003,
+      "minimum_learning_rate": 1e-05,
+      "type": "AdamW",
+      "weight_decay": 1e-05
+    },
+    "plateau_validation_checks": 30,
+    "previous_action_input_contract": {
+      "field_names": [
+        "previous_action.throttle",
+        "previous_action.steer",
+        "previous_action.pitch",
+        "previous_action.yaw",
+        "previous_action.roll",
+        "previous_action.jump",
+        "previous_action.boost",
+        "previous_action.handbrake"
+      ],
+      "fields_structurally_present": true,
+      "human_after_adapter_and_pad_overlay": 0.0,
+      "human_before_observation_adapter_v2": {
+        "quality": "unavailable",
+        "value": 0.0
+      },
+      "indices": [
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174
+      ],
+      "policy_config": {
+        "zero_previous_action_inputs": true
+      },
+      "rivalsim_immediately_before_policy_trunk": 0.0,
+      "version": "RIVAL2_PREVIOUS_ACTION_ALWAYS_ZERO_V1"
+    },
+    "selection_metric": "lowest_complete_action_validation_rmse_only",
+    "significant_improvement": 0.0001,
+    "target_plateau_validation_checks": 10,
+    "target_rmse": 0.3,
+    "trainable": [
+      "shared_trunk",
+      "actor_mean_rows_0_4",
+      "actor_button_rows_10_12"
+    ],
+    "training_seed": 2026090107,
+    "validation_interval_steps": 100
+  },
+  "task_scope": {
+    "closed_loop_evaluation_after_selection": true,
+    "ppo_authorized": false,
+    "stage1_fresh_gameplay_imitation_only": true
+  }
+}

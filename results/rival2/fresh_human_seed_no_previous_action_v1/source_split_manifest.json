@@ -1,0 +1,101 @@
+{
+  "action_order": [
+    "throttle",
+    "steer",
+    "pitch",
+    "yaw",
+    "roll",
+    "jump",
+    "boost",
+    "handbrake"
+  ],
+  "complete_coverage": true,
+  "created_utc": "2026-09-01T19:06:08.560944+00:00",
+  "disjoint": true,
+  "format": "RIVAL2_FRESH_HUMAN_SEED_NO_PREVIOUS_ACTION_V1_SOURCE_SPLIT_MANIFEST",
+  "policy": "chronological_first_80_next_10_final_10",
+  "rounding": "train_end=floor(N*0.8); validation_end=floor(N*0.9)",
+  "shuffle": {
+    "test": false,
+    "train": true,
+    "validation": false
+  },
+  "source": {
+    "adapter": {
+      "frozen": true,
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+      "tensor_sha256": "797E7139C485C692C2280F1CB126B9D1D682F1A8911C63AC46A4008042364863",
+      "version": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
+    },
+    "container_valid": true,
+    "dataset_manifest": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+    "dataset_manifest_sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55",
+    "first_physics_frame": 887,
+    "first_sequence": 0,
+    "frame_count": 58306,
+    "last_physics_frame": 61739,
+    "last_sequence": 58305,
+    "mechanic_practice_sessions_loaded": 0,
+    "previous_action_input_contract": {
+      "after_adapter_and_pad_overlay": "hard_zero",
+      "before_adapter": "zero_value_and_unavailable_quality",
+      "enabled": true,
+      "indices": [
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174
+      ],
+      "input_samples_verified": 58306,
+      "output_samples_verified": 58306
+    },
+    "quality_field_sample_counts": {
+      "approximate": 1982228,
+      "exact_direct": 932812,
+      "exactly_derived": 3381743,
+      "unavailable": 4314909
+    },
+    "session_file_set_sha256": "D7195C22964FDB096EDCB6D6ECBCE10C152F2D5F645B2095E64C2418F68927B9",
+    "session_uuid": "CD6E7DB1-2761-4B8B-BD37-F21C7F135722"
+  },
+  "splits": {
+    "test": {
+      "action_tensor_sha256": "E1A8B3C8B29ED7359DA499BC335D60F6EAB24E7256524EE1EE59C2BE8D78F783",
+      "end_index_exclusive": 58306,
+      "end_physics_frame": 61739,
+      "end_sequence": 58305,
+      "frame_count": 5831,
+      "observation_tensor_sha256": "334FB85A20626BAC084DAB3AF5D2C37D682ACF2ED116307C6BFC4DD3CB93D79A",
+      "start_index_inclusive": 52475,
+      "start_physics_frame": 55572,
+      "start_sequence": 52475
+    },
+    "train": {
+      "action_tensor_sha256": "2FFD950E1BD9172DBA27A2A0C81455E3EAC3F0ED021FC03BBF3883ED5B6A36BE",
+      "end_index_exclusive": 46644,
+      "end_physics_frame": 49625,
+      "end_sequence": 46643,
+      "frame_count": 46644,
+      "observation_tensor_sha256": "CA32DF4BC43673ED3B9DAA24758C87E7FD13EED81C170B6AF02D5B5D5D2D1991",
+      "start_index_inclusive": 0,
+      "start_physics_frame": 887,
+      "start_sequence": 0
+    },
+    "validation": {
+      "action_tensor_sha256": "325C3988E7B9A9056816EA3742994754D5D9FB2CFE09EC973A90ED3758D7D9FC",
+      "end_index_exclusive": 52475,
+      "end_physics_frame": 55571,
+      "end_sequence": 52474,
+      "frame_count": 5831,
+      "observation_tensor_sha256": "3B0EA3C3A866C307C128993582B0AB2356B1FD6201DF37027FA2C493573F0560",
+      "start_index_inclusive": 46644,
+      "start_physics_frame": 49626,
+      "start_sequence": 46644
+    }
+  }
+}
