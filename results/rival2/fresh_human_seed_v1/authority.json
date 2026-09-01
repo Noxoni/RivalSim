@@ -1,0 +1,105 @@
+{
+  "created_utc": "2026-09-01T17:00:25.897387+00:00",
+  "forbidden": {
+    "mechanic_labels_in_objective_sampling_selection_stopping": true,
+    "mechanic_practice_data": true,
+    "nexto_training": true,
+    "old_policy_teacher_or_retention": true,
+    "previous_rival_checkpoint_load": true
+  },
+  "format": "RIVAL2_FRESH_HUMAN_SEED_V1_AUTHORITY",
+  "lineage": {
+    "fresh_random_initialization": true,
+    "initial_model_tensor_sha256": "80D781F532450C7545DB07CAB9C386734E575DE3D24AF2AD367DAFA63BBED34F",
+    "initialization_seed": 2026090102,
+    "prior_rival_checkpoint_allowed": false,
+    "prior_rival_checkpoint_loaded": false
+  },
+  "package_commit": "84A05B1E050D746AFDD25BDBA7530B4583FE709D",
+  "source_split_manifest": "results/rival2/fresh_human_seed_v1/source_split_manifest.json",
+  "source_split_manifest_sha256": "CB56B82D6230E2876B2BFB6755AAB15EF85C579B4E242C440E6C5EAAB3EE2589",
+  "stage1": {
+    "frozen": [
+      "critic_head",
+      "actor_log_std_rows_5_9"
+    ],
+    "log_std_rows": {
+      "bias": -1.0,
+      "weight": 0.0
+    },
+    "maximum_steps": 30000,
+    "minimum_plateau_step": 5000,
+    "objective": "mean_squared_error_over_exact_8_channel_action",
+    "optimizer": {
+      "batch_size": 4096,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "epsilon": 1e-08,
+      "gradient_clip": 1.0,
+      "learning_rate": 0.0003,
+      "minimum_learning_rate": 1e-05,
+      "type": "AdamW",
+      "weight_decay": 1e-05
+    },
+    "plateau_validation_checks": 30,
+    "selection_metric": "lowest_complete_action_validation_rmse_only",
+    "significant_improvement": 0.0001,
+    "target_plateau_validation_checks": 10,
+    "target_rmse": 0.3,
+    "trainable": [
+      "shared_trunk",
+      "actor_mean_rows_0_4",
+      "actor_button_rows_10_12"
+    ],
+    "training_seed": 2026090103,
+    "validation_interval_steps": 100
+  },
+  "stage2": {
+    "accepted_updates": 600,
+    "bootstrap_fields": [
+      "model",
+      "policy_config"
+    ],
+    "critic_reinitialized": true,
+    "fresh_optimizer_rng_counters": true,
+    "opponents": {
+      "current": 1.0,
+      "historical": 0.0,
+      "nexto": 0.0,
+      "wisp": 0.0
+    },
+    "ppo_contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "ppo_version": "RIVAL2_PPO_120HZ_V1",
+    "reward": {
+      "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+      "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+      "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+      "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+    },
+    "snapshots": [
+      30,
+      60,
+      90,
+      120,
+      150,
+      180,
+      210,
+      240,
+      270,
+      300,
+      330,
+      360,
+      390,
+      420,
+      450,
+      480,
+      500,
+      510,
+      540,
+      570,
+      600
+    ]
+  }
+}
