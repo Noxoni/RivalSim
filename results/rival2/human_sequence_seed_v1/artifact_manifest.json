@@ -1,0 +1,85 @@
+{
+  "format": "RIVAL2_HUMAN_SEQUENCE_SEED_V1_ARTIFACT_MANIFEST",
+  "verdict": "BLOCKED_CLOSED_LOOP_NONFUNCTIONAL",
+  "artifacts": {
+    "authority": {
+      "path": "results/rival2/human_sequence_seed_v1/authority.json",
+      "sha256": "8816EE990626E024457A819CAF24CB986378FD593384EDD83F69DE9718DA7BEB"
+    },
+    "source_split_manifest": {
+      "path": "results/rival2/human_sequence_seed_v1/source_split_manifest.json",
+      "sha256": "6DF9B97988BD3EF6480B358C16D5F920E8CDA94FAAB530C336CFE4BF68EA3BE5"
+    },
+    "projected_matched_state_parity": {
+      "path": "results/rival2/human_sequence_seed_v1/projected_matched_state_parity.json",
+      "sha256": "D1FCB0B147846C33B3FCFBBD526743B803A90037B2ACF30BD2E0C2C3F4F6A239"
+    },
+    "selected_checkpoint": {
+      "path": "checkpoints/rival2/human_sequence_seed_v1/rival2_human_sequence_seed_v1.pt",
+      "sha256": "B77A059ECB31DE59A964FE2A368F40C3F367DE0C028E29325F0FF6F763BAF292",
+      "bytes": 23285525
+    },
+    "training_curve": {
+      "path": "results/rival2/human_sequence_seed_v1/stage1_curve.jsonl",
+      "sha256": "15F58D04DEAEFFFC97EB2B80199574158242DB5FE7FE5F1DC105C74213CAEA71"
+    },
+    "selected_record": {
+      "path": "results/rival2/human_sequence_seed_v1/stage1_selected.json",
+      "sha256": "0B14563DEFCF1558C3756D470CF743E1A6BFA2A1B7EFEB1942CA30C6404941FF"
+    },
+    "untouched_test_record": {
+      "path": "results/rival2/human_sequence_seed_v1/stage1_untouched_test.json",
+      "sha256": "760B8A7BFB67216A737521C81ACF9F8AE91C053448A6940E345A413C462CCB23"
+    },
+    "deterministic_nexto_closed_loop": {
+      "path": "results/rival2/human_sequence_seed_v1/deterministic_nexto_closed_loop.json",
+      "sha256": "DBB3D854592F3BD7CEF32059277074ADAB5F59B141CE471376B6D4E0E2623AFC"
+    },
+    "post_training_tests": {
+      "path": "results/rival2/human_sequence_seed_v1/post_training_tests.xml",
+      "sha256": "C9D4508C33C5BCBE57B5A95C3A061585C85DCC882475F42AA4F3AC87349437A9",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0
+    },
+    "final_report": {
+      "path": "results/rival2/human_sequence_seed_v1/FINAL_REPORT.md",
+      "sha256": "0C6A06709D88F24396872D97E38AF278611BE9D14C9396A6C1C8C51716CC586F"
+    }
+  },
+  "contracts": {
+    "observation_view": "RIVAL2_HUMAN_SEQUENCE_OBS_VIEW_V1",
+    "observation_view_sha256": "17380BA08330F2BC49B2AFE8C09BA9B07D98CB4D7444D313243E65D285FC29A2",
+    "recurrent_policy_config_sha256": "D2BEF8B710385A5923877C3A146F0D42292B3EB5AFC161FFA272677B5B0F6209",
+    "sequence_alignment_addendum_commit": "AFA4AFB36FEA60FD566D22487E42EC138C51B3E3"
+  },
+  "guardrails": {
+    "fresh_random_initialization": true,
+    "prior_checkpoint_loaded": false,
+    "mechanic_practice_frames_loaded": 0,
+    "observation_adapter_v2_used": false,
+    "previous_action_visible": false,
+    "critic_optimizer_steps": 0,
+    "reward_optimization_steps": 0,
+    "ppo_optimizer_steps": 0,
+    "human_test_evaluations": 1,
+    "closed_loop_policy_stochastic": false
+  },
+  "selection": {
+    "selected_step": 400,
+    "steps_executed": 2400,
+    "validation_complete_action_rmse": 0.4426745468066241,
+    "untouched_test_complete_action_rmse": 0.41012141192787555,
+    "stop_reason": "validation_complete_action_rmse_plateau"
+  },
+  "closed_loop": {
+    "episodes": 256,
+    "rival_touches": 52,
+    "episodes_with_rival_touch": 52,
+    "rival_goals": 0,
+    "nexto_goals": 256,
+    "no_touch_truncations": 0,
+    "mean_rival_speed_uu_per_s": 1437.4989403889047,
+    "functional_gameplay_demonstrated": false
+  }
+}

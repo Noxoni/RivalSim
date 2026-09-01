@@ -151,7 +151,12 @@ class RecurrentNextoEpisodeRunner:
             self.nexto.notify_kickoff(reset_mask)
             self.world.apply_interval_resets()
             if bool(torch.any(reset_mask)):
-                self.rival_hidden[:, reset_mask] = 0.0
+                # ``_update_rival_action`` intentionally creates the recurrent
+                # state under inference mode.  Reset that inference tensor
+                # under the same mode rather than attempting an ordinary
+                # autograd-tracked in-place write at an episode boundary.
+                with torch.inference_mode():
+                    self.rival_hidden[:, reset_mask] = 0.0
                 self.recurrent_reset_count += int(reset_mask.sum().item())
         self.rival_observation = self.bridge.observation()
 

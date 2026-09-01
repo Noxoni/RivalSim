@@ -1,0 +1,152 @@
+{
+  "behavioral_interpretation": {
+    "approaches_and_challenges_ball": false,
+    "conceding_observed": true,
+    "functional_closed_loop_gameplay_demonstrated": false,
+    "interpretation_is_descriptive_not_checkpoint_selection": true,
+    "moves_ball_toward_opponent_goal": false,
+    "produces_legitimate_physics_touches": true,
+    "scoring_observed": false
+  },
+  "checkpoint": {
+    "evaluation_only_stage1_load": true,
+    "format": "RIVAL2_HUMAN_SEQUENCE_SEED_V1_STAGE1_CHECKPOINT",
+    "path": "G:/dev/RivalSim/checkpoints/rival2/human_sequence_seed_v1/rival2_human_sequence_seed_v1.pt",
+    "policy_config": {
+      "activation": "silu",
+      "actor_outputs": 13,
+      "dtype": "float32",
+      "encoder_dim": 512,
+      "hidden_dim": 512,
+      "initialization": "orthogonal",
+      "log_std_max": 2.0,
+      "log_std_min": -5.0,
+      "obs_dim": 182,
+      "observation_view_sha256": "17380BA08330F2BC49B2AFE8C09BA9B07D98CB4D7444D313243E65D285FC29A2",
+      "observation_view_version": "RIVAL2_HUMAN_SEQUENCE_OBS_VIEW_V1",
+      "post_dim": 512,
+      "recurrent_layers": 1
+    },
+    "policy_config_sha256": "D2BEF8B710385A5923877C3A146F0D42292B3EB5AFC161FFA272677B5B0F6209",
+    "selected_step": 400,
+    "sha256": "B77A059ECB31DE59A964FE2A368F40C3F367DE0C028E29325F0FF6F763BAF292",
+    "size_bytes": 23285525
+  },
+  "created_utc": "2026-09-01T20:30:09.974837+00:00",
+  "execution": {
+    "deterministic_actor_means_and_button_threshold": true,
+    "episodes": 256,
+    "hidden_continuous_within_episode": true,
+    "hidden_reset_only_at_native_episode_reset": true,
+    "initial_hidden_zero_at_playable_kickoff": true,
+    "optimizer_steps": 0,
+    "paired_balanced_standard_kickoffs": true,
+    "physics_hz": 120,
+    "ppo_steps": 0,
+    "reward_optimization": false,
+    "rival_policy_hz": 120,
+    "sampling": false,
+    "seed": 2026090204,
+    "worlds_per_side": 128
+  },
+  "five_initial_kickoff_action_vectors": [
+    {
+      "controller_output": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.021886494010686874,
+        "roll": 0.04190603271126747,
+        "steer": 0.061471126973629,
+        "throttle": 0.09536435455083847,
+        "yaw": 0.026992175728082657
+      },
+      "hidden_state": "zero",
+      "layout": 0,
+      "layout_name": "diagonal_left"
+    },
+    {
+      "controller_output": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": -0.021108467131853104,
+        "roll": 0.041325319558382034,
+        "steer": 0.10133549571037292,
+        "throttle": 0.23513156175613403,
+        "yaw": 0.06718218326568604
+      },
+      "hidden_state": "zero",
+      "layout": 1,
+      "layout_name": "diagonal_right"
+    },
+    {
+      "controller_output": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.016281262040138245,
+        "roll": 0.04604250192642212,
+        "steer": 0.1100926622748375,
+        "throttle": 0.15817582607269287,
+        "yaw": 0.06787041574716568
+      },
+      "hidden_state": "zero",
+      "layout": 2,
+      "layout_name": "off_center_left"
+    },
+    {
+      "controller_output": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.016119301319122314,
+        "roll": 0.04559965431690216,
+        "steer": 0.10695332288742065,
+        "throttle": 0.16027846932411194,
+        "yaw": 0.06635230779647827
+      },
+      "hidden_state": "zero",
+      "layout": 3,
+      "layout_name": "off_center_right"
+    },
+    {
+      "controller_output": {
+        "boost": 0.0,
+        "handbrake": 0.0,
+        "jump": 0.0,
+        "pitch": 0.02813967503607273,
+        "roll": 0.04246599227190018,
+        "steer": 0.10801592469215393,
+        "throttle": 0.17241452634334564,
+        "yaw": 0.07018855214118958
+      },
+      "hidden_state": "zero",
+      "layout": 4,
+      "layout_name": "center"
+    }
+  ],
+  "format": "RIVAL2_HUMAN_SEQUENCE_SEED_V1_DETERMINISTIC_NEXTO",
+  "gameplay": {
+    "episodes_with_rival_touch": 52,
+    "episodes_with_rival_touch_fraction": 0.203125,
+    "hard_timeouts": 0,
+    "mean_rival_speed_uu_per_s": 1437.4989403889047,
+    "nexto_goals": 256,
+    "nexto_touches": 360,
+    "no_touch_fraction": 0.0,
+    "no_touch_interpretation": "short evaluator stopped a world after the frozen no-touch timeout; it is a failure to acquire a first contact, not a goal",
+    "no_touch_truncations": 0,
+    "rival_challenge_possession_exchanges": 52,
+    "rival_first_touches": 0,
+    "rival_forward_ball_displacement_possessions": 0,
+    "rival_forward_ball_velocity_contacts": 52,
+    "rival_goals": 0,
+    "rival_touches": 52
+  },
+  "performance": {
+    "peak_cuda_bytes": 69541376,
+    "wall_seconds": 64.51322970003821,
+    "world_ticks_per_second": 21428.16297413151
+  }
+}
