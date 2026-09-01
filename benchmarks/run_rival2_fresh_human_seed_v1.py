@@ -112,6 +112,19 @@ def append_jsonl(path: Path, value: Any) -> None:
         os.fsync(handle.fileno())
 
 
+def replace_with_retry(source: Path, destination: Path) -> None:
+    """Tolerate a short-lived Windows scanner handle on a freshly written checkpoint."""
+
+    for attempt in range(20):
+        try:
+            os.replace(source, destination)
+            return
+        except PermissionError:
+            if attempt == 19:
+                raise
+            time.sleep(0.05 * (attempt + 1))
+
+
 def _load_adapter(device: str) -> tuple[HumanDemoObservationAdapterV2, dict[str, Any]]:
     actual_sha = file_sha256(ADAPTER_CHECKPOINT)
     if actual_sha != ADAPTER_EXPECTED_SHA256:
@@ -540,7 +553,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
             }
             temporary = CHECKPOINT.with_suffix(".pt.tmp")
             torch.save(payload, temporary)
-            os.replace(temporary, CHECKPOINT)
+            replace_with_retry(temporary, CHECKPOINT)
         if validation_rmse <= TARGET_RMSE:
             target_reached = True
         row = {
