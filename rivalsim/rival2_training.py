@@ -12,6 +12,7 @@ import torch
 from rivalsim.rival2_contracts import contract_hashes_for_reward
 from rivalsim.rival2_env import Rival2Env
 from rivalsim.rival2_policy import (
+    HybridDistributionOverride,
     Rival2ActorCritic,
     Rival2PolicyConfig,
     deterministic_hybrid_action,
@@ -166,6 +167,12 @@ class Rival2Trainer:
         self.agent_decisions_120hz = 0
         self.physical_physics_ticks_experienced = 0
         self.curriculum_transition: dict[str, Any] | None = None
+        self.exploration_override: HybridDistributionOverride | None = None
+
+    def set_exploration_override(self, value: HybridDistributionOverride | None) -> None:
+        """Freeze the effective rollout/PPO distribution until explicitly replaced."""
+
+        self.exploration_override = value
 
     def add_historical_snapshot(self) -> None:
         evicted_version = self.opponent_pool.add(
@@ -256,7 +263,10 @@ class Rival2Trainer:
             with torch.no_grad():
                 actor, value, acting_version, train_mask = self._policy_outputs(observation)
                 sample = sample_hybrid_action(
-                    actor, generator=self.policy_generator, config=self.policy_config
+                    actor,
+                    generator=self.policy_generator,
+                    config=self.policy_config,
+                    distribution_override=self.exploration_override,
                 )
                 action = sample.action
                 if active_world_mask is not None:
@@ -342,6 +352,7 @@ class Rival2Trainer:
                 generator=self.policy_generator,
                 policy_config=self.policy_config,
                 kl_guard=kl_guard,
+                distribution_override=self.exploration_override,
             )
         except Rival2PolicyDisplacementRejected as error:
             if rollback is None:
@@ -428,6 +439,9 @@ class Rival2Trainer:
             "opponent_generator_state": self.opponent_generator.get_state(),
             "opponent_assignment": self.opponent_assignment,
             "historical_opponents": self.opponent_pool.checkpoint_state(),
+            "exploration_override": (
+                None if self.exploration_override is None else asdict(self.exploration_override)
+            ),
         }
         if self.curriculum_transition is not None:
             payload["curriculum_transition"] = copy.deepcopy(self.curriculum_transition)
@@ -473,6 +487,10 @@ class Rival2Trainer:
         self.opponent_assignment.copy_(payload["opponent_assignment"])
         self.opponent_pool.load_checkpoint_state(payload["historical_opponents"])
         self.curriculum_transition = copy.deepcopy(payload.get("curriculum_transition"))
+        override = payload.get("exploration_override")
+        self.exploration_override = (
+            None if override is None else HybridDistributionOverride(**override)
+        )
 
         # Constructing the frozen historical policy objects consumes the global
         # generators. Restore these last so exact continuation really is exact.

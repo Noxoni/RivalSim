@@ -28,6 +28,13 @@ from rivalsim.rival2_contracts import (  # noqa: E402
     contract_hashes_for_reward,
 )
 from rivalsim.rival2_env import Rival2Env  # noqa: E402
+from rivalsim.rival2_exploration import (  # noqa: E402
+    RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT,
+    RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH,
+    RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_V1,
+    FreshHumanSeedExploration,
+    fresh_human_seed_exploration,
+)
 from rivalsim.rival2_opponent_curriculum import (  # noqa: E402
     OPPONENT_CURRENT,
     Rival2OpponentCurriculumConfig,
@@ -43,13 +50,16 @@ from rivalsim.rival2_ppo import (  # noqa: E402
 )
 from rivalsim.rival2_training import Rival2SelfPlayConfig  # noqa: E402
 
-FORMAT = "RIVAL2_FRESH_HUMAN_SEED_V1_PPO"
+FORMAT = "RIVAL2_FRESH_HUMAN_SEED_PPO_EXPLORATION_RAMP_V1"
+PACKAGE_COMMIT = "6F45CC21D54E89A685704E556D606E4FA00EB4E4"
 STAGE1_FORMAT = "RIVAL2_FRESH_HUMAN_SEED_V1_STAGE1_CHECKPOINT"
-RESULTS = ROOT / "results/rival2/fresh_human_seed_v1"
-AUTHORITY = RESULTS / "ppo_authority.json"
+RESULTS = ROOT / "results/rival2/fresh_human_seed_ppo_exploration_ramp_v1"
+AUTHORITY = RESULTS / "authority.json"
 SOURCE = ROOT / "checkpoints/rival2/fresh_human_seed_v1/rival2_fresh_human_seed_v1.pt"
-CHECKPOINT_DIR = ROOT / "checkpoints/rival2/fresh_human_seed_v1/ppo"
-DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/fresh-human-seed-v1-ppo")
+SOURCE_SHA256 = "CA2DB62A709BBD7DBA9D2997D701E2E6010584F8119BDA6F5D1686AD7425F9D2"
+STAGE1_TEST = ROOT / "results/rival2/fresh_human_seed_v1/stage1_test_metrics.json"
+CHECKPOINT_DIR = ROOT / "checkpoints/rival2/fresh_human_seed_v1/ppo_exploration_ramp_v1"
+DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/fresh-human-seed-ppo-exploration-ramp-v1")
 WORLD_COUNT = 32_768
 TARGET_UPDATES = 600
 LR_SCHEDULE = (1.0e-4, 5.0e-5, 2.5e-5)
@@ -107,20 +117,28 @@ def scalar_metrics(metrics: dict[str, torch.Tensor]) -> dict[str, float]:
 
 
 def prepare_authority() -> dict[str, Any]:
+    if sha256_file(SOURCE) != SOURCE_SHA256:
+        raise RuntimeError("Stage-1 source SHA-256 mismatch")
     source = torch.load(SOURCE, map_location="cpu", weights_only=False)
+    stage1_test = json.loads(STAGE1_TEST.read_text(encoding="utf-8"))
     if source.get("format") != STAGE1_FORMAT:
         raise RuntimeError("Stage-1 source format mismatch")
     if source["lineage"].get("prior_rival_checkpoint_loaded") is not False:
         raise RuntimeError("Stage-1 source is not the fresh lineage")
+    if stage1_test.get("complete_action_rmse") != 0.09109495009433785:
+        raise RuntimeError("Stage-1 untouched-test RMSE identity changed")
     authority = {
         "format": f"{FORMAT}_AUTHORITY",
         "created_utc": utc_now(),
+        "package_commit": PACKAGE_COMMIT,
         "source": {
             "path": SOURCE.relative_to(ROOT).as_posix(),
             "sha256": sha256_file(SOURCE),
             "format": source["format"],
             "selected_step": source["selected_step"],
             "validation_rmse": source["validation_rmse"],
+            "untouched_test_rmse": stage1_test["complete_action_rmse"],
+            "untouched_test_evidence_sha256": sha256_file(STAGE1_TEST),
             "model_tensor_sha256": state_dict_sha256(source["model"]),
             "used_fields": ["model", "policy_config"],
             "stage1_optimizer_loaded": False,
@@ -133,6 +151,17 @@ def prepare_authority() -> dict[str, Any]:
             "fresh_ppo_rng": True,
             "fresh_ppo_counters": True,
             "historical_pool_empty": True,
+            "stopped_ppo_descendant_loaded": False,
+        },
+        "exploration": {
+            "version": RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_V1,
+            "contract_sha256": (RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH),
+            "contract": RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT,
+            "checkpoints": {
+                str(update): fresh_human_seed_exploration(update).as_dict()
+                for update in (0, 60, 300, 600)
+            },
+            "fixed_for_rollout_and_consuming_transaction": True,
         },
         "reward": {
             "version": RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
@@ -167,12 +196,17 @@ def load_authority() -> dict[str, Any]:
     checks = {
         "format": authority.get("format") == f"{FORMAT}_AUTHORITY",
         "source": authority.get("source", {}).get("sha256") == sha256_file(SOURCE),
+        "source_exact": sha256_file(SOURCE) == SOURCE_SHA256,
+        "source_test_evidence": authority.get("source", {}).get("untouched_test_evidence_sha256")
+        == sha256_file(STAGE1_TEST),
         "reward": authority.get("reward", {}).get("contract_sha256")
         == REWARD_GAMEPLAY_120_V2_CONTRACT_HASH,
         "ppo": authority.get("ppo", {}).get("contract_sha256") == RIVAL2_PPO_120HZ_CONTRACT_HASH,
         "worlds": authority.get("ppo", {}).get("worlds") == WORLD_COUNT,
         "updates": authority.get("ppo", {}).get("accepted_updates") == TARGET_UPDATES,
         "snapshots": authority.get("snapshots") == sorted(SNAPSHOTS),
+        "exploration": authority.get("exploration", {}).get("contract_sha256")
+        == RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH,
     }
     if not all(checks.values()):
         raise RuntimeError(f"PPO authority mismatch: {checks}")
@@ -213,6 +247,19 @@ def make_trainer(
     if trainer.optimizer.state:
         raise RuntimeError("fresh PPO optimizer unexpectedly has state")
     trainer.model.load_state_dict(source["model"], strict=True)
+    source_behavior = {
+        key: value
+        for key, value in source["model"].items()
+        if key.startswith("trunk.") or key.startswith("actor.")
+    }
+    loaded_behavior = {
+        key: value
+        for key, value in trainer.model.state_dict().items()
+        if key.startswith("trunk.") or key.startswith("actor.")
+    }
+    source_behavior_hash = state_dict_sha256(source_behavior)
+    if state_dict_sha256(loaded_behavior) != source_behavior_hash:
+        raise RuntimeError("Stage-1 deterministic actor/trunk tensors changed")
     stage1_critic = {
         key: value.detach().cpu().clone()
         for key, value in trainer.model.critic.state_dict().items()
@@ -227,6 +274,12 @@ def make_trainer(
     trainer.model.requires_grad_(True)
     if not all(parameter.requires_grad for parameter in trainer.model.parameters()):
         raise RuntimeError("full Stage-2 model was not unfrozen")
+    trainer.set_exploration_override(fresh_human_seed_exploration(1).distribution_override)
+    # Discard the constructor placeholder and create the campaign optimizer only after
+    # the corrected effective distribution has been installed.
+    trainer.optimizer = torch.optim.Adam(
+        trainer.model.parameters(), lr=trainer.ppo_config.learning_rate
+    )
     if trainer.optimizer.state or trainer.opponent_pool.versions:
         raise RuntimeError("fresh optimizer/pool precondition failed")
     trainer.curriculum_transition = {
@@ -238,6 +291,12 @@ def make_trainer(
         "stage1_critic_tensor_sha256": state_dict_sha256(stage1_critic),
         "fresh_critic_tensor_sha256": state_dict_sha256(trainer.model.critic.state_dict()),
         "fresh_optimizer_rng_counters": True,
+        "fresh_optimizer_created_after_exploration_transition": True,
+        "deterministic_actor_trunk_button_tensor_sha256": source_behavior_hash,
+        "deterministic_actor_trunk_button_outputs_unchanged": True,
+        "exploration": fresh_human_seed_exploration(1).as_dict(),
+        "exploration_contract_sha256": (RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH),
+        "stopped_ppo_descendant_loaded": False,
         "contracts": dict(env.contract_hashes),
         "authority_sha256": sha256_file(AUTHORITY),
     }
@@ -261,7 +320,11 @@ def set_optimizer_lr(trainer: Rival2OpponentCurriculumTrainer, rate: float) -> N
         group["lr"] = rate
 
 
-def checkpoint_record(trainer: Rival2OpponentCurriculumTrainer, path: Path) -> dict[str, Any]:
+def checkpoint_record(
+    trainer: Rival2OpponentCurriculumTrainer,
+    path: Path,
+    exploration: FreshHumanSeedExploration | None = None,
+) -> dict[str, Any]:
     path.parent.mkdir(parents=True, exist_ok=True)
     trainer.save_checkpoint(path)
     return {
@@ -272,6 +335,7 @@ def checkpoint_record(trainer: Rival2OpponentCurriculumTrainer, path: Path) -> d
         "bytes": path.stat().st_size,
         "total_agent_samples": trainer.total_agent_samples,
         "learning_rate": optimizer_lr(trainer),
+        "exploration": (exploration or fresh_human_seed_exploration(trainer.iteration)).as_dict(),
     }
 
 
@@ -281,6 +345,13 @@ def preflight(
     inventory = trainer.env.world.gameplay_120.memory_inventory()
     curriculum = trainer.opponent_curriculum
     checks = {
+        "source_sha256_exact": sha256_file(SOURCE) == SOURCE_SHA256,
+        "source_selected_step_2800": source.get("selected_step") == 2800,
+        "source_validation_rmse_exact": source.get("validation_rmse") == 0.09304266346161075,
+        "source_untouched_test_rmse_exact": json.loads(STAGE1_TEST.read_text(encoding="utf-8")).get(
+            "complete_action_rmse"
+        )
+        == 0.09109495009433785,
         "fresh_stage1_source": source.get("format") == STAGE1_FORMAT,
         "prior_rival_checkpoint_absent": source["lineage"]["prior_rival_checkpoint_loaded"]
         is False,
@@ -302,6 +373,21 @@ def preflight(
         "historical_pool_empty": not trainer.opponent_pool.versions,
         "named_mechanics_hot_path_absent": trainer.env.world.gameplay_v3 is None,
         "named_mechanics_arrays_zero": inventory["named_mechanics_arrays"] == 0,
+        "deterministic_actor_trunk_button_outputs_unchanged": (
+            trainer.curriculum_transition["deterministic_actor_trunk_button_outputs_unchanged"]
+        ),
+        "update_0_schedule_exact": fresh_human_seed_exploration(0).analog_sigma == 0.01
+        and fresh_human_seed_exploration(0).button_temperature == 0.02,
+        "update_60_schedule_exact": fresh_human_seed_exploration(60).analog_sigma == 0.01
+        and fresh_human_seed_exploration(60).button_temperature == 0.02,
+        "update_300_schedule_exact": fresh_human_seed_exploration(300).analog_sigma == 0.08
+        and fresh_human_seed_exploration(300).button_temperature == 0.50,
+        "fresh_optimizer_created_after_transition": trainer.curriculum_transition[
+            "fresh_optimizer_created_after_exploration_transition"
+        ],
+        "stopped_descendant_not_loaded": not trainer.curriculum_transition[
+            "stopped_ppo_descendant_loaded"
+        ],
     }
     return {
         "format": f"{FORMAT}_PREFLIGHT",
@@ -312,6 +398,7 @@ def preflight(
         "ppo_config": asdict(trainer.ppo_config),
         "opponent_curriculum": asdict(curriculum),
         "memory_inventory": inventory,
+        "exploration_contract": RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT,
     }
 
 
@@ -330,7 +417,7 @@ def run(args: argparse.Namespace) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
     curve = RESULTS / "ppo_curve.jsonl"
-    rolling = run_dir / "fresh_human_seed_v1_ppo_rolling.pt"
+    rolling = run_dir / "fresh_human_seed_ppo_exploration_ramp_v1_rolling.pt"
     manifest_path = RESULTS / "ppo_snapshot_manifest.json"
     manifest = (
         json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -355,6 +442,8 @@ def run(args: argparse.Namespace) -> int:
     first_rollout_verified = trainer.iteration > 0
     started = time.monotonic()
     while trainer.iteration < TARGET_UPDATES:
+        exploration = fresh_human_seed_exploration(trainer.iteration + 1)
+        trainer.set_exploration_override(exploration.distribution_override)
         rollout_started = time.monotonic()
         rollout = trainer.collect_rollout()
         rollout_seconds = time.monotonic() - rollout_started
@@ -374,6 +463,7 @@ def run(args: argparse.Namespace) -> int:
                 },
                 "curriculum": curriculum_metrics,
                 "gameplay": gameplay,
+                "exploration": exploration.as_dict(),
             }
             first["verdict"] = "PASS" if all(first["checks"].values()) else "FAIL"
             write_json(RESULTS / "ppo_first_rollout.json", first)
@@ -421,12 +511,13 @@ def run(args: argparse.Namespace) -> int:
             "rejected_proposals": rejected,
             "curriculum": curriculum_metrics,
             "gameplay": gameplay,
+            "exploration": exploration.as_dict(),
         }
         append_jsonl(curve, row)
-        checkpoint_record(trainer, rolling)
+        checkpoint_record(trainer, rolling, exploration)
         if trainer.iteration in SNAPSHOTS:
-            path = CHECKPOINT_DIR / f"rival2_fresh_human_seed_v1_ppo_u{trainer.iteration:04d}.pt"
-            record = checkpoint_record(trainer, path)
+            path = CHECKPOINT_DIR / f"rival2_fresh_human_seed_ppo_ramp_u{trainer.iteration:04d}.pt"
+            record = checkpoint_record(trainer, path, exploration)
             manifest["snapshots"] = [
                 prior
                 for prior in manifest["snapshots"]
@@ -444,6 +535,7 @@ def run(args: argparse.Namespace) -> int:
                         "touches_per_minute": gameplay.get("touches_per_minute"),
                         "goals": gameplay.get("goal_events"),
                         "no_touch": gameplay.get("no_touch_truncations"),
+                        "exploration": exploration.as_dict(),
                     },
                     sort_keys=True,
                 ),
@@ -451,17 +543,13 @@ def run(args: argparse.Namespace) -> int:
             )
 
     final = next(
-        (
-            row
-            for row in manifest["snapshots"]
-            if row["accepted_update"] == trainer.iteration
-        ),
+        (row for row in manifest["snapshots"] if row["accepted_update"] == trainer.iteration),
         None,
     )
     if final is None:
         final = checkpoint_record(
             trainer,
-            CHECKPOINT_DIR / f"rival2_fresh_human_seed_v1_ppo_u{trainer.iteration:04d}.pt",
+            CHECKPOINT_DIR / f"rival2_fresh_human_seed_ppo_ramp_u{trainer.iteration:04d}.pt",
         )
     manifest["final"] = final
     write_json(manifest_path, manifest)
@@ -475,6 +563,8 @@ def run(args: argparse.Namespace) -> int:
         "total_agent_samples": trainer.total_agent_samples,
         "final_learning_rate": optimizer_lr(trainer),
         "hard_safety_failure": hard_failure,
+        "exploration_contract_sha256": (RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH),
+        "final_exploration": fresh_human_seed_exploration(trainer.iteration).as_dict(),
         "final_checkpoint": final,
         "snapshots_complete": {row["accepted_update"] for row in manifest["snapshots"]}
         == SNAPSHOTS,

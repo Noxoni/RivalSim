@@ -443,7 +443,10 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             with torch.no_grad():
                 actor, value, acting_version, train_mask = self._policy_outputs(observation)
                 sample = sample_hybrid_action(
-                    actor, generator=self.policy_generator, config=self.policy_config
+                    actor,
+                    generator=self.policy_generator,
+                    config=self.policy_config,
+                    distribution_override=self.exploration_override,
                 )
                 action = self._apply_historical_policy_cadence(sample.action)
                 if active_world_mask is not None:

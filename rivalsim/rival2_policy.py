@@ -36,6 +36,26 @@ class Rival2PolicyConfig:
         return hashlib.sha256(payload).hexdigest().upper()
 
 
+@dataclass(frozen=True, slots=True)
+class HybridDistributionOverride:
+    """Campaign-scoped effective hybrid distribution parameters.
+
+    The actor means and button decision boundary remain learned.  Analog log standard
+    deviations and the positive button temperature are supplied by one externally frozen
+    schedule, ensuring rollout sampling and every likelihood calculation share one exact
+    distribution.
+    """
+
+    analog_log_std: float
+    button_temperature: float
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.analog_log_std):
+            raise ValueError("effective analog log standard deviation must be finite")
+        if not math.isfinite(self.button_temperature) or self.button_temperature <= 0.0:
+            raise ValueError("button temperature must be finite and positive")
+
+
 class Rival2ActorCritic(nn.Module):
     """Fixed shared 3x512 SiLU trunk with actor and critic heads."""
 
@@ -84,13 +104,34 @@ class HybridSample:
 def _distribution_parameters(
     actor_output: torch.Tensor,
     config: Rival2PolicyConfig,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     if actor_output.shape[-1] != 13:
         raise ValueError("Rival 2.0 actor output must have 13 channels")
     mean = actor_output[..., :5]
-    log_std = actor_output[..., 5:10].clamp(config.log_std_min, config.log_std_max)
+    if distribution_override is None:
+        log_std = actor_output[..., 5:10].clamp(config.log_std_min, config.log_std_max)
+    else:
+        log_std = torch.full_like(mean, distribution_override.analog_log_std)
     logits = actor_output[..., 10:13]
+    if distribution_override is not None:
+        logits = logits / distribution_override.button_temperature
     return mean, log_std, logits
+
+
+def hybrid_distribution_parameters(
+    actor_output: torch.Tensor,
+    config: Rival2PolicyConfig | None = None,
+    *,
+    distribution_override: HybridDistributionOverride | None = None,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Return the exact mean/log-std/logits used by the hybrid policy."""
+
+    return _distribution_parameters(
+        actor_output,
+        config or Rival2PolicyConfig(),
+        distribution_override,
+    )
 
 
 def _analog_log_probability(
@@ -111,9 +152,10 @@ def hybrid_log_probability(
     *,
     config: Rival2PolicyConfig | None = None,
     pre_tanh: torch.Tensor | None = None,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> torch.Tensor:
     config = config or Rival2PolicyConfig()
-    mean, log_std, logits = _distribution_parameters(actor_output, config)
+    mean, log_std, logits = _distribution_parameters(actor_output, config, distribution_override)
     if pre_tanh is None:
         analog = action[..., :5].clamp(-1.0 + 1e-6, 1.0 - 1e-6)
         pre_tanh = torch.atanh(analog)
@@ -128,11 +170,13 @@ def hybrid_log_probability(
 def hybrid_entropy(
     actor_output: torch.Tensor,
     config: Rival2PolicyConfig | None = None,
+    *,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> torch.Tensor:
     """Finite exploration diagnostic used by PPO (base Gaussian + Bernoulli)."""
 
     config = config or Rival2PolicyConfig()
-    _, log_std, logits = _distribution_parameters(actor_output, config)
+    _, log_std, logits = _distribution_parameters(actor_output, config, distribution_override)
     gaussian = (log_std + 0.5 * (1.0 + LOG_TWO_PI)).sum(dim=-1)
     probability = torch.sigmoid(logits)
     bernoulli = (
@@ -146,9 +190,10 @@ def sample_hybrid_action(
     *,
     generator: torch.Generator,
     config: Rival2PolicyConfig | None = None,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> HybridSample:
     config = config or Rival2PolicyConfig()
-    mean, log_std, logits = _distribution_parameters(actor_output, config)
+    mean, log_std, logits = _distribution_parameters(actor_output, config, distribution_override)
     epsilon = torch.randn(mean.shape, dtype=mean.dtype, device=mean.device, generator=generator)
     pre_tanh = mean + torch.exp(log_std) * epsilon
     analog = torch.tanh(pre_tanh)
@@ -163,12 +208,22 @@ def sample_hybrid_action(
         < probability
     ).to(probability.dtype)
     action = torch.cat((analog, buttons), dim=-1)
-    log_probability = hybrid_log_probability(actor_output, action, config=config, pre_tanh=pre_tanh)
+    log_probability = hybrid_log_probability(
+        actor_output,
+        action,
+        config=config,
+        pre_tanh=pre_tanh,
+        distribution_override=distribution_override,
+    )
     return HybridSample(
         action=action,
         pre_tanh=pre_tanh,
         log_probability=log_probability,
-        entropy=hybrid_entropy(actor_output, config),
+        entropy=hybrid_entropy(
+            actor_output,
+            config,
+            distribution_override=distribution_override,
+        ),
     )
 
 
@@ -184,10 +239,12 @@ def deterministic_hybrid_action(
 
 
 __all__ = [
+    "HybridDistributionOverride",
     "HybridSample",
     "Rival2ActorCritic",
     "Rival2PolicyConfig",
     "deterministic_hybrid_action",
+    "hybrid_distribution_parameters",
     "hybrid_entropy",
     "hybrid_log_probability",
     "sample_hybrid_action",

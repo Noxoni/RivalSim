@@ -16,8 +16,10 @@ from rivalsim.rival2_contracts import (
     OBS_DIM,
 )
 from rivalsim.rival2_policy import (
+    HybridDistributionOverride,
     Rival2ActorCritic,
     Rival2PolicyConfig,
+    hybrid_distribution_parameters,
     hybrid_entropy,
     hybrid_log_probability,
 )
@@ -281,6 +283,7 @@ def _completed_update_diagnostics(
     old_log_probability: torch.Tensor,
     policy_config: Rival2PolicyConfig,
     chunk_size: int,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> dict[str, torch.Tensor]:
     """Measure the final policy once against every trainable rollout sample."""
 
@@ -301,16 +304,18 @@ def _completed_update_diagnostics(
     for start in range(0, count, chunk_size):
         stop = min(start + chunk_size, count)
         actor_output, value = model(observation[start:stop])
-        mean = actor_output[..., :5]
-        log_std = actor_output[..., 5:10].clamp(
-            policy_config.log_std_min, policy_config.log_std_max
+        mean, log_std, effective_button_logits = hybrid_distribution_parameters(
+            actor_output,
+            policy_config,
+            distribution_override=distribution_override,
         )
-        probability = torch.sigmoid(actor_output[..., 10:13])
+        probability = torch.sigmoid(effective_button_logits)
         new_log_probability = hybrid_log_probability(
             actor_output,
             action[start:stop],
             config=policy_config,
             pre_tanh=pre_tanh[start:stop],
+            distribution_override=distribution_override,
         )
         log_ratio = new_log_probability - old_log_probability[start:stop]
         ratio = torch.exp(log_ratio)
@@ -361,6 +366,7 @@ def ppo_update(
     policy_config: Rival2PolicyConfig | None = None,
     gae_ready: bool = False,
     kl_guard: Rival2KLGuardConfig | None = None,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> dict[str, torch.Tensor]:
     """Run all PPO shuffling, gathers, losses, and optimizer work on CUDA."""
 
@@ -410,6 +416,7 @@ def ppo_update(
                 batch_action,
                 config=policy_config,
                 pre_tanh=batch_pre_tanh,
+                distribution_override=distribution_override,
             )
             log_ratio = new_log_probability - batch_old_log_probability
             ratio = torch.exp(log_ratio)
@@ -420,7 +427,11 @@ def ppo_update(
             )
             policy_loss = -torch.minimum(unclipped, clipped).mean()
             value_loss = 0.5 * (value - returns.index_select(0, batch)).square().mean()
-            entropy = hybrid_entropy(actor_output, policy_config).mean()
+            entropy = hybrid_entropy(
+                actor_output,
+                policy_config,
+                distribution_override=distribution_override,
+            ).mean()
             total_loss = (
                 policy_loss
                 + config.value_loss_coefficient * value_loss
@@ -483,6 +494,7 @@ def ppo_update(
                         batch_action,
                         config=policy_config,
                         pre_tanh=batch_pre_tanh,
+                        distribution_override=distribution_override,
                     )
                     post_log_ratio = post_log_probability - batch_old_log_probability
                     post_ratio = torch.exp(post_log_ratio)
@@ -538,6 +550,7 @@ def ppo_update(
             old_log_probability,
             policy_config,
             config.minibatch_size,
+            distribution_override,
         )
         result.update(completed)
         result["approx_kl"] = completed["completed_update_mean_kl"]
@@ -591,6 +604,7 @@ def evaluate_clipped_policy_objective(
     config: Rival2PPOConfig,
     *,
     policy_config: Rival2PolicyConfig | None = None,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> dict[str, torch.Tensor]:
     """Evaluate one frozen rollout without gradients or optimizer mutation."""
 
@@ -610,6 +624,7 @@ def evaluate_clipped_policy_objective(
             action,
             config=policy_config,
             pre_tanh=pre_tanh,
+            distribution_override=distribution_override,
         )
         - old_log_probability
     )
