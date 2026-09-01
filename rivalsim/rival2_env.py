@@ -11,6 +11,7 @@ import warp as wp
 
 from rivalsim.constants import DOUBLEJUMP_MAX_DELAY
 from rivalsim.gameplay_120 import Rival2Gameplay120State
+from rivalsim.gameplay_120_v2 import Rival2Gameplay120V2State
 from rivalsim.gameplay_v3 import Rival2GameplayV3State, default_threshold_path
 from rivalsim.kernels.rival2 import (
     PHYSICS_TICKS_PER_DECISION,
@@ -18,6 +19,7 @@ from rivalsim.kernels.rival2 import (
     REWARD_MODE_BASE,
     REWARD_MODE_GAMEPLAY,
     REWARD_MODE_GAMEPLAY_120_V1,
+    REWARD_MODE_GAMEPLAY_120_V2,
     REWARD_MODE_GAMEPLAY_V2,
     REWARD_MODE_GAMEPLAY_V3,
     REWARD_MODE_GOAL_ONLY,
@@ -50,6 +52,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_OBS_V2_120HZ_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
@@ -155,6 +158,7 @@ class Rival2WorldSim(CompleteWorldSim):
             REWARD_MODE_GAMEPLAY_V2,
             REWARD_MODE_GAMEPLAY_V3,
             REWARD_MODE_GAMEPLAY_120_V1,
+            REWARD_MODE_GAMEPLAY_120_V2,
         ):
             raise ValueError(f"unsupported Rival 2.0 reward mode: {self.reward_mode}")
         threshold_path = kwargs.pop("v3_threshold_path", None)
@@ -173,7 +177,11 @@ class Rival2WorldSim(CompleteWorldSim):
         self.gameplay_120 = (
             Rival2Gameplay120State(self)
             if self.reward_mode == REWARD_MODE_GAMEPLAY_120_V1
-            else None
+            else (
+                Rival2Gameplay120V2State(self)
+                if self.reward_mode == REWARD_MODE_GAMEPLAY_120_V2
+                else None
+            )
         )
         state = self.rival2
         wp.launch(
@@ -262,6 +270,7 @@ class Rival2WorldSim(CompleteWorldSim):
             REWARD_MODE_GAMEPLAY_V2,
             REWARD_MODE_GAMEPLAY_V3,
             REWARD_MODE_GAMEPLAY_120_V1,
+            REWARD_MODE_GAMEPLAY_120_V2,
         ):
             raise ValueError(f"unsupported Rival 2.0 reward mode: {self.reward_mode}")
         super()._launch_tick()
@@ -655,6 +664,21 @@ class Rival2TensorBridge:
                 "bad_flip_component",
             ):
                 self._bind(f"gameplay_120.{name}", getattr(gameplay_120, name))
+            for name in (
+                "interval_retained_control_exempt",
+                "retained_control_exempt_total",
+                "control_component",
+                "control_score_current",
+                "control_score_sum_total",
+                "control_score_tick_total",
+                "control_score_positive_total",
+                "control_score_ge_025_total",
+                "control_score_ge_05_total",
+                "control_reward_sum_total",
+            ):
+                value = getattr(gameplay_120, name, None)
+                if value is not None:
+                    self._bind(f"gameplay_120.{name}", value)
         controls = self.sim.controls
         for name in ("throttle", "steer", "pitch", "yaw", "roll", "jump", "boost"):
             self._bind(f"control.{name}", getattr(controls, name))
@@ -938,18 +962,26 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_V3
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V1
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_120_V2
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = episode_version
         self.observation_version = observation_version or (
             RIVAL2_OBS_V2_120HZ_VERSION
-            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
+            if reward_version in (
+                RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+                RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+            )
             else "RIVAL2_OBS_V1"
         )
         self.action_version = action_version or (
             RIVAL2_ACTION_V2_120HZ_VERSION
-            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
+            if reward_version in (
+                RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+                RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+            )
             else "RIVAL2_ACTION_V1"
         )
         self.physics_hz = 120
@@ -1058,6 +1090,8 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_V3
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V1
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION:
+            reward_mode = REWARD_MODE_GAMEPLAY_120_V2
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         if reward_mode == REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is None:
@@ -1066,12 +1100,28 @@ class Rival2Env:
             )
         if reward_mode != REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is not None:
             raise ValueError("Gameplay V3 native state cannot be removed in-place")
-        if reward_mode == REWARD_MODE_GAMEPLAY_120_V1 and self.world.gameplay_120 is None:
+        if reward_mode in (
+            REWARD_MODE_GAMEPLAY_120_V1,
+            REWARD_MODE_GAMEPLAY_120_V2,
+        ) and self.world.gameplay_120 is None:
             raise ValueError(
-                "Gameplay 120 V1 requires a freshly constructed 120 Hz environment"
+                "Gameplay 120 requires a freshly constructed 120 Hz environment"
             )
-        if reward_mode != REWARD_MODE_GAMEPLAY_120_V1 and self.world.gameplay_120 is not None:
-            raise ValueError("Gameplay 120 V1 physical-guard state cannot be removed in-place")
+        if reward_mode not in (
+            REWARD_MODE_GAMEPLAY_120_V1,
+            REWARD_MODE_GAMEPLAY_120_V2,
+        ) and self.world.gameplay_120 is not None:
+            raise ValueError("Gameplay 120 physical-guard state cannot be removed in-place")
+        expected_type = (
+            Rival2Gameplay120State
+            if reward_mode == REWARD_MODE_GAMEPLAY_120_V1
+            else Rival2Gameplay120V2State
+        )
+        if reward_mode in (
+            REWARD_MODE_GAMEPLAY_120_V1,
+            REWARD_MODE_GAMEPLAY_120_V2,
+        ) and not isinstance(self.world.gameplay_120, expected_type):
+            raise ValueError("Gameplay 120 reward generations cannot be changed in-place")
         self.reward_version = reward_version
         self.contract_hashes = contract_hashes_for_reward(
             reward_version,

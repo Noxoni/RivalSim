@@ -1,0 +1,71 @@
+{
+  "campaign": {
+    "explicit_snapshot_update": 500,
+    "hard_ceiling": 750,
+    "minimum_updates": 600,
+    "snapshot_interval": 30,
+    "stop_at_600_if_development_is_ambiguous": true
+  },
+  "created_utc": "2026-09-01T00:00:00+00:00",
+  "format": "RIVAL2_V5_SELFPLAY_PPO_V1_AUTHORITY",
+  "lineage": {
+    "package_commit": "AC00EE4C092F60538C4574A68E6703435EF7674B",
+    "required_human_bc_v5_result_commit": "6F87B26C85F5E413C914116A7804E9AEE09B771B"
+  },
+  "opponents": {
+    "both_current_perspectives_trainable": true,
+    "current_probability": 1.0,
+    "historical_pool_initial_count": 0,
+    "historical_probability": 0.0,
+    "nexto_probability": 0.0,
+    "wisp_probability": 0.0
+  },
+  "optimizer_transition": {
+    "allowed_learning_rates": [
+      0.0001,
+      0.00005,
+      0.000025
+    ],
+    "fresh_full_model_adam": true,
+    "load_bc_optimizer": false,
+    "load_historical_pool": false,
+    "load_prior_ppo_optimizer": false,
+    "reduction_trigger": "transactionally rolled-back hard KL proposal",
+    "rollback_exact": true
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "completed_update_mean_kl_hard_limit": 0.05,
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "initial_learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_kl_hard_limit": 0.1,
+    "minibatch_size": 65536,
+    "resolved_config_sha256": "FEE2EB9BE28515944BF3B26374C90A2D965A8F505C5F42B6011F7536D7B3E53D",
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5,
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "worlds": 32768
+  },
+  "reward": {
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2"
+  },
+  "scope": {
+    "action_contract_unchanged": true,
+    "human_data_unchanged": true,
+    "named_mechanics_hot_path_forbidden": true,
+    "observation_contract_unchanged": true,
+    "physics_unchanged": true,
+    "policy_hz": 120
+  },
+  "source": {
+    "model_tensors_only": true,
+    "path": "checkpoints/rival2/human_bc_v5/rival2_human_bc_v5.pt",
+    "sha256": "F9100E543F48B1AD9E447179DFC2022774F039AD8D47F9FBF07359B7E1D12FE8"
+  }
+}

@@ -19,6 +19,7 @@ RIVAL2_REWARD_GAMEPLAY_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V1"
 RIVAL2_REWARD_GAMEPLAY_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V2"
 RIVAL2_REWARD_GAMEPLAY_V3_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V3"
 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_120_V1"
+RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_120_V2"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -105,6 +106,16 @@ GAMEPLAY_V3_UNNECESSARY_FLIP_PENALTY: Final = -0.01
 GAMEPLAY_120_SPEED_COEFFICIENT: Final = GAMEPLAY_SPEED_COEFFICIENT / 4.0
 GAMEPLAY_120_SUPERSONIC_REWARD: Final = GAMEPLAY_SUPERSONIC_REWARD / 4.0
 GAMEPLAY_120_BOOST_USE_REWARD: Final = GAMEPLAY_BOOST_USE_REWARD / 4.0
+GAMEPLAY_120_V2_SPEED_COEFFICIENT: Final = 0.0
+GAMEPLAY_120_V2_SUPERSONIC_REWARD: Final = 0.000075
+GAMEPLAY_120_V2_BOOST_USE_REWARD: Final = 0.0
+GAMEPLAY_120_V2_CONTROL_REWARD: Final = 0.00015
+GAMEPLAY_120_V2_CONTROL_DISTANCE_MAX: Final = 500.0
+GAMEPLAY_120_V2_CONTROL_DISTANCE_RANGE: Final = 350.0
+GAMEPLAY_120_V2_CONTROL_RELATIVE_SPEED_SCALE: Final = 1200.0
+GAMEPLAY_120_V2_RETAINED_CONTROL_THRESHOLD: Final = 0.20
+GAMEPLAY_120_V2_RETAINED_CONTROL_WINDOW_TICKS: Final = 12
+GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY: Final = -0.005
 
 _CAR_FIELDS = (
     "position.x",
@@ -694,6 +705,87 @@ REWARD_GAMEPLAY_120_V1_CONTRACT: Final = {
     ),
 }
 
+REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+    "cadence_hz": 120,
+    "physics_hz": 120,
+    "action_hold_ticks": 1,
+    "observation_version": RIVAL2_OBS_V2_120HZ_VERSION,
+    "action_version": RIVAL2_ACTION_V2_120HZ_VERSION,
+    "episode_version": RIVAL2_EPISODE_VERSION,
+    "zero_sum": True,
+    "composition": (
+        "BlueReward = Goal + Progress + Demo + SupersonicOccupancy + BoostPickup + "
+        "Save + CompetitiveBallControl + BadFlipGuard; OrangeReward = -BlueReward"
+    ),
+    "event_rewards": {
+        "goal": 10.0,
+        "demo": 0.10,
+        "small_pad_pickup": GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
+        "large_pad_pickup": GAMEPLAY_BIG_PAD_PICKUP_REWARD,
+        "save": GAMEPLAY_SAVE_REWARD,
+        "unnecessary_flip_through_contact": (
+            GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY
+        ),
+        "cadence_scaling": "none; paid once per authoritative physical event",
+    },
+    "progress": {
+        "coefficient": SCORING_PROGRESS_COEFFICIENT,
+        "progress_y_scale": PROGRESS_Y_SCALE,
+        "displacement": "signed ball displacement over exactly one 120 Hz physics tick",
+        "four_tick_telescope": True,
+    },
+    "dense_time_occupancy": {
+        "speed_coefficient": GAMEPLAY_120_V2_SPEED_COEFFICIENT,
+        "supersonic_reward": GAMEPLAY_120_V2_SUPERSONIC_REWARD,
+        "physical_boost_use_reward": GAMEPLAY_120_V2_BOOST_USE_REWARD,
+    },
+    "competitive_ball_control": {
+        "distance": "norm(ball_position - car_position)",
+        "relative_speed": "norm(ball_velocity - car_velocity)",
+        "proximity": (
+            "clamp((500 - distance) / 350, 0, 1)"
+        ),
+        "velocity_match": "clamp(1 - relative_speed / 1200, 0, 1)",
+        "score": "proximity * velocity_match",
+        "coefficient": GAMEPLAY_120_V2_CONTROL_REWARD,
+        "competitive": "BlueControlScore - OrangeControlScore",
+        "reset_transition_reward": 0.0,
+    },
+    "unconditional_unique_touch": 0.0,
+    "named_mechanics_reward": 0.0,
+    "named_mechanics_hot_path": False,
+    "bad_flip_guard": {
+        "penalty": GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY,
+        "candidate": (
+            "new legitimate car-ball contact onset during active directional dodge: "
+            "is_flipping and has_flipped and non-zero directional flip_rel_torque"
+        ),
+        "pending_window_ticks_at_120_hz": (
+            GAMEPLAY_120_V2_RETAINED_CONTROL_WINDOW_TICKS
+        ),
+        "active_exemptions_in_precedence_order": [
+            "EXEMPT_CONTESTED_50",
+            "EXEMPT_POWER_CONTACT",
+            "EXEMPT_RETAINED_CONTROL",
+        ],
+        "retained_control": {
+            "window": "the next 12 authoritative ticks after contact",
+            "minimum_control_score": (
+                GAMEPLAY_120_V2_RETAINED_CONTROL_THRESHOLD
+            ),
+            "ends_on": "reset or termination",
+        },
+        "recognized_mechanic_exemption": False,
+        "controlled_flick_exemption": False,
+        "generic_jump_penalty": 0.0,
+        "generic_flip_penalty": 0.0,
+    },
+    "quarantined_experimental_labels": list(
+        REWARD_GAMEPLAY_V3_CONTRACT["mechanics"]["canonical_rewardable"]
+    ),
+}
+
 EPISODE_CONTRACT: Final = {
     "version": RIVAL2_EPISODE_VERSION,
     "goal": "terminated",
@@ -734,6 +826,9 @@ REWARD_GAMEPLAY_V3_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V3_CON
 REWARD_GAMEPLAY_120_V1_CONTRACT_HASH: Final = _canonical_hash(
     REWARD_GAMEPLAY_120_V1_CONTRACT
 )
+REWARD_GAMEPLAY_120_V2_CONTRACT_HASH: Final = _canonical_hash(
+    REWARD_GAMEPLAY_120_V2_CONTRACT
+)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -761,19 +856,25 @@ def contract_hashes_for_reward(
     else:
         raise ValueError(f"unsupported Rival 2.0 episode version: {episode_version}")
 
-    if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
+    if reward_version in (
+        RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+        RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+    ):
         selected_observation = observation_version or RIVAL2_OBS_V2_120HZ_VERSION
         selected_action = action_version or RIVAL2_ACTION_V2_120HZ_VERSION
         if selected_observation != RIVAL2_OBS_V2_120HZ_VERSION:
-            raise ValueError("Gameplay 120 V1 requires RIVAL2_OBS_V2_120HZ")
+            raise ValueError("Gameplay 120 requires RIVAL2_OBS_V2_120HZ")
         if selected_action != RIVAL2_ACTION_V2_120HZ_VERSION:
-            raise ValueError("Gameplay 120 V1 requires RIVAL2_ACTION_V2_120HZ")
+            raise ValueError("Gameplay 120 requires RIVAL2_ACTION_V2_120HZ")
+        reward_hash = (
+            REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
+            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
+            else REWARD_GAMEPLAY_120_V2_CONTRACT_HASH
+        )
         return {
             RIVAL2_OBS_V2_120HZ_VERSION: OBSERVATION_SCHEMA_V2_120HZ_HASH,
             RIVAL2_ACTION_V2_120HZ_VERSION: ACTION_CONTRACT_V2_120HZ_HASH,
-            RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION: (
-                REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
-            ),
+            reward_version: reward_hash,
             episode_version: episode_hash,
         }
 
@@ -858,6 +959,16 @@ __all__ = [
     "GAMEPLAY_120_BOOST_USE_REWARD",
     "GAMEPLAY_120_SPEED_COEFFICIENT",
     "GAMEPLAY_120_SUPERSONIC_REWARD",
+    "GAMEPLAY_120_V2_BOOST_USE_REWARD",
+    "GAMEPLAY_120_V2_CONTROL_DISTANCE_MAX",
+    "GAMEPLAY_120_V2_CONTROL_DISTANCE_RANGE",
+    "GAMEPLAY_120_V2_CONTROL_RELATIVE_SPEED_SCALE",
+    "GAMEPLAY_120_V2_CONTROL_REWARD",
+    "GAMEPLAY_120_V2_RETAINED_CONTROL_THRESHOLD",
+    "GAMEPLAY_120_V2_RETAINED_CONTROL_WINDOW_TICKS",
+    "GAMEPLAY_120_V2_SPEED_COEFFICIENT",
+    "GAMEPLAY_120_V2_SUPERSONIC_REWARD",
+    "GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY",
     "GAMEPLAY_BIG_PAD_PICKUP_REWARD",
     "GAMEPLAY_BOOST_USE_REWARD",
     "GAMEPLAY_SAVE_REWARD",
@@ -883,6 +994,8 @@ __all__ = [
     "REWARD_CONTRACT_HASH",
     "REWARD_GAMEPLAY_120_V1_CONTRACT",
     "REWARD_GAMEPLAY_120_V1_CONTRACT_HASH",
+    "REWARD_GAMEPLAY_120_V2_CONTRACT",
+    "REWARD_GAMEPLAY_120_V2_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V1_CONTRACT",
     "REWARD_GAMEPLAY_V1_CONTRACT_HASH",
     "REWARD_GAMEPLAY_V2_CONTRACT",
@@ -900,6 +1013,7 @@ __all__ = [
     "RIVAL2_OBS_V2_120HZ_VERSION",
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION",
+    "RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V2_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_V3_VERSION",

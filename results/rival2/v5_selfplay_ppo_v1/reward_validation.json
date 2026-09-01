@@ -1,0 +1,37 @@
+{
+  "checks": {
+    "bad_flip_penalty_is_minus_0_005": true,
+    "boost_use_occupancy_zero": true,
+    "competitive_control_zero_sum": true,
+    "control_formula_representative_cases": true,
+    "contested_exemption_preserved": true,
+    "existing_120hz_regressions_pass": true,
+    "human_bc_ppo_transition_regressions_pass": true,
+    "named_mechanics_hot_path_absent": true,
+    "power_contact_exemption_preserved": true,
+    "reset_control_reward_zero": true,
+    "retained_control_authoritative_post_contact": true,
+    "speed_occupancy_zero": true,
+    "supersonic_occupancy_0_000075": true,
+    "unretained_flip_contact_penalized": true,
+    "v1_reward_contract_hash_unchanged": true
+  },
+  "commands": [
+    ".venv/Scripts/python.exe -m pytest tests/test_rival2_gameplay_120_v2.py -q",
+    ".venv/Scripts/python.exe -m pytest tests/test_rival2_120hz.py tests/test_rival2_gameplay_reward.py tests/test_rival2_human_bc_ppo_v1.py -q"
+  ],
+  "created_utc": "2026-09-01T16:40:00+00:00",
+  "focused_results": {
+    "passed": 13,
+    "warnings": 0
+  },
+  "format": "RIVAL2_GAMEPLAY_120_V2_REWARD_VALIDATION",
+  "regression_results": {
+    "passed": 20,
+    "warnings": 15
+  },
+  "reward_contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+  "reward_version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+  "v1_reward_contract_sha256": "0D4C9A78803BBAF851AB4FDD7D9AC4196AB08E42B51DC0A173A1EAEC066AFAED",
+  "verdict": "PASS"
+}

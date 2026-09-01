@@ -374,6 +374,11 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             "bad_flip_total",
             "contest_exempt_total",
             "power_exempt_total",
+        ) + (
+            ("retained_control_exempt_total",)
+            if gameplay_120 is not None
+            and hasattr(gameplay_120, "retained_control_exempt_total")
+            else ()
         )
         gameplay_counter_before = (
             {}
@@ -395,6 +400,10 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
             ("save_component", "rival2.save_component"),
             ("strict_double_dash_component", "rival2.strict_double_dash_component"),
             ("unnecessary_flip_component", "gameplay_120.bad_flip_component"),
+        ) + (
+            (("control_component", "gameplay_120.control_component"),)
+            if gameplay_120 is not None and hasattr(gameplay_120, "control_component")
+            else ()
         )
         component_signed_sum = {
             name: torch.zeros((), dtype=torch.float64, device=self.device)
@@ -410,6 +419,23 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         analog_saturation_count = torch.zeros((), dtype=torch.int64, device=self.device)
         normalized_speed_sum = torch.zeros((), dtype=torch.float64, device=self.device)
         normalized_speed_square_sum = torch.zeros((), dtype=torch.float64, device=self.device)
+        supersonic_player_ticks = torch.zeros((), dtype=torch.int64, device=self.device)
+        control_telemetry_names = (
+            "control_score_sum_total",
+            "control_score_tick_total",
+            "control_score_positive_total",
+            "control_score_ge_025_total",
+            "control_score_ge_05_total",
+            "control_reward_sum_total",
+        )
+        control_telemetry_before = (
+            {
+                name: self.env.bridge.views[f"gameplay_120.{name}"].clone()
+                for name in control_telemetry_names
+            }
+            if gameplay_120 is not None and hasattr(gameplay_120, "control_component")
+            else None
+        )
         velocity_start = OBS_FIELD_NAMES.index("self.linear_velocity.x")
         no_touch_index = OBS_FIELD_NAMES.index("lifecycle.no_touch_age")
         self.model.eval()
@@ -460,6 +486,12 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                         normalized_speed.square(),
                         torch.zeros_like(normalized_speed),
                     ).sum(dtype=torch.float64)
+                    supersonic = self.env.bridge.views["is_supersonic"].reshape(
+                        self.env.num_envs, 2
+                    )
+                    supersonic_player_ticks += (
+                        (supersonic != 0) & train_mask
+                    ).sum()
                 active_family = self.opponent_family
                 family_world_decisions += torch.bincount(active_family, minlength=4)
                 family_trainable_samples.scatter_add_(
@@ -593,11 +625,49 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 "mean_movement_speed_uu_per_second": (
                     speed_mean * CAR_LINEAR_SPEED_SCALE
                 ),
+                "supersonic_occupancy_fraction": (
+                    int(supersonic_player_ticks.item()) / max(action_count, 1)
+                ),
                 "named_mechanics_hot_path_absent": self.env.world.gameplay_v3 is None,
                 "named_mechanics_arrays": gameplay_120.memory_inventory()[
                     "named_mechanics_arrays"
                 ],
             }
+            if control_telemetry_before is not None:
+                control_deltas = {
+                    name: float(
+                        (
+                            self.env.bridge.views[f"gameplay_120.{name}"]
+                            - control_telemetry_before[name]
+                        )
+                        .sum(dtype=torch.float64)
+                        .item()
+                    )
+                    for name in control_telemetry_names
+                }
+                control_ticks = max(
+                    int(control_deltas["control_score_tick_total"]), 1
+                )
+                self.last_rollout_gameplay_metrics["control_score"] = {
+                    "mean": (
+                        control_deltas["control_score_sum_total"] / control_ticks
+                    ),
+                    "positive_fraction": (
+                        control_deltas["control_score_positive_total"] / control_ticks
+                    ),
+                    "ge_025_fraction": (
+                        control_deltas["control_score_ge_025_total"] / control_ticks
+                    ),
+                    "ge_05_fraction": (
+                        control_deltas["control_score_ge_05_total"] / control_ticks
+                    ),
+                    "player_ticks": int(
+                        control_deltas["control_score_tick_total"]
+                    ),
+                    "cumulative_competitive_reward": control_deltas[
+                        "control_reward_sum_total"
+                    ],
+                }
         return rollout
 
     def enable_safe_mixed_ppo(
