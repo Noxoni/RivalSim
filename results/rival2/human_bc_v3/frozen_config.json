@@ -1,0 +1,192 @@
+{
+  "authority": {
+    "base_bc_config": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+    "base_bc_config_sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4",
+    "base_bc_evidence": "results/rival2/human_behavior_cloning_v1/evidence.json",
+    "base_bc_evidence_sha256": "31BEAA23CC5291644B9BA9C48437304CE9BB129048D50D6B09134079FABD9FE7",
+    "observation_adapter_checkpoint": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+    "observation_adapter_checkpoint_sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+    "old_opened_simulator_test_role": "diagnostic_only_never_selection_stopping_tuning_or_acceptance",
+    "required_parent": "b9140d96f73a78a539df7ebd019a8f9670bc34e7",
+    "source_checkpoint": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "source_checkpoint_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+    "source_model_tensor_sha256": "872731CA5FD5FE148242A709D954CD1FFEF5249075811E79A15B93420AF0DAD7",
+    "source_selected_accepted_step": 160,
+    "v2_checkpoint_training_prohibited": true,
+    "v2_diagnostic_checkpoint": "checkpoints/rival2/human_bc_v2/rival2_human_bc_v2.pt",
+    "v2_diagnostic_checkpoint_sha256": "CF77852EEEA7E30092F193E7EA1F8BC327EE83BFD1B81FD86275D4CF260811B2",
+    "v2_diagnostic_evidence": "results/rival2/human_bc_v2/evidence.json",
+    "v2_diagnostic_evidence_sha256": "D8522979DA8AB5C123EC9F45BDD0CAD45B8BF1E01139CA02173211D59C5DD988"
+  },
+  "checkpoint": {
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V3",
+    "historical_ppo_optimizer_resumable": false,
+    "path": "checkpoints/rival2/human_bc_v3/rival2_human_bc_v3.pt",
+    "ppo_resumable": false,
+    "save_every_accepted_validation_boundary": true
+  },
+  "distribution_guard": {
+    "maximum_analog_actor_absolute_ge_5_fraction": 0.95,
+    "maximum_button_probability_saturation_fraction": 0.95,
+    "maximum_log_std_clamp_fraction": 0.95,
+    "minimum_nonconstant_channel_std": 0.01,
+    "nonfinite_allowed": false
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_FROZEN_CONFIG_V3",
+  "inherit_exactly_from_base_bc_v1": {
+    "human_action_objective": true,
+    "human_dataset_and_source_hashes": true,
+    "human_train_validation_test_splits": true,
+    "mechanic_aware_sampling": true,
+    "observation_action_contracts": true,
+    "observation_adapter": true,
+    "sampling_family_proportions": true,
+    "simulator_retention_hard_limits": true,
+    "simulator_training_and_validation_corpus": true
+  },
+  "optimizer": {
+    "continuation_seed": 2026090111,
+    "historical_ppo_optimizer_loaded": false,
+    "minimum_learning_rate": 3.75e-06,
+    "source_full_model_bc_optimizer_loaded": false,
+    "transactional_backoff_factor": 0.5,
+    "transactional_retries_per_interval": 3,
+    "type": "fresh torch.optim.AdamW over actor.weight and actor.bias only"
+  },
+  "prohibited": {
+    "additional_demonstrations": true,
+    "dataset_or_split_change": true,
+    "mechanic_definition_change": true,
+    "observation_action_contract_change": true,
+    "observation_adapter_change": true,
+    "ppo": true,
+    "raw_recording_or_review_mutation": true,
+    "reward_change": true
+  },
+  "retention_sampling": {
+    "low_variance_quantile": 0.1,
+    "low_variance_threshold_log_std": -3.1078375339508058,
+    "membership_source": "frozen BC-V1 teacher only",
+    "ordered_strata": [
+      "natural",
+      "current_policy_applicable",
+      "historical_opponent",
+      "low_teacher_variance"
+    ],
+    "pool_hashes": {
+      "current_policy_applicable": "8E3C2A64122655924A5B5FFA930DF8B95569888DE026ED6729FE8F54F70E366D",
+      "historical_opponent": "F05635C398CEEEB8331375B43210A845A9D5966CCF5C5263982ACF7C092FC32F",
+      "low_teacher_variance": "E99852AE1E87274065695E342203254782255F9C22B7A63C4E34F16F5033751F",
+      "natural": "8E73219B0250B71CA8A8CA78CDDCDF8D5113F7D921BA13A3A0448795E635CCC6"
+    },
+    "rows_per_step": {
+      "current_policy_applicable": 1024,
+      "historical_opponent": 1024,
+      "low_teacher_variance": 1024,
+      "natural": 2048
+    },
+    "with_replacement": true
+  },
+  "selection": {
+    "best_checkpoint_update": "strict combined score improvement among eligible candidates",
+    "candidate_score": "0.32 gameplay ratio + 0.32 mechanic ratio + 0.18 mean label ratio + 0.10 mean-KL/soft-limit + 0.08 max-KL/hard-limit",
+    "early_stopping_material_score_improvement": 0.0005,
+    "early_stopping_patience_validations": 20,
+    "mechanic_label_nonregression_relative_tolerance": 0.02,
+    "minimum_accepted_steps_before_plateau": 2048,
+    "minimum_human_family_relative_improvement": 0.05,
+    "minimum_mechanic_labels_improved_fraction": 0.6,
+    "minimum_mechanic_labels_nonregressed_fraction": 0.8,
+    "requires_action_distribution_health": true,
+    "requires_both_human_families_improve_over_parent": true,
+    "requires_complete_validation_hard_guard": true,
+    "score_weights": {
+      "gameplay_rmse_ratio": 0.32,
+      "mean_per_label_rmse_ratio": 0.18,
+      "mechanic_rmse_ratio": 0.32,
+      "simulator_actor_kl_soft_limit_ratio": 0.1,
+      "simulator_max_kl_hard_limit_ratio": 0.08
+    },
+    "test_used_for_selection": false
+  },
+  "simulator_authority": {
+    "complete_validation_worlds": 3277,
+    "new_untouched_test_authority": "results/rival2/human_bc_v3/new_simulator_test_authority.json",
+    "new_untouched_test_corpus_identity_sha256": "4A51EB64EC4A102E49CAC89374F821786F3C46BDBCDA3F9EBBA7B97C1C544FA8",
+    "new_untouched_test_corpus_seed": 2026090107,
+    "new_untouched_test_observation_sha256": "9520CAA27DAC9F64BB60C59E8EDCD81441A8F2AAC6307D481C3A0B47959FD818",
+    "new_untouched_test_split_seed": 2026090108,
+    "new_untouched_test_world_indices_sha256": "D07FE1A539F0A3B1346A0FD4ADD3B9D7FBE8D170C37F875822F38A53C037633C",
+    "new_untouched_test_worlds": 3277,
+    "old_test_worlds_excluded": true,
+    "retention_strata_manifest": "results/rival2/human_bc_v3/retention_strata_manifest.json",
+    "test_access_before_final_validation_selection": 0,
+    "training_validation_corpus_identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+    "training_validation_observation_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+    "training_world_indices_sha256": "9B4297DD04012725B5CAB96918B01D3430B1F0ECEF9A5033F97158BDC61300C4",
+    "validation_world_indices_sha256": "EBA60143575344EF1F1BB000246BE91558DF150F6D6DF35A266B72E733D93A70"
+  },
+  "tail_aware_retention": {
+    "activation_threshold_sample_kl": 0.5,
+    "barrier_coefficient": 4.0,
+    "cvar_top_quantile_fraction": null,
+    "existing_mean_channel_and_critic_guards_unchanged": true,
+    "formulation": "mean_KL + coefficient * mean((temperature * softplus((sample_KL - threshold) / temperature))^2)",
+    "hard_all_perspective_max_sample_kl": 2.0,
+    "ordinary_mean_teacher_to_student_kl_coefficient": 2.0,
+    "temperature": 0.05
+  },
+  "test_discipline": {
+    "human_test_access": "exactly once after final validation selection",
+    "new_simulator_test_access": "exactly once after final validation selection",
+    "old_opened_simulator_test": "diagnostic only and not reevaluated for selection",
+    "selection_reopened_after_test": false
+  },
+  "trainable_parameters": {
+    "critic_head": "frozen byte-identical to Human BC V1",
+    "mode": "actor_head_only",
+    "names": [
+      "actor.weight",
+      "actor.bias"
+    ],
+    "shared_trunk": "frozen byte-identical to Human BC V1"
+  },
+  "training": {
+    "gradient_clip_norm": 1.0,
+    "initial_learning_rate": 3e-05,
+    "maximum_accepted_supervised_steps": 10000,
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "optimizer_epsilon": 1e-08,
+    "validation_interval_optimizer_steps": 64,
+    "weight_decay": 1e-05
+  },
+  "validation": {
+    "groups": [
+      "all_perspectives",
+      "current_policy_applicable",
+      "counterfactual_opponent",
+      "historical_opponent",
+      "low_teacher_variance"
+    ],
+    "hard_guard": {
+      "actor_max_channel_kl": 0.01,
+      "actor_max_sample_kl": 2.0,
+      "actor_mean_kl": 0.02,
+      "critic_max_absolute_drift": 0.5,
+      "critic_rmse": 0.075,
+      "nonfinite_allowed": false
+    },
+    "per_channel_tail_contribution": true,
+    "soft_actor_mean_kl": 0.01,
+    "threshold_counts": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "worlds": 3277,
+    "worlds_per_batch": 64
+  }
+}
