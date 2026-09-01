@@ -1,5 +1,11 @@
 # Rival 2.0 Human BC V3
 
+> Final status: **BLOCKED**. Training and complete validation were safe, but
+> the once-only prospective simulator test measured one all-perspective sample
+> at actor KL `2.1052461326179`, above the unchanged `2.0` hard limit. The
+> checkpoint is diagnostic evidence and is not an accepted BC parent. See
+> `BLOCKED_AUDIT.md` and `evidence.json`.
+
 Human BC V3 is an actor-only continuation from the accepted Human BC V1
 checkpoint. It exists to preserve V2's human-imitation gains while addressing
 the rare all-perspective simulator-retention tail that made V2 ineligible.
@@ -73,7 +79,8 @@ persisted:
 .\.venv\Scripts\python.exe benchmarks/run_rival2_human_bc_v3.py
 ```
 
-Final evidence is written to `evidence.json`, `validation_curve.json`,
-`test_evidence.json`, `artifact_manifest.json`, and `summary.md`. The selected
-checkpoint is `checkpoints/rival2/human_bc_v3/rival2_human_bc_v3.pt` and is
-explicitly not PPO-resumable.
+Final evidence is written to `evidence.json`, `training_curve.json`,
+`human_test_metrics.json`, `new_simulator_test_results.json`,
+`artifact_manifest.json`, and `BLOCKED_AUDIT.md`. The selected checkpoint is
+`checkpoints/rival2/human_bc_v3/rival2_human_bc_v3.pt`; it is blocked diagnostic
+evidence and explicitly not PPO-resumable.
