@@ -674,7 +674,6 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
-    torch.use_deterministic_algorithms(True)
     source_path = ROOT / config["authority"]["source_checkpoint"]
     adapter_path = ROOT / config["authority"]["observation_adapter_checkpoint"]
     source_bytes = source_path.read_bytes()
@@ -713,6 +712,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         bootstrap_identity,
         device=args.device,
     )
+    torch.use_deterministic_algorithms(True)
     simulator_authority = config["simulator_authority"]
     corpus_checks = {
         "identity_exact": corpus_manifest["identity_sha256"]
@@ -799,12 +799,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "authority": base_config["authority"],
         "corpus": new_corpus_config,
     }
-    new_corpus, new_manifest, new_splits = _build_rollout_corpus(
-        new_compatibility,
-        bootstrap_payload,
-        bootstrap_identity,
-        device=args.device,
-    )
+    torch.use_deterministic_algorithms(False)
+    try:
+        new_corpus, new_manifest, new_splits = _build_rollout_corpus(
+            new_compatibility,
+            bootstrap_payload,
+            bootstrap_identity,
+            device=args.device,
+        )
+    finally:
+        torch.use_deterministic_algorithms(True)
     new_test_checks = {
         "corpus_identity_exact": new_manifest["identity_sha256"]
         == simulator_authority["new_untouched_test_corpus_identity_sha256"],
