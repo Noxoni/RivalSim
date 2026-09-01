@@ -1,0 +1,181 @@
+{
+  "format": "RIVAL2_HUMAN_BC_V4_RETENTION_STRATA_V1",
+  "initial_hard_tail_replay": {
+    "ordered_int64_sha256": "6F0E5A361C55CDCA22D06D7D136E2CA698F85604EDCC04CA8C2231F0A40ECEE9",
+    "rows": 4096,
+    "source": "highest frozen teacher/state orientation scores inside the deterministic orientation candidate segment; score descending then encoded row ascending"
+  },
+  "low_variance_definition": {
+    "quantile": 0.1,
+    "statistic": "minimum clamped teacher analog log_std across five channels",
+    "teacher": "frozen Human BC V1 actor",
+    "threshold_log_std": -3.1078375339508058,
+    "threshold_std": 0.04469750774998815
+  },
+  "membership_source": "teacher_and_training_state_only_no_student",
+  "mining_candidate_pool": {
+    "fractions": {
+      "current_policy_applicable": 0.25,
+      "historical_opponent": 0.125,
+      "natural": 0.125,
+      "orientation_sensitive": 0.5
+    },
+    "ordered_int64_sha256": "1875C425828BF3A8C8B4FE975D303047B384721C392A84EF926EB3CC07334417",
+    "rows": 524288,
+    "seed": 2026090121,
+    "segment_order": [
+      "orientation_sensitive",
+      "current_policy_applicable",
+      "historical_opponent",
+      "natural"
+    ],
+    "segment_rows": {
+      "current_policy_applicable": 131072,
+      "historical_opponent": 65536,
+      "natural": 65536,
+      "orientation_sensitive": 262144
+    },
+    "selection_algorithm": "SplitMix64(encoded_row XOR (seed XOR segment_tag)); lowest rank then encoded row ascending",
+    "source": "frozen simulator training rows only",
+    "unique_rows": 524288
+  },
+  "opened_test_rows_used": false,
+  "optimizer_steps": 0,
+  "orientation_sensitive_definition": {
+    "component_training_quantiles": {
+      "state_body_angular_rate": {
+        "0.5": 0.9008120894432068,
+        "0.75": 0.9158371686935425,
+        "0.85": 0.916361927986145,
+        "0.9": 0.9164946675300598,
+        "0.95": 0.9165995717048645,
+        "0.99": 0.9166527986526489,
+        "0.999": 0.91666579246521
+      },
+      "state_tilt_fraction": {
+        "0.5": 0.36150914430618286,
+        "0.75": 0.6667038798332214,
+        "0.85": 0.7998092174530029,
+        "0.9": 0.8651487529277802,
+        "0.95": 0.9314550459384918,
+        "0.99": 0.9824932813644409,
+        "0.999": 0.9963112458586696
+      },
+      "teacher_confidence_normalized_demand": {
+        "0.5": 13.414868831634521,
+        "0.75": 23.16712236404419,
+        "0.85": 27.653685569763184,
+        "0.9": 31.578822135925293,
+        "0.95": 36.76634502410889,
+        "0.99": 47.07022724151612,
+        "0.999": 53.394950561523444
+      },
+      "teacher_orientation_mean_magnitude": {
+        "0.5": 0.7958909273147583,
+        "0.75": 0.921179473400116,
+        "0.85": 0.9434354305267334,
+        "0.9": 0.952952116727829,
+        "0.95": 0.9621850848197937,
+        "0.99": 0.9723137885332107,
+        "0.999": 0.98033867508173
+      },
+      "teacher_orientation_precision": {
+        "0.5": 187.65633392333984,
+        "0.75": 364.7658996582031,
+        "0.85": 485.52787017822266,
+        "0.9": 561.5004577636719,
+        "0.95": 747.3708648681641,
+        "0.99": 2114.3007690429795,
+        "0.999": 2721.4190332031285
+      }
+    },
+    "context_quantiles": {
+      "contact_absolute_up_z": 0.2,
+      "contact_up_z": 0.05,
+      "recovery_dynamics": 0.65,
+      "recovery_position": 0.35,
+      "recovery_velocity": 0.35
+    },
+    "context_thresholds": {
+      "airborne_body_angular_rate_q65": 0.9157872796058655,
+      "airborne_linear_velocity_z_q35": -0.006818121718242765,
+      "airborne_position_z_q35": 0.05575662851333618,
+      "airborne_tilt_q65": 0.6590818762779236,
+      "contact_absolute_up_z_q20": 0.9999550580978394,
+      "contact_up_z_q05": 0.999954879283905
+    },
+    "core_feature_order": [
+      "teacher_orientation_precision",
+      "teacher_confidence_normalized_demand",
+      "teacher_orientation_mean_magnitude",
+      "state_body_angular_rate",
+      "state_tilt_fraction"
+    ],
+    "core_feature_quantile": 0.9,
+    "core_thresholds": {
+      "state_body_angular_rate": 0.9164946675300598,
+      "state_tilt_fraction": 0.8651487529277802,
+      "teacher_confidence_normalized_demand": 31.578822135925293,
+      "teacher_orientation_mean_magnitude": 0.952952116727829,
+      "teacher_orientation_precision": 561.5004577636719
+    },
+    "current_policy_applicable_required": true,
+    "format": "RIVAL2_HUMAN_BC_V4_ORIENTATION_STRATUM_V1",
+    "inclusive_rule": "current_policy_applicable AND (max(feature / training_q90) >= 1 OR recovery_landing_context OR wall_ceiling_contact_context)",
+    "membership_source": "frozen BC-V1 teacher plus simulator training state only",
+    "opened_test_rows_used": false,
+    "ordered_int64_sha256": "B7883E82EFE8DAAA8DB447A77D874E115A5D5175AD24F39B6DD1374D23D72736",
+    "reason_counts": {
+      "core": 1400766,
+      "recovery_landing": 1607611,
+      "union": 2172959,
+      "wall_or_ceiling_contact": 225107
+    },
+    "rows": 2172959,
+    "score_training_quantiles": {
+      "0.5": 0.996517539024353,
+      "0.75": 1.011277824640274,
+      "0.85": 1.103840947151184,
+      "0.9": 1.1690908670425415,
+      "0.95": 1.417861431837082,
+      "0.99": 3.7654477238655275,
+      "0.999": 4.846690378189093
+    },
+    "student_outputs_used": false
+  },
+  "pools": {
+    "current_policy_applicable": {
+      "ordered_int64_sha256": "8E3C2A64122655924A5B5FFA930DF8B95569888DE026ED6729FE8F54F70E366D",
+      "rows": 4032256,
+      "unique_rows": 4032256
+    },
+    "historical_opponent": {
+      "ordered_int64_sha256": "F05635C398CEEEB8331375B43210A845A9D5966CCF5C5263982ACF7C092FC32F",
+      "rows": 334592,
+      "unique_rows": 334592
+    },
+    "low_teacher_variance": {
+      "ordered_int64_sha256": "E99852AE1E87274065695E342203254782255F9C22B7A63C4E34F16F5033751F",
+      "rows": 671079,
+      "unique_rows": 671079
+    },
+    "natural": {
+      "ordered_int64_sha256": "8E73219B0250B71CA8A8CA78CDDCDF8D5113F7D921BA13A3A0448795E635CCC6",
+      "rows": 6710784,
+      "unique_rows": 6710784
+    },
+    "orientation_sensitive": {
+      "ordered_int64_sha256": "B7883E82EFE8DAAA8DB447A77D874E115A5D5175AD24F39B6DD1374D23D72736",
+      "rows": 2172959,
+      "unique_rows": 2172959
+    }
+  },
+  "role_membership_source": "rollout-aligned opponent_family and train_mask",
+  "row_identity": "world_index * 256 + tick * 2 + car_perspective",
+  "source_aligned_simulator_corpus_identity_sha256": "CBE670ABD6B8EED6F909070E6B47A9A3A4918E7FDBB153FE7F2ED0735CEBF027",
+  "source_observation_tensor_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+  "source_opponent_family_tensor_sha256": "71C5705DC4BEE837E9FFC6EB6004BA9B6864D38F3AFF7FC5B33E863C68DB8976",
+  "source_train_mask_tensor_sha256": "88E0F32D182843CB92EC0D1DD31E2272FC674AAB89ACACCCACDB54BE46E6B6E9",
+  "source_train_world_indices_sha256": "9B4297DD04012725B5CAB96918B01D3430B1F0ECEF9A5033F97158BDC61300C4",
+  "student_outputs_used_for_static_membership": false
+}

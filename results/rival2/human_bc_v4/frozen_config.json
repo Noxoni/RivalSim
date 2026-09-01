@@ -1,0 +1,366 @@
+{
+  "authority": {
+    "all_pre_v4_simulator_tests_diagnostic_only": true,
+    "base_bc_config": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+    "base_bc_config_sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4",
+    "base_bc_evidence": "results/rival2/human_behavior_cloning_v1/evidence.json",
+    "base_bc_evidence_sha256": "31BEAA23CC5291644B9BA9C48437304CE9BB129048D50D6B09134079FABD9FE7",
+    "observation_adapter_checkpoint": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+    "observation_adapter_checkpoint_sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+    "pre_step_authority": "results/rival2/human_bc_v4/pre_step_authority.json",
+    "required_parent": "da185d219127968d6612d596552f90ee18e02cca",
+    "source_checkpoint": "checkpoints/rival2/human_bc_v1/rival2_human_bc_v1.pt",
+    "source_checkpoint_sha256": "560C2414C17039DC920126EA148BF73FE6CC4677EE440F043599A7E1C76D2874",
+    "source_model_tensor_sha256": "872731CA5FD5FE148242A709D954CD1FFEF5249075811E79A15B93420AF0DAD7",
+    "source_selected_accepted_step": 160,
+    "v2_diagnostic_checkpoint_sha256": "CF77852EEEA7E30092F193E7EA1F8BC327EE83BFD1B81FD86275D4CF260811B2",
+    "v2_diagnostic_evidence_sha256": "D8522979DA8AB5C123EC9F45BDD0CAD45B8BF1E01139CA02173211D59C5DD988",
+    "v2_v3_checkpoint_training_prohibited": true,
+    "v3_diagnostic_checkpoint_sha256": "CE2A9671C3768710F5DECD456E28D1265910CB5934D0FB0BB819478E369E939B",
+    "v3_diagnostic_evidence_sha256": "46B4FD780F6B92CDFE4E0AC891675C7D389B1402BD8AA57286963DD3243AD412",
+    "v3_opened_test_authority_sha256": "B36602FD809DEA7DFDB93B1B201194C88A85A00C67449150096D3EF004B59725"
+  },
+  "checkpoint": {
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V4",
+    "historical_ppo_optimizer_resumable": false,
+    "path": "checkpoints/rival2/human_bc_v4/rival2_human_bc_v4.pt",
+    "ppo_resumable": false,
+    "save_every_accepted_validation_boundary": true
+  },
+  "distribution_guard": {
+    "maximum_analog_actor_absolute_ge_5_fraction": 0.95,
+    "maximum_button_probability_saturation_fraction": 0.95,
+    "maximum_log_std_clamp_fraction": 0.95,
+    "minimum_nonconstant_channel_std": 0.01,
+    "nonfinite_allowed": false
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_FROZEN_CONFIG_V4",
+  "hard_tail_mining": {
+    "candidate_evaluation_rows_per_batch": 65536,
+    "candidate_pool_fractions": {
+      "current_policy_applicable": 0.25,
+      "historical_opponent": 0.125,
+      "natural": 0.125,
+      "orientation_sensitive": 0.5
+    },
+    "candidate_pool_rows": 524288,
+    "candidate_pool_seed": 2026090121,
+    "candidate_pool_sha256": "1875C425828BF3A8C8B4FE975D303047B384721C392A84EF926EB3CC07334417",
+    "initial_replay_rows": 4096,
+    "initial_replay_sha256": "6F0E5A361C55CDCA22D06D7D136E2CA698F85604EDCC04CA8C2231F0A40ECEE9",
+    "maximum_generation_age_inclusive": 3,
+    "maximum_replay_rows": 16384,
+    "mining_frequency_accepted_steps": 64,
+    "ranking": "hybrid actor sample KL descending then encoded row ascending",
+    "replacement_aging_policy": "newest generation first; refreshed rows replace older identity; retain at most current plus three preceding generations; truncate deterministically",
+    "replay_fraction_per_retention_batch": 0.125,
+    "source": "prospectively frozen simulator training candidate pool only",
+    "top_k_per_generation": 4096,
+    "validation_or_test_inspection_prohibited": true
+  },
+  "inherit_exactly_from_base_bc_v1": {
+    "human_action_objective": true,
+    "human_dataset_and_source_hashes": true,
+    "human_train_validation_test_splits": true,
+    "mechanic_aware_sampling": true,
+    "observation_action_contracts": true,
+    "observation_adapter": true,
+    "sampling_family_proportions": true,
+    "simulator_retention_hard_limits": true
+  },
+  "optimizer": {
+    "historical_ppo_optimizer_loaded": false,
+    "minimum_learning_rate": 3.75e-06,
+    "retention_sampling_seed": 2026090122,
+    "source_full_model_bc_optimizer_loaded": false,
+    "training_seed": 2026090123,
+    "transactional_backoff_factor": 0.5,
+    "transactional_retries_per_interval": 3,
+    "type": "fresh torch.optim.AdamW over actor.weight and actor.bias only",
+    "v2_v3_optimizer_loaded": false
+  },
+  "orientation_sensitive_stratum": {
+    "component_training_quantiles": {
+      "state_body_angular_rate": {
+        "0.5": 0.9008120894432068,
+        "0.75": 0.9158371686935425,
+        "0.85": 0.916361927986145,
+        "0.9": 0.9164946675300598,
+        "0.95": 0.9165995717048645,
+        "0.99": 0.9166527986526489,
+        "0.999": 0.91666579246521
+      },
+      "state_tilt_fraction": {
+        "0.5": 0.36150914430618286,
+        "0.75": 0.6667038798332214,
+        "0.85": 0.7998092174530029,
+        "0.9": 0.8651487529277802,
+        "0.95": 0.9314550459384918,
+        "0.99": 0.9824932813644409,
+        "0.999": 0.9963112458586696
+      },
+      "teacher_confidence_normalized_demand": {
+        "0.5": 13.414868831634521,
+        "0.75": 23.16712236404419,
+        "0.85": 27.653685569763184,
+        "0.9": 31.578822135925293,
+        "0.95": 36.76634502410889,
+        "0.99": 47.07022724151612,
+        "0.999": 53.394950561523444
+      },
+      "teacher_orientation_mean_magnitude": {
+        "0.5": 0.7958909273147583,
+        "0.75": 0.921179473400116,
+        "0.85": 0.9434354305267334,
+        "0.9": 0.952952116727829,
+        "0.95": 0.9621850848197937,
+        "0.99": 0.9723137885332107,
+        "0.999": 0.98033867508173
+      },
+      "teacher_orientation_precision": {
+        "0.5": 187.65633392333984,
+        "0.75": 364.7658996582031,
+        "0.85": 485.52787017822266,
+        "0.9": 561.5004577636719,
+        "0.95": 747.3708648681641,
+        "0.99": 2114.3007690429795,
+        "0.999": 2721.4190332031285
+      }
+    },
+    "context_quantiles": {
+      "contact_absolute_up_z": 0.2,
+      "contact_up_z": 0.05,
+      "recovery_dynamics": 0.65,
+      "recovery_position": 0.35,
+      "recovery_velocity": 0.35
+    },
+    "context_thresholds": {
+      "airborne_body_angular_rate_q65": 0.9157872796058655,
+      "airborne_linear_velocity_z_q35": -0.006818121718242765,
+      "airborne_position_z_q35": 0.05575662851333618,
+      "airborne_tilt_q65": 0.6590818762779236,
+      "contact_absolute_up_z_q20": 0.9999550580978394,
+      "contact_up_z_q05": 0.999954879283905
+    },
+    "core_feature_order": [
+      "teacher_orientation_precision",
+      "teacher_confidence_normalized_demand",
+      "teacher_orientation_mean_magnitude",
+      "state_body_angular_rate",
+      "state_tilt_fraction"
+    ],
+    "core_feature_quantile": 0.9,
+    "core_thresholds": {
+      "state_body_angular_rate": 0.9164946675300598,
+      "state_tilt_fraction": 0.8651487529277802,
+      "teacher_confidence_normalized_demand": 31.578822135925293,
+      "teacher_orientation_mean_magnitude": 0.952952116727829,
+      "teacher_orientation_precision": 561.5004577636719
+    },
+    "current_policy_applicable_required": true,
+    "format": "RIVAL2_HUMAN_BC_V4_ORIENTATION_STRATUM_V1",
+    "inclusive_rule": "current_policy_applicable AND (max(feature / training_q90) >= 1 OR recovery_landing_context OR wall_ceiling_contact_context)",
+    "membership_source": "frozen BC-V1 teacher plus simulator training state only",
+    "opened_test_rows_used": false,
+    "ordered_int64_sha256": "B7883E82EFE8DAAA8DB447A77D874E115A5D5175AD24F39B6DD1374D23D72736",
+    "reason_counts": {
+      "core": 1400766,
+      "recovery_landing": 1607611,
+      "union": 2172959,
+      "wall_or_ceiling_contact": 225107
+    },
+    "rows": 2172959,
+    "score_training_quantiles": {
+      "0.5": 0.996517539024353,
+      "0.75": 1.011277824640274,
+      "0.85": 1.103840947151184,
+      "0.9": 1.1690908670425415,
+      "0.95": 1.417861431837082,
+      "0.99": 3.7654477238655275,
+      "0.999": 4.846690378189093
+    },
+    "student_outputs_used": false
+  },
+  "prohibited": {
+    "additional_demonstrations": true,
+    "dataset_or_split_change": true,
+    "mechanic_definition_or_adjudication_change": true,
+    "observation_action_contract_change": true,
+    "observation_adapter_change": true,
+    "ppo": true,
+    "raw_recording_or_review_mutation": true,
+    "reward_change": true
+  },
+  "retention_sampling": {
+    "low_variance_quantile": 0.1,
+    "low_variance_threshold_log_std": -3.1078375339508058,
+    "membership_source": "frozen BC-V1 teacher, authoritative training state, and rollout-aligned roles",
+    "ordered_strata": [
+      "natural",
+      "current_policy_applicable",
+      "historical_opponent",
+      "low_teacher_variance",
+      "orientation_sensitive",
+      "hard_tail_replay"
+    ],
+    "pool_hashes": {
+      "current_policy_applicable": "8E3C2A64122655924A5B5FFA930DF8B95569888DE026ED6729FE8F54F70E366D",
+      "historical_opponent": "F05635C398CEEEB8331375B43210A845A9D5966CCF5C5263982ACF7C092FC32F",
+      "low_teacher_variance": "E99852AE1E87274065695E342203254782255F9C22B7A63C4E34F16F5033751F",
+      "natural": "8E73219B0250B71CA8A8CA78CDDCDF8D5113F7D921BA13A3A0448795E635CCC6",
+      "orientation_sensitive": "B7883E82EFE8DAAA8DB447A77D874E115A5D5175AD24F39B6DD1374D23D72736"
+    },
+    "rows_per_step": {
+      "current_policy_applicable": 1024,
+      "hard_tail_replay": 1024,
+      "historical_opponent": 1024,
+      "low_teacher_variance": 1024,
+      "natural": 2048,
+      "orientation_sensitive": 2048
+    },
+    "total_rows_per_step": 8192,
+    "with_replacement": true
+  },
+  "selection": {
+    "candidate_score": "0.29 gameplay ratio + 0.29 mechanic ratio + 0.16 mean label ratio + 0.08 complete mean-KL/soft + 0.06 complete max-KL/margin + 0.06 stress mean-KL/soft + 0.06 stress max-KL/margin",
+    "early_stopping_material_score_improvement": 0.0005,
+    "early_stopping_patience_validations": 20,
+    "mechanic_label_nonregression_relative_tolerance": 0.02,
+    "minimum_accepted_steps_before_plateau": 2048,
+    "minimum_human_family_relative_improvement": 0.05,
+    "minimum_mechanic_labels_improved_fraction": 0.6,
+    "minimum_mechanic_labels_nonregressed_fraction": 0.8,
+    "normal_complete_validation_required": true,
+    "prospective_validation_safety_margin": {
+      "acceptance_hard_sample_kl_unchanged": 2.0,
+      "maximum_sample_kl": 1.0,
+      "maximum_single_orientation_channel_kl": 0.5
+    },
+    "requires_action_distribution_health": true,
+    "requires_both_human_families_improve_over_parent": true,
+    "score_weights": {
+      "complete_max_kl_selection_ratio": 0.06,
+      "complete_mean_kl_soft_limit_ratio": 0.08,
+      "gameplay_rmse_ratio": 0.29,
+      "mean_per_label_rmse_ratio": 0.16,
+      "mechanic_rmse_ratio": 0.29,
+      "stress_max_kl_selection_ratio": 0.06,
+      "stress_mean_kl_soft_limit_ratio": 0.06
+    },
+    "stress_validation_required": true,
+    "test_used_for_selection": false
+  },
+  "simulator_authority": {
+    "complete_validation_worlds": 3277,
+    "old_test_worlds_excluded": true,
+    "retention_strata_manifest": "results/rival2/human_bc_v4/retention_strata_manifest.json",
+    "stress_validation_authority": "results/rival2/human_bc_v4/stress_validation_authority.json",
+    "stress_validation_corpus_identity_sha256": "E65CFF3926EDC08AB46F446A0BAE080BEE253536FE79AE42B49ECCECEFBEDFCC",
+    "stress_validation_corpus_seed": 2026090117,
+    "stress_validation_observation_sha256": "9520CAA27DAC9F64BB60C59E8EDCD81441A8F2AAC6307D481C3A0B47959FD818",
+    "stress_validation_opponent_family_sha256": "71C5705DC4BEE837E9FFC6EB6004BA9B6864D38F3AFF7FC5B33E863C68DB8976",
+    "stress_validation_split_seed": 2026090118,
+    "stress_validation_train_mask_sha256": "88E0F32D182843CB92EC0D1DD31E2272FC674AAB89ACACCCACDB54BE46E6B6E9",
+    "stress_validation_world_indices_sha256": "A0D3A92DFC1D06D225AD45A5D5A50D3EED8B0F9242E82A48F995B3A570F5F2C9",
+    "stress_validation_worlds": 8192,
+    "test_access_before_final_validation_selection": 0,
+    "training_validation_corpus_identity_sha256": "CBE670ABD6B8EED6F909070E6B47A9A3A4918E7FDBB153FE7F2ED0735CEBF027",
+    "training_validation_legacy_identity_sha256": "7FCC2675279BA86A6592F033EC1F22BEC64EAF6DD6BE816D439B869BC0EEF7BC",
+    "training_validation_observation_sha256": "F47EE006A1BEC75DD6D34F858748A207F2E2DF1161C0B72AA7F3C7B1AED57349",
+    "training_validation_opponent_family_sha256": "71C5705DC4BEE837E9FFC6EB6004BA9B6864D38F3AFF7FC5B33E863C68DB8976",
+    "training_validation_train_mask_sha256": "88E0F32D182843CB92EC0D1DD31E2272FC674AAB89ACACCCACDB54BE46E6B6E9",
+    "training_world_indices_sha256": "9B4297DD04012725B5CAB96918B01D3430B1F0ECEF9A5033F97158BDC61300C4",
+    "untouched_test_authority": "results/rival2/human_bc_v4/untouched_test_authority.json",
+    "untouched_test_corpus_identity_sha256": "C51F963E638B725171F97BFF339FA43CFC03F3D80A66814C3A50C8FB11028608",
+    "untouched_test_corpus_seed": 2026090119,
+    "untouched_test_observation_sha256": "F676B0AA8FC7790938FCFD12C51D77962AFDB89ACEE16F7A3DD0AA45CBB27A8B",
+    "untouched_test_opponent_family_sha256": "71C5705DC4BEE837E9FFC6EB6004BA9B6864D38F3AFF7FC5B33E863C68DB8976",
+    "untouched_test_split_seed": 2026090120,
+    "untouched_test_train_mask_sha256": "88E0F32D182843CB92EC0D1DD31E2272FC674AAB89ACACCCACDB54BE46E6B6E9",
+    "untouched_test_world_indices_sha256": "D30C5030D1312A37C0E65F55D71C889057C4E0A800F715FA836521298F5F30F3",
+    "untouched_test_worlds": 8192,
+    "validation_world_indices_sha256": "EBA60143575344EF1F1BB000246BE91558DF150F6D6DF35A266B72E733D93A70"
+  },
+  "tail_aware_retention": {
+    "barrier_phi": "(temperature * softplus((value-threshold)/temperature))^2",
+    "cvar_top_quantile_fraction": 0.01,
+    "formulation": "2*mean(K) + 4*mean(phi(K;0.5,0.05)) + 4*CVaR_top1pct(phi(K;0.5,0.05)) + 4*CVaR_top1pct(phi(M_orientation;0.125,0.0125))",
+    "hard_all_perspective_max_sample_kl": 2.0,
+    "inherited_mean_channel_and_critic_guards_unchanged": true,
+    "ordinary_mean_kl_coefficient": 2.0,
+    "orientation_activation_threshold": 0.125,
+    "orientation_cvar_barrier_coefficient": 4.0,
+    "orientation_tail": "maximum single steer/pitch/yaw/roll channel KL contribution per sample",
+    "orientation_temperature": 0.0125,
+    "sample_kl": "sum of all eight hybrid actor channel KL contributions",
+    "total_cvar_barrier_coefficient": 4.0,
+    "total_mean_barrier_coefficient": 4.0,
+    "total_sample_activation_threshold": 0.5,
+    "total_sample_temperature": 0.05
+  },
+  "test_discipline": {
+    "all_pre_v4_tests": "diagnostic only and never reevaluated for selection",
+    "human_test_access": "exactly once after final validation selection",
+    "selection_reopened_after_test": false,
+    "v4_simulator_test_access": "exactly once after final validation selection"
+  },
+  "trainable_parameters": {
+    "critic_head": "frozen byte-identical to Human BC V1",
+    "mode": "actor_head_only",
+    "names": [
+      "actor.weight",
+      "actor.bias"
+    ],
+    "optimizer": "fresh actor-only torch.optim.AdamW",
+    "shared_trunk": "frozen byte-identical to Human BC V1"
+  },
+  "training": {
+    "gradient_clip_norm": 1.0,
+    "initial_learning_rate": 3e-05,
+    "maximum_accepted_supervised_steps": 10000,
+    "optimizer_betas": [
+      0.9,
+      0.999
+    ],
+    "optimizer_epsilon": 1e-08,
+    "validation_interval_optimizer_steps": 64,
+    "weight_decay": 1e-05
+  },
+  "validation": {
+    "complete_worlds": 3277,
+    "groups": [
+      "all_perspectives",
+      "current_policy_applicable",
+      "counterfactual_opponent",
+      "historical_opponent",
+      "low_teacher_variance",
+      "orientation_sensitive"
+    ],
+    "hard_guard": {
+      "actor_max_channel_kl": 0.01,
+      "actor_max_sample_kl": 2.0,
+      "actor_mean_kl": 0.02,
+      "critic_max_absolute_drift": 0.5,
+      "critic_rmse": 0.075,
+      "nonfinite_allowed": false
+    },
+    "orientation_channels": [
+      "steer",
+      "pitch",
+      "yaw",
+      "roll"
+    ],
+    "selection_margin": {
+      "maximum_individual_orientation_channel_kl": 0.5,
+      "maximum_sample_kl": 1.0
+    },
+    "soft_actor_mean_kl": 0.01,
+    "stress_worlds": 8192,
+    "threshold_counts": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "worlds_per_batch": 64
+  }
+}
