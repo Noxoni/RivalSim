@@ -12,6 +12,7 @@ import sys
 import time
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -522,6 +523,63 @@ def preflight(
     }
 
 
+def resume_preflight(
+    trainer: Rival2RecurrentTrainer,
+    checkpoint: Path,
+    worlds: int,
+) -> dict[str, Any]:
+    expected_reward = (
+        RIVAL2_REWARD_ACQUISITION_120_V1_VERSION
+        if trainer.phase == "phase_a_acquisition"
+        else RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION
+    )
+    checks = {
+        "source_sha256_exact": sha256_file(SOURCE) == SOURCE_SHA256,
+        "source_identity_preserved": trainer.source_identity == load_authority()["source"],
+        "checkpoint_exists": checkpoint.is_file(),
+        "checkpoint_format_exact": torch.load(
+            checkpoint, map_location="cpu", weights_only=False
+        ).get("format")
+        == CHECKPOINT_FORMAT,
+        "phase_valid": trainer.phase
+        in {"phase_a_acquisition", "phase_b_gameplay_120_v2"},
+        "accepted_update_counters_valid": trainer.accepted_updates_total >= 1
+        and trainer.accepted_updates_total >= trainer.phase_accepted_updates
+        and trainer.policy_version == trainer.accepted_updates_total,
+        "optimizer_restored": len(trainer.optimizer.state) > 0,
+        "all_parameters_trainable": all(
+            parameter.requires_grad for parameter in trainer.model.parameters()
+        ),
+        "worlds_exact": worlds == WORLD_COUNT,
+        "policy_and_physics_120_hz": trainer.env.policy_hz
+        == trainer.env.physics_hz
+        == 120,
+        "phase_reward_exact": trainer.env.reward_version == expected_reward,
+        "runtime_contracts_exact": trainer.env.contract_hashes
+        == phase_contracts(expected_reward),
+        "observation_view_exact": trainer.policy_config.observation_view_version
+        == "RIVAL2_HUMAN_SEQUENCE_OBS_VIEW_V1",
+        "adapter_v2_absent": True,
+        "previous_action_zeroed_by_policy_projection": True,
+        "historical_nexto_wisp_training_absent": True,
+        "kl_telemetry_only": load_authority()["ppo"]["kl"]["mode"]
+        == "telemetry_only",
+    }
+    return {
+        "format": f"{FORMAT}_RESUME_PREFLIGHT",
+        "created_utc": utc_now(),
+        "verdict": "PASS" if all(checks.values()) else "FAIL",
+        "checks": checks,
+        "resume_checkpoint": str(checkpoint),
+        "resume_checkpoint_sha256": sha256_file(checkpoint),
+        "phase": trainer.phase,
+        "accepted_updates_total": trainer.accepted_updates_total,
+        "phase_accepted_updates": trainer.phase_accepted_updates,
+        "policy_config": asdict(trainer.policy_config),
+        "ppo_config": asdict(trainer.ppo_config),
+    }
+
+
 def checkpoint_record(
     trainer: Rival2RecurrentTrainer,
     path: Path,
@@ -579,6 +637,7 @@ def run_evaluation(
     trainer: Rival2RecurrentTrainer,
     run_dir: Path,
     label: str,
+    collision_root: Path,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     checkpoint = run_dir / "evaluations" / f"{label}.pt"
     record = checkpoint_record(trainer, checkpoint, include_optimizer=False)
@@ -586,7 +645,7 @@ def run_evaluation(
     result = evaluate_checkpoint(
         checkpoint,
         output,
-        collision_root=DEFAULT_COLLISION_ROOT,
+        collision_root=collision_root,
         expected_format=CHECKPOINT_FORMAT,
         worlds_per_side=128,
         seed=EVALUATION_SEED,
@@ -612,8 +671,10 @@ def run(args: argparse.Namespace) -> int:
             "phase_a_evaluations": [],
         }
     )
+    resume_path: Path | None = None
     if args.resume:
         resume = Path(args.resume)
+        resume_path = resume
         payload = torch.load(resume, map_location="cpu", weights_only=False)
         phase = payload.get("phase")
         reward = (
@@ -646,8 +707,17 @@ def run(args: argparse.Namespace) -> int:
             Path(args.collision_root), worlds=args.worlds
         )
 
-    preflight_payload = preflight(trainer, source, args.worlds)
-    write_json(RESULTS / "preflight.json", preflight_payload)
+    preflight_payload = (
+        resume_preflight(trainer, resume_path, args.worlds)
+        if resume_path is not None
+        else preflight(trainer, source, args.worlds)
+    )
+    preflight_path = (
+        RESULTS / "resume_preflight.json"
+        if resume_path is not None
+        else RESULTS / "preflight.json"
+    )
+    write_json(preflight_path, preflight_payload)
     if preflight_payload["verdict"] != "PASS":
         raise RuntimeError(f"recurrent PPO preflight failed: {preflight_payload}")
     if args.preflight_only:
@@ -655,10 +725,25 @@ def run(args: argparse.Namespace) -> int:
         return 0
 
     rolling = run_dir / "rolling.pt"
-    phase_a_nonimproving = 0
-    phase_a_previous_score = evaluation_score(
-        json.loads(SOURCE_EVALUATION.read_text(encoding="utf-8"))
-    )
+    prior_phase_a_evaluations = manifest.get("phase_a_evaluations", [])
+    if prior_phase_a_evaluations:
+        phase_a_previous_score = evaluation_score(
+            {"gameplay": prior_phase_a_evaluations[-1]["gameplay"]}
+        )
+        phase_a_nonimproving = 0
+        recent = prior_phase_a_evaluations[-(PHASE_A_NONIMPROVING_PATIENCE + 1) :]
+        for previous, current in pairwise(recent):
+            if evaluation_score({"gameplay": current["gameplay"]}) > evaluation_score(
+                {"gameplay": previous["gameplay"]}
+            ):
+                phase_a_nonimproving = 0
+            else:
+                phase_a_nonimproving += 1
+    else:
+        phase_a_nonimproving = 0
+        phase_a_previous_score = evaluation_score(
+            json.loads(SOURCE_EVALUATION.read_text(encoding="utf-8"))
+        )
     started = time.monotonic()
     hard_failure: dict[str, Any] | None = None
 
@@ -735,6 +820,7 @@ def run(args: argparse.Namespace) -> int:
             trainer,
             run_dir,
             f"phase_a_u{trainer.phase_accepted_updates:04d}",
+            Path(args.collision_root),
         )
         manifest["phase_a_evaluations"].append(
             {"checkpoint": record, "result_path": str(
@@ -867,7 +953,10 @@ def run(args: argparse.Namespace) -> int:
             trainer, phase_b_path, include_optimizer=True
         )
         _evaluation_checkpoint, final_evaluation = run_evaluation(
-            trainer, run_dir, "phase_b_u0600_final"
+            trainer,
+            run_dir,
+            "phase_b_u0600_final",
+            Path(args.collision_root),
         )
     summary = {
         "format": f"{FORMAT}_SUMMARY",
