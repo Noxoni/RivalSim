@@ -213,6 +213,101 @@ def _transactional_retry_learning_rates(
     )
 
 
+def _actor_only_mode(config: dict[str, Any]) -> bool:
+    return config.get("trainable_parameters", {}).get("mode") == "actor_head_only"
+
+
+def _configure_trainable_parameters(
+    student: Rival2ActorCritic, config: dict[str, Any]
+) -> tuple[list[torch.nn.Parameter], tuple[str, ...]]:
+    """Apply the prospectively frozen parameter partition for this continuation."""
+
+    if not _actor_only_mode(config):
+        student.requires_grad_(True)
+        return list(student.parameters()), tuple(name for name, _ in student.named_parameters())
+    student.requires_grad_(False)
+    student.actor.requires_grad_(True)
+    names = tuple(name for name, parameter in student.named_parameters() if parameter.requires_grad)
+    expected = ("actor.weight", "actor.bias")
+    if names != expected:
+        raise RuntimeError(f"actor-only parameter partition changed: {names} != {expected}")
+    parameters = [parameter for parameter in student.actor.parameters() if parameter.requires_grad]
+    return parameters, names
+
+
+def _model_partition_hashes(model: Rival2ActorCritic) -> dict[str, str]:
+    state = model.state_dict()
+    actor = {name: tensor for name, tensor in state.items() if name.startswith("actor.")}
+    frozen = {name: tensor for name, tensor in state.items() if not name.startswith("actor.")}
+    return {
+        "actor": tensor_tree_sha256(actor),
+        "frozen_trunk_and_critic": tensor_tree_sha256(frozen),
+        "full_model": tensor_tree_sha256(state),
+    }
+
+
+def _mechanic_label_comparison(
+    parent_human: dict[str, Any],
+    candidate_human: dict[str, Any],
+    *,
+    nonregression_relative_tolerance: float,
+) -> dict[str, Any]:
+    parent_rows = parent_human["per_mechanic_label"]
+    candidate_rows = candidate_human["per_mechanic_label"]
+    if set(parent_rows) != set(candidate_rows):
+        raise RuntimeError("validation mechanic label set changed")
+    ratios = {
+        label: float(candidate_rows[label]["complete_action_rmse"])
+        / float(parent_rows[label]["complete_action_rmse"])
+        for label in sorted(parent_rows)
+    }
+    improved = [label for label, ratio in ratios.items() if ratio < 1.0]
+    nonregressed = [
+        label
+        for label, ratio in ratios.items()
+        if ratio <= 1.0 + nonregression_relative_tolerance
+    ]
+    return {
+        "total_labels": len(ratios),
+        "improved_labels": len(improved),
+        "nonregressed_labels": len(nonregressed),
+        "improved_fraction": len(improved) / len(ratios),
+        "nonregressed_fraction": len(nonregressed) / len(ratios),
+        "mean_rmse_ratio_to_parent": float(np.mean(list(ratios.values()))),
+        "median_rmse_ratio_to_parent": float(np.median(list(ratios.values()))),
+        "improved": improved,
+        "regressed": [label for label in ratios if label not in nonregressed],
+        "per_label_rmse_ratio_to_parent": ratios,
+    }
+
+
+def _actor_only_selection_score(
+    human: dict[str, Any],
+    parent_human: dict[str, Any],
+    retention: dict[str, Any],
+    label_comparison: dict[str, Any],
+    config: dict[str, Any],
+    base_config: dict[str, Any],
+) -> float:
+    weights = config["selection"]["score_weights"]
+    gameplay_ratio = float(human["families"]["gameplay"]["complete_action_rmse"]) / float(
+        parent_human["families"]["gameplay"]["complete_action_rmse"]
+    )
+    mechanic_ratio = float(human["families"]["mechanic"]["complete_action_rmse"]) / float(
+        parent_human["families"]["mechanic"]["complete_action_rmse"]
+    )
+    retention_ratio = float(retention["actor_mean_kl"]) / float(
+        base_config["retention"]["soft_actor_mean_kl"]
+    )
+    return (
+        float(weights["gameplay_rmse_ratio"]) * gameplay_ratio
+        + float(weights["mechanic_rmse_ratio"]) * mechanic_ratio
+        + float(weights["mean_per_label_rmse_ratio"])
+        * float(label_comparison["mean_rmse_ratio_to_parent"])
+        + float(weights["simulator_actor_kl_soft_limit_ratio"]) * retention_ratio
+    )
+
+
 def _save_state(
     path: Path,
     *,
@@ -272,7 +367,7 @@ def _train_continuation(
     base_config: dict[str, Any],
     device: str,
 ) -> tuple[torch.optim.Optimizer, dict[str, Any], dict[str, Any]]:
-    settings = base_config["training"]
+    settings = {**base_config["training"], **continuation_config.get("training", {})}
     objective = base_config["objective"]
     sampling = base_config["sampling"]
     source_step = int(source_payload["counters"]["accepted_optimizer_steps"])
@@ -286,17 +381,23 @@ def _train_continuation(
         maximum_oversampling_ratio=float(sampling["maximum_mechanic_frame_oversampling_ratio"]),
         generator=human_generator,
     )
+    trainable_parameters, trainable_parameter_names = _configure_trainable_parameters(
+        student, continuation_config
+    )
     optimizer = torch.optim.AdamW(
-        student.parameters(),
+        trainable_parameters,
         lr=float(settings["initial_learning_rate"]),
         betas=tuple(settings["optimizer_betas"]),
         eps=float(settings["optimizer_epsilon"]),
         weight_decay=float(settings["weight_decay"]),
     )
-    optimizer.load_state_dict(source_payload["fresh_supervised_optimizer"])
-    if len(optimizer.param_groups) != 1:
-        raise ValueError("source supervised optimizer parameter groups changed")
+    optimizer_state_loaded = not _actor_only_mode(continuation_config)
+    if optimizer_state_loaded:
+        optimizer.load_state_dict(source_payload["fresh_supervised_optimizer"])
+        if len(optimizer.param_groups) != 1:
+            raise ValueError("source supervised optimizer parameter groups changed")
     source_optimizer_lr = float(optimizer.param_groups[0]["lr"])
+    initial_partition_hashes = _model_partition_hashes(student)
     parent_human = _evaluate_human(student, teacher, validation_data, device=device)
     selected_validation_worlds = validation_worlds[
         : int(base_config["retention"]["validation_subset"]["worlds"])
@@ -335,11 +436,16 @@ def _train_continuation(
             parent_human["families"]["mechanic"]["complete_action_rmse"]
             - recorded_parent["human_validation"]["families"]["mechanic"]["complete_action_rmse"]
         ),
-        "simulator_actor_mean_kl_absolute_error": abs(
+    }
+    if _actor_only_mode(continuation_config):
+        parent_reproduction["simulator_actor_mean_kl_absolute_error"] = abs(
+            parent_retention["actor_mean_kl"]
+        )
+    else:
+        parent_reproduction["simulator_actor_mean_kl_absolute_error"] = abs(
             parent_retention["actor_mean_kl"]
             - recorded_parent["simulator_retention"]["actor_mean_kl"]
-        ),
-    }
+        )
     parent_reproduction["exact_within_tolerance"] = max(parent_reproduction.values()) <= 1e-7
     if (
         not parent_candidate["eligible_for_selection"]
@@ -350,6 +456,23 @@ def _train_continuation(
             f"candidate={parent_candidate}, reproduction={parent_reproduction}"
         )
 
+    if _actor_only_mode(continuation_config):
+        parent_labels = _mechanic_label_comparison(
+            parent_human,
+            parent_human,
+            nonregression_relative_tolerance=float(
+                continuation_config["selection"]["mechanic_label_nonregression_relative_tolerance"]
+            ),
+        )
+        parent_candidate["mechanic_label_comparison_to_parent"] = parent_labels
+        parent_candidate["selection_score"] = _actor_only_selection_score(
+            parent_human,
+            parent_human,
+            parent_retention,
+            parent_labels,
+            continuation_config,
+            base_config,
+        )
     best_score = float(parent_candidate["selection_score"])
     best_candidate = copy.deepcopy(parent_candidate)
     best_path = ROOT / WORK_ROOT / "best.pt"
@@ -371,7 +494,14 @@ def _train_continuation(
         candidate=parent_candidate,
     )
     interval = int(settings["validation_interval_optimizer_steps"])
-    emergency = int(continuation_config["continuation"]["emergency_max_additional_accepted_steps"])
+    accepted_step_ceiling = int(
+        continuation_config["continuation"].get(
+            "max_accepted_supervised_steps",
+            continuation_config["continuation"].get(
+                "emergency_max_additional_accepted_steps", 0
+            ),
+        )
+    )
     retry_limit = int(continuation_config["optimizer"]["transactional_retries_per_interval"])
     minimum_lr = float(continuation_config["optimizer"]["minimum_learning_rate"])
     backoff = float(continuation_config["optimizer"]["transactional_backoff_factor"])
@@ -379,8 +509,14 @@ def _train_continuation(
     material_delta = float(
         continuation_config["selection"]["early_stopping_material_score_improvement"]
     )
+    minimum_steps_before_plateau = int(
+        continuation_config["selection"].get("minimum_accepted_steps_before_plateau", 0)
+    )
 
-    while additional_accepted_steps < emergency:
+    while additional_accepted_steps < accepted_step_ceiling:
+        steps_this_boundary = min(
+            interval, accepted_step_ceiling - additional_accepted_steps
+        )
         rollback_path = ROOT / WORK_ROOT / "rollback.pt"
         _save_state(
             rollback_path,
@@ -411,7 +547,7 @@ def _train_continuation(
             if retry_lr < minimum_lr - 1e-15:
                 attempts.append(
                     {
-                        "attempted_cumulative_step": cumulative_step + interval,
+                        "attempted_cumulative_step": cumulative_step + steps_this_boundary,
                         "retry": retry,
                         "learning_rate": retry_lr,
                         "executed": False,
@@ -423,7 +559,7 @@ def _train_continuation(
                 group["lr"] = retry_lr
             loss_sums: defaultdict[str, float] = defaultdict(float)
             grad_norm_max = 0.0
-            for _ in range(interval):
+            for _ in range(steps_this_boundary):
                 proposed_steps += 1
                 gameplay_indices = torch.randint(
                     train_data.gameplay_observation.shape[0],
@@ -484,15 +620,21 @@ def _train_continuation(
                 optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 grad_norm = torch.nn.utils.clip_grad_norm_(
-                    student.parameters(), float(settings["gradient_clip_norm"])
+                    trainable_parameters, float(settings["gradient_clip_norm"])
                 )
                 if not bool(torch.isfinite(grad_norm)):
                     raise RuntimeError("nonfinite continuation gradient norm")
                 optimizer.step()
                 if not all(
-                    bool(torch.isfinite(parameter).all()) for parameter in student.parameters()
+                    bool(torch.isfinite(parameter).all()) for parameter in trainable_parameters
                 ):
                     raise RuntimeError("nonfinite continuation parameter")
+                if _actor_only_mode(continuation_config) and any(
+                    parameter.grad is not None
+                    for name, parameter in student.named_parameters()
+                    if name not in trainable_parameter_names
+                ):
+                    raise RuntimeError("frozen trunk/critic unexpectedly received a gradient")
                 grad_norm_max = max(grad_norm_max, float(grad_norm.item()))
                 for key, value in (
                     ("total", loss),
@@ -531,23 +673,34 @@ def _train_continuation(
             )
             retention_guard = _guard(candidate_retention, base_config)
             distribution_guard = _distribution_guard(candidate_human, continuation_config)
-            attempted_step = cumulative_step + interval
+            partition_hashes = _model_partition_hashes(student)
+            frozen_partition_exact = (
+                partition_hashes["frozen_trunk_and_critic"]
+                == initial_partition_hashes["frozen_trunk_and_critic"]
+            )
+            if _actor_only_mode(continuation_config) and not frozen_partition_exact:
+                raise RuntimeError("frozen trunk/critic tensor identity changed")
+            attempted_step = cumulative_step + steps_this_boundary
             attempt = {
                 "attempted_cumulative_step": attempted_step,
                 "retry": retry,
                 "learning_rate": retry_lr,
                 "executed": True,
                 "proposed_optimizer_steps": proposed_steps,
-                "mean_training_loss": {key: value / interval for key, value in loss_sums.items()},
+                "mean_training_loss": {
+                    key: value / steps_this_boundary for key, value in loss_sums.items()
+                },
                 "max_preclip_gradient_norm": grad_norm_max,
                 "simulator_retention": candidate_retention,
                 "retention_guard": retention_guard,
                 "distribution_guard": distribution_guard,
+                "model_partition_hashes": partition_hashes,
+                "frozen_trunk_and_critic_exact": frozen_partition_exact,
             }
             attempts.append(attempt)
             if retention_guard["accepted"] and distribution_guard["accepted"]:
                 cumulative_step = attempted_step
-                additional_accepted_steps += interval
+                additional_accepted_steps += steps_this_boundary
                 candidate = _candidate_summary(
                     step=cumulative_step,
                     human=candidate_human,
@@ -567,12 +720,47 @@ def _train_continuation(
                     candidate_human["families"]["mechanic"]["complete_action_rmse"]
                     / parent_mechanic
                 )
+                if _actor_only_mode(continuation_config):
+                    label_comparison = _mechanic_label_comparison(
+                        parent_human,
+                        candidate_human,
+                        nonregression_relative_tolerance=float(
+                            continuation_config["selection"][
+                                "mechanic_label_nonregression_relative_tolerance"
+                            ]
+                        ),
+                    )
+                    candidate["mechanic_label_comparison_to_parent"] = label_comparison
                 candidate["eligible_for_selection"] = bool(
                     candidate["eligible_for_selection"]
                     and distribution_guard["accepted"]
                     and candidate["gameplay_rmse_ratio_to_parent"] < 1.0
                     and candidate["mechanic_rmse_ratio_to_parent"] < 1.0
                 )
+                if _actor_only_mode(continuation_config):
+                    candidate["eligible_for_selection"] = bool(
+                        candidate["eligible_for_selection"]
+                        and label_comparison["improved_fraction"]
+                        >= float(
+                            continuation_config["selection"][
+                                "minimum_mechanic_labels_improved_fraction"
+                            ]
+                        )
+                        and label_comparison["nonregressed_fraction"]
+                        >= float(
+                            continuation_config["selection"][
+                                "minimum_mechanic_labels_nonregressed_fraction"
+                            ]
+                        )
+                    )
+                    candidate["selection_score"] = _actor_only_selection_score(
+                        candidate_human,
+                        parent_human,
+                        candidate_retention,
+                        label_comparison,
+                        continuation_config,
+                        base_config,
+                    )
                 candidate["learning_rate"] = retry_lr
                 candidate["training_loss"] = attempt["mean_training_loss"]
                 candidate["max_preclip_gradient_norm"] = grad_norm_max
@@ -635,11 +823,14 @@ def _train_continuation(
         if not accepted_boundary:
             stop_reason = "frozen retention/distribution guard rejected further progress"
             break
-        if no_improvement >= patience:
+        if (
+            additional_accepted_steps >= minimum_steps_before_plateau
+            and no_improvement >= patience
+        ):
             stop_reason = "held-out validation improvement plateaued"
             break
     if not stop_reason:
-        stop_reason = "emergency accepted-step ceiling reached while not converged"
+        stop_reason = "accepted supervised-step ceiling reached"
 
     selected_state = _restore_state(
         best_path,
@@ -655,7 +846,11 @@ def _train_continuation(
         "source_optimizer_learning_rate": source_optimizer_lr,
         "source_checkpoint_rng_state_available": False,
         "continuation_seed": seed,
-        "fresh_supervised_optimizer_resumed": True,
+        "fresh_supervised_optimizer_resumed": optimizer_state_loaded,
+        "fresh_actor_only_optimizer": _actor_only_mode(continuation_config),
+        "trainable_parameter_names": list(trainable_parameter_names),
+        "initial_model_partition_hashes": initial_partition_hashes,
+        "selected_model_partition_hashes": _model_partition_hashes(student),
         "historical_ppo_optimizer_loaded": False,
         "parent_validation": parent_candidate,
         "parent_reproduction": parent_reproduction,
@@ -671,6 +866,7 @@ def _train_continuation(
         "plateaued": stop_reason == "held-out validation improvement plateaued",
         "guard_stopped": stop_reason.startswith("frozen retention"),
         "emergency_ceiling_reached": stop_reason.startswith("emergency"),
+        "accepted_step_ceiling_reached": stop_reason.endswith("ceiling reached"),
         "mechanic_sampling": {
             "uniform_label_fraction": mechanic_sampler.uniform_label_fraction,
             "maximum_realized_oversampling_ratio": (
@@ -797,8 +993,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if not all(corpus_checks.values()):
         raise RuntimeError(f"authoritative simulator corpus changed: {corpus_checks}")
     torch.use_deterministic_algorithms(True)
+    actor_only = _actor_only_mode(continuation_config)
     teacher = Rival2ActorCritic(policy_config).to(args.device)
-    teacher.load_state_dict(bootstrap_payload["model"])
+    teacher.load_state_dict(
+        source_payload["model"] if actor_only else bootstrap_payload["model"]
+    )
     teacher.eval().requires_grad_(False)
     parent = Rival2ActorCritic(policy_config).to(args.device)
     parent.load_state_dict(source_payload["model"])
@@ -879,9 +1078,31 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "mechanic_rmse_ratio_to_parent", 1.0
         )
         <= 1.0 - minimum_parent_improvement,
-        "not_emergency_ceiling": not training["emergency_ceiling_reached"],
+        "valid_stop_condition": not training["emergency_ceiling_reached"],
         "all_outputs_finite": bool(test_parent["finite"] and test_selected["finite"]),
     }
+    if actor_only:
+        label_comparison = training["selected_candidate"][
+            "mechanic_label_comparison_to_parent"
+        ]
+        checks.update(
+            {
+                "broad_mechanic_label_improvement": label_comparison["improved_fraction"]
+                >= float(
+                    continuation_config["selection"][
+                        "minimum_mechanic_labels_improved_fraction"
+                    ]
+                ),
+                "broad_mechanic_label_nonregression": label_comparison[
+                    "nonregressed_fraction"
+                ]
+                >= float(
+                    continuation_config["selection"][
+                        "minimum_mechanic_labels_nonregressed_fraction"
+                    ]
+                ),
+            }
+        )
     accepted = all(checks.values())
     checkpoint_path = ROOT / continuation_config["checkpoint"]["path"]
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
@@ -890,10 +1111,18 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "version": CONTINUATION_VERSION,
         "base_human_bc_version": HUMAN_BC_VERSION,
         "model": selected_model,
-        "fresh_supervised_optimizer": selected_optimizer,
+        (
+            "actor_only_optimizer"
+            if actor_only
+            else "fresh_supervised_optimizer"
+        ): selected_optimizer,
         "optimizer_provenance": {
             "fresh_for_human_bc": True,
-            "resumed_from_source_checkpoint": source_identity,
+            "resumed_from_source_checkpoint": None if actor_only else source_identity,
+            "model_parent": source_identity,
+            "source_supervised_optimizer_loaded": not actor_only,
+            "actor_only": actor_only,
+            "trainable_parameter_names": training["trainable_parameter_names"],
             "historical_ppo_optimizer_loaded": False,
             "historical_ppo_optimizer_resumable": False,
         },
@@ -917,6 +1146,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "continuation_proposed_optimizer_steps": training[
                 "additional_proposed_optimizer_steps"
             ],
+            "accepted_actor_only_supervised_steps": selected_additional
+            if actor_only
+            else None,
         },
         "rng_state": {
             "human_generator": selected_state["human_generator_state"],
@@ -942,6 +1174,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "bytes": checkpoint_path.stat().st_size,
         "sha256": file_sha256(checkpoint_path),
         "model_tensor_sha256": tensor_tree_sha256(selected_model),
+        "model_partition_hashes": _model_partition_hashes(student),
     }
     source_after = _verify_human_sources(args.human_source_root)
     integrity = {
@@ -970,6 +1203,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             not parameter.requires_grad and parameter.grad is None
             for parameter in adapter.parameters()
         ),
+        "actor_only_trainable_parameters": training["trainable_parameter_names"],
+        "frozen_trunk_and_critic_sha256_before_after": [
+            training["initial_model_partition_hashes"]["frozen_trunk_and_critic"],
+            training["selected_model_partition_hashes"]["frozen_trunk_and_critic"],
+        ],
         "test_access_before_selection": test_access_before_selection,
         "test_access_count_this_task": 1,
         "test_access_utc": test_access_utc,
@@ -994,6 +1232,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         and integrity["teacher_frozen"]
         and integrity["parent_frozen"]
         and integrity["adapter_frozen"]
+        and (
+            not actor_only
+            or integrity["actor_only_trainable_parameters"] == ["actor.weight", "actor.bias"]
+        )
+        and integrity["frozen_trunk_and_critic_sha256_before_after"][0]
+        == integrity["frozen_trunk_and_critic_sha256_before_after"][1]
         and not integrity["test_access_before_selection"]
         and integrity["test_access_count_this_task"] == 1
         and not integrity["closed_loop_mechanic_evaluation"]
