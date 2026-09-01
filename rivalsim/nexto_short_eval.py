@@ -1009,9 +1009,16 @@ class NextoShortEpisodeRunner:
         evaluation_seed: int,
         device: str = "cuda:0",
         dash_event_capacity: int = DEFAULT_DASH_EVENT_CAPACITY,
+        rival_policy_hz: int = 30,
+        accepted_stage1_checkpoint_format: str | None = None,
+        collect_open_play_telemetry: bool = False,
     ):
         self.num_worlds = int(num_worlds)
         self.device = torch.device(device)
+        if rival_policy_hz <= 0 or PHYSICS_HZ % int(rival_policy_hz) != 0:
+            raise ValueError("Rival policy Hz must be a positive divisor of physics Hz")
+        self.rival_policy_hz = int(rival_policy_hz)
+        self.rival_cadence_ticks = PHYSICS_HZ // self.rival_policy_hz
         layout = np.asarray(starting_layout, dtype=np.int32).reshape(self.num_worlds)
         side = np.asarray(rival_side, dtype=np.int32).reshape(self.num_worlds)
         if np.any((layout < 0) | (layout >= 5)):
@@ -1042,21 +1049,32 @@ class NextoShortEpisodeRunner:
                 f"{expected_checkpoint_sha256.upper()}"
             )
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-        if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
+        checkpoint_format = payload.get("format")
+        standard_checkpoint = checkpoint_format == "RIVAL2_CHECKPOINT_V1"
+        stage1_checkpoint = (
+            accepted_stage1_checkpoint_format is not None
+            and checkpoint_format == accepted_stage1_checkpoint_format
+        )
+        if not standard_checkpoint and not stage1_checkpoint:
             raise RuntimeError("unsupported Rival checkpoint format")
         checkpoint_reward = payload.get("reward_version")
-        if checkpoint_reward not in SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS:
-            raise RuntimeError("short evaluator requires a Gameplay V1/V2/V3 checkpoint")
-        if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
-            raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
+        if standard_checkpoint:
+            if checkpoint_reward not in SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS:
+                raise RuntimeError("short evaluator requires a Gameplay V1/V2/V3 checkpoint")
+            if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
+                raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
         policy_config = Rival2PolicyConfig(**payload["policy_config"])
-        if policy_config.content_hash != payload["policy_config_hash"]:
+        if (
+            payload.get("policy_config_hash", policy_config.content_hash)
+            != policy_config.content_hash
+        ):
             raise RuntimeError("Rival checkpoint policy contract mismatch")
-        expected_contracts = contract_hashes_for_reward(
-            checkpoint_reward, RIVAL2_EPISODE_VERSION
-        )
-        if payload.get("contract_hashes") != expected_contracts:
-            raise RuntimeError("Rival checkpoint observation/action/reward contract mismatch")
+        if standard_checkpoint:
+            expected_contracts = contract_hashes_for_reward(
+                checkpoint_reward, RIVAL2_EPISODE_VERSION
+            )
+            if payload.get("contract_hashes") != expected_contracts:
+                raise RuntimeError("Rival checkpoint observation/action/reward contract mismatch")
         self.rival_policy = Rival2ActorCritic(policy_config).to(self.device)
         self.rival_policy.load_state_dict(payload["model"])
         self.rival_policy.eval()
@@ -1064,14 +1082,17 @@ class NextoShortEpisodeRunner:
             "path": checkpoint_path.as_posix(),
             "sha256": checkpoint_sha,
             "size_bytes": checkpoint_path.stat().st_size,
-            "iteration": int(payload["iteration"]),
-            "policy_version": int(payload["policy_version"]),
-            "total_agent_samples": int(payload["total_agent_samples"]),
+            "format": checkpoint_format,
+            "iteration": int(payload.get("iteration", 0)),
+            "policy_version": int(payload.get("policy_version", payload.get("selected_step", 0))),
+            "total_agent_samples": int(payload.get("total_agent_samples", 0)),
+            "selected_step": payload.get("selected_step"),
             "policy_config": asdict(policy_config),
             "policy_config_hash": policy_config.content_hash,
-            "reward_version": payload["reward_version"],
-            "episode_version": payload["episode_version"],
-            "contract_hashes": payload["contract_hashes"],
+            "reward_version": payload.get("reward_version"),
+            "episode_version": payload.get("episode_version"),
+            "contract_hashes": payload.get("contract_hashes"),
+            "evaluation_only_stage1_load": bool(stage1_checkpoint),
         }
         del payload
 
@@ -1091,6 +1112,12 @@ class NextoShortEpisodeRunner:
         self.actions = torch.zeros((self.num_worlds, 2, 8), dtype=torch.float32, device=self.device)
         self.telemetry = ShortEvalTelemetry(self.world, event_capacity=dash_event_capacity)
         self.telemetry.attach()
+        self.open_play_telemetry = None
+        if collect_open_play_telemetry:
+            from rivalsim.open_play import OpenPlayTelemetry
+
+            self.open_play_telemetry = OpenPlayTelemetry(self.world)
+            self.open_play_telemetry.attach(self.world)
         self.host_tick = 0
         self.world.reset_transfer_counters()
         torch.cuda.reset_peak_memory_stats(self.device)
@@ -1113,7 +1140,7 @@ class NextoShortEpisodeRunner:
 
     def tick(self) -> None:
         self._activate_stream()
-        if self.host_tick % RIVAL_CADENCE_TICKS == 0:
+        if self.host_tick % self.rival_cadence_ticks == 0:
             self._update_rival_action()
             self.world.begin_decision()
         kickoff_active = self.bridge.views["rival2.kickoff_indicator"] != 0
@@ -1123,7 +1150,7 @@ class NextoShortEpisodeRunner:
         self.bridge.set_actions(self.actions)
         self.world.step_graph(1)
         self.host_tick += 1
-        if self.host_tick % RIVAL_CADENCE_TICKS == 0:
+        if self.host_tick % self.rival_cadence_ticks == 0:
             reset_mask = self.bridge.views["rival2.reset_mask"].to(torch.bool)
             self.nexto.notify_kickoff(reset_mask)
             self.world.apply_interval_resets()
@@ -1144,7 +1171,7 @@ class NextoShortEpisodeRunner:
 
     def export(self) -> dict[str, Any]:
         raw = self.telemetry.numpy()
-        return {
+        result = {
             "raw": raw,
             "checkpoint_identity": self.checkpoint_identity,
             "starting_layout": self.starting_layout.copy(),
@@ -1156,7 +1183,12 @@ class NextoShortEpisodeRunner:
             "nexto_observation_builds": int(self.nexto.observation_builds),
             "nexto_timed_h2d_bytes": int(self.nexto.timed_h2d_bytes),
             "nexto_timed_d2h_bytes": int(self.nexto.timed_d2h_bytes),
+            "rival_policy_hz": self.rival_policy_hz,
+            "rival_cadence_ticks": self.rival_cadence_ticks,
         }
+        if self.open_play_telemetry is not None:
+            result["open_play_raw"] = self.open_play_telemetry.numpy()
+        return result
 
 
 def _mask_bits(mask: int) -> list[int]:

@@ -11,10 +11,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from rivalsim.rival2_contracts import OBS_DIM
+from rivalsim.rival2_contracts import ACTION_NAMES, OBS_DIM, OBS_FIELD_NAMES
 
 LOG_TWO_PI = math.log(2.0 * math.pi)
 LOG_TWO = math.log(2.0)
+PREVIOUS_ACTION_OBSERVATION_FIELDS = tuple(
+    f"previous_action.{action}" for action in ACTION_NAMES
+)
+PREVIOUS_ACTION_OBSERVATION_INDICES = tuple(
+    OBS_FIELD_NAMES.index(field) for field in PREVIOUS_ACTION_OBSERVATION_FIELDS
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,10 +35,16 @@ class Rival2PolicyConfig:
     dtype: str = "float32"
     autocast: bool = False
     initialization: str = "orthogonal_sqrt2_actor0.01_critic0.01"
+    zero_previous_action_inputs: bool = False
 
     @property
     def content_hash(self) -> str:
-        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode("ascii")
+        values = asdict(self)
+        # Preserve every pre-existing checkpoint's policy hash.  The new field only
+        # becomes part of a policy contract when this opt-in lineage enables it.
+        if not self.zero_previous_action_inputs:
+            values.pop("zero_previous_action_inputs")
+        payload = json.dumps(values, sort_keys=True, separators=(",", ":")).encode("ascii")
         return hashlib.sha256(payload).hexdigest().upper()
 
 
@@ -72,6 +84,11 @@ class Rival2ActorCritic(nn.Module):
         self.trunk = nn.Sequential(*layers)
         self.actor = nn.Linear(self.config.hidden_dim, self.config.actor_outputs)
         self.critic = nn.Linear(self.config.hidden_dim, 1)
+        self.register_buffer(
+            "_previous_action_observation_indices",
+            torch.tensor(PREVIOUS_ACTION_OBSERVATION_INDICES, dtype=torch.long),
+            persistent=False,
+        )
         self._initialize()
 
     def _initialize(self) -> None:
@@ -85,6 +102,10 @@ class Rival2ActorCritic(nn.Module):
         nn.init.zeros_(self.critic.bias)
 
     def forward(self, observation: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        if self.config.zero_previous_action_inputs:
+            observation = observation.index_fill(
+                -1, self._previous_action_observation_indices, 0.0
+            )
         hidden = self.trunk(observation)
         return self.actor(hidden), self.critic(hidden).squeeze(-1)
 
@@ -239,6 +260,8 @@ def deterministic_hybrid_action(
 
 
 __all__ = [
+    "PREVIOUS_ACTION_OBSERVATION_FIELDS",
+    "PREVIOUS_ACTION_OBSERVATION_INDICES",
     "HybridDistributionOverride",
     "HybridSample",
     "Rival2ActorCritic",

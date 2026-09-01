@@ -48,7 +48,11 @@ from rivalsim.rival2_contracts import (  # noqa: E402
     RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
     contract_hashes_for_reward,
 )
-from rivalsim.rival2_policy import Rival2ActorCritic, Rival2PolicyConfig  # noqa: E402
+from rivalsim.rival2_policy import (  # noqa: E402
+    PREVIOUS_ACTION_OBSERVATION_INDICES,
+    Rival2ActorCritic,
+    Rival2PolicyConfig,
+)
 from rivalsim.rival2_ppo import (  # noqa: E402
     RIVAL2_PPO_120HZ_CONTRACT_HASH,
     RIVAL2_PPO_120HZ_V1,
@@ -83,6 +87,9 @@ TARGET_RMSE = 0.30
 LEARNING_RATE = 3.0e-4
 MINIMUM_LEARNING_RATE = 1.0e-5
 ADAPTER_EXPECTED_SHA256 = "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+AUTHORITY_PREPARATION_REQUIRES_EXACT_PACKAGE_COMMIT = True
+NEUTRALIZE_PREVIOUS_ACTION = False
+ZERO_PREVIOUS_ACTION_POLICY_INPUTS = False
 
 
 def utc_now() -> str:
@@ -148,9 +155,36 @@ def _load_adapter(device: str) -> tuple[HumanDemoObservationAdapterV2, dict[str,
     }
 
 
+def neutralize_previous_action_before_adapter(
+    degraded: torch.Tensor, quality: torch.Tensor
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Neutralize the optional shortcut before Adapter V2 can inspect it."""
+
+    indices = torch.as_tensor(
+        PREVIOUS_ACTION_OBSERVATION_INDICES,
+        dtype=torch.long,
+        device=degraded.device,
+    )
+    degraded.index_fill_(1, indices, 0.0)
+    quality.index_fill_(1, indices, int(FieldQuality.UNAVAILABLE))
+    return degraded, quality
+
+
+def hard_zero_previous_action_after_adapter(observation: torch.Tensor) -> torch.Tensor:
+    """Enforce the final human-domain observation contract after all reconstruction."""
+
+    indices = torch.as_tensor(
+        PREVIOUS_ACTION_OBSERVATION_INDICES,
+        dtype=torch.long,
+        device=observation.device,
+    )
+    observation.index_fill_(1, indices, 0.0)
+    return observation
+
+
 @torch.no_grad()
 def load_gameplay(
-    source_root: Path, *, device: str
+    source_root: Path, *, device: str, neutralize_previous_action: bool = False
 ) -> tuple[torch.Tensor, torch.Tensor, dict[str, Any]]:
     dataset = json.loads(DATASET_MANIFEST.read_text(encoding="utf-8"))
     gameplay = dataset["general_gameplay"]
@@ -175,9 +209,15 @@ def load_gameplay(
     sequences: list[int] = []
     physics_frames: list[int] = []
     quality_counts = np.zeros(4, dtype=np.int64)
+    previous_action_indices = torch.tensor(
+        PREVIOUS_ACTION_OBSERVATION_INDICES, dtype=torch.long, device=device
+    )
+    neutralized_input_sample_count = 0
+    neutralized_output_sample_count = 0
     buffer: list[tuple[Any, np.ndarray, np.ndarray]] = []
 
     def flush() -> None:
+        nonlocal neutralized_input_sample_count, neutralized_output_sample_count
         if not buffer:
             return
         degraded = torch.from_numpy(
@@ -186,10 +226,22 @@ def load_gameplay(
         quality = torch.from_numpy(np.stack([np.asarray(row[0].quality) for row in buffer])).to(
             device
         )
+        if neutralize_previous_action:
+            degraded, quality = neutralize_previous_action_before_adapter(
+                degraded, quality
+            )
+            neutralized_input_sample_count += int(degraded.shape[0])
         repaired = adapter(degraded, quality, profile=AdapterProfile.GAMEPLAY)
         pads = torch.from_numpy(np.stack([row[1] for row in buffer])).to(device)
         support = torch.from_numpy(np.stack([row[2] for row in buffer])).to(device)
         repaired = apply_native_pad_overlay(repaired, pads, support)
+        if neutralize_previous_action:
+            repaired = hard_zero_previous_action_after_adapter(repaired)
+            if not torch.count_nonzero(
+                repaired.index_select(1, previous_action_indices)
+            ).eq(0):
+                raise RuntimeError("previous-action output mask failed")
+            neutralized_output_sample_count += int(repaired.shape[0])
         observations.append(repaired.cpu())
         actions.append(
             torch.from_numpy(np.stack([np.asarray(row[0].action) for row in buffer])).float()
@@ -243,6 +295,14 @@ def load_gameplay(
         "container_valid": report.container_valid,
         "mechanic_practice_sessions_loaded": 0,
         "adapter": adapter_identity,
+        "previous_action_input_contract": {
+            "enabled": bool(neutralize_previous_action),
+            "indices": list(PREVIOUS_ACTION_OBSERVATION_INDICES),
+            "before_adapter": "zero_value_and_unavailable_quality",
+            "after_adapter_and_pad_overlay": "hard_zero",
+            "input_samples_verified": neutralized_input_sample_count,
+            "output_samples_verified": neutralized_output_sample_count,
+        },
         "quality_field_sample_counts": {
             "unavailable": int(quality_counts[int(FieldQuality.UNAVAILABLE)]),
             "approximate": int(quality_counts[int(FieldQuality.APPROXIMATE)]),
@@ -297,9 +357,13 @@ def build_split_manifest(
     }
 
 
-def fresh_model() -> Rival2ActorCritic:
+def fresh_model(*, zero_previous_action_inputs: bool = False) -> Rival2ActorCritic:
     torch.manual_seed(INITIALIZATION_SEED)
-    model = Rival2ActorCritic(Rival2PolicyConfig())
+    model = Rival2ActorCritic(
+        Rival2PolicyConfig(
+            zero_previous_action_inputs=zero_previous_action_inputs
+        )
+    )
     with torch.no_grad():
         model.actor.weight[5:10].zero_()
         model.actor.bias[5:10].fill_(-1.0)
@@ -308,11 +372,20 @@ def fresh_model() -> Rival2ActorCritic:
 
 
 def prepare(args: argparse.Namespace) -> dict[str, Any]:
-    if git("rev-parse", "HEAD").upper() != PACKAGE_COMMIT:
-        raise RuntimeError("authority preparation must occur on exact package commit")
-    observation, action, source = load_gameplay(args.human_source_root, device=args.device)
+    if AUTHORITY_PREPARATION_REQUIRES_EXACT_PACKAGE_COMMIT:
+        if git("rev-parse", "HEAD").upper() != PACKAGE_COMMIT:
+            raise RuntimeError("authority preparation must occur on exact package commit")
+    elif git("merge-base", "--is-ancestor", PACKAGE_COMMIT, "HEAD") != "":
+        raise RuntimeError("authorization parent is not an ancestor of current HEAD")
+    observation, action, source = load_gameplay(
+        args.human_source_root,
+        device=args.device,
+        neutralize_previous_action=NEUTRALIZE_PREVIOUS_ACTION,
+    )
     split = build_split_manifest(observation, action, source)
-    model = fresh_model()
+    model = fresh_model(
+        zero_previous_action_inputs=ZERO_PREVIOUS_ACTION_POLICY_INPUTS
+    )
     authority = {
         "format": f"{FORMAT}_AUTHORITY",
         "created_utc": utc_now(),
@@ -421,11 +494,17 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         raise RuntimeError("frozen source/split manifest hash mismatch")
     if not git("merge-base", "--is-ancestor", PACKAGE_COMMIT, "HEAD") == "":
         raise RuntimeError("package commit is not an ancestor of current HEAD")
-    observation, action, source = load_gameplay(args.human_source_root, device=args.device)
+    observation, action, source = load_gameplay(
+        args.human_source_root,
+        device=args.device,
+        neutralize_previous_action=NEUTRALIZE_PREVIOUS_ACTION,
+    )
     del source
     _verify_materialization(observation, action, manifest)
 
-    model = fresh_model()
+    model = fresh_model(
+        zero_previous_action_inputs=ZERO_PREVIOUS_ACTION_POLICY_INPUTS
+    )
     initial_hash = tensor_tree_sha256(model.state_dict())
     if initial_hash != authority["lineage"]["initial_model_tensor_sha256"]:
         raise RuntimeError("fresh deterministic initialization identity mismatch")
