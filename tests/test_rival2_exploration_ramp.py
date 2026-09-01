@@ -123,3 +123,57 @@ def test_rollout_sampling_and_ppo_recompute_use_identical_scheduled_distribution
         distribution_override=scheduled.distribution_override,
     )
     assert abs(float(update_metrics["completed_update_mean_kl"].item())) < 1.0e-8
+
+
+def test_kl_telemetry_only_mode_accepts_threshold_excess() -> None:
+    torch.manual_seed(321)
+    config = Rival2PolicyConfig()
+    model = Rival2ActorCritic(config)
+    observation = torch.randn(4, 2, config.obs_dim)
+    with torch.no_grad():
+        actor, value = model(observation.reshape(-1, config.obs_dim))
+        actor = actor.reshape(4, 2, 13)
+        value = value.reshape(4, 2)
+        scheduled = fresh_human_seed_exploration(1)
+        sample = sample_hybrid_action(
+            actor,
+            generator=torch.Generator().manual_seed(654),
+            config=config,
+            distribution_override=scheduled.distribution_override,
+        )
+    rollout = Rival2RolloutBuffer(1, 4, "cpu")
+    rollout.add(
+        observation=observation,
+        action=sample.action,
+        pre_tanh=sample.pre_tanh,
+        old_log_probability=sample.log_probability,
+        value=value,
+        reward=torch.tensor(
+            [[1.0, -1.0], [0.5, -0.5], [0.75, -0.75], [0.25, -0.25]]
+        ),
+        terminated=torch.zeros(4, 2, dtype=torch.bool),
+        truncated=torch.zeros(4, 2, dtype=torch.bool),
+        next_value=value,
+        policy_version=torch.zeros(4, 2, dtype=torch.int64),
+        opponent_version=torch.zeros(4, 2, dtype=torch.int64),
+        train_mask=torch.ones(4, 2, dtype=torch.bool),
+    )
+    guard = Rival2KLGuardConfig(
+        minibatch_kl_limit=1.0e-20,
+        completed_update_mean_kl_limit=1.0e-20,
+        reject_minibatch_kl=False,
+        reject_completed_update_kl=False,
+    )
+    metrics = ppo_update(
+        model,
+        torch.optim.Adam(model.parameters(), lr=1.0e-4),
+        rollout,
+        Rival2PPOConfig(rollout_horizon=1, minibatch_size=8, epochs=1),
+        generator=torch.Generator().manual_seed(987),
+        gae_ready=True,
+        kl_guard=guard,
+        distribution_override=scheduled.distribution_override,
+    )
+    assert guard.kl_telemetry_only
+    assert float(metrics["optimizer_post_step_approx_kl_max"].item()) > 1.0e-20
+    assert float(metrics["completed_update_mean_kl"].item()) > 1.0e-20

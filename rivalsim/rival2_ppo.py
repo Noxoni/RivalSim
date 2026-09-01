@@ -96,10 +96,12 @@ RIVAL2_PPO_120HZ_CONTRACT_HASH = hashlib.sha256(
 
 @dataclass(frozen=True, slots=True)
 class Rival2KLGuardConfig:
-    """Transactional PPO corruption guard; not part of the frozen PPO identity."""
+    """Transactional PPO corruption guard and optional KL rejection policy."""
 
     minibatch_kl_limit: float = 0.10
     completed_update_mean_kl_limit: float = 0.05
+    reject_minibatch_kl: bool = True
+    reject_completed_update_kl: bool = True
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.minibatch_kl_limit) or self.minibatch_kl_limit <= 0.0:
@@ -109,6 +111,10 @@ class Rival2KLGuardConfig:
             or self.completed_update_mean_kl_limit <= 0.0
         ):
             raise ValueError("completed-update KL limit must be finite and positive")
+
+    @property
+    def kl_telemetry_only(self) -> bool:
+        return not self.reject_minibatch_kl and not self.reject_completed_update_kl
 
 
 class Rival2PolicyDisplacementRejected(RuntimeError):
@@ -501,7 +507,7 @@ def ppo_update(
                     post_step_kl = ((post_ratio - 1.0) - post_log_ratio).mean()
                     guarded_post_step_kl.append(post_step_kl.detach())
                     post_step_kl_value = float(post_step_kl.item())
-                    if (
+                    if kl_guard.reject_minibatch_kl and (
                         not math.isfinite(post_step_kl_value)
                         or post_step_kl_value > kl_guard.minibatch_kl_limit
                     ):
@@ -568,7 +574,7 @@ def ppo_update(
                 (action[:, channel].abs() > 0.95).to(torch.float32).mean()
             )
         completed_kl = float(result["completed_update_mean_kl"].item())
-        if (
+        if kl_guard.reject_completed_update_kl and (
             not math.isfinite(completed_kl)
             or completed_kl > kl_guard.completed_update_mean_kl_limit
         ):

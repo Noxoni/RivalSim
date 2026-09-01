@@ -50,19 +50,24 @@ from rivalsim.rival2_ppo import (  # noqa: E402
 )
 from rivalsim.rival2_training import Rival2SelfPlayConfig  # noqa: E402
 
-FORMAT = "RIVAL2_FRESH_HUMAN_SEED_PPO_EXPLORATION_RAMP_V1"
+FORMAT = "RIVAL2_FRESH_HUMAN_SEED_PPO_EXPLORATION_RAMP_KL_TELEMETRY_V2"
 PACKAGE_COMMIT = "6F45CC21D54E89A685704E556D606E4FA00EB4E4"
+AUTHORIZATION_PARENT_COMMIT = "4E9BF99476DD294E3F4ADEF3B0900CEC41C32856"
 STAGE1_FORMAT = "RIVAL2_FRESH_HUMAN_SEED_V1_STAGE1_CHECKPOINT"
-RESULTS = ROOT / "results/rival2/fresh_human_seed_ppo_exploration_ramp_v1"
+RESULTS = ROOT / "results/rival2/fresh_human_seed_ppo_exploration_ramp_kl_telemetry_v2"
 AUTHORITY = RESULTS / "authority.json"
 SOURCE = ROOT / "checkpoints/rival2/fresh_human_seed_v1/rival2_fresh_human_seed_v1.pt"
 SOURCE_SHA256 = "CA2DB62A709BBD7DBA9D2997D701E2E6010584F8119BDA6F5D1686AD7425F9D2"
 STAGE1_TEST = ROOT / "results/rival2/fresh_human_seed_v1/stage1_test_metrics.json"
-CHECKPOINT_DIR = ROOT / "checkpoints/rival2/fresh_human_seed_v1/ppo_exploration_ramp_v1"
-DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/fresh-human-seed-ppo-exploration-ramp-v1")
+CHECKPOINT_DIR = ROOT / (
+    "checkpoints/rival2/fresh_human_seed_v1/ppo_exploration_ramp_kl_telemetry_v2"
+)
+DEFAULT_RUN_DIR = Path(
+    "G:/dev/RivalSim-runs/fresh-human-seed-ppo-exploration-ramp-kl-telemetry-v2"
+)
 WORLD_COUNT = 32_768
 TARGET_UPDATES = 600
-LR_SCHEDULE = (1.0e-4, 5.0e-5, 2.5e-5)
+PPO_LEARNING_RATE = 1.0e-4
 SEED = 2026090104
 CRITIC_SEED = 2026090105
 SNAPSHOTS = frozenset([*range(30, 481, 30), 500, 510, 540, 570, 600])
@@ -110,10 +115,21 @@ def append_jsonl(path: Path, payload: Any) -> None:
         os.fsync(handle.fileno())
 
 
-def scalar_metrics(metrics: dict[str, torch.Tensor]) -> dict[str, float]:
-    return {
-        name: float(value.detach().item()) for name, value in metrics.items() if value.numel() == 1
-    }
+def scalar_metrics(metrics: dict[str, torch.Tensor]) -> dict[str, float | str]:
+    result: dict[str, float | str] = {}
+    for name, value in metrics.items():
+        if value.numel() != 1:
+            continue
+        number = float(value.detach().item())
+        if math.isnan(number):
+            result[name] = "NaN"
+        elif number == math.inf:
+            result[name] = "Infinity"
+        elif number == -math.inf:
+            result[name] = "-Infinity"
+        else:
+            result[name] = number
+    return result
 
 
 def prepare_authority() -> dict[str, Any]:
@@ -131,6 +147,7 @@ def prepare_authority() -> dict[str, Any]:
         "format": f"{FORMAT}_AUTHORITY",
         "created_utc": utc_now(),
         "package_commit": PACKAGE_COMMIT,
+        "authorization_parent_commit": AUTHORIZATION_PARENT_COMMIT,
         "source": {
             "path": SOURCE.relative_to(ROOT).as_posix(),
             "sha256": sha256_file(SOURCE),
@@ -172,10 +189,16 @@ def prepare_authority() -> dict[str, Any]:
             "contract_sha256": RIVAL2_PPO_120HZ_CONTRACT_HASH,
             "worlds": WORLD_COUNT,
             "accepted_updates": TARGET_UPDATES,
-            "initial_learning_rate": LR_SCHEDULE[0],
-            "allowed_learning_rates": list(LR_SCHEDULE),
-            "hard_minibatch_kl": 0.10,
-            "hard_completed_update_mean_kl": 0.05,
+            "learning_rate": PPO_LEARNING_RATE,
+            "kl_policy": {
+                "mode": "telemetry_only",
+                "minibatch_kl_rejection": False,
+                "completed_update_kl_rejection": False,
+                "kl_threshold_rollback": False,
+                "diagnostic_reference_minibatch_kl": 0.10,
+                "diagnostic_reference_completed_update_mean_kl": 0.05,
+                "nonfinite_loss_gradient_parameter_guards": True,
+            },
         },
         "opponents": {
             "current_probability": 1.0,
@@ -207,6 +230,11 @@ def load_authority() -> dict[str, Any]:
         "snapshots": authority.get("snapshots") == sorted(SNAPSHOTS),
         "exploration": authority.get("exploration", {}).get("contract_sha256")
         == RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH,
+        "kl_telemetry_only": authority.get("ppo", {}).get("kl_policy", {}).get("mode")
+        == "telemetry_only"
+        and authority["ppo"]["kl_policy"].get("minibatch_kl_rejection") is False
+        and authority["ppo"]["kl_policy"].get("completed_update_kl_rejection") is False
+        and authority["ppo"]["kl_policy"].get("kl_threshold_rollback") is False,
     }
     if not all(checks.values()):
         raise RuntimeError(f"PPO authority mismatch: {checks}")
@@ -233,7 +261,7 @@ def make_trainer(
     trainer = Rival2OpponentCurriculumTrainer(
         env,
         policy_config=policy_config,
-        ppo_config=replace(rival2_ppo_120hz_config(), learning_rate=LR_SCHEDULE[0]),
+        ppo_config=replace(rival2_ppo_120hz_config(), learning_rate=PPO_LEARNING_RATE),
         self_play_config=Rival2SelfPlayConfig(historical_chance=0.0, historical_pool_bound=1),
         opponent_curriculum=Rival2OpponentCurriculumConfig(
             nexto_probability=0.0,
@@ -313,13 +341,6 @@ def optimizer_lr(trainer: Rival2OpponentCurriculumTrainer) -> float:
     return rates.pop()
 
 
-def set_optimizer_lr(trainer: Rival2OpponentCurriculumTrainer, rate: float) -> None:
-    if rate not in LR_SCHEDULE:
-        raise RuntimeError(f"unauthorized PPO LR: {rate}")
-    for group in trainer.optimizer.param_groups:
-        group["lr"] = rate
-
-
 def checkpoint_record(
     trainer: Rival2OpponentCurriculumTrainer,
     path: Path,
@@ -388,6 +409,18 @@ def preflight(
         "stopped_descendant_not_loaded": not trainer.curriculum_transition[
             "stopped_ppo_descendant_loaded"
         ],
+        "kl_minibatch_rejection_disabled": load_authority()["ppo"]["kl_policy"][
+            "minibatch_kl_rejection"
+        ]
+        is False,
+        "kl_completed_update_rejection_disabled": load_authority()["ppo"]["kl_policy"][
+            "completed_update_kl_rejection"
+        ]
+        is False,
+        "kl_threshold_rollback_disabled": load_authority()["ppo"]["kl_policy"][
+            "kl_threshold_rollback"
+        ]
+        is False,
     }
     return {
         "format": f"{FORMAT}_PREFLIGHT",
@@ -417,7 +450,7 @@ def run(args: argparse.Namespace) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
     curve = RESULTS / "ppo_curve.jsonl"
-    rolling = run_dir / "fresh_human_seed_ppo_exploration_ramp_v1_rolling.pt"
+    rolling = run_dir / "fresh_human_seed_ppo_exploration_ramp_kl_telemetry_v2_rolling.pt"
     manifest_path = RESULTS / "ppo_snapshot_manifest.json"
     manifest = (
         json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -437,7 +470,12 @@ def run(args: argparse.Namespace) -> int:
     elif curve.exists():
         raise RuntimeError("PPO curve already exists; use --resume")
 
-    guard = Rival2KLGuardConfig(0.10, 0.05)
+    guard = Rival2KLGuardConfig(
+        minibatch_kl_limit=0.10,
+        completed_update_mean_kl_limit=0.05,
+        reject_minibatch_kl=False,
+        reject_completed_update_kl=False,
+    )
     hard_failure: dict[str, Any] | None = None
     first_rollout_verified = trainer.iteration > 0
     started = time.monotonic()
@@ -471,24 +509,13 @@ def run(args: argparse.Namespace) -> int:
                 raise RuntimeError(f"first rollout opponent check failed: {first}")
             first_rollout_verified = True
 
-        rejected: list[dict[str, Any]] = []
         update_started = time.monotonic()
-        while True:
-            rate = optimizer_lr(trainer)
-            try:
-                metrics = trainer.update(rollout, kl_guard=guard)
-                break
-            except Rival2PolicyDisplacementRejected as error:
-                diagnostics = dict(error.diagnostics)
-                diagnostics["learning_rate"] = rate
-                diagnostics["created_utc"] = utc_now()
-                rejected.append(diagnostics)
-                reason = str(diagnostics.get("reason", ""))
-                index = LR_SCHEDULE.index(rate)
-                if "nonfinite" in reason or index + 1 >= len(LR_SCHEDULE):
-                    hard_failure = diagnostics
-                    break
-                set_optimizer_lr(trainer, LR_SCHEDULE[index + 1])
+        try:
+            metrics = trainer.update(rollout, kl_guard=guard)
+        except Rival2PolicyDisplacementRejected as error:
+            hard_failure = dict(error.diagnostics)
+            hard_failure["learning_rate"] = optimizer_lr(trainer)
+            hard_failure["created_utc"] = utc_now()
         if hard_failure is not None:
             hard_failure = {
                 "format": f"{FORMAT}_HARD_SAFETY_FAILURE",
@@ -496,10 +523,9 @@ def run(args: argparse.Namespace) -> int:
                 "reason": hard_failure.get("reason"),
                 "accepted_updates": trainer.iteration,
                 "exploration": exploration.as_dict(),
-                "authorized_learning_rates": list(LR_SCHEDULE),
-                "rejected_proposals": rejected,
                 "terminal_rejection": hard_failure,
-                "all_authorized_retries_exhausted": len(rejected) == len(LR_SCHEDULE),
+                "kl_telemetry_only": True,
+                "kl_threshold_caused_rejection": False,
             }
             write_json(RESULTS / "ppo_hard_safety_failure.json", hard_failure)
             checkpoint_record(trainer, rolling)
@@ -507,8 +533,8 @@ def run(args: argparse.Namespace) -> int:
 
         scalars = scalar_metrics(metrics)
         completed_kl = scalars.get("completed_update_mean_kl")
-        if completed_kl is None or not math.isfinite(completed_kl):
-            raise RuntimeError("accepted PPO update lacks finite completed KL")
+        if completed_kl is None:
+            raise RuntimeError("accepted PPO update lacks completed KL telemetry")
         row = {
             "accepted_update": trainer.iteration,
             "policy_version": trainer.policy_version,
@@ -519,7 +545,7 @@ def run(args: argparse.Namespace) -> int:
             "elapsed_seconds": time.monotonic() - started,
             "total_agent_samples": trainer.total_agent_samples,
             "ppo": scalars,
-            "rejected_proposals": rejected,
+            "kl_telemetry_only": True,
             "curriculum": curriculum_metrics,
             "gameplay": gameplay,
             "exploration": exploration.as_dict(),
@@ -527,7 +553,9 @@ def run(args: argparse.Namespace) -> int:
         append_jsonl(curve, row)
         checkpoint_record(trainer, rolling, exploration)
         if trainer.iteration in SNAPSHOTS:
-            path = CHECKPOINT_DIR / f"rival2_fresh_human_seed_ppo_ramp_u{trainer.iteration:04d}.pt"
+            path = CHECKPOINT_DIR / (
+                f"rival2_fresh_human_seed_ppo_ramp_kl_telemetry_u{trainer.iteration:04d}.pt"
+            )
             record = checkpoint_record(trainer, path, exploration)
             manifest["snapshots"] = [
                 prior
@@ -560,7 +588,8 @@ def run(args: argparse.Namespace) -> int:
     if final is None:
         final = checkpoint_record(
             trainer,
-            CHECKPOINT_DIR / f"rival2_fresh_human_seed_ppo_ramp_u{trainer.iteration:04d}.pt",
+            CHECKPOINT_DIR
+            / f"rival2_fresh_human_seed_ppo_ramp_kl_telemetry_u{trainer.iteration:04d}.pt",
         )
     manifest["final"] = final
     write_json(manifest_path, manifest)
@@ -573,6 +602,7 @@ def run(args: argparse.Namespace) -> int:
         "exact_600_completed": trainer.iteration == TARGET_UPDATES,
         "total_agent_samples": trainer.total_agent_samples,
         "final_learning_rate": optimizer_lr(trainer),
+        "kl_policy": "telemetry_only",
         "hard_safety_failure": hard_failure,
         "exploration_contract_sha256": (RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_CONTRACT_HASH),
         "final_exploration": fresh_human_seed_exploration(trainer.iteration).as_dict(),

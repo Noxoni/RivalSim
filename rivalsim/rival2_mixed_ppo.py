@@ -1179,7 +1179,7 @@ def ppo_update_mixed_curriculum(
                     retention_mean_kl = retention_channel.sum(dim=-1).mean()
                 post_step_kl_value = float(post_step_kl.item())
                 retention_kl_value = float(retention_mean_kl.item())
-                if (
+                if kl_guard.reject_minibatch_kl and (
                     not math.isfinite(post_step_kl_value)
                     or post_step_kl_value > kl_guard.minibatch_kl_limit
                 ):
@@ -1203,9 +1203,15 @@ def ppo_update_mixed_curriculum(
                     )
 
                 violations: list[str] = []
-                if post_step_kl_value > safety_config.soft_minibatch_kl_target:
+                if (
+                    not kl_guard.kl_telemetry_only
+                    and post_step_kl_value > safety_config.soft_minibatch_kl_target
+                ):
                     violations.append("soft_minibatch_kl")
-                if retention_kl_value > safety_config.retention_soft_mean_kl_target:
+                if (
+                    not kl_guard.kl_telemetry_only
+                    and retention_kl_value > safety_config.retention_soft_mean_kl_target
+                ):
                     violations.append("retention_mean_kl")
                 if violations:
                     if batch_digest is None:
@@ -1389,7 +1395,10 @@ def ppo_update_mixed_curriculum(
         family_statistics[name]["empirical_kl"] = value
 
     completed_kl = float(result["completed_update_mean_kl"].item())
-    if not math.isfinite(completed_kl) or completed_kl > kl_guard.completed_update_mean_kl_limit:
+    if kl_guard.reject_completed_update_kl and (
+        not math.isfinite(completed_kl)
+        or completed_kl > kl_guard.completed_update_mean_kl_limit
+    ):
         raise Rival2PolicyDisplacementRejected(
             {
                 "reason": "completed_update_mean_kl_limit_exceeded",
@@ -1483,6 +1492,7 @@ def ppo_update_mixed_curriculum(
             == safety_config.critic_learning_rate,
             "hard_minibatch_guard_unchanged": kl_guard.minibatch_kl_limit == 0.10,
             "hard_completed_guard_unchanged": (kl_guard.completed_update_mean_kl_limit == 0.05),
+            "kl_telemetry_only": kl_guard.kl_telemetry_only,
             "accepted_steps_within_soft_minibatch_target": all(
                 step["post_step_empirical_kl"] <= safety_config.soft_minibatch_kl_target
                 for step in accepted_steps
