@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -45,87 +47,102 @@ INITIALIZATION_SEED = 2026090106
 TRAINING_SEED = 2026090107
 
 
-def _configure_base() -> None:
-    stage1.PACKAGE_COMMIT = AUTHORIZATION_PARENT
-    stage1.FORMAT = FORMAT
-    stage1.CHECKPOINT_FORMAT = CHECKPOINT_FORMAT
-    stage1.RESULTS = RESULTS
-    stage1.AUTHORITY = AUTHORITY
-    stage1.SPLIT_MANIFEST = SPLIT_MANIFEST
-    stage1.CURVE = CURVE
-    stage1.CHECKPOINT = CHECKPOINT
-    stage1.INITIALIZATION_SEED = INITIALIZATION_SEED
-    stage1.TRAINING_SEED = TRAINING_SEED
-    stage1.AUTHORITY_PREPARATION_REQUIRES_EXACT_PACKAGE_COMMIT = False
-    stage1.NEUTRALIZE_PREVIOUS_ACTION = True
-    stage1.ZERO_PREVIOUS_ACTION_POLICY_INPUTS = True
+def _configure_base() -> dict[str, Any]:
+    overrides = {
+        "PACKAGE_COMMIT": AUTHORIZATION_PARENT,
+        "FORMAT": FORMAT,
+        "CHECKPOINT_FORMAT": CHECKPOINT_FORMAT,
+        "RESULTS": RESULTS,
+        "AUTHORITY": AUTHORITY,
+        "SPLIT_MANIFEST": SPLIT_MANIFEST,
+        "CURVE": CURVE,
+        "CHECKPOINT": CHECKPOINT,
+        "INITIALIZATION_SEED": INITIALIZATION_SEED,
+        "TRAINING_SEED": TRAINING_SEED,
+        "AUTHORITY_PREPARATION_REQUIRES_EXACT_PACKAGE_COMMIT": False,
+        "NEUTRALIZE_PREVIOUS_ACTION": True,
+        "ZERO_PREVIOUS_ACTION_POLICY_INPUTS": True,
+    }
+    previous = {name: getattr(stage1, name) for name in overrides}
+    for name, value in overrides.items():
+        setattr(stage1, name, value)
+    return previous
+
+
+def _restore_base(previous: dict[str, Any]) -> None:
+    for name, value in previous.items():
+        setattr(stage1, name, value)
 
 
 def prepare(args: argparse.Namespace) -> dict[str, Any]:
-    _configure_base()
-    authority = stage1.prepare(args)
-    authority.pop("stage2", None)
-    authority["task_scope"] = {
-        "stage1_fresh_gameplay_imitation_only": True,
-        "ppo_authorized": False,
-        "closed_loop_evaluation_after_selection": True,
-    }
-    authority["stage1"]["previous_action_input_contract"] = {
-        "version": "RIVAL2_PREVIOUS_ACTION_ALWAYS_ZERO_V1",
-        "fields_structurally_present": True,
-        "field_names": list(PREVIOUS_ACTION_OBSERVATION_FIELDS),
-        "indices": list(PREVIOUS_ACTION_OBSERVATION_INDICES),
-        "human_before_observation_adapter_v2": {
-            "value": 0.0,
-            "quality": "unavailable",
-        },
-        "human_after_adapter_and_pad_overlay": 0.0,
-        "rivalsim_immediately_before_policy_trunk": 0.0,
-        "policy_config": {"zero_previous_action_inputs": True},
-    }
-    authority["forbidden"].update(
-        {
-            "ppo_or_reward_optimization": True,
-            "existing_bc_or_ppo_checkpoint_load": True,
-            "human_previous_action_as_policy_input": True,
+    previous = _configure_base()
+    try:
+        authority = stage1.prepare(args)
+        authority.pop("stage2", None)
+        authority["task_scope"] = {
+            "stage1_fresh_gameplay_imitation_only": True,
+            "ppo_authorized": False,
+            "closed_loop_evaluation_after_selection": True,
         }
-    )
-    authority["policy_config"] = {
-        "values": stage1.asdict(
-            Rival2PolicyConfig(zero_previous_action_inputs=True)
-        ),
-        "content_hash": Rival2PolicyConfig(
-            zero_previous_action_inputs=True
-        ).content_hash,
-    }
-    stage1.write_json(AUTHORITY, authority)
-    return authority
+        authority["stage1"]["previous_action_input_contract"] = {
+            "version": "RIVAL2_PREVIOUS_ACTION_ALWAYS_ZERO_V1",
+            "fields_structurally_present": True,
+            "field_names": list(PREVIOUS_ACTION_OBSERVATION_FIELDS),
+            "indices": list(PREVIOUS_ACTION_OBSERVATION_INDICES),
+            "human_before_observation_adapter_v2": {
+                "value": 0.0,
+                "quality": "unavailable",
+            },
+            "human_after_adapter_and_pad_overlay": 0.0,
+            "rivalsim_immediately_before_policy_trunk": 0.0,
+            "policy_config": {"zero_previous_action_inputs": True},
+        }
+        authority["forbidden"].update(
+            {
+                "ppo_or_reward_optimization": True,
+                "existing_bc_or_ppo_checkpoint_load": True,
+                "human_previous_action_as_policy_input": True,
+            }
+        )
+        authority["policy_config"] = {
+            "values": asdict(Rival2PolicyConfig(zero_previous_action_inputs=True)),
+            "content_hash": Rival2PolicyConfig(
+                zero_previous_action_inputs=True
+            ).content_hash,
+        }
+        stage1.write_json(AUTHORITY, authority)
+        return authority
+    finally:
+        _restore_base(previous)
 
 
 def train(args: argparse.Namespace) -> dict[str, Any]:
-    _configure_base()
-    selected = stage1.train(args)
-    payload = torch.load(CHECKPOINT, map_location="cpu", weights_only=False)
-    config = Rival2PolicyConfig(**payload["policy_config"])
-    if payload.get("format") != CHECKPOINT_FORMAT:
-        raise RuntimeError("selected checkpoint format mismatch")
-    if not config.zero_previous_action_inputs:
-        raise RuntimeError("selected policy does not enforce the previous-action mask")
-    authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
-    contract = authority["stage1"]["previous_action_input_contract"]
-    if contract["indices"] != list(PREVIOUS_ACTION_OBSERVATION_INDICES):
-        raise RuntimeError("frozen previous-action indices changed")
-    selected["previous_action_input_contract"] = {
-        "version": contract["version"],
-        "policy_config_hash": config.content_hash,
-        "eight_human_inputs_zero_before_adapter": True,
-        "eight_human_inputs_unavailable_before_adapter": True,
-        "eight_human_outputs_zero_after_adapter_overlay": True,
-        "eight_rivalsim_inputs_zero_immediately_before_policy": True,
-    }
-    selected["checkpoint"]["sha256"] = file_sha256(CHECKPOINT)
-    stage1.write_json(RESULTS / "stage1_selected.json", selected)
-    return selected
+    previous = _configure_base()
+    try:
+        selected = stage1.train(args)
+        payload = torch.load(CHECKPOINT, map_location="cpu", weights_only=False)
+        config = Rival2PolicyConfig(**payload["policy_config"])
+        if payload.get("format") != CHECKPOINT_FORMAT:
+            raise RuntimeError("selected checkpoint format mismatch")
+        if not config.zero_previous_action_inputs:
+            raise RuntimeError("selected policy does not enforce the previous-action mask")
+        authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
+        contract = authority["stage1"]["previous_action_input_contract"]
+        if contract["indices"] != list(PREVIOUS_ACTION_OBSERVATION_INDICES):
+            raise RuntimeError("frozen previous-action indices changed")
+        selected["previous_action_input_contract"] = {
+            "version": contract["version"],
+            "policy_config_hash": config.content_hash,
+            "eight_human_inputs_zero_before_adapter": True,
+            "eight_human_inputs_unavailable_before_adapter": True,
+            "eight_human_outputs_zero_after_adapter_overlay": True,
+            "eight_rivalsim_inputs_zero_immediately_before_policy": True,
+        }
+        selected["checkpoint"]["sha256"] = file_sha256(CHECKPOINT)
+        stage1.write_json(RESULTS / "stage1_selected.json", selected)
+        return selected
+    finally:
+        _restore_base(previous)
 
 
 def parse_args() -> argparse.Namespace:
@@ -137,7 +154,7 @@ def parse_args() -> argparse.Namespace:
         "--human-source-root",
         type=Path,
         default=(
-            Path(stage1.os.environ["APPDATA"])
+            Path(os.environ["APPDATA"])
             / "bakkesmod/bakkesmod/data/rival2/human_demos"
         ),
     )

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
+
 import torch
 
+from benchmarks import run_rival2_fresh_human_seed_no_previous_action_v1 as masked_stage1
 from benchmarks.run_rival2_fresh_human_seed_v1 import (
     hard_zero_previous_action_after_adapter,
     neutralize_previous_action_before_adapter,
@@ -83,3 +86,43 @@ def test_mask_buffer_does_not_change_checkpoint_tensor_schema() -> None:
         Rival2PolicyConfig(zero_previous_action_inputs=True)
     )
     assert tuple(plain.state_dict()) == tuple(masked.state_dict())
+
+
+def test_selected_checkpoint_preserves_mask_and_untrained_critic() -> None:
+    payload = torch.load(
+        masked_stage1.CHECKPOINT, map_location="cpu", weights_only=False
+    )
+    assert payload["format"] == masked_stage1.CHECKPOINT_FORMAT
+    assert payload["lineage"]["fresh_random_initialization"]
+    assert not payload["lineage"]["prior_rival_checkpoint_loaded"]
+    assert not payload["critic_trained"]
+    assert not payload["ppo_resumable"]
+    config = Rival2PolicyConfig(**payload["policy_config"])
+    assert config.zero_previous_action_inputs
+
+    torch.manual_seed(masked_stage1.INITIALIZATION_SEED)
+    initial = Rival2ActorCritic(
+        Rival2PolicyConfig(zero_previous_action_inputs=True)
+    )
+    with torch.no_grad():
+        initial.actor.weight[5:10].zero_()
+        initial.actor.bias[5:10].fill_(-1.0)
+    for name, value in initial.critic.state_dict().items():
+        assert torch.equal(value, payload["model"][f"critic.{name}"])
+
+
+def test_corrected_closed_loop_evidence_is_complete_and_nonfunctional() -> None:
+    result = json.loads(
+        (
+            masked_stage1.RESULTS / "deterministic_nexto_closed_loop.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert result["execution"]["rival_policy_hz"] == 120
+    assert not result["execution"]["gaussian_sampling"]
+    assert not result["execution"]["bernoulli_sampling"]
+    assert result["execution"]["optimizer_steps"] == 0
+    assert result["gameplay"]["rival_touches"] == 0
+    assert result["gameplay"]["nexto_goals"] == result["execution"]["episodes"]
+    assert not result["behavioral_interpretation"][
+        "functional_gameplay_demonstrated"
+    ]

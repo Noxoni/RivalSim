@@ -1019,6 +1019,10 @@ class NextoShortEpisodeRunner:
             raise ValueError("Rival policy Hz must be a positive divisor of physics Hz")
         self.rival_policy_hz = int(rival_policy_hz)
         self.rival_cadence_ticks = PHYSICS_HZ // self.rival_policy_hz
+        # The original short lifecycle/reward accounting remains a four-physics-
+        # tick interval.  A 120 Hz evaluation policy may refresh observations and
+        # actions every tick without repeatedly reopening that lifecycle interval.
+        self.lifecycle_cadence_ticks = RIVAL_CADENCE_TICKS
         layout = np.asarray(starting_layout, dtype=np.int32).reshape(self.num_worlds)
         side = np.asarray(rival_side, dtype=np.int32).reshape(self.num_worlds)
         if np.any((layout < 0) | (layout >= 5)):
@@ -1142,6 +1146,7 @@ class NextoShortEpisodeRunner:
         self._activate_stream()
         if self.host_tick % self.rival_cadence_ticks == 0:
             self._update_rival_action()
+        if self.host_tick % self.lifecycle_cadence_ticks == 0:
             self.world.begin_decision()
         kickoff_active = self.bridge.views["rival2.kickoff_indicator"] != 0
         nexto_action, _indices = self.nexto.tick_action(self.nexto_state, kickoff_active)
@@ -1150,10 +1155,11 @@ class NextoShortEpisodeRunner:
         self.bridge.set_actions(self.actions)
         self.world.step_graph(1)
         self.host_tick += 1
-        if self.host_tick % self.rival_cadence_ticks == 0:
+        if self.host_tick % self.lifecycle_cadence_ticks == 0:
             reset_mask = self.bridge.views["rival2.reset_mask"].to(torch.bool)
             self.nexto.notify_kickoff(reset_mask)
             self.world.apply_interval_resets()
+        if self.host_tick % self.rival_cadence_ticks == 0:
             self.rival_observation = self.bridge.observation()
 
     def run(self) -> ShortEvalTiming:
@@ -1185,6 +1191,7 @@ class NextoShortEpisodeRunner:
             "nexto_timed_d2h_bytes": int(self.nexto.timed_d2h_bytes),
             "rival_policy_hz": self.rival_policy_hz,
             "rival_cadence_ticks": self.rival_cadence_ticks,
+            "lifecycle_cadence_ticks": self.lifecycle_cadence_ticks,
         }
         if self.open_play_telemetry is not None:
             result["open_play_raw"] = self.open_play_telemetry.numpy()
