@@ -1,0 +1,15 @@
+{
+  "checkpoint_structural_validation": "PASS",
+  "commands": [
+    ".venv/Scripts/python.exe -m pytest tests/test_human_bc_v2.py tests/test_human_bc_continuation.py tests/test_human_demo_behavior_cloning.py tests/test_human_demo_observation_adapter_v2.py -q",
+    ".venv/Scripts/python.exe -m ruff check benchmarks/run_rival2_human_bc_continuation_v1.py benchmarks/run_rival2_human_bc_v2.py tests/test_human_bc_v2.py",
+    "git diff --check"
+  ],
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_TEST_RESULTS_V2",
+  "pytest": {
+    "failed": 0,
+    "passed": 21
+  },
+  "ruff": "PASS",
+  "verdict": "PASS"
+}

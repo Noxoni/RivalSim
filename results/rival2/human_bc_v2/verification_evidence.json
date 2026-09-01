@@ -1,0 +1,62 @@
+{
+  "checkpoint": {
+    "path": "checkpoints/rival2/human_bc_v2/rival2_human_bc_v2.pt",
+    "sha256": "CF77852EEEA7E30092F193E7EA1F8BC327EE83BFD1B81FD86275D4CF260811B2"
+  },
+  "critic_parity": {
+    "maximum_absolute_drift": 0.0,
+    "rmse": 0.0
+  },
+  "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_VERIFICATION_V2",
+  "frozen_trunk_and_critic": {
+    "parent_sha256": "44DD21E20FAF9D07C58009D791564B7CD7A7D5FB85EF02A17E4FC99F58C250AA",
+    "selected_sha256": "44DD21E20FAF9D07C58009D791564B7CD7A7D5FB85EF02A17E4FC99F58C250AA",
+    "unchanged": true
+  },
+  "human_validation": {
+    "gameplay_complete_action_rmse": {
+      "bc_v1": 0.5600362420082092,
+      "bc_v2": 0.5171583294868469
+    },
+    "mechanic_complete_action_rmse": {
+      "bc_v1": 0.5355024933815002,
+      "bc_v2": 0.4797895848751068
+    },
+    "mechanic_labels_improved": 12,
+    "mechanic_labels_nonregressed": 13,
+    "mechanic_labels_total": 13
+  },
+  "optimizer": {
+    "accepted_actor_only_steps_in_selected_checkpoint": 2304,
+    "accepted_actor_only_steps_run": 2752,
+    "fresh_adamw": true,
+    "source_optimizer_loaded": false,
+    "trainable_parameters": [
+      "actor.weight",
+      "actor.bias"
+    ]
+  },
+  "prohibited_work_counters": {
+    "added_demonstrations": 0,
+    "dataset_or_split_changes": 0,
+    "mechanic_definition_or_detector_changes": 0,
+    "observation_adapter_changes": 0,
+    "ppo_updates": 0,
+    "reward_changes": 0
+  },
+  "simulator_retention": {
+    "hard_actor_max_sample_kl_limit": 2.0,
+    "test_actor_max_sample_kl": 2.498593807220459,
+    "test_actor_mean_kl": 0.0037696635305681423,
+    "test_guard_accepted": false,
+    "validation_actor_max_sample_kl": 0.5221092104911804,
+    "validation_actor_mean_kl": 0.003803050407441333,
+    "validation_guard_accepted": true
+  },
+  "stop": {
+    "reason": "held-out validation improvement plateaued",
+    "test_access_count": 1,
+    "test_accessed_before_selection": false
+  },
+  "verdict": "BLOCKED"
+}
