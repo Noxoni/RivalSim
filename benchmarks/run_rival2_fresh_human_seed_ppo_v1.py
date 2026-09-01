@@ -490,6 +490,17 @@ def run(args: argparse.Namespace) -> int:
                     break
                 set_optimizer_lr(trainer, LR_SCHEDULE[index + 1])
         if hard_failure is not None:
+            hard_failure = {
+                "format": f"{FORMAT}_HARD_SAFETY_FAILURE",
+                "created_utc": utc_now(),
+                "reason": hard_failure.get("reason"),
+                "accepted_updates": trainer.iteration,
+                "exploration": exploration.as_dict(),
+                "authorized_learning_rates": list(LR_SCHEDULE),
+                "rejected_proposals": rejected,
+                "terminal_rejection": hard_failure,
+                "all_authorized_retries_exhausted": len(rejected) == len(LR_SCHEDULE),
+            }
             write_json(RESULTS / "ppo_hard_safety_failure.json", hard_failure)
             checkpoint_record(trainer, rolling)
             break
