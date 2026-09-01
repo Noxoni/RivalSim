@@ -1,0 +1,188 @@
+{
+  "checks": {
+    "critic_reinitialized": true,
+    "deterministic_actor_trunk_button_outputs_unchanged": true,
+    "external_and_historical_zero": true,
+    "fresh_counters_zero": true,
+    "fresh_optimizer_created_after_transition": true,
+    "fresh_optimizer_empty": true,
+    "fresh_stage1_source": true,
+    "full_model_trainable": true,
+    "historical_pool_empty": true,
+    "named_mechanics_arrays_zero": true,
+    "named_mechanics_hot_path_absent": true,
+    "policy_and_physics_120_hz": true,
+    "prior_rival_checkpoint_absent": true,
+    "pure_current": true,
+    "reward_contract_exact": true,
+    "source_selected_step_2800": true,
+    "source_sha256_exact": true,
+    "source_untouched_test_rmse_exact": true,
+    "source_validation_rmse_exact": true,
+    "stopped_descendant_not_loaded": true,
+    "update_0_schedule_exact": true,
+    "update_300_schedule_exact": true,
+    "update_60_schedule_exact": true,
+    "worlds_exact": true
+  },
+  "created_utc": "2026-09-01T17:42:59.605893+00:00",
+  "exploration_contract": {
+    "analog": {
+      "channels": [
+        "throttle",
+        "steer",
+        "pitch",
+        "yaw",
+        "roll"
+      ],
+      "interpolation": "linear_in_log_sigma",
+      "raw_actor_log_std_bypassed": true,
+      "sigma_end": 0.08,
+      "sigma_start": 0.01
+    },
+    "buttons": {
+      "channels": [
+        "jump",
+        "boost",
+        "handbrake"
+      ],
+      "effective_logits": "learned_logits/positive_temperature",
+      "temperature_end": 0.5,
+      "temperature_start": 0.02
+    },
+    "coherence": [
+      "rollout_sampling",
+      "stored_old_log_probability",
+      "ppo_recomputed_log_probability",
+      "ppo_ratio",
+      "entropy_diagnostic",
+      "kl_guards"
+    ],
+    "normalized_progress": {
+      "from_update_300": 1.0,
+      "interior": "x*x*(3-2*x)",
+      "through_update_60": 0.0,
+      "x": "(accepted_update-60)/240"
+    },
+    "version": "RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_V1"
+  },
+  "format": "RIVAL2_FRESH_HUMAN_SEED_PPO_EXPLORATION_RAMP_V1_PREFLIGHT",
+  "memory_inventory": {
+    "arrays": {
+      "bad_flip_component": 131072,
+      "bad_flip_total": 262144,
+      "contest_exempt_total": 262144,
+      "control_component": 131072,
+      "control_reward_sum_total": 131072,
+      "control_score_current": 262144,
+      "control_score_ge_025_total": 262144,
+      "control_score_ge_05_total": 262144,
+      "control_score_positive_total": 262144,
+      "control_score_sum_total": 262144,
+      "control_score_tick_total": 262144,
+      "flip_touch_total": 262144,
+      "interval_bad_flip": 262144,
+      "interval_contest_exempt": 262144,
+      "interval_power_exempt": 262144,
+      "interval_retained_control_exempt": 262144,
+      "legitimate_touch_total": 262144,
+      "opponent_touch_latched": 262144,
+      "pending_active": 262144,
+      "pending_age": 262144,
+      "pending_ball_position": 786432,
+      "pending_contest": 262144,
+      "pending_power": 262144,
+      "pending_retained_control": 262144,
+      "pending_self_contact_tick": 262144,
+      "power_exempt_total": 262144,
+      "recent_opponent_contact_ball_position": 786432,
+      "recent_opponent_contact_tick": 262144,
+      "retained_control_exempt_total": 262144,
+      "touch_latched": 262144
+    },
+    "controlled_flick_arrays": 0,
+    "logical_bytes": 8519680,
+    "named_mechanics_arrays": 0
+  },
+  "opponent_curriculum": {
+    "current_probability": 1.0,
+    "historical_probability": 0.0,
+    "nexto_probability": 0.0,
+    "seed": 2026102537,
+    "wisp_probability": 0.0
+  },
+  "ppo_config": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "transition": {
+    "authority_sha256": "03A268851F878A8851930728CEA7AD8E1CEB45D2F30F54D9340EA51C736D9298",
+    "contracts": {
+      "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+      "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+      "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+      "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+    },
+    "critic_reinitialized": true,
+    "deterministic_actor_trunk_button_outputs_unchanged": true,
+    "deterministic_actor_trunk_button_tensor_sha256": "406D1B5F0F441D05AD6AC5814B7146C7C0D6E9BC38B70B6AC1C2A1A284769177",
+    "exploration": {
+      "accepted_update": 1,
+      "analog_log_sigma": -4.605170185988091,
+      "analog_sigma": 0.01,
+      "button_temperature": 0.02,
+      "contract_sha256": "55B12BC7099F7D8E90B8E5C478DB9AA844BAE4DD0B43E9C7224ABB1DE5DE1489",
+      "normalized_progress": 0.0,
+      "version": "RIVAL2_FRESH_HUMAN_SEED_EXPLORATION_RAMP_V1"
+    },
+    "exploration_contract_sha256": "55B12BC7099F7D8E90B8E5C478DB9AA844BAE4DD0B43E9C7224ABB1DE5DE1489",
+    "format": "RIVAL2_FRESH_HUMAN_SEED_PPO_EXPLORATION_RAMP_V1_TRANSITION",
+    "fresh_critic_tensor_sha256": "00DD9A63DC3D27EA094AD1F701D22B503AF3846A71F4C9DF72C56E1C96CBF3D0",
+    "fresh_optimizer_created_after_exploration_transition": true,
+    "fresh_optimizer_rng_counters": true,
+    "loaded_fields": [
+      "model",
+      "policy_config"
+    ],
+    "opponent_curriculum_initialization": {
+      "config": {
+        "current_probability": 1.0,
+        "historical_probability": 0.0,
+        "nexto_probability": 0.0,
+        "seed": 2026102537,
+        "wisp_probability": 0.0
+      },
+      "dedicated_generator_state_sha256_after_initialization": "F10DEB021E4B4296A267210D22DD3F0502F5A2142652DC86C6842586676BB2A5",
+      "source_assignment_current_count": 32768,
+      "source_assignment_historical_count": 0,
+      "source_assignment_replaced_at_fresh_episode_boundary": true
+    },
+    "source": {
+      "format": "RIVAL2_FRESH_HUMAN_SEED_V1_STAGE1_CHECKPOINT",
+      "model_tensor_sha256": "AED96574311AD580788965047E081E5CE07DB17EEF0C12DA67F706D4A3CFD521",
+      "path": "checkpoints/rival2/fresh_human_seed_v1/rival2_fresh_human_seed_v1.pt",
+      "selected_step": 2800,
+      "sha256": "CA2DB62A709BBD7DBA9D2997D701E2E6010584F8119BDA6F5D1686AD7425F9D2",
+      "stage1_optimizer_loaded": false,
+      "untouched_test_evidence_sha256": "EA26B1705B528D58C01A5187D11B20CFDB967B0302A510869835B9055D248A0E",
+      "untouched_test_rmse": 0.09109495009433785,
+      "used_fields": [
+        "model",
+        "policy_config"
+      ],
+      "validation_rmse": 0.09304266346161075
+    },
+    "stage1_critic_tensor_sha256": "90AD2A19EDA3C879F21BE2DA8C6EBBEB2897D6C304B6825BFDCB86C629899576",
+    "stage1_optimizer_loaded": false,
+    "stopped_ppo_descendant_loaded": false
+  },
+  "verdict": "PASS"
+}
