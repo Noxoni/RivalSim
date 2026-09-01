@@ -50,6 +50,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_ACTION_V2_120HZ_VERSION,
     RIVAL2_EPISODE_VERSION,
     RIVAL2_OBS_V2_120HZ_VERSION,
+    RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
@@ -950,7 +951,10 @@ class Rival2Env:
     ):
         if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
             reward_mode = REWARD_MODE_BASE
-        elif reward_version == RIVAL2_REWARD_ACQUISITION_V1_VERSION:
+        elif reward_version in (
+            RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+            RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
+        ):
             reward_mode = REWARD_MODE_ACQUISITION
         elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_MODE_GOAL_ONLY
@@ -971,6 +975,7 @@ class Rival2Env:
         self.observation_version = observation_version or (
             RIVAL2_OBS_V2_120HZ_VERSION
             if reward_version in (
+                RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
             )
@@ -979,6 +984,7 @@ class Rival2Env:
         self.action_version = action_version or (
             RIVAL2_ACTION_V2_120HZ_VERSION
             if reward_version in (
+                RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
             )
@@ -1040,6 +1046,7 @@ class Rival2Env:
         if self.reward_version in (
             RIVAL2_REWARD_V2_VERSION,
             RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+            RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
         ):
             reward.add_(self.bridge.approach_reward(decision_observation, transition_observation))
         elif self.reward_version == RIVAL2_REWARD_SCORING_V1_VERSION:
@@ -1078,7 +1085,10 @@ class Rival2Env:
 
         if reward_version in (RIVAL2_REWARD_VERSION, RIVAL2_REWARD_V2_VERSION):
             reward_mode = REWARD_MODE_BASE
-        elif reward_version == RIVAL2_REWARD_ACQUISITION_V1_VERSION:
+        elif reward_version in (
+            RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+            RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
+        ):
             reward_mode = REWARD_MODE_ACQUISITION
         elif reward_version == RIVAL2_REWARD_GOAL_ONLY_VERSION:
             reward_mode = REWARD_MODE_GOAL_ONLY

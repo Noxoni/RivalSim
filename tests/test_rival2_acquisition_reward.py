@@ -12,9 +12,14 @@ from rivalsim.kernels.rival2 import (
     PHYSICS_TICKS_PER_DECISION,
 )
 from rivalsim.rival2_contracts import (
+    REWARD_ACQUISITION_120_V1_CONTRACT,
+    REWARD_ACQUISITION_120_V1_CONTRACT_HASH,
     REWARD_ACQUISITION_V1_CONTRACT,
     REWARD_ACQUISITION_V1_CONTRACT_HASH,
+    RIVAL2_ACTION_V2_120HZ_VERSION,
     RIVAL2_EPISODE_VERSION,
+    RIVAL2_OBS_V2_120HZ_VERSION,
+    RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
     RIVAL2_REWARD_ACQUISITION_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     contract_hashes_for_reward,
@@ -76,6 +81,28 @@ def test_acquisition_contract_is_explicit_and_content_addressed() -> None:
         hashes[RIVAL2_REWARD_ACQUISITION_V1_VERSION]
         == REWARD_ACQUISITION_V1_CONTRACT_HASH
     )
+
+
+def test_acquisition_120_binding_preserves_coefficients_and_uses_120hz_contracts() -> None:
+    assert REWARD_ACQUISITION_120_V1_CONTRACT["cadence_hz"] == 120
+    assert REWARD_ACQUISITION_120_V1_CONTRACT["goal"] == (
+        REWARD_ACQUISITION_V1_CONTRACT["goal"]
+    )
+    assert REWARD_ACQUISITION_120_V1_CONTRACT["progress"] == (
+        REWARD_ACQUISITION_V1_CONTRACT["progress"]
+    )
+    assert REWARD_ACQUISITION_120_V1_CONTRACT["unique_touch_per_player"] == (
+        REWARD_ACQUISITION_V1_CONTRACT["unique_touch_per_player"]
+    )
+    hashes = contract_hashes_for_reward(
+        RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
+        RIVAL2_EPISODE_VERSION,
+    )
+    assert hashes[RIVAL2_REWARD_ACQUISITION_120_V1_VERSION] == (
+        REWARD_ACQUISITION_120_V1_CONTRACT_HASH
+    )
+    assert RIVAL2_OBS_V2_120HZ_VERSION in hashes
+    assert RIVAL2_ACTION_V2_120HZ_VERSION in hashes
 
 
 def test_first_touch_stacks_once_and_continuous_contact_is_latched(
@@ -150,4 +177,3 @@ def test_no_touch_failure_is_per_player_and_uses_original_truncation(
         atol=2.0e-6,
     )
     assert acquisition.bridge.views["rival2.episode_player_touched"].sum().item() == 0
-

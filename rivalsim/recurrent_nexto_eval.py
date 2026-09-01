@@ -88,7 +88,15 @@ class RecurrentNextoEpisodeRunner:
             "sha256": checkpoint_sha,
             "size_bytes": checkpoint_path.stat().st_size,
             "format": payload["format"],
-            "selected_step": int(payload["selected_step"]),
+            "selected_step": int(
+                payload.get(
+                    "selected_step",
+                    payload.get("source", {}).get("selected_step", -1),
+                )
+            ),
+            "accepted_updates_total": int(payload.get("accepted_updates_total", 0)),
+            "phase_accepted_updates": int(payload.get("phase_accepted_updates", 0)),
+            "phase": payload.get("phase", "human_sequence_stage1"),
             "policy_config": asdict(config),
             "policy_config_sha256": config.content_hash,
             "evaluation_only_stage1_load": True,

@@ -13,6 +13,7 @@ RIVAL2_ACTION_V2_120HZ_VERSION: Final = "RIVAL2_ACTION_V2_120HZ"
 RIVAL2_REWARD_VERSION: Final = "RIVAL2_REWARD_V1"
 RIVAL2_REWARD_V2_VERSION: Final = "RIVAL2_REWARD_V2"
 RIVAL2_REWARD_ACQUISITION_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_V1"
+RIVAL2_REWARD_ACQUISITION_120_V1_VERSION: Final = "RIVAL2_REWARD_ACQUISITION_120_V1"
 RIVAL2_REWARD_GOAL_ONLY_VERSION: Final = "RIVAL2_REWARD_GOAL_ONLY_V1"
 RIVAL2_REWARD_SCORING_V1_VERSION: Final = "RIVAL2_REWARD_SCORING_V1"
 RIVAL2_REWARD_GAMEPLAY_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V1"
@@ -361,6 +362,26 @@ REWARD_ACQUISITION_V1_CONTRACT: Final = {
         "training_episode_effect": "RIVAL2_EPISODE_V1 truncation and kickoff reset",
     },
     "direct_mechanic_rewards": [],
+}
+
+# The legacy acquisition contract remains immutable at 30 Hz.  This binding
+# preserves every coefficient and physical event rule while aligning distance
+# deltas, observation history, and action application to one authoritative
+# 120 Hz tick for the recurrent Human Sequence lineage.
+REWARD_ACQUISITION_120_V1_CONTRACT: Final = {
+    **REWARD_ACQUISITION_V1_CONTRACT,
+    "version": RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
+    "semantics_from": RIVAL2_REWARD_ACQUISITION_V1_VERSION,
+    "cadence_hz": 120,
+    "approach": {
+        **REWARD_ACQUISITION_V1_CONTRACT["approach"],
+        "before": "start of one-tick policy decision",
+        "after": "final pre-reset transition state after one physics tick",
+        "composition": "(distance_before - distance_after) / distance_scale per agent",
+        "four_tick_telescope": True,
+    },
+    "unchanged_coefficients": True,
+    "named_mechanics_reward": 0.0,
 }
 
 REWARD_GOAL_ONLY_CONTRACT: Final = {
@@ -818,6 +839,9 @@ ACTION_CONTRACT_V2_120HZ_HASH: Final = _canonical_hash(ACTION_CONTRACT_V2_120HZ)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
 REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
 REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_ACQUISITION_V1_CONTRACT)
+REWARD_ACQUISITION_120_V1_CONTRACT_HASH: Final = _canonical_hash(
+    REWARD_ACQUISITION_120_V1_CONTRACT
+)
 REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
 REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SCORING_V1_CONTRACT)
 REWARD_GAMEPLAY_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V1_CONTRACT)
@@ -857,20 +881,22 @@ def contract_hashes_for_reward(
         raise ValueError(f"unsupported Rival 2.0 episode version: {episode_version}")
 
     if reward_version in (
+        RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
         RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
         RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
     ):
         selected_observation = observation_version or RIVAL2_OBS_V2_120HZ_VERSION
         selected_action = action_version or RIVAL2_ACTION_V2_120HZ_VERSION
         if selected_observation != RIVAL2_OBS_V2_120HZ_VERSION:
-            raise ValueError("Gameplay 120 requires RIVAL2_OBS_V2_120HZ")
+            raise ValueError("120 Hz reward requires RIVAL2_OBS_V2_120HZ")
         if selected_action != RIVAL2_ACTION_V2_120HZ_VERSION:
-            raise ValueError("Gameplay 120 requires RIVAL2_ACTION_V2_120HZ")
-        reward_hash = (
-            REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
-            if reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION
-            else REWARD_GAMEPLAY_120_V2_CONTRACT_HASH
-        )
+            raise ValueError("120 Hz reward requires RIVAL2_ACTION_V2_120HZ")
+        if reward_version == RIVAL2_REWARD_ACQUISITION_120_V1_VERSION:
+            reward_hash = REWARD_ACQUISITION_120_V1_CONTRACT_HASH
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
+            reward_hash = REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
+        else:
+            reward_hash = REWARD_GAMEPLAY_120_V2_CONTRACT_HASH
         return {
             RIVAL2_OBS_V2_120HZ_VERSION: OBSERVATION_SCHEMA_V2_120HZ_HASH,
             RIVAL2_ACTION_V2_120HZ_VERSION: ACTION_CONTRACT_V2_120HZ_HASH,
@@ -988,6 +1014,8 @@ __all__ = [
     "OBS_DIM",
     "OBS_FIELD_NAMES",
     "ORANGE_PAD_REMAP",
+    "REWARD_ACQUISITION_120_V1_CONTRACT",
+    "REWARD_ACQUISITION_120_V1_CONTRACT_HASH",
     "REWARD_ACQUISITION_V1_CONTRACT",
     "REWARD_ACQUISITION_V1_CONTRACT_HASH",
     "REWARD_CONTRACT",
@@ -1011,6 +1039,7 @@ __all__ = [
     "RIVAL2_ACTION_V2_120HZ_VERSION",
     "RIVAL2_FULL_MATCH_EPISODE_VERSION",
     "RIVAL2_OBS_V2_120HZ_VERSION",
+    "RIVAL2_REWARD_ACQUISITION_120_V1_VERSION",
     "RIVAL2_REWARD_ACQUISITION_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION",
     "RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION",
