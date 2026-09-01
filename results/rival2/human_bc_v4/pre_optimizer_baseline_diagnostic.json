@@ -1,0 +1,114 @@
+{
+  "format": "RIVAL2_HUMAN_BC_V4_PRE_OPTIMIZER_BASELINE_DIAGNOSTIC_V1",
+  "generated_utc": "2026-09-01T14:46:51.0035445Z",
+  "subject": "byte-identical Human BC V1 teacher and student before V4 optimization",
+  "verdict": "operational_parent_baseline_assertion_mismatch",
+  "optimizer_constructed": false,
+  "optimizer_steps": 0,
+  "human_test_accesses": 0,
+  "v4_simulator_test_student_evaluations": 0,
+  "v4_simulator_test_loaded": false,
+  "complete_retention_guard": {
+    "accepted": true,
+    "contract_failed_checks": [],
+    "selection_margin_failed_checks": []
+  },
+  "stress_retention_guard": {
+    "accepted": true,
+    "contract_failed_checks": [],
+    "selection_margin_failed_checks": []
+  },
+  "human_distribution_guard": {
+    "accepted": true,
+    "failed_checks": []
+  },
+  "simulator_distribution_diagnostic": {
+    "maximum_button_probability_saturation_fraction": 0.95,
+    "only_failed_channel": "boost",
+    "failed_check_suffix": ".button.boost.not_saturated",
+    "failed_groups": [
+      "all_perspectives",
+      "current_policy_applicable",
+      "counterfactual_opponent",
+      "low_teacher_variance",
+      "orientation_sensitive"
+    ],
+    "passing_groups": [
+      "historical_opponent"
+    ],
+    "complete": {
+      "all_perspectives": {
+        "samples": 838912,
+        "boost_saturation_fraction": 0.9617134928703308,
+        "accepted": false
+      },
+      "current_policy_applicable": {
+        "samples": 501632,
+        "boost_saturation_fraction": 0.960847795009613,
+        "accepted": false
+      },
+      "counterfactual_opponent": {
+        "samples": 337280,
+        "boost_saturation_fraction": 0.9630010724067688,
+        "accepted": false
+      },
+      "historical_opponent": {
+        "samples": 41984,
+        "boost_saturation_fraction": 0.9168730974197388,
+        "accepted": true
+      },
+      "low_teacher_variance": {
+        "samples": 83728,
+        "boost_saturation_fraction": 0.9683618545532227,
+        "accepted": false
+      },
+      "orientation_sensitive": {
+        "samples": 267744,
+        "boost_saturation_fraction": 0.9833348393440247,
+        "accepted": false
+      }
+    },
+    "stress": {
+      "all_perspectives": {
+        "samples": 2097152,
+        "boost_saturation_fraction": 0.9606823921203613,
+        "accepted": false
+      },
+      "current_policy_applicable": {
+        "samples": 1255168,
+        "boost_saturation_fraction": 0.9589529037475586,
+        "accepted": false
+      },
+      "counterfactual_opponent": {
+        "samples": 841984,
+        "boost_saturation_fraction": 0.9632605910301208,
+        "accepted": false
+      },
+      "historical_opponent": {
+        "samples": 106496,
+        "boost_saturation_fraction": 0.915818452835083,
+        "accepted": true
+      },
+      "low_teacher_variance": {
+        "samples": 209475,
+        "boost_saturation_fraction": 0.9712567329406738,
+        "accepted": false
+      },
+      "orientation_sensitive": {
+        "samples": 676545,
+        "boost_saturation_fraction": 0.9808748960494995,
+        "accepted": false
+      }
+    }
+  },
+  "correction_scope": {
+    "parent_only": true,
+    "trained_candidate_simulator_distribution_guards_unchanged": true,
+    "complete_validation_guard_unchanged": true,
+    "stress_validation_guard_unchanged": true,
+    "untouched_test_guard_unchanged": true,
+    "hard_maximum_per_sample_actor_kl_unchanged": 2.0,
+    "distribution_thresholds_changed": false,
+    "reward_or_ppo_changes": false
+  }
+}

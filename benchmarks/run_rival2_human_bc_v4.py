@@ -336,6 +336,29 @@ def _simulator_distribution_guard(
     return continuation._distribution_guard(wrapped, config)
 
 
+def _parent_pretraining_baseline_guard(
+    *,
+    complete_retention: Mapping[str, Any],
+    stress_retention: Mapping[str, Any],
+    human_distribution: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Gate the unchanged BC-V1 parent before any optimizer step.
+
+    Simulator distribution-health checks are candidate acceptance checks. They are
+    still recorded for the parent, but requiring the unchanged parent to satisfy
+    them would make an inherited teacher characteristic an impossible prerequisite
+    for beginning the actor-only correction. Every trained candidate, selection,
+    and untouched-test result remains subject to those unchanged checks.
+    """
+
+    checks = {
+        "complete_retention": bool(complete_retention["accepted"]),
+        "stress_retention": bool(stress_retention["accepted"]),
+        "human_distribution": bool(human_distribution["accepted"]),
+    }
+    return {"checks": checks, "accepted": all(checks.values())}
+
+
 def _snapshot_rng() -> dict[str, Any]:
     return {
         "torch_cpu": torch.random.get_rng_state().clone(),
@@ -716,13 +739,12 @@ def _train(
         parent_complete, config
     )
     parent_stress_distribution = _simulator_distribution_guard(parent_stress, config)
-    if not (
-        parent_complete_guard["accepted"]
-        and parent_stress_guard["accepted"]
-        and parent_distribution["accepted"]
-        and parent_complete_distribution["accepted"]
-        and parent_stress_distribution["accepted"]
-    ):
+    parent_baseline_guard = _parent_pretraining_baseline_guard(
+        complete_retention=parent_complete_guard,
+        stress_retention=parent_stress_guard,
+        human_distribution=parent_distribution,
+    )
+    if not parent_baseline_guard["accepted"]:
         raise RuntimeError("BC V1 parent failed V4 complete/stress validation baseline")
 
     source_step = int(source_payload["counters"]["accepted_optimizer_steps"])
@@ -1226,6 +1248,7 @@ def _train(
             "parent_complete_guard": parent_complete_guard,
             "parent_stress_guard": parent_stress_guard,
             "parent_human_distribution_guard": parent_distribution,
+            "parent_pretraining_baseline_guard": parent_baseline_guard,
             "parent_complete_simulator_distribution_guard": parent_complete_distribution,
             "parent_stress_simulator_distribution_guard": parent_stress_distribution,
             "selected_candidate": selected_candidate,

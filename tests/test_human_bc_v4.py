@@ -7,6 +7,7 @@ import pytest
 import torch
 
 import rivalsim.human_demo.bc_v4_retention as v4
+from benchmarks.run_rival2_human_bc_v4 import _parent_pretraining_baseline_guard
 from rivalsim.human_demo.bc_v4_retention import (
     HardTailReplayState,
     V4RetentionPools,
@@ -95,6 +96,45 @@ def test_aligned_roles_follow_mid_trajectory_reassignment() -> None:
     assert roles["current_policy_applicable"].tolist() == [True, False, False, True]
     assert roles["counterfactual_opponent"].tolist() == [False, True, True, False]
     assert roles["historical_opponent"].tolist() == [False, True, True, False]
+
+
+def test_parent_baseline_does_not_require_candidate_distribution_health() -> None:
+    passing = {"accepted": True}
+
+    result = _parent_pretraining_baseline_guard(
+        complete_retention=passing,
+        stress_retention=passing,
+        human_distribution=passing,
+    )
+
+    assert result == {
+        "checks": {
+            "complete_retention": True,
+            "stress_retention": True,
+            "human_distribution": True,
+        },
+        "accepted": True,
+    }
+
+
+@pytest.mark.parametrize(
+    "failed",
+    ["complete_retention", "stress_retention", "human_distribution"],
+)
+def test_parent_baseline_still_fails_closed_on_authoritative_guards(
+    failed: str,
+) -> None:
+    values = {
+        "complete_retention": {"accepted": True},
+        "stress_retention": {"accepted": True},
+        "human_distribution": {"accepted": True},
+    }
+    values[failed] = {"accepted": False}
+
+    result = _parent_pretraining_baseline_guard(**values)
+
+    assert not result["accepted"]
+    assert not result["checks"][failed]
 
 
 @pytest.mark.parametrize("encoded", [torch.tensor([-1]), torch.tensor([512])])
