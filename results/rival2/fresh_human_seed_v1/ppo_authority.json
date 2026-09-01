@@ -1,0 +1,75 @@
+{
+  "created_utc": "2026-09-01T17:06:37.426783+00:00",
+  "format": "RIVAL2_FRESH_HUMAN_SEED_V1_PPO_AUTHORITY",
+  "opponents": {
+    "both_current_sides_trainable": true,
+    "current_probability": 1.0,
+    "historical_probability": 0.0,
+    "nexto_probability": 0.0,
+    "wisp_probability": 0.0
+  },
+  "ppo": {
+    "accepted_updates": 600,
+    "allowed_learning_rates": [
+      0.0001,
+      5e-05,
+      2.5e-05
+    ],
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "hard_completed_update_mean_kl": 0.05,
+    "hard_minibatch_kl": 0.1,
+    "initial_learning_rate": 0.0001,
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "worlds": 32768
+  },
+  "reward": {
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2"
+  },
+  "seed": 2026090104,
+  "snapshots": [
+    30,
+    60,
+    90,
+    120,
+    150,
+    180,
+    210,
+    240,
+    270,
+    300,
+    330,
+    360,
+    390,
+    420,
+    450,
+    480,
+    500,
+    510,
+    540,
+    570,
+    600
+  ],
+  "source": {
+    "format": "RIVAL2_FRESH_HUMAN_SEED_V1_STAGE1_CHECKPOINT",
+    "model_tensor_sha256": "AED96574311AD580788965047E081E5CE07DB17EEF0C12DA67F706D4A3CFD521",
+    "path": "checkpoints/rival2/fresh_human_seed_v1/rival2_fresh_human_seed_v1.pt",
+    "selected_step": 2800,
+    "sha256": "CA2DB62A709BBD7DBA9D2997D701E2E6010584F8119BDA6F5D1686AD7425F9D2",
+    "stage1_optimizer_loaded": false,
+    "used_fields": [
+      "model",
+      "policy_config"
+    ],
+    "validation_rmse": 0.09304266346161075
+  },
+  "transition": {
+    "critic_reinitialized": true,
+    "critic_seed": 2026090105,
+    "fresh_ppo_counters": true,
+    "fresh_ppo_optimizer": true,
+    "fresh_ppo_rng": true,
+    "full_model_unfrozen": true,
+    "historical_pool_empty": true
+  }
+}

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import torch
 
+from benchmarks import run_rival2_fresh_human_seed_ppo_v1 as fresh_ppo
 from benchmarks import run_rival2_fresh_human_seed_v1 as fresh
 from rivalsim.rival2_120hz_transition import tensor_tree_sha256
 
@@ -56,3 +57,14 @@ def test_stage1_checkpoint_path_is_new_lineage_only() -> None:
     )
     assert "human_bc_v5" not in Path(fresh.__file__).read_text(encoding="utf-8")
 
+
+def test_ppo_authority_binds_only_selected_fresh_seed() -> None:
+    authority = json.loads(fresh_ppo.AUTHORITY.read_text(encoding="utf-8"))
+    assert authority["source"]["format"] == fresh.CHECKPOINT_FORMAT
+    assert authority["source"]["sha256"] == fresh_ppo.sha256_file(fresh.CHECKPOINT)
+    assert authority["source"]["used_fields"] == ["model", "policy_config"]
+    assert not authority["source"]["stage1_optimizer_loaded"]
+    assert authority["transition"]["critic_reinitialized"]
+    assert authority["transition"]["fresh_ppo_optimizer"]
+    assert authority["ppo"]["accepted_updates"] == 600
+    assert set(authority["snapshots"]) == fresh_ppo.SNAPSHOTS
