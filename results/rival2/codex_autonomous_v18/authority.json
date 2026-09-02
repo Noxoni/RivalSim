@@ -1,0 +1,59 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V18_AUTHORITY",
+  "purpose": "align PPO rollout behavior closely to deterministic deployment after V17 exposed a sharp stochastic-to-deterministic boundary",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500",
+    "complete_match_record": "5-5 vs Nexto, 113-126 goals",
+    "never_overwrite": true
+  },
+  "reward": {
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "ppo": {
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "worlds": 32768,
+    "rollout_horizon": 128,
+    "fresh_optimizer": true,
+    "policy_learning_rate": 0.0000001,
+    "critic_learning_rate": 0.0000005,
+    "optimizer_steps_per_rollout_boundary": 1,
+    "policy_training_boundary": "actor analog-mean rows 0-4 only",
+    "kl_telemetry_only": true,
+    "nonfinite_guard": true
+  },
+  "exploration": {
+    "analog_sigma": 0.005,
+    "button_temperature": 0.25,
+    "rationale": "make sampled training controls closely approximate deterministic deployment controls",
+    "rollout_and_likelihood_coherent": true
+  },
+  "opponents": {
+    "current": 0.5,
+    "nexto": 0.5,
+    "historical": 0.0,
+    "wisp": 0.0
+  },
+  "human_replay": {
+    "steps_per_update": 0,
+    "validation_read_only": true,
+    "test_opened": false
+  },
+  "selection": {
+    "candidate_interval_microsteps": 1,
+    "preselection": "paired continuous 60-second Nexto matrix over all five layouts and both sides",
+    "promotion": "strict improvement on the complete five-minute ten-layout Nexto matrix",
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "source_checkpoint_never_overwritten": true
+  },
+  "campaign": {
+    "seed": "branch-specific",
+    "branch_seeds": [2026090251, 2026090253, 2026090257, 2026090259],
+    "updates_per_branch": 6,
+    "all_candidates_preserved": true
+  }
+}
