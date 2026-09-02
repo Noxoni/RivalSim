@@ -1,0 +1,89 @@
+{
+  "checkpoint": {
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39"
+  },
+  "environment_checkpoint": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39"
+  },
+  "format": "RIVAL2_NATIVE_NEXTO_IMITATION_DIAGNOSTIC",
+  "observation": "native RIVAL2_OBS_V2_120HZ immediately before action",
+  "physics_ticks": 1200,
+  "policy_mutation": false,
+  "sample_every_physics_ticks": 4,
+  "seed": 2026090219,
+  "teacher": "pinned deterministic Nexto exact consumed actions",
+  "with_native_previous_action": {
+    "button_accuracy": [
+      0.6472981770833334,
+      0.7117285156250001,
+      0.6764290364583334
+    ],
+    "button_bce": [
+      2.1726833262671565,
+      1.1784891537949302,
+      2.0579427703951767
+    ],
+    "complete_action_mae": 0.43492138249668744,
+    "complete_action_rmse": 0.6082208396686198,
+    "per_channel_mae": [
+      0.3502037245654422,
+      0.5856837314105973,
+      0.4772294713620804,
+      0.5840143559947234,
+      0.5107100140538051,
+      0.3536858912830769,
+      0.29431354863463216,
+      0.32353032266914233
+    ],
+    "per_channel_rmse": [
+      0.48801163998296077,
+      0.7418143272732193,
+      0.6179516458562675,
+      0.7105202556904836,
+      0.6542189032401853,
+      0.5634384974265163,
+      0.49508226753042167,
+      0.5419795437337871
+    ],
+    "samples": 307200
+  },
+  "with_previous_action_forced_zero": {
+    "button_accuracy": [
+      0.632900390625,
+      0.6834863281250001,
+      0.6518977864583334
+    ],
+    "button_bce": [
+      2.182381815949196,
+      1.6247698581559424,
+      2.3222543108557265
+    ],
+    "complete_action_mae": 0.46120982550564504,
+    "complete_action_rmse": 0.6356908088443441,
+    "per_channel_mae": [
+      0.4786774917708575,
+      0.6147424432768962,
+      0.4573026665692395,
+      0.6039708345048547,
+      0.49939662971122245,
+      0.3669173993437495,
+      0.32169634360039784,
+      0.34697479526794284
+    ],
+    "per_channel_rmse": [
+      0.6219974515746399,
+      0.7758976585338107,
+      0.603260156465769,
+      0.7357288991224805,
+      0.6483091302302546,
+      0.5742856677123547,
+      0.5200889921618949,
+      0.5640064571252925
+    ],
+    "samples": 307200
+  },
+  "worlds": 1024
+}

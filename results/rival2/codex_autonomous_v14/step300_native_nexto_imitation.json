@@ -1,0 +1,89 @@
+{
+  "checkpoint": {
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v14/candidate_s0300.pt",
+    "sha256": "6C21B078C73A4B4039326C4C49A6D663C8E7C6952BEE66060F1793D14955B924"
+  },
+  "environment_checkpoint": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39"
+  },
+  "format": "RIVAL2_NATIVE_NEXTO_IMITATION_DIAGNOSTIC",
+  "observation": "native RIVAL2_OBS_V2_120HZ immediately before action",
+  "physics_ticks": 1200,
+  "policy_mutation": false,
+  "sample_every_physics_ticks": 4,
+  "seed": 2026090219,
+  "teacher": "pinned deterministic Nexto exact consumed actions",
+  "with_native_previous_action": {
+    "button_accuracy": [
+      0.813232421875,
+      0.6718880208333333,
+      0.75744140625
+    ],
+    "button_bce": [
+      0.9639752979843531,
+      1.150063789531148,
+      1.2779425775357443
+    ],
+    "complete_action_mae": 0.384437294448817,
+    "complete_action_rmse": 0.5620688717940148,
+    "per_channel_mae": [
+      0.31092901057503575,
+      0.5363723861463314,
+      0.43657017205791043,
+      0.5621672564962373,
+      0.45651091526906556,
+      0.19259283431033472,
+      0.3363851779716121,
+      0.24397060276400895
+    ],
+    "per_channel_rmse": [
+      0.4779887126870051,
+      0.6839682978754457,
+      0.5833950070866388,
+      0.692051726424784,
+      0.6085813423804363,
+      0.39565519927435944,
+      0.52265320014296,
+      0.4601298840505041
+    ],
+    "samples": 307200
+  },
+  "with_previous_action_forced_zero": {
+    "button_accuracy": [
+      0.7948697916666667,
+      0.6571582031250001,
+      0.7304427083333334
+    ],
+    "button_bce": [
+      0.9871052794591657,
+      1.1785115477715231,
+      1.493615253638119
+    ],
+    "complete_action_mae": 0.40552264675244104,
+    "complete_action_rmse": 0.5843531469521581,
+    "per_channel_mae": [
+      0.39741451172726217,
+      0.562880628637588,
+      0.4281136487140742,
+      0.5812697132379444,
+      0.4473148085100398,
+      0.20994415125797455,
+      0.347607894929518,
+      0.269635817005127
+    ],
+    "per_channel_rmse": [
+      0.5596613931558632,
+      0.7195245686880952,
+      0.5777811813241395,
+      0.7173093246617821,
+      0.6054027857197005,
+      0.41904654481360326,
+      0.5224499725246566,
+      0.487218686711322
+    ],
+    "samples": 307200
+  },
+  "worlds": 1024
+}
