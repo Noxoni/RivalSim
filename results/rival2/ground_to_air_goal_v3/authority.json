@@ -1,7 +1,7 @@
 {
-  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_1_AUTHORITY",
-  "created_utc": "2026-09-02T22:15:00Z",
-  "purpose": "Extend the passing self-pop aerial continuation into repeated goalward airborne contacts and goals before natural self-play integration.",
+  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_2_AUTHORITY",
+  "created_utc": "2026-09-02T22:39:54Z",
+  "purpose": "Extend the passing self-pop aerial continuation into an efficient goalward chain that scores within six distinct contacts while preserving sustained glued control as one contact interval.",
   "bound_inputs": {
     "passing_ground_to_air_v2": {
       "path": "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt",
@@ -21,7 +21,7 @@
     },
     "goal_directed_physics": {
       "path": "rivalsim/rival2_ground_to_air_goal_v3.py",
-      "sha256": "EB8DA1B232FD21566F5BB1397913847942BB0458C3A4CAEEB190E0D16D5DD63D"
+      "sha256": "115C86CF0FCDF9E4CBB07943B3B738A7602EBA79516B183F1102EC4D941213D6"
     },
     "protected_blue_v23": {
       "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
@@ -41,13 +41,30 @@
     "self_play_not_yet_started": true,
     "reason": "V2 has enough launch/recontact competence to train intent and continuation; V3 now requires physical repeated contacts and a causal goal before self-play integration."
   },
-  "prospective_correction": {
+  "canonical_sign_correction": {
     "optimizer_steps_under_this_authority": 0,
     "rejected_predecessor_blocks": 25,
     "rejected_predecessor_promoted": false,
     "issue": "duplicate raw-team-sign multiplication on an already canonical observation-space ball Y velocity",
     "corrected_semantics": "positive observation-space Y is goalward for both team perspectives",
     "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
+  },
+  "prospective_contact_budget_correction": {
+    "optimizer_steps_under_this_authority": 0,
+    "rejected_uncapped_predecessor_blocks": 2,
+    "rejected_uncapped_predecessor_promoted": false,
+    "issue": "the predecessor paid every third-or-later separated contact and could favor useless touch accumulation instead of an efficient finish",
+    "corrected_semantics": "the low pop is contact one; at most five separated airborne recontacts are eligible; a seventh distinct chain contact terminates as failure; a goal is credited only within the six-contact budget",
+    "glued_control_semantics": "native lifecycle.self_touch_event is a unique contact onset; low-separation sustained control is measured as a contact interval and cannot farm per-tick touch reward",
+    "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
+  },
+  "human_reference": {
+    "source_path": "C:/Users/patri/Videos/Medal/Edits/MedalTVRocketLeague20260902174434464-trim-1788386200969.mp4",
+    "source_sha256": "5085071BCADC19F9CE90CB4DBE376DE739F421E350F03F7A861B0989F12D8728",
+    "duration_seconds": 20.866,
+    "review_scope": "live play plus replay of the same scoring sequence",
+    "observed_pattern": "low setup and lift followed by prolonged low-separation nose-behind-ball control into goal",
+    "authority_interpretation": "efficient 3-4 contact chains are preferred; six total distinct contacts is a hard maximum; a glued carry remains valid without repeated onset events"
   },
   "bootstrap_config": {
     "approach_steer_gain": 3.5,
@@ -134,15 +151,22 @@
     "elevated_follow_touch_event": 4.0,
     "high_follow_touch_event": 2.0,
     "second_airborne_touch_event": 5.0,
-    "third_or_later_airborne_touch_event": 8.0,
+    "third_airborne_touch_event": 4.0,
+    "fourth_airborne_touch_event": 2.0,
+    "fifth_airborne_touch_event": 1.0,
     "goalward_velocity_contact_event": 2.0,
     "forward_velocity_transfer_per_uu_per_second": 0.002,
-    "goal_after_follow_event": 25.0,
+    "sustained_control_shell_uu": 160.0,
+    "sustained_control_minimum_ticks": 12,
+    "sustained_control_interval_event": 3.0,
+    "goal_within_contact_budget_event": 25.0,
     "other_goal": -1.0,
-    "failure": -1.0
+    "failure": -1.0,
+    "over_contact_budget_failure": -5.0
   },
   "episode": {
     "horizon_ticks": 300,
+    "maximum_distinct_chain_contacts": 6,
     "pop_deadline_tick": 60,
     "ground_failure_after_tick": 110,
     "ground_failure_ball_height_uu": 105.0
@@ -158,8 +182,9 @@
     "elevated_follow_touch_fraction_min": 0.15,
     "high_follow_touch_fraction_min": 0.03,
     "second_airborne_touch_fraction_min": 0.03,
-    "third_or_later_airborne_touch_fraction_min": 0.01,
-    "goal_after_follow_fraction_min": 0.015,
+    "productive_continuation_fraction_min": 0.03,
+    "goal_within_contact_budget_fraction_min": 0.015,
+    "contact_budget_exceeded_fraction_max": 0.01,
     "unassisted_or_ground_goal_fraction_max": 0.05,
     "maximum_analog_saturation_fraction": 0.98,
     "consecutive_boundaries": 2,
@@ -171,6 +196,8 @@
     "production_reward_unchanged": true,
     "raw_airtime_reward_absent": true,
     "named_mechanic_classifier_used": false,
+    "distinct_contact_rewards_capped": true,
+    "sustained_contact_reward_farming_absent": true,
     "optimizer_steps_before_authority_commit": 0,
     "v3_test_seed_unopened_before_validation_pass": true,
     "promotion_requires_full_chain_goal_validation_and_test_pass": true

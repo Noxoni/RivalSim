@@ -98,9 +98,87 @@ def test_goal_tracker_requires_pop_and_elevated_follow_before_goal_credit(side: 
     assert bool(first["first_elevated"].item())
     assert bool(second["second"].item())
     assert bool(second["high"].item())
-    assert bool(goal["goal_after_follow"].item())
+    assert bool(goal["goal_within_contact_budget"].item())
     assert tracker.telemetry.low_pop_touches == 1
     assert tracker.telemetry.elevated_follow_touches == 1
     assert tracker.telemetry.second_airborne_touches == 1
     assert tracker.telemetry.high_follow_touches == 1
-    assert tracker.telemetry.goals_after_elevated_follow == 1
+    assert tracker.telemetry.goals_within_contact_budget == 1
+
+
+def test_goal_tracker_caps_chain_at_six_distinct_contacts() -> None:
+    tracker = GoalDirectedTracker(
+        1, attacker_side=0, horizon=100, maximum_distinct_contacts=6
+    )
+    active = torch.ones(1, dtype=torch.bool)
+    false = torch.zeros(1, dtype=torch.bool)
+    low_before = _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=400.0)
+    low_after = _observation(car_z=80.0, ball_z=190.0, touch=True, ball_vy=500.0)
+    tracker.step(
+        low_before,
+        low_after,
+        tick=0,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    event = None
+    before = _observation(car_z=250.0, ball_z=300.0, touch=False, ball_vy=500.0)
+    for index in range(6):
+        after = _observation(
+            car_z=250.0,
+            ball_z=300.0,
+            touch=True,
+            ball_vy=600.0 + 100.0 * index,
+        )
+        event = tracker.step(
+            before,
+            after,
+            tick=10 + index * 5,
+            goal_for_attacker=false,
+            any_goal=false,
+            active=active,
+        )
+        before = _observation(
+            car_z=250.0,
+            ball_z=300.0,
+            touch=False,
+            ball_vy=600.0 + 100.0 * index,
+        )
+    assert event is not None
+    assert bool(event["contact_budget_exceeded"].item())
+    assert tracker.telemetry.fifth_airborne_touches == 1
+    assert tracker.telemetry.contact_budget_exceeded == 1
+
+
+def test_continuous_touch_signal_does_not_farm_distinct_contacts() -> None:
+    tracker = GoalDirectedTracker(1, attacker_side=0, horizon=100)
+    active = torch.ones(1, dtype=torch.bool)
+    false = torch.zeros(1, dtype=torch.bool)
+    tracker.step(
+        _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=400.0),
+        _observation(car_z=80.0, ball_z=190.0, touch=True, ball_vy=500.0),
+        tick=0,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    for tick in range(10, 20):
+        tracker.step(
+            _observation(car_z=250.0, ball_z=300.0, touch=False, ball_vy=500.0),
+            _observation(
+                car_z=250.0,
+                ball_z=300.0,
+                touch=tick == 10,
+                ball_vy=550.0,
+            ),
+            tick=tick,
+            goal_for_attacker=false,
+            any_goal=false,
+            active=active,
+        )
+    # Native lifecycle telemetry emits unique onsets.  The extra four-tick
+    # debounce prevents immediately adjacent collision chatter from becoming
+    # reward spam, while the sustained interval itself has no extra onsets.
+    assert tracker.telemetry.elevated_follow_touches == 1
+    assert tracker.telemetry.second_airborne_touches == 0

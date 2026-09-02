@@ -18,7 +18,7 @@ from rivalsim.rival2_aerial_option import FIELD
 from rivalsim.rival2_contracts import BALL_LINEAR_SPEED_SCALE, POSITION_SCALE
 from rivalsim.state import StateSnapshot
 
-GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_1"
+GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_2"
 PHASE_EASY_FINISH = 0
 PHASE_ATTACKING_HALF = 1
 PHASE_NAMES = ("easy_finish", "attacking_half")
@@ -106,22 +106,45 @@ class GoalDirectedTelemetry:
     elevated_follow_touches: int = 0
     high_follow_touches: int = 0
     second_airborne_touches: int = 0
-    third_or_later_airborne_touches: int = 0
-    goals_after_elevated_follow: int = 0
+    third_airborne_touches: int = 0
+    fourth_airborne_touches: int = 0
+    fifth_airborne_touches: int = 0
+    contact_budget_exceeded: int = 0
+    goals_within_contact_budget: int = 0
+    goals_over_contact_budget: int = 0
     unassisted_or_ground_goals: int = 0
     goalward_velocity_contacts: int = 0
     goalward_velocity_transfer_sum: float = 0.0
 
 
 class GoalDirectedTracker:
-    """Track a causal pop, elevated contacts, repeated contacts, and a goal."""
+    """Track a causal pop, bounded distinct contacts, and a goal.
 
-    def __init__(self, worlds: int, *, attacker_side: int, horizon: int) -> None:
-        if worlds <= 0 or attacker_side not in (0, 1) or horizon <= 0:
+    ``lifecycle.self_touch_event`` is a unique contact onset, not a contact
+    duration signal.  A low-separation glued carry therefore remains one
+    sustained contact interval, while separated recontacts increment the
+    explicit six-contact budget.
+    """
+
+    def __init__(
+        self,
+        worlds: int,
+        *,
+        attacker_side: int,
+        horizon: int,
+        maximum_distinct_contacts: int = 6,
+    ) -> None:
+        if (
+            worlds <= 0
+            or attacker_side not in (0, 1)
+            or horizon <= 0
+            or maximum_distinct_contacts < 2
+        ):
             raise ValueError("invalid goal-directed tracker request")
         self.worlds = int(worlds)
         self.side = int(attacker_side)
         self.horizon = int(horizon)
+        self.maximum_distinct_contacts = int(maximum_distinct_contacts)
         self.initialized = False
         self.telemetry = GoalDirectedTelemetry(attempts=worlds)
 
@@ -176,7 +199,15 @@ class GoalDirectedTracker:
         previous_count = self.air_touch_count.clone()
         self.air_touch_count += elevated.to(torch.int64)
         second = elevated & (previous_count == 1)
-        third_or_later = elevated & (previous_count >= 2)
+        third = elevated & (previous_count == 2)
+        fourth = elevated & (previous_count == 3)
+        fifth = elevated & (previous_count == 4)
+        # The low pop is contact one.  With a six-contact budget, the fifth
+        # elevated recontact is the final eligible contact and any later
+        # separated onset is a failed overlong chain.
+        contact_budget_exceeded = elevated & (
+            previous_count >= self.maximum_distinct_contacts - 1
+        )
         self.elevated_seen |= elevated
         self.high_seen |= high
         self.last_air_touch_tick.copy_(
@@ -197,31 +228,67 @@ class GoalDirectedTracker:
             self._self(after, "ball.linear_velocity.y") * BALL_LINEAR_SPEED_SCALE
         )
         forward_transfer = after_forward - before_forward
-        goalward_contact = elevated & (forward_transfer >= 100.0)
-        goal_after_follow = active & goal_for_attacker & self.elevated_seen
-        other_goal = active & any_goal & ~goal_after_follow
+        within_contact_budget = (
+            1 + self.air_touch_count <= self.maximum_distinct_contacts
+        )
+        goalward_contact = (
+            elevated & within_contact_budget & (forward_transfer >= 100.0)
+        )
+        goal_within_contact_budget = (
+            active
+            & goal_for_attacker
+            & self.elevated_seen
+            & within_contact_budget
+        )
+        goal_over_contact_budget = (
+            active
+            & goal_for_attacker
+            & self.elevated_seen
+            & ~within_contact_budget
+        )
+        other_goal = (
+            active
+            & any_goal
+            & ~goal_within_contact_budget
+            & ~goal_over_contact_budget
+        )
         done = any_goal | (active & (tick >= self.horizon - 1))
 
         self.telemetry.low_pop_touches += int(low_pop.sum())
         self.telemetry.elevated_follow_touches += int(first_elevated.sum())
         self.telemetry.high_follow_touches += int(high.sum())
         self.telemetry.second_airborne_touches += int(second.sum())
-        self.telemetry.third_or_later_airborne_touches += int(third_or_later.sum())
-        self.telemetry.goals_after_elevated_follow += int(goal_after_follow.sum())
+        self.telemetry.third_airborne_touches += int(third.sum())
+        self.telemetry.fourth_airborne_touches += int(fourth.sum())
+        self.telemetry.fifth_airborne_touches += int(fifth.sum())
+        self.telemetry.contact_budget_exceeded += int(contact_budget_exceeded.sum())
+        self.telemetry.goals_within_contact_budget += int(
+            goal_within_contact_budget.sum()
+        )
+        self.telemetry.goals_over_contact_budget += int(goal_over_contact_budget.sum())
         self.telemetry.unassisted_or_ground_goals += int(other_goal.sum())
         self.telemetry.goalward_velocity_contacts += int(goalward_contact.sum())
         self.telemetry.goalward_velocity_transfer_sum += float(
-            torch.where(elevated, forward_transfer.clamp(-2_000.0, 2_000.0), 0.0).sum()
+            torch.where(
+                elevated & within_contact_budget,
+                forward_transfer.clamp(-2_000.0, 2_000.0),
+                0.0,
+            ).sum()
         )
         return {
             "low_pop": low_pop,
             "first_elevated": first_elevated,
             "high": high,
             "second": second,
-            "third_or_later": third_or_later,
+            "third": third,
+            "fourth": fourth,
+            "fifth": fifth,
+            "contact_budget_exceeded": contact_budget_exceeded,
+            "within_contact_budget": within_contact_budget,
             "goalward_contact": goalward_contact,
             "forward_transfer": forward_transfer,
-            "goal_after_follow": goal_after_follow,
+            "goal_within_contact_budget": goal_within_contact_budget,
+            "goal_over_contact_budget": goal_over_contact_budget,
             "other_goal": other_goal,
             "done": done,
         }

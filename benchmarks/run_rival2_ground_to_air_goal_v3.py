@@ -61,7 +61,7 @@ from rivalsim.rival2_policy import (  # noqa: E402
 )
 
 AUTHORITY = ROOT / "results/rival2/ground_to_air_goal_v3/authority.json"
-AUTHORITY_SHA256 = "AA747D3365B7D7D650CDE0A538376AA1C7F3AF5E054DB0BC38C539DC977F0F70"
+AUTHORITY_SHA256 = "1E7AB9C5FCC31D46AE5794B1DF3172CD13AF5E0D4BF44B12CE97DB14EDAA94FA"
 RESULTS = ROOT / "results/rival2/ground_to_air_goal_v3"
 CHECKPOINTS = ROOT / "checkpoints/rival2/ground_to_air_goal_v3"
 PARENT = ROOT / "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt"
@@ -159,11 +159,24 @@ class GoalDirectedTrainingTracker:
         self.horizon = horizon
         self.authority = authority
         self.physical = GoalDirectedTracker(
-            worlds, attacker_side=attacker_side, horizon=horizon
+            worlds,
+            attacker_side=attacker_side,
+            horizon=horizon,
+            maximum_distinct_contacts=int(
+                authority["episode"]["maximum_distinct_chain_contacts"]
+            ),
         )
         self.reward_sum = 0.0
         self.ground_failures = 0
         self.no_pop_failures = 0
+        self.over_contact_budget_failures = 0
+        self.connected_streak = torch.zeros(worlds, dtype=torch.int64)
+        self.sustained_control_seen = torch.zeros(worlds, dtype=torch.bool)
+        self.productive_continuation_seen = torch.zeros(worlds, dtype=torch.bool)
+        self.sustained_control_attempts = 0
+        self.productive_continuation_attempts = 0
+        self.sustained_control_ticks = 0
+        self.maximum_connected_control_ticks = 0
 
     def _vector(self, observation: torch.Tensor, prefix: str) -> torch.Tensor:
         return torch.stack(
@@ -230,21 +243,59 @@ class GoalDirectedTrainingTracker:
         reward += event["second"] * float(
             reward_authority["second_airborne_touch_event"]
         )
-        reward += event["third_or_later"] * float(
-            reward_authority["third_or_later_airborne_touch_event"]
-        )
+        reward += event["third"] * float(reward_authority["third_airborne_touch_event"])
+        reward += event["fourth"] * float(reward_authority["fourth_airborne_touch_event"])
+        reward += event["fifth"] * float(reward_authority["fifth_airborne_touch_event"])
         reward += event["goalward_contact"] * float(
             reward_authority["goalward_velocity_contact_event"]
         )
         reward += event["first_elevated"] * event["forward_transfer"].clamp(
             -1_000.0, 1_500.0
         ) * float(reward_authority["forward_velocity_transfer_per_uu_per_second"])
-        reward += event["goal_after_follow"] * float(
-            reward_authority["goal_after_follow_event"]
+        reward += event["goal_within_contact_budget"] * float(
+            reward_authority["goal_within_contact_budget_event"]
         )
-        reward += event["other_goal"] * float(reward_authority["other_goal"])
+        reward += (event["other_goal"] | event["goal_over_contact_budget"]) * float(
+            reward_authority["other_goal"]
+        )
 
         ball_height = after[:, self.side, FIELD["ball.position.z"]] * POSITION_SCALE[2]
+        connected = (
+            active
+            & self.physical.elevated_seen
+            & (distance_after <= float(reward_authority["sustained_control_shell_uu"]))
+            & (ball_height >= 250.0)
+        )
+        if self.connected_streak.device != before.device:
+            self.connected_streak = self.connected_streak.to(before.device)
+            self.sustained_control_seen = self.sustained_control_seen.to(before.device)
+            self.productive_continuation_seen = self.productive_continuation_seen.to(
+                before.device
+            )
+        self.connected_streak = torch.where(
+            connected, self.connected_streak + 1, torch.zeros_like(self.connected_streak)
+        )
+        sustained_control = connected & ~self.sustained_control_seen & (
+            self.connected_streak
+            >= int(reward_authority["sustained_control_minimum_ticks"])
+        )
+        self.sustained_control_seen |= sustained_control
+        productive_continuation = (
+            (event["second"] | sustained_control)
+            & ~self.productive_continuation_seen
+        )
+        self.productive_continuation_seen |= productive_continuation
+        reward += sustained_control * float(
+            reward_authority["sustained_control_interval_event"]
+        )
+        self.sustained_control_attempts += int(sustained_control.sum())
+        self.productive_continuation_attempts += int(productive_continuation.sum())
+        self.sustained_control_ticks += int(connected.sum())
+        self.maximum_connected_control_ticks = max(
+            self.maximum_connected_control_ticks,
+            int(self.connected_streak.max().item()),
+        )
+
         ground_failure = (
             active
             & self.physical.pop_seen
@@ -256,11 +307,17 @@ class GoalDirectedTrainingTracker:
             & ~self.physical.pop_seen
             & (tick >= int(self.authority["episode"]["pop_deadline_tick"]))
         )
-        failure = ground_failure | no_pop_failure
-        reward += failure * float(reward_authority["failure"])
+        over_contact_budget = active & event["contact_budget_exceeded"]
+        ordinary_failure = ground_failure | no_pop_failure
+        reward += ordinary_failure * float(reward_authority["failure"])
+        reward += over_contact_budget * float(
+            reward_authority["over_contact_budget_failure"]
+        )
+        failure = ordinary_failure | over_contact_budget
         done = event["done"] | failure
         self.ground_failures += int(ground_failure.sum())
         self.no_pop_failures += int(no_pop_failure.sum())
+        self.over_contact_budget_failures += int(over_contact_budget.sum())
         self.reward_sum += float(reward.sum())
         return reward, done
 
@@ -270,6 +327,11 @@ class GoalDirectedTrainingTracker:
             {
                 "ground_failures": self.ground_failures,
                 "no_pop_failures": self.no_pop_failures,
+                "over_contact_budget_failures": self.over_contact_budget_failures,
+                "sustained_control_attempts": self.sustained_control_attempts,
+                "productive_continuation_attempts": self.productive_continuation_attempts,
+                "sustained_control_ticks": self.sustained_control_ticks,
+                "maximum_connected_control_ticks": self.maximum_connected_control_ticks,
                 "reward_sum": self.reward_sum,
             }
         )
@@ -425,8 +487,14 @@ def collect_rollout(
             ("elevated_follow_touch", "elevated_follow_touches"),
             ("high_follow_touch", "high_follow_touches"),
             ("second_airborne_touch", "second_airborne_touches"),
-            ("third_or_later_airborne_touch", "third_or_later_airborne_touches"),
-            ("goal_after_follow", "goals_after_elevated_follow"),
+            ("third_airborne_touch", "third_airborne_touches"),
+            ("fourth_airborne_touch", "fourth_airborne_touches"),
+            ("fifth_airborne_touch", "fifth_airborne_touches"),
+            ("contact_budget_exceeded", "contact_budget_exceeded"),
+            ("goal_within_contact_budget", "goals_within_contact_budget"),
+            ("goal_over_contact_budget", "goals_over_contact_budget"),
+            ("sustained_control", "sustained_control_attempts"),
+            ("productive_continuation", "productive_continuation_attempts"),
             ("unassisted_or_ground_goal", "unassisted_or_ground_goals"),
             ("goalward_velocity_contact", "goalward_velocity_contacts"),
         )
@@ -558,14 +626,16 @@ def evaluation_score(rows: list[dict[str, Any]]) -> float:
             "elevated_follow_touch",
             "high_follow_touch",
             "second_airborne_touch",
-            "third_or_later_airborne_touch",
-            "goal_after_follow",
+            "third_airborne_touch",
+            "sustained_control",
+            "goal_within_contact_budget",
             "goalward_velocity_contact",
         )
     }
     return float(
-        20.0 * minimum["goal_after_follow"]
-        + 8.0 * minimum["third_or_later_airborne_touch"]
+        20.0 * minimum["goal_within_contact_budget"]
+        + 5.0 * minimum["sustained_control"]
+        + 4.0 * minimum["third_airborne_touch"]
         + 5.0 * minimum["second_airborne_touch"]
         + 3.0 * minimum["high_follow_touch"]
         + minimum["elevated_follow_touch"]
@@ -586,11 +656,17 @@ def passes_gate(rows: list[dict[str, Any]], authority: dict[str, Any]) -> bool:
             return False
         if fractions["second_airborne_touch"] < float(gate["second_airborne_touch_fraction_min"]):
             return False
-        if fractions["third_or_later_airborne_touch"] < float(
-            gate["third_or_later_airborne_touch_fraction_min"]
+        if fractions["productive_continuation"] < float(
+            gate["productive_continuation_fraction_min"]
         ):
             return False
-        if fractions["goal_after_follow"] < float(gate["goal_after_follow_fraction_min"]):
+        if fractions["goal_within_contact_budget"] < float(
+            gate["goal_within_contact_budget_fraction_min"]
+        ):
+            return False
+        if fractions["contact_budget_exceeded"] > float(
+            gate["contact_budget_exceeded_fraction_max"]
+        ):
             return False
         if fractions["unassisted_or_ground_goal"] > float(
             gate["unassisted_or_ground_goal_fraction_max"]
