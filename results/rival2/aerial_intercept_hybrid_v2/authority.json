@@ -1,0 +1,117 @@
+{
+  "format": "RIVAL2_AERIAL_INTERCEPT_HYBRID_V2_AUTHORITY",
+  "created_utc": "2026-09-02T19:15:00Z",
+  "parent_commit": "0746d7aac61cd13c90acfe35aabc0ebd6177ba4b",
+  "purpose": "Correct V1's late low-contact activations by requiring sufficient launch time and a genuinely high predicted ballistic intercept point, while preserving the exact aerial definition and immutable V23 gameplay fallback.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "immutable": true,
+    "inactive_semantics": "byte-identical V23 physical-side policy action"
+  },
+  "controller": {
+    "path": "rivalsim/rival2_aerial_intercept_hybrid.py",
+    "sha256": "C354B18D67DA05FF65DEDF45B009DC74F04A43C0A48C5B1E4711AD8187AC5562",
+    "teacher": {
+      "path": "rivalsim/rival2_aerial_intercept_teacher.py",
+      "sha256": "A1DFB98D33B6E2D25889583316FD7605B7366FA7E1B4E1F70F47DF3FEE3D603A",
+      "observation_only": true,
+      "simulator_internal_state": false,
+      "game_state_mutation": false
+    },
+    "calibration": {
+      "path": "results/rival2/aerial_intercept_teacher/calibration.json",
+      "sha256": "3CE0F55AD6966B2EB0A0DE049BE32D84EC179FEF226AB12AA0C9146CA4B50672"
+    }
+  },
+  "gate": {
+    "minimum_ball_height_uu": 350.0,
+    "maximum_ball_height_uu": 1200.0,
+    "minimum_relative_distance_uu": 300.0,
+    "maximum_relative_distance_uu": 2500.0,
+    "minimum_forward_alignment": 0.25,
+    "minimum_boost_fraction": 0.15,
+    "minimum_intercept_time_seconds": 0.65,
+    "minimum_predicted_ball_height_uu": 450.0,
+    "maximum_reach_residual_uu": 450.0,
+    "release_ball_height_uu": 190.0,
+    "release_grounded_after_tick": 40,
+    "maximum_option_ticks": 300,
+    "cooldown_ticks": 90,
+    "membership": "authoritative RIVAL2_OBS_V2_120HZ fields plus the frozen observation-only teacher plan",
+    "activation_learning": false,
+    "threshold_tuning_after_evaluation": false
+  },
+  "option_action": {
+    "ticks_0_through_28": "frozen fast-aerial initiation primitive",
+    "tick_29_onward": "frozen ballistic intercept teacher action from the current observation each 120 Hz tick",
+    "input_injection": false,
+    "physics_hz": 120,
+    "policy_hz": 120
+  },
+  "diagnostic_predecessor": {
+    "dagger_v1_result": {
+      "path": "results/rival2/aerial_intercept_dagger_v1/result.json",
+      "sha256": "B79B0AC8D07ECBAF2C48B94DD1B02F94D2F8751A25CA0A70F7163814A8358B7D"
+    },
+    "hybrid_v1_result": {
+      "path": "results/rival2/aerial_intercept_hybrid_v1/result.json",
+      "sha256": "96E786152BB58EEC4B622FFA44410EEB141F11D0C504FABF1AB183311A4DB087"
+    },
+    "hybrid_v1_natural_evaluation": {
+      "path": "results/rival2/aerial_intercept_hybrid_v1/natural_evaluation.json",
+      "sha256": "514B86F7AD5CB7120C50671369886CBAFDFB3513B9BA32E58ADA9FDD6C4009EA"
+    },
+    "measured_failure": "16 activations produced 14 option-controlled touches but zero high contacts; Nexto regressed from 8-2 to 4-6.",
+    "prospective_correction": "Require the predicted intercept to remain at least 450 uu high, at least 0.65 seconds of intercept time, and positive nose-route alignment before taking control."
+  },
+  "validation": {
+    "seed": 2026090282,
+    "matrix": "five standard kickoff layouts x both Rival physical sides against pinned Nexto",
+    "action_mode": "deterministic",
+    "regulation_minutes": 5,
+    "maximum_overtime_minutes": 5,
+    "baseline": {
+      "path": "results/rival2/codex_autonomous_v23/physical_behavior_telemetry.json",
+      "sha256": "A8FD635470827E350404852AD14A729525F0FE2E1AAC7EAA7E12EE114FE6818B",
+      "wins": 8,
+      "losses": 2,
+      "rival_goals": 159,
+      "nexto_goals": 111,
+      "touches": 687,
+      "touches_per_minute": 13.74,
+      "high_aerial_contacts": 0,
+      "high_aerial_goals": 0
+    },
+    "promotion_gate": {
+      "minimum_wins": 6,
+      "maximum_losses": 4,
+      "minimum_goal_differential": 0,
+      "minimum_touch_fraction_of_v23": 0.8,
+      "minimum_touch_rate_fraction_of_v23": 0.8,
+      "minimum_high_aerial_contacts": 5,
+      "minimum_high_aerial_goals": 1,
+      "maximum_additional_no_touch_worlds": 0,
+      "finite_actions_and_observations": true,
+      "both_physical_sides_must_activate": true
+    },
+    "single_frozen_evaluation": true,
+    "no_reselection_after_results": true
+  },
+  "integrity": {
+    "optimizer_steps_before_authority": 0,
+    "optimizer_steps_allowed": 0,
+    "ppo_steps_allowed": 0,
+    "production_reward_changes": 0,
+    "policy_parameter_mutation": false,
+    "named_mechanic_detector_or_reward": false,
+    "human_test_opened": false,
+    "fallback_on_failure": "V23 remains promoted; preserve V2 as diagnostic evidence"
+  }
+}
