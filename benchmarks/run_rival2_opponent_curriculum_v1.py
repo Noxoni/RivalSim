@@ -158,6 +158,11 @@ def parse_args() -> argparse.Namespace:
         "--evaluation-single-mode", choices=("deterministic", "stochastic")
     )
     parser.add_argument(
+        "--evaluation-worlds-per-side",
+        type=int,
+        help="override the default number of parallel episodes per Rival side",
+    )
+    parser.add_argument(
         "--finalize-existing-rejection",
         action="store_true",
         help="audit and finalize an already-published KL rejection without simulation",
@@ -1977,6 +1982,11 @@ def main() -> int:
         }
         if any(value is None for value in required.values()):
             raise ValueError(f"single evaluation arguments are incomplete: {required}")
+        if (
+            args.evaluation_worlds_per_side is not None
+            and args.evaluation_worlds_per_side <= 0
+        ):
+            raise ValueError("evaluation worlds per side must be positive")
         mode = str(args.evaluation_single_mode)
         result = run_evaluation(
             opponent_name=str(args.evaluation_single_opponent),
@@ -1987,7 +1997,11 @@ def main() -> int:
             collision_dir=args.collision_dir,
             device=args.device,
             work_dir=args.work_dir,
-            worlds_per_side=5 if mode == "deterministic" else 128,
+            worlds_per_side=(
+                int(args.evaluation_worlds_per_side)
+                if args.evaluation_worlds_per_side is not None
+                else 5 if mode == "deterministic" else 128
+            ),
             seed=(
                 DETERMINISTIC_EVALUATION_SEED
                 if mode == "deterministic"

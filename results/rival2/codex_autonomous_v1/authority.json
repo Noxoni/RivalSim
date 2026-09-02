@@ -1,0 +1,77 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V1_AUTHORITY",
+  "source": {
+    "path": "checkpoints/rival2/human_bc_ppo_v1/rival2_human_bc_ppo_10h.pt",
+    "sha256": "C75F08F91E2FF29D78C15A67B5DE85BDF0B0A548E0268FFDB0CF29C272750067",
+    "closed_loop_baseline": {
+      "episodes": 256,
+      "goals_for": 52,
+      "goals_against": 204,
+      "rival_touches": 1160,
+      "first_touches": 256,
+      "no_touch_episodes": 0
+    }
+  },
+  "reward": {
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "ppo": {
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "worlds": 32768,
+    "rollout_horizon": 128,
+    "fresh_optimizer": true,
+    "policy_learning_rate": 0.000002,
+    "critic_learning_rate": 0.00001,
+    "kl_telemetry_only": true,
+    "nonfinite_guard": true
+  },
+  "exploration": {
+    "analog_sigma": 0.1,
+    "button_temperature": 1.5,
+    "fixed_until_first_closed_loop_review": true,
+    "rollout_and_likelihood_coherent": true
+  },
+  "opponents": {
+    "current": 0.5,
+    "nexto": 0.5,
+    "historical": 0.0,
+    "wisp": 0.0,
+    "current_current_both_sides_trainable": true,
+    "nexto_frozen_and_inference_only": true
+  },
+  "human_replay": {
+    "source": "frozen reviewed Human BC V1 training split",
+    "steps_per_update": 8,
+    "gameplay_frames_per_step": 1024,
+    "mechanic_frames_per_step": 512,
+    "mechanic_uniform_label_fraction": 0.1,
+    "mechanic_maximum_oversampling_ratio": 4.0,
+    "objective": "V1 Smooth-L1 analog plus button BCE plus parent log-std retention",
+    "critic_gradient": false,
+    "validation_read_only": true,
+    "test_opened": false
+  },
+  "selection": {
+    "evaluation_interval_updates": 5,
+    "deterministic_nexto_episodes": 256,
+    "primary": "goal differential",
+    "tie_breakers": [
+      "goals_for",
+      "rival_touches",
+      "first_touches"
+    ],
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "no_touch_episodes_required": 0,
+    "nexto_win_rate_target": 0.55,
+    "stop_after_consecutive_material_regressions": 3
+  },
+  "campaign": {
+    "accepted_update_ceiling": 300,
+    "checkpoint_every_update": true,
+    "best_checkpoint_preserved": true,
+    "resume_supported": true
+  }
+}

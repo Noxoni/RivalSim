@@ -27,8 +27,10 @@ from rivalsim.rival2_contracts import (
     POSITION_SCALE,
 )
 from rivalsim.rival2_policy import (
+    HybridDistributionOverride,
     Rival2ActorCritic,
     Rival2PolicyConfig,
+    hybrid_distribution_parameters,
     hybrid_entropy,
     hybrid_log_probability,
 )
@@ -488,11 +490,18 @@ def _analytic_channel_kl(
     old_actor: torch.Tensor,
     new_actor: torch.Tensor,
     policy_config: Rival2PolicyConfig,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> torch.Tensor:
-    old_mean = old_actor[..., :5]
-    new_mean = new_actor[..., :5]
-    old_log_std = old_actor[..., 5:10].clamp(policy_config.log_std_min, policy_config.log_std_max)
-    new_log_std = new_actor[..., 5:10].clamp(policy_config.log_std_min, policy_config.log_std_max)
+    old_mean, old_log_std, old_logits = hybrid_distribution_parameters(
+        old_actor,
+        policy_config,
+        distribution_override=distribution_override,
+    )
+    new_mean, new_log_std, new_logits = hybrid_distribution_parameters(
+        new_actor,
+        policy_config,
+        distribution_override=distribution_override,
+    )
     old_variance = torch.exp(2.0 * old_log_std)
     new_variance = torch.exp(2.0 * new_log_std)
     analog = (
@@ -501,8 +510,8 @@ def _analytic_channel_kl(
         + (old_variance + (old_mean - new_mean).square()) / (2.0 * new_variance)
         - 0.5
     )
-    old_probability = torch.sigmoid(old_actor[..., 10:13]).clamp(1.0e-7, 1.0 - 1.0e-7)
-    new_probability = torch.sigmoid(new_actor[..., 10:13]).clamp(1.0e-7, 1.0 - 1.0e-7)
+    old_probability = torch.sigmoid(old_logits).clamp(1.0e-7, 1.0 - 1.0e-7)
+    new_probability = torch.sigmoid(new_logits).clamp(1.0e-7, 1.0 - 1.0e-7)
     buttons = old_probability * (torch.log(old_probability) - torch.log(new_probability))
     buttons += (1.0 - old_probability) * (
         torch.log1p(-old_probability) - torch.log1p(-new_probability)
@@ -596,6 +605,7 @@ def _final_mixed_diagnostics(
     family_names: tuple[str, ...],
     policy_config: Rival2PolicyConfig,
     chunk_size: int,
+    distribution_override: HybridDistributionOverride | None = None,
 ) -> dict[str, Any]:
     device = observation.device
     channel_sum = torch.zeros(8, dtype=torch.float64, device=device)
@@ -605,13 +615,19 @@ def _final_mixed_diagnostics(
         stop = min(start + chunk_size, observation.shape[0])
         new_actor, _ = model(observation[start:stop])
         old_actor, _ = behavior_model(observation[start:stop])
-        channel = _analytic_channel_kl(old_actor, new_actor, policy_config)
+        channel = _analytic_channel_kl(
+            old_actor,
+            new_actor,
+            policy_config,
+            distribution_override,
+        )
         channel_sum += channel.sum(dim=0, dtype=torch.float64)
         new_log_probability = hybrid_log_probability(
             new_actor,
             action[start:stop],
             config=policy_config,
             pre_tanh=pre_tanh[start:stop],
+            distribution_override=distribution_override,
         )
         log_ratio = new_log_probability - old_log_probability[start:stop]
         sample_kl = (torch.exp(log_ratio) - 1.0) - log_ratio
@@ -963,6 +979,7 @@ def ppo_update_mixed_curriculum(
     generator: torch.Generator,
     policy_config: Rival2PolicyConfig | None = None,
     kl_guard: Rival2KLGuardConfig,
+    distribution_override: HybridDistributionOverride | None = None,
     gae_ready: bool = False,
     diagnostic_optimizer_step_limit: int | None = None,
 ) -> tuple[dict[str, torch.Tensor], dict[str, Any]]:
@@ -1065,6 +1082,7 @@ def ppo_update_mixed_curriculum(
                     batch_action,
                     config=policy_config,
                     pre_tanh=batch_pre_tanh,
+                    distribution_override=distribution_override,
                 )
                 log_ratio = new_log_probability - batch_old_log_probability
                 ratio = torch.exp(log_ratio)
@@ -1075,7 +1093,11 @@ def ppo_update_mixed_curriculum(
                 )
                 policy_loss = -torch.minimum(unclipped, clipped).mean()
                 value_loss = 0.5 * (value - batch_returns).square().mean()
-                entropy = hybrid_entropy(actor_output, policy_config).mean()
+                entropy = hybrid_entropy(
+                    actor_output,
+                    policy_config,
+                    distribution_override=distribution_override,
+                ).mean()
                 actor_objective = policy_loss - ppo_config.entropy_coefficient * entropy
                 weighted_value_loss = ppo_config.value_loss_coefficient * value_loss
                 total_loss = actor_objective + weighted_value_loss
@@ -1165,15 +1187,22 @@ def ppo_update_mixed_curriculum(
                         batch_action,
                         config=policy_config,
                         pre_tanh=batch_pre_tanh,
+                        distribution_override=distribution_override,
                     )
                     post_log_ratio = post_log_probability - batch_old_log_probability
                     post_step_kl = ((torch.exp(post_log_ratio) - 1.0) - post_log_ratio).mean()
                     batch_channel_kl = _analytic_channel_kl(
-                        behavior_actor, post_actor, policy_config
+                        behavior_actor,
+                        post_actor,
+                        policy_config,
+                        distribution_override,
                     )
                     retention_actor, _ = model(retention_observations)
                     retention_channel = _analytic_channel_kl(
-                        retention_reference, retention_actor, policy_config
+                        retention_reference,
+                        retention_actor,
+                        policy_config,
+                        distribution_override,
                     )
                     retention_channel_mean = retention_channel.mean(dim=0)
                     retention_mean_kl = retention_channel.sum(dim=-1).mean()
@@ -1355,6 +1384,7 @@ def ppo_update_mixed_curriculum(
         old_log_probability,
         policy_config,
         ppo_config.minibatch_size,
+        distribution_override,
     )
     result.update(completed)
     result["approx_kl"] = completed["completed_update_mean_kl"]
@@ -1375,7 +1405,10 @@ def ppo_update_mixed_curriculum(
     with torch.no_grad():
         final_retention_actor, _ = model(retention_observations)
         final_retention_channel = _analytic_channel_kl(
-            retention_reference, final_retention_actor, policy_config
+            retention_reference,
+            final_retention_actor,
+            policy_config,
+            distribution_override,
         )
         final_retention_channel_mean = final_retention_channel.mean(dim=0)
         final_retention_mean = final_retention_channel.sum(dim=-1).mean()
@@ -1390,6 +1423,7 @@ def ppo_update_mixed_curriculum(
         family_names,
         policy_config,
         ppo_config.minibatch_size,
+        distribution_override,
     )
     for name, value in mixed_final["family_empirical_kl"].items():
         family_statistics[name]["empirical_kl"] = value

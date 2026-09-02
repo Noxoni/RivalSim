@@ -1,0 +1,49 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V1_FOUNDATION_SCREENING",
+  "evaluation": {
+    "opponent": "Nexto",
+    "mode": "deterministic",
+    "native_checkpoint_policy_cadence": true,
+    "episode_contract": "RIVAL2_EPISODE_V1"
+  },
+  "candidates": [
+    {
+      "checkpoint": "checkpoints/rival2/human_bc_v5/rival2_human_bc_v5.pt",
+      "sha256": "F9100E543F48B1AD9E447179DFC2022774F039AD8D47F9FBF07359B7E1D12FE8",
+      "episodes": 10,
+      "goals_for": 1,
+      "goals_against": 8,
+      "draws": 1,
+      "rival_touches": 24,
+      "human_gameplay_validation_rmse": 0.5251850485801697,
+      "human_mechanic_validation_rmse": 0.4997873902320862
+    },
+    {
+      "checkpoint": "checkpoints/rival2/gameplay_v3_continuation/rival2_gameplay_v3_iteration_580_restored_resume.pt",
+      "sha256": "F3CBD88FE611FC7D8C69FDD6E7D1203336167BC96A92E0E0111F9C8B64916FC6",
+      "episodes": 10,
+      "goals_for": 0,
+      "goals_against": 10,
+      "draws": 0,
+      "rival_touches": 26,
+      "human_gameplay_validation_rmse": 0.6183570027351379,
+      "human_mechanic_validation_rmse": 0.6220418810844421
+    },
+    {
+      "checkpoint": "checkpoints/rival2/human_bc_ppo_v1/rival2_human_bc_ppo_10h.pt",
+      "sha256": "C75F08F91E2FF29D78C15A67B5DE85BDF0B0A548E0268FFDB0CF29C272750067",
+      "episodes": 256,
+      "goals_for": 52,
+      "goals_against": 204,
+      "draws": 0,
+      "rival_touches": 1160,
+      "nexto_touches": 1465,
+      "first_touches": 256,
+      "no_touch_episodes": 0,
+      "human_gameplay_validation_rmse": 0.5711650848388672,
+      "human_mechanic_validation_rmse": 0.5709697008132935,
+      "selected": true
+    }
+  ],
+  "selection_reason": "The Human-BC PPO checkpoint is the only screened human-derived policy with statistically demonstrated closed-loop competence; it retains bounded human imitation while materially outperforming lower-RMSE BC-only checkpoints in actual play."
+}

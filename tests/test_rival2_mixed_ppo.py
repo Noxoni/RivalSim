@@ -7,12 +7,17 @@ import torch
 
 from rivalsim.rival2_mixed_ppo import (
     Rival2MixedPPOSafetyConfig,
+    _analytic_channel_kl,
     migrate_adam_to_mixed_groups,
     mixed_optimizer_learning_rates,
     reset_policy_learning_rate_for_new_update,
     set_policy_learning_rate,
 )
-from rivalsim.rival2_policy import Rival2ActorCritic, Rival2PolicyConfig
+from rivalsim.rival2_policy import (
+    HybridDistributionOverride,
+    Rival2ActorCritic,
+    Rival2PolicyConfig,
+)
 
 
 def _exact(left: Any, right: Any) -> bool:
@@ -97,3 +102,22 @@ def test_update_local_policy_lr_reset_preserves_model_and_adam_state() -> None:
         "policy": 1.0e-4,
         "critic": 3.0e-4,
     }
+
+
+def test_mixed_kl_uses_the_effective_exploration_distribution() -> None:
+    config = Rival2PolicyConfig(hidden_dim=16, hidden_layers=2)
+    old = torch.zeros((4, 13))
+    new = old.clone()
+    new[:, 5:10] = 5.0
+    new[:, 10:13] = 2.0
+    override = HybridDistributionOverride(
+        analog_log_std=-2.0,
+        button_temperature=2.0,
+    )
+
+    channel_kl = _analytic_channel_kl(old, new, config, override)
+
+    assert torch.equal(channel_kl[:, :5], torch.zeros_like(channel_kl[:, :5]))
+    assert bool((channel_kl[:, 5:] > 0.0).all())
+    raw_channel_kl = _analytic_channel_kl(old, new, config)
+    assert bool((channel_kl[:, 5:] < raw_channel_kl[:, 5:]).all())

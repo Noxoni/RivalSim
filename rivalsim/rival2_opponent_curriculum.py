@@ -792,6 +792,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 generator=self.policy_generator,
                 policy_config=self.policy_config,
                 kl_guard=kl_guard,
+                distribution_override=self.exploration_override,
             )
         except Rival2PolicyDisplacementRejected as error:
             self.model.load_state_dict(rollback["model"])
