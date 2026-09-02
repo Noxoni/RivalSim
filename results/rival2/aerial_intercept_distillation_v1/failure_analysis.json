@@ -1,0 +1,89 @@
+{
+  "format": "RIVAL2_AERIAL_INTERCEPT_DISTILLATION_V1_FAILURE_ANALYSIS",
+  "verdict": "REJECTED_NO_PROMOTION",
+  "stop_reason": "validation_plateau",
+  "accepted_supervised_optimizer_steps_per_side": 480,
+  "selected_diagnostic_boundary": 40,
+  "open_loop_teacher_action_rmse": {
+    "blue_baseline": 0.6893945932388306,
+    "blue_best_physical_boundary": 0.21311655640602112,
+    "blue_terminal": 0.17934364080429077,
+    "orange_baseline": 0.7234333157539368,
+    "orange_best_physical_boundary": 0.21225818991661072,
+    "orange_terminal": 0.1793925017118454
+  },
+  "best_physical_boundary": [
+    {
+      "pack": "center_pop",
+      "side": 0,
+      "high_touch_fraction": 0.1484375,
+      "goalward_first_touch_fraction": 0.1435546875,
+      "goal_fraction": 0.04541015625
+    },
+    {
+      "pack": "center_pop",
+      "side": 1,
+      "high_touch_fraction": 0.13916015625,
+      "goalward_first_touch_fraction": 0.13623046875,
+      "goal_fraction": 0.0390625
+    },
+    {
+      "pack": "lateral_pop",
+      "side": 0,
+      "high_touch_fraction": 0.40869140625,
+      "goalward_first_touch_fraction": 0.3505859375,
+      "goal_fraction": 0.02294921875
+    },
+    {
+      "pack": "lateral_pop",
+      "side": 1,
+      "high_touch_fraction": 0.412109375,
+      "goalward_first_touch_fraction": 0.359375,
+      "goal_fraction": 0.03076171875
+    },
+    {
+      "pack": "airborne_possession",
+      "side": 0,
+      "high_touch_fraction": 0.25048828125,
+      "goalward_first_touch_fraction": 0.2109375,
+      "goal_fraction": 0.015625
+    },
+    {
+      "pack": "airborne_possession",
+      "side": 1,
+      "high_touch_fraction": 0.2578125,
+      "goalward_first_touch_fraction": 0.21826171875,
+      "goal_fraction": 0.01904296875
+    }
+  ],
+  "human_validation_guard": {
+    "maximum": 0.3,
+    "blue_best_physical_boundary": 0.23746031522750854,
+    "orange_best_physical_boundary": 0.23721589893102646,
+    "passed": true
+  },
+  "attribution": {
+    "teacher_observation_information_sufficient": true,
+    "source_exact_teacher_physical_gate_available": true,
+    "offline_supervised_imitation_improved": true,
+    "closed_loop_gate_passed": false,
+    "dominant_failure": "Small per-tick action errors compound after the learned option leaves source-exact successful teacher trajectories; lower offline RMSE after block 40 did not yield better physical interception.",
+    "not_attributed_to": [
+      "missing ball trajectory fields",
+      "insufficient launch intent",
+      "reward coefficient",
+      "named mechanic detector",
+      "critic drift"
+    ]
+  },
+  "next_prospective_correction": {
+    "name": "observation-only on-policy teacher relabeling",
+    "method": "Roll out the learned option in the same bounded packs, label only policy-visited pre-contact states with the frozen observation-only intercept teacher, deliberately include miss trajectories as corrective states, and retain the source-exact successful corpus.",
+    "reason": "This directly trains recovery from the learned policy's own state distribution while keeping the controller, contracts, physics, production reward, and physical acceptance gates unchanged.",
+    "requires_new_authority_before_optimizer_step": true
+  },
+  "protected_competitive_v23_unchanged": true,
+  "production_reward_unchanged": true,
+  "ppo_updates": 0,
+  "promoted": false
+}
