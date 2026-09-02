@@ -18,7 +18,7 @@ from rivalsim.rival2_aerial_option import FIELD
 from rivalsim.rival2_contracts import BALL_LINEAR_SPEED_SCALE, POSITION_SCALE
 from rivalsim.state import StateSnapshot
 
-GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_3"
+GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_4"
 PHASE_EASY_FINISH = 0
 PHASE_ATTACKING_HALF = 1
 PHASE_NAMES = ("easy_finish", "attacking_half")
@@ -116,6 +116,7 @@ class GoalDirectedTelemetry:
     goalward_velocity_contacts: int = 0
     goalward_velocity_transfer_sum: float = 0.0
     goalward_ball_speed_at_contact_sum: float = 0.0
+    horizon_timeouts: int = 0
 
 
 class GoalDirectedTracker:
@@ -257,7 +258,8 @@ class GoalDirectedTracker:
             & ~goal_within_contact_budget
             & ~goal_over_contact_budget
         )
-        done = any_goal | (active & (tick >= self.horizon - 1))
+        horizon_timeout = active & ~any_goal & (tick >= self.horizon - 1)
+        done = any_goal | horizon_timeout
 
         self.telemetry.low_pop_touches += int(low_pop.sum())
         self.telemetry.elevated_follow_touches += int(first_elevated.sum())
@@ -287,6 +289,7 @@ class GoalDirectedTracker:
                 0.0,
             ).sum()
         )
+        self.telemetry.horizon_timeouts += int(horizon_timeout.sum())
         return {
             "low_pop": low_pop,
             "first_elevated": first_elevated,
@@ -304,6 +307,7 @@ class GoalDirectedTracker:
             "goal_within_contact_budget": goal_within_contact_budget,
             "goal_over_contact_budget": goal_over_contact_budget,
             "other_goal": other_goal,
+            "horizon_timeout": horizon_timeout,
             "done": done,
         }
 

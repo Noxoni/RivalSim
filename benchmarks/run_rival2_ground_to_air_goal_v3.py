@@ -67,7 +67,7 @@ from rivalsim.rival2_policy import (  # noqa: E402
 )
 
 AUTHORITY = ROOT / "results/rival2/ground_to_air_goal_v3/authority.json"
-AUTHORITY_SHA256 = "8EBB34DB3360C95358E78B11BD5CACCD70727B541ED953BFA68633F58DBE8E67"
+AUTHORITY_SHA256 = "E0E5786EDAF1107FD6A24A4345417F6BFDB3A0D8E49176D8728B71F2A40A66B8"
 RESULTS = ROOT / "results/rival2/ground_to_air_goal_v3"
 CHECKPOINTS = ROOT / "checkpoints/rival2/ground_to_air_goal_v3"
 PARENT = ROOT / "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt"

@@ -1,6 +1,6 @@
 {
-  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_3_AUTHORITY",
-  "created_utc": "2026-09-02T23:22:57Z",
+  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_4_AUTHORITY",
+  "created_utc": "2026-09-02T23:53:08Z",
   "purpose": "Extend the passing self-pop aerial continuation into an efficient goalward chain that preserves forward momentum, aims through the goal volume, and scores within six distinct contacts.",
   "bound_inputs": {
     "passing_ground_to_air_v2": {
@@ -21,7 +21,7 @@
     },
     "goal_directed_physics": {
       "path": "rivalsim/rival2_ground_to_air_goal_v3.py",
-      "sha256": "7771CE9C37A0E1ECC7715804072E3FA761B27DC56B6BA40A3E204CD2CA9878D0"
+      "sha256": "14F8A73D58684C728DF5C7B1E1C8A7E96D21270AC7732A92C3FACADF2CB256C1"
     },
     "protected_blue_v23": {
       "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
@@ -80,6 +80,18 @@
     "corrected_semantics": "every eligible airborne contact is charged for velocity loss and credited for useful post-contact goalward speed; repeated-contact and sustained-control event credit requires useful goalward speed; dense progress targets the physical goal center",
     "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
   },
+  "prospective_horizon_correction": {
+    "optimizer_steps_under_this_authority": 0,
+    "rejected_correction_3_external_checkpoint_sha256": "F64082BDD028D143959048DF2E925D3F94E27756C350F9D488CFF35A163B1C64",
+    "rejected_correction_3_last_saved_block": 36,
+    "fixed_validation_goal_counts": [[3, 1024], [1, 1024]],
+    "fixed_validation_ground_failure_counts": [550, 550],
+    "fixed_validation_inferred_non_goal_horizon_counts": [471, 473],
+    "reference_clip_live_sequence_duration_interpretation": "approximately five seconds from low setup/lift to goal",
+    "issue": "the prior 300-tick horizon allowed only 2.5 seconds and timed out nearly half the attempts despite centered deep trajectories",
+    "corrected_semantics": "the hard efficiency boundary remains six distinct contacts; the physical time horizon is five seconds and every horizon timeout is reported explicitly",
+    "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
+  },
   "bootstrap_config": {
     "approach_steer_gain": 3.5,
     "boost_during_pop": false,
@@ -93,7 +105,7 @@
     "jump_release_ticks": 8,
     "launch_delay_ticks": 0,
     "maximum_ball_height_uu": 190.0,
-    "maximum_option_ticks": 420,
+    "maximum_option_ticks": 720,
     "maximum_planar_distance_uu": 100.0,
     "minimum_ball_height_uu": 80.0,
     "minimum_boost_fraction": 0.25,
@@ -110,7 +122,7 @@
     "trunk_learning_rate": 0.000015,
     "weight_decay": 0.00001,
     "maximum_gradient_norm": 0.5,
-    "discount_gamma": 0.997,
+    "discount_gamma": 0.99875,
     "ppo_clip": 0.2,
     "epochs": 2,
     "minibatch_size": 65536,
@@ -183,7 +195,7 @@
     "over_contact_budget_failure": -5.0
   },
   "episode": {
-    "horizon_ticks": 300,
+    "horizon_ticks": 600,
     "maximum_distinct_chain_contacts": 6,
     "pop_deadline_tick": 60,
     "ground_failure_after_tick": 110,

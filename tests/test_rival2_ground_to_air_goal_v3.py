@@ -219,3 +219,20 @@ def test_productive_contact_depends_on_post_contact_goalward_speed() -> None:
     )
     assert not bool(slow["goalward_contact"].item())
     assert bool(fast["goalward_contact"].item())
+
+
+def test_horizon_timeout_is_reported_without_a_goal() -> None:
+    tracker = GoalDirectedTracker(1, attacker_side=0, horizon=2)
+    active = torch.ones(1, dtype=torch.bool)
+    false = torch.zeros(1, dtype=torch.bool)
+    event = tracker.step(
+        _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=300.0),
+        _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=300.0),
+        tick=1,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    assert bool(event["horizon_timeout"].item())
+    assert bool(event["done"].item())
+    assert tracker.telemetry.horizon_timeouts == 1
