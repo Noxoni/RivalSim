@@ -10,6 +10,7 @@ explicitly labelled as physics proxies rather than mechanic adjudications.
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 import json
 import sys
 from pathlib import Path
@@ -33,6 +34,11 @@ from rivalsim.full_match import (  # noqa: E402
     FullMatchRunner,
     NEXTO_CADENCE_TICKS,
     REGULATION_TICKS,
+)
+from rivalsim.rival2_policy import (  # noqa: E402
+    Rival2ActorCritic,
+    Rival2PolicyConfig,
+    deterministic_hybrid_action,
 )
 
 BLUE = ROOT / "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt"
@@ -263,6 +269,43 @@ class PhysicalTelemetryRunner(_PhysicalTelemetryMixin, SideSpecializedFullMatchR
 
 class UniformPhysicalTelemetryRunner(_PhysicalTelemetryMixin, FullMatchRunner):
     """One-checkpoint runner for prospective capability candidates."""
+
+
+class DualCheckpointPhysicalTelemetryRunner(_PhysicalTelemetryMixin, FullMatchRunner):
+    """One immutable checkpoint for each physical team side."""
+
+    orange_checkpoint: Path
+    orange_sha256: str
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        path = Path(self.orange_checkpoint).resolve()
+        observed = sha256_file(path)
+        if observed != self.orange_sha256:
+            raise RuntimeError(
+                f"Orange checkpoint SHA-256 mismatch: {observed} != {self.orange_sha256}"
+            )
+        payload = torch.load(path, map_location="cpu", weights_only=False)
+        config = Rival2PolicyConfig(**payload["policy_config"])
+        if asdict(config) != self.checkpoint_identity["policy_config"]:
+            raise RuntimeError("dual-checkpoint policy architecture mismatch")
+        if payload.get("contract_hashes") != self.checkpoint_identity["contract_hashes"]:
+            raise RuntimeError("dual-checkpoint contract mismatch")
+        if int(payload.get("policy_hz", 0)) != self.rival_policy_hz:
+            raise RuntimeError("dual-checkpoint policy cadence mismatch")
+        self.orange_policy = Rival2ActorCritic(config).to(self.device)
+        self.orange_policy.load_state_dict(payload["model"], strict=True)
+        self.orange_policy.eval()
+
+    def _update_rival_action(self) -> None:
+        observation = self.rival_observation[self.batch_index, self.rival_side]
+        with torch.inference_mode():
+            blue_actor, _ = self.rival_policy(observation)
+            orange_actor, _ = self.orange_policy(observation)
+            actor = torch.where(
+                (self.rival_side == 1).unsqueeze(1), orange_actor, blue_actor
+            )
+            self.rival_action.copy_(deterministic_hybrid_action(actor))
 
 
 def _distribution(values: np.ndarray) -> dict[str, Any]:
@@ -614,15 +657,44 @@ def run(args: argparse.Namespace) -> int:
             raise RuntimeError(
                 f"candidate checkpoint SHA-256 mismatch: {observed} != {expected}"
             )
-        runner_type = UniformPhysicalTelemetryRunner
+        orange_checkpoint = (
+            Path(args.orange_checkpoint).resolve() if args.orange_checkpoint else None
+        )
+        if orange_checkpoint is None:
+            runner_type = UniformPhysicalTelemetryRunner
+        else:
+            orange_expected = str(args.orange_checkpoint_sha256 or "").upper()
+            if not orange_expected:
+                raise RuntimeError(
+                    "--orange-checkpoint-sha256 is required with --orange-checkpoint"
+                )
+            orange_observed = sha256_file(orange_checkpoint)
+            if orange_observed != orange_expected:
+                raise RuntimeError(
+                    "Orange candidate checkpoint SHA-256 mismatch: "
+                    f"{orange_observed} != {orange_expected}"
+                )
+            DualCheckpointPhysicalTelemetryRunner.orange_checkpoint = orange_checkpoint
+            DualCheckpointPhysicalTelemetryRunner.orange_sha256 = orange_observed
+            runner_type = DualCheckpointPhysicalTelemetryRunner
         runner_checkpoint = checkpoint
         try:
             relative = checkpoint.relative_to(ROOT).as_posix()
         except ValueError:
             relative = checkpoint.as_posix()
-        checkpoint_report = {
-            "uniform": {"path": relative, "sha256": observed}
-        }
+        checkpoint_report = {"uniform": {"path": relative, "sha256": observed}}
+        if orange_checkpoint is not None:
+            try:
+                orange_relative = orange_checkpoint.relative_to(ROOT).as_posix()
+            except ValueError:
+                orange_relative = orange_checkpoint.as_posix()
+            checkpoint_report = {
+                "blue": {"path": relative, "sha256": observed},
+                "orange": {
+                    "path": orange_relative,
+                    "sha256": sha256_file(orange_checkpoint),
+                },
+            }
         report_format = "RIVAL2_PHYSICAL_CAPABILITY_TELEMETRY_V1"
     layout = np.repeat(np.arange(5, dtype=np.int32), 2)
     rival_side = np.tile(np.asarray([0, 1], dtype=np.int32), 5)
@@ -727,6 +799,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--checkpoint-sha256")
+    parser.add_argument("--orange-checkpoint", type=Path)
+    parser.add_argument("--orange-checkpoint-sha256")
     return parser.parse_args()
 
 

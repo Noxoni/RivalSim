@@ -1,0 +1,35 @@
+{
+  "format": "RIVAL2_CAPABILITY_CURRICULUM_V1_FAILURE_ATTRIBUTION",
+  "diagnostic_only": true,
+  "human_rehearsal_checkpoint": {
+    "path": "G:/dev/RivalSim-runs/capability-curriculum-v1/human_rehearsal_selected.pt",
+    "sha256": "863276B9A60011D0B1397C95A1006CCF78EEBA0EB273B3DB4F8E8E9FB4456540"
+  },
+  "human_rehearsal_natural_evaluation": {
+    "record": "0-10",
+    "goals": "1-236",
+    "rival_as_blue_touches": 183,
+    "rival_as_blue_goals": 0,
+    "rival_as_orange_touches": 194,
+    "rival_as_orange_goals": 1,
+    "high_aerial_contacts": 2,
+    "productive_floor_landing_proxy": 0,
+    "productive_wall_landing_proxy": 3,
+    "demolitions": 1
+  },
+  "attribution": [
+    "The aggressive trunk-plus-actor human rehearsal had already destroyed closed-loop gameplay before scenario PPO.",
+    "Scenario PPO partially recovered scoring and demolitions but did not recover competitive play or physical capability gates.",
+    "The next curriculum must avoid a full human-rehearsal warm start, train the two V23 physical-side parents independently, and enforce natural-play preservation throughout optimization."
+  ],
+  "v2_required_changes": {
+    "shared_trunk_during_human_auxiliary": "frozen",
+    "human_auxiliary_role": "bounded actor-only auxiliary, not a stage replacement",
+    "side_specialization": "preserved and trained independently",
+    "natural_state_teacher_retention": "required every optimizer block",
+    "natural_nexto_screen": "required at every selection boundary",
+    "high_aerial_gate": "ground-origin high contact and goal evidence required",
+    "dash_gate": "actual flip-to-surface landing gain required by surface normal",
+    "promotion": "full ten-match matrix plus physical telemetry"
+  }
+}
