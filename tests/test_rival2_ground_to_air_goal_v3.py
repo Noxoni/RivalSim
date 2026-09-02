@@ -26,7 +26,7 @@ def test_goal_directed_scenarios_are_low_ball_possession_starts(
     assert np.all((state.ball_pos[:, 2] >= 142.0) & (state.ball_pos[:, 2] <= 168.0))
     assert np.all(state.on_ground[:, side] == 1)
     assert np.all(state.boost[:, side] == 100.0)
-    assert np.all(sign * state.ball_pos[:, 1] > 2_300.0)
+    assert np.all(sign * state.ball_pos[:, 1] > 2_100.0)
     assert np.all(
         sign * (state.ball_pos[:, 1] - state.car_pos[:, side, 1]) >= 12.0
     )

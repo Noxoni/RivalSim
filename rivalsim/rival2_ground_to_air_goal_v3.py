@@ -48,13 +48,13 @@ def build_goal_directed_pop_scenarios(
     sign = 1.0 if attacker_side == 0 else -1.0
     other = 1 - attacker_side
     if phase == PHASE_EASY_FINISH:
-        ball_y = (3_450.0, 4_000.0)
-        ball_speed = (350.0, 750.0)
-        ball_x = (-700.0, 700.0)
+        ball_y = (3_300.0, 3_900.0)
+        ball_speed = (150.0, 400.0)
+        ball_x = (-800.0, 800.0)
     else:
-        ball_y = (2_350.0, 3_600.0)
-        ball_speed = (500.0, 1_000.0)
-        ball_x = (-1_050.0, 1_050.0)
+        ball_y = (2_200.0, 3_200.0)
+        ball_speed = (250.0, 650.0)
+        ball_x = (-1_000.0, 1_000.0)
 
     state = StateSnapshot.empty(worlds)
     state.car_pos[..., 2] = 17.0

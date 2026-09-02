@@ -61,7 +61,7 @@ from rivalsim.rival2_policy import (  # noqa: E402
 )
 
 AUTHORITY = ROOT / "results/rival2/ground_to_air_goal_v3/authority.json"
-AUTHORITY_SHA256 = "46B9FD82DC6551F6601C2DDCD607D04110F87E55B869BD4BFC447F44E1E1D7B9"
+AUTHORITY_SHA256 = "D54ACCAE8C90E97D9F0AFB213774969E45F21651B562FBFD163E9AD3688D1762"
 RESULTS = ROOT / "results/rival2/ground_to_air_goal_v3"
 CHECKPOINTS = ROOT / "checkpoints/rival2/ground_to_air_goal_v3"
 PARENT = ROOT / "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt"
@@ -591,6 +591,10 @@ def passes_gate(rows: list[dict[str, Any]], authority: dict[str, Any]) -> bool:
         ):
             return False
         if fractions["goal_after_follow"] < float(gate["goal_after_follow_fraction_min"]):
+            return False
+        if fractions["unassisted_or_ground_goal"] > float(
+            gate["unassisted_or_ground_goal_fraction_max"]
+        ):
             return False
         if not row["finite"] or max(row["analog_saturation_fraction"]) >= float(
             gate["maximum_analog_saturation_fraction"]
