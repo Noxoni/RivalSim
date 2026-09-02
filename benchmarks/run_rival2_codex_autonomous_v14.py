@@ -60,6 +60,7 @@ GAMEPLAY_RMSE_CEILING = 0.60
 MECHANIC_RMSE_CEILING = 0.62
 CAMPAIGN_IDENTITY = "RIVAL2_CODEX_AUTONOMOUS_V14_NATIVE_TEACHER_BRIDGE"
 AUTHORITY_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V14_AUTHORITY"
+PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V14_PREFLIGHT"
 PREVIOUS_ACTION_SLICE = slice(167, 175)
 
 
@@ -203,7 +204,7 @@ def _preflight(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]
     if int(args.worlds) != WORLDS:
         raise RuntimeError(f"V14 requires exactly {WORLDS} worlds")
     preflight = {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V14_PREFLIGHT",
+        "format": PREFLIGHT_FORMAT,
         "verdict": "PASS",
         "authority_sha256": base.sha256_file(AUTHORITY),
         "source_sha256": SOURCE_SHA256,
