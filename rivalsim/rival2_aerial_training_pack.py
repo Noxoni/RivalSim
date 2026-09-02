@@ -54,7 +54,7 @@ def build_training_pack_scenarios(
             # have a non-zero physical interception basin, while still
             # requiring an airborne correction and a high touch.
             car_x = float(rng.uniform(-450.0, 450.0))
-            car_y = float(rng.uniform(700.0, 2000.0))
+            car_y = float(rng.uniform(2800.0, 3600.0))
             forward_offset = float(rng.uniform(300.0, 600.0))
             lateral_offset = float(rng.uniform(-80.0, 80.0))
             ball_z = float(rng.uniform(280.0, 450.0))
@@ -63,7 +63,7 @@ def build_training_pack_scenarios(
             ball_vz = float(rng.uniform(80.0, 200.0))
         elif pack == PACK_LATERAL_POP:
             car_x = float(rng.uniform(-1300.0, 1300.0))
-            car_y = float(rng.uniform(650.0, 2100.0))
+            car_y = float(rng.uniform(2500.0, 3300.0))
             forward_offset = float(rng.uniform(400.0, 800.0))
             lateral_offset = float(rng.uniform(120.0, 280.0))
             if bool(rng.integers(0, 2)):
@@ -74,7 +74,7 @@ def build_training_pack_scenarios(
             ball_vz = float(rng.uniform(80.0, 250.0))
         else:
             car_x = float(rng.uniform(-1500.0, 1500.0))
-            car_y = float(rng.uniform(750.0, 2300.0))
+            car_y = float(rng.uniform(2300.0, 3100.0))
             forward_offset = float(rng.uniform(500.0, 1000.0))
             lateral_offset = float(rng.uniform(220.0, 420.0))
             if bool(rng.integers(0, 2)):

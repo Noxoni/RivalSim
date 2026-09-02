@@ -41,6 +41,8 @@ from rivalsim.rival2_policy import (  # noqa: E402
 
 AUTHORITY = ROOT / "results/rival2/aerial_training_pack_v1/authority.json"
 AUTHORITY_SHA256 = "C7CD065A5AB5FCC26CBB6C62F65DD99BDD07F812BDB5492CFFDE657578A6ED72"
+CORRECTION = ROOT / "results/rival2/aerial_training_pack_v1/calibration_correction.json"
+CORRECTION_SHA256 = "B2FC1EB0CB8B0429E1BD4D72C5A6F8C275678167796A7011B4EFA93866F92283"
 RESULTS = ROOT / "results/rival2/aerial_training_pack_v1"
 BLUE = ROOT / "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_blue.pt"
 ORANGE = ROOT / "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_orange.pt"
@@ -52,6 +54,15 @@ TARGET_LABELS = ("aerialdribble", "groundtoairdribble")
 def load_authority() -> dict[str, Any]:
     if v1.v1.sha256_file(AUTHORITY) != AUTHORITY_SHA256:
         raise RuntimeError("aerial training-pack authority changed")
+    if v1.v1.sha256_file(CORRECTION) != CORRECTION_SHA256:
+        raise RuntimeError("aerial training-pack calibration correction changed")
+    correction = json.loads(CORRECTION.read_text(encoding="utf-8"))
+    if (
+        correction["optimizer_steps_after_correction_before_commit"] != 0
+        or correction["verdict"]
+        != "AUTHORIZED_TO_RESTART_FROM_ORIGINAL_V2_OPTION"
+    ):
+        raise RuntimeError("aerial training-pack correction is not authorized")
     authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
     for identity in (
         authority["protected_competitive_base"]["blue"],
@@ -307,6 +318,10 @@ def save_checkpoint(
             "path": AUTHORITY.relative_to(ROOT).as_posix(),
             "sha256": AUTHORITY_SHA256,
         },
+        "calibration_correction": {
+            "path": CORRECTION.relative_to(ROOT).as_posix(),
+            "sha256": CORRECTION_SHA256,
+        },
         "deployment_side": side,
         "pack": PACK_NAMES[pack],
         "accepted_pack_block": block,
@@ -409,6 +424,10 @@ def run(args: argparse.Namespace) -> int:
     training_signal_verified = bool(
         all(row["fractions"]["launch"] == 1.0 for row in physical_rows)
         and all(row["fractions"]["high_touch"] > 0.0 for row in physical_rows)
+        and all(
+            row["fractions"]["goal"] > 0.0
+            for row in baseline_physical[PACK_NAMES[0]]
+        )
         and all(row["finite_observation"] for row in physical_rows)
         and all(
             row["mean_complete_action_rmse"]
@@ -612,6 +631,7 @@ def run(args: argparse.Namespace) -> int:
         "format": "RIVAL2_AERIAL_TRAINING_PACK_V1_RESULT",
         "created_utc": v1.utc_now(),
         "authority_sha256": AUTHORITY_SHA256,
+        "calibration_correction_sha256": CORRECTION_SHA256,
         "baseline_human": baseline_human,
         "baseline_physical": baseline_physical,
         "completed_packs": completed,

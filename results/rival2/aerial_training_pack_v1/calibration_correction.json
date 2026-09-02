@@ -1,0 +1,69 @@
+{
+  "format": "RIVAL2_AERIAL_TRAINING_PACK_V1_CALIBRATION_CORRECTION",
+  "created_utc": "2026-09-02T16:11:52.1204872Z",
+  "parent_authority": {
+    "path": "results/rival2/aerial_training_pack_v1/authority.json",
+    "sha256": "C7CD065A5AB5FCC26CBB6C62F65DD99BDD07F812BDB5492CFFDE657578A6ED72"
+  },
+  "reason": "The initial reachable geometry produced nonzero high contacts but zero deterministic goals at boundaries 10 and 20, so it supplied no successful completion examples for the frozen goal objective.",
+  "rejected_run": {
+    "continued": false,
+    "last_completed_block": 25,
+    "deterministic_boundaries": [
+      10,
+      20
+    ],
+    "boundary_20": {
+      "blue_high_touch_fraction": 0.18359375,
+      "orange_high_touch_fraction": 0.142578125,
+      "blue_goal_fraction": 0.0,
+      "orange_goal_fraction": 0.0
+    },
+    "curve": {
+      "path": "results/rival2/aerial_training_pack_v1/rejected_initial_geometry_training_curve.jsonl",
+      "sha256": "6806A812643A4C990D31DCFA21335EBB73F1A03F531CDD9D8AA0E3C30D948829"
+    },
+    "rolling_checkpoint_evidence_only": {
+      "blue_sha256": "1A90EAF9518BA3421084761660790322DDB0AE7B21B203AFB6E1101FFA700F16",
+      "orange_sha256": "D9E0D6DCB25709D9427C1534405FF63E653943EB6F84159BB0F67D7E3CDC4208"
+    }
+  },
+  "correction": {
+    "restart_from_original_v2_option": true,
+    "load_rejected_rolling_checkpoint": false,
+    "reward_changed": false,
+    "gates_changed": false,
+    "timeouts_changed": false,
+    "launch_primitive_changed": false,
+    "change": "Move post-pop shot origins into the attacking third so a qualified high touch can physically score before timeout.",
+    "normalized_attacker_car_y_ranges_uu": {
+      "center_pop": [
+        2800.0,
+        3600.0
+      ],
+      "lateral_pop": [
+        2500.0,
+        3300.0
+      ],
+      "airborne_possession": [
+        2300.0,
+        3100.0
+      ]
+    }
+  },
+  "corrected_preflight": {
+    "path": "results/rival2/aerial_training_pack_v1/preflight.json",
+    "sha256": "2FC0B12D13DCFF1366C9B4789E478B7685C07BB93EC07AB8848C7EBC66144F07",
+    "verdict": "PASS",
+    "training_signal_verified": true,
+    "center_pop": {
+      "blue_high_touch_fraction": 0.1796875,
+      "orange_high_touch_fraction": 0.13037109375,
+      "blue_qualified_goal_fraction": 0.04345703125,
+      "orange_qualified_goal_fraction": 0.0244140625
+    },
+    "unqualified_low_touch_goals_remain_failures": true
+  },
+  "optimizer_steps_after_correction_before_commit": 0,
+  "verdict": "AUTHORIZED_TO_RESTART_FROM_ORIGINAL_V2_OPTION"
+}
