@@ -767,7 +767,86 @@ def run(args: argparse.Namespace) -> int:
     started = time.monotonic()
     hard_failure: dict[str, Any] | None = None
 
-    while trainer.phase == "phase_a_acquisition":
+    evaluated_phase_a_updates = {
+        int(item["checkpoint"]["phase_accepted_updates"])
+        for item in prior_phase_a_evaluations
+    }
+    pending_resume_evaluation = (
+        resume_path is not None
+        and trainer.phase == "phase_a_acquisition"
+        and trainer.phase_accepted_updates >= PHASE_A_EVALUATION_START
+        and trainer.phase_accepted_updates % PHASE_A_EVALUATION_INTERVAL == 0
+        and trainer.phase_accepted_updates not in evaluated_phase_a_updates
+    )
+    if pending_resume_evaluation:
+        record, evaluation = run_evaluation(
+            trainer,
+            run_dir,
+            f"phase_a_u{trainer.phase_accepted_updates:04d}",
+            Path(args.collision_root),
+        )
+        manifest["phase_a_evaluations"].append(
+            {
+                "checkpoint": record,
+                "result_path": str(
+                    (
+                        RESULTS
+                        / f"nexto_phase_a_u{trainer.phase_accepted_updates:04d}.json"
+                    )
+                    .relative_to(ROOT)
+                    .as_posix()
+                ),
+                "gameplay": evaluation["gameplay"],
+            }
+        )
+        write_json(manifest_path, manifest)
+        if evaluation["phase_a_transition_evidence"]["routine_acquisition"]:
+            phase_a_path = CHECKPOINTS / "rival2_human_sequence_phase_a.pt"
+            phase_a_final = checkpoint_record(
+                trainer, phase_a_path, include_optimizer=True
+            )
+            write_json(
+                RESULTS / "phase_a_summary.json",
+                {
+                    "format": f"{FORMAT}_PHASE_A_SUMMARY",
+                    "created_utc": utc_now(),
+                    "checkpoint": phase_a_final,
+                    "nexto": evaluation,
+                    "transition_to_phase_b": True,
+                },
+            )
+            prior = trainer
+            trainer = transition_to_phase_b(
+                prior, Path(args.collision_root), worlds=args.worlds
+            )
+            write_json(RESULTS / "phase_transition.json", trainer.phase_transition)
+            del prior
+            gc.collect()
+            torch.cuda.empty_cache()
+            checkpoint_record(trainer, rolling, include_optimizer=True)
+        else:
+            score = evaluation_score(evaluation)
+            phase_a_nonimproving = (
+                0 if score > phase_a_previous_score else phase_a_nonimproving + 1
+            )
+            phase_a_previous_score = score
+            if phase_a_nonimproving >= PHASE_A_NONIMPROVING_PATIENCE:
+                hard_failure = {
+                    "format": f"{FORMAT}_PHASE_A_BLOCKED",
+                    "created_utc": utc_now(),
+                    "reason": "ball_acquisition_not_routine_and_no_longer_improving",
+                    "phase_a_updates": trainer.phase_accepted_updates,
+                    "nexto": evaluation["gameplay"],
+                    "kl_caused_stop": False,
+                }
+                write_json(RESULTS / "phase_a_blocked.json", hard_failure)
+                checkpoint_record(
+                    trainer,
+                    CHECKPOINTS / "rival2_human_sequence_phase_a_blocked.pt",
+                    include_optimizer=True,
+                )
+
+    while hard_failure is None and trainer.phase == "phase_a_acquisition":
         exploration = fresh_human_seed_exploration(
             trainer.accepted_updates_total + 1
         )
