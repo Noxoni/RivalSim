@@ -1,0 +1,75 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V5_AUTHORITY",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v4/rival2_codex_autonomous_best.pt",
+    "sha256": "172BA59786A2E08EB6DC95CFE29F20C21826F7CB9429FF3C89F4D7C4F4BD9E10",
+    "closed_loop_baseline": {
+      "episodes": 256,
+      "goals_for": 103,
+      "goals_against": 153,
+      "draws": 0,
+      "rival_touches": 1285,
+      "first_touches": 256,
+      "no_touch_episodes": 0
+    }
+  },
+  "reward": {
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "ppo": {
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "worlds": 32768,
+    "rollout_horizon": 128,
+    "fresh_optimizer": true,
+    "policy_learning_rate": 0.000002,
+    "critic_learning_rate": 0.00001,
+    "optimizer_steps_per_rollout_boundary": 1,
+    "policy_training_boundary": "actor analog-mean rows 0-4 only",
+    "frozen_policy_state": "shared trunk plus actor log-std and button rows 5-12",
+    "kl_telemetry_only": true,
+    "nonfinite_guard": true
+  },
+  "exploration": {
+    "analog_sigma": 0.05,
+    "button_temperature": 1.15,
+    "rollout_and_likelihood_coherent": true
+  },
+  "opponents": {
+    "current": 0.2,
+    "nexto": 0.8,
+    "historical": 0.0,
+    "wisp": 0.0,
+    "current_current_both_sides_trainable": true,
+    "nexto_frozen_and_inference_only": true
+  },
+  "human_replay": {
+    "steps_per_update": 0,
+    "validation_read_only": true,
+    "test_opened": false
+  },
+  "selection": {
+    "pilot_evaluation_interval_microsteps": 1,
+    "deterministic_nexto_episodes": 256,
+    "primary": "goal differential",
+    "tie_breakers": [
+      "goals_for",
+      "rival_touches",
+      "first_touches"
+    ],
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "no_touch_episodes_required": 0,
+    "nexto_win_rate_target": 0.55,
+    "stop_after_consecutive_material_regressions": 3
+  },
+  "campaign": {
+    "seed": 2026090205,
+    "pilot_microsteps": 5,
+    "accepted_microstep_ceiling": 300,
+    "checkpoint_every_microstep": true,
+    "best_checkpoint_preserved": true,
+    "resume_supported": true
+  }
+}

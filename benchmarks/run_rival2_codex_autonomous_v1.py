@@ -102,6 +102,8 @@ RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_RESULT"
 STATE_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_STATE"
 OPTIMIZER_STEP_LIMIT: int | None = None
 POLICY_TRAINING_BOUNDARY = "full"
+CURRENT_OPPONENT_PROBABILITY = 0.5
+NEXTO_OPPONENT_PROBABILITY = 0.5
 
 
 def utc_now() -> str:
@@ -166,8 +168,10 @@ def load_authority() -> dict[str, Any]:
             if POLICY_TRAINING_BOUNDARY == "analog_actor_only"
             else None
         ),
-        "current_probability": authority.get("opponents", {}).get("current") == 0.5,
-        "nexto_probability": authority.get("opponents", {}).get("nexto") == 0.5,
+        "current_probability": authority.get("opponents", {}).get("current")
+        == CURRENT_OPPONENT_PROBABILITY,
+        "nexto_probability": authority.get("opponents", {}).get("nexto")
+        == NEXTO_OPPONENT_PROBABILITY,
         "wisp_probability": authority.get("opponents", {}).get("wisp") == 0.0,
         "human_replay_steps": authority.get("human_replay", {}).get("steps_per_update")
         == HUMAN_REPLAY_STEPS,
@@ -210,9 +214,9 @@ def build_trainer(
             historical_pool_bound=1,
         ),
         opponent_curriculum=Rival2OpponentCurriculumConfig(
-            nexto_probability=0.5,
+            nexto_probability=NEXTO_OPPONENT_PROBABILITY,
             wisp_probability=0.0,
-            current_probability=0.5,
+            current_probability=CURRENT_OPPONENT_PROBABILITY,
             historical_probability=0.0,
             seed=SEED ^ 0xC0DE,
         ),
