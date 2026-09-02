@@ -28,6 +28,8 @@ HYBRID_VERSION = "RIVAL2_AERIAL_INTERCEPT_HYBRID_V1"
 
 @dataclass(frozen=True, slots=True)
 class AerialInterceptGateConfig:
+    allow_ground_launch: bool = True
+    allow_airborne_intercept: bool = False
     minimum_ball_height_uu: float = 300.0
     maximum_ball_height_uu: float = 1_200.0
     minimum_relative_distance_uu: float = 300.0
@@ -37,6 +39,17 @@ class AerialInterceptGateConfig:
     minimum_intercept_time_seconds: float = 0.30
     minimum_predicted_ball_height_uu: float = 300.0
     maximum_reach_residual_uu: float = 450.0
+    airborne_minimum_car_height_uu: float = 80.0
+    airborne_maximum_car_height_uu: float = 1_200.0
+    airborne_minimum_ball_height_uu: float = 300.0
+    airborne_maximum_ball_height_uu: float = 1_400.0
+    airborne_minimum_relative_distance_uu: float = 150.0
+    airborne_maximum_relative_distance_uu: float = 2_000.0
+    airborne_minimum_forward_alignment: float = -0.25
+    airborne_minimum_boost_fraction: float = 0.05
+    airborne_minimum_intercept_time_seconds: float = 0.12
+    airborne_minimum_predicted_ball_height_uu: float = 300.0
+    airborne_maximum_reach_residual_uu: float = 450.0
     release_ball_height_uu: float = 190.0
     release_grounded_after_tick: int = 40
     maximum_option_ticks: int = 300
@@ -57,6 +70,25 @@ class AerialInterceptGateConfig:
             raise ValueError("minimum predicted ball height must be positive")
         if self.maximum_reach_residual_uu <= 0.0:
             raise ValueError("maximum reach residual must be positive")
+        if self.airborne_minimum_car_height_uu >= self.airborne_maximum_car_height_uu:
+            raise ValueError("airborne car-height gate is empty")
+        if self.airborne_minimum_ball_height_uu >= self.airborne_maximum_ball_height_uu:
+            raise ValueError("airborne ball-height gate is empty")
+        if (
+            self.airborne_minimum_relative_distance_uu
+            >= self.airborne_maximum_relative_distance_uu
+        ):
+            raise ValueError("airborne distance gate is empty")
+        if not -1.0 <= self.airborne_minimum_forward_alignment <= 1.0:
+            raise ValueError("airborne forward alignment must be in [-1,1]")
+        if not 0.0 <= self.airborne_minimum_boost_fraction <= 1.0:
+            raise ValueError("airborne minimum boost fraction must be in [0,1]")
+        if self.airborne_minimum_intercept_time_seconds <= 0.0:
+            raise ValueError("airborne minimum intercept time must be positive")
+        if self.airborne_minimum_predicted_ball_height_uu <= 0.0:
+            raise ValueError("airborne predicted ball height must be positive")
+        if self.airborne_maximum_reach_residual_uu <= 0.0:
+            raise ValueError("airborne maximum reach residual must be positive")
         if self.release_grounded_after_tick < 29:
             raise ValueError("grounded release cannot precede the launch primitive")
         if self.maximum_option_ticks <= self.release_grounded_after_tick:
@@ -68,7 +100,10 @@ class AerialInterceptGateConfig:
 @dataclass(frozen=True, slots=True)
 class AerialInterceptEligibility:
     eligible: torch.Tensor
+    ground_eligible: torch.Tensor
+    airborne_eligible: torch.Tensor
     ball_height_uu: torch.Tensor
+    car_height_uu: torch.Tensor
     relative_distance_uu: torch.Tensor
     forward_alignment: torch.Tensor
     predicted_ball_height_uu: torch.Tensor
@@ -80,6 +115,8 @@ class AerialInterceptEligibility:
 class AerialInterceptStep:
     action: torch.Tensor
     activated: torch.Tensor
+    ground_activated: torch.Tensor
+    airborne_activated: torch.Tensor
     active: torch.Tensor
     released_touch: torch.Tensor
     released_grounded: torch.Tensor
@@ -129,8 +166,10 @@ def aerial_intercept_eligibility(
     )
     reachable = 0.5 * BOOST_ACCELERATION * plan.intercept_time.square()
     reach_residual = (plan.predicted_distance - reachable).abs()
-    eligible = (
-        (observation[:, FIELD["self.on_ground"]] >= 0.5)
+    finite = torch.isfinite(observation).all(dim=1)
+    ground_eligible = (
+        config.allow_ground_launch
+        & (observation[:, FIELD["self.on_ground"]] >= 0.5)
         & (observation[:, FIELD["self.is_demoed"]] < 0.5)
         & (observation[:, FIELD["self.boost"]] >= config.minimum_boost_fraction)
         & (ball_height >= config.minimum_ball_height_uu)
@@ -141,11 +180,39 @@ def aerial_intercept_eligibility(
         & (plan.intercept_time >= config.minimum_intercept_time_seconds)
         & (predicted_ball_height >= config.minimum_predicted_ball_height_uu)
         & (reach_residual <= config.maximum_reach_residual_uu)
-        & torch.isfinite(observation).all(dim=1)
+        & finite
     )
+    car_height = observation[:, FIELD["self.position.z"]] * POSITION_SCALE[2]
+    airborne_eligible = (
+        config.allow_airborne_intercept
+        & (observation[:, FIELD["self.on_ground"]] < 0.5)
+        & (observation[:, FIELD["self.is_demoed"]] < 0.5)
+        & (
+            observation[:, FIELD["self.boost"]]
+            >= config.airborne_minimum_boost_fraction
+        )
+        & (car_height >= config.airborne_minimum_car_height_uu)
+        & (car_height <= config.airborne_maximum_car_height_uu)
+        & (ball_height >= config.airborne_minimum_ball_height_uu)
+        & (ball_height <= config.airborne_maximum_ball_height_uu)
+        & (relative_distance >= config.airborne_minimum_relative_distance_uu)
+        & (relative_distance <= config.airborne_maximum_relative_distance_uu)
+        & (forward_alignment >= config.airborne_minimum_forward_alignment)
+        & (plan.intercept_time >= config.airborne_minimum_intercept_time_seconds)
+        & (
+            predicted_ball_height
+            >= config.airborne_minimum_predicted_ball_height_uu
+        )
+        & (reach_residual <= config.airborne_maximum_reach_residual_uu)
+        & finite
+    )
+    eligible = ground_eligible | airborne_eligible
     return AerialInterceptEligibility(
         eligible=eligible,
+        ground_eligible=ground_eligible,
+        airborne_eligible=airborne_eligible,
         ball_height_uu=ball_height,
+        car_height_uu=car_height,
         relative_distance_uu=relative_distance,
         forward_alignment=forward_alignment,
         predicted_ball_height_uu=predicted_ball_height,
@@ -177,6 +244,8 @@ class AerialInterceptHybridController:
             name: torch.zeros((), dtype=torch.int64, device=self.device)
             for name in (
                 "activations",
+                "ground_activations",
+                "airborne_activations",
                 "active_ticks",
                 "primitive_ticks",
                 "teacher_ticks",
@@ -254,9 +323,14 @@ class AerialInterceptHybridController:
             & ~match_done
             & eligibility.eligible
         )
+        ground_activated = activated & eligibility.ground_eligible
+        airborne_activated = activated & eligibility.airborne_eligible
         self.active |= activated
-        self.age.masked_fill_(activated, 0)
-        self.ever_airborne.masked_fill_(activated, False)
+        self.age.masked_fill_(ground_activated, 0)
+        # Starting at 29 bypasses the ground-only fast-aerial primitive.
+        self.age.masked_fill_(airborne_activated, 29)
+        self.ever_airborne.masked_fill_(ground_activated, False)
+        self.ever_airborne.masked_fill_(airborne_activated, True)
 
         option_action, primitive = apply_fast_aerial_initiation(
             eligibility.plan.action, self.age, self.active
@@ -266,6 +340,8 @@ class AerialInterceptHybridController:
         self.ever_airborne |= self.active & airborne
 
         self._counters["activations"] += activated.sum()
+        self._counters["ground_activations"] += ground_activated.sum()
+        self._counters["airborne_activations"] += airborne_activated.sum()
         self._counters["active_ticks"] += self.active.sum()
         self._counters["primitive_ticks"] += (self.active & primitive).sum()
         self._counters["teacher_ticks"] += (self.active & ~primitive).sum()
@@ -279,6 +355,8 @@ class AerialInterceptHybridController:
         return AerialInterceptStep(
             action=action,
             activated=activated,
+            ground_activated=ground_activated,
+            airborne_activated=airborne_activated,
             active=self.active.clone(),
             released_touch=touch,
             released_grounded=grounded,

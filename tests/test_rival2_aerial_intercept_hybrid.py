@@ -78,6 +78,29 @@ def test_kickoff_reset_clears_latch_without_reactivation() -> None:
     assert torch.equal(result.action, base)
 
 
+def test_airborne_intercept_bypasses_ground_launch_primitive() -> None:
+    observation = _observation(1)
+    observation[:, FIELD["self.on_ground"]] = 0.0
+    observation[:, FIELD["self.position.z"]] = 120.0 / POSITION_SCALE[2]
+    config = AerialInterceptGateConfig(
+        allow_ground_launch=False,
+        allow_airborne_intercept=True,
+    )
+    controller = AerialInterceptHybridController(1, device="cpu", config=config)
+    lifecycle = torch.zeros(1, dtype=torch.bool)
+    result = controller.step(
+        torch.zeros((1, 8)),
+        observation,
+        kickoff_active=lifecycle,
+        match_done=lifecycle,
+    )
+    assert result.activated.item()
+    assert result.airborne_activated.item()
+    assert not result.ground_activated.item()
+    assert not result.primitive.item()
+    assert torch.equal(result.action, result.eligibility.plan.action)
+
+
 def test_nonfinite_observation_fails_closed() -> None:
     observation = _observation(1)
     observation[0, 0] = float("nan")
