@@ -1,0 +1,45 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V20_AUTHORITY",
+  "purpose": "prospective full-match tournament between the two independently improving V19 antithetic directions and their actor-mean blends",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v19/rival2_codex_autonomous_best.pt",
+    "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+    "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA",
+    "complete_match_record": "5-5 vs Nexto, 122-105 goals",
+    "never_overwrite": true
+  },
+  "alternative": {
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v19/candidate_14.pt",
+    "sha256": "5C64506A548EA8C802B01F41EFA41D3656C58C022AB7A3F3CCEE9A195CF21396",
+    "model_tensor_sha256": "99E7BFC6D75D81612CE6AC17A986DE2C2EB39CB008AE5C918FE63EE450A76436",
+    "identity": "V19 four-branch-mean antithetic direction at magnitude 0.5"
+  },
+  "candidate_space": {
+    "changed_parameters": [
+      "actor.weight[0:5]",
+      "actor.bias[0:5]"
+    ],
+    "alternative_blend_weights": [
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "optimizer_steps": 0,
+    "ppo_steps": 0
+  },
+  "selection": {
+    "preselection": "paired continuous 120-second Nexto matrix over all five layouts and both sides",
+    "full_match_finalists": 2,
+    "promotion": "strict improvement by complete-match rank (wins, goal differential, goals for) over the protected V19 source",
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "human_test_opened": false
+  },
+  "contracts": {
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "reward": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "policy_hz": 120
+  }
+}
