@@ -1,0 +1,74 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V22_AUTHORITY",
+  "purpose": "full-match antithetic search over fresh V21 current-self-play and Nexto policy directions from the promoted V19 parent",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v19/rival2_codex_autonomous_best.pt",
+    "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+    "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA",
+    "complete_match_record": "5-5 vs Nexto, 122-105 goals",
+    "never_overwrite": true
+  },
+  "directions": [
+    {
+      "seed": 2026090261,
+      "path": "G:/dev/RivalSim-runs/codex-autonomous-v21/branches/2026090261/candidate_u0001.pt",
+      "sha256": "7B5DCE9288C6C743750E89572C0A22D2EACD7D0E7FF33DFEBC03D2D8D8CAA238",
+      "model_tensor_sha256": "37BCA70310F27BAA2EC47A9E56786CDD511D0F773D37B7214C5FB3BBFB5F3049"
+    },
+    {
+      "seed": 2026090263,
+      "path": "G:/dev/RivalSim-runs/codex-autonomous-v21/branches/2026090263/candidate_u0001.pt",
+      "sha256": "4F05B0D40917F61ACAE97C08C9709A31D254C55B156AD4A091AFF86583A6BB91",
+      "model_tensor_sha256": "8CE451F71BA0A99803BBE546AAC853E25621A0C231CB2B50315DAF7F37849FBE"
+    },
+    {
+      "seed": 2026090267,
+      "path": "G:/dev/RivalSim-runs/codex-autonomous-v21/branches/2026090267/candidate_u0001.pt",
+      "sha256": "FF71B3DE5FF4F280510D009209B89F98F9DFEC60C261C9FD6AC3C0A2E1B88661",
+      "model_tensor_sha256": "BC281CAF1C9B2E28F31142A7396071FD507199A0131B1F5D54524C5B83062D31"
+    },
+    {
+      "seed": 2026090269,
+      "path": "G:/dev/RivalSim-runs/codex-autonomous-v21/branches/2026090269/candidate_u0001.pt",
+      "sha256": "E8EF55ADC69094924E3098AD315E81376792CD49A50A3CAE1C01868D91202598",
+      "model_tensor_sha256": "EA8EFE91F2A835C461A771518C1B37F7FC2ABFB4F43FB209247F5545FB794672"
+    }
+  ],
+  "candidate_space": {
+    "single_direction_antithetic_magnitudes": [
+      0.125,
+      0.25
+    ],
+    "mean_direction_antithetic_magnitudes": [
+      0.125,
+      0.25,
+      0.5
+    ],
+    "candidate_count": 11,
+    "changed_parameters": [
+      "actor.weight[0:5]",
+      "actor.bias[0:5]"
+    ],
+    "optimizer_steps": 0,
+    "ppo_steps": 0
+  },
+  "selection": {
+    "method": "complete five-minute Nexto matrix for every candidate; no short-window preselection",
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "rank": [
+      "wins",
+      "goal_differential",
+      "goals_for"
+    ],
+    "promotion": "strict rank improvement over protected V19 source",
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "human_test_opened": false
+  },
+  "contracts": {
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "reward": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "policy_hz": 120
+  }
+}
