@@ -49,6 +49,27 @@
     "not_learned": "The option did not acquire enough altitude and closing geometry to intercept moving balls at genuine aerial height.",
     "next_experiment": "Preserve the successful launch initialization but add deterministic physical altitude and time-to-intercept progress supervision before sparse high-contact and goal optimization. Do not loosen the high-contact acceptance gate."
   },
+  "trajectory_diagnosis": {
+    "unassisted": {
+      "double_jump_world_fraction_blue": 0.0,
+      "double_jump_world_fraction_orange": 0.001953125,
+      "median_maximum_car_height_uu_blue": 226.1199951171875,
+      "median_maximum_car_height_uu_orange": 226.4029541015625,
+      "median_minimum_ball_distance_uu_blue": 314.0455322265625,
+      "median_minimum_ball_distance_uu_orange": 299.0588684082031
+    },
+    "bounded_fast_aerial_option_initiation": {
+      "double_jump_world_fraction_blue": 1.0,
+      "double_jump_world_fraction_orange": 1.0,
+      "median_maximum_car_height_uu_blue": 313.54791259765625,
+      "median_maximum_car_height_uu_orange": 346.1936950683594,
+      "median_minimum_ball_distance_uu_blue": 249.4500732421875,
+      "median_minimum_ball_distance_uu_orange": 246.72134399414062,
+      "high_contact_fraction_blue": 0.103515625,
+      "high_contact_fraction_orange": 0.103515625
+    },
+    "root_cause": "The learned option held jump nearly continuously and almost never produced the release and second rising edge required for a double jump. It learned launch commitment but remained near the single-jump altitude ceiling."
+  },
   "promotion": {
     "aerial_option_promoted": false,
     "competitive_policy_remains": "RIVAL2_CODEX_AUTONOMOUS_V23"
