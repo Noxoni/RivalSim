@@ -1,0 +1,4855 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_FULL_MATCH_EVALUATION",
+  "checkpoint": {
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v22/candidate_09.pt",
+    "sha256": "3B9D15CCB42B533F861E0096996B6BAA1D1B271AA7F5695A12A3BB7C51F6CDAD"
+  },
+  "opponent": "Nexto",
+  "matrix": "five standard kickoff layouts x both Rival sides",
+  "selection_use": "post-selection evaluation only",
+  "policy_mutation": false,
+  "canonical": {
+    "suite": "canonical_deterministic",
+    "worlds": 10,
+    "rival_action_mode": "deterministic_deployment",
+    "nexto_action_mode": "deterministic_beta_1_argmax_plus_stock_kickoff",
+    "seed": 2026090206,
+    "regulation_physics_ticks": 36000,
+    "overtime_rule": "fresh kickoff, next goal wins",
+    "zero_second_airborne_continuation": false,
+    "side_assignment_counts": {
+      "rival_as_blue": 5,
+      "rival_as_orange": 5
+    },
+    "starting_layout_counts": {
+      "0": 2,
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 2
+    },
+    "results_by_rival_side": {
+      "rival_as_blue": {
+        "rival": {
+          "matches": 5,
+          "goals": 58,
+          "goals_per_match": 11.6,
+          "goals_conceded": 62,
+          "goals_conceded_per_match": 12.4,
+          "regulation_wins": 1,
+          "overtime_wins": 0,
+          "total_wins": 1,
+          "total_losses": 4,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 1,
+            "denominator": 5,
+            "fraction": 0.2
+          },
+          "goal_differential": {
+            "count": 5,
+            "mean": -0.8,
+            "median": -6.0,
+            "minimum": -7.0,
+            "p25": -6.0,
+            "p75": -4.0,
+            "maximum": 19.0
+          },
+          "scoreline_histogram_policy_first": {
+            "27-8": 1,
+            "7-11": 1,
+            "7-14": 1,
+            "8-14": 1,
+            "9-15": 1
+          },
+          "touches": 348,
+          "touch_share": {
+            "count": 348,
+            "denominator": 1048,
+            "fraction": 0.3320610687022901
+          },
+          "kickoff_first_touches": 33,
+          "kickoff_goals": 2,
+          "next_touch_possession": {
+            "total_resolved": 297,
+            "same_player": {
+              "count": 98,
+              "denominator": 297,
+              "fraction": 0.32996632996632996
+            },
+            "opponent_handoff": {
+              "count": 199,
+              "denominator": 297,
+              "fraction": 0.67003367003367
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 348,
+            "classes": {
+              "backward": {
+                "count": 18,
+                "denominator": 348,
+                "fraction": 0.05172413793103448
+              },
+              "neutral": {
+                "count": 23,
+                "denominator": 348,
+                "fraction": 0.06609195402298851
+              },
+              "forward": {
+                "count": 307,
+                "denominator": 348,
+                "fraction": 0.882183908045977
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 346,
+            "classes": {
+              "backward": {
+                "count": 32,
+                "denominator": 346,
+                "fraction": 0.09248554913294797
+              },
+              "neutral": {
+                "count": 137,
+                "denominator": 346,
+                "fraction": 0.3959537572254335
+              },
+              "forward": {
+                "count": 177,
+                "denominator": 346,
+                "fraction": 0.5115606936416185
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 35,
+            "denominator": 346,
+            "fraction": 0.10115606936416185
+          },
+          "backboard_continuation": {
+            "count": 27,
+            "denominator": 346,
+            "fraction": 0.07803468208092486
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 58,
+            "interpolated_crossing_valid": {
+              "count": 58,
+              "denominator": 58,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 58,
+              "denominator": 58,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 58,
+              "mean": 130.72219952221573,
+              "median": 72.25091552734375,
+              "minimum": -787.5531616210938,
+              "p25": -156.72135543823242,
+              "p75": 392.465087890625,
+              "maximum": 765.9412841796875
+            },
+            "z_uu": {
+              "count": 58,
+              "mean": 159.32952288923593,
+              "median": 93.14863586425781,
+              "minimum": 91.3110580444336,
+              "p25": 93.08943748474121,
+              "p75": 204.72438049316406,
+              "maximum": 475.49786376953125
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                13,
+                22,
+                23
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                46,
+                10,
+                2
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  7,
+                  2,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  5,
+                  8,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  5,
+                  2,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  13,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "nexto": {
+          "matches": 5,
+          "goals": 62,
+          "goals_per_match": 12.4,
+          "goals_conceded": 58,
+          "goals_conceded_per_match": 11.6,
+          "regulation_wins": 4,
+          "overtime_wins": 0,
+          "total_wins": 4,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 4,
+            "denominator": 5,
+            "fraction": 0.8
+          },
+          "goal_differential": {
+            "count": 5,
+            "mean": 0.8,
+            "median": 6.0,
+            "minimum": -19.0,
+            "p25": 4.0,
+            "p75": 6.0,
+            "maximum": 7.0
+          },
+          "scoreline_histogram_policy_first": {
+            "11-7": 1,
+            "14-7": 1,
+            "14-8": 1,
+            "15-9": 1,
+            "8-27": 1
+          },
+          "touches": 700,
+          "touch_share": {
+            "count": 700,
+            "denominator": 1048,
+            "fraction": 0.6679389312977099
+          },
+          "kickoff_first_touches": 91,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 627,
+            "same_player": {
+              "count": 410,
+              "denominator": 627,
+              "fraction": 0.6539074960127592
+            },
+            "opponent_handoff": {
+              "count": 217,
+              "denominator": 627,
+              "fraction": 0.34609250398724084
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 700,
+            "classes": {
+              "backward": {
+                "count": 22,
+                "denominator": 700,
+                "fraction": 0.03142857142857143
+              },
+              "neutral": {
+                "count": 156,
+                "denominator": 700,
+                "fraction": 0.22285714285714286
+              },
+              "forward": {
+                "count": 522,
+                "denominator": 700,
+                "fraction": 0.7457142857142857
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 698,
+            "classes": {
+              "backward": {
+                "count": 107,
+                "denominator": 698,
+                "fraction": 0.15329512893982808
+              },
+              "neutral": {
+                "count": 251,
+                "denominator": 698,
+                "fraction": 0.35959885386819485
+              },
+              "forward": {
+                "count": 340,
+                "denominator": 698,
+                "fraction": 0.4871060171919771
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 61,
+            "denominator": 698,
+            "fraction": 0.08739255014326648
+          },
+          "backboard_continuation": {
+            "count": 49,
+            "denominator": 698,
+            "fraction": 0.07020057306590258
+          },
+          "demos": 9,
+          "goal_entries": {
+            "goal_count": 62,
+            "interpolated_crossing_valid": {
+              "count": 62,
+              "denominator": 62,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 62,
+              "denominator": 62,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 62,
+              "mean": -33.3665182359757,
+              "median": -153.2765121459961,
+              "minimum": -749.2078857421875,
+              "p25": -323.8522186279297,
+              "p75": 234.86094665527344,
+              "maximum": 802.7444458007812
+            },
+            "z_uu": {
+              "count": 62,
+              "mean": 187.845517189272,
+              "median": 140.11473083496094,
+              "minimum": 93.11845397949219,
+              "p25": 109.90765380859375,
+              "p75": 242.20947265625,
+              "maximum": 433.54632568359375
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                18,
+                30,
+                14
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                39,
+                22,
+                1
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  2,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  2,
+                  2,
+                  3,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  3,
+                  9,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  5,
+                  1,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  4,
+                  1,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  2,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  7,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "rival_as_orange": {
+        "rival": {
+          "matches": 5,
+          "goals": 54,
+          "goals_per_match": 10.8,
+          "goals_conceded": 63,
+          "goals_conceded_per_match": 12.6,
+          "regulation_wins": 1,
+          "overtime_wins": 0,
+          "total_wins": 1,
+          "total_losses": 4,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 1,
+            "denominator": 5,
+            "fraction": 0.2
+          },
+          "goal_differential": {
+            "count": 5,
+            "mean": -1.8,
+            "median": -2.0,
+            "minimum": -9.0,
+            "p25": -5.0,
+            "p75": -1.0,
+            "maximum": 8.0
+          },
+          "scoreline_histogram_policy_first": {
+            "12-13": 1,
+            "12-14": 1,
+            "16-8": 1,
+            "6-15": 1,
+            "8-13": 1
+          },
+          "touches": 334,
+          "touch_share": {
+            "count": 334,
+            "denominator": 1097,
+            "fraction": 0.30446672743846853
+          },
+          "kickoff_first_touches": 41,
+          "kickoff_goals": 10,
+          "next_touch_possession": {
+            "total_resolved": 285,
+            "same_player": {
+              "count": 85,
+              "denominator": 285,
+              "fraction": 0.2982456140350877
+            },
+            "opponent_handoff": {
+              "count": 200,
+              "denominator": 285,
+              "fraction": 0.7017543859649122
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 334,
+            "classes": {
+              "backward": {
+                "count": 20,
+                "denominator": 334,
+                "fraction": 0.059880239520958084
+              },
+              "neutral": {
+                "count": 17,
+                "denominator": 334,
+                "fraction": 0.05089820359281437
+              },
+              "forward": {
+                "count": 297,
+                "denominator": 334,
+                "fraction": 0.8892215568862275
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 330,
+            "classes": {
+              "backward": {
+                "count": 25,
+                "denominator": 330,
+                "fraction": 0.07575757575757576
+              },
+              "neutral": {
+                "count": 126,
+                "denominator": 330,
+                "fraction": 0.38181818181818183
+              },
+              "forward": {
+                "count": 179,
+                "denominator": 330,
+                "fraction": 0.5424242424242425
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 31,
+            "denominator": 330,
+            "fraction": 0.09393939393939393
+          },
+          "backboard_continuation": {
+            "count": 37,
+            "denominator": 330,
+            "fraction": 0.11212121212121212
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 54,
+            "interpolated_crossing_valid": {
+              "count": 54,
+              "denominator": 54,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 54,
+              "denominator": 54,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 54,
+              "mean": 129.2142057772036,
+              "median": 49.20434761047363,
+              "minimum": -550.4866333007812,
+              "p25": -309.29486083984375,
+              "p75": 736.7953186035156,
+              "maximum": 774.4411010742188
+            },
+            "z_uu": {
+              "count": 54,
+              "mean": 161.17314275105795,
+              "median": 105.03296661376953,
+              "minimum": 91.32969665527344,
+              "p25": 93.14098358154297,
+              "p75": 230.60060119628906,
+              "maximum": 519.0546875
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                15,
+                20,
+                19
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                39,
+                14,
+                1
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  5,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  0,
+                  1,
+                  1,
+                  1,
+                  0
+                ],
+                [
+                  1,
+                  4,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  5,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  10,
+                  0,
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "nexto": {
+          "matches": 5,
+          "goals": 63,
+          "goals_per_match": 12.6,
+          "goals_conceded": 54,
+          "goals_conceded_per_match": 10.8,
+          "regulation_wins": 3,
+          "overtime_wins": 1,
+          "total_wins": 4,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 4,
+            "denominator": 5,
+            "fraction": 0.8
+          },
+          "goal_differential": {
+            "count": 5,
+            "mean": 1.8,
+            "median": 2.0,
+            "minimum": -8.0,
+            "p25": 1.0,
+            "p75": 5.0,
+            "maximum": 9.0
+          },
+          "scoreline_histogram_policy_first": {
+            "13-12": 1,
+            "13-8": 1,
+            "14-12": 1,
+            "15-6": 1,
+            "8-16": 1
+          },
+          "touches": 763,
+          "touch_share": {
+            "count": 763,
+            "denominator": 1097,
+            "fraction": 0.6955332725615314
+          },
+          "kickoff_first_touches": 80,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 689,
+            "same_player": {
+              "count": 483,
+              "denominator": 689,
+              "fraction": 0.7010159651669086
+            },
+            "opponent_handoff": {
+              "count": 206,
+              "denominator": 689,
+              "fraction": 0.29898403483309144
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 763,
+            "classes": {
+              "backward": {
+                "count": 37,
+                "denominator": 763,
+                "fraction": 0.04849279161205767
+              },
+              "neutral": {
+                "count": 226,
+                "denominator": 763,
+                "fraction": 0.2961992136304063
+              },
+              "forward": {
+                "count": 500,
+                "denominator": 763,
+                "fraction": 0.6553079947575361
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 761,
+            "classes": {
+              "backward": {
+                "count": 83,
+                "denominator": 761,
+                "fraction": 0.10906701708278581
+              },
+              "neutral": {
+                "count": 281,
+                "denominator": 761,
+                "fraction": 0.3692509855453351
+              },
+              "forward": {
+                "count": 397,
+                "denominator": 761,
+                "fraction": 0.5216819973718791
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 43,
+            "denominator": 761,
+            "fraction": 0.056504599211563734
+          },
+          "backboard_continuation": {
+            "count": 39,
+            "denominator": 761,
+            "fraction": 0.051248357424441525
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 63,
+            "interpolated_crossing_valid": {
+              "count": 63,
+              "denominator": 63,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 63,
+              "denominator": 63,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 63,
+              "mean": -115.70784688729142,
+              "median": -188.632568359375,
+              "minimum": -779.599365234375,
+              "p25": -428.02806091308594,
+              "p75": 215.71041107177734,
+              "maximum": 669.1314697265625
+            },
+            "z_uu": {
+              "count": 63,
+              "mean": 203.69760034954737,
+              "median": 158.93032836914062,
+              "minimum": 93.10769653320312,
+              "p25": 114.8126449584961,
+              "p75": 243.79742431640625,
+              "maximum": 510.1817932128906
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                25,
+                26,
+                12
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                41,
+                17,
+                5
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  1,
+                  3,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  5,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0,
+                  3,
+                  1,
+                  0
+                ],
+                [
+                  3,
+                  3,
+                  5,
+                  0,
+                  3,
+                  0
+                ],
+                [
+                  2,
+                  3,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0,
+                  1,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  10,
+                  1,
+                  3,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  2,
+                  2,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "overall_with_side_breakdowns": {
+        "rival": {
+          "matches": 10,
+          "goals": 112,
+          "goals_per_match": 11.2,
+          "goals_conceded": 125,
+          "goals_conceded_per_match": 12.5,
+          "regulation_wins": 2,
+          "overtime_wins": 0,
+          "total_wins": 2,
+          "total_losses": 8,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 2,
+            "denominator": 10,
+            "fraction": 0.2
+          },
+          "goal_differential": {
+            "count": 10,
+            "mean": -1.3,
+            "median": -4.5,
+            "minimum": -9.0,
+            "p25": -6.0,
+            "p75": -1.25,
+            "maximum": 19.0
+          },
+          "scoreline_histogram_policy_first": {
+            "12-13": 1,
+            "12-14": 1,
+            "16-8": 1,
+            "27-8": 1,
+            "6-15": 1,
+            "7-11": 1,
+            "7-14": 1,
+            "8-13": 1,
+            "8-14": 1,
+            "9-15": 1
+          },
+          "touches": 682,
+          "touch_share": {
+            "count": 682,
+            "denominator": 2145,
+            "fraction": 0.31794871794871793
+          },
+          "kickoff_first_touches": 74,
+          "kickoff_goals": 12,
+          "next_touch_possession": {
+            "total_resolved": 582,
+            "same_player": {
+              "count": 183,
+              "denominator": 582,
+              "fraction": 0.31443298969072164
+            },
+            "opponent_handoff": {
+              "count": 399,
+              "denominator": 582,
+              "fraction": 0.6855670103092784
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 682,
+            "classes": {
+              "backward": {
+                "count": 38,
+                "denominator": 682,
+                "fraction": 0.05571847507331378
+              },
+              "neutral": {
+                "count": 40,
+                "denominator": 682,
+                "fraction": 0.05865102639296188
+              },
+              "forward": {
+                "count": 604,
+                "denominator": 682,
+                "fraction": 0.8856304985337243
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 676,
+            "classes": {
+              "backward": {
+                "count": 57,
+                "denominator": 676,
+                "fraction": 0.08431952662721894
+              },
+              "neutral": {
+                "count": 263,
+                "denominator": 676,
+                "fraction": 0.3890532544378698
+              },
+              "forward": {
+                "count": 356,
+                "denominator": 676,
+                "fraction": 0.5266272189349113
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 66,
+            "denominator": 676,
+            "fraction": 0.09763313609467456
+          },
+          "backboard_continuation": {
+            "count": 64,
+            "denominator": 676,
+            "fraction": 0.09467455621301775
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 112,
+            "interpolated_crossing_valid": {
+              "count": 112,
+              "denominator": 112,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 112,
+              "denominator": 112,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 112,
+              "mean": 129.99513110944204,
+              "median": 68.55766677856445,
+              "minimum": -787.5531616210938,
+              "p25": -249.75522232055664,
+              "p75": 709.8800354003906,
+              "maximum": 774.4411010742188
+            },
+            "z_uu": {
+              "count": 112,
+              "mean": 160.2184110369001,
+              "median": 97.29769897460938,
+              "minimum": 91.3110580444336,
+              "p25": 93.12241744995117,
+              "p75": 204.9367218017578,
+              "maximum": 519.0546875
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                28,
+                42,
+                42
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                85,
+                24,
+                3
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  5,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  0,
+                  8,
+                  3,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  5,
+                  1,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  9,
+                  13,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  9,
+                  2,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  2,
+                  2,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  23,
+                  0,
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "nexto": {
+          "matches": 10,
+          "goals": 125,
+          "goals_per_match": 12.5,
+          "goals_conceded": 112,
+          "goals_conceded_per_match": 11.2,
+          "regulation_wins": 7,
+          "overtime_wins": 1,
+          "total_wins": 8,
+          "total_losses": 2,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 8,
+            "denominator": 10,
+            "fraction": 0.8
+          },
+          "goal_differential": {
+            "count": 10,
+            "mean": 1.3,
+            "median": 4.5,
+            "minimum": -19.0,
+            "p25": 1.25,
+            "p75": 6.0,
+            "maximum": 9.0
+          },
+          "scoreline_histogram_policy_first": {
+            "11-7": 1,
+            "13-12": 1,
+            "13-8": 1,
+            "14-12": 1,
+            "14-7": 1,
+            "14-8": 1,
+            "15-6": 1,
+            "15-9": 1,
+            "8-16": 1,
+            "8-27": 1
+          },
+          "touches": 1463,
+          "touch_share": {
+            "count": 1463,
+            "denominator": 2145,
+            "fraction": 0.6820512820512821
+          },
+          "kickoff_first_touches": 171,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 1316,
+            "same_player": {
+              "count": 893,
+              "denominator": 1316,
+              "fraction": 0.6785714285714286
+            },
+            "opponent_handoff": {
+              "count": 423,
+              "denominator": 1316,
+              "fraction": 0.32142857142857145
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 1463,
+            "classes": {
+              "backward": {
+                "count": 59,
+                "denominator": 1463,
+                "fraction": 0.04032809295967191
+              },
+              "neutral": {
+                "count": 382,
+                "denominator": 1463,
+                "fraction": 0.2611073137388927
+              },
+              "forward": {
+                "count": 1022,
+                "denominator": 1463,
+                "fraction": 0.6985645933014354
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 1459,
+            "classes": {
+              "backward": {
+                "count": 190,
+                "denominator": 1459,
+                "fraction": 0.13022618231665525
+              },
+              "neutral": {
+                "count": 532,
+                "denominator": 1459,
+                "fraction": 0.36463331048663467
+              },
+              "forward": {
+                "count": 737,
+                "denominator": 1459,
+                "fraction": 0.5051405071967101
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 104,
+            "denominator": 1459,
+            "fraction": 0.07128169979437972
+          },
+          "backboard_continuation": {
+            "count": 88,
+            "denominator": 1459,
+            "fraction": 0.06031528444139822
+          },
+          "demos": 9,
+          "goal_entries": {
+            "goal_count": 125,
+            "interpolated_crossing_valid": {
+              "count": 125,
+              "denominator": 125,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 125,
+              "denominator": 125,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 125,
+              "mean": -74.86654787623883,
+              "median": -188.632568359375,
+              "minimum": -779.599365234375,
+              "p25": -385.85430908203125,
+              "p75": 233.6743621826172,
+              "maximum": 802.7444458007812
+            },
+            "z_uu": {
+              "count": 125,
+              "mean": 195.83496710205077,
+              "median": 157.5255126953125,
+              "minimum": 93.10769653320312,
+              "p25": 111.79362487792969,
+              "p75": 243.79742431640625,
+              "maximum": 510.1817932128906
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                43,
+                56,
+                26
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                80,
+                39,
+                6
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  1,
+                  5,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  6,
+                  2,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  5,
+                  3,
+                  2,
+                  6,
+                  2,
+                  0
+                ],
+                [
+                  5,
+                  6,
+                  14,
+                  1,
+                  3,
+                  0
+                ],
+                [
+                  7,
+                  4,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  5,
+                  1,
+                  2,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  12,
+                  1,
+                  4,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  3,
+                  3,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  7,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "physical_team_results": {
+      "blue": {
+        "goals": 121,
+        "wins": 5,
+        "losses": 5,
+        "goals_per_match": 12.1
+      },
+      "orange": {
+        "goals": 116,
+        "wins": 5,
+        "losses": 5,
+        "goals_per_match": 11.6
+      }
+    },
+    "results_by_starting_layout_and_rival_side": {
+      "0": {
+        "layout_name": "Blue diagonal-left",
+        "rival_as_blue": {
+          "matches": 1,
+          "goals": 7,
+          "goals_per_match": 7.0,
+          "goals_conceded": 14,
+          "goals_conceded_per_match": 14.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -7.0,
+            "median": -7.0,
+            "minimum": -7.0,
+            "p25": -7.0,
+            "p75": -7.0,
+            "maximum": -7.0
+          },
+          "scoreline_histogram_policy_first": {
+            "7-14": 1
+          },
+          "touches": 67,
+          "touch_share": {
+            "count": 67,
+            "denominator": 243,
+            "fraction": 0.2757201646090535
+          },
+          "kickoff_first_touches": 5,
+          "kickoff_goals": 1,
+          "next_touch_possession": {
+            "total_resolved": 59,
+            "same_player": {
+              "count": 24,
+              "denominator": 59,
+              "fraction": 0.4067796610169492
+            },
+            "opponent_handoff": {
+              "count": 35,
+              "denominator": 59,
+              "fraction": 0.5932203389830508
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 67,
+            "classes": {
+              "backward": {
+                "count": 10,
+                "denominator": 67,
+                "fraction": 0.14925373134328357
+              },
+              "neutral": {
+                "count": 5,
+                "denominator": 67,
+                "fraction": 0.07462686567164178
+              },
+              "forward": {
+                "count": 52,
+                "denominator": 67,
+                "fraction": 0.7761194029850746
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 66,
+            "classes": {
+              "backward": {
+                "count": 7,
+                "denominator": 66,
+                "fraction": 0.10606060606060606
+              },
+              "neutral": {
+                "count": 26,
+                "denominator": 66,
+                "fraction": 0.3939393939393939
+              },
+              "forward": {
+                "count": 33,
+                "denominator": 66,
+                "fraction": 0.5
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 8,
+            "denominator": 66,
+            "fraction": 0.12121212121212122
+          },
+          "backboard_continuation": {
+            "count": 7,
+            "denominator": 66,
+            "fraction": 0.10606060606060606
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 7,
+            "interpolated_crossing_valid": {
+              "count": 7,
+              "denominator": 7,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 7,
+              "denominator": 7,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 7,
+              "mean": 131.61493682861328,
+              "median": -53.123687744140625,
+              "minimum": -162.1518096923828,
+              "p25": -95.66872787475586,
+              "p75": 282.7626190185547,
+              "maximum": 762.3922729492188
+            },
+            "z_uu": {
+              "count": 7,
+              "mean": 119.87284306117466,
+              "median": 93.14826965332031,
+              "minimum": 93.08429718017578,
+              "p25": 93.13984680175781,
+              "p75": 103.49605560302734,
+              "maximum": 259.60552978515625
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                0,
+                5,
+                2
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                6,
+                1,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "rival_as_orange": {
+          "matches": 1,
+          "goals": 12,
+          "goals_per_match": 12.0,
+          "goals_conceded": 13,
+          "goals_conceded_per_match": 13.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -1.0,
+            "median": -1.0,
+            "minimum": -1.0,
+            "p25": -1.0,
+            "p75": -1.0,
+            "maximum": -1.0
+          },
+          "scoreline_histogram_policy_first": {
+            "12-13": 1
+          },
+          "touches": 68,
+          "touch_share": {
+            "count": 68,
+            "denominator": 238,
+            "fraction": 0.2857142857142857
+          },
+          "kickoff_first_touches": 8,
+          "kickoff_goals": 2,
+          "next_touch_possession": {
+            "total_resolved": 57,
+            "same_player": {
+              "count": 16,
+              "denominator": 57,
+              "fraction": 0.2807017543859649
+            },
+            "opponent_handoff": {
+              "count": 41,
+              "denominator": 57,
+              "fraction": 0.7192982456140351
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 68,
+            "classes": {
+              "backward": {
+                "count": 5,
+                "denominator": 68,
+                "fraction": 0.07352941176470588
+              },
+              "neutral": {
+                "count": 0,
+                "denominator": 68,
+                "fraction": 0.0
+              },
+              "forward": {
+                "count": 63,
+                "denominator": 68,
+                "fraction": 0.9264705882352942
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 68,
+            "classes": {
+              "backward": {
+                "count": 6,
+                "denominator": 68,
+                "fraction": 0.08823529411764706
+              },
+              "neutral": {
+                "count": 23,
+                "denominator": 68,
+                "fraction": 0.3382352941176471
+              },
+              "forward": {
+                "count": 39,
+                "denominator": 68,
+                "fraction": 0.5735294117647058
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 8,
+            "denominator": 68,
+            "fraction": 0.11764705882352941
+          },
+          "backboard_continuation": {
+            "count": 4,
+            "denominator": 68,
+            "fraction": 0.058823529411764705
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 12,
+            "interpolated_crossing_valid": {
+              "count": 12,
+              "denominator": 12,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 12,
+              "denominator": 12,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 12,
+              "mean": 124.22151406606038,
+              "median": 98.7297248840332,
+              "minimum": -385.6370849609375,
+              "p25": -106.97294044494629,
+              "p75": 237.13946914672852,
+              "maximum": 774.4411010742188
+            },
+            "z_uu": {
+              "count": 12,
+              "mean": 158.29926681518555,
+              "median": 93.86080169677734,
+              "minimum": 91.32969665527344,
+              "p25": 93.13578987121582,
+              "p75": 185.37099838256836,
+              "maximum": 519.0546875
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                2,
+                7,
+                3
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                10,
+                1,
+                1
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "1": {
+        "layout_name": "Blue diagonal-right",
+        "rival_as_blue": {
+          "matches": 1,
+          "goals": 9,
+          "goals_per_match": 9.0,
+          "goals_conceded": 15,
+          "goals_conceded_per_match": 15.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -6.0,
+            "median": -6.0,
+            "minimum": -6.0,
+            "p25": -6.0,
+            "p75": -6.0,
+            "maximum": -6.0
+          },
+          "scoreline_histogram_policy_first": {
+            "9-15": 1
+          },
+          "touches": 87,
+          "touch_share": {
+            "count": 87,
+            "denominator": 229,
+            "fraction": 0.3799126637554585
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 1,
+          "next_touch_possession": {
+            "total_resolved": 80,
+            "same_player": {
+              "count": 39,
+              "denominator": 80,
+              "fraction": 0.4875
+            },
+            "opponent_handoff": {
+              "count": 41,
+              "denominator": 80,
+              "fraction": 0.5125
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 87,
+            "classes": {
+              "backward": {
+                "count": 3,
+                "denominator": 87,
+                "fraction": 0.034482758620689655
+              },
+              "neutral": {
+                "count": 13,
+                "denominator": 87,
+                "fraction": 0.14942528735632185
+              },
+              "forward": {
+                "count": 71,
+                "denominator": 87,
+                "fraction": 0.8160919540229885
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 86,
+            "classes": {
+              "backward": {
+                "count": 7,
+                "denominator": 86,
+                "fraction": 0.08139534883720931
+              },
+              "neutral": {
+                "count": 32,
+                "denominator": 86,
+                "fraction": 0.37209302325581395
+              },
+              "forward": {
+                "count": 47,
+                "denominator": 86,
+                "fraction": 0.5465116279069767
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 5,
+            "denominator": 86,
+            "fraction": 0.05813953488372093
+          },
+          "backboard_continuation": {
+            "count": 8,
+            "denominator": 86,
+            "fraction": 0.09302325581395349
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 9,
+            "interpolated_crossing_valid": {
+              "count": 9,
+              "denominator": 9,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 9,
+              "denominator": 9,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 9,
+              "mean": -47.380165841844345,
+              "median": 8.780716896057129,
+              "minimum": -787.5531616210938,
+              "p25": -385.3470764160156,
+              "p75": 327.3697814941406,
+              "maximum": 753.3653564453125
+            },
+            "z_uu": {
+              "count": 9,
+              "mean": 222.0150883992513,
+              "median": 171.85128784179688,
+              "minimum": 91.3110580444336,
+              "p25": 93.14900207519531,
+              "p75": 363.2713317871094,
+              "maximum": 475.49786376953125
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                4,
+                2,
+                3
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                5,
+                3,
+                1
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  2,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "rival_as_orange": {
+          "matches": 1,
+          "goals": 6,
+          "goals_per_match": 6.0,
+          "goals_conceded": 15,
+          "goals_conceded_per_match": 15.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -9.0,
+            "median": -9.0,
+            "minimum": -9.0,
+            "p25": -9.0,
+            "p75": -9.0,
+            "maximum": -9.0
+          },
+          "scoreline_histogram_policy_first": {
+            "6-15": 1
+          },
+          "touches": 67,
+          "touch_share": {
+            "count": 67,
+            "denominator": 220,
+            "fraction": 0.30454545454545456
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 61,
+            "same_player": {
+              "count": 12,
+              "denominator": 61,
+              "fraction": 0.19672131147540983
+            },
+            "opponent_handoff": {
+              "count": 49,
+              "denominator": 61,
+              "fraction": 0.8032786885245902
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 67,
+            "classes": {
+              "backward": {
+                "count": 4,
+                "denominator": 67,
+                "fraction": 0.05970149253731343
+              },
+              "neutral": {
+                "count": 3,
+                "denominator": 67,
+                "fraction": 0.04477611940298507
+              },
+              "forward": {
+                "count": 60,
+                "denominator": 67,
+                "fraction": 0.8955223880597015
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 66,
+            "classes": {
+              "backward": {
+                "count": 11,
+                "denominator": 66,
+                "fraction": 0.16666666666666666
+              },
+              "neutral": {
+                "count": 25,
+                "denominator": 66,
+                "fraction": 0.3787878787878788
+              },
+              "forward": {
+                "count": 30,
+                "denominator": 66,
+                "fraction": 0.45454545454545453
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 7,
+            "denominator": 66,
+            "fraction": 0.10606060606060606
+          },
+          "backboard_continuation": {
+            "count": 10,
+            "denominator": 66,
+            "fraction": 0.15151515151515152
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 6,
+            "interpolated_crossing_valid": {
+              "count": 6,
+              "denominator": 6,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 6,
+              "denominator": 6,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 6,
+              "mean": -167.33166122436523,
+              "median": -164.82713317871094,
+              "minimum": -454.23046875,
+              "p25": -346.8623695373535,
+              "p75": -77.2320384979248,
+              "maximum": 235.46922302246094
+            },
+            "z_uu": {
+              "count": 6,
+              "mean": 173.72334162394205,
+              "median": 122.64534378051758,
+              "minimum": 93.09404754638672,
+              "p25": 93.14011001586914,
+              "p75": 224.5483856201172,
+              "maximum": 362.13421630859375
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                2,
+                4,
+                0
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                4,
+                2,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "2": {
+        "layout_name": "Blue off-center-left",
+        "rival_as_blue": {
+          "matches": 1,
+          "goals": 8,
+          "goals_per_match": 8.0,
+          "goals_conceded": 14,
+          "goals_conceded_per_match": 14.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -6.0,
+            "median": -6.0,
+            "minimum": -6.0,
+            "p25": -6.0,
+            "p75": -6.0,
+            "maximum": -6.0
+          },
+          "scoreline_histogram_policy_first": {
+            "8-14": 1
+          },
+          "touches": 58,
+          "touch_share": {
+            "count": 58,
+            "denominator": 202,
+            "fraction": 0.2871287128712871
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 51,
+            "same_player": {
+              "count": 9,
+              "denominator": 51,
+              "fraction": 0.17647058823529413
+            },
+            "opponent_handoff": {
+              "count": 42,
+              "denominator": 51,
+              "fraction": 0.8235294117647058
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 58,
+            "classes": {
+              "backward": {
+                "count": 3,
+                "denominator": 58,
+                "fraction": 0.05172413793103448
+              },
+              "neutral": {
+                "count": 2,
+                "denominator": 58,
+                "fraction": 0.034482758620689655
+              },
+              "forward": {
+                "count": 53,
+                "denominator": 58,
+                "fraction": 0.9137931034482759
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 58,
+            "classes": {
+              "backward": {
+                "count": 8,
+                "denominator": 58,
+                "fraction": 0.13793103448275862
+              },
+              "neutral": {
+                "count": 25,
+                "denominator": 58,
+                "fraction": 0.43103448275862066
+              },
+              "forward": {
+                "count": 25,
+                "denominator": 58,
+                "fraction": 0.43103448275862066
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 7,
+            "denominator": 58,
+            "fraction": 0.1206896551724138
+          },
+          "backboard_continuation": {
+            "count": 3,
+            "denominator": 58,
+            "fraction": 0.05172413793103448
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 8,
+            "interpolated_crossing_valid": {
+              "count": 8,
+              "denominator": 8,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 8,
+              "denominator": 8,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 8,
+              "mean": 122.94866919517517,
+              "median": 25.074355125427246,
+              "minimum": -331.1379699707031,
+              "p25": -156.57427978515625,
+              "p75": 304.38221740722656,
+              "maximum": 724.5609741210938
+            },
+            "z_uu": {
+              "count": 8,
+              "mean": 150.2070779800415,
+              "median": 93.1341667175293,
+              "minimum": 93.09654998779297,
+              "p25": 93.10629081726074,
+              "p75": 117.611328125,
+              "maximum": 459.1325988769531
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                1,
+                5,
+                2
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                7,
+                0,
+                1
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "rival_as_orange": {
+          "matches": 1,
+          "goals": 12,
+          "goals_per_match": 12.0,
+          "goals_conceded": 14,
+          "goals_conceded_per_match": 14.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -2.0,
+            "median": -2.0,
+            "minimum": -2.0,
+            "p25": -2.0,
+            "p75": -2.0,
+            "maximum": -2.0
+          },
+          "scoreline_histogram_policy_first": {
+            "12-14": 1
+          },
+          "touches": 67,
+          "touch_share": {
+            "count": 67,
+            "denominator": 225,
+            "fraction": 0.29777777777777775
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 3,
+          "next_touch_possession": {
+            "total_resolved": 56,
+            "same_player": {
+              "count": 16,
+              "denominator": 56,
+              "fraction": 0.2857142857142857
+            },
+            "opponent_handoff": {
+              "count": 40,
+              "denominator": 56,
+              "fraction": 0.7142857142857143
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 67,
+            "classes": {
+              "backward": {
+                "count": 9,
+                "denominator": 67,
+                "fraction": 0.13432835820895522
+              },
+              "neutral": {
+                "count": 0,
+                "denominator": 67,
+                "fraction": 0.0
+              },
+              "forward": {
+                "count": 58,
+                "denominator": 67,
+                "fraction": 0.8656716417910447
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 67,
+            "classes": {
+              "backward": {
+                "count": 6,
+                "denominator": 67,
+                "fraction": 0.08955223880597014
+              },
+              "neutral": {
+                "count": 23,
+                "denominator": 67,
+                "fraction": 0.34328358208955223
+              },
+              "forward": {
+                "count": 38,
+                "denominator": 67,
+                "fraction": 0.5671641791044776
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 4,
+            "denominator": 67,
+            "fraction": 0.05970149253731343
+          },
+          "backboard_continuation": {
+            "count": 5,
+            "denominator": 67,
+            "fraction": 0.07462686567164178
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 12,
+            "interpolated_crossing_valid": {
+              "count": 12,
+              "denominator": 12,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 12,
+              "denominator": 12,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 12,
+              "mean": 158.00828170776367,
+              "median": 31.006038665771484,
+              "minimum": -428.7081604003906,
+              "p25": -198.97610092163086,
+              "p75": 672.5178985595703,
+              "maximum": 762.3505249023438
+            },
+            "z_uu": {
+              "count": 12,
+              "mean": 139.71471150716147,
+              "median": 104.19107437133789,
+              "minimum": 91.32969665527344,
+              "p25": 93.13957595825195,
+              "p75": 185.37099838256836,
+              "maximum": 236.73057556152344
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                3,
+                5,
+                4
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                11,
+                1,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  2,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  3,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "3": {
+        "layout_name": "Blue off-center-right",
+        "rival_as_blue": {
+          "matches": 1,
+          "goals": 7,
+          "goals_per_match": 7.0,
+          "goals_conceded": 11,
+          "goals_conceded_per_match": 11.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -4.0,
+            "median": -4.0,
+            "minimum": -4.0,
+            "p25": -4.0,
+            "p75": -4.0,
+            "maximum": -4.0
+          },
+          "scoreline_histogram_policy_first": {
+            "7-11": 1
+          },
+          "touches": 58,
+          "touch_share": {
+            "count": 58,
+            "denominator": 219,
+            "fraction": 0.2648401826484018
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 50,
+            "same_player": {
+              "count": 6,
+              "denominator": 50,
+              "fraction": 0.12
+            },
+            "opponent_handoff": {
+              "count": 44,
+              "denominator": 50,
+              "fraction": 0.88
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 58,
+            "classes": {
+              "backward": {
+                "count": 2,
+                "denominator": 58,
+                "fraction": 0.034482758620689655
+              },
+              "neutral": {
+                "count": 2,
+                "denominator": 58,
+                "fraction": 0.034482758620689655
+              },
+              "forward": {
+                "count": 54,
+                "denominator": 58,
+                "fraction": 0.9310344827586207
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 58,
+            "classes": {
+              "backward": {
+                "count": 9,
+                "denominator": 58,
+                "fraction": 0.15517241379310345
+              },
+              "neutral": {
+                "count": 25,
+                "denominator": 58,
+                "fraction": 0.43103448275862066
+              },
+              "forward": {
+                "count": 24,
+                "denominator": 58,
+                "fraction": 0.41379310344827586
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 8,
+            "denominator": 58,
+            "fraction": 0.13793103448275862
+          },
+          "backboard_continuation": {
+            "count": 2,
+            "denominator": 58,
+            "fraction": 0.034482758620689655
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 7,
+            "interpolated_crossing_valid": {
+              "count": 7,
+              "denominator": 7,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 7,
+              "denominator": 7,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 7,
+              "mean": 281.02295357840404,
+              "median": 166.03704833984375,
+              "minimum": -315.3170471191406,
+              "p25": 72.25091552734375,
+              "p75": 623.6889343261719,
+              "maximum": 724.5609741210938
+            },
+            "z_uu": {
+              "count": 7,
+              "mean": 127.95499965122768,
+              "median": 93.14038848876953,
+              "minimum": 93.10774230957031,
+              "p25": 93.12406539916992,
+              "p75": 170.28467559814453,
+              "maximum": 182.619384765625
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                1,
+                3,
+                3
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                7,
+                0,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "rival_as_orange": {
+          "matches": 1,
+          "goals": 8,
+          "goals_per_match": 8.0,
+          "goals_conceded": 13,
+          "goals_conceded_per_match": 13.0,
+          "regulation_wins": 0,
+          "overtime_wins": 0,
+          "total_wins": 0,
+          "total_losses": 1,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 0,
+            "denominator": 1,
+            "fraction": 0.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": -5.0,
+            "median": -5.0,
+            "minimum": -5.0,
+            "p25": -5.0,
+            "p75": -5.0,
+            "maximum": -5.0
+          },
+          "scoreline_histogram_policy_first": {
+            "8-13": 1
+          },
+          "touches": 72,
+          "touch_share": {
+            "count": 72,
+            "denominator": 214,
+            "fraction": 0.3364485981308411
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 1,
+          "next_touch_possession": {
+            "total_resolved": 64,
+            "same_player": {
+              "count": 28,
+              "denominator": 64,
+              "fraction": 0.4375
+            },
+            "opponent_handoff": {
+              "count": 36,
+              "denominator": 64,
+              "fraction": 0.5625
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 72,
+            "classes": {
+              "backward": {
+                "count": 1,
+                "denominator": 72,
+                "fraction": 0.013888888888888888
+              },
+              "neutral": {
+                "count": 13,
+                "denominator": 72,
+                "fraction": 0.18055555555555555
+              },
+              "forward": {
+                "count": 58,
+                "denominator": 72,
+                "fraction": 0.8055555555555556
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 70,
+            "classes": {
+              "backward": {
+                "count": 1,
+                "denominator": 70,
+                "fraction": 0.014285714285714285
+              },
+              "neutral": {
+                "count": 33,
+                "denominator": 70,
+                "fraction": 0.4714285714285714
+              },
+              "forward": {
+                "count": 36,
+                "denominator": 70,
+                "fraction": 0.5142857142857142
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 4,
+            "denominator": 70,
+            "fraction": 0.05714285714285714
+          },
+          "backboard_continuation": {
+            "count": 6,
+            "denominator": 70,
+            "fraction": 0.08571428571428572
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 8,
+            "interpolated_crossing_valid": {
+              "count": 8,
+              "denominator": 8,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 8,
+              "denominator": 8,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 8,
+              "mean": 213.42125511169434,
+              "median": 408.74974822998047,
+              "minimum": -550.4866333007812,
+              "p25": -356.50877380371094,
+              "p75": 729.0698699951172,
+              "maximum": 774.3710327148438
+            },
+            "z_uu": {
+              "count": 8,
+              "mean": 158.64538192749023,
+              "median": 151.34862518310547,
+              "minimum": 93.12039184570312,
+              "p25": 93.8587532043457,
+              "p75": 190.67825317382812,
+              "maximum": 278.1314392089844
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                3,
+                1,
+                4
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                6,
+                2,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "4": {
+        "layout_name": "center",
+        "rival_as_blue": {
+          "matches": 1,
+          "goals": 27,
+          "goals_per_match": 27.0,
+          "goals_conceded": 8,
+          "goals_conceded_per_match": 8.0,
+          "regulation_wins": 1,
+          "overtime_wins": 0,
+          "total_wins": 1,
+          "total_losses": 0,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 1,
+            "denominator": 1,
+            "fraction": 1.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": 19.0,
+            "median": 19.0,
+            "minimum": 19.0,
+            "p25": 19.0,
+            "p75": 19.0,
+            "maximum": 19.0
+          },
+          "scoreline_histogram_policy_first": {
+            "27-8": 1
+          },
+          "touches": 78,
+          "touch_share": {
+            "count": 78,
+            "denominator": 155,
+            "fraction": 0.5032258064516129
+          },
+          "kickoff_first_touches": 7,
+          "kickoff_goals": 0,
+          "next_touch_possession": {
+            "total_resolved": 57,
+            "same_player": {
+              "count": 20,
+              "denominator": 57,
+              "fraction": 0.3508771929824561
+            },
+            "opponent_handoff": {
+              "count": 37,
+              "denominator": 57,
+              "fraction": 0.6491228070175439
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 78,
+            "classes": {
+              "backward": {
+                "count": 0,
+                "denominator": 78,
+                "fraction": 0.0
+              },
+              "neutral": {
+                "count": 1,
+                "denominator": 78,
+                "fraction": 0.01282051282051282
+              },
+              "forward": {
+                "count": 77,
+                "denominator": 78,
+                "fraction": 0.9871794871794872
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 78,
+            "classes": {
+              "backward": {
+                "count": 1,
+                "denominator": 78,
+                "fraction": 0.01282051282051282
+              },
+              "neutral": {
+                "count": 29,
+                "denominator": 78,
+                "fraction": 0.3717948717948718
+              },
+              "forward": {
+                "count": 48,
+                "denominator": 78,
+                "fraction": 0.6153846153846154
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 7,
+            "denominator": 78,
+            "fraction": 0.08974358974358974
+          },
+          "backboard_continuation": {
+            "count": 7,
+            "denominator": 78,
+            "fraction": 0.08974358974358974
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 27,
+            "interpolated_crossing_valid": {
+              "count": 27,
+              "denominator": 27,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 27,
+              "denominator": 27,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 27,
+              "mean": 153.19461031313296,
+              "median": -70.0340805053711,
+              "minimum": -452.4045715332031,
+              "p25": -222.74656295776367,
+              "p75": 579.2031860351562,
+              "maximum": 765.9412841796875
+            },
+            "z_uu": {
+              "count": 27,
+              "mean": 159.50092626501012,
+              "median": 93.13874816894531,
+              "minimum": 93.08216857910156,
+              "p25": 93.0846176147461,
+              "p75": 204.72438049316406,
+              "maximum": 261.7030029296875
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                7,
+                7,
+                13
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                21,
+                6,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  6,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  7,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  7,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        },
+        "rival_as_orange": {
+          "matches": 1,
+          "goals": 16,
+          "goals_per_match": 16.0,
+          "goals_conceded": 8,
+          "goals_conceded_per_match": 8.0,
+          "regulation_wins": 1,
+          "overtime_wins": 0,
+          "total_wins": 1,
+          "total_losses": 0,
+          "unresolved": 0,
+          "win_rate": {
+            "count": 1,
+            "denominator": 1,
+            "fraction": 1.0
+          },
+          "goal_differential": {
+            "count": 1,
+            "mean": 8.0,
+            "median": 8.0,
+            "minimum": 8.0,
+            "p25": 8.0,
+            "p75": 8.0,
+            "maximum": 8.0
+          },
+          "scoreline_histogram_policy_first": {
+            "16-8": 1
+          },
+          "touches": 60,
+          "touch_share": {
+            "count": 60,
+            "denominator": 200,
+            "fraction": 0.3
+          },
+          "kickoff_first_touches": 12,
+          "kickoff_goals": 4,
+          "next_touch_possession": {
+            "total_resolved": 47,
+            "same_player": {
+              "count": 13,
+              "denominator": 47,
+              "fraction": 0.2765957446808511
+            },
+            "opponent_handoff": {
+              "count": 34,
+              "denominator": 47,
+              "fraction": 0.723404255319149
+            }
+          },
+          "immediate_touch_direction": {
+            "denominator": 60,
+            "classes": {
+              "backward": {
+                "count": 1,
+                "denominator": 60,
+                "fraction": 0.016666666666666666
+              },
+              "neutral": {
+                "count": 1,
+                "denominator": 60,
+                "fraction": 0.016666666666666666
+              },
+              "forward": {
+                "count": 58,
+                "denominator": 60,
+                "fraction": 0.9666666666666667
+              }
+            }
+          },
+          "net_displacement_before_next_touch_or_goal": {
+            "denominator": 59,
+            "classes": {
+              "backward": {
+                "count": 1,
+                "denominator": 59,
+                "fraction": 0.01694915254237288
+              },
+              "neutral": {
+                "count": 22,
+                "denominator": 59,
+                "fraction": 0.3728813559322034
+              },
+              "forward": {
+                "count": 36,
+                "denominator": 59,
+                "fraction": 0.6101694915254238
+              }
+            }
+          },
+          "wall_continuation": {
+            "count": 8,
+            "denominator": 59,
+            "fraction": 0.13559322033898305
+          },
+          "backboard_continuation": {
+            "count": 12,
+            "denominator": 59,
+            "fraction": 0.2033898305084746
+          },
+          "demos": 0,
+          "goal_entries": {
+            "goal_count": 16,
+            "interpolated_crossing_valid": {
+              "count": 16,
+              "denominator": 16,
+              "fraction": 1.0
+            },
+            "inside_declared_goal_mouth": {
+              "count": 16,
+              "denominator": 16,
+              "fraction": 1.0
+            },
+            "declared_geometry_uu": {
+              "x": [
+                -892.755,
+                892.755
+              ],
+              "z": [
+                0.0,
+                642.775
+              ]
+            },
+            "canonical_x_uu": {
+              "count": 16,
+              "mean": 180.4643430709839,
+              "median": 289.7073745727539,
+              "minimum": -550.4866333007812,
+              "p25": -515.6163024902344,
+              "p75": 761.8231353759766,
+              "maximum": 774.3710327148438
+            },
+            "z_uu": {
+              "count": 16,
+              "mean": 175.9799289703369,
+              "median": 167.8167839050293,
+              "minimum": 93.10845947265625,
+              "p25": 93.14098358154297,
+              "p75": 242.4833106994629,
+              "maximum": 278.1314392089844
+            },
+            "horizontal_bins": {
+              "edges_uu": [
+                -892.755,
+                -297.585,
+                297.585,
+                892.755
+              ],
+              "labels": [
+                "left",
+                "center",
+                "right"
+              ],
+              "counts": [
+                5,
+                3,
+                8
+              ]
+            },
+            "vertical_bins": {
+              "edges_uu": [
+                0.0,
+                214.25833333333333,
+                428.51666666666665,
+                642.775
+              ],
+              "labels": [
+                "low",
+                "middle",
+                "high"
+              ],
+              "counts": [
+                8,
+                8,
+                0
+              ]
+            },
+            "histogram_x_by_z": {
+              "x_edges_uu": [
+                -892.755,
+                -714.204,
+                -535.653,
+                -357.102,
+                -178.55100000000004,
+                -1.1368683772161603e-13,
+                178.55100000000004,
+                357.102,
+                535.6529999999999,
+                714.2039999999998,
+                892.755
+              ],
+              "z_edges_uu": [
+                0.0,
+                107.12916666666666,
+                214.25833333333333,
+                321.3875,
+                428.51666666666665,
+                535.6458333333333,
+                642.775
+              ],
+              "counts": [
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  4,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  0,
+                  4,
+                  0,
+                  0,
+                  0
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "performance": {
+      "profiled_first_ticks": {
+        "physics_ticks_requested": 8,
+        "seconds": 1.0774075998924673,
+        "world_ticks_per_second": 74.25230711940824
+      },
+      "profiled_h2d_d2h_event_count": 0,
+      "profiled_h2d_d2h_event_names": [],
+      "long_timed_blocks_seconds": 251.81929319980554,
+      "long_timed_blocks_world_ticks": 395920,
+      "long_timed_blocks_world_ticks_per_second": 1572.2385484016827,
+      "peak_cuda_bytes": 38872576,
+      "world_host_to_device_bytes_after_initialization": 0,
+      "world_device_to_host_bytes_before_final_export": 0,
+      "nexto_timed_h2d_bytes": 0,
+      "nexto_timed_d2h_bytes": 0,
+      "compact_phase_boundary_exports": 2
+    },
+    "checkpoint": {
+      "path": "G:/dev/RivalSim-runs/codex-autonomous-v22/candidate_09.pt",
+      "sha256": "3B9D15CCB42B533F861E0096996B6BAA1D1B271AA7F5695A12A3BB7C51F6CDAD",
+      "size_bytes": 12404743,
+      "format": "RIVAL2_CHECKPOINT_V1",
+      "iteration": 4579,
+      "policy_version": 4590,
+      "total_agent_samples": 30962274060,
+      "policy_config": {
+        "obs_dim": 182,
+        "hidden_dim": 512,
+        "hidden_layers": 3,
+        "activation": "silu",
+        "actor_outputs": 13,
+        "log_std_min": -5.0,
+        "log_std_max": 1.0,
+        "dtype": "float32",
+        "autocast": false,
+        "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+        "zero_previous_action_inputs": false
+      },
+      "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+      "reward_version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+      "episode_version": "RIVAL2_EPISODE_V1",
+      "contract_hashes": {
+        "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+        "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+        "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+        "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E"
+      },
+      "observation_version": "RIVAL2_OBS_V2_120HZ",
+      "action_version": "RIVAL2_ACTION_V2_120HZ",
+      "policy_hz": 120
+    },
+    "goal_telemetry_capacity_per_world": 128,
+    "goal_telemetry_overflow_worlds": 0,
+    "canonical_match_ledger": [
+      {
+        "match": 1,
+        "starting_layout": 0,
+        "starting_layout_name": "Blue diagonal-left",
+        "rival_side": "Blue",
+        "blue_score": 7,
+        "orange_score": 14,
+        "rival_score": 7,
+        "nexto_score": 14,
+        "scoreline_rival_nexto": "7-14",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 2,
+        "starting_layout": 0,
+        "starting_layout_name": "Blue diagonal-left",
+        "rival_side": "Orange",
+        "blue_score": 13,
+        "orange_score": 12,
+        "rival_score": 12,
+        "nexto_score": 13,
+        "scoreline_rival_nexto": "12-13",
+        "winner": "Nexto",
+        "entered_overtime": true,
+        "overtime_ticks": 1414,
+        "total_physics_ticks": 37414
+      },
+      {
+        "match": 3,
+        "starting_layout": 1,
+        "starting_layout_name": "Blue diagonal-right",
+        "rival_side": "Blue",
+        "blue_score": 9,
+        "orange_score": 15,
+        "rival_score": 9,
+        "nexto_score": 15,
+        "scoreline_rival_nexto": "9-15",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 4,
+        "starting_layout": 1,
+        "starting_layout_name": "Blue diagonal-right",
+        "rival_side": "Orange",
+        "blue_score": 15,
+        "orange_score": 6,
+        "rival_score": 6,
+        "nexto_score": 15,
+        "scoreline_rival_nexto": "6-15",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 5,
+        "starting_layout": 2,
+        "starting_layout_name": "Blue off-center-left",
+        "rival_side": "Blue",
+        "blue_score": 8,
+        "orange_score": 14,
+        "rival_score": 8,
+        "nexto_score": 14,
+        "scoreline_rival_nexto": "8-14",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 6,
+        "starting_layout": 2,
+        "starting_layout_name": "Blue off-center-left",
+        "rival_side": "Orange",
+        "blue_score": 14,
+        "orange_score": 12,
+        "rival_score": 12,
+        "nexto_score": 14,
+        "scoreline_rival_nexto": "12-14",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 7,
+        "starting_layout": 3,
+        "starting_layout_name": "Blue off-center-right",
+        "rival_side": "Blue",
+        "blue_score": 7,
+        "orange_score": 11,
+        "rival_score": 7,
+        "nexto_score": 11,
+        "scoreline_rival_nexto": "7-11",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 8,
+        "starting_layout": 3,
+        "starting_layout_name": "Blue off-center-right",
+        "rival_side": "Orange",
+        "blue_score": 13,
+        "orange_score": 8,
+        "rival_score": 8,
+        "nexto_score": 13,
+        "scoreline_rival_nexto": "8-13",
+        "winner": "Nexto",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 9,
+        "starting_layout": 4,
+        "starting_layout_name": "center",
+        "rival_side": "Blue",
+        "blue_score": 27,
+        "orange_score": 8,
+        "rival_score": 27,
+        "nexto_score": 8,
+        "scoreline_rival_nexto": "27-8",
+        "winner": "Rival",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      },
+      {
+        "match": 10,
+        "starting_layout": 4,
+        "starting_layout_name": "center",
+        "rival_side": "Orange",
+        "blue_score": 8,
+        "orange_score": 16,
+        "rival_score": 16,
+        "nexto_score": 8,
+        "scoreline_rival_nexto": "16-8",
+        "winner": "Rival",
+        "entered_overtime": false,
+        "overtime_ticks": 0,
+        "total_physics_ticks": 36000
+      }
+    ]
+  }
+}
