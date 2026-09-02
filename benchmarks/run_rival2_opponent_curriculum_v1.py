@@ -475,7 +475,7 @@ def _summarize_evaluation(
             "first_goal_terminates": True,
             "no_touch_seconds": 15,
             "hard_limit_seconds": 45,
-            "rival_policy_hz": 30,
+            "rival_policy_hz": int(export.get("rival_policy_hz", 30)),
             "physics_hz": PHYSICS_HZ,
         },
         "episodes": worlds,
@@ -611,7 +611,18 @@ def run_evaluation(
     seed: int,
 ) -> dict[str, Any]:
     rival_side, layout = _assignments(worlds_per_side)
+    checkpoint_payload = torch.load(
+        checkpoint_path, map_location="cpu", weights_only=False
+    )
+    checkpoint_format = checkpoint_payload.get("format")
+    rival_policy_hz = int(checkpoint_payload.get("policy_hz", 30))
+    del checkpoint_payload
     runner_type = NextoShortEpisodeRunner if opponent_name == "Nexto" else WispShortEpisodeRunner
+    runner_kwargs: dict[str, Any] = {}
+    if opponent_name == "Nexto":
+        runner_kwargs["rival_policy_hz"] = rival_policy_hz
+        if checkpoint_format != "RIVAL2_CHECKPOINT_V1":
+            runner_kwargs["accepted_stage1_checkpoint_format"] = checkpoint_format
     runner = runner_type(
         rival_side.size,
         str(collision_dir),
@@ -623,6 +634,7 @@ def run_evaluation(
         evaluation_seed=seed,
         device=device,
         dash_event_capacity=EVALUATION_EVENT_CAPACITY_PER_CAR,
+        **runner_kwargs,
     )
     timing = asdict(runner.run())
     export = runner.export()

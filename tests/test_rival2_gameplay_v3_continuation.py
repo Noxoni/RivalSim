@@ -11,7 +11,11 @@ from benchmarks.run_rival2_gameplay_v3_continuation import (
 from rivalsim.nexto_short_eval import (
     SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS as NEXTO_SUPPORTED_REWARDS,
 )
-from rivalsim.rival2_contracts import RIVAL2_REWARD_GAMEPLAY_V3_VERSION
+from rivalsim.rival2_contracts import (
+    RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+)
 from rivalsim.wisp_short_eval import (
     SUPPORTED_GAMEPLAY_CHECKPOINT_REWARDS as WISP_SUPPORTED_REWARDS,
 )
@@ -111,6 +115,11 @@ def test_continuation_uses_prior_30_update_boundary_cadence() -> None:
 def test_compact_evaluators_accept_gameplay_v3_checkpoints() -> None:
     assert RIVAL2_REWARD_GAMEPLAY_V3_VERSION in NEXTO_SUPPORTED_REWARDS
     assert RIVAL2_REWARD_GAMEPLAY_V3_VERSION in WISP_SUPPORTED_REWARDS
+
+
+def test_nexto_evaluator_accepts_native_120hz_gameplay_checkpoints() -> None:
+    assert RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION in NEXTO_SUPPORTED_REWARDS
+    assert RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION in NEXTO_SUPPORTED_REWARDS
 
 
 def test_campaign_wrapper_recognizes_recorded_hard_stops() -> None:
