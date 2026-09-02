@@ -48,6 +48,8 @@ DEFAULT_OUTPUT = (
 )
 PHYSICS_HZ = 120
 SUPERSONIC_UU_PER_SECOND = 2200.0
+MAXIMUM_OVERTIME_TICKS = 5 * 60 * PHYSICS_HZ
+OVERTIME_POLL_TICKS = 10 * PHYSICS_HZ
 
 
 class _PhysicalTelemetryMixin:
@@ -81,6 +83,7 @@ class _PhysicalTelemetryMixin:
             "world_contact_normal_z",
         )
         int_names = (
+            "match_active",
             "on_ground",
             "wheel_contacts",
             "has_flipped",
@@ -133,7 +136,9 @@ class _PhysicalTelemetryMixin:
         return reshaped[self.batch_index, self.nexto_side]
 
     def _record_post_physics(
-        self, ball_velocity_before: torch.Tensor
+        self,
+        ball_velocity_before: torch.Tensor,
+        match_active_before: torch.Tensor,
     ) -> None:
         index = self.trace_index
         if index >= self.trace_ticks:
@@ -150,6 +155,9 @@ class _PhysicalTelemetryMixin:
         hit_rival = torch.where(self.rival_side == 0, self._hit_a, self._hit_b)
         hit_nexto = torch.where(self.rival_side == 0, self._hit_b, self._hit_a)
 
+        self.trace["match_active"][index].copy_(
+            match_active_before.to(torch.int16)
+        )
         self.trace["car_x"][index].copy_(car_pos[:, 0])
         self.trace["car_y"][index].copy_(car_pos[:, 1])
         self.trace["car_z"][index].copy_(car_pos[:, 2])
@@ -226,6 +234,7 @@ class _PhysicalTelemetryMixin:
             self._update_rival_action()
         if self.host_tick % self.lifecycle_cadence_ticks == 0:
             self.world.begin_decision()
+        match_active_before = self.match_views["done"] == 0
         kickoff_active = self.match_views["kickoff_active"] != 0
         nexto_action, _indices = self.nexto.tick_action(
             self.nexto_state, kickoff_active
@@ -235,7 +244,7 @@ class _PhysicalTelemetryMixin:
         self.bridge.set_actions(self.actions)
         ball_velocity_before = self.bridge.views["ball_vel"].clone()
         self.world.step_graph(1)
-        self._record_post_physics(ball_velocity_before)
+        self._record_post_physics(ball_velocity_before, match_active_before)
 
         self.match_views["rival_scheduler_tick"].add_(1).remainder_(
             self.rival_cadence_ticks
@@ -342,19 +351,22 @@ def _analyze_subset(
     trace: dict[str, np.ndarray], world_indices: np.ndarray, rival_side: np.ndarray
 ) -> dict[str, Any]:
     selected = np.asarray(world_indices, dtype=np.int64)
-    ground = trace["on_ground"][:, selected] != 0
-    airborne = ~ground
+    active = trace["match_active"][:, selected] != 0
+    ground = (trace["on_ground"][:, selected] != 0) & active
+    airborne = (trace["on_ground"][:, selected] == 0) & active
     speed = trace["horizontal_speed"][:, selected]
     car_z = trace["car_z"][:, selected]
     ball_z = trace["ball_z"][:, selected]
     action = trace["action"][:, selected]
-    raw_rival_hit = trace["rival_hit_raw"][:, selected] != 0
-    raw_nexto_hit = trace["nexto_hit_raw"][:, selected] != 0
+    raw_rival_hit = (trace["rival_hit_raw"][:, selected] != 0) & active
+    raw_nexto_hit = (trace["nexto_hit_raw"][:, selected] != 0) & active
     rival_touch = _rising(raw_rival_hit)
     nexto_touch = _rising(raw_nexto_hit)
-    jump_rising = _rising(action[..., 5] >= 0.5)
-    flip_rising = _rising(trace["has_flipped"][:, selected] != 0)
-    goal = trace["goal_scored"][:, selected] != 0
+    jump_rising = _rising((action[..., 5] >= 0.5) & active) & active
+    flip_rising = _rising(
+        (trace["has_flipped"][:, selected] != 0) & active
+    ) & active
+    goal = (trace["goal_scored"][:, selected] != 0) & active
 
     ground_speed = speed[ground]
     air_speed = speed[airborne]
@@ -396,7 +408,7 @@ def _analyze_subset(
             multi_elevated_touch_episodes += int(
                 elevated_touch[start:end, local_world].sum() >= 2
             )
-            if end < ground.shape[0]:
+            if end < ground.shape[0] and active[end, local_world]:
                 landing_count += 1
                 recent_start = max(start, end - 12)
                 recent_flip = bool(
@@ -532,14 +544,16 @@ def _analyze_subset(
             bool(np.any(goal_rows & (scoring_rows == side)))
         )
 
-    total_ticks = int(ground.size)
+    total_ticks = int(active.sum())
     match_minutes = total_ticks / PHYSICS_HZ / 60.0
     return {
         "worlds": int(selected.size),
         "match_minutes": match_minutes,
         "air": {
-            "airborne_tick_fraction": float(airborne.mean()),
-            "maximum_car_height_uu": float(car_z.max()),
+            "airborne_tick_fraction": float(
+                airborne.sum() / max(1, total_ticks)
+            ),
+            "maximum_car_height_uu": float(car_z[active].max()),
             "airborne_horizontal_speed_uu_per_second": _distribution(air_speed),
             "air_episode_count": len(episode_durations),
             "air_episode_duration_seconds": _distribution(
@@ -582,7 +596,9 @@ def _analyze_subset(
             "last_touch_ball_height_uu": _distribution(goal_last_touch_ball_z),
         },
         "ground": {
-            "grounded_tick_fraction": float(ground.mean()),
+            "grounded_tick_fraction": float(
+                ground.sum() / max(1, total_ticks)
+            ),
             "horizontal_speed_uu_per_second": _distribution(ground_speed),
             "fraction_above_1400uu_per_second": float(
                 (ground_speed >= 1400.0).mean()
@@ -706,20 +722,42 @@ def run(args: argparse.Namespace) -> int:
         rival_side=rival_side,
         stochastic_rival=False,
         evaluation_seed=int(args.seed),
-        trace_ticks=REGULATION_TICKS,
+        trace_ticks=REGULATION_TICKS + MAXIMUM_OVERTIME_TICKS,
     )
     print("physical telemetry: running 10 deterministic regulation matches", flush=True)
     timing = runner.run_ticks(REGULATION_TICKS)
+    timing_seconds = timing.seconds
     status = runner.phase_status()
+    overtime_ticks_run = 0
+    while np.any(status["done"] == 0) and overtime_ticks_run < MAXIMUM_OVERTIME_TICKS:
+        ticks = min(
+            OVERTIME_POLL_TICKS,
+            MAXIMUM_OVERTIME_TICKS - overtime_ticks_run,
+        )
+        print(
+            "physical telemetry: advancing "
+            f"{int((status['done'] == 0).sum())} tied match(es) through overtime",
+            flush=True,
+        )
+        overtime_timing = runner.run_ticks(ticks)
+        timing_seconds += overtime_timing.seconds
+        overtime_ticks_run += ticks
+        status = runner.phase_status()
     if np.any(status["done"] == 0):
-        raise RuntimeError("physical telemetry authority expected no overtime")
+        raise RuntimeError(
+            "physical telemetry overtime exceeded the frozen five-minute bound"
+        )
     trace = runner.trace_numpy()
     exported = runner.export()
     raw = exported["raw"]
     observed_touches = int(
         raw["touch_count"][np.arange(10), rival_side].sum()
     )
-    traced_touch_count = int(_rising(trace["rival_hit_raw"] != 0).sum())
+    traced_touch_count = int(
+        _rising(
+            (trace["rival_hit_raw"] != 0) & (trace["match_active"] != 0)
+        ).sum()
+    )
     if observed_touches != traced_touch_count:
         raise RuntimeError(
             f"touch trace mismatch: {traced_touch_count} != {observed_touches}"
@@ -739,8 +777,13 @@ def run(args: argparse.Namespace) -> int:
             "seed": int(args.seed),
             "matrix": "five standard kickoff layouts x both Rival sides",
             "physics_hz": PHYSICS_HZ,
-            "physics_ticks": REGULATION_TICKS,
-            "seconds": timing.seconds,
+            "physics_ticks": int(runner.trace_index),
+            "regulation_ticks": REGULATION_TICKS,
+            "overtime_ticks_run": overtime_ticks_run,
+            "maximum_overtime_ticks": MAXIMUM_OVERTIME_TICKS,
+            "per_world_total_ticks": status["total_ticks"].astype(int).tolist(),
+            "per_world_overtime_ticks": status["overtime_ticks"].astype(int).tolist(),
+            "seconds": timing_seconds,
             "score": {
                 "wins": int((status["winner"] == rival_side).sum()),
                 "losses": int((status["winner"] != rival_side).sum()),
