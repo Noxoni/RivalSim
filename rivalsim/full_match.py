@@ -26,7 +26,9 @@ from rivalsim.behavioral_telemetry import (
     _surface_category,
 )
 from rivalsim.rival2_contracts import (
+    RIVAL2_ACTION_V2_120HZ_VERSION,
     RIVAL2_EPISODE_VERSION,
+    RIVAL2_OBS_V2_120HZ_VERSION,
     RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
     RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
     RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
@@ -669,8 +671,24 @@ class FullMatchRunner:
         checkpoint_path = Path(checkpoint_path)
         checkpoint_sha = hashlib.sha256(checkpoint_path.read_bytes()).hexdigest().upper()
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-        if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
+        checkpoint_format = str(payload.get("format", ""))
+        is_ppo_checkpoint = checkpoint_format == "RIVAL2_CHECKPOINT_V1"
+        is_human_bc_checkpoint = checkpoint_format.startswith(
+            "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V"
+        )
+        if not is_ppo_checkpoint and not is_human_bc_checkpoint:
             raise RuntimeError("unsupported Rival checkpoint format")
+        if is_human_bc_checkpoint:
+            if (
+                payload.get("observation_version") != RIVAL2_OBS_V2_120HZ_VERSION
+                or payload.get("action_version")
+                != RIVAL2_ACTION_V2_120HZ_VERSION
+                or int(payload.get("physics_hz", 0)) != PHYSICS_HZ
+                or int(payload.get("policy_hz", 0)) != PHYSICS_HZ
+            ):
+                raise RuntimeError(
+                    "human-BC checkpoint does not use the native 120 Hz Rival contracts"
+                )
         checkpoint_reward = payload.get("reward_version")
         supported_rewards = (
             RIVAL2_REWARD_VERSION,
@@ -680,9 +698,11 @@ class FullMatchRunner:
             RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
             RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
         )
-        if checkpoint_reward not in supported_rewards:
+        if is_ppo_checkpoint and checkpoint_reward not in supported_rewards:
             raise RuntimeError("full-match runner requires a Gameplay V1/V2/V3 checkpoint")
-        modern_gameplay_checkpoint = checkpoint_reward != RIVAL2_REWARD_VERSION
+        modern_gameplay_checkpoint = (
+            is_ppo_checkpoint and checkpoint_reward != RIVAL2_REWARD_VERSION
+        )
         if modern_gameplay_checkpoint:
             if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
                 raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
@@ -699,23 +719,37 @@ class FullMatchRunner:
         self.rival_cadence_ticks = PHYSICS_HZ // self.rival_policy_hz
         self.lifecycle_cadence_ticks = RIVAL_CADENCE_TICKS
         policy_config = Rival2PolicyConfig(**payload["policy_config"])
-        if policy_config.content_hash != payload["policy_config_hash"]:
+        declared_policy_hash = payload.get("policy_config_hash")
+        if (
+            declared_policy_hash is not None
+            and policy_config.content_hash != declared_policy_hash
+        ):
             raise RuntimeError("Rival checkpoint policy contract mismatch")
         self.rival_policy = Rival2ActorCritic(policy_config).to(self.device)
         self.rival_policy.load_state_dict(payload["model"])
         self.rival_policy.eval()
+        counters = payload.get("counters", {})
+        bc_step = int(
+            counters.get(
+                "cumulative_human_bc_steps",
+                counters.get("accepted_actor_only_supervised_steps", 0),
+            )
+        )
         self.checkpoint_identity = {
             "path": checkpoint_path.as_posix(),
             "sha256": checkpoint_sha,
             "size_bytes": checkpoint_path.stat().st_size,
-            "iteration": int(payload["iteration"]),
-            "policy_version": int(payload["policy_version"]),
-            "total_agent_samples": int(payload["total_agent_samples"]),
+            "format": checkpoint_format,
+            "iteration": int(payload.get("iteration", bc_step)),
+            "policy_version": int(payload.get("policy_version", bc_step)),
+            "total_agent_samples": int(payload.get("total_agent_samples", 0)),
             "policy_config": asdict(policy_config),
             "policy_config_hash": policy_config.content_hash,
-            "reward_version": payload["reward_version"],
+            "reward_version": checkpoint_reward,
             "episode_version": payload.get("episode_version"),
             "contract_hashes": payload.get("contract_hashes"),
+            "observation_version": payload.get("observation_version"),
+            "action_version": payload.get("action_version"),
             "policy_hz": self.rival_policy_hz,
         }
         del payload

@@ -1,0 +1,166 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_MATCH_WINDOW_EVALUATION",
+  "checkpoint": {
+    "path": "G:/dev/RivalSim/checkpoints/rival2/human_bc_v5/rival2_human_bc_v5.pt",
+    "sha256": "F9100E543F48B1AD9E447179DFC2022774F039AD8D47F9FBF07359B7E1D12FE8",
+    "size_bytes": 3004125,
+    "format": "RIVAL2_HUMAN_BEHAVIOR_CLONING_CHECKPOINT_V5",
+    "iteration": 416,
+    "policy_version": 416,
+    "total_agent_samples": 0,
+    "policy_config": {
+      "obs_dim": 182,
+      "hidden_dim": 512,
+      "hidden_layers": 3,
+      "activation": "silu",
+      "actor_outputs": 13,
+      "log_std_min": -5.0,
+      "log_std_max": 1.0,
+      "dtype": "float32",
+      "autocast": false,
+      "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+      "zero_previous_action_inputs": false
+    },
+    "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+    "reward_version": null,
+    "episode_version": null,
+    "contract_hashes": null,
+    "observation_version": "RIVAL2_OBS_V2_120HZ",
+    "action_version": "RIVAL2_ACTION_V2_120HZ",
+    "policy_hz": 120
+  },
+  "checkpoint_sha256": "F9100E543F48B1AD9E447179DFC2022774F039AD8D47F9FBF07359B7E1D12FE8",
+  "opponent": "Nexto",
+  "action_mode": "deterministic_deployment",
+  "window_seconds": 60,
+  "physics_ticks": 7200,
+  "matrix": "five standard kickoff layouts x both Rival sides",
+  "seed": 2026090206,
+  "overall": {
+    "goals_for": 2,
+    "goals_against": 50,
+    "goal_differential": -48,
+    "rival_touches": 85,
+    "opponent_touches": 426,
+    "touch_differential": -341,
+    "rival_touch_share": 0.16634050880626222,
+    "rival_kickoff_first_touches": 35,
+    "opponent_kickoff_first_touches": 26
+  },
+  "by_rival_side": {
+    "blue": {
+      "worlds": 5,
+      "goals_for": 0,
+      "goals_against": 25,
+      "goal_differential": -25,
+      "rival_touches": 42,
+      "opponent_touches": 201,
+      "rival_touch_share": 0.1728395061728395,
+      "rival_kickoff_first_touches": 17,
+      "opponent_kickoff_first_touches": 13
+    },
+    "orange": {
+      "worlds": 5,
+      "goals_for": 2,
+      "goals_against": 25,
+      "goal_differential": -23,
+      "rival_touches": 43,
+      "opponent_touches": 225,
+      "rival_touch_share": 0.16044776119402984,
+      "rival_kickoff_first_touches": 18,
+      "opponent_kickoff_first_touches": 13
+    }
+  },
+  "per_layout_side": [
+    {
+      "layout": 0,
+      "rival_side": "Blue",
+      "goals_for": 0,
+      "goals_against": 4,
+      "rival_touches": 8,
+      "opponent_touches": 41
+    },
+    {
+      "layout": 0,
+      "rival_side": "Orange",
+      "goals_for": 0,
+      "goals_against": 5,
+      "rival_touches": 12,
+      "opponent_touches": 71
+    },
+    {
+      "layout": 1,
+      "rival_side": "Blue",
+      "goals_for": 0,
+      "goals_against": 5,
+      "rival_touches": 9,
+      "opponent_touches": 25
+    },
+    {
+      "layout": 1,
+      "rival_side": "Orange",
+      "goals_for": 1,
+      "goals_against": 4,
+      "rival_touches": 8,
+      "opponent_touches": 48
+    },
+    {
+      "layout": 2,
+      "rival_side": "Blue",
+      "goals_for": 0,
+      "goals_against": 5,
+      "rival_touches": 6,
+      "opponent_touches": 34
+    },
+    {
+      "layout": 2,
+      "rival_side": "Orange",
+      "goals_for": 1,
+      "goals_against": 5,
+      "rival_touches": 7,
+      "opponent_touches": 39
+    },
+    {
+      "layout": 3,
+      "rival_side": "Blue",
+      "goals_for": 0,
+      "goals_against": 6,
+      "rival_touches": 10,
+      "opponent_touches": 38
+    },
+    {
+      "layout": 3,
+      "rival_side": "Orange",
+      "goals_for": 0,
+      "goals_against": 5,
+      "rival_touches": 5,
+      "opponent_touches": 16
+    },
+    {
+      "layout": 4,
+      "rival_side": "Blue",
+      "goals_for": 0,
+      "goals_against": 5,
+      "rival_touches": 9,
+      "opponent_touches": 63
+    },
+    {
+      "layout": 4,
+      "rival_side": "Orange",
+      "goals_for": 0,
+      "goals_against": 6,
+      "rival_touches": 11,
+      "opponent_touches": 51
+    }
+  ],
+  "performance": {
+    "seconds": 39.680106499930844,
+    "world_ticks_per_second": 1814.5112589384175,
+    "peak_cuda_bytes": 38872576,
+    "world_h2d_bytes": 0,
+    "world_d2h_bytes_before_export": 0,
+    "nexto_timed_h2d_bytes": 0,
+    "nexto_timed_d2h_bytes": 0
+  },
+  "policy_mutation": false
+}
