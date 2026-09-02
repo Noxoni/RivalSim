@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import torch
 
+from benchmarks.run_rival2_aerial_intercept_hybrid_v1 import promotion_verdict
 from rivalsim.rival2_aerial_intercept_hybrid import (
     AerialInterceptGateConfig,
     AerialInterceptHybridController,
@@ -85,3 +86,41 @@ def test_nonfinite_observation_fails_closed() -> None:
         assert "nonfinite" in str(exc)
     else:
         raise AssertionError("nonfinite observation did not fail closed")
+
+
+def test_campaign_promotion_requires_physical_aerial_results() -> None:
+    authority = {
+        "validation": {
+            "baseline": {"touches": 100, "touches_per_minute": 10.0},
+            "promotion_gate": {
+                "minimum_wins": 6,
+                "maximum_losses": 4,
+                "minimum_goal_differential": 0,
+                "minimum_touch_fraction_of_v23": 0.8,
+                "minimum_touch_rate_fraction_of_v23": 0.8,
+                "minimum_high_aerial_contacts": 5,
+                "minimum_high_aerial_goals": 1,
+                "maximum_additional_no_touch_worlds": 0,
+            },
+        }
+    }
+    report = {
+        "evaluation": {
+            "score": {"wins": 6, "losses": 4, "rival_goals": 12, "nexto_goals": 10},
+            "no_touch_worlds": 0,
+            "finite_actions_and_observations": True,
+        },
+        "overall": {
+            "touches": {"total": 80, "per_minute": 8.0, "high_aerial_proxy": 5},
+            "scoring": {"goals_from_high_aerial_proxy": 1},
+        },
+        "option": {
+            "per_side": {"blue": {"activations": 1}, "orange": {"activations": 1}}
+        },
+    }
+    passed, checks = promotion_verdict(report, authority)
+    assert passed and all(checks.values())
+    report["overall"]["touches"]["high_aerial_proxy"] = 4
+    passed, checks = promotion_verdict(report, authority)
+    assert not passed
+    assert not checks["high_aerial_contacts"]
