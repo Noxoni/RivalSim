@@ -578,6 +578,18 @@ def short_screen(
             np.abs(trace["action"][..., :5]) > 0.95
         ).mean(axis=(0, 1)).tolist(),
     }
+    # FullMatchRunner activates a Torch wrapper around its Warp-owned stream.
+    # Restore a process-owned default stream before releasing the runner;
+    # otherwise the next Rival2Env can inherit a stream whose Warp handle was
+    # destroyed with the evaluation world.
+    torch.cuda.synchronize(runner.device)
+    default_stream = torch.cuda.default_stream(runner.device)
+    torch.cuda.set_stream(default_stream)
+    wp.set_stream(
+        wp.stream_from_torch(default_stream),
+        device=runner.world.device,
+        sync=False,
+    )
     del runner
     gc.collect()
     torch.cuda.empty_cache()
