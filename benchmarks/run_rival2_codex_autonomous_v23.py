@@ -137,7 +137,11 @@ def run(args: argparse.Namespace) -> int:
     nexto_matches.FullMatchRunner = SideSpecializedFullMatchRunner
     layout = np.repeat(np.arange(5, dtype=np.int32), 2)
     rival_side = np.tile(np.asarray([0, 1], dtype=np.int32), 5)
-    canonical, _raw = nexto_matches._run_suite(name="canonical_side_specialized", layout=layout, rival_side=rival_side, stochastic_rival=False, seed=int(args.seed))
+    canonical, raw = nexto_matches._run_suite(name="canonical_side_specialized", layout=layout, rival_side=rival_side, stochastic_rival=False, seed=int(args.seed))
+    # The established suite only attaches its ledger for the literal historical
+    # suite name.  V23 deliberately uses a distinct name, so serialize the same
+    # authoritative raw match rows explicitly.
+    canonical["canonical_match_ledger"] = nexto_matches._canonical_ledger(raw)
     evaluation = {
         "format": "RIVAL2_CODEX_AUTONOMOUS_V23_SIDE_SPECIALIZED_EVALUATION",
         "authority_sha256": base.sha256_file(AUTHORITY),
