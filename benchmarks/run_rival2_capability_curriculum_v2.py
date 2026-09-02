@@ -71,6 +71,14 @@ DEFAULT_COLLISION_ROOT = Path("G:/dev/RLBot-Rival/bot/collision_meshes")
 SEED = 2_026_090_221
 TARGET_LABELS = v1.TARGET_LABELS
 
+# Evaluation runners install a Torch external-stream wrapper around the active
+# Warp stream.  A fresh, process-owned handoff stream must outlive each runner;
+# retaining both wrappers avoids leaving either runtime pointed at an object
+# released with the evaluation world.  At most a few dozen streams are kept for
+# this bounded campaign.
+_CUDA_LIFETIME_WARP_STREAMS: list[wp.Stream] = []
+_CUDA_LIFETIME_TORCH_STREAMS: list[torch.cuda.Stream] = []
+
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat()
@@ -85,6 +93,18 @@ def write_json(path: Path, payload: Any) -> None:
         newline="\n",
     )
     os.replace(temporary, path)
+
+
+def release_full_match_runner(runner: FullMatchRunner) -> None:
+    """Move Torch and Warp to a persistent stream before releasing a runner."""
+
+    torch.cuda.synchronize(runner.device)
+    warp_stream = wp.Stream(device=runner.world.device)
+    torch_stream = wp.stream_to_torch(warp_stream)
+    wp.set_stream(warp_stream, device=runner.world.device, sync=False)
+    torch.cuda.set_stream(torch_stream)
+    _CUDA_LIFETIME_WARP_STREAMS.append(warp_stream)
+    _CUDA_LIFETIME_TORCH_STREAMS.append(torch_stream)
 
 
 def append_jsonl(path: Path, payload: Any) -> None:
@@ -229,6 +249,7 @@ def collect_on_policy_pool(
             ].detach().cpu()
         )
     result = torch.cat(rows)
+    release_full_match_runner(runner)
     del runner
     gc.collect()
     torch.cuda.empty_cache()
@@ -578,18 +599,7 @@ def short_screen(
             np.abs(trace["action"][..., :5]) > 0.95
         ).mean(axis=(0, 1)).tolist(),
     }
-    # FullMatchRunner activates a Torch wrapper around its Warp-owned stream.
-    # Restore a process-owned default stream before releasing the runner;
-    # otherwise the next Rival2Env can inherit a stream whose Warp handle was
-    # destroyed with the evaluation world.
-    torch.cuda.synchronize(runner.device)
-    default_stream = torch.cuda.default_stream(runner.device)
-    torch.cuda.set_stream(default_stream)
-    wp.set_stream(
-        wp.stream_from_torch(default_stream),
-        device=runner.world.device,
-        sync=False,
-    )
+    release_full_match_runner(runner)
     del runner
     gc.collect()
     torch.cuda.empty_cache()
