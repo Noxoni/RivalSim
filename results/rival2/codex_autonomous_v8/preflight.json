@@ -1,0 +1,113 @@
+{
+  "authority_sha256": "A8EF606965C7727B61080AC0EB40479220FA763F0BF4E759828618C0438970BE",
+  "checks": {
+    "critic_frozen": true,
+    "fresh_actor_optimizer": true,
+    "human_test_not_loaded": true,
+    "nexto_only_collection": true,
+    "ppo_steps_zero": true,
+    "source_exact": true
+  },
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V8_PREFLIGHT",
+  "human_identity": {
+    "adapter": {
+      "external_frozen": true,
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "requires_grad_false": true,
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+      "tensor_sha256": "797E7139C485C692C2280F1CB126B9D1D682F1A8911C63AC46A4008042364863",
+      "version": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
+    },
+    "frozen_config": {
+      "git_blob_oid": "4bc422d42ed413d2fe1cf8d1943b3b84e2710172",
+      "origin_main": "9fa8ad8fbe063c9b067146a2c4698c9de9446084",
+      "path": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+      "pre_step_git_commit": "9fa8ad8fbe063c9b067146a2c4698c9de9446084",
+      "required_parent": "1fbfc1bddf77ebdf4c2f8cc66405f8a0998f81f5",
+      "required_parent_is_ancestor": true,
+      "sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4"
+    },
+    "test_loaded": false,
+    "train_action_sha256": "3355FA664016AFD42DB2FA58954122E5436B683ABEBC8FA5BAF43525E9ECC6E7",
+    "train_sequences_sha256": "9F2EA20534D7AC61E6AE7CCDED0F7A866392A32E788379BEA2F9BB0B5A2B6938",
+    "validation_action_sha256": "1F922D29CF5BA45229C0FB37672B8D7EFA4B9D6D1F68759E29ADC78D408FE4F6",
+    "validation_sequences_sha256": "F588F38C58A111DD7D79DC65F673DE71FAF786134154DC4862F1B43DB01E06EC"
+  },
+  "nexto_corpus": {
+    "action_mean": [
+      0.6203049421310425,
+      0.049087606370449066,
+      -0.1650530993938446,
+      -0.04219472035765648,
+      -0.0557863712310791,
+      0.3260488510131836,
+      0.5096817016601562,
+      0.25090789794921875
+    ],
+    "action_nonzero_fraction": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.3260488510131836,
+      0.5096817016601562,
+      0.25090789794921875
+    ],
+    "consecutive_rollouts": 16,
+    "horizon": 128,
+    "rollout_curriculum": {
+      "opponent_wins": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 4456.0,
+        "wisp": 0.0
+      },
+      "rival_wins": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 2901.0,
+        "wisp": 0.0
+      },
+      "terminated_episodes": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 7357.0,
+        "wisp": 0.0
+      },
+      "trainable_agent_samples": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 16777216.0,
+        "wisp": 0.0
+      },
+      "trainable_reward_sum": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": -13955.297576089195,
+        "wisp": 0.0
+      },
+      "truncated_episodes": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 0.0,
+        "wisp": 0.0
+      },
+      "world_decisions": {
+        "current": 0.0,
+        "historical": 0.0,
+        "nexto": 16777216.0,
+        "wisp": 0.0
+      }
+    },
+    "samples": 1048576,
+    "simulated_seconds_per_world": 17.066666666666666,
+    "train_samples": 917504,
+    "validation_samples": 131072,
+    "validation_world_start": 7168,
+    "worlds": 8192
+  },
+  "source_model_tensor_sha256": "E7167577A87DB5E33E8A848C1B59770C92FAEAF39F0944662FB5F668EB5DD6A3",
+  "source_sha256": "172BA59786A2E08EB6DC95CFE29F20C21826F7CB9429FF3C89F4D7C4F4BD9E10",
+  "verdict": "PASS"
+}
