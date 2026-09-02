@@ -30,6 +30,7 @@ from benchmarks.run_rival2_codex_autonomous_v23 import (  # noqa: E402
     SideSpecializedFullMatchRunner,
 )
 from rivalsim.full_match import (  # noqa: E402
+    FullMatchRunner,
     NEXTO_CADENCE_TICKS,
     REGULATION_TICKS,
 )
@@ -43,10 +44,8 @@ PHYSICS_HZ = 120
 SUPERSONIC_UU_PER_SECOND = 2200.0
 
 
-class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
-    """Side-specialized runner with bounded post-physics trace capture."""
-
-    orange_checkpoint = ORANGE
+class _PhysicalTelemetryMixin:
+    """Bounded post-physics trace capture shared by uniform and V23 runners."""
 
     def __init__(self, *args: Any, trace_ticks: int, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -54,7 +53,13 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
         self.trace_index = 0
         shape = (self.trace_ticks, self.num_worlds)
         float_names = (
+            "car_x",
+            "car_y",
             "car_z",
+            "opponent_x",
+            "opponent_y",
+            "ball_x",
+            "ball_y",
             "ball_z",
             "horizontal_speed",
             "speed_3d",
@@ -65,6 +70,9 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
             "ball_speed_after",
             "ball_velocity_y_before",
             "ball_velocity_y_after",
+            "world_contact_normal_x",
+            "world_contact_normal_y",
+            "world_contact_normal_z",
         )
         int_names = (
             "on_ground",
@@ -77,6 +85,7 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
             "goal_scored",
             "scoring_team",
             "pre_tick_first_car",
+            "rival_demo_count",
         )
         self.trace: dict[str, torch.Tensor] = {
             name: torch.empty(shape, dtype=torch.float32, device=self.device)
@@ -98,12 +107,24 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
         self._pre_tick_first_car = wp.to_torch(
             self.world.car_car.pre_tick_first_car
         )
+        self._world_contact_normal = wp.to_torch(
+            self.world.vehicle.world_contact_normal
+        )
+        self._cumulative_demo_count = wp.to_torch(
+            self.telemetry.demo_count
+        ).reshape(self.num_worlds, 2)
 
     def _rival_car(self, name: str) -> torch.Tensor:
         value = self.bridge.views[name]
         trailing = value.shape[1:]
         reshaped = value.reshape(self.num_worlds, 2, *trailing)
         return reshaped[self.batch_index, self.rival_side]
+
+    def _opponent_car(self, name: str) -> torch.Tensor:
+        value = self.bridge.views[name]
+        trailing = value.shape[1:]
+        reshaped = value.reshape(self.num_worlds, 2, *trailing)
+        return reshaped[self.batch_index, self.nexto_side]
 
     def _record_post_physics(
         self, ball_velocity_before: torch.Tensor
@@ -115,6 +136,7 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
         car_vel = self._rival_car("car_vel")
         car_ang = self._rival_car("car_ang_vel")
         car_quat = self._rival_car("car_quat")
+        opponent_pos = self._opponent_car("car_pos")
         ball_pos = self.bridge.views["ball_pos"]
         ball_vel = self.bridge.views["ball_vel"]
         x, y, _z, _w = car_quat.unbind(-1)
@@ -122,7 +144,13 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
         hit_rival = torch.where(self.rival_side == 0, self._hit_a, self._hit_b)
         hit_nexto = torch.where(self.rival_side == 0, self._hit_b, self._hit_a)
 
+        self.trace["car_x"][index].copy_(car_pos[:, 0])
+        self.trace["car_y"][index].copy_(car_pos[:, 1])
         self.trace["car_z"][index].copy_(car_pos[:, 2])
+        self.trace["opponent_x"][index].copy_(opponent_pos[:, 0])
+        self.trace["opponent_y"][index].copy_(opponent_pos[:, 1])
+        self.trace["ball_x"][index].copy_(ball_pos[:, 0])
+        self.trace["ball_y"][index].copy_(ball_pos[:, 1])
         self.trace["ball_z"][index].copy_(ball_pos[:, 2])
         self.trace["horizontal_speed"][index].copy_(
             torch.linalg.vector_norm(car_vel[:, :2], dim=1)
@@ -169,6 +197,18 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
         self.trace["pre_tick_first_car"][index].copy_(
             self._pre_tick_first_car.to(torch.int16)
         )
+        self.trace["rival_demo_count"][index].copy_(
+            self._cumulative_demo_count[
+                self.batch_index, self.rival_side
+            ].to(torch.int16)
+        )
+        contact_normal = self._world_contact_normal.reshape(
+            self.num_worlds, 2, 3
+        )[self.batch_index, self.rival_side]
+        for axis, name in enumerate(
+            ("world_contact_normal_x", "world_contact_normal_y", "world_contact_normal_z")
+        ):
+            self.trace[name][index].copy_(contact_normal[:, axis])
         self.trace["action"][index].copy_(self.rival_action)
         self.trace_index += 1
 
@@ -213,6 +253,16 @@ class PhysicalTelemetryRunner(SideSpecializedFullMatchRunner):
             name: value[: self.trace_index].detach().cpu().numpy().copy()
             for name, value in self.trace.items()
         }
+
+
+class PhysicalTelemetryRunner(_PhysicalTelemetryMixin, SideSpecializedFullMatchRunner):
+    """V23 side-specialized runner retained for the historical diagnostic."""
+
+    orange_checkpoint = ORANGE
+
+
+class UniformPhysicalTelemetryRunner(_PhysicalTelemetryMixin, FullMatchRunner):
+    """One-checkpoint runner for prospective capability candidates."""
 
 
 def _distribution(values: np.ndarray) -> dict[str, Any]:
@@ -285,6 +335,9 @@ def _analyze_subset(
     flip_active_landings = 0
     short_flip_landings = 0
     speed_gain_flip_landings = 0
+    productive_floor_landings = 0
+    productive_wall_landings = 0
+    productive_landing_events: list[tuple[int, int]] = []
     landing_speed_ratios: list[float] = []
     for local_world in range(selected.size):
         for start, end in _episodes(airborne[:, local_world]):
@@ -317,6 +370,30 @@ def _analyze_subset(
                 speed_gain_flip_landings += int(
                     recent_flip and after_speed - before_speed >= 100.0
                 )
+                normal_z = float(
+                    trace["world_contact_normal_z"][end, selected[local_world]]
+                )
+                productive = bool(
+                    recent_flip
+                    and duration <= 90
+                    and after_speed - before_speed >= 100.0
+                )
+                floor = normal_z >= 0.70
+                wall = abs(normal_z) <= 0.30
+                productive_floor_landings += int(productive and floor)
+                productive_wall_landings += int(productive and wall)
+                if productive:
+                    productive_landing_events.append((local_world, end))
+
+    productive_dash_chains = 0
+    by_world: dict[int, list[int]] = {}
+    for local_world, tick in productive_landing_events:
+        by_world.setdefault(local_world, []).append(tick)
+    for ticks in by_world.values():
+        productive_dash_chains += sum(
+            int(current - previous <= 90)
+            for previous, current in zip(ticks, ticks[1:])
+        )
 
     scoring = trace["scoring_team"][:, selected]
     first_car = trace["pre_tick_first_car"][:, selected]
@@ -371,6 +448,46 @@ def _analyze_subset(
                             and float(last_touch["ball_z"]) >= 300.0
                         )
                 last_touch = None
+
+    cumulative_demos = trace["rival_demo_count"][:, selected].astype(np.int64)
+    previous_demos = np.zeros_like(cumulative_demos)
+    previous_demos[1:] = cumulative_demos[:-1]
+    demo_delta = np.maximum(cumulative_demos - previous_demos, 0)
+    demo_ticks = np.argwhere(demo_delta > 0)
+    demos_total = int(demo_delta.sum())
+    demos_opponent_half = 0
+    demos_offensive_route = 0
+    demos_followed_by_touch = 0
+    demos_followed_by_goal = 0
+    demo_opponent_distances: list[float] = []
+    five_seconds = 5 * PHYSICS_HZ
+    for tick, local_world in demo_ticks.tolist():
+        world = int(selected[local_world])
+        multiplicity = int(demo_delta[tick, local_world])
+        side = int(rival_side[world])
+        direction = 1.0 if side == 0 else -1.0
+        car_y = float(trace["car_y"][tick, world])
+        ball_y_value = float(trace["ball_y"][tick, world])
+        opponent_dx = float(
+            trace["car_x"][tick, world] - trace["opponent_x"][tick, world]
+        )
+        opponent_dy = float(car_y - trace["opponent_y"][tick, world])
+        demo_opponent_distances.extend(
+            [float(np.hypot(opponent_dx, opponent_dy))] * multiplicity
+        )
+        opponent_half = direction * ball_y_value >= 0.0
+        route = opponent_half or direction * car_y >= direction * ball_y_value
+        demos_opponent_half += multiplicity * int(opponent_half)
+        demos_offensive_route += multiplicity * int(route)
+        end = min(goal.shape[0], tick + five_seconds + 1)
+        demos_followed_by_touch += multiplicity * int(
+            bool(rival_touch[tick:end, local_world].any())
+        )
+        goal_rows = goal[tick:end, local_world]
+        scoring_rows = scoring[tick:end, local_world]
+        demos_followed_by_goal += multiplicity * int(
+            bool(np.any(goal_rows & (scoring_rows == side)))
+        )
 
     total_ticks = int(ground.size)
     match_minutes = total_ticks / PHYSICS_HZ / 60.0
@@ -446,26 +563,73 @@ def _analyze_subset(
             "flip_active_landings": flip_active_landings,
             "short_air_flip_active_landings": short_flip_landings,
             "flip_active_landings_with_100uu_speed_gain": speed_gain_flip_landings,
+            "productive_floor_landing_proxy": productive_floor_landings,
+            "productive_wall_landing_proxy": productive_wall_landings,
+            "productive_dash_chain_proxy": productive_dash_chains,
             "landing_speed_retention_ratio": _distribution(landing_speed_ratios),
             "wavedash_interpretation": (
                 "Flip-active landing counts are a broad physics proxy. They include "
                 "ordinary dodge landings and are not proof of intentional wavedashes."
             ),
         },
+        "demolitions": {
+            "total": demos_total,
+            "per_minute": float(demos_total / match_minutes),
+            "opponent_half": demos_opponent_half,
+            "offensive_route_context": demos_offensive_route,
+            "followed_by_rival_touch_within_5_seconds": demos_followed_by_touch,
+            "followed_by_rival_goal_within_5_seconds": demos_followed_by_goal,
+            "opponent_distance_uu": _distribution(demo_opponent_distances),
+            "interpretation": (
+                "Counts are authoritative simulator demolition events. Offensive "
+                "context and five-second follow-ups are descriptive telemetry, not rewards."
+            ),
+        },
     }
 
 
 def run(args: argparse.Namespace) -> int:
-    if sha256_file(BLUE) != BLUE_SHA256:
-        raise RuntimeError("V23 Blue checkpoint identity changed")
-    if sha256_file(ORANGE) != ORANGE_SHA256:
-        raise RuntimeError("V23 Orange checkpoint identity changed")
+    checkpoint = Path(args.checkpoint).resolve() if args.checkpoint else None
+    if checkpoint is None:
+        if sha256_file(BLUE) != BLUE_SHA256:
+            raise RuntimeError("V23 Blue checkpoint identity changed")
+        if sha256_file(ORANGE) != ORANGE_SHA256:
+            raise RuntimeError("V23 Orange checkpoint identity changed")
+        runner_type = PhysicalTelemetryRunner
+        runner_checkpoint = BLUE
+        checkpoint_report: dict[str, Any] = {
+            "blue": {"path": BLUE.relative_to(ROOT).as_posix(), "sha256": BLUE_SHA256},
+            "orange": {
+                "path": ORANGE.relative_to(ROOT).as_posix(),
+                "sha256": ORANGE_SHA256,
+            },
+        }
+        report_format = "RIVAL2_V23_PHYSICAL_BEHAVIOR_TELEMETRY_V2"
+    else:
+        expected = str(args.checkpoint_sha256 or "").upper()
+        observed = sha256_file(checkpoint)
+        if not expected:
+            raise RuntimeError("--checkpoint-sha256 is required with --checkpoint")
+        if observed != expected:
+            raise RuntimeError(
+                f"candidate checkpoint SHA-256 mismatch: {observed} != {expected}"
+            )
+        runner_type = UniformPhysicalTelemetryRunner
+        runner_checkpoint = checkpoint
+        try:
+            relative = checkpoint.relative_to(ROOT).as_posix()
+        except ValueError:
+            relative = checkpoint.as_posix()
+        checkpoint_report = {
+            "uniform": {"path": relative, "sha256": observed}
+        }
+        report_format = "RIVAL2_PHYSICAL_CAPABILITY_TELEMETRY_V1"
     layout = np.repeat(np.arange(5, dtype=np.int32), 2)
     rival_side = np.tile(np.asarray([0, 1], dtype=np.int32), 5)
-    runner = PhysicalTelemetryRunner(
+    runner = runner_type(
         10,
         str(Path(args.collision_root).resolve()),
-        BLUE,
+        runner_checkpoint,
         starting_layout=layout,
         rival_side=rival_side,
         stochastic_rival=False,
@@ -491,18 +655,12 @@ def run(args: argparse.Namespace) -> int:
     blue_worlds = np.flatnonzero(rival_side == 0)
     orange_worlds = np.flatnonzero(rival_side == 1)
     report = {
-        "format": "RIVAL2_V23_PHYSICAL_BEHAVIOR_TELEMETRY_V1",
+        "format": report_format,
         "diagnostic_only": True,
         "policy_mutation": False,
         "optimizer_steps": 0,
         "reward_changes": 0,
-        "checkpoint": {
-            "blue": {"path": BLUE.relative_to(ROOT).as_posix(), "sha256": BLUE_SHA256},
-            "orange": {
-                "path": ORANGE.relative_to(ROOT).as_posix(),
-                "sha256": ORANGE_SHA256,
-            },
-        },
+        "checkpoint": checkpoint_report,
         "evaluation": {
             "opponent": "pinned Nexto",
             "action_mode": "deterministic",
@@ -534,6 +692,15 @@ def run(args: argparse.Namespace) -> int:
                 "airborne-to-ground transition with flip state in preceding 12 ticks; "
                 "speed-gain subset requires >=100 uu/s over preceding 6 ticks"
             ),
+            "productive_floor_landing_proxy": (
+                "the wavedash-like proxy plus first grounded world-contact normal z >= 0.70"
+            ),
+            "productive_wall_landing_proxy": (
+                "the wavedash-like proxy plus absolute first grounded world-contact normal z <= 0.30"
+            ),
+            "productive_dash_chain_proxy": (
+                "two productive landing proxies for one car no more than 90 physics ticks apart"
+            ),
             "supersonic_speed_reference_uu_per_second": SUPERSONIC_UU_PER_SECOND,
         },
         "overall": _analyze_subset(trace, np.arange(10), rival_side),
@@ -558,6 +725,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--seed", type=int, default=2_026_090_206)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--checkpoint-sha256")
     return parser.parse_args()
 
 
