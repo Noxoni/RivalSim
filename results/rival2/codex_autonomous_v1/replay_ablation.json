@@ -1,0 +1,70 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V1_REPLAY_ABLATION",
+  "source": {
+    "path": "checkpoints/rival2/human_bc_ppo_v1/rival2_human_bc_ppo_10h.pt",
+    "sha256": "C75F08F91E2FF29D78C15A67B5DE85BDF0B0A548E0268FFDB0CF29C272750067",
+    "human_gameplay_validation_rmse": 0.5711650848388672,
+    "human_mechanic_validation_rmse": 0.5709697008132935,
+    "nexto": {
+      "episodes": 256,
+      "goals_for": 52,
+      "goals_against": 204,
+      "draws": 0,
+      "touches": 1160
+    }
+  },
+  "arms": [
+    {
+      "supervised_steps": 8,
+      "checkpoint_sha256": "9E8EC453944D8B0065611F54609B55C4FDE97DC3291803727CCB538246705CE2",
+      "human_gameplay_validation_rmse": 0.5704216361045837,
+      "human_mechanic_validation_rmse": 0.5702383518218994,
+      "nexto": {
+        "episodes": 256,
+        "goals_for": 78,
+        "goals_against": 152,
+        "draws": 26,
+        "touches": 1545
+      }
+    },
+    {
+      "supervised_steps": 16,
+      "checkpoint_sha256": "E62A5227D6299277BCB7976DBD2054BF89890272C4DDB493EFB8549993D6B0DA4",
+      "human_gameplay_validation_rmse": 0.5697020292282104,
+      "human_mechanic_validation_rmse": 0.5695196986198425,
+      "nexto": {
+        "episodes": 256,
+        "goals_for": 52,
+        "goals_against": 204,
+        "draws": 0,
+        "touches": 714
+      }
+    },
+    {
+      "supervised_steps": 40,
+      "checkpoint_sha256": "3FC42F80B64DF877D98F1A5ADB99F53F297CFC27903294ED4E068E89FA09CB710",
+      "human_gameplay_validation_rmse": 0.5675965547561646,
+      "human_mechanic_validation_rmse": 0.5674030780792236,
+      "nexto": {
+        "episodes": 256,
+        "goals_for": 0,
+        "goals_against": 256,
+        "draws": 0,
+        "touches": 867
+      }
+    },
+    {
+      "supervised_steps_per_ppo_update": 8,
+      "ppo_updates": 5,
+      "human_gameplay_validation_rmse": 0.5663496851921082,
+      "nexto": {
+        "episodes": 256,
+        "goals_for": 0,
+        "goals_against": 256,
+        "draws": 0,
+        "touches": 1476
+      }
+    }
+  ],
+  "conclusion": "Exactly one eight-step replay block improved both human validation and deterministic closed-loop Nexto play. Repeated replay optimized offline imitation while destroying scoring, so human replay is frozen into a one-time selected anchor and removed from competitive PPO updates."
+}

@@ -1,0 +1,73 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V2_AUTHORITY",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v2/rival2_codex_human_anchor_v1.pt",
+    "sha256": "9E8EC453944D8B0065611F54609B55C4FDE97DC3291803727CCB538246705CE2",
+    "derivation": "exactly one bounded eight-step reviewed-human replay block from human_bc_ppo_10h",
+    "closed_loop_baseline": {
+      "episodes": 256,
+      "goals_for": 78,
+      "goals_against": 152,
+      "draws": 26,
+      "rival_touches": 1545,
+      "first_touches": 256,
+      "no_touch_episodes": 0
+    }
+  },
+  "reward": {
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "ppo": {
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "worlds": 32768,
+    "rollout_horizon": 128,
+    "fresh_optimizer": true,
+    "policy_learning_rate": 0.0000005,
+    "critic_learning_rate": 0.00001,
+    "kl_telemetry_only": true,
+    "nonfinite_guard": true
+  },
+  "exploration": {
+    "analog_sigma": 0.05,
+    "button_temperature": 1.15,
+    "rollout_and_likelihood_coherent": true
+  },
+  "opponents": {
+    "current": 0.5,
+    "nexto": 0.5,
+    "historical": 0.0,
+    "wisp": 0.0,
+    "current_current_both_sides_trainable": true,
+    "nexto_frozen_and_inference_only": true
+  },
+  "human_replay": {
+    "steps_per_update": 0,
+    "reason": "repeated replay improved offline RMSE while catastrophically regressing closed-loop scoring",
+    "validation_read_only": true,
+    "test_opened": false
+  },
+  "selection": {
+    "evaluation_interval_updates": 1,
+    "deterministic_nexto_episodes": 256,
+    "primary": "goal differential",
+    "tie_breakers": [
+      "goals_for",
+      "rival_touches",
+      "first_touches"
+    ],
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "no_touch_episodes_required": 0,
+    "nexto_win_rate_target": 0.55,
+    "stop_after_consecutive_material_regressions": 3
+  },
+  "campaign": {
+    "pilot_updates": 5,
+    "accepted_update_ceiling": 300,
+    "checkpoint_every_update": true,
+    "best_checkpoint_preserved": true,
+    "resume_supported": true
+  }
+}

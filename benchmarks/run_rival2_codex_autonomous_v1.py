@@ -95,6 +95,11 @@ HUMAN_MECHANIC_BATCH = 512
 HUMAN_VALIDATION_GAMEPLAY_RMSE_CEILING = 0.61
 HUMAN_VALIDATION_MECHANIC_RMSE_CEILING = 0.62
 NEXTO_WIN_TARGET = 0.55
+CAMPAIGN_IDENTITY = "RIVAL2_CODEX_AUTONOMOUS_V1"
+AUTHORITY_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_AUTHORITY"
+PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_PREFLIGHT"
+RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_RESULT"
+STATE_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_STATE"
 
 
 def utc_now() -> str:
@@ -139,7 +144,7 @@ def scalar_metrics(metrics: dict[str, torch.Tensor]) -> dict[str, float]:
 def load_authority() -> dict[str, Any]:
     authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
     checks = {
-        "format": authority.get("format") == "RIVAL2_CODEX_AUTONOMOUS_V1_AUTHORITY",
+        "format": authority.get("format") == AUTHORITY_FORMAT,
         "source": authority.get("source", {}).get("sha256") == SOURCE_SHA256,
         "reward": authority.get("reward", {}).get("contract_sha256")
         == REWARD_GAMEPLAY_120_V2_CONTRACT_HASH,
@@ -207,7 +212,7 @@ def build_trainer(
         source.get("sample_accounting", {}).get("source_30hz_agent_decisions", 0)
     )
     trainer.curriculum_transition = {
-        "identity": "RIVAL2_CODEX_AUTONOMOUS_V1",
+        "identity": CAMPAIGN_IDENTITY,
         "created_utc": utc_now(),
         "source": {
             "path": SOURCE.relative_to(ROOT).as_posix(),
@@ -334,6 +339,8 @@ def human_replay(
     mechanic_sampler: MechanicHierarchySampler,
     generator: torch.Generator,
 ) -> dict[str, float]:
+    if HUMAN_REPLAY_STEPS == 0:
+        return {"loss": 0.0, "analog": 0.0, "buttons": 0.0, "log_std": 0.0}
     model = trainer.model
     model.train()
     critic_before = {
@@ -552,7 +559,7 @@ def preflight(
         "human_test_not_loaded": human_identity["test_loaded"] is False,
     }
     return {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V1_PREFLIGHT",
+        "format": PREFLIGHT_FORMAT,
         "created_utc": utc_now(),
         "checks": checks,
         "verdict": "PASS" if all(checks.values()) else "FAIL",
@@ -829,7 +836,7 @@ def run(args: argparse.Namespace) -> int:
         write_json(
             state_path,
             {
-                "format": "RIVAL2_CODEX_AUTONOMOUS_V1_STATE",
+                "format": STATE_FORMAT,
                 "updated_utc": utc_now(),
                 "campaign_step": campaign_step,
                 "rolling": rolling_record,
@@ -841,7 +848,7 @@ def run(args: argparse.Namespace) -> int:
         gc.collect()
 
     final = {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V1_RESULT",
+        "format": RESULT_FORMAT,
         "created_utc": utc_now(),
         "campaign_step": campaign_step,
         "stop_reason": stop_reason,

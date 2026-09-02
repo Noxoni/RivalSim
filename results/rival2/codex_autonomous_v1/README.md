@@ -13,3 +13,9 @@ replace the preserved best model. The human test split is not loaded.
 
 The pre-step authority is `authority.json`; `preflight.json` records the exact-scale
 32,768-world no-optimizer validation.
+
+The five-update pilot was not promoted: deterministic scoring fell from 52 goals to
+zero. `replay_ablation.json` isolates repeated human replay as sufficient to cause the
+same regression. One eight-step replay block was beneficial (78-152 with 1,545 Rival
+touches), but additional replay was not. That selected one-block anchor is the frozen
+parent for V2; V1's recurring-replay campaign is closed.
