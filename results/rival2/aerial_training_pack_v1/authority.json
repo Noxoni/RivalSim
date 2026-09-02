@@ -1,0 +1,187 @@
+{
+  "format": "RIVAL2_AERIAL_TRAINING_PACK_V1_AUTHORITY",
+  "created_utc": "2026-09-02T15:36:26.4601445Z",
+  "parent_commit": "bd97a8d612f01fc8e6a7aee5e03288335e531098",
+  "purpose": "Train discrete Rocket-League-style aerial shot attempts with explicit launch, intercept, ball-ground, possession, goal, and timeout outcomes.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "immutable": true
+  },
+  "initial_option": {
+    "blue": {
+      "path": "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_blue.pt",
+      "sha256": "7F6FEFD10F2C844ACC8072460C4205788D2CAED659367DD68A9702BEC59F4A4C",
+      "model_tensor_sha256": "45FF563FDAD500245F67FF2610EEA816C571D2937D643445CD91B83B3B79939B"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_orange.pt",
+      "sha256": "9468AF5107840088B6198E23EE1BB3C7650D52713ECCAFAE56B047C7DEA2BFAC",
+      "model_tensor_sha256": "E80E7D94571E2A7AE47A68F1445D6E1DF4CC60563EABBFFFC6EDF15B610B7500"
+    },
+    "optimizer_state_loaded": false,
+    "v2_result": {
+      "path": "results/rival2/aerial_option_v2/result.json",
+      "sha256": "5B15B779FD46F019E75A705464A1F04B34FD94884C89061D24B414C1963361B8"
+    },
+    "v2_failure_attribution": {
+      "path": "results/rival2/aerial_option_v2/failure_attribution.json",
+      "sha256": "B44D2C1421E710BAF87005BCCB2C4EE4FFAE1EFD2B1FDD45EA54CD67A6141894"
+    }
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "production_reward_unchanged": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "training_pack_reward_only": true,
+    "named_mechanic_classifier_used": false
+  },
+  "option_initiation": {
+    "source": "RIVAL2_AERIAL_OPTION_V2_AUTHORITY fast_aerial_initiation",
+    "ticks_0_through_28": "authority-frozen fast-aerial primitive",
+    "tick_29_onward": "learned option controller",
+    "primitive_ticks_excluded_from_policy_gradient": true,
+    "used_identically_in_training_and_deployment": true
+  },
+  "training_boundary": {
+    "trainable": [
+      "option.shared_trunk",
+      "option.actor"
+    ],
+    "frozen": [
+      "option.critic",
+      "protected competitive base"
+    ],
+    "optimizer": "fresh AdamW",
+    "trunk_learning_rate": 0.00003,
+    "actor_learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 0.5,
+    "critic_used": false,
+    "kl": "telemetry only",
+    "finite_checks": true
+  },
+  "human_auxiliary": {
+    "labels": [
+      "aerialdribble",
+      "groundtoairdribble"
+    ],
+    "samples_per_block": 512,
+    "weight": 0.05,
+    "validation_rmse_max": 0.30,
+    "test_opened": false,
+    "frozen_data_and_adapter": true
+  },
+  "physical_training": {
+    "worlds_per_side": 2048,
+    "evaluation_worlds_per_side": 2048,
+    "discount_gamma": 0.9987476493904754,
+    "advantage": "normalized discounted shot-attempt return; no critic",
+    "ppo_clip": 0.2,
+    "epochs": 1,
+    "minibatch_size": 65536,
+    "evaluation_interval_blocks": 10,
+    "exploration": {
+      "center_pop": {
+        "analog_sigma": 0.10,
+        "button_temperature": 1.6
+      },
+      "lateral_pop": {
+        "analog_sigma": 0.10,
+        "button_temperature": 1.6
+      },
+      "airborne_possession": {
+        "analog_sigma": 0.08,
+        "button_temperature": 1.4
+      }
+    },
+    "packs": [
+      {
+        "name": "center_pop",
+        "description": "Centered upward ball launch toward the opponent half; learn fast high contact and finish before the ball lands.",
+        "horizon_ticks": 360,
+        "first_high_touch_deadline_tick": 180,
+        "maximum_blocks": 120,
+        "advance": {
+          "high_touch_fraction_min": 0.50,
+          "goal_fraction_min": 0.15,
+          "consecutive_boundaries": 2
+        }
+      },
+      {
+        "name": "lateral_pop",
+        "description": "Laterally offset and moving airborne shot; learn three-dimensional steering and goalward touch geometry.",
+        "horizon_ticks": 420,
+        "first_high_touch_deadline_tick": 240,
+        "maximum_blocks": 160,
+        "advance": {
+          "high_touch_fraction_min": 0.35,
+          "goal_fraction_min": 0.08,
+          "consecutive_boundaries": 2
+        }
+      },
+      {
+        "name": "airborne_possession",
+        "description": "Angled high launch requiring a first aerial touch, continued airborne possession, and a goal before timeout.",
+        "horizon_ticks": 480,
+        "first_high_touch_deadline_tick": 270,
+        "maximum_blocks": 200,
+        "select": {
+          "high_touch_fraction_min": 0.30,
+          "second_airborne_touch_fraction_min": 0.05,
+          "goal_fraction_min": 0.05
+        }
+      }
+    ],
+    "failure_resets": {
+      "no_launch_by_tick": 36,
+      "no_high_touch_by_pack_deadline": true,
+      "ball_ground_after_initial_launch": true,
+      "no_goal_by_horizon": true,
+      "reset_is_immediate": true
+    },
+    "reward": {
+      "post_primitive_3d_closure_progress_max_per_tick": 0.03,
+      "post_primitive_vertical_closure_progress_max_per_tick": 0.02,
+      "nose_alignment_progress_max_per_tick": 0.02,
+      "first_high_touch": 3.0,
+      "goalward_momentum_transfer_max": 1.0,
+      "second_airborne_touch": 2.0,
+      "airborne_possession_height_progress_max_per_tick": 0.01,
+      "goal": 8.0,
+      "no_launch_failure": -1.0,
+      "missed_intercept_failure": -1.0,
+      "ball_ground_failure": -1.0,
+      "timeout_after_touch_failure": -0.5,
+      "ordinary_ground_touch": 0.0,
+      "positive_episode_budget": 15.0
+    }
+  },
+  "selection": {
+    "controlled": "all three packs pass on both physical sides",
+    "human_validation": "both sides remain <= 0.30 mean aerial RMSE",
+    "natural_short_screen": "hybrid retains >=80% of V23 touches, goals, and mean speed with no no-touch regression",
+    "final_nexto": {
+      "minimum_record": "6-4",
+      "minimum_goal_differential": 0,
+      "high_aerial_contacts_min": 5,
+      "high_aerial_goals_min": 1,
+      "touches_per_minute_floor_fraction_of_v23": 0.8
+    },
+    "fallback": "V23 remains promoted"
+  },
+  "integrity": {
+    "no_general_policy_ppo": true,
+    "no_production_reward_change": true,
+    "no_named_mechanic_reward": true,
+    "no_promotion_on_partial_success": true
+  }
+}
