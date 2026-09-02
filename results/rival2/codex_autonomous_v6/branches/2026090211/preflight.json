@@ -1,0 +1,104 @@
+{
+  "authority_sha256": "7D8246559A3E91C281D6E196174BD440B476963A4A94168ECFC5AFDA012AE503",
+  "checks": {
+    "both_required_families_present": true,
+    "controlled_flick_arrays_zero": true,
+    "current_and_nexto_only": true,
+    "exploration_override_exact": true,
+    "fresh_optimizer_state_empty": true,
+    "human_test_not_loaded": true,
+    "named_mechanics_arrays_zero": true,
+    "physics_and_policy_120hz": true,
+    "policy_training_boundary": true,
+    "ppo_contract_exact": true,
+    "reward_contract_exact": true,
+    "source_model_loaded_exact": true,
+    "source_sha256_exact": true,
+    "split_learning_rates": true,
+    "world_count": true
+  },
+  "contracts": {
+    "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "created_utc": "2026-09-02T03:30:49.223636+00:00",
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V6_PREFLIGHT",
+  "human_data": {
+    "adapter": {
+      "external_frozen": true,
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "requires_grad_false": true,
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99",
+      "tensor_sha256": "797E7139C485C692C2280F1CB126B9D1D682F1A8911C63AC46A4008042364863",
+      "version": "RIVAL2_HUMAN_DEMO_OBSERVATION_ADAPTER_V2"
+    },
+    "frozen_config": {
+      "git_blob_oid": "4bc422d42ed413d2fe1cf8d1943b3b84e2710172",
+      "origin_main": "1504cfb47e2604a2b6d718a628b73d16bbd13d49",
+      "path": "results/rival2/human_behavior_cloning_v1/frozen_config.json",
+      "pre_step_git_commit": "1504cfb47e2604a2b6d718a628b73d16bbd13d49",
+      "required_parent": "1fbfc1bddf77ebdf4c2f8cc66405f8a0998f81f5",
+      "required_parent_is_ancestor": true,
+      "sha256": "CC7159838230492D90F64F11E473E61142D6879B740419BDA984D558444D51C4"
+    },
+    "test_loaded": false,
+    "train_action_sha256": "3355FA664016AFD42DB2FA58954122E5436B683ABEBC8FA5BAF43525E9ECC6E7",
+    "train_sequences_sha256": "9F2EA20534D7AC61E6AE7CCDED0F7A866392A32E788379BEA2F9BB0B5A2B6938",
+    "validation_action_sha256": "1F922D29CF5BA45229C0FB37672B8D7EFA4B9D6D1F68759E29ADC78D408FE4F6",
+    "validation_sequences_sha256": "F588F38C58A111DD7D79DC65F673DE71FAF786134154DC4862F1B43DB01E06EC"
+  },
+  "kl_guard": {
+    "completed_update_mean_kl_limit": 0.05,
+    "minibatch_kl_limit": 0.1,
+    "reject_completed_update_kl": false,
+    "reject_minibatch_kl": false
+  },
+  "mixed_safety": {
+    "critic_learning_rate": 1e-05,
+    "initial_policy_learning_rate": 2e-06,
+    "minimum_policy_learning_rate": 2e-06,
+    "policy_learning_rate_backoff": 0.5,
+    "retention_corpus_size": 512,
+    "retention_soft_mean_kl_target": 0.02,
+    "soft_minibatch_kl_target": 0.02
+  },
+  "opponent_curriculum": {
+    "current_probability": 0.5,
+    "historical_probability": 0.0,
+    "nexto_probability": 0.5,
+    "seed": 2026073661,
+    "wisp_probability": 0.0
+  },
+  "optimizer_steps_per_rollout_boundary": 1,
+  "ppo_config": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 0.0003,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "realized_initial_family_counts": [
+    16347,
+    0,
+    16421,
+    0
+  ],
+  "source": {
+    "format": "RIVAL2_CHECKPOINT_V1",
+    "iteration": 4549,
+    "model_tensor_sha256": "E7167577A87DB5E33E8A848C1B59770C92FAEAF39F0944662FB5F668EB5DD6A3",
+    "optimizer_loaded": false,
+    "path": "checkpoints/rival2/codex_autonomous_v4/rival2_codex_autonomous_best.pt",
+    "policy_version": 4550,
+    "sha256": "172BA59786A2E08EB6DC95CFE29F20C21826F7CB9429FF3C89F4D7C4F4BD9E10"
+  },
+  "verdict": "PASS",
+  "worlds": 32768
+}

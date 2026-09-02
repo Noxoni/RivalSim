@@ -105,6 +105,7 @@ POLICY_TRAINING_BOUNDARY = "full"
 CURRENT_OPPONENT_PROBABILITY = 0.5
 NEXTO_OPPONENT_PROBABILITY = 0.5
 AUTHORIZED_BRANCH_SEEDS: tuple[int, ...] | None = None
+MATERIAL_REGRESSION_PATIENCE = 3
 
 
 def utc_now() -> str:
@@ -888,7 +889,7 @@ def run(args: argparse.Namespace) -> int:
             if evaluation["win_rate"] >= NEXTO_WIN_TARGET and boundary["eligible"]:
                 stop_reason = "nexto_win_target_reached"
                 break
-            if consecutive_regressions >= 3:
+            if consecutive_regressions >= MATERIAL_REGRESSION_PATIENCE:
                 stop_reason = "three_consecutive_closed_loop_regressions"
                 break
         elif campaign_step == 1 or campaign_step % 2 == 0:
