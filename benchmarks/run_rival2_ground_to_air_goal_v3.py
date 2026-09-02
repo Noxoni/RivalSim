@@ -67,7 +67,7 @@ from rivalsim.rival2_policy import (  # noqa: E402
 )
 
 AUTHORITY = ROOT / "results/rival2/ground_to_air_goal_v3/authority.json"
-AUTHORITY_SHA256 = "1E7AB9C5FCC31D46AE5794B1DF3172CD13AF5E0D4BF44B12CE97DB14EDAA94FA"
+AUTHORITY_SHA256 = "8EBB34DB3360C95358E78B11BD5CACCD70727B541ED953BFA68633F58DBE8E67"
 RESULTS = ROOT / "results/rival2/ground_to_air_goal_v3"
 CHECKPOINTS = ROOT / "checkpoints/rival2/ground_to_air_goal_v3"
 PARENT = ROOT / "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt"
@@ -171,6 +171,11 @@ class GoalDirectedTrainingTracker:
             maximum_distinct_contacts=int(
                 authority["episode"]["maximum_distinct_chain_contacts"]
             ),
+            minimum_goalward_ball_speed=float(
+                authority["reward"][
+                    "minimum_productive_goalward_speed_uu_per_second"
+                ]
+            ),
         )
         self.reward_sum = 0.0
         self.ground_failures = 0
@@ -247,6 +252,7 @@ class GoalDirectedTrainingTracker:
         ) * POSITION_SCALE[1]
         reward_authority = self.authority["reward"]
         self._ensure_diagnostic_device(before.device)
+        ball_position_before = self._vector(before, "ball.position") * scale
         ball_position = self._vector(after, "ball.position") * scale
         ball_velocity = (
             self._vector(after, "ball.linear_velocity") * BALL_LINEAR_SPEED_SCALE
@@ -293,6 +299,14 @@ class GoalDirectedTrainingTracker:
         self.linear_goal_projection_seen |= projection_eligible & (
             projection_error <= 0.0
         )
+        goal_target = torch.tensor(
+            (0.0, GOAL_SCORING_PLANE_Y_UU, 320.0),
+            dtype=before.dtype,
+            device=before.device,
+        )
+        goal_target_progress = torch.linalg.vector_norm(
+            ball_position_before - goal_target, dim=-1
+        ) - torch.linalg.vector_norm(ball_position - goal_target, dim=-1)
         tracking = self.physical.pop_seen & active
         reward = torch.zeros(self.worlds, dtype=torch.float32, device=before.device)
         reward += tracking * (
@@ -306,24 +320,40 @@ class GoalDirectedTrainingTracker:
         reward += self.physical.elevated_seen * active * (
             ball_goalward_progress.clamp(-20.0, 20.0)
             * float(reward_authority["post_contact_goalward_progress_per_uu"])
+            + goal_target_progress.clamp(-20.0, 20.0)
+            * float(reward_authority["goal_target_progress_per_uu"])
         )
         reward += event["low_pop"] * float(reward_authority["low_pop_event"])
         reward += event["first_elevated"] * float(
             reward_authority["elevated_follow_touch_event"]
         )
         reward += event["high"] * float(reward_authority["high_follow_touch_event"])
-        reward += event["second"] * float(
+        reward += (event["second"] & event["goalward_contact"]) * float(
             reward_authority["second_airborne_touch_event"]
         )
-        reward += event["third"] * float(reward_authority["third_airborne_touch_event"])
-        reward += event["fourth"] * float(reward_authority["fourth_airborne_touch_event"])
-        reward += event["fifth"] * float(reward_authority["fifth_airborne_touch_event"])
+        reward += (event["third"] & event["goalward_contact"]) * float(
+            reward_authority["third_airborne_touch_event"]
+        )
+        reward += (event["fourth"] & event["goalward_contact"]) * float(
+            reward_authority["fourth_airborne_touch_event"]
+        )
+        reward += (event["fifth"] & event["goalward_contact"]) * float(
+            reward_authority["fifth_airborne_touch_event"]
+        )
         reward += event["goalward_contact"] * float(
             reward_authority["goalward_velocity_contact_event"]
         )
-        reward += event["first_elevated"] * event["forward_transfer"].clamp(
+        reward += event["eligible_elevated_contact"] * event[
+            "forward_transfer"
+        ].clamp(
             -1_000.0, 1_500.0
         ) * float(reward_authority["forward_velocity_transfer_per_uu_per_second"])
+        speed_excess = event["after_forward"] - float(
+            reward_authority["goalward_speed_neutral_uu_per_second"]
+        )
+        reward += event["eligible_elevated_contact"] * speed_excess.clamp(
+            -600.0, 1_400.0
+        ) * float(reward_authority["goalward_speed_at_contact_per_uu_per_second"])
         reward += event["goal_within_contact_budget"] * float(
             reward_authority["goal_within_contact_budget_event"]
         )
@@ -337,6 +367,14 @@ class GoalDirectedTrainingTracker:
             & self.physical.elevated_seen
             & (distance_after <= float(reward_authority["sustained_control_shell_uu"]))
             & (ball_height >= 250.0)
+            & (
+                ball_velocity[:, 1]
+                >= float(
+                    reward_authority[
+                        "minimum_productive_goalward_speed_uu_per_second"
+                    ]
+                )
+            )
         )
         if self.connected_streak.device != before.device:
             self.connected_streak = self.connected_streak.to(before.device)

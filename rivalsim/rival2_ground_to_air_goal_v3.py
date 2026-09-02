@@ -18,7 +18,7 @@ from rivalsim.rival2_aerial_option import FIELD
 from rivalsim.rival2_contracts import BALL_LINEAR_SPEED_SCALE, POSITION_SCALE
 from rivalsim.state import StateSnapshot
 
-GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_2"
+GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_3"
 PHASE_EASY_FINISH = 0
 PHASE_ATTACKING_HALF = 1
 PHASE_NAMES = ("easy_finish", "attacking_half")
@@ -115,6 +115,7 @@ class GoalDirectedTelemetry:
     unassisted_or_ground_goals: int = 0
     goalward_velocity_contacts: int = 0
     goalward_velocity_transfer_sum: float = 0.0
+    goalward_ball_speed_at_contact_sum: float = 0.0
 
 
 class GoalDirectedTracker:
@@ -133,18 +134,21 @@ class GoalDirectedTracker:
         attacker_side: int,
         horizon: int,
         maximum_distinct_contacts: int = 6,
+        minimum_goalward_ball_speed: float = 600.0,
     ) -> None:
         if (
             worlds <= 0
             or attacker_side not in (0, 1)
             or horizon <= 0
             or maximum_distinct_contacts < 2
+            or minimum_goalward_ball_speed <= 0.0
         ):
             raise ValueError("invalid goal-directed tracker request")
         self.worlds = int(worlds)
         self.side = int(attacker_side)
         self.horizon = int(horizon)
         self.maximum_distinct_contacts = int(maximum_distinct_contacts)
+        self.minimum_goalward_ball_speed = float(minimum_goalward_ball_speed)
         self.initialized = False
         self.telemetry = GoalDirectedTelemetry(attempts=worlds)
 
@@ -231,8 +235,9 @@ class GoalDirectedTracker:
         within_contact_budget = (
             1 + self.air_touch_count <= self.maximum_distinct_contacts
         )
-        goalward_contact = (
-            elevated & within_contact_budget & (forward_transfer >= 100.0)
+        eligible_elevated_contact = elevated & within_contact_budget
+        goalward_contact = eligible_elevated_contact & (
+            after_forward >= self.minimum_goalward_ball_speed
         )
         goal_within_contact_budget = (
             active
@@ -270,8 +275,15 @@ class GoalDirectedTracker:
         self.telemetry.goalward_velocity_contacts += int(goalward_contact.sum())
         self.telemetry.goalward_velocity_transfer_sum += float(
             torch.where(
-                elevated & within_contact_budget,
+                eligible_elevated_contact,
                 forward_transfer.clamp(-2_000.0, 2_000.0),
+                0.0,
+            ).sum()
+        )
+        self.telemetry.goalward_ball_speed_at_contact_sum += float(
+            torch.where(
+                eligible_elevated_contact,
+                after_forward.clamp(-2_000.0, 2_000.0),
                 0.0,
             ).sum()
         )
@@ -285,8 +297,10 @@ class GoalDirectedTracker:
             "fifth": fifth,
             "contact_budget_exceeded": contact_budget_exceeded,
             "within_contact_budget": within_contact_budget,
+            "eligible_elevated_contact": eligible_elevated_contact,
             "goalward_contact": goalward_contact,
             "forward_transfer": forward_transfer,
+            "after_forward": after_forward,
             "goal_within_contact_budget": goal_within_contact_budget,
             "goal_over_contact_budget": goal_over_contact_budget,
             "other_goal": other_goal,

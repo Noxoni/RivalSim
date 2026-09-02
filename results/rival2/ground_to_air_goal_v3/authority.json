@@ -1,7 +1,7 @@
 {
-  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_2_AUTHORITY",
-  "created_utc": "2026-09-02T22:39:54Z",
-  "purpose": "Extend the passing self-pop aerial continuation into an efficient goalward chain that scores within six distinct contacts while preserving sustained glued control as one contact interval.",
+  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_3_AUTHORITY",
+  "created_utc": "2026-09-02T23:22:57Z",
+  "purpose": "Extend the passing self-pop aerial continuation into an efficient goalward chain that preserves forward momentum, aims through the goal volume, and scores within six distinct contacts.",
   "bound_inputs": {
     "passing_ground_to_air_v2": {
       "path": "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt",
@@ -21,7 +21,7 @@
     },
     "goal_directed_physics": {
       "path": "rivalsim/rival2_ground_to_air_goal_v3.py",
-      "sha256": "115C86CF0FCDF9E4CBB07943B3B738A7602EBA79516B183F1102EC4D941213D6"
+      "sha256": "7771CE9C37A0E1ECC7715804072E3FA761B27DC56B6BA40A3E204CD2CA9878D0"
     },
     "protected_blue_v23": {
       "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
@@ -66,6 +66,20 @@
     "observed_pattern": "low setup and lift followed by prolonged low-separation nose-behind-ball control into goal",
     "authority_interpretation": "efficient 3-4 contact chains are preferred; six total distinct contacts is a hard maximum; a glued carry remains valid without repeated onset events"
   },
+  "prospective_finish_momentum_correction": {
+    "optimizer_steps_under_this_authority": 0,
+    "rejected_correction_2_checkpoint": "checkpoints/rival2/ground_to_air_goal_v3_diagnostic/rival2_block48.pt",
+    "rejected_correction_2_checkpoint_sha256": "4E9CAF2A9417A2480EE8B0EF7C0AEFBA2D165C36C0C2374E869E53A194A6DE71",
+    "diagnostic_worlds_per_side": 2048,
+    "diagnostic_elevated_follow_parent_to_descendant": [[204, 939], [220, 899]],
+    "diagnostic_goals_descendant": [2, 2],
+    "diagnostic_median_maximum_goalward_y_uu_descendant": [4057.0595703125, 4030.926513671875],
+    "diagnostic_goalward_velocity_transfer_sum_descendant": [-118950.15267944336, -121132.3101196289],
+    "diagnostic_deep_inside_goal_mouth_descendant": [19, 8],
+    "conclusion": "the descendant usually stalled more than 1100 uu before the scoring plane; the rare deep trajectories were predominantly inside goal width and height, so forward momentum was the primary blocker",
+    "corrected_semantics": "every eligible airborne contact is charged for velocity loss and credited for useful post-contact goalward speed; repeated-contact and sustained-control event credit requires useful goalward speed; dense progress targets the physical goal center",
+    "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
+  },
   "bootstrap_config": {
     "approach_steer_gain": 3.5,
     "boost_during_pop": false,
@@ -100,7 +114,7 @@
     "ppo_clip": 0.2,
     "epochs": 2,
     "minibatch_size": 65536,
-    "maximum_blocks": 200,
+    "maximum_blocks": 240,
     "evaluation_interval_blocks": 4,
     "plateau_patience_boundaries": 24,
     "minimum_score_improvement": 0.0001,
@@ -109,12 +123,12 @@
     "kl_is_telemetry_only": true,
     "phase_schedule": [
       {"first_block": 1, "phase": 0, "name": "easy_finish"},
-      {"first_block": 49, "phase": 1, "name": "attacking_half"}
+      {"first_block": 97, "phase": 1, "name": "attacking_half"}
     ],
     "handoff_schedule": [
       {"first_block": 1, "handoff_ticks": [40, 36]},
-      {"first_block": 49, "handoff_ticks": [32, 28]},
-      {"first_block": 97, "handoff_ticks": [20, 17]}
+      {"first_block": 97, "handoff_ticks": [32, 28]},
+      {"first_block": 145, "handoff_ticks": [20, 17]}
     ],
     "successful_rehearsal": {
       "source": "sampled trajectories with a literal elevated physical contact event",
@@ -146,7 +160,8 @@
     "contact_shell_progress_per_uu": 0.01,
     "horizontal_tracking_progress_per_uu": 0.005,
     "vertical_tracking_progress_per_uu": 0.005,
-    "post_contact_goalward_progress_per_uu": 0.002,
+    "post_contact_goalward_progress_per_uu": 0.001,
+    "goal_target_progress_per_uu": 0.004,
     "low_pop_event": 0.25,
     "elevated_follow_touch_event": 4.0,
     "high_follow_touch_event": 2.0,
@@ -155,7 +170,10 @@
     "fourth_airborne_touch_event": 2.0,
     "fifth_airborne_touch_event": 1.0,
     "goalward_velocity_contact_event": 2.0,
-    "forward_velocity_transfer_per_uu_per_second": 0.002,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
     "sustained_control_shell_uu": 160.0,
     "sustained_control_minimum_ticks": 12,
     "sustained_control_interval_event": 3.0,
@@ -198,6 +216,8 @@
     "named_mechanic_classifier_used": false,
     "distinct_contact_rewards_capped": true,
     "sustained_contact_reward_farming_absent": true,
+    "recontact_event_credit_requires_productive_goalward_speed": true,
+    "velocity_transfer_applies_to_every_eligible_airborne_contact": true,
     "optimizer_steps_before_authority_commit": 0,
     "v3_test_seed_unopened_before_validation_pass": true,
     "promotion_requires_full_chain_goal_validation_and_test_pass": true

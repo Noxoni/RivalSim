@@ -182,3 +182,40 @@ def test_continuous_touch_signal_does_not_farm_distinct_contacts() -> None:
     # reward spam, while the sustained interval itself has no extra onsets.
     assert tracker.telemetry.elevated_follow_touches == 1
     assert tracker.telemetry.second_airborne_touches == 0
+
+
+def test_productive_contact_depends_on_post_contact_goalward_speed() -> None:
+    tracker = GoalDirectedTracker(
+        1,
+        attacker_side=0,
+        horizon=40,
+        minimum_goalward_ball_speed=600.0,
+    )
+    active = torch.ones(1, dtype=torch.bool)
+    false = torch.zeros(1, dtype=torch.bool)
+    tracker.step(
+        _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=300.0),
+        _observation(car_z=80.0, ball_z=190.0, touch=True, ball_vy=400.0),
+        tick=0,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    slow = tracker.step(
+        _observation(car_z=220.0, ball_z=300.0, touch=False, ball_vy=700.0),
+        _observation(car_z=220.0, ball_z=300.0, touch=True, ball_vy=550.0),
+        tick=10,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    fast = tracker.step(
+        _observation(car_z=220.0, ball_z=300.0, touch=False, ball_vy=550.0),
+        _observation(car_z=220.0, ball_z=300.0, touch=True, ball_vy=650.0),
+        tick=20,
+        goal_for_attacker=false,
+        any_goal=false,
+        active=active,
+    )
+    assert not bool(slow["goalward_contact"].item())
+    assert bool(fast["goalward_contact"].item())
