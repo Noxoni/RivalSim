@@ -104,6 +104,7 @@ OPTIMIZER_STEP_LIMIT: int | None = None
 POLICY_TRAINING_BOUNDARY = "full"
 CURRENT_OPPONENT_PROBABILITY = 0.5
 NEXTO_OPPONENT_PROBABILITY = 0.5
+AUTHORIZED_BRANCH_SEEDS: tuple[int, ...] | None = None
 
 
 def utc_now() -> str:
@@ -175,6 +176,12 @@ def load_authority() -> dict[str, Any]:
         "wisp_probability": authority.get("opponents", {}).get("wisp") == 0.0,
         "human_replay_steps": authority.get("human_replay", {}).get("steps_per_update")
         == HUMAN_REPLAY_STEPS,
+        "branch_seeds": authority.get("campaign", {}).get("branch_seeds")
+        == (
+            list(AUTHORIZED_BRANCH_SEEDS)
+            if AUTHORIZED_BRANCH_SEEDS is not None
+            else None
+        ),
     }
     if not all(checks.values()):
         raise RuntimeError(f"campaign authority mismatch: {checks}")
