@@ -30,6 +30,10 @@ RESULTS = ROOT / "results/rival2/codex_autonomous_v9"
 CHECKPOINT = ROOT / "checkpoints/rival2/codex_autonomous_v9/rival2_codex_autonomous_best.pt"
 DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/codex-autonomous-v9")
 LAMBDAS = (-0.25, 0.125, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0)
+CAMPAIGN_IDENTITY = "RIVAL2_CODEX_AUTONOMOUS_V9_DIRECTION_LINE_SEARCH"
+AUTHORITY_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V9_AUTHORITY"
+PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V9_PREFLIGHT"
+RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V9_RESULT"
 
 
 def save_candidate(
@@ -45,7 +49,7 @@ def save_candidate(
     payload["optimizer"] = {"state": {}, "param_groups": []}
     payload["policy_version"] = int(source["policy_version"]) + candidate_index
     payload["curriculum_transition"] = {
-        "identity": "RIVAL2_CODEX_AUTONOMOUS_V9_DIRECTION_LINE_SEARCH",
+        "identity": CAMPAIGN_IDENTITY,
         "source": {"path": SOURCE.relative_to(ROOT).as_posix(), "sha256": SOURCE_SHA256},
         "authority": {
             "path": AUTHORITY.relative_to(ROOT).as_posix(),
@@ -74,6 +78,8 @@ def save_candidate(
 
 def run(args: argparse.Namespace) -> int:
     authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
+    if authority.get("format") != AUTHORITY_FORMAT:
+        raise RuntimeError("V9 authority format mismatch")
     if authority.get("lambdas") != list(LAMBDAS):
         raise RuntimeError("V9 lambda authority mismatch")
     if base.sha256_file(SOURCE) != SOURCE_SHA256:
@@ -128,7 +134,7 @@ def run(args: argparse.Namespace) -> int:
         "human_validation": baseline_human,
     }
     preflight = {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V9_PREFLIGHT",
+        "format": PREFLIGHT_FORMAT,
         "verdict": "PASS",
         "authority_sha256": base.sha256_file(AUTHORITY),
         "source_sha256": base.sha256_file(SOURCE),
@@ -210,7 +216,7 @@ def run(args: argparse.Namespace) -> int:
     if not (RESULTS / "best.json").exists():
         base.write_json(RESULTS / "best.json", best)
     result = {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V9_RESULT",
+        "format": RESULT_FORMAT,
         "authority_sha256": base.sha256_file(AUTHORITY),
         "candidates": len(rows),
         "best": best,

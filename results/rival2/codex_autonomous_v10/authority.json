@@ -1,0 +1,31 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V10_AUTHORITY",
+  "purpose": "fine prospective search around the narrow V9 winning region",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v4/rival2_codex_autonomous_best.pt",
+    "sha256": "172BA59786A2E08EB6DC95CFE29F20C21826F7CB9429FF3C89F4D7C4F4BD9E10",
+    "model_tensor_sha256": "E7167577A87DB5E33E8A848C1B59770C92FAEAF39F0944662FB5F668EB5DD6A3"
+  },
+  "direction_from": {
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v4/candidate_u0002.pt",
+    "sha256": "A4A153525BCD98DC38EBE4EA086C5CCBA46785C84F65C674ABD878DEEAA6711E",
+    "model_tensor_sha256": "1E37E2942D67DAC978A52046DC9F5575A54C4A4C0DDEC425BF26FFAC771CACD7"
+  },
+  "direction": "V4 step-3 model minus V4 step-2 model",
+  "changed_parameters": ["actor.weight[0:5]", "actor.bias[0:5]"],
+  "frozen_parameters": ["shared trunk", "actor log-standard-deviation rows", "actor button rows", "critic"],
+  "lambdas": [0.3, 0.35, 0.4, 0.45, 0.475, 0.525, 0.55, 0.6, 0.65, 0.7],
+  "optimization": {
+    "optimizer_steps": 0,
+    "ppo_steps": 0,
+    "reward_changes": 0,
+    "operation": "deterministic parameter-space line search"
+  },
+  "selection": {
+    "primary": "deterministic paired 256-episode Nexto goal differential",
+    "tie_breakers": ["goals_for", "Rival touches", "Rival first touches"],
+    "requirements": ["zero no-touch episodes", "human validation floors", "finite model and actions"],
+    "target_win_rate": 0.55,
+    "source_checkpoint_never_overwritten": true
+  }
+}
