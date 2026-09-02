@@ -1,0 +1,34 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V13_AUTHORITY",
+  "purpose": "prospective sustained-play line search along the V7 update-25 to update-30 winning direction",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500"
+  },
+  "direction_from": {
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v7/candidate_u0025.pt",
+    "sha256": "47932A97A17917AE88C5F9937EF62A9D1ABD14388FF59D71D4A2D50EFA9EBE34",
+    "model_tensor_sha256": "D1847183F2235A07E900E715B8595B25A8A12F8ACB9D6EEFCF21F321ADB99089"
+  },
+  "direction": "V7 update-30 actor analog rows minus V7 update-25 actor analog rows",
+  "changed_parameters": ["actor.weight[0:5]", "actor.bias[0:5]"],
+  "frozen_parameters": ["shared trunk", "actor log-standard-deviation rows", "actor button rows", "critic"],
+  "lambdas": [0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0, 1.5],
+  "optimization": {
+    "optimizer_steps": 0,
+    "ppo_steps": 0,
+    "reward_changes": 0,
+    "operation": "deterministic parameter-space line search"
+  },
+  "selection": {
+    "primary": "60-second continuous Nexto matrix goal differential",
+    "tie_breakers": ["goals for", "touch differential", "Rival touches"],
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "window_seconds": 60,
+    "evaluation_seed": 2026090206,
+    "requirements": ["human validation floors", "finite model and actions"],
+    "source_checkpoint_never_overwritten": true,
+    "complete_five_minute_evaluation_required_after_selection": true
+  }
+}
