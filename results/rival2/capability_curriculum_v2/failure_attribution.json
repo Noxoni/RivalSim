@@ -1,0 +1,51 @@
+{
+  "format": "RIVAL2_CAPABILITY_CURRICULUM_V2_FAILURE_ATTRIBUTION",
+  "verdict": "REJECTED_NOT_PROMOTED",
+  "authority_sha256": "BCC00214B4AA72E7E53F037B6F77BED149F50FB5099E25232A6712CCE4D05B4B",
+  "selected_boundary": 10,
+  "selected": {
+    "blue_sha256": "8F3942F30AFF00655D5A83CC2FA8EA8B9AC5314907CCB4D0AE2888C0F48C5442",
+    "orange_sha256": "E1E27300D58CFB57CEDE9A0E49E1F1C1392EA3DB59B44C22674BCB4B953AAC34"
+  },
+  "controlled_scenario_evidence": {
+    "ground_origin_high_contacts": 0,
+    "high_contact_goals": 0,
+    "productive_floor_landings": 68,
+    "productive_wall_landings": 110,
+    "productive_landing_chains": 153,
+    "actual_demos": 411,
+    "demo_followup_touches": 382,
+    "demo_followup_goals": 303
+  },
+  "natural_nexto_evidence": {
+    "wins": 4,
+    "losses": 6,
+    "rival_goals": 119,
+    "nexto_goals": 113,
+    "touches": 680,
+    "touches_per_minute": 13.50084380273767,
+    "high_aerial_contacts": 3,
+    "high_aerial_goals": 0,
+    "productive_floor_landing_proxy": 0,
+    "productive_wall_landing_proxy": 2,
+    "productive_dash_chain_proxy": 0,
+    "demolitions": 1,
+    "demo_followup_touches": 1,
+    "demo_followup_goals": 0
+  },
+  "causes": [
+    "The ground-origin high-ball curriculum exposed no positive launch signal until the existing reactive policy had already completed takeoff and reached 150 uu, so all 160 blocks produced zero qualifying controlled high contacts.",
+    "Controlled landing/dash and demolition-route outcomes did not transfer to the required natural-match floor-chain and productive-demo behaviors.",
+    "Natural scoring retention deteriorated after block 10; preserving the early candidate prevented promotion of later regressions.",
+    "The controlled offensive-context telemetry/reward branch is team-asymmetric: Orange recorded authoritative demos and follow-ups but zero offensive-context demos, consistent with applying a second team-direction sign to team-normalized observations. This V2 branch must not be reused unchanged."
+  ],
+  "next_authority_requirements": [
+    "Train an isolated aerial option in short ground-launch episodes where a ground-only policy cannot obtain the objective.",
+    "Provide continuous physical intercept guidance before takeoff and fail episodes when the elevated intercept window is missed.",
+    "Progress from easy vertical launches to lateral, moving-ball, wall-launch, and goal-directed aerial states only after measured acquisition gates pass.",
+    "Keep the competitive V23 base frozen while the option is acquired, then integrate behind an explicit state-derived gate.",
+    "Use global authoritative simulator positions for side-aware offensive-demo context or prove the observation coordinate convention before applying a team sign."
+  ],
+  "human_test_loaded": false,
+  "promoted": false
+}

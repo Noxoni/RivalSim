@@ -695,9 +695,79 @@ def pair_rank(
     )
 
 
+def final_physical_pass(physical: dict[str, Any]) -> bool:
+    overall = physical["overall"]
+    score = physical["evaluation"]["score"]
+    return bool(
+        score["wins"] >= 6
+        and score["rival_goals"] - score["nexto_goals"] >= 0
+        and overall["touches"]["high_aerial_proxy"] >= 1
+        and overall["scoring"]["goals_from_high_aerial_proxy"] >= 1
+        and overall["jump_flip_recovery"]["productive_floor_landing_proxy"] >= 1
+        and overall["jump_flip_recovery"]["productive_wall_landing_proxy"] >= 1
+        and overall["jump_flip_recovery"]["productive_dash_chain_proxy"] >= 1
+        and overall["demolitions"]["total"] >= 1
+        and (
+            overall["demolitions"]["followed_by_rival_touch_within_5_seconds"] >= 1
+            or overall["demolitions"]["followed_by_rival_goal_within_5_seconds"] >= 1
+        )
+    )
+
+
+def finalize_existing_run(authority_sha: str) -> int:
+    """Finalize a completed run after a telemetry-only operational recovery."""
+
+    best_path = RESULTS / "best.json"
+    curve_path = RESULTS / "training_curve.jsonl"
+    physical_output = RESULTS / "selected_physical_behavior_telemetry.json"
+    required = (best_path, curve_path, physical_output)
+    if not all(path.is_file() for path in required):
+        raise RuntimeError("V2 finalization evidence is incomplete")
+    rows = [json.loads(line) for line in curve_path.read_text(encoding="utf-8").splitlines()]
+    if len(rows) != 160 or int(rows[-1]["block"]) != 160:
+        raise RuntimeError("V2 finalization requires the complete 160-block curve")
+    best = json.loads(best_path.read_text(encoding="utf-8"))
+    selected_blue = CHECKPOINTS / "rival2_blue.pt"
+    selected_orange = CHECKPOINTS / "rival2_orange.pt"
+    selected_sha = [v1.sha256_file(selected_blue), v1.sha256_file(selected_orange)]
+    expected_sha = [entry["sha256"] for entry in best["checkpoint"]]
+    if selected_sha != expected_sha:
+        raise RuntimeError("V2 selected pair no longer matches the frozen best boundary")
+    physical = json.loads(physical_output.read_text(encoding="utf-8"))
+    final_pass = final_physical_pass(physical)
+    result = {
+        "format": "RIVAL2_CAPABILITY_CURRICULUM_V2_RESULT",
+        "created_utc": utc_now(),
+        "authority_sha256": authority_sha,
+        "stop_reason": "maximum_blocks",
+        "best": best,
+        "selected": {
+            "blue": {
+                "path": selected_blue.relative_to(ROOT).as_posix(),
+                "sha256": selected_sha[0],
+            },
+            "orange": {
+                "path": selected_orange.relative_to(ROOT).as_posix(),
+                "sha256": selected_sha[1],
+            },
+        },
+        "final_physical_evaluation": physical_output.relative_to(ROOT).as_posix(),
+        "final_pass": final_pass,
+        "promoted": False,
+        "human_test_loaded": False,
+        "trunk_critic_frozen": True,
+        "finalization_recovery": "bounded overtime telemetry only; no optimizer step",
+    }
+    write_json(RESULTS / "result.json", result)
+    print(json.dumps(result, indent=2, sort_keys=True), flush=True)
+    return 0 if final_pass else 2
+
+
 def run(args: argparse.Namespace) -> int:
     authority = load_authority()
     authority_sha = v1.sha256_file(AUTHORITY)
+    if args.finalize_only:
+        return finalize_existing_run(authority_sha)
     blue_source = torch.load(BLUE, map_location="cpu", weights_only=False)
     orange_source = torch.load(ORANGE, map_location="cpu", weights_only=False)
     if human_base.tensor_tree_sha256(blue_source["model"]) != authority["protected_parents"]["blue"]["model_tensor_sha256"]:
@@ -995,22 +1065,7 @@ def run(args: argparse.Namespace) -> int:
     if completed.returncode != 0:
         raise RuntimeError("V2 final physical evaluation failed")
     physical = json.loads(physical_output.read_text(encoding="utf-8"))
-    overall = physical["overall"]
-    score = physical["evaluation"]["score"]
-    final_pass = bool(
-        score["wins"] >= 6
-        and score["rival_goals"] - score["nexto_goals"] >= 0
-        and overall["touches"]["high_aerial_proxy"] >= 1
-        and overall["scoring"]["goals_from_high_aerial_proxy"] >= 1
-        and overall["jump_flip_recovery"]["productive_floor_landing_proxy"] >= 1
-        and overall["jump_flip_recovery"]["productive_wall_landing_proxy"] >= 1
-        and overall["jump_flip_recovery"]["productive_dash_chain_proxy"] >= 1
-        and overall["demolitions"]["total"] >= 1
-        and (
-            overall["demolitions"]["followed_by_rival_touch_within_5_seconds"] >= 1
-            or overall["demolitions"]["followed_by_rival_goal_within_5_seconds"] >= 1
-        )
-    )
+    final_pass = final_physical_pass(physical)
     result = {
         "format": "RIVAL2_CAPABILITY_CURRICULUM_V2_RESULT",
         "created_utc": utc_now(),
@@ -1048,6 +1103,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eval-worlds-per-side", type=int, default=2048)
     parser.add_argument("--blocks", type=int, default=160)
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--finalize-only", action="store_true")
     return parser.parse_args()
 
 
