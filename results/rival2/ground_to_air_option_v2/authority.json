@@ -1,0 +1,158 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_OPTION_V2_AUTHORITY",
+  "created_utc": "2026-09-02T22:00:00Z",
+  "purpose": "Turn a reliable self-created low-ball pop into elevated and repeated airborne contacts by shortening PPO credit assignment without changing the protected competitive policy or production reward.",
+  "bound_inputs": {
+    "diagnostic_v1_orange_block80": {
+      "path": "checkpoints/rival2/ground_to_air_option_v1_diagnostic/rival2_orange_block80.pt",
+      "sha256": "F353A8B784AD5619CE56C8E8B66D98A4E690F6C40652A629D90345CA753FF28A"
+    },
+    "ground_to_air_v1_physics": {
+      "path": "rivalsim/rival2_ground_to_air_option.py",
+      "sha256": "90248D128F0961F4BFC339FB46ADD4AA3E140AC57161EBB46C4E80DC10FCDC40"
+    },
+    "ground_to_air_v2_curriculum": {
+      "path": "rivalsim/rival2_ground_to_air_curriculum_v2.py",
+      "sha256": "12E4F7DD597F9737A47BAAA96D726C5F71DBF94C94556FFD2FC2E55B2D44A8F1"
+    },
+    "v1_result": {
+      "path": "results/rival2/ground_to_air_option_v1/result.json",
+      "sha256": "64615FEFB2702B5487B4170816A5CBE7E320D0E1F4A3C396363730B656B2DC3E"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "parent_selection": {
+    "source": "V1 validation-selected block 80",
+    "selected_side": "orange",
+    "reason": "The orange V1 policy had the stronger minimum physical continuation result and is used only as a diagnostic curriculum parent, not as a promoted competitive policy.",
+    "old_v1_test_is_diagnostic_only": true,
+    "fresh_optimizer": true
+  },
+  "bootstrap_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 190.0,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 100.0,
+    "minimum_ball_height_uu": 80.0,
+    "minimum_boost_fraction": 0.25,
+    "minimum_forward_alignment": 0.5,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 105.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "both_team_perspectives_per_block": true,
+    "actor_learning_rate": 0.00006,
+    "trunk_learning_rate": 0.00002,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.995,
+    "ppo_clip": 0.2,
+    "epochs": 2,
+    "minibatch_size": 65536,
+    "maximum_blocks": 160,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 24,
+    "minimum_score_improvement": 0.0001,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "handoff_schedule": [
+      {
+        "first_block": 1,
+        "handoff_ticks": [40, 36]
+      },
+      {
+        "first_block": 33,
+        "handoff_ticks": [32, 28]
+      },
+      {
+        "first_block": 65,
+        "handoff_ticks": [24, 20]
+      },
+      {
+        "first_block": 97,
+        "handoff_ticks": [17]
+      }
+    ],
+    "successful_rehearsal": {
+      "source": "sampled trajectories with a literal elevated physical contact event",
+      "event_reward_threshold": 3.5,
+      "history_ticks": 36,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.15,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5,
+      "named_mechanic_labels_used": false
+    },
+    "exploration": {
+      "analog_sigma": 0.2,
+      "button_temperature": 1.0
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "qualified_pop_event": 0.25,
+    "ball_rise_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "goal_after_follow_event": 10.0,
+    "failure": -0.5
+  },
+  "episode": {
+    "horizon_ticks": 180,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_pop_ticks": 90,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026091201,
+    "validation": 2026091301,
+    "optimizer_and_exploration": 2026091401,
+    "test": 2026091501
+  },
+  "acceptance": {
+    "pop_touch_fraction_min": 0.8,
+    "elevated_follow_touch_fraction_min": 0.15,
+    "high_follow_touch_fraction_min": 0.03,
+    "second_airborne_touch_fraction_min": 0.01,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "optimizer_steps_before_authority_commit": 0,
+    "v2_test_seed_unopened_before_validation_pass": true,
+    "promotion_requires_full_chain_validation_and_test_pass": true
+  }
+}
