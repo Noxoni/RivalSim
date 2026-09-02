@@ -1,0 +1,206 @@
+{
+  "format": "RIVAL2_AERIAL_OPTION_V2_AUTHORITY",
+  "created_utc": "2026-09-02T15:03:11.9636596Z",
+  "parent_commit": "0864a2097437609299b9fd719229a799539d385f",
+  "purpose": "Turn the V1 learned launch intent into a genuine high-ball interception and goal-directed aerial option by pairing it with a bounded fast-aerial initiation primitive and training the post-launch controller.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+      "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+      "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514"
+    },
+    "immutable": true,
+    "role": "ordinary gameplay policy whenever the aerial gate is inactive"
+  },
+  "initial_option": {
+    "blue": {
+      "path": "checkpoints/rival2/aerial_option_v1/rival2_aerial_option_v1_final_blue.pt",
+      "sha256": "75C4572C5601D6753D00A5EC80112FB68AFAAA2446AA21DA9FF1C0C9BE8D5F51",
+      "model_tensor_sha256": "DB1CD958AD76BCFB1DCA0630F3F88DCA74AD9B6AB932CB870A3B51A059D75C98"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/aerial_option_v1/rival2_aerial_option_v1_final_orange.pt",
+      "sha256": "E2741EDA8513ED250212C3A9AD7FFA1D0A39A46CF06584954889E511D8378DA1",
+      "model_tensor_sha256": "730FB1D8F9EC3BDC828C672785C12E838A3DD1BAD3DFA13DDD9911565CE0B5EC"
+    },
+    "optimizer_state_loaded": false,
+    "human_validation_rmse_max": 0.24,
+    "v1_result": {
+      "path": "results/rival2/aerial_option_v1/result.json",
+      "sha256": "15C2A1F03C00098F0F5426BB31410B4153B5E1E5CEADC0F2D4D9F33248A4F8C2"
+    },
+    "v1_failure_attribution": {
+      "path": "results/rival2/aerial_option_v1/failure_attribution.json",
+      "sha256": "E58C82D2789914915253396EB0DD3DE33C0E8F782D3D49E4179CF679715708CB"
+    }
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "production_reward_unchanged": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "skill_acquisition_reward_is_not_a_production_reward": true,
+    "named_mechanic_classifier_used": false
+  },
+  "fast_aerial_initiation": {
+    "role": "bounded option-internal controller primitive used identically in controlled training and hybrid deployment after a learned aerial-gate decision",
+    "ticks_0_through_23": {
+      "throttle": 1.0,
+      "pitch": -1.0,
+      "jump": 1.0,
+      "boost": 1.0
+    },
+    "ticks_24_through_27": {
+      "throttle": 1.0,
+      "pitch": -1.0,
+      "jump": 0.0,
+      "boost": 1.0
+    },
+    "tick_28": {
+      "throttle": 1.0,
+      "steer": 0.0,
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "jump": 1.0,
+      "boost": 1.0,
+      "handbrake": 0.0
+    },
+    "tick_29_onward": "learned option action",
+    "policy_gradient_mask": "ticks 0 through 28 excluded because their emitted action is the fixed option primitive",
+    "input_injection": false,
+    "deployment_semantics": "part of the explicit hierarchical aerial option, never applied outside a qualifying aerial activation"
+  },
+  "training_boundary": {
+    "trainable": [
+      "option.shared_trunk",
+      "option.actor"
+    ],
+    "frozen": [
+      "option.critic",
+      "protected competitive base models"
+    ],
+    "optimizer": "fresh AdamW",
+    "trunk_learning_rate": 0.00003,
+    "actor_learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 0.5,
+    "critic_used": false,
+    "kl": "telemetry only",
+    "finite_parameter_and_gradient_checks": true
+  },
+  "human_auxiliary": {
+    "dataset_manifest": {
+      "path": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+      "sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55"
+    },
+    "observation_adapter": {
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    },
+    "labels": [
+      "aerialdribble",
+      "groundtoairdribble"
+    ],
+    "samples_per_block": 512,
+    "weight": 0.05,
+    "validation_rmse_max": 0.30,
+    "human_test_opened": false
+  },
+  "physical_training": {
+    "worlds_per_side": 2048,
+    "evaluation_worlds_per_side": 2048,
+    "discount_gamma": 0.9987476493904754,
+    "advantage": "normalized discounted option return; no critic bootstrap",
+    "ppo_clip": 0.2,
+    "epochs": 1,
+    "minibatch_size": 65536,
+    "evaluation_interval_blocks": 10,
+    "exploration": {
+      "moving_intercept": {
+        "analog_sigma": 0.12,
+        "button_temperature": 1.8
+      },
+      "goal_directed": {
+        "analog_sigma": 0.08,
+        "button_temperature": 1.4
+      }
+    },
+    "phases": [
+      {
+        "name": "moving_intercept",
+        "scenario_source": "Aerial Option V1 moving_intercept",
+        "horizon_ticks": 300,
+        "maximum_blocks": 120,
+        "success_termination": "first genuine high contact only; a low elevated touch does not end the episode",
+        "advance": {
+          "launch_fraction_min": 0.99,
+          "high_contact_fraction_min": 0.20,
+          "forward_high_contact_fraction_min": 0.12,
+          "consecutive_boundaries": 2
+        }
+      },
+      {
+        "name": "goal_directed",
+        "scenario_source": "Aerial Option V1 goal_directed",
+        "horizon_ticks": 420,
+        "maximum_blocks": 160,
+        "success_termination": "aerial-origin goal",
+        "select": {
+          "high_contact_fraction_min": 0.15,
+          "forward_high_contact_fraction_min": 0.10,
+          "aerial_origin_goal_fraction_min": 0.02
+        }
+      }
+    ],
+    "reward": {
+      "positive_3d_intercept_distance_progress_max_per_tick": 0.03,
+      "positive_vertical_gap_progress_max_per_tick": 0.02,
+      "positive_nose_alignment_progress_max_per_tick": 0.02,
+      "altitude_milestones": {
+        "150_uu": 0.1,
+        "250_uu": 0.2,
+        "350_uu": 0.3
+      },
+      "elevated_contact": 1.0,
+      "high_contact_additional": 2.0,
+      "forward_momentum_transfer_max": 1.0,
+      "aerial_origin_goal": 5.0,
+      "missed_window": -0.1,
+      "episode_positive_budget": 10.0,
+      "ordinary_ground_contact": 0.0
+    }
+  },
+  "integration": {
+    "activation": "ball height >= 300 uu, relative distance <= 2500 uu, ball in normalized forward hemisphere, self grounded, boost >= 15",
+    "latch_maximum_ticks": 300,
+    "release": "qualifying touch, demolition/reset, goal, or grounded after launch window",
+    "fast_aerial_primitive_runs_once_per_activation": true,
+    "base_policy_unchanged_when_inactive": true
+  },
+  "selection": {
+    "controlled_gate": "both physical-side options pass goal-directed thresholds",
+    "human_validation": "both options remain at or below 0.30 mean aerial validation RMSE",
+    "natural_short_screen": "hybrid retains at least 80 percent of V23 goals, touches, and mean speed with no extra no-touch world",
+    "final_nexto": {
+      "minimum_record": "6-4",
+      "minimum_goal_differential": 0,
+      "high_aerial_contacts_min": 5,
+      "high_aerial_goals_min": 1,
+      "touches_per_minute_floor_fraction_of_v23": 0.8
+    },
+    "fallback": "V23 remains promoted"
+  },
+  "integrity": {
+    "no_ppo_on_competitive_base": true,
+    "no_production_reward_change": true,
+    "no_named_mechanic_detector_or_reward": true,
+    "no_promotion_on_partial_or_proxy_only_success": true
+  }
+}
