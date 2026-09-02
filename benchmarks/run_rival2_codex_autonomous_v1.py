@@ -100,6 +100,7 @@ AUTHORITY_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_AUTHORITY"
 PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_PREFLIGHT"
 RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_RESULT"
 STATE_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_STATE"
+OPTIMIZER_STEP_LIMIT: int | None = None
 
 
 def utc_now() -> str:
@@ -152,6 +153,10 @@ def load_authority() -> dict[str, Any]:
         == RIVAL2_PPO_120HZ_CONTRACT_HASH,
         "worlds": authority.get("ppo", {}).get("worlds") == WORLD_COUNT,
         "kl_telemetry_only": authority.get("ppo", {}).get("kl_telemetry_only") is True,
+        "optimizer_step_limit": authority.get("ppo", {}).get(
+            "optimizer_steps_per_rollout_boundary"
+        )
+        == OPTIMIZER_STEP_LIMIT,
         "current_probability": authority.get("opponents", {}).get("current") == 0.5,
         "nexto_probability": authority.get("opponents", {}).get("nexto") == 0.5,
         "wisp_probability": authority.get("opponents", {}).get("wisp") == 0.0,
@@ -578,6 +583,7 @@ def preflight(
         "realized_initial_family_counts": family_count,
         "human_data": human_identity,
         "worlds": int(worlds),
+        "optimizer_steps_per_rollout_boundary": OPTIMIZER_STEP_LIMIT,
     }
 
 
@@ -693,7 +699,11 @@ def run(args: argparse.Namespace) -> int:
         started = time.perf_counter()
         rollout = trainer.collect_rollout()
         try:
-            ppo_metrics = trainer.update(rollout, kl_guard=kl_guard)
+            ppo_metrics = trainer.update(
+                rollout,
+                kl_guard=kl_guard,
+                optimizer_step_limit=OPTIMIZER_STEP_LIMIT,
+            )
             replay_metrics = human_replay(
                 trainer,
                 train,

@@ -757,6 +757,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
         rollout: Rival2RolloutBuffer,
         *,
         kl_guard: Rival2KLGuardConfig | None = None,
+        optimizer_step_limit: int | None = None,
     ) -> dict[str, torch.Tensor]:
         if self.mixed_ppo_safety is None:
             return super().update(rollout, kl_guard=kl_guard)
@@ -793,6 +794,7 @@ class Rival2OpponentCurriculumTrainer(Rival2Trainer):
                 policy_config=self.policy_config,
                 kl_guard=kl_guard,
                 distribution_override=self.exploration_override,
+                diagnostic_optimizer_step_limit=optimizer_step_limit,
             )
         except Rival2PolicyDisplacementRejected as error:
             self.model.load_state_dict(rollback["model"])
