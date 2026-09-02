@@ -1,0 +1,66 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V14_AUTHORITY",
+  "purpose": "bridge reviewed human imitation into authoritative native gameplay before further PPO",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500"
+  },
+  "teacher": {
+    "identity": "pinned deterministic Nexto",
+    "nexto_model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+    "target": "exact eight-channel action consumed by RivalSim",
+    "native_observation": "RIVAL2_OBS_V2_120HZ before target action application"
+  },
+  "human_data": {
+    "identity": "existing frozen reviewed train/validation splits and Observation Adapter V2",
+    "batch": {
+      "gameplay": 1024,
+      "positive_mechanics": 1024,
+      "failed_or_ambiguous": 0
+    },
+    "test_split_opened": false,
+    "validation_floors": {
+      "gameplay_complete_action_rmse_max": 0.6,
+      "mechanic_complete_action_rmse_max": 0.62
+    }
+  },
+  "native_data": {
+    "worlds": 8192,
+    "batch": 2048,
+    "state_distribution": "frozen stochastic source Rival versus frozen deterministic Nexto",
+    "starting_layouts": "deterministically randomized across five standard layouts",
+    "side_assignment": "deterministically balanced in expectation",
+    "optimizer_interval_physics_ticks": 4
+  },
+  "optimization": {
+    "kind": "supervised AdamW",
+    "accepted_step_ceiling": 300,
+    "learning_rate": 0.000005,
+    "weight_decay": 0.00001,
+    "gradient_norm_max": 0.5,
+    "trainable": ["shared trunk", "complete actor head"],
+    "frozen": ["critic"],
+    "objective": {
+      "analog": "Smooth-L1 beta 0.1 on tanh(actor mean)",
+      "buttons": "BCEWithLogits",
+      "log_std": "squared retention to frozen source actor",
+      "native_and_human_sample_fraction": [0.5, 0.5]
+    },
+    "previous_action_dropout": {
+      "probability": 0.5,
+      "applies_to": ["native teacher states", "human demonstration states"],
+      "purpose": "prevent copy-the-previous-action shortcut while retaining deployment compatibility"
+    },
+    "ppo_steps": 0,
+    "reward_changes": 0
+  },
+  "selection": {
+    "candidate_interval_steps": 50,
+    "preselection": "60-second continuous Nexto matrix across five layouts and both sides",
+    "rank": ["goal differential", "goals for", "touch differential", "Rival touches"],
+    "source_checkpoint_never_overwritten": true,
+    "complete_five_minute_evaluation_required_after_selection": true,
+    "no_test_data_for_selection": true
+  }
+}
