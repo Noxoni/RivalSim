@@ -1,0 +1,215 @@
+{
+  "format": "RIVAL2_CAPABILITY_CURRICULUM_V2_AUTHORITY",
+  "created_utc": "2026-09-02T12:34:40.9616210Z",
+  "parent_commit": "56f123cf08e62042a3f09b03bcca9c363af4723a",
+  "purpose": "learn high aerial offense, productive surface-landing acceleration and chains, and possession-oriented demolitions without sacrificing the promoted V23 side-specialized competitive policy",
+  "protected_parents": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+      "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA",
+      "deployment_side": 0
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+      "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514",
+      "deployment_side": 1
+    },
+    "immutable": true,
+    "training": "independent actor-only descendants; never deploy either descendant on the opposite physical side"
+  },
+  "v1_negative_evidence": {
+    "failure_attribution": {
+      "path": "results/rival2/capability_curriculum_v1/failure_attribution.json",
+      "sha256": "E679781AEFDDCB41AAEE17EBB4BF5E2B1220C4FF8F173CDA9702F72F6C7770E8"
+    },
+    "natural_verdict": {
+      "path": "results/rival2/capability_curriculum_v1/natural_evaluation_verdict.json",
+      "sha256": "5255A5AE3DFA371BF9F62AF5279B8200AF6E36D1521D50B7C600A0359EDFD79C"
+    },
+    "prohibited": [
+      "trunk-plus-actor human warm start",
+      "uniform one-checkpoint deployment across both physical sides",
+      "selection from isolated scenario counters without a natural-play screen",
+      "crediting a pre-airborne start as ground-origin aerial offense"
+    ]
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "observation_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "action_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "base_reward": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "base_reward_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "unchanged": true
+  },
+  "training_boundary": {
+    "shared_trunk": "frozen byte-identical to the corresponding V23 side parent",
+    "critic": "frozen byte-identical to the corresponding V23 side parent",
+    "actor": "only trainable module",
+    "optimizer": "fresh AdamW per side",
+    "actor_learning_rate": 5e-7,
+    "weight_decay": 0.0,
+    "max_gradient_norm": 0.5,
+    "nonfinite_guard": "hard stop",
+    "kl": "teacher-to-student objective and telemetry; not a rejection or rollback trigger"
+  },
+  "human_auxiliary": {
+    "role": "bounded auxiliary during capability optimization, never a replacement stage",
+    "dataset_manifest": {
+      "path": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+      "sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55"
+    },
+    "review_candidates": {
+      "path": "results/rival2/human_demo_review_v2/behavior_cloning_candidates.json",
+      "sha256": "2A76524022406E210B6F951D09DECCB14664794DA36C7853CDB90B43B282F6DE"
+    },
+    "observation_adapter": {
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    },
+    "positive_train_labels": [
+      "aerialdribble",
+      "groundtoairdribble",
+      "flipreset",
+      "ceilingpinch",
+      "wavedash",
+      "walldash"
+    ],
+    "gameplay_samples_per_block": 256,
+    "mechanic_samples_per_block": 256,
+    "gameplay_loss_weight": 0.10,
+    "mechanic_loss_weight": 0.25,
+    "log_std_parent_retention_weight": 0.10,
+    "failed_or_ambiguous_attempts": "excluded",
+    "test_split_opened_during_selection": false
+  },
+  "natural_teacher_preservation": {
+    "teacher": "the corresponding immutable V23 side parent",
+    "fixed_parent_retention_samples_per_block": 4096,
+    "on_policy_nexto_state_samples_per_block": 4096,
+    "teacher_actor_kl_weight": 4.0,
+    "teacher_action_smooth_l1_weight": 1.0,
+    "on_policy_capture": "current side student against pinned Nexto, deterministic student actions, deployment side fixed",
+    "screen": {
+      "frequency_blocks": 10,
+      "duration_seconds": 30,
+      "layouts": "five standard kickoff layouts x both physical deployment sides using the paired candidates",
+      "seed": 2026090221,
+      "eligibility": "goals, touches, no-touch rate, speed, and action health each remain at least 80 percent of the frozen V23 short-window baseline; nonfinite output and action collapse are ineligible"
+    }
+  },
+  "physical_scenarios": {
+    "worlds_per_side": 4096,
+    "horizon_ticks": 256,
+    "fresh_deterministic_states_each_block": true,
+    "side_fixed_to_checkpoint_deployment_side": true,
+    "mix": {
+      "ground_origin_high_ball_offense": 0.45,
+      "floor_landing_acceleration": 0.20,
+      "wall_landing_acceleration": 0.10,
+      "offensive_demo_route": 0.25
+    },
+    "pre_airborne_intercept_training_fraction": 0.0,
+    "opponent": "physically simulated scripted non-learning car",
+    "exploration": {
+      "analog_sigma": 0.08,
+      "button_temperature": 1.5,
+      "rollout_and_likelihood_coherent": true
+    }
+  },
+  "physical_overlay": {
+    "named_mechanic_classifier": false,
+    "episode_absolute_budget": 8.0,
+    "aerial": {
+      "approach_requires_car_height_uu": 150.0,
+      "high_contact_requires_car_height_uu": 300.0,
+      "high_contact_requires_ball_height_uu": 350.0,
+      "high_contact_reward": 1.0,
+      "forward_impulse_reward_max": 0.25,
+      "goal_after_high_contact_reward": 2.0,
+      "selection_requires_ground_origin": true
+    },
+    "surface_landing": {
+      "actual_flip_onset_required": true,
+      "actual_wheel_or_world_contact_required": true,
+      "maximum_flip_to_landing_ticks": 36,
+      "minimum_tangent_speed_gain_uu_per_second": 100.0,
+      "productive_landing_reward_max": 0.5,
+      "chain_window_ticks": 90,
+      "second_productive_landing_reward": 0.75,
+      "surface_classification": "authoritative world-contact normal at first contact"
+    },
+    "demolition": {
+      "authoritative_demo_event_required": true,
+      "actual_demo_reward": 1.0,
+      "opponent_half_or_offensive_route_bonus": 0.5,
+      "rival_touch_within_5_seconds_bonus": 0.5,
+      "rival_goal_within_5_seconds_bonus": 1.0,
+      "non_demo_bump_reward": 0.0
+    }
+  },
+  "optimization": {
+    "maximum_blocks": 160,
+    "scenario_ppo_epochs": 1,
+    "scenario_minibatch_size": 65536,
+    "clip_range": 0.2,
+    "gamma": 0.9987476493904754,
+    "gae_lambda": 0.9872585449014338,
+    "entropy_coefficient": 0.0,
+    "critic_updates": 0,
+    "human_auxiliary_steps_per_block": 1,
+    "natural_teacher_steps_per_block": 1,
+    "selection_interval_blocks": 10,
+    "stop": "two consecutive full capability passes, nonfinite/corruption, or maximum blocks"
+  },
+  "selection": {
+    "scenario_requirements": {
+      "ground_origin_high_contacts": 20,
+      "high_contact_goals": 2,
+      "productive_floor_landings": 20,
+      "productive_wall_landings": 10,
+      "productive_landing_chains": 5,
+      "actual_demos": 10,
+      "offensive_demo_fraction_min": 0.6
+    },
+    "human_requirements": {
+      "gameplay_validation_rmse_max": 0.59,
+      "target_mechanic_validation_rmse_below_v23": true,
+      "finite": true
+    },
+    "natural_short_screen_required": true,
+    "pareto": "natural preservation is an eligibility gate; among eligible pairs prefer number of physical gates passed, then high-contact goals, high contacts, dash outcomes, productive demos, and target-mechanic validation",
+    "source_pair_remains_best_when_no candidate is eligible": true
+  },
+  "final_evaluation": {
+    "candidate": "one selected checkpoint per physical team side",
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "opponent": "pinned Nexto",
+    "deterministic": true,
+    "physics_hz": 120,
+    "physical_telemetry": true,
+    "minimum_competitive_record": "6-4",
+    "minimum_goal_differential": 0,
+    "high_aerial_contacts_min": 1,
+    "high_aerial_goals_min": 1,
+    "productive_floor_landing_proxy_min": 1,
+    "productive_wall_landing_proxy_min": 1,
+    "productive_dash_chain_proxy_min": 1,
+    "demolitions_min": 1,
+    "productive_demo_follow_up_required": true,
+    "human_test": "open exactly once only after one final pair is selected"
+  },
+  "integrity": {
+    "raw_recordings_mutated": false,
+    "human_splits_mutated": false,
+    "observation_adapter_mutated": false,
+    "base_reward_contract_mutated": false,
+    "old_named_mechanics_reward_path_activated": false,
+    "v23_parents_overwritten": false,
+    "v1_rejected_checkpoint_used_as_parent": false
+  }
+}
