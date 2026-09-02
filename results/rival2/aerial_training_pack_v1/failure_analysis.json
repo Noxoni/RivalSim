@@ -1,0 +1,56 @@
+{
+  "format": "RIVAL2_AERIAL_TRAINING_PACK_V1_FAILURE_ANALYSIS",
+  "created_utc": "2026-09-02T16:41:00Z",
+  "authority_sha256": "C7CD065A5AB5FCC26CBB6C62F65DD99BDD07F812BDB5492CFFDE657578A6ED72",
+  "calibration_correction_sha256": "B2FC1EB0CB8B0429E1BD4D72C5A6F8C275678167796A7011B4EFA93866F92283",
+  "result": {
+    "path": "results/rival2/aerial_training_pack_v1/result.json",
+    "sha256": "F7B4E5D4C71DBF2FA287700CF8272C2FA6004D188E030976227D631B9A78D3D2"
+  },
+  "training_curve": {
+    "path": "results/rival2/aerial_training_pack_v1/training_curve.jsonl",
+    "sha256": "BC9EAEFB72EC7376DFA73DC31C94E3C655611E6CC23479529094568D8E7B63AD"
+  },
+  "outcome": {
+    "controlled_pass": false,
+    "stop_reason": "center_pop_maximum_blocks_without_gate",
+    "completed_packs": [],
+    "promoted": false,
+    "protected_competitive_v23_unchanged": true
+  },
+  "baseline": {
+    "blue_high_touch_fraction": 0.1796875,
+    "orange_high_touch_fraction": 0.13037109375,
+    "blue_goal_fraction": 0.04345703125,
+    "orange_goal_fraction": 0.0244140625
+  },
+  "best_boundary": {
+    "block": 10,
+    "blue_high_touch_fraction": 0.1826171875,
+    "orange_high_touch_fraction": 0.11865234375,
+    "blue_goal_fraction": 0.04443359375,
+    "orange_goal_fraction": 0.02099609375,
+    "blue_checkpoint_sha256": "F7510D98F04B2592E6604783682D5DCC5CC96A052FC0D5F2486BF2124F82E02F",
+    "orange_checkpoint_sha256": "35A0C4DE4DF0FCFC10078028F67DE81D95AD5BBD19303048BA462169EBCD8FB6"
+  },
+  "final_boundary": {
+    "block": 120,
+    "blue_high_touch_fraction": 0.181640625,
+    "orange_high_touch_fraction": 0.111328125,
+    "blue_goal_fraction": 0.04443359375,
+    "orange_goal_fraction": 0.0185546875,
+    "blue_human_aerial_rmse": 0.226827330887318,
+    "orange_human_aerial_rmse": 0.229044683277607,
+    "blue_checkpoint_sha256": "6B755F147FC82F91D566BF65FB6B40DC3928FD2D9D6D579FF94AA398EAE98DF8",
+    "orange_checkpoint_sha256": "E321A35960DD435DE23F7D0DE0BD0C9EEB6720A05939F18B32EF61C6E6B7D4AA"
+  },
+  "attribution": {
+    "scenario_reachable": true,
+    "qualified_goal_examples_present_in_every_training_block": true,
+    "finite_training": true,
+    "human_auxiliary_preserved": true,
+    "deterministic_improvement": false,
+    "diagnosis": "Per-tick clipped PPO diluted rare successful shot trajectories and did not concentrate the deterministic policy on their steering sequence.",
+    "next_experiment": "Restart from the original V2 option and train on a bounded replay of source-exact successful high-touch and goal trajectories, with trajectory-level outcome ranking and no promotion until the unchanged physical gates pass."
+  }
+}
