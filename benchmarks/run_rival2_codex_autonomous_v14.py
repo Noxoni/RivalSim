@@ -110,7 +110,9 @@ def _save_candidate(
             "sha256": base.sha256_file(AUTHORITY),
         },
         "source": {
-            "path": SOURCE.relative_to(ROOT).as_posix(),
+            "path": SOURCE.relative_to(ROOT).as_posix()
+            if SOURCE.is_relative_to(ROOT)
+            else SOURCE.as_posix(),
             "sha256": SOURCE_SHA256,
             "model_tensor_sha256": SOURCE_MODEL_SHA256,
         },
@@ -286,7 +288,9 @@ def run(args: argparse.Namespace) -> int:
     best: dict[str, Any] = {
         "accepted_supervised_steps": 0,
         "checkpoint": {
-            "path": SOURCE.relative_to(ROOT).as_posix(),
+            "path": SOURCE.relative_to(ROOT).as_posix()
+            if SOURCE.is_relative_to(ROOT)
+            else SOURCE.as_posix(),
             "sha256": SOURCE_SHA256,
             "model_tensor_sha256": SOURCE_MODEL_SHA256,
         },

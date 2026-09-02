@@ -1,0 +1,60 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V15_AUTHORITY",
+  "purpose": "continue native Nexto teacher imitation until the student is coherent enough for closed-loop selection",
+  "source": {
+    "role": "training initialization only; not a promoted policy",
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v14/candidate_s0300.pt",
+    "sha256": "6C21B078C73A4B4039326C4C49A6D663C8E7C6952BEE66060F1793D14955B924",
+    "model_tensor_sha256": "6E7A7288B338C6825F04F5DB288B206961F876EAFFD88BBADF9B3FBBCFB44828",
+    "native_nexto_imitation_rmse": 0.5620688717940148,
+    "human_gameplay_validation_rmse": 0.5364857912063599,
+    "closed_loop_status": "not promotable"
+  },
+  "promotion_floor": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "five_minute_nexto_record": "5-5",
+    "never_overwrite": true
+  },
+  "teacher": {
+    "identity": "pinned deterministic Nexto",
+    "nexto_model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+    "target": "exact action consumed at the paired native pre-action state"
+  },
+  "optimization": {
+    "kind": "fresh supervised AdamW continuation",
+    "additional_accepted_steps": 1750,
+    "cumulative_bridge_steps_after_completion": 2050,
+    "learning_rate": 0.000005,
+    "weight_decay": 0.00001,
+    "gradient_norm_max": 0.5,
+    "batch": {
+      "native_nexto": 3072,
+      "human_gameplay": 512,
+      "human_positive_mechanics": 512,
+      "native_fraction": 0.75,
+      "human_fraction": 0.25
+    },
+    "previous_action_dropout": 0.5,
+    "trainable": ["shared trunk", "complete actor head"],
+    "frozen": ["critic"],
+    "ppo_steps": 0,
+    "reward_changes": 0
+  },
+  "data": {
+    "worlds": 8192,
+    "native_state_distribution": "frozen stochastic V14 step-300 policy versus frozen Nexto",
+    "human_train_and_validation_splits": "unchanged reviewed corpus",
+    "human_test_opened": false,
+    "failed_or_ambiguous_mechanics_used": false
+  },
+  "selection": {
+    "candidate_interval_additional_steps": 250,
+    "candidate_cumulative_steps": [550, 800, 1050, 1300, 1550, 1800, 2050],
+    "preselection": "60-second continuous Nexto matrix",
+    "human_gameplay_rmse_max": 0.6,
+    "human_mechanic_rmse_max": 0.62,
+    "complete_five_minute_evaluation_required_before promotion": true,
+    "no_test_data_for_selection": true
+  }
+}
