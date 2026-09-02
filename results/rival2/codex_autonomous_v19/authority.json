@@ -1,0 +1,31 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V19_AUTHORITY",
+  "purpose": "measure whether the Gameplay 120 V2 PPO gradient is locally opposite to sustained deterministic Nexto performance",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500",
+    "never_overwrite": true
+  },
+  "directions": {
+    "source": "four prospectively frozen V18 update-1 analog PPO displacements",
+    "seeds": [2026090251, 2026090253, 2026090257, 2026090259],
+    "include_arithmetic_mean": true,
+    "individual_checkpoint_hashes_bound_in_runner": true
+  },
+  "magnitudes": [0.25, 0.5, 1.0],
+  "operation": {
+    "formula": "parent - magnitude * (V18_update1 - parent)",
+    "changed_parameters": ["actor.weight[0:5]", "actor.bias[0:5]"],
+    "optimizer_steps": 0,
+    "ppo_steps": 0,
+    "reward_changes": 0
+  },
+  "selection": {
+    "preselection": "paired continuous 60-second Nexto matrix over all five layouts and both sides",
+    "human_validation_floors": [0.61, 0.62],
+    "promotion": "strict improvement on complete five-minute ten-layout Nexto matrix",
+    "source_checkpoint_never_overwritten": true,
+    "human_test_opened": false
+  }
+}
