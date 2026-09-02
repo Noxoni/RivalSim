@@ -1,0 +1,169 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_AUTHORITY",
+  "created_utc": "2026-09-02T22:15:00Z",
+  "purpose": "Extend the passing self-pop aerial continuation into repeated goalward airborne contacts and goals before natural self-play integration.",
+  "bound_inputs": {
+    "passing_ground_to_air_v2": {
+      "path": "checkpoints/rival2/ground_to_air_option_v2/rival2_ground_to_air_option_v2.pt",
+      "sha256": "FEF43A01FF627B4B41BFA76AED811BD21F2A4E8900B1A34FFE0A736E12C71249"
+    },
+    "ground_to_air_v2_result": {
+      "path": "results/rival2/ground_to_air_option_v2/result.json",
+      "sha256": "E23BFE2E8725337A064801A1304EA05D4A3A6CFB0C04CECF1458A1F32F4BC20E"
+    },
+    "ground_to_air_v1_physics": {
+      "path": "rivalsim/rival2_ground_to_air_option.py",
+      "sha256": "90248D128F0961F4BFC339FB46ADD4AA3E140AC57161EBB46C4E80DC10FCDC40"
+    },
+    "ground_to_air_v2_curriculum": {
+      "path": "rivalsim/rival2_ground_to_air_curriculum_v2.py",
+      "sha256": "12E4F7DD597F9737A47BAAA96D726C5F71DBF94C94556FFD2FC2E55B2D44A8F1"
+    },
+    "goal_directed_physics": {
+      "path": "rivalsim/rival2_ground_to_air_goal_v3.py",
+      "sha256": "91679F3B032F47D6F25D56ADAA077444CC02E70E66C9C302F92432F26433567C"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "transition": {
+    "v2_controlled_test_passed": true,
+    "v2_test_elevated_follow_fraction": [0.21435546875, 0.20947265625],
+    "v2_test_high_follow_fraction": [0.060546875, 0.07373046875],
+    "v2_test_second_airborne_fraction": [0.01953125, 0.0234375],
+    "v2_test_goal_fraction": [0.0, 0.0],
+    "self_play_not_yet_started": true,
+    "reason": "V2 has enough launch/recontact competence to train intent and continuation; V3 now requires physical repeated contacts and a causal goal before self-play integration."
+  },
+  "bootstrap_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 190.0,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 100.0,
+    "minimum_ball_height_uu": 80.0,
+    "minimum_boost_fraction": 0.25,
+    "minimum_forward_alignment": 0.5,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 105.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "actor_learning_rate": 0.00004,
+    "trunk_learning_rate": 0.000015,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.997,
+    "ppo_clip": 0.2,
+    "epochs": 2,
+    "minibatch_size": 65536,
+    "maximum_blocks": 200,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 24,
+    "minimum_score_improvement": 0.0001,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "phase_schedule": [
+      {"first_block": 1, "phase": 0, "name": "easy_finish"},
+      {"first_block": 49, "phase": 1, "name": "attacking_half"}
+    ],
+    "handoff_schedule": [
+      {"first_block": 1, "handoff_ticks": [40, 36]},
+      {"first_block": 49, "handoff_ticks": [32, 28]},
+      {"first_block": 97, "handoff_ticks": [20, 17]}
+    ],
+    "successful_rehearsal": {
+      "source": "sampled trajectories with a literal elevated physical contact event",
+      "event_reward_threshold": 3.5,
+      "history_ticks": 48,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.1,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "goal_rehearsal": {
+      "source": "sampled trajectories with a causal goal after an elevated follow contact",
+      "event_reward_threshold": 20.0,
+      "history_ticks": 96,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.2,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "exploration": {
+      "analog_sigma": 0.16,
+      "button_temperature": 0.9
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "post_contact_goalward_progress_per_uu": 0.002,
+    "low_pop_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "third_or_later_airborne_touch_event": 8.0,
+    "goalward_velocity_contact_event": 2.0,
+    "forward_velocity_transfer_per_uu_per_second": 0.002,
+    "goal_after_follow_event": 25.0,
+    "other_goal": -1.0,
+    "failure": -1.0
+  },
+  "episode": {
+    "horizon_ticks": 300,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_tick": 110,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026091601,
+    "validation": 2026091701,
+    "optimizer_and_exploration": 2026091801,
+    "test": 2026091901
+  },
+  "acceptance": {
+    "pop_touch_fraction_min": 0.8,
+    "elevated_follow_touch_fraction_min": 0.15,
+    "high_follow_touch_fraction_min": 0.03,
+    "second_airborne_touch_fraction_min": 0.03,
+    "third_or_later_airborne_touch_fraction_min": 0.01,
+    "goal_after_follow_fraction_min": 0.015,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "passing_v2_parent_unchanged": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "optimizer_steps_before_authority_commit": 0,
+    "v3_test_seed_unopened_before_validation_pass": true,
+    "promotion_requires_full_chain_goal_validation_and_test_pass": true
+  }
+}
