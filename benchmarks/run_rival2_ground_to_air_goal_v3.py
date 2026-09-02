@@ -29,8 +29,14 @@ from benchmarks import run_rival2_aerial_option_v1 as aerial_v1  # noqa: E402
 from benchmarks import run_rival2_capability_curriculum_v1 as capability  # noqa: E402
 from benchmarks import run_rival2_codex_autonomous_v1 as autonomous  # noqa: E402
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes  # noqa: E402
+from rivalsim.behavioral_telemetry import (  # noqa: E402
+    GOAL_HALF_WIDTH_UU,
+    GOAL_HEIGHT_UU,
+    GOAL_SCORING_PLANE_Y_UU,
+)
 from rivalsim.rival2_aerial_option import FIELD  # noqa: E402
 from rivalsim.rival2_contracts import (  # noqa: E402
+    BALL_LINEAR_SPEED_SCALE,
     POSITION_SCALE,
     RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
 )
@@ -177,6 +183,25 @@ class GoalDirectedTrainingTracker:
         self.productive_continuation_attempts = 0
         self.sustained_control_ticks = 0
         self.maximum_connected_control_ticks = 0
+        self.maximum_goalward_y = torch.full((worlds,), -torch.inf)
+        self.x_at_maximum_goalward_y = torch.zeros(worlds)
+        self.z_at_maximum_goalward_y = torch.zeros(worlds)
+        self.minimum_linear_goal_projection_error = torch.full(
+            (worlds,), torch.inf
+        )
+        self.linear_goal_projection_seen = torch.zeros(worlds, dtype=torch.bool)
+
+    def _ensure_diagnostic_device(self, device: torch.device) -> None:
+        for name in (
+            "maximum_goalward_y",
+            "x_at_maximum_goalward_y",
+            "z_at_maximum_goalward_y",
+            "minimum_linear_goal_projection_error",
+            "linear_goal_projection_seen",
+        ):
+            value = getattr(self, name)
+            if value.device != device:
+                setattr(self, name, value.to(device))
 
     def _vector(self, observation: torch.Tensor, prefix: str) -> torch.Tensor:
         return torch.stack(
@@ -221,6 +246,53 @@ class GoalDirectedTrainingTracker:
             - before[:, self.side, FIELD["ball.position.y"]]
         ) * POSITION_SCALE[1]
         reward_authority = self.authority["reward"]
+        self._ensure_diagnostic_device(before.device)
+        ball_position = self._vector(after, "ball.position") * scale
+        ball_velocity = (
+            self._vector(after, "ball.linear_velocity") * BALL_LINEAR_SPEED_SCALE
+        )
+        eligible = active & self.physical.elevated_seen
+        farther = eligible & (ball_position[:, 1] > self.maximum_goalward_y)
+        self.maximum_goalward_y = torch.where(
+            farther, ball_position[:, 1], self.maximum_goalward_y
+        )
+        self.x_at_maximum_goalward_y = torch.where(
+            farther, ball_position[:, 0], self.x_at_maximum_goalward_y
+        )
+        self.z_at_maximum_goalward_y = torch.where(
+            farther, ball_position[:, 2], self.z_at_maximum_goalward_y
+        )
+        forward_velocity = ball_velocity[:, 1]
+        projection_eligible = (
+            eligible
+            & (forward_velocity > 100.0)
+            & (ball_position[:, 1] < GOAL_SCORING_PLANE_Y_UU)
+        )
+        projection_time = (
+            (GOAL_SCORING_PLANE_Y_UU - ball_position[:, 1])
+            / forward_velocity.clamp_min(100.0)
+        ).clamp(0.0, 4.0)
+        projected_x = ball_position[:, 0] + ball_velocity[:, 0] * projection_time
+        projected_z = (
+            ball_position[:, 2]
+            + ball_velocity[:, 2] * projection_time
+            - 0.5 * 650.0 * projection_time.square()
+        )
+        projection_error = torch.sqrt(
+            (projected_x.abs() - GOAL_HALF_WIDTH_UU).clamp_min(0.0).square()
+            + (projected_z - GOAL_HEIGHT_UU).clamp_min(0.0).square()
+            + (-projected_z).clamp_min(0.0).square()
+        )
+        self.minimum_linear_goal_projection_error = torch.where(
+            projection_eligible,
+            torch.minimum(
+                self.minimum_linear_goal_projection_error, projection_error
+            ),
+            self.minimum_linear_goal_projection_error,
+        )
+        self.linear_goal_projection_seen |= projection_eligible & (
+            projection_error <= 0.0
+        )
         tracking = self.physical.pop_seen & active
         reward = torch.zeros(self.worlds, dtype=torch.float32, device=before.device)
         reward += tracking * (
@@ -322,6 +394,27 @@ class GoalDirectedTrainingTracker:
         return reward, done
 
     def telemetry(self) -> dict[str, Any]:
+        finite = torch.isfinite(self.maximum_goalward_y)
+        maximum_y = self.maximum_goalward_y[finite]
+        deepest_x = self.x_at_maximum_goalward_y[finite]
+        deepest_z = self.z_at_maximum_goalward_y[finite]
+
+        def quantiles(value: torch.Tensor) -> dict[str, float | None]:
+            if value.numel() == 0:
+                return {"p10": None, "p50": None, "p90": None, "maximum": None}
+            value = value.to(torch.float32)
+            levels = torch.tensor((0.1, 0.5, 0.9), device=value.device)
+            measured = torch.quantile(value, levels).detach().cpu().tolist()
+            return {
+                "p10": float(measured[0]),
+                "p50": float(measured[1]),
+                "p90": float(measured[2]),
+                "maximum": float(value.max().item()),
+            }
+
+        deep = maximum_y >= 4_900.0
+        deep_inside_width = deep & (deepest_x.abs() <= GOAL_HALF_WIDTH_UU)
+        deep_inside_height = deep & (deepest_z <= GOAL_HEIGHT_UU)
         result = asdict(self.physical.telemetry)
         result.update(
             {
@@ -332,6 +425,26 @@ class GoalDirectedTrainingTracker:
                 "productive_continuation_attempts": self.productive_continuation_attempts,
                 "sustained_control_ticks": self.sustained_control_ticks,
                 "maximum_connected_control_ticks": self.maximum_connected_control_ticks,
+                "finish_geometry": {
+                    "attempts_with_elevated_state": int(finite.sum()),
+                    "maximum_goalward_y_uu": quantiles(maximum_y),
+                    "absolute_x_at_deepest_y_uu": quantiles(deepest_x.abs()),
+                    "z_at_deepest_y_uu": quantiles(deepest_z),
+                    "reached_deep_goal_area": int(deep.sum()),
+                    "deep_inside_goal_width": int(deep_inside_width.sum()),
+                    "deep_inside_goal_height": int(deep_inside_height.sum()),
+                    "deep_inside_goal_mouth": int(
+                        (deep_inside_width & deep_inside_height).sum()
+                    ),
+                    "linear_goal_projection_seen": int(
+                        self.linear_goal_projection_seen.sum()
+                    ),
+                    "minimum_linear_goal_projection_error_uu": quantiles(
+                        self.minimum_linear_goal_projection_error[
+                            torch.isfinite(self.minimum_linear_goal_projection_error)
+                        ]
+                    ),
+                },
                 "reward_sum": self.reward_sum,
             }
         )
