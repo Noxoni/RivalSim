@@ -1,0 +1,131 @@
+{
+  "format": "RIVAL2_AERIAL_INTERCEPT_HYBRID_V3_AUTHORITY",
+  "created_utc": "2026-09-02T20:10:00Z",
+  "parent_commit": "dd129148fe0e24c54e09a4afc064379f7850c96f",
+  "purpose": "Convert V23's existing airborne trajectories into genuine high-ball interceptions by applying ballistic alignment only after V23 is already airborne; disable the failed fixed ground-launch takeover.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "immutable": true,
+    "inactive_semantics": "byte-identical V23 physical-side policy action"
+  },
+  "controller": {
+    "path": "rivalsim/rival2_aerial_intercept_hybrid.py",
+    "sha256": "06D73C329E0509E73F2571BE51B3FF309323CF4885628CB0FF3ADECDAB08E95B",
+    "teacher": {
+      "path": "rivalsim/rival2_aerial_intercept_teacher.py",
+      "sha256": "A1DFB98D33B6E2D25889583316FD7605B7366FA7E1B4E1F70F47DF3FEE3D603A",
+      "observation_only": true,
+      "simulator_internal_state": false,
+      "game_state_mutation": false
+    },
+    "calibration": {
+      "path": "results/rival2/aerial_intercept_teacher/calibration.json",
+      "sha256": "3CE0F55AD6966B2EB0A0DE049BE32D84EC179FEF226AB12AA0C9146CA4B50672"
+    }
+  },
+  "gate": {
+    "allow_ground_launch": false,
+    "allow_airborne_intercept": true,
+    "minimum_ball_height_uu": 350.0,
+    "maximum_ball_height_uu": 1200.0,
+    "minimum_relative_distance_uu": 300.0,
+    "maximum_relative_distance_uu": 2500.0,
+    "minimum_forward_alignment": 0.25,
+    "minimum_boost_fraction": 0.15,
+    "minimum_intercept_time_seconds": 0.65,
+    "minimum_predicted_ball_height_uu": 450.0,
+    "maximum_reach_residual_uu": 450.0,
+    "airborne_minimum_car_height_uu": 100.0,
+    "airborne_maximum_car_height_uu": 900.0,
+    "airborne_minimum_ball_height_uu": 350.0,
+    "airborne_maximum_ball_height_uu": 1200.0,
+    "airborne_minimum_relative_distance_uu": 150.0,
+    "airborne_maximum_relative_distance_uu": 1600.0,
+    "airborne_minimum_forward_alignment": 0.0,
+    "airborne_minimum_boost_fraction": 0.1,
+    "airborne_minimum_intercept_time_seconds": 0.12,
+    "airborne_minimum_predicted_ball_height_uu": 350.0,
+    "airborne_maximum_reach_residual_uu": 350.0,
+    "release_ball_height_uu": 190.0,
+    "release_grounded_after_tick": 40,
+    "maximum_option_ticks": 300,
+    "cooldown_ticks": 90,
+    "membership": "authoritative RIVAL2_OBS_V2_120HZ fields plus the frozen observation-only teacher plan",
+    "activation_learning": false,
+    "threshold_tuning_after_evaluation": false
+  },
+  "option_action": {
+    "ground_launch": "disabled",
+    "airborne_activation": "teacher action begins immediately; the fast-aerial primitive is bypassed",
+    "release": "authoritative touch, landing after a short debounce, low ball, timeout, or lifecycle reset",
+    "input_injection": false,
+    "physics_hz": 120,
+    "policy_hz": 120
+  },
+  "diagnostic_predecessor": {
+    "dagger_v1_result": {
+      "path": "results/rival2/aerial_intercept_dagger_v1/result.json",
+      "sha256": "B79B0AC8D07ECBAF2C48B94DD1B02F94D2F8751A25CA0A70F7163814A8358B7D"
+    },
+    "hybrid_v2_result": {
+      "path": "results/rival2/aerial_intercept_hybrid_v2/result.json",
+      "sha256": "584CABE032763C5F547EF9040A7701930B3A6007075CE878991184F4C6136440"
+    },
+    "hybrid_v2_natural_evaluation": {
+      "path": "results/rival2/aerial_intercept_hybrid_v2/natural_evaluation.json",
+      "sha256": "2B8503A6C95D74EA50AF643A0BA6663F4C18C1F78FFE37A4566811E0E46925B4"
+    },
+    "measured_failure": "The fixed ground launch produced 25 contacts across V1/V2 but zero high contacts and a repeated 4-6 Nexto record.",
+    "prospective_correction": "Retain V23's own launch/jump behavior and apply the trajectory planner only to qualified already-airborne states."
+  },
+  "validation": {
+    "seed": 2026090353,
+    "matrix": "five standard kickoff layouts x both Rival physical sides against pinned Nexto",
+    "action_mode": "deterministic",
+    "regulation_minutes": 5,
+    "maximum_overtime_minutes": 5,
+    "baseline": {
+      "path": "results/rival2/codex_autonomous_v23/physical_behavior_telemetry.json",
+      "sha256": "A8FD635470827E350404852AD14A729525F0FE2E1AAC7EAA7E12EE114FE6818B",
+      "wins": 8,
+      "losses": 2,
+      "rival_goals": 159,
+      "nexto_goals": 111,
+      "touches": 687,
+      "touches_per_minute": 13.74,
+      "high_aerial_contacts": 0,
+      "high_aerial_goals": 0
+    },
+    "promotion_gate": {
+      "minimum_wins": 6,
+      "maximum_losses": 4,
+      "minimum_goal_differential": 0,
+      "minimum_touch_fraction_of_v23": 0.8,
+      "minimum_touch_rate_fraction_of_v23": 0.8,
+      "minimum_high_aerial_contacts": 5,
+      "minimum_high_aerial_goals": 1,
+      "maximum_additional_no_touch_worlds": 0,
+      "finite_actions_and_observations": true,
+      "both_physical_sides_must_activate": true
+    },
+    "single_frozen_evaluation": true,
+    "no_reselection_after_results": true
+  },
+  "integrity": {
+    "optimizer_steps_before_authority": 0,
+    "optimizer_steps_allowed": 0,
+    "ppo_steps_allowed": 0,
+    "production_reward_changes": 0,
+    "policy_parameter_mutation": false,
+    "named_mechanic_detector_or_reward": false,
+    "human_test_opened": false,
+    "fallback_on_failure": "V23 remains promoted; preserve V3 as diagnostic evidence"
+  }
+}
