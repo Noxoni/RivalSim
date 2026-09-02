@@ -1,0 +1,175 @@
+{
+  "format": "RIVAL2_CAPABILITY_CURRICULUM_V1_AUTHORITY",
+  "created_utc": "2026-09-02T11:48:58.7940838Z",
+  "purpose": "teach genuine aerial offense, physically productive surface dashes, and possession-oriented demolitions while preserving the promoted V23 competitive baseline",
+  "protected_parents": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+      "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+      "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514"
+    },
+    "immutable": true,
+    "initial_training_parent": "blue"
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "observation_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "action_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "base_reward": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "base_reward_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "physics_hz": 120,
+    "policy_hz": 120
+  },
+  "human_rehearsal": {
+    "dataset_manifest": {
+      "path": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+      "sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55"
+    },
+    "review_candidates": {
+      "path": "results/rival2/human_demo_review_v2/behavior_cloning_candidates.json",
+      "sha256": "2A76524022406E210B6F951D09DECCB14664794DA36C7853CDB90B43B282F6DE"
+    },
+    "observation_adapter": {
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    },
+    "train_only_labels": [
+      "aerialdribble",
+      "groundtoairdribble",
+      "flipreset",
+      "ceilingpinch",
+      "wavedash",
+      "walldash"
+    ],
+    "gameplay_frames_per_step": 1024,
+    "target_mechanic_frames_per_step": 1024,
+    "family_loss_weights": {
+      "gameplay": 0.5,
+      "target_mechanics": 0.5
+    },
+    "bounded_label_balancing": true,
+    "maximum_steps": 800,
+    "validation_interval_steps": 50,
+    "patience_boundaries": 5,
+    "actor_trunk_learning_rate": 5e-06,
+    "weight_decay": 0.0001,
+    "critic_trainable": false,
+    "teacher_actor_retention_coefficient": 0.1,
+    "log_std_retention_coefficient": 0.05,
+    "selection": "lowest equal-weight mean of gameplay and target-mechanic validation complete-action RMSE, subject to gameplay RMSE <= 0.590379 and finite outputs",
+    "test_split_opened_during_selection": false
+  },
+  "scenario_curriculum": {
+    "worlds": 8192,
+    "rollout_horizon": 128,
+    "scenario_mix": {
+      "airborne_intercept": 0.25,
+      "ground_takeoff": 0.25,
+      "floor_dash_recovery": 0.15,
+      "wall_dash_recovery": 0.10,
+      "offensive_demo_route": 0.25
+    },
+    "fresh_deterministic_scenarios_each_update": true,
+    "trainable_agent": "one randomized canonical attacking side per world",
+    "scripted_opponent": "non-learning physically simulated target; stationary outside demo routes and forward-coasting in demo routes",
+    "ppo": {
+      "gamma": 0.9987476493904754,
+      "gae_lambda": 0.9872585449014338,
+      "clip_range": 0.2,
+      "value_loss_coefficient": 0.5,
+      "entropy_coefficient": 0.0,
+      "max_gradient_norm": 0.5,
+      "epochs": 2,
+      "minibatch_size": 65536,
+      "actor_trunk_learning_rate": 2e-06,
+      "critic_learning_rate": 1e-05,
+      "kl_telemetry_only": true,
+      "nonfinite_guard": true
+    },
+    "exploration": {
+      "analog_sigma": 0.1,
+      "button_temperature": 1.25,
+      "rollout_likelihood_coherent": true
+    },
+    "maximum_updates": 120,
+    "evaluation_interval_updates": 10,
+    "early_stop": "all capability gates pass twice consecutively without preservation failure"
+  },
+  "physical_training_overlay": {
+    "all_terms_are_authoritative_state_or_event_outcomes": true,
+    "named_mechanic_classifier_used": false,
+    "aerial": {
+      "minimum_car_height_uu": 250.0,
+      "minimum_ball_height_uu": 300.0,
+      "three_dimensional_approach_delta_clip_uu": 40.0,
+      "approach_reward_per_clip": 0.004,
+      "high_contact_reward": 0.75,
+      "forward_ball_impulse_reward_max": 0.25,
+      "goal_reward_source": "unchanged base Gameplay 120 V2"
+    },
+    "dash": {
+      "requires_actual_flip_onset": true,
+      "requires_subsequent_wheel_contact": true,
+      "maximum_flip_to_landing_ticks": 30,
+      "tangent_speed_gain_scale_uu_per_s": 500.0,
+      "productive_landing_reward_max": 0.25,
+      "two_productive_landings_window_ticks": 90,
+      "second_landing_chain_reward": 0.5,
+      "surface_classification": "first landing wheel normal; floor, wall, and transition surfaces reported separately"
+    },
+    "demolition": {
+      "requires_authoritative_demolition_event": true,
+      "opponent_route_approach_reward_max_per_tick": 0.002,
+      "actual_demo_reward": 1.0,
+      "offensive_or_possession_context_bonus": 0.5,
+      "defensive_context_actual_demo_reward": 0.5,
+      "no_reward_for_non-demo_bump": true
+    },
+    "overlay_absolute_reward_budget_per_agent_episode": 8.0
+  },
+  "evaluation": {
+    "telemetry": "read-only 120 Hz physical state/action/event evidence",
+    "aerial_gate": {
+      "high_aerial_contacts_min": 10,
+      "high_aerial_goals_min": 1,
+      "multi_elevated_touch_air_episodes_min": 1
+    },
+    "dash_gate": {
+      "productive_floor_dash_landings_min": 20,
+      "productive_wall_dash_landings_min": 10,
+      "productive_double_dash_chains_min": 5,
+      "minimum_tangent_gain_uu_per_s": 100.0
+    },
+    "demo_gate": {
+      "actual_demos_min": 10,
+      "offensive_or_possession_context_fraction_min": 0.6,
+      "goals_within_five_seconds_after_demo_min": 1
+    },
+    "competitive_preservation": {
+      "full_nexto_matrix_games": 10,
+      "wins_min": 6,
+      "goal_differential_min": 0,
+      "v23_reference_record": "8-2, 159-111",
+      "human_gameplay_validation_rmse_max": 0.61,
+      "human_target_mechanic_validation_rmse_must_improve": true,
+      "touch_rate_collapse_relative_limit": 0.2,
+      "nonfinite_or_action_collapse_allowed": false
+    },
+    "selection": "Pareto selection over aerial, dash, demo, competitive, and human-validation evidence; no single reward counter can promote a policy"
+  },
+  "integrity": {
+    "raw_recordings_mutated": false,
+    "human_splits_mutated": false,
+    "observation_adapter_mutated": false,
+    "base_reward_mutated": false,
+    "old_named_mechanics_reward_path_activated": false,
+    "v23_parent_overwritten": false,
+    "human_test_split_reserved_until_final_selection": true
+  }
+}
