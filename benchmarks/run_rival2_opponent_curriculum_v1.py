@@ -163,6 +163,14 @@ def parse_args() -> argparse.Namespace:
         help="override the default number of parallel episodes per Rival side",
     )
     parser.add_argument(
+        "--evaluation-single-seed",
+        type=int,
+        help=(
+            "override the frozen default seed for a standalone evaluation; "
+            "intended for independently seeded robustness checks"
+        ),
+    )
+    parser.add_argument(
         "--finalize-existing-rejection",
         action="store_true",
         help="audit and finalize an already-published KL rejection without simulation",
@@ -1987,6 +1995,8 @@ def main() -> int:
             and args.evaluation_worlds_per_side <= 0
         ):
             raise ValueError("evaluation worlds per side must be positive")
+        if args.evaluation_single_seed is not None and args.evaluation_single_seed < 0:
+            raise ValueError("evaluation seed must be nonnegative")
         mode = str(args.evaluation_single_mode)
         result = run_evaluation(
             opponent_name=str(args.evaluation_single_opponent),
@@ -2003,7 +2013,9 @@ def main() -> int:
                 else 5 if mode == "deterministic" else 128
             ),
             seed=(
-                DETERMINISTIC_EVALUATION_SEED
+                int(args.evaluation_single_seed)
+                if args.evaluation_single_seed is not None
+                else DETERMINISTIC_EVALUATION_SEED
                 if mode == "deterministic"
                 else STOCHASTIC_EVALUATION_SEED
             ),

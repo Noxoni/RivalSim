@@ -495,6 +495,7 @@ def run_nexto_evaluation(
     device: str,
     collision_dir: Path,
     worlds_per_side: int = EVALUATION_WORLDS_PER_SIDE,
+    evaluation_seed: int | None = None,
 ) -> dict[str, Any]:
     digest = sha256_file(checkpoint_path)
     label = f"codex_autonomous_u{campaign_step:04d}"
@@ -525,6 +526,8 @@ def run_nexto_evaluation(
         "--evaluation-worlds-per-side",
         str(worlds_per_side),
     ]
+    if evaluation_seed is not None:
+        command.extend(("--evaluation-single-seed", str(int(evaluation_seed))))
     with stdout_path.open("w", encoding="utf-8", newline="\n") as stdout, stderr_path.open(
         "w", encoding="utf-8", newline="\n"
     ) as stderr:
