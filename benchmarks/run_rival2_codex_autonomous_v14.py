@@ -61,6 +61,7 @@ MECHANIC_RMSE_CEILING = 0.62
 CAMPAIGN_IDENTITY = "RIVAL2_CODEX_AUTONOMOUS_V14_NATIVE_TEACHER_BRIDGE"
 AUTHORITY_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V14_AUTHORITY"
 PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V14_PREFLIGHT"
+RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V14_RESULT"
 PREVIOUS_ACTION_SLICE = slice(167, 175)
 
 
@@ -454,7 +455,7 @@ def run(args: argparse.Namespace) -> int:
     if not (RESULTS / "best.json").exists():
         base.write_json(RESULTS / "best.json", best)
     result = {
-        "format": "RIVAL2_CODEX_AUTONOMOUS_V14_RESULT",
+        "format": RESULT_FORMAT,
         "authority_sha256": base.sha256_file(AUTHORITY),
         "accepted_supervised_steps": accepted_steps,
         "native_teacher_samples": native_samples,

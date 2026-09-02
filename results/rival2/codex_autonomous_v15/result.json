@@ -1,0 +1,312 @@
+{
+  "accepted_supervised_steps": 1750,
+  "authority_sha256": "EC0ABD95187EE7BBC36C3320AEA0E4CEEC49BFA07BAB4697390FD4824660F4E4",
+  "best": {
+    "accepted_supervised_steps": 250,
+    "checkpoint": {
+      "accepted_supervised_steps": 250,
+      "bytes": 17429721,
+      "model_tensor_sha256": "C55C323E4D8A06596CFB34DCF73D4616CDA7002651216407D0B22202B82BC2A0",
+      "path": "checkpoints/rival2/codex_autonomous_v15/rival2_codex_autonomous_best.pt",
+      "sha256": "A38842F9C2F7605B3B08EA762E1EB6F53F1DC95C4BF48EB552AE799528284E20"
+    },
+    "critic_byte_identical": true,
+    "evaluation": {
+      "action_mode": "deterministic_deployment",
+      "by_rival_side": {
+        "blue": {
+          "goal_differential": -21,
+          "goals_against": 22,
+          "goals_for": 1,
+          "opponent_kickoff_first_touches": 26,
+          "opponent_touches": 118,
+          "rival_kickoff_first_touches": 2,
+          "rival_touch_share": 0.23870967741935484,
+          "rival_touches": 37,
+          "worlds": 5
+        },
+        "orange": {
+          "goal_differential": -27,
+          "goals_against": 27,
+          "goals_for": 0,
+          "opponent_kickoff_first_touches": 30,
+          "opponent_touches": 138,
+          "rival_kickoff_first_touches": 1,
+          "rival_touch_share": 0.23333333333333334,
+          "rival_touches": 42,
+          "worlds": 5
+        }
+      },
+      "checkpoint": {
+        "action_version": "RIVAL2_ACTION_V2_120HZ",
+        "contract_hashes": {
+          "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+          "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+          "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+          "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+        },
+        "episode_version": "RIVAL2_EPISODE_V1",
+        "format": "RIVAL2_CHECKPOINT_V1",
+        "iteration": 5129,
+        "observation_version": "RIVAL2_OBS_V2_120HZ",
+        "path": "G:/dev/RivalSim-runs/codex-autonomous-v15/candidate_s0250.pt",
+        "policy_config": {
+          "activation": "silu",
+          "actor_outputs": 13,
+          "autocast": false,
+          "dtype": "float32",
+          "hidden_dim": 512,
+          "hidden_layers": 3,
+          "initialization": "orthogonal_sqrt2_actor0.01_critic0.01",
+          "log_std_max": 1.0,
+          "log_std_min": -5.0,
+          "obs_dim": 182,
+          "zero_previous_action_inputs": false
+        },
+        "policy_config_hash": "58C7409F34EA24CB7FAE7505A7F5FE2CC1B65021EE48B5200ED12BB8990C6136",
+        "policy_hz": 120,
+        "policy_version": 5130,
+        "reward_version": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+        "sha256": "8815B2598A8D546D81805F860F7A8D17740E3EF370A4D94844231760F3862D34",
+        "size_bytes": 17428607,
+        "total_agent_samples": 30962274060
+      },
+      "checkpoint_sha256": "8815B2598A8D546D81805F860F7A8D17740E3EF370A4D94844231760F3862D34",
+      "format": "RIVAL2_CODEX_AUTONOMOUS_MATCH_WINDOW_EVALUATION",
+      "matrix": "five standard kickoff layouts x both Rival sides",
+      "opponent": "Nexto",
+      "overall": {
+        "goal_differential": -48,
+        "goals_against": 49,
+        "goals_for": 1,
+        "opponent_kickoff_first_touches": 56,
+        "opponent_touches": 256,
+        "rival_kickoff_first_touches": 3,
+        "rival_touch_share": 0.23582089552238805,
+        "rival_touches": 79,
+        "touch_differential": -177
+      },
+      "per_layout_side": [
+        {
+          "goals_against": 5,
+          "goals_for": 0,
+          "layout": 0,
+          "opponent_touches": 22,
+          "rival_side": "Blue",
+          "rival_touches": 6
+        },
+        {
+          "goals_against": 6,
+          "goals_for": 0,
+          "layout": 0,
+          "opponent_touches": 19,
+          "rival_side": "Orange",
+          "rival_touches": 6
+        },
+        {
+          "goals_against": 4,
+          "goals_for": 0,
+          "layout": 1,
+          "opponent_touches": 18,
+          "rival_side": "Blue",
+          "rival_touches": 6
+        },
+        {
+          "goals_against": 4,
+          "goals_for": 0,
+          "layout": 1,
+          "opponent_touches": 34,
+          "rival_side": "Orange",
+          "rival_touches": 7
+        },
+        {
+          "goals_against": 5,
+          "goals_for": 0,
+          "layout": 2,
+          "opponent_touches": 17,
+          "rival_side": "Blue",
+          "rival_touches": 6
+        },
+        {
+          "goals_against": 5,
+          "goals_for": 0,
+          "layout": 2,
+          "opponent_touches": 18,
+          "rival_side": "Orange",
+          "rival_touches": 7
+        },
+        {
+          "goals_against": 3,
+          "goals_for": 1,
+          "layout": 3,
+          "opponent_touches": 37,
+          "rival_side": "Blue",
+          "rival_touches": 8
+        },
+        {
+          "goals_against": 7,
+          "goals_for": 0,
+          "layout": 3,
+          "opponent_touches": 45,
+          "rival_side": "Orange",
+          "rival_touches": 12
+        },
+        {
+          "goals_against": 5,
+          "goals_for": 0,
+          "layout": 4,
+          "opponent_touches": 24,
+          "rival_side": "Blue",
+          "rival_touches": 11
+        },
+        {
+          "goals_against": 5,
+          "goals_for": 0,
+          "layout": 4,
+          "opponent_touches": 22,
+          "rival_side": "Orange",
+          "rival_touches": 10
+        }
+      ],
+      "performance": {
+        "nexto_timed_d2h_bytes": 0,
+        "nexto_timed_h2d_bytes": 0,
+        "peak_cuda_bytes": 38872576,
+        "seconds": 39.26602390012704,
+        "world_d2h_bytes_before_export": 0,
+        "world_h2d_bytes": 0,
+        "world_ticks_per_second": 1833.6463142571217
+      },
+      "physics_ticks": 7200,
+      "policy_mutation": false,
+      "seed": 2026090206,
+      "window_seconds": 60
+    },
+    "gradient_norm": 0.5880094170570374,
+    "human_replay_samples": 256000,
+    "human_validation": {
+      "eligible": true,
+      "gameplay": {
+        "analog_mae": 0.3962230980396271,
+        "analog_rmse": 0.5523996949195862,
+        "button_accuracy": 0.7357945442199707,
+        "button_bce": 1.0529983043670654,
+        "complete_action_mae": 0.3485790193080902,
+        "complete_action_rmse": 0.5230885148048401,
+        "finite": true,
+        "per_channel": {
+          "boost": {
+            "accuracy": 0.5767025351524353,
+            "bce": 1.3833881616592407,
+            "mae": 0.43764346837997437,
+            "rmse": 0.5970600247383118
+          },
+          "handbrake": {
+            "accuracy": 0.7983498573303223,
+            "bce": 1.064820647239685,
+            "mae": 0.20463542640209198,
+            "rmse": 0.41201382875442505
+          },
+          "jump": {
+            "accuracy": 0.832331120967865,
+            "bce": 0.7107860445976257,
+            "mae": 0.16523762047290802,
+            "rmse": 0.3701484799385071
+          },
+          "pitch": {
+            "mae": 0.4950842559337616,
+            "rmse": 0.6460362076759338
+          },
+          "roll": {
+            "mae": 0.3011501133441925,
+            "rmse": 0.438972145318985
+          },
+          "steer": {
+            "mae": 0.5505908727645874,
+            "rmse": 0.6636057496070862
+          },
+          "throttle": {
+            "mae": 0.19137105345726013,
+            "rmse": 0.37240326404571533
+          },
+          "yaw": {
+            "mae": 0.44291919469833374,
+            "rmse": 0.5801817774772644
+          }
+        },
+        "sample_count": 7151
+      },
+      "mechanic": {
+        "analog_mae": 0.3999372720718384,
+        "analog_rmse": 0.5466613173484802,
+        "button_accuracy": 0.7183995842933655,
+        "button_bce": 0.8074456453323364,
+        "complete_action_mae": 0.3627330958843231,
+        "complete_action_rmse": 0.5167538523674011,
+        "finite": true,
+        "per_channel": {
+          "boost": {
+            "accuracy": 0.5544484853744507,
+            "bce": 1.2175333499908447,
+            "mae": 0.46281373500823975,
+            "rmse": 0.5824901461601257
+          },
+          "handbrake": {
+            "accuracy": 0.7728285193443298,
+            "bce": 0.6686414480209351,
+            "mae": 0.2463618963956833,
+            "rmse": 0.41858261823654175
+          },
+          "jump": {
+            "accuracy": 0.8279216885566711,
+            "bce": 0.5361621975898743,
+            "mae": 0.19300255179405212,
+            "rmse": 0.35717955231666565
+          },
+          "pitch": {
+            "mae": 0.4842296838760376,
+            "rmse": 0.6224458813667297
+          },
+          "roll": {
+            "mae": 0.347851425409317,
+            "rmse": 0.49750447273254395
+          },
+          "steer": {
+            "mae": 0.5075072050094604,
+            "rmse": 0.6388648152351379
+          },
+          "throttle": {
+            "mae": 0.3169623017311096,
+            "rmse": 0.48081448674201965
+          },
+          "yaw": {
+            "mae": 0.3431359529495239,
+            "rmse": 0.46894851326942444
+          }
+        },
+        "sample_count": 8531
+      }
+    },
+    "loss": {
+      "analog": 0.41741353273391724,
+      "buttons": 0.837568461894989,
+      "log_std": 0.01833394169807434,
+      "total": 0.6277223825454712
+    },
+    "native_teacher_samples": 768000,
+    "previous_action_dropped_samples": 511449
+  },
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V15_RESULT",
+  "human_replay_samples": 1792000,
+  "human_test_not_loaded": true,
+  "native_teacher_samples": 5376000,
+  "ppo_steps": 0,
+  "promoted": true,
+  "reward_changes": 0,
+  "source_rank": [
+    -48,
+    0,
+    -157,
+    95
+  ]
+}
