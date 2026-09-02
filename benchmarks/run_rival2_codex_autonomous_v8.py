@@ -42,6 +42,8 @@ RESULTS = ROOT / "results/rival2/codex_autonomous_v8"
 CHECKPOINTS = ROOT / "checkpoints/rival2/codex_autonomous_v8"
 DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/codex-autonomous-v8")
 COLLECTION_WORLDS = 8_192
+COLLECTION_ROLLOUTS = 16
+SAMPLES_PER_ROLLOUT = 65_536
 SEED = 2_026_090_223
 SUPERVISED_STEPS = 64
 BOUNDARIES = (1, 2, 4, 8, 16, 32, 64)
@@ -77,6 +79,14 @@ def load_authority() -> dict[str, Any]:
         "source": payload.get("source", {}).get("sha256") == SOURCE_SHA256,
         "collection_worlds": payload.get("nexto_distillation", {}).get("collection_worlds")
         == COLLECTION_WORLDS,
+        "collection_rollouts": payload.get("nexto_distillation", {}).get(
+            "consecutive_rollouts"
+        )
+        == COLLECTION_ROLLOUTS,
+        "samples_per_rollout": payload.get("nexto_distillation", {}).get(
+            "samples_per_rollout"
+        )
+        == SAMPLES_PER_ROLLOUT,
         "supervised_steps": payload.get("nexto_distillation", {}).get("maximum_steps")
         == SUPERVISED_STEPS,
         "boundaries": payload.get("nexto_distillation", {}).get("validation_boundaries")
@@ -156,22 +166,84 @@ def collect_nexto_supervision(
         worlds=COLLECTION_WORLDS,
         device=device,
     )
-    rollout = trainer.collect_rollout()
-    flat_version = rollout.policy_version.reshape(-1)
-    selected = flat_version == NEXTO_ACTING_VERSION
-    if int(selected.sum().item()) != COLLECTION_WORLDS * rollout.horizon:
-        raise RuntimeError("Nexto supervision count does not match one opponent per world/tick")
-    observation = rollout.observations.reshape(-1, rollout.observations.shape[-1])[selected].clone()
-    action = rollout.actions.reshape(-1, 8)[selected].clone()
-    world = (
-        torch.arange(COLLECTION_WORLDS, device=device)
-        .view(1, COLLECTION_WORLDS, 1)
-        .expand(rollout.horizon, COLLECTION_WORLDS, 2)
-        .reshape(-1)[selected]
-        .clone()
-    )
     validation_world_start = int(COLLECTION_WORLDS * (1.0 - VALIDATION_WORLD_FRACTION))
-    train_mask = world < validation_world_start
+    generator = torch.Generator(device=device).manual_seed(SEED ^ 0xC011EC7)
+    observations: list[torch.Tensor] = []
+    actions: list[torch.Tensor] = []
+    train_masks: list[torch.Tensor] = []
+    aggregate_curriculum: dict[str, dict[str, float]] = {}
+    expected_per_rollout = COLLECTION_WORLDS * trainer.ppo_config.rollout_horizon
+    train_sample_count = int(SAMPLES_PER_ROLLOUT * (1.0 - VALIDATION_WORLD_FRACTION))
+    validation_sample_count = SAMPLES_PER_ROLLOUT - train_sample_count
+    for _rollout_index in range(COLLECTION_ROLLOUTS):
+        rollout = trainer.collect_rollout()
+        flat_version = rollout.policy_version.reshape(-1)
+        selected = flat_version == NEXTO_ACTING_VERSION
+        if int(selected.sum().item()) != expected_per_rollout:
+            raise RuntimeError(
+                "Nexto supervision count does not match one opponent per world/tick"
+            )
+        selected_observation = rollout.observations.reshape(
+            -1, rollout.observations.shape[-1]
+        )[selected]
+        selected_action = rollout.actions.reshape(-1, 8)[selected]
+        world = (
+            torch.arange(COLLECTION_WORLDS, device=device)
+            .view(1, COLLECTION_WORLDS, 1)
+            .expand(rollout.horizon, COLLECTION_WORLDS, 2)
+            .reshape(-1)[selected]
+        )
+        available_train = torch.nonzero(
+            world < validation_world_start, as_tuple=False
+        ).squeeze(-1)
+        available_validation = torch.nonzero(
+            world >= validation_world_start, as_tuple=False
+        ).squeeze(-1)
+        train_pick = available_train.index_select(
+            0,
+            torch.randperm(
+                available_train.shape[0], device=device, generator=generator
+            )[:train_sample_count],
+        )
+        validation_pick = available_validation.index_select(
+            0,
+            torch.randperm(
+                available_validation.shape[0], device=device, generator=generator
+            )[:validation_sample_count],
+        )
+        picked = torch.cat((train_pick, validation_pick))
+        observations.append(selected_observation.index_select(0, picked).clone())
+        actions.append(selected_action.index_select(0, picked).clone())
+        train_masks.append(
+            torch.cat(
+                (
+                    torch.ones(train_sample_count, dtype=torch.bool, device=device),
+                    torch.zeros(validation_sample_count, dtype=torch.bool, device=device),
+                )
+            )
+        )
+        for metric, values in trainer.last_rollout_curriculum_metrics.items():
+            if not isinstance(values, dict):
+                continue
+            target = aggregate_curriculum.setdefault(metric, {})
+            for family, value in values.items():
+                target[family] = target.get(family, 0.0) + float(value)
+        del (
+            rollout,
+            flat_version,
+            selected,
+            selected_observation,
+            selected_action,
+            world,
+            available_train,
+            available_validation,
+            train_pick,
+            validation_pick,
+            picked,
+        )
+    observation = torch.cat(observations)
+    action = torch.cat(actions)
+    train_mask = torch.cat(train_masks)
     if not bool(torch.isfinite(observation).all().item()) or not bool(
         torch.isfinite(action).all().item()
     ):
@@ -181,7 +253,11 @@ def collect_nexto_supervision(
     ):
         raise RuntimeError("Nexto supervision actions violate Rival action bounds")
     telemetry = {
-        "horizon": int(rollout.horizon),
+        "horizon": int(trainer.ppo_config.rollout_horizon),
+        "consecutive_rollouts": COLLECTION_ROLLOUTS,
+        "simulated_seconds_per_world": (
+            COLLECTION_ROLLOUTS * trainer.ppo_config.rollout_horizon / 120.0
+        ),
         "worlds": COLLECTION_WORLDS,
         "samples": int(observation.shape[0]),
         "train_samples": int(train_mask.sum().item()),
@@ -189,9 +265,9 @@ def collect_nexto_supervision(
         "validation_world_start": validation_world_start,
         "action_mean": action.mean(dim=0).cpu().tolist(),
         "action_nonzero_fraction": (action != 0.0).to(torch.float32).mean(dim=0).cpu().tolist(),
-        "rollout_curriculum": copy.deepcopy(trainer.last_rollout_curriculum_metrics),
+        "rollout_curriculum": aggregate_curriculum,
     }
-    del rollout, trainer, selected, flat_version, world
+    del trainer, observations, actions, train_masks
     gc.collect()
     torch.cuda.empty_cache()
     return observation, action, train_mask, telemetry, source
@@ -262,7 +338,9 @@ def run(args: argparse.Namespace) -> int:
             "nexto_only_collection": set(corpus["rollout_curriculum"]["world_decisions"])
             == {"current", "historical", "nexto", "wisp"}
             and corpus["rollout_curriculum"]["world_decisions"]["nexto"]
-            == COLLECTION_WORLDS * int(corpus["horizon"]),
+            == COLLECTION_WORLDS
+            * int(corpus["horizon"])
+            * int(corpus["consecutive_rollouts"]),
             "human_test_not_loaded": human_identity["test_loaded"] is False,
             "critic_frozen": not any(p.requires_grad for p in model.critic.parameters()),
             "fresh_actor_optimizer": len(optimizer.state) == 0,
