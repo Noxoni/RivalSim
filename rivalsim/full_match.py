@@ -25,7 +25,16 @@ from rivalsim.behavioral_telemetry import (
     SURFACE_SIDE_WALL,
     _surface_category,
 )
-from rivalsim.rival2_contracts import RIVAL2_REWARD_VERSION
+from rivalsim.rival2_contracts import (
+    RIVAL2_EPISODE_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+    RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+    RIVAL2_REWARD_VERSION,
+    contract_hashes_for_reward,
+)
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -618,7 +627,7 @@ class MatchRunTiming:
 
 
 class FullMatchRunner:
-    """Mixed 30/15/120 Hz Rival-vs-fixed-policy scheduler."""
+    """Mixed checkpoint-native/15/120 Hz Rival-vs-fixed-policy scheduler."""
 
     def __init__(
         self,
@@ -662,8 +671,33 @@ class FullMatchRunner:
         payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
         if payload.get("format") != "RIVAL2_CHECKPOINT_V1":
             raise RuntimeError("unsupported Rival checkpoint format")
-        if payload.get("reward_version") != RIVAL2_REWARD_VERSION:
-            raise RuntimeError("full-match runner requires the final Reward V1 checkpoint")
+        checkpoint_reward = payload.get("reward_version")
+        supported_rewards = (
+            RIVAL2_REWARD_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_V1_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_V2_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
+            RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+        )
+        if checkpoint_reward not in supported_rewards:
+            raise RuntimeError("full-match runner requires a Gameplay V1/V2/V3 checkpoint")
+        modern_gameplay_checkpoint = checkpoint_reward != RIVAL2_REWARD_VERSION
+        if modern_gameplay_checkpoint:
+            if payload.get("episode_version") != RIVAL2_EPISODE_VERSION:
+                raise RuntimeError("checkpoint episode identity is not RIVAL2_EPISODE_V1")
+            expected_contracts = contract_hashes_for_reward(
+                checkpoint_reward, RIVAL2_EPISODE_VERSION
+            )
+            if payload.get("contract_hashes") != expected_contracts:
+                raise RuntimeError(
+                    "Rival checkpoint observation/action/reward contract mismatch"
+                )
+        self.rival_policy_hz = int(payload.get("policy_hz", 30))
+        if self.rival_policy_hz <= 0 or PHYSICS_HZ % self.rival_policy_hz != 0:
+            raise RuntimeError("Rival policy Hz must be a positive divisor of physics Hz")
+        self.rival_cadence_ticks = PHYSICS_HZ // self.rival_policy_hz
+        self.lifecycle_cadence_ticks = RIVAL_CADENCE_TICKS
         policy_config = Rival2PolicyConfig(**payload["policy_config"])
         if policy_config.content_hash != payload["policy_config_hash"]:
             raise RuntimeError("Rival checkpoint policy contract mismatch")
@@ -680,6 +714,9 @@ class FullMatchRunner:
             "policy_config": asdict(policy_config),
             "policy_config_hash": policy_config.content_hash,
             "reward_version": payload["reward_version"],
+            "episode_version": payload.get("episode_version"),
+            "contract_hashes": payload.get("contract_hashes"),
+            "policy_hz": self.rival_policy_hz,
         }
         del payload
 
@@ -725,8 +762,9 @@ class FullMatchRunner:
 
     def tick(self) -> None:
         self._activate_stream()
-        if self.host_tick % RIVAL_CADENCE_TICKS == 0:
+        if self.host_tick % self.rival_cadence_ticks == 0:
             self._update_rival_action()
+        if self.host_tick % self.lifecycle_cadence_ticks == 0:
             self.world.begin_decision()
         kickoff_active = self.match_views["kickoff_active"] != 0
         nexto_action, _indices = self.nexto.tick_action(
@@ -737,10 +775,12 @@ class FullMatchRunner:
         self.bridge.set_actions(self.actions)
         self.world.step_graph(1)
 
-        self.match_views["rival_scheduler_tick"].add_(1).remainder_(RIVAL_CADENCE_TICKS)
+        self.match_views["rival_scheduler_tick"].add_(1).remainder_(
+            self.rival_cadence_ticks
+        )
         self.match_views["nexto_scheduler_tick"].add_(1).remainder_(NEXTO_CADENCE_TICKS)
         self.host_tick += 1
-        if self.host_tick % RIVAL_CADENCE_TICKS == 0:
+        if self.host_tick % self.lifecycle_cadence_ticks == 0:
             # Replace the training timeout mask with the match-owned goal or
             # regulation-tie reset relation before invoking the accepted reset.
             wp.copy(self.world.rival2.reset_mask, self.match.pending_reset)
@@ -748,6 +788,7 @@ class FullMatchRunner:
             self.nexto.notify_kickoff(reset_mask)
             self.world.apply_interval_resets()
             self.telemetry.after_resets(self.world, self.world.rival2.reset_mask)
+        if self.host_tick % self.rival_cadence_ticks == 0:
             self.rival_observation = self.bridge.observation()
 
     def run_ticks(self, ticks: int) -> MatchRunTiming:
