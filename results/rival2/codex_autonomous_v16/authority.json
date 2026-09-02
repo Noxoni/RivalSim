@@ -1,0 +1,57 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V16_AUTHORITY",
+  "purpose": "correct open-loop covariate shift by querying the Nexto oracle on states induced by the current student",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500",
+    "five_minute_nexto_record": "5-5",
+    "never_overwrite": true
+  },
+  "dagger": {
+    "student_rollout": "current updating Rival student versus frozen Nexto",
+    "student_action_mode": "stochastic coherent hybrid action",
+    "oracle": "independent pinned Nexto instance controlling the student side counterfactually",
+    "oracle_model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA",
+    "pairing": "student-side native observation immediately before the oracle action",
+    "oracle_action_applied_to_world": false,
+    "opponent_nexto_action_applied_to_world": true
+  },
+  "teacher": {
+    "identity": "pinned public Nexto 1v1 policy",
+    "nexto_model_sha256": "BF5343B5EEACAC6BF7CDB75DAC4A5C14BA0F94D820EAE75F00A211B6119D69FA"
+  },
+  "optimization": {
+    "kind": "on-policy DAgger supervised AdamW",
+    "accepted_steps": 600,
+    "learning_rate": 0.000002,
+    "weight_decay": 0.00001,
+    "gradient_norm_max": 0.5,
+    "batch": {
+      "student_state_oracle": 3072,
+      "human_gameplay": 512,
+      "human_positive_mechanics": 512
+    },
+    "previous_action_dropout": 0.25,
+    "trainable": ["shared trunk", "complete actor head"],
+    "frozen": ["critic"],
+    "ppo_steps": 0,
+    "reward_changes": 0
+  },
+  "data": {
+    "worlds": 8192,
+    "layouts": "deterministically randomized across all five standard layouts",
+    "sides": "deterministically randomized",
+    "human_splits": "unchanged reviewed train/validation; test unopened",
+    "failed_or_ambiguous_mechanics_used": false
+  },
+  "selection": {
+    "candidate_steps": [100, 200, 300, 400, 500, 600],
+    "preselection": "60-second continuous Nexto matrix",
+    "human_gameplay_rmse_max": 0.6,
+    "human_mechanic_rmse_max": 0.62,
+    "complete_five_minute_evaluation_required_before_promotion": true,
+    "promotion_rule": "candidate full-match rank (wins, goal differential, goals) must strictly exceed the protected 5-5 parent",
+    "no_test_data_for_selection": true
+  }
+}
