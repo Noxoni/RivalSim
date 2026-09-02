@@ -85,6 +85,10 @@ def load_authority() -> dict[str, Any]:
         "protected competitive base",
     ]:
         raise RuntimeError("distillation critic/competitive-base freeze changed")
+    if authority["optimization"]["analog_loss"] != (
+        "SmoothL1(tanh(actor_mean), teacher_action), beta=0.1"
+    ):
+        raise RuntimeError("distillation SmoothL1 authority changed")
     return authority
 
 
@@ -617,7 +621,7 @@ def run(args: argparse.Namespace) -> int:
                     student_actor,
                     parent_actor,
                     action,
-                    smooth_l1_beta=float(optimization["smooth_l1_beta"]),
+                    smooth_l1_beta=0.1,
                     analog_weight=float(optimization["analog_weight"]),
                     button_weight=float(optimization["button_weight"]),
                     log_std_weight=float(
@@ -641,7 +645,7 @@ def run(args: argparse.Namespace) -> int:
                     auxiliary_student,
                     auxiliary_parent,
                     auxiliary_action,
-                    smooth_l1_beta=float(optimization["smooth_l1_beta"]),
+                    smooth_l1_beta=0.1,
                     analog_weight=float(optimization["analog_weight"]),
                     button_weight=float(optimization["button_weight"]),
                     log_std_weight=float(
