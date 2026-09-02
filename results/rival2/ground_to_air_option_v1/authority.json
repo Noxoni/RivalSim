@@ -1,0 +1,128 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_OPTION_V1_AUTHORITY",
+  "created_utc": "2026-09-02T21:30:00Z",
+  "purpose": "Learn a bounded post-pop continuation policy from physical 120 Hz outcomes without changing the protected competitive policy or production reward.",
+  "bound_inputs": {
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "ground_to_air_source": {
+      "path": "rivalsim/rival2_ground_to_air_option.py",
+      "sha256": "90248D128F0961F4BFC339FB46ADD4AA3E140AC57161EBB46C4E80DC10FCDC40"
+    },
+    "human_review_attempts": {
+      "path": "results/rival2/human_demo_review_v2/attempts/24A888CE-9F8A-4FBB-8FC9-F26730314ACF.jsonl",
+      "sha256": "381CB318E36C1DEDFAF82DD4AF90173F5D01468960DC13332EF92BF249CA9DE8"
+    },
+    "human_dataset_manifest": {
+      "path": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+      "sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55"
+    }
+  },
+  "human_timing_evidence": {
+    "splits_used": [
+      "train",
+      "validation"
+    ],
+    "test_split_loaded": false,
+    "successful_pop_followup_pairs": 51,
+    "median_jump_onset_delay_ticks": 2.0,
+    "median_left_ground_delay_ticks": 9.0,
+    "median_neutral_second_jump_delay_ticks": 27.0,
+    "median_elevated_follow_touch_delay_ticks": 44.0
+  },
+  "bootstrap_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 190.0,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 100.0,
+    "minimum_ball_height_uu": 80.0,
+    "minimum_boost_fraction": 0.25,
+    "minimum_forward_alignment": 0.5,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 105.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "training": {
+    "actor_learning_rate": 0.00003,
+    "trunk_learning_rate": 0.00001,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.995,
+    "ppo_clip": 0.2,
+    "epochs": 2,
+    "minibatch_size": 65536,
+    "maximum_blocks": 80,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 12,
+    "minimum_score_improvement": 0.0001,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "exploration": {
+      "analog_sigma": 0.2,
+      "button_temperature": 1.0
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "qualified_pop_event": 0.25,
+    "ball_rise_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "goal_after_follow_event": 10.0,
+    "failure": -0.5
+  },
+  "episode": {
+    "horizon_ticks": 180,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_pop_ticks": 90,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026090601,
+    "validation": 2026090701,
+    "optimizer_and_exploration": 2026090801,
+    "test": 2026090901
+  },
+  "acceptance": {
+    "pop_touch_fraction_min": 0.8,
+    "elevated_follow_touch_fraction_min": 0.15,
+    "high_follow_touch_fraction_min": 0.03,
+    "second_airborne_touch_fraction_min": 0.01,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "production_reward_unchanged": true,
+    "named_mechanic_classifier_used": false,
+    "optimizer_steps_before_authority_commit": 0,
+    "test_seed_unopened_before_selection": true,
+    "promotion_requires_controlled_validation_and_test_pass": true
+  }
+}
