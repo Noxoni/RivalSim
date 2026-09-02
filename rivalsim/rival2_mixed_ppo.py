@@ -1512,8 +1512,12 @@ def ppo_update_mixed_curriculum(
             "actor_receives_nonzero_policy_gradient": any(
                 step["actor_head_gradient_norm"] > 0.0 for step in accepted_steps
             ),
-            "trunk_receives_nonzero_policy_gradient": any(
-                step["policy_trunk_gradient_norm"] > 0.0 for step in accepted_steps
+            "trunk_policy_gradient_matches_training_boundary": (
+                any(step["policy_trunk_gradient_norm"] > 0.0 for step in accepted_steps)
+                if any(parameter.requires_grad for parameter in trunk_parameters)
+                else all(
+                    step["policy_trunk_gradient_norm"] == 0.0 for step in accepted_steps
+                )
             ),
             "critic_learning_rate_unchanged": end_rates[CRITIC_GROUP_NAME]
             == safety_config.critic_learning_rate,
