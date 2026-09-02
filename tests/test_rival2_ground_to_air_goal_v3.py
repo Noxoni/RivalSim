@@ -52,8 +52,9 @@ def _observation(*, car_z: float, ball_z: float, touch: bool, ball_vy: float) ->
     return observation
 
 
-def test_goal_tracker_requires_pop_and_elevated_follow_before_goal_credit() -> None:
-    tracker = GoalDirectedTracker(1, attacker_side=0, horizon=40)
+@pytest.mark.parametrize("side", [0, 1])
+def test_goal_tracker_requires_pop_and_elevated_follow_before_goal_credit(side: int) -> None:
+    tracker = GoalDirectedTracker(1, attacker_side=side, horizon=40)
     active = torch.ones(1, dtype=torch.bool)
     false = torch.zeros(1, dtype=torch.bool)
     before = _observation(car_z=17.0, ball_z=160.0, touch=False, ball_vy=500.0)

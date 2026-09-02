@@ -18,7 +18,7 @@ from rivalsim.rival2_aerial_option import FIELD
 from rivalsim.rival2_contracts import BALL_LINEAR_SPEED_SCALE, POSITION_SCALE
 from rivalsim.state import StateSnapshot
 
-GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3"
+GROUND_TO_AIR_GOAL_V3_VERSION = "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_1"
 PHASE_EASY_FINISH = 0
 PHASE_ATTACKING_HALF = 1
 PHASE_NAMES = ("easy_finish", "attacking_half")
@@ -187,12 +187,14 @@ class GoalDirectedTracker:
             )
         )
 
-        sign = 1.0 if self.side == 0 else -1.0
+        # Rival2TensorBridge has already canonicalized each agent's observation
+        # so positive Y is goalward for both team perspectives.  Applying the
+        # raw team sign here would invert orange a second time.
         before_forward = (
-            self._self(before, "ball.linear_velocity.y") * BALL_LINEAR_SPEED_SCALE * sign
+            self._self(before, "ball.linear_velocity.y") * BALL_LINEAR_SPEED_SCALE
         )
         after_forward = (
-            self._self(after, "ball.linear_velocity.y") * BALL_LINEAR_SPEED_SCALE * sign
+            self._self(after, "ball.linear_velocity.y") * BALL_LINEAR_SPEED_SCALE
         )
         forward_transfer = after_forward - before_forward
         goalward_contact = elevated & (forward_transfer >= 100.0)

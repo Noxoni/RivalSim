@@ -1,5 +1,5 @@
 {
-  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_AUTHORITY",
+  "format": "RIVAL2_GROUND_TO_AIR_GOAL_V3_CORRECTION_1_AUTHORITY",
   "created_utc": "2026-09-02T22:15:00Z",
   "purpose": "Extend the passing self-pop aerial continuation into repeated goalward airborne contacts and goals before natural self-play integration.",
   "bound_inputs": {
@@ -21,7 +21,7 @@
     },
     "goal_directed_physics": {
       "path": "rivalsim/rival2_ground_to_air_goal_v3.py",
-      "sha256": "99618A3A06BF670811E797BDE35E91EC4B74FEA2E7F40EA10AB67D60DAB3D1B7"
+      "sha256": "EB8DA1B232FD21566F5BB1397913847942BB0458C3A4CAEEB190E0D16D5DD63D"
     },
     "protected_blue_v23": {
       "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
@@ -40,6 +40,14 @@
     "v2_test_goal_fraction": [0.0, 0.0],
     "self_play_not_yet_started": true,
     "reason": "V2 has enough launch/recontact competence to train intent and continuation; V3 now requires physical repeated contacts and a causal goal before self-play integration."
+  },
+  "prospective_correction": {
+    "optimizer_steps_under_this_authority": 0,
+    "rejected_predecessor_blocks": 25,
+    "rejected_predecessor_promoted": false,
+    "issue": "duplicate raw-team-sign multiplication on an already canonical observation-space ball Y velocity",
+    "corrected_semantics": "positive observation-space Y is goalward for both team perspectives",
+    "restart_parent": "byte-exact passing ground-to-air V2 checkpoint"
   },
   "bootstrap_config": {
     "approach_steer_gain": 3.5,
