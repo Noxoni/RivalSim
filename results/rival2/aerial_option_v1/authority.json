@@ -1,0 +1,204 @@
+{
+  "format": "RIVAL2_AERIAL_OPTION_V1_AUTHORITY",
+  "created_utc": "2026-09-02T14:15:06.2037412Z",
+  "parent_commit": "ccd8ac922a2e8019422310d9e165af1d852ca696",
+  "purpose": "Acquire a separately gated 120 Hz aerial-offense option from grounded launch states while preserving the competitive V23 base byte-for-byte.",
+  "protected_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+      "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA",
+      "deployment_side": 0
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+      "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514",
+      "deployment_side": 1
+    },
+    "immutable": true,
+    "role": "ordinary gameplay policy whenever the aerial option gate is inactive"
+  },
+  "negative_evidence": {
+    "path": "results/rival2/capability_curriculum_v2/failure_attribution.json",
+    "sha256": "C932A933AEE19BB0824BAC53A72F2A6EB4ABD2278B7B94E45C6DBE9FCF132097",
+    "lesson": "A grounded general policy received no usable launch gradient and produced zero controlled high contacts in 160 blocks."
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "production_reward_unchanged": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "skill_acquisition_reward_is_not_a_production_reward": true,
+    "named_mechanic_classifier_used": false
+  },
+  "option_training_boundary": {
+    "initialization": "one independent option model from each protected physical-side V23 model",
+    "trainable": [
+      "option.shared_trunk",
+      "option.actor"
+    ],
+    "frozen": [
+      "option.critic",
+      "both protected V23 base models"
+    ],
+    "critic_used_for_advantage_or_loss": false,
+    "optimizer": "fresh AdamW",
+    "trunk_learning_rate": 0.00003,
+    "actor_learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 0.5,
+    "kl": "telemetry only; never a rollback or rejection condition",
+    "finite_parameter_and_gradient_checks": true
+  },
+  "human_launch_rehearsal": {
+    "dataset_manifest": {
+      "path": "results/rival2/human_demo_dataset_v1/dataset_manifest.json",
+      "sha256": "DB3B626038909B64A19ACB1EA223C3B97549D785A1C0219A625A1F417E26AB55"
+    },
+    "review_candidates": {
+      "path": "results/rival2/human_demo_review_v2/behavior_cloning_candidates.json",
+      "sha256": "2A76524022406E210B6F951D09DECCB14664794DA36C7853CDB90B43B282F6DE"
+    },
+    "observation_adapter": {
+      "path": "checkpoints/rival2/observation_adapter_v2/rival2_human_demo_observation_adapter_v2.pt",
+      "sha256": "EDEDC9CCDE3269B393FB4C944F641CF4D34A78AB5944662F9019009BBA914C99"
+    },
+    "positive_train_labels": [
+      "aerialdribble",
+      "groundtoairdribble"
+    ],
+    "failed_or_ambiguous_attempts": "excluded",
+    "batch_size": 512,
+    "maximum_steps": 2000,
+    "validation_interval_steps": 100,
+    "selection": "lowest mean complete-action RMSE across the two frozen validation labels",
+    "analog_objective": "Smooth-L1 on tanh actor mean against exact native action",
+    "button_objective": "BCEWithLogits against exact native action",
+    "log_std_parent_retention_weight": 0.05,
+    "human_test_opened": false
+  },
+  "physical_curriculum": {
+    "worlds_per_side": 2048,
+    "evaluation_worlds_per_side": 2048,
+    "discount_gamma": 0.9987476493904754,
+    "advantage": "normalized discounted option return; no critic bootstrap",
+    "ppo_clip": 0.2,
+    "epochs": 1,
+    "minibatch_size": 65536,
+    "human_auxiliary_samples_per_block": 512,
+    "human_auxiliary_weight": 0.05,
+    "exploration": {
+      "easy_launch": {
+        "analog_sigma": 0.18,
+        "button_temperature": 2.5
+      },
+      "moving_intercept": {
+        "analog_sigma": 0.14,
+        "button_temperature": 2.0
+      },
+      "goal_directed": {
+        "analog_sigma": 0.1,
+        "button_temperature": 1.6
+      }
+    },
+    "phases": [
+      {
+        "name": "easy_launch",
+        "horizon_ticks": 180,
+        "maximum_blocks": 80,
+        "ball_height_uu": [260.0, 480.0],
+        "forward_offset_uu": [300.0, 650.0],
+        "lateral_offset_absolute_max_uu": 120.0,
+        "ball_speed_absolute_max_uu_per_second": 120.0,
+        "failure": "terminate if no launch by tick 54, if the car relands without an elevated contact, or at horizon",
+        "advance": {
+          "launch_fraction_min": 0.8,
+          "elevated_contact_fraction_min": 0.35,
+          "consecutive_boundaries": 2
+        }
+      },
+      {
+        "name": "moving_intercept",
+        "horizon_ticks": 300,
+        "maximum_blocks": 120,
+        "ball_height_uu": [400.0, 850.0],
+        "forward_offset_uu": [500.0, 1100.0],
+        "lateral_offset_absolute_max_uu": 400.0,
+        "ball_speed_absolute_max_uu_per_second": 450.0,
+        "failure": "terminate after a missed elevated-intercept window, a post-launch landing without contact, or at horizon",
+        "advance": {
+          "launch_fraction_min": 0.8,
+          "high_contact_fraction_min": 0.2,
+          "forward_high_contact_fraction_min": 0.12,
+          "consecutive_boundaries": 2
+        }
+      },
+      {
+        "name": "goal_directed",
+        "horizon_ticks": 420,
+        "maximum_blocks": 160,
+        "ball_height_uu": [450.0, 1000.0],
+        "forward_offset_uu": [650.0, 1400.0],
+        "lateral_offset_absolute_max_uu": 650.0,
+        "ball_speed_absolute_max_uu_per_second": 600.0,
+        "failure": "terminate at goal, missed intercept plus landing, or horizon",
+        "select": {
+          "high_contact_fraction_min": 0.15,
+          "forward_high_contact_fraction_min": 0.1,
+          "aerial_origin_goal_fraction_min": 0.02
+        }
+      }
+    ],
+    "evaluation_interval_blocks": 10,
+    "option_reward": {
+      "launch_onset": 0.1,
+      "positive_airborne_height_progress_max_per_tick": 0.01,
+      "positive_airborne_intercept_distance_progress_max_per_tick": 0.01,
+      "positive_airborne_nose_alignment_progress_max_per_tick": 0.02,
+      "elevated_contact": 2.0,
+      "high_contact_additional": 1.0,
+      "forward_momentum_transfer_max": 1.0,
+      "aerial_origin_goal": 5.0,
+      "missed_window": -0.1,
+      "episode_positive_budget": 10.0,
+      "ordinary_ground_ball_contact": 0.0
+    }
+  },
+  "integration_gate": {
+    "inputs": "authoritative observation and per-world option latch only",
+    "initial_activation": "ball height >= 300 uu, relative distance <= 2500 uu, ball in the normalized forward hemisphere, self boost >= 15",
+    "latch_maximum_ticks": 240,
+    "release": "qualifying touch, demolition/reset, or grounded after the launch window",
+    "base_policy_unchanged_when_inactive": true,
+    "gate_tuning_data": "controlled train/validation states and natural short screens only; final ten-match matrix is untouched until selection"
+  },
+  "selection": {
+    "controlled_gate": "all final goal-directed deterministic thresholds pass for both physical-side options",
+    "natural_short_screen": "hybrid must retain at least 80 percent of V23 goals, touches, and mean speed with no additional no-touch world",
+    "human_validation": "both selected option models improve the mean aerialdribble plus groundtoairdribble validation RMSE over their V23 parent",
+    "test_split": "human test remains unopened",
+    "fallback": "V23 remains promoted if no option passes"
+  },
+  "final_evaluation": {
+    "opponent": "pinned Nexto",
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "deterministic": true,
+    "minimum_record": "6-4",
+    "minimum_goal_differential": 0,
+    "high_aerial_contacts_min": 5,
+    "high_aerial_goals_min": 1,
+    "touches_per_minute_floor_fraction_of_v23": 0.8,
+    "no_touch_regression": false,
+    "base_and_option_checkpoint_hashes_required": true
+  },
+  "integrity": {
+    "no_ppo_on_base_policy": true,
+    "no_production_reward_change": true,
+    "no_named_mechanic_detector_or_reward": true,
+    "no_input_injection_or_scripted_deployment_action": true,
+    "physical_120hz_telemetry_required": true,
+    "no_promotion_on_partial_or_proxy_only_success": true
+  }
+}
