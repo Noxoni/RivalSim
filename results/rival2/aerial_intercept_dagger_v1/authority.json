@@ -1,0 +1,163 @@
+{
+  "format": "RIVAL2_AERIAL_INTERCEPT_DAGGER_V1_AUTHORITY",
+  "created_utc": "2026-09-02T18:03:00Z",
+  "parent_commit": "f6ca8eb6c0dbb4e1170de71575e64bf9e61daed6",
+  "purpose": "Correct compounding aerial-intercept imitation error by labeling the learned option's own bounded pre-contact state distribution with the frozen observation-only ballistic teacher.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "immutable": true
+  },
+  "diagnostic_parent": {
+    "blue": {
+      "path": "checkpoints/rival2/aerial_intercept_distillation_v1/diagnostic_best_blue.pt",
+      "sha256": "76C61092152E534941D75C6C38CB5E33A17AB92824235366A5496F2A5C1B2EA2"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/aerial_intercept_distillation_v1/diagnostic_best_orange.pt",
+      "sha256": "31EC2CEF12C4C7D752FEF33AB253C1A0F2BEBAEDE6D376933B758896AF4A97CF"
+    },
+    "identity": "Aerial Intercept Distillation V1 block 40 diagnostic best",
+    "promoted": false,
+    "fresh_optimizer": true
+  },
+  "failure_evidence": {
+    "result": {
+      "path": "results/rival2/aerial_intercept_distillation_v1/result.json",
+      "sha256": "59F44F75385A44B3D47C36A9F34EA5A84A9016F82C3ED01D2EC4EE5B2E994DEE"
+    },
+    "analysis": {
+      "path": "results/rival2/aerial_intercept_distillation_v1/failure_analysis.json",
+      "sha256": "CAB87591FDECB4BF2B37DDBA4C9CCA70EC2A4C87B194B8D43A830BC5286927DD"
+    },
+    "attribution": "Offline teacher-action RMSE continued decreasing after physical performance peaked, proving a learned-policy state-distribution correction is required."
+  },
+  "frozen_teacher": {
+    "implementation": {
+      "path": "rivalsim/rival2_aerial_intercept_teacher.py",
+      "sha256": "A1DFB98D33B6E2D25889583316FD7605B7366FA7E1B4E1F70F47DF3FEE3D603A"
+    },
+    "observation_only": true,
+    "hidden_simulator_state": false,
+    "mutates_gameplay": false,
+    "teacher_changes_authorized": false
+  },
+  "source_exact_corpus": {
+    "rebuild_authority": {
+      "path": "results/rival2/aerial_intercept_distillation_v1/authority.json",
+      "sha256": "593DCF72E8A9720479A3A972A429444D05822FBDFBDF36FF79A4D389586FA659"
+    },
+    "training_seed_base": 2026090317,
+    "validation_seed_base": 2026091317,
+    "training_tensor_sha256": "EDF5BD7255526751E87AE072166D0C734AD55FD10EC48AE5FEA6E5F1B28C3D0E",
+    "validation_tensor_sha256": "182F4093CCB6C07C14BB5871C6AE85F506EFAA82695C040436EDA0E4868AE6EE",
+    "training_trajectories": 5102,
+    "validation_trajectories": 5115,
+    "immutable": true
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "fast_aerial_final_tick": 28,
+    "production_reward_unchanged": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "ppo": false
+  },
+  "on_policy_collection": {
+    "mode": "deterministic learned-option rollout with frozen teacher labels",
+    "worlds_per_pack_side_per_round": 2048,
+    "seed_base": 2026092317,
+    "seed_stride_per_round": 256,
+    "pack_side_balance": "uniform",
+    "begin_tick": 29,
+    "end": "first high touch, attempt terminal, or frozen deadline",
+    "include_successful_worlds": true,
+    "include_failed_worlds": true,
+    "failed_world_sampling_weight": 2.0,
+    "successful_world_sampling_weight": 1.0,
+    "minimum_current_ball_height_uu": 250.0,
+    "maximum_teacher_reach_residual_uu": 450.0,
+    "maximum_samples_per_world_per_round": 96,
+    "within_world_sampling": "deterministic evenly spaced eligible ticks preserving order",
+    "replay_rounds": 2,
+    "candidate_state_source": "training worlds only",
+    "validation_or_test_mining": false
+  },
+  "optimization": {
+    "trainable": [
+      "option.shared_trunk",
+      "option.actor"
+    ],
+    "frozen": [
+      "option.critic",
+      "protected competitive base",
+      "frozen teacher"
+    ],
+    "optimizer": "fresh AdamW",
+    "trunk_learning_rate": 0.00001,
+    "actor_learning_rate": 0.00005,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 0.5,
+    "batch_size": 32768,
+    "supervised_steps_per_round": 40,
+    "maximum_rounds": 12,
+    "source_exact_batch_fraction": 0.4,
+    "on_policy_batch_fraction": 0.6,
+    "analog_loss": "SmoothL1(tanh(actor_mean), teacher_action), beta=0.1",
+    "button_loss": "BCEWithLogits against teacher Boolean action",
+    "analog_weight": 1.0,
+    "button_weight": 0.25,
+    "diagnostic_parent_log_standard_deviation_retention_weight": 0.05,
+    "human_aerial_auxiliary_weight": 0.05,
+    "human_aerial_auxiliary_samples_per_round": 5120,
+    "human_validation_rmse_max": 0.3,
+    "finite_checks": true
+  },
+  "validation": {
+    "physical_worlds_per_pack_side": 2048,
+    "physical_seed_base": 2026091317,
+    "teacher_action_validation_corpus": "frozen source-exact validation",
+    "evaluate_after_every_round": true,
+    "plateau_patience_rounds": 6,
+    "physical_gate": {
+      "center_pop": {
+        "high_touch_fraction_min": 0.15,
+        "qualified_goal_fraction_min": 0.05
+      },
+      "lateral_pop": {
+        "high_touch_fraction_min": 0.5,
+        "goalward_first_touch_fraction_min": 0.45
+      },
+      "airborne_possession": {
+        "high_touch_fraction_min": 0.35,
+        "goalward_first_touch_fraction_min": 0.3
+      },
+      "both_physical_sides": true,
+      "consecutive_rounds": 2
+    }
+  },
+  "selection": {
+    "select_only_from_validation": true,
+    "no_human_test": true,
+    "physical_gate_required": true,
+    "no_promotion_from_dagger_alone": true,
+    "next_stage_after_pass": "Separately frozen aerial-opportunity integration with live defenders and useful physical airborne progression."
+  },
+  "integrity": {
+    "optimizer_steps_before_authority_commit": 0,
+    "diagnostic_parent_unchanged": true,
+    "no_general_policy_ppo": true,
+    "no_production_reward_change": true,
+    "no_named_mechanic_classifier": true,
+    "no_raw_airtime_reward": true,
+    "no_validation_or_test_data_in_replay": true,
+    "no_partial_promotion": true
+  }
+}
