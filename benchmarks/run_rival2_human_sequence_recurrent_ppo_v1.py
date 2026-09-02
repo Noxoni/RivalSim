@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 import os
+import subprocess
 import sys
 import time
 from dataclasses import asdict, replace
@@ -23,9 +24,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from benchmarks.evaluate_rival2_human_sequence_recurrent_ppo import (  # noqa: E402
-    evaluate_checkpoint,
-)
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes  # noqa: E402
 from rivalsim.rival2_contracts import (  # noqa: E402
     REWARD_ACQUISITION_120_V1_CONTRACT_HASH,
@@ -642,15 +640,37 @@ def run_evaluation(
     checkpoint = run_dir / "evaluations" / f"{label}.pt"
     record = checkpoint_record(trainer, checkpoint, include_optimizer=False)
     output = RESULTS / f"nexto_{label}.json"
-    result = evaluate_checkpoint(
-        checkpoint,
-        output,
-        collision_root=collision_root,
-        expected_format=CHECKPOINT_FORMAT,
-        worlds_per_side=128,
-        seed=EVALUATION_SEED,
-        device="cuda:0",
+    command = [
+        sys.executable,
+        str(ROOT / "benchmarks/evaluate_rival2_human_sequence_recurrent_ppo.py"),
+        "--checkpoint",
+        str(checkpoint),
+        "--output",
+        str(output),
+        "--collision-root",
+        str(collision_root),
+        "--expected-format",
+        CHECKPOINT_FORMAT,
+        "--worlds-per-side",
+        "128",
+        "--seed",
+        str(EVALUATION_SEED),
+        "--device",
+        "cuda:0",
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
     )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "isolated recurrent Nexto evaluation failed: "
+            f"returncode={completed.returncode}; stderr={completed.stderr[-4000:]}"
+        )
+    result = json.loads(output.read_text(encoding="utf-8"))
     return record, result
 
 
