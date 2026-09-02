@@ -1,0 +1,41 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V23_AUTHORITY",
+  "purpose": "directly validate a side-specialized deployment bundle after exhaustive full-match evidence exposed complementary Blue and Orange policy strengths",
+  "blue_policy": {
+    "path": "checkpoints/rival2/codex_autonomous_v19/rival2_codex_autonomous_best.pt",
+    "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+    "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA",
+    "independent_blue_record": "4-1, 86-48 goals"
+  },
+  "orange_policy": {
+    "path": "G:/dev/RivalSim-runs/codex-autonomous-v22/candidate_08.pt",
+    "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+    "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514",
+    "independent_orange_record": "4-1, 73-63 goals"
+  },
+  "routing": {
+    "selector": "physical Rocket League team side known before match start",
+    "blue": "blue_policy",
+    "orange": "orange_policy",
+    "mid_match_switching": false,
+    "state_or_action_heuristics": false,
+    "policy_mutation": false,
+    "observation_contract_change": false,
+    "action_contract_change": false
+  },
+  "validation": {
+    "method": "single direct complete five-minute Nexto matrix with both policies loaded simultaneously",
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "expected_from_independent_evidence": "8-2, 159-111 goals",
+    "pass": "more than 5 wins and strict complete-match rank improvement over V19",
+    "human_gameplay_validation_rmse_ceiling": 0.61,
+    "human_mechanic_validation_rmse_ceiling": 0.62,
+    "human_test_opened": false
+  },
+  "output": {
+    "bundle_directory": "checkpoints/rival2/codex_autonomous_v23",
+    "blue_filename": "rival2_blue.pt",
+    "orange_filename": "rival2_orange.pt",
+    "manifest_filename": "bundle.json"
+  }
+}
