@@ -1,0 +1,52 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_V8_AUTHORITY",
+  "source": {
+    "path": "checkpoints/rival2/codex_autonomous_v4/rival2_codex_autonomous_best.pt",
+    "sha256": "172BA59786A2E08EB6DC95CFE29F20C21826F7CB9429FF3C89F4D7C4F4BD9E10",
+    "role": "strongest deterministic closed-loop human-derived checkpoint"
+  },
+  "purpose": "learn pinned Nexto controller behavior without abandoning reviewed human demonstrations",
+  "nexto_distillation": {
+    "collection_worlds": 8192,
+    "rollout_horizon": 128,
+    "physics_hz": 120,
+    "source_policy_hz": 120,
+    "opponent": "pinned deterministic Nexto including stock kickoff control",
+    "target": "exact eight-channel action emitted into RivalSim",
+    "training_world_fraction": 0.875,
+    "validation_world_fraction": 0.125,
+    "split_unit": "whole simulator world",
+    "batch": 4096,
+    "maximum_steps": 64,
+    "validation_boundaries": [1, 2, 4, 8, 16, 32, 64]
+  },
+  "human_replay": {
+    "source": "existing reviewed frozen gameplay and positive-mechanic train split",
+    "gameplay_batch": 2048,
+    "mechanic_batch": 2048,
+    "failed_or_ambiguous_attempts": "excluded",
+    "test_split": "not loaded",
+    "selection_floor_gameplay_rmse": 0.61,
+    "selection_floor_mechanic_rmse": 0.62
+  },
+  "optimization": {
+    "boundary": "shared trunk plus actor",
+    "critic": "frozen",
+    "optimizer": "fresh AdamW",
+    "learning_rate": 0.000002,
+    "weight_decay": 0.0,
+    "gradient_clip": 0.5,
+    "analog_loss": "Smooth-L1 beta 0.1",
+    "button_loss": "BCEWithLogits weight 0.25",
+    "log_std_retention": "source actor target weight 0.05",
+    "ppo_steps": 0,
+    "reward_optimization": false
+  },
+  "selection": {
+    "primary": "deterministic paired 256-episode Nexto goal differential",
+    "tie_breakers": ["goals_for", "Rival touches", "Rival first touches"],
+    "requirements": ["zero no-touch episodes", "human validation floors", "finite model and actions"],
+    "target_win_rate": 0.55,
+    "source_checkpoint_never_overwritten": true
+  }
+}
