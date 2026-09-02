@@ -1,0 +1,44 @@
+{
+  "format": "RIVAL2_AERIAL_OPTION_V2_FAILURE_ATTRIBUTION",
+  "authority_sha256": "3AE030402525049317F9B221BEC288401A936B178CE37EBAA7C93090CA630860",
+  "verdict": "REJECTED_NO_PROMOTION",
+  "stop_reason": "moving_intercept_maximum_blocks_without_gate",
+  "protected_v23_base_unchanged": true,
+  "human_test_opened": false,
+  "baseline": {
+    "blue_high_contact_fraction": 0.1025390625,
+    "blue_forward_high_contact_fraction": 0.0830078125,
+    "orange_high_contact_fraction": 0.1201171875,
+    "orange_forward_high_contact_fraction": 0.10205078125
+  },
+  "best_joint_boundary": {
+    "block": 80,
+    "blue_high_contact_fraction": 0.130859375,
+    "blue_forward_high_contact_fraction": 0.1142578125,
+    "orange_high_contact_fraction": 0.1396484375,
+    "orange_forward_high_contact_fraction": 0.1181640625,
+    "blue_human_validation_rmse": 0.226471908390522,
+    "orange_human_validation_rmse": 0.22805894911289215
+  },
+  "final_boundary": {
+    "block": 120,
+    "blue_high_contact_fraction": 0.1240234375,
+    "blue_forward_high_contact_fraction": 0.107421875,
+    "orange_high_contact_fraction": 0.14404296875,
+    "orange_forward_high_contact_fraction": 0.12548828125
+  },
+  "required": {
+    "high_contact_fraction_min": 0.20,
+    "forward_high_contact_fraction_min": 0.12,
+    "both_physical_sides": true
+  },
+  "interpretation": {
+    "learned": "The fixed initiation primitive eliminated the launch-sequence defect and post-launch PPO improved altitude, high contacts, and forward transfers without degrading the human aerial prior.",
+    "not_learned": "Broad moving-intercept PPO plateaued below the frozen high-contact gate, especially on the Blue physical perspective.",
+    "next_experiment": "Use explicit Rocket-League-style aerial shot packs with deterministic launch, touch, ball-ground, possession, and goal deadlines. The episode should reset on each failed stage and train increasingly varied airborne shots instead of broad random interception states."
+  },
+  "promotion": {
+    "aerial_option_promoted": false,
+    "competitive_policy_remains": "RIVAL2_CODEX_AUTONOMOUS_V23"
+  }
+}
