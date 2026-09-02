@@ -21,6 +21,7 @@ def _observation(rows: int = 2) -> torch.Tensor:
     observation[:, FIELD["ball.position.z"]] = 500.0 / POSITION_SCALE[2]
     observation[:, FIELD["relative.ball_position.y"]] = 400.0 / POSITION_SCALE[1]
     observation[:, FIELD["relative.ball_position.z"]] = 483.0 / POSITION_SCALE[2]
+    observation[:, FIELD["ball.linear_velocity.z"]] = 0.25
     return observation
 
 

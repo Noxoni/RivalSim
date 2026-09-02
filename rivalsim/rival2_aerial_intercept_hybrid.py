@@ -21,7 +21,7 @@ from rivalsim.rival2_aerial_intercept_teacher import (
 )
 from rivalsim.rival2_aerial_option import FIELD
 from rivalsim.rival2_aerial_option_v2 import apply_fast_aerial_initiation
-from rivalsim.rival2_contracts import POSITION_SCALE
+from rivalsim.rival2_contracts import BALL_LINEAR_SPEED_SCALE, POSITION_SCALE
 
 HYBRID_VERSION = "RIVAL2_AERIAL_INTERCEPT_HYBRID_V1"
 
@@ -35,6 +35,7 @@ class AerialInterceptGateConfig:
     minimum_forward_alignment: float = 0.0
     minimum_boost_fraction: float = 0.15
     minimum_intercept_time_seconds: float = 0.30
+    minimum_predicted_ball_height_uu: float = 300.0
     maximum_reach_residual_uu: float = 450.0
     release_ball_height_uu: float = 190.0
     release_grounded_after_tick: int = 40
@@ -52,6 +53,8 @@ class AerialInterceptGateConfig:
             raise ValueError("forward alignment must be in [-1,1]")
         if self.minimum_intercept_time_seconds <= 0.0:
             raise ValueError("minimum intercept time must be positive")
+        if self.minimum_predicted_ball_height_uu <= 0.0:
+            raise ValueError("minimum predicted ball height must be positive")
         if self.maximum_reach_residual_uu <= 0.0:
             raise ValueError("maximum reach residual must be positive")
         if self.release_grounded_after_tick < 29:
@@ -68,6 +71,7 @@ class AerialInterceptEligibility:
     ball_height_uu: torch.Tensor
     relative_distance_uu: torch.Tensor
     forward_alignment: torch.Tensor
+    predicted_ball_height_uu: torch.Tensor
     reach_residual_uu: torch.Tensor
     plan: AerialInterceptPlan
 
@@ -100,7 +104,7 @@ def aerial_intercept_eligibility(
 
     if observation.ndim != 2 or observation.shape[1] != 182:
         raise ValueError("aerial hybrid expects [N,182] observations")
-    if not bool(torch.isfinite(observation).all()):
+    if observation.device.type == "cpu" and not bool(torch.isfinite(observation).all()):
         raise ValueError("aerial hybrid observation contains nonfinite values")
     plan = plan_aerial_intercept(observation)
     scale = torch.as_tensor(
@@ -115,6 +119,14 @@ def aerial_intercept_eligibility(
     ).clamp_min(1.0e-6)
     forward_alignment = (forward * direction).sum(dim=-1)
     ball_height = observation[:, FIELD["ball.position.z"]] * POSITION_SCALE[2]
+    ball_vertical_velocity = (
+        observation[:, FIELD["ball.linear_velocity.z"]] * BALL_LINEAR_SPEED_SCALE
+    )
+    predicted_ball_height = (
+        ball_height
+        + ball_vertical_velocity * plan.intercept_time
+        - 0.5 * 650.0 * plan.intercept_time.square()
+    )
     reachable = 0.5 * BOOST_ACCELERATION * plan.intercept_time.square()
     reach_residual = (plan.predicted_distance - reachable).abs()
     eligible = (
@@ -127,13 +139,16 @@ def aerial_intercept_eligibility(
         & (relative_distance <= config.maximum_relative_distance_uu)
         & (forward_alignment >= config.minimum_forward_alignment)
         & (plan.intercept_time >= config.minimum_intercept_time_seconds)
+        & (predicted_ball_height >= config.minimum_predicted_ball_height_uu)
         & (reach_residual <= config.maximum_reach_residual_uu)
+        & torch.isfinite(observation).all(dim=1)
     )
     return AerialInterceptEligibility(
         eligible=eligible,
         ball_height_uu=ball_height,
         relative_distance_uu=relative_distance,
         forward_alignment=forward_alignment,
+        predicted_ball_height_uu=predicted_ball_height,
         reach_residual_uu=reach_residual,
         plan=plan,
     )
