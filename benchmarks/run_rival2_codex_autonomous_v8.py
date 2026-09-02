@@ -266,7 +266,7 @@ def run(args: argparse.Namespace) -> int:
             "human_test_not_loaded": human_identity["test_loaded"] is False,
             "critic_frozen": not any(p.requires_grad for p in model.critic.parameters()),
             "fresh_actor_optimizer": len(optimizer.state) == 0,
-            "ppo_steps": 0,
+            "ppo_steps_zero": authority["optimization"]["ppo_steps"] == 0,
         },
     }
     if not all(preflight["checks"].values()):
