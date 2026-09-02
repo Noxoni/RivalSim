@@ -95,16 +95,24 @@ def write_json(path: Path, payload: Any) -> None:
     os.replace(temporary, path)
 
 
-def release_full_match_runner(runner: FullMatchRunner) -> None:
-    """Move Torch and Warp to a persistent stream before releasing a runner."""
+def activate_fresh_persistent_stream(device: str | torch.device) -> None:
+    """Install a fresh process-owned stream in both CUDA runtime wrappers."""
 
-    torch.cuda.synchronize(runner.device)
-    warp_stream = wp.Stream(device=runner.world.device)
+    torch_device = torch.device(device)
+    torch.cuda.synchronize(torch_device)
+    warp_device = wp.get_device(str(torch_device))
+    warp_stream = wp.Stream(device=warp_device)
     torch_stream = wp.stream_to_torch(warp_stream)
-    wp.set_stream(warp_stream, device=runner.world.device, sync=False)
+    wp.set_stream(warp_stream, device=warp_device, sync=False)
     torch.cuda.set_stream(torch_stream)
     _CUDA_LIFETIME_WARP_STREAMS.append(warp_stream)
     _CUDA_LIFETIME_TORCH_STREAMS.append(torch_stream)
+
+
+def release_full_match_runner(runner: FullMatchRunner) -> None:
+    """Move Torch and Warp to a persistent stream before releasing a runner."""
+
+    activate_fresh_persistent_stream(runner.device)
 
 
 def append_jsonl(path: Path, payload: Any) -> None:
@@ -229,6 +237,7 @@ def collect_on_policy_pool(
     ticks_between: int = 112,
 ) -> torch.Tensor:
     rng = np.random.default_rng(seed)
+    activate_fresh_persistent_stream(device)
     runner = FullMatchRunner(
         worlds,
         str(collision_root),
@@ -566,6 +575,7 @@ def short_screen(
     seed: int,
     ticks: int = 3600,
 ) -> dict[str, Any]:
+    activate_fresh_persistent_stream("cuda:0")
     DualCheckpointPhysicalTelemetryRunner.orange_checkpoint = orange_path.resolve()
     DualCheckpointPhysicalTelemetryRunner.orange_sha256 = orange_sha
     layout = np.repeat(np.arange(5, dtype=np.int32), 2)
