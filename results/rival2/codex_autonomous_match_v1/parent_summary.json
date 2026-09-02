@@ -1,0 +1,45 @@
+{
+  "format": "RIVAL2_CODEX_AUTONOMOUS_MATCH_V1_PARENT",
+  "lineage": "human_bc_ppo_v1 -> eight-step human anchor -> V4 analog PPO candidate -> V7 protected 30-microstep PPO",
+  "selected_checkpoint": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_parent.pt",
+    "sha256": "0B90C201A0E1A16E83CF5CCBDE3371434F78D455C2AED20E0DDA6414F3B84E39",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500",
+    "iteration": 4579,
+    "policy_version": 4580,
+    "total_agent_samples": 30962274060
+  },
+  "resumable_optimizer_checkpoint": {
+    "path": "checkpoints/rival2/codex_autonomous_match_v1/rival2_codex_autonomous_match_resume.pt",
+    "sha256": "16277F5683A8AA7A6FFD3101F86E60335974A9B820AB7F4C92ED8B7AF66CA9C4",
+    "model_tensor_sha256": "A8E6BCED160F9C6871B9D4DF8D91AD2FDF260AA76E64F5788FEACF0371564500"
+  },
+  "human_validation": {
+    "gameplay_complete_action_rmse": 0.5703790187835693,
+    "mechanic_complete_action_rmse": 0.5702256560325623,
+    "eligible_under_frozen_v7_floors": true,
+    "human_test_loaded": false
+  },
+  "continuous_60_second_matrix": {
+    "goals_for": 25,
+    "goals_against": 21,
+    "goal_differential": 4,
+    "rival_touches": 140,
+    "opponent_touches": 324
+  },
+  "complete_five_minute_matrix": {
+    "matches": 10,
+    "wins": 5,
+    "losses": 5,
+    "goals_for": 113,
+    "goals_against": 126,
+    "rival_as_blue_wins": 4,
+    "rival_as_orange_wins": 1,
+    "rival_touches": 687,
+    "opponent_touches": 1371
+  },
+  "selection_correction": "The former first-goal gate ranked this checkpoint 52-204 and discarded it. Continuous and complete-match evaluation are authoritative for the autonomous continuation.",
+  "full_match_evaluation_sha256": "8718C18E940083AE2EDA30F982234DC4FFCCA3196DCF22BD1910BAA1E71F7416",
+  "full_match_ledger_sha256": "3DFE03647EDB1616A845D700E46191581CA2577DDDE208FCF58B8D8E10861804",
+  "verdict": "PROMOTE_AS_STRONGEST_SUSTAINED_NEXTO_PARENT"
+}
