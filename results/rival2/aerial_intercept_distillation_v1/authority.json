@@ -1,0 +1,150 @@
+{
+  "format": "RIVAL2_AERIAL_INTERCEPT_DISTILLATION_V1_AUTHORITY",
+  "created_utc": "2026-09-02T17:10:15.1417592Z",
+  "parent_commit": "f55b8da902485c9509bce79e2aa137bd97eb45a9",
+  "purpose": "Distill an observation-only ballistic pursuit controller into Rival's aerial option using source-exact successful 120 Hz trajectories before any aerial-opportunity self-play.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "immutable": true
+  },
+  "initial_option": {
+    "blue": {
+      "path": "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_blue.pt",
+      "sha256": "7F6FEFD10F2C844ACC8072460C4205788D2CAED659367DD68A9702BEC59F4A4C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/aerial_option_v2/rival2_aerial_option_v2_selected_orange.pt",
+      "sha256": "9468AF5107840088B6198E23EE1BB3C7650D52713ECCAFAE56B047C7DEA2BFAC"
+    },
+    "load_aerial_training_pack_v1_descendant": false,
+    "fresh_optimizer": true
+  },
+  "teacher": {
+    "implementation": {
+      "path": "rivalsim/rival2_aerial_intercept_teacher.py",
+      "sha256": "A1DFB98D33B6E2D25889583316FD7605B7366FA7E1B4E1F70F47DF3FEE3D603A"
+    },
+    "calibration_runner": {
+      "path": "benchmarks/calibrate_rival2_aerial_intercept_teacher.py",
+      "sha256": "D0061CC846DB9D778FD8FCCEC3F606AD595C8D9D18CAB13788A73141B73A52F4"
+    },
+    "calibration": {
+      "path": "results/rival2/aerial_intercept_teacher/calibration.json",
+      "sha256": "3CE0F55AD6966B2EB0A0DE049BE32D84EC179FEF226AB12AA0C9146CA4B50672"
+    },
+    "uses_only_rival_observation": true,
+    "hidden_simulator_state": false,
+    "input_injection": false,
+    "deployment_required": false
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "fast_aerial_final_tick": 28,
+    "production_reward_unchanged": "RIVAL2_REWARD_GAMEPLAY_120_V2",
+    "ppo": false
+  },
+  "scenario_authority": {
+    "training_pack": {
+      "path": "results/rival2/aerial_training_pack_v1/authority.json",
+      "sha256": "C7CD065A5AB5FCC26CBB6C62F65DD99BDD07F812BDB5492CFFDE657578A6ED72"
+    },
+    "scoring_geometry_correction": {
+      "path": "results/rival2/aerial_training_pack_v1/calibration_correction.json",
+      "sha256": "B2FC1EB0CB8B0429E1BD4D72C5A6F8C275678167796A7011B4EFA93866F92283"
+    },
+    "training_seed_base": 2026090317,
+    "validation_seed_base": 2026091317,
+    "validation_disjoint": true,
+    "worlds_per_pack_side_training": 2048,
+    "worlds_per_pack_side_validation": 2048
+  },
+  "trajectory_selection": {
+    "primitive_ticks_excluded": true,
+    "post_primitive_start_tick": 29,
+    "trajectory_ends_at_first_high_touch_or_attempt_terminal": true,
+    "failed_worlds_excluded_from_positive_distillation": true,
+    "center_pop": {
+      "qualified_goal_world_weight": 4.0,
+      "qualified_high_touch_non_goal_world_weight": 2.0
+    },
+    "lateral_pop": {
+      "goalward_high_touch_world_weight": 3.0,
+      "other_high_touch_world_weight": 2.0
+    },
+    "airborne_possession": {
+      "goalward_high_touch_world_weight": 3.0,
+      "other_high_touch_world_weight": 2.0
+    },
+    "pack_sampling": "uniform across pack then side then successful world",
+    "maximum_samples_per_world_per_block": 96,
+    "preserve_tick_order_in_trajectory_artifact": true
+  },
+  "optimization": {
+    "trainable": [
+      "option.shared_trunk",
+      "option.actor"
+    ],
+    "frozen": [
+      "option.critic",
+      "protected competitive base"
+    ],
+    "optimizer": "fresh AdamW",
+    "trunk_learning_rate": 0.00003,
+    "actor_learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "maximum_gradient_norm": 0.5,
+    "batch_size": 32768,
+    "supervised_steps_per_block": 4,
+    "maximum_blocks": 200,
+    "validation_interval_blocks": 10,
+    "plateau_patience_boundaries": 8,
+    "analog_loss": "SmoothL1(tanh(actor_mean), teacher_action), beta=0.1",
+    "button_loss": "BCEWithLogits against teacher Boolean action",
+    "analog_weight": 1.0,
+    "button_weight": 0.25,
+    "parent_log_standard_deviation_retention_weight": 0.05,
+    "human_aerial_auxiliary_weight": 0.05,
+    "human_aerial_auxiliary_samples_per_block": 512,
+    "human_validation_rmse_max": 0.3,
+    "finite_checks": true
+  },
+  "selection": {
+    "teacher_action_validation_reported": true,
+    "physical_validation_required": true,
+    "center_pop": {
+      "high_touch_fraction_min": 0.15,
+      "qualified_goal_fraction_min": 0.05
+    },
+    "lateral_pop": {
+      "high_touch_fraction_min": 0.5,
+      "goalward_first_touch_fraction_min": 0.45
+    },
+    "airborne_possession": {
+      "high_touch_fraction_min": 0.35,
+      "goalward_first_touch_fraction_min": 0.3
+    },
+    "both_physical_sides": true,
+    "consecutive_boundaries": 2,
+    "no_promotion_from_distillation_alone": true,
+    "next_stage": "Separately frozen live-defender aerial-opportunity self-play with physically useful airborne progression and bounded possession/goal outcomes."
+  },
+  "integrity": {
+    "optimizer_steps_before_authority_commit": 0,
+    "human_test_opened": false,
+    "no_general_policy_ppo": true,
+    "no_production_reward_change": true,
+    "no_named_mechanic_classifier": true,
+    "no_raw_airtime_reward": true,
+    "no_promotion_on_partial_success": true
+  }
+}
