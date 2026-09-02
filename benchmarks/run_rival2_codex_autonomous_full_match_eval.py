@@ -57,7 +57,7 @@ def main() -> int:
     layout = np.repeat(np.arange(5, dtype=np.int32), 2)
     rival_side = np.tile(np.asarray([0, 1], dtype=np.int32), 5)
     canonical, _raw = nexto_matches._run_suite(
-        name="codex_autonomous_deterministic_full_match",
+        name="canonical_deterministic",
         layout=layout,
         rival_side=rival_side,
         stochastic_rival=False,
