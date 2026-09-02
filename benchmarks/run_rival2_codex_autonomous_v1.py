@@ -312,7 +312,9 @@ def human_validation(
         for start in range(0, observation.shape[0], 8192):
             actor, _ = model(observation[start : start + 8192].to(device))
             actors.append(actor.cpu())
-        output[name] = action_metric_summary(torch.cat(actors), action)
+        actor = torch.cat(actors)
+        output[name] = action_metric_summary(actor, action)
+        output[name]["finite"] = bool(torch.isfinite(actor).all().item())
     output["eligible"] = bool(
         output["gameplay"]["complete_action_rmse"]
         <= HUMAN_VALIDATION_GAMEPLAY_RMSE_CEILING
