@@ -101,6 +101,7 @@ PREFLIGHT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_PREFLIGHT"
 RESULT_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_RESULT"
 STATE_FORMAT = "RIVAL2_CODEX_AUTONOMOUS_V1_STATE"
 OPTIMIZER_STEP_LIMIT: int | None = None
+POLICY_TRAINING_BOUNDARY = "full"
 
 
 def utc_now() -> str:
@@ -157,6 +158,14 @@ def load_authority() -> dict[str, Any]:
             "optimizer_steps_per_rollout_boundary"
         )
         == OPTIMIZER_STEP_LIMIT,
+        "policy_training_boundary": authority.get("ppo", {}).get(
+            "policy_training_boundary"
+        )
+        == (
+            "actor analog-mean rows 0-4 only"
+            if POLICY_TRAINING_BOUNDARY == "analog_actor_only"
+            else None
+        ),
         "current_probability": authority.get("opponents", {}).get("current") == 0.5,
         "nexto_probability": authority.get("opponents", {}).get("nexto") == 0.5,
         "wisp_probability": authority.get("opponents", {}).get("wisp") == 0.0,
@@ -210,6 +219,16 @@ def build_trainer(
         seed=SEED,
     )
     trainer.model.load_state_dict(source["model"], strict=True)
+    if POLICY_TRAINING_BOUNDARY == "analog_actor_only":
+        trainer.model.trunk.requires_grad_(False)
+        weight_mask = torch.zeros_like(trainer.model.actor.weight)
+        weight_mask[:5].fill_(1.0)
+        bias_mask = torch.zeros_like(trainer.model.actor.bias)
+        bias_mask[:5].fill_(1.0)
+        trainer.model.actor.weight.register_hook(lambda gradient: gradient * weight_mask)
+        trainer.model.actor.bias.register_hook(lambda gradient: gradient * bias_mask)
+    elif POLICY_TRAINING_BOUNDARY != "full":
+        raise ValueError(f"unsupported policy training boundary: {POLICY_TRAINING_BOUNDARY}")
     trainer.policy_version = int(source["policy_version"])
     trainer.iteration = int(source["iteration"])
     trainer.total_agent_samples = int(source["total_agent_samples"])
@@ -233,6 +252,7 @@ def build_trainer(
         ),
         "reward_version": RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
         "ppo_optimizer": "fresh split Adam at conservative fixed rates",
+        "policy_training_boundary": POLICY_TRAINING_BOUNDARY,
         "kl_policy": "telemetry_only_no_KL_rejection_or_rollback",
         "human_replay": "reviewed frozen train split only; validation is read-only",
         "authority": {
@@ -443,6 +463,18 @@ def checkpoint(
     }
 
 
+def frozen_policy_boundary_snapshot(model: Rival2ActorCritic) -> str | None:
+    if POLICY_TRAINING_BOUNDARY != "analog_actor_only":
+        return None
+    frozen: dict[str, torch.Tensor] = {
+        f"trunk.{name}": value.detach().cpu()
+        for name, value in model.trunk.state_dict().items()
+    }
+    frozen["actor.weight.rows_5_12"] = model.actor.weight[5:].detach().cpu()
+    frozen["actor.bias.rows_5_12"] = model.actor.bias[5:].detach().cpu()
+    return tensor_tree_sha256(frozen)
+
+
 def run_nexto_evaluation(
     checkpoint_path: Path,
     *,
@@ -562,6 +594,17 @@ def preflight(
         "named_mechanics_arrays_zero": inventory["named_mechanics_arrays"] == 0,
         "controlled_flick_arrays_zero": inventory["controlled_flick_arrays"] == 0,
         "human_test_not_loaded": human_identity["test_loaded"] is False,
+        "policy_training_boundary": (
+            POLICY_TRAINING_BOUNDARY == "full"
+            or (
+                POLICY_TRAINING_BOUNDARY == "analog_actor_only"
+                and not any(
+                    parameter.requires_grad for parameter in trainer.model.trunk.parameters()
+                )
+                and trainer.model.actor.weight.requires_grad
+                and trainer.model.actor.bias.requires_grad
+            )
+        ),
     }
     return {
         "format": PREFLIGHT_FORMAT,
@@ -698,6 +741,7 @@ def run(args: argparse.Namespace) -> int:
         campaign_step += 1
         started = time.perf_counter()
         rollout = trainer.collect_rollout()
+        frozen_boundary_before = frozen_policy_boundary_snapshot(trainer.model)
         try:
             ppo_metrics = trainer.update(
                 rollout,
@@ -712,6 +756,11 @@ def run(args: argparse.Namespace) -> int:
                 mechanic_sampler,
                 human_generator,
             )
+            frozen_boundary_after = frozen_policy_boundary_snapshot(trainer.model)
+            if frozen_boundary_after != frozen_boundary_before:
+                raise Rival2PolicyDisplacementRejected(
+                    {"reason": "frozen_policy_boundary_changed"}
+                )
         except Rival2PolicyDisplacementRejected as error:
             stop_reason = str(error.diagnostics.get("reason", "nonfinite_guard"))
             write_json(
@@ -740,6 +789,11 @@ def run(args: argparse.Namespace) -> int:
             "exploration": {
                 "analog_sigma": EXPLORATION_SIGMA,
                 "button_temperature": EXPLORATION_BUTTON_TEMPERATURE,
+            },
+            "policy_training_boundary": {
+                "identity": POLICY_TRAINING_BOUNDARY,
+                "frozen_exact": frozen_boundary_after == frozen_boundary_before,
+                "frozen_sha256": frozen_boundary_after,
             },
         }
         append_jsonl(curve_path, row)
