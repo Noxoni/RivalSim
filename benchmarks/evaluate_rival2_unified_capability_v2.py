@@ -92,6 +92,7 @@ def load_unified(path: Path, device: str) -> tuple[dict[str, Any], Rival2Unified
     if payload.get("format") not in {
         "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V2",
         "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V3",
+        "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V4",
     }:
         raise RuntimeError("unsupported unified checkpoint format")
     config = Rival2UnifiedPolicyConfig(**payload["policy_config"])
