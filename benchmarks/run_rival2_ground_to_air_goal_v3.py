@@ -506,6 +506,7 @@ def collect_rollout(
     collision_dir: Path,
     handoff_tick: int | None = None,
     phase: int = PHASE_ATTACKING_HALF,
+    record_deterministic: bool = False,
 ) -> tuple[aerial_v1.OptionRollout | None, dict[str, Any]]:
     initial = build_goal_directed_pop_scenarios(
         worlds,
@@ -538,7 +539,11 @@ def collect_rollout(
         horizon=horizon,
         authority=authority,
     )
-    rollout = None if deterministic else aerial_v1.OptionRollout(horizon, worlds, device)
+    rollout = (
+        None
+        if deterministic and not record_deterministic
+        else aerial_v1.OptionRollout(horizon, worlds, device)
+    )
     active = torch.ones(worlds, dtype=torch.bool, device=device)
     observation = env.observation
     false = torch.zeros(worlds, dtype=torch.bool, device=device)
