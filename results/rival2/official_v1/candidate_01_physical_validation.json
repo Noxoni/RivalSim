@@ -1,0 +1,668 @@
+{
+  "acceptance": {
+    "checks": {
+      "finite_summary": true,
+      "nonnegative_goal_differential": false,
+      "touches_at_least_75_percent_of_v23": true,
+      "wins_at_least_6_of_10": false
+    },
+    "reference": {
+      "checkpoint": {
+        "blue": {
+          "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+          "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+        },
+        "orange": {
+          "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+          "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+        }
+      },
+      "score": {
+        "losses": 2,
+        "nexto_goals": 111,
+        "rival_goals": 159,
+        "wins": 8
+      },
+      "touches": 687
+    },
+    "verdict": "FAIL"
+  },
+  "candidate": {
+    "format": "RIVAL2_OFFICIAL_CAPABILITY_CHECKPOINT_V1",
+    "path": "checkpoints/rival2/official_v1/rival2_official_v1.pt",
+    "sha256": "F7EC3AB4B28097F7BBC63B037B35DF93157A67B82B3FD8F5F853ACA729182BDD"
+  },
+  "evaluation": {
+    "action_mode": "deterministic",
+    "matrix": "five standard kickoff layouts x both Rival sides",
+    "opponent": "pinned Nexto",
+    "overtime_ticks_run": 3600,
+    "physics_hz": 120,
+    "physics_ticks": 39600,
+    "regulation_ticks": 36000,
+    "score": {
+      "losses": 8,
+      "nexto_goals": 123,
+      "rival_goals": 105,
+      "wins": 2
+    },
+    "seconds": 382.1456337997224,
+    "seed": 2026090206,
+    "touch_trace_matches_authoritative_telemetry": true
+  },
+  "format": "RIVAL2_OFFICIAL_CAPABILITY_PHYSICAL_VALIDATION_V1",
+  "overall": {
+    "air": {
+      "air_episode_count": 1315,
+      "air_episode_duration_seconds": {
+        "count": 1315,
+        "maximum": 4.125,
+        "mean": 1.1743092522179974,
+        "minimum": 0.008333333333333333,
+        "p50": 1.2083333333333333,
+        "p90": 1.3583333333333334,
+        "p95": 1.565833333333332,
+        "p99": 2.1416666666666666
+      },
+      "air_episode_max_height_uu": {
+        "count": 1315,
+        "maximum": 995.8189697265625,
+        "mean": 135.45808840849554,
+        "minimum": 25.185298919677734,
+        "p50": 127.62444305419922,
+        "p90": 138.1720184326172,
+        "p95": 194.842622375487,
+        "p99": 498.2944030761719
+      },
+      "airborne_horizontal_speed_uu_per_second": {
+        "count": 185306,
+        "maximum": 2299.998291015625,
+        "mean": 1357.6247905967377,
+        "minimum": 5.764598369598389,
+        "p50": 1421.2637329101562,
+        "p90": 2118.427734375,
+        "p95": 2239.5480346679688,
+        "p99": 2290.471240234375
+      },
+      "airborne_tick_fraction": 0.5049581304346641,
+      "episodes_reaching_1000uu": 0,
+      "episodes_reaching_100uu": 1067,
+      "episodes_reaching_300uu": 35,
+      "maximum_car_height_uu": 995.8189697265625,
+      "multi_elevated_touch_air_episodes": 0
+    },
+    "demolitions": {
+      "followed_by_rival_goal_within_5_seconds": 0,
+      "followed_by_rival_touch_within_5_seconds": 0,
+      "interpretation": "Counts are authoritative simulator demolition events. Offensive context and five-second follow-ups are descriptive telemetry, not rewards.",
+      "offensive_route_context": 0,
+      "opponent_distance_uu": {
+        "count": 0
+      },
+      "opponent_half": 0,
+      "per_minute": 0.0,
+      "total": 0
+    },
+    "ground": {
+      "boost_fraction": 0.5103513571534731,
+      "fraction_above_1400uu_per_second": 0.2378802974673441,
+      "fraction_above_2000uu_per_second": 0.0661319887486445,
+      "full_throttle_fraction": 0.24470046843950746,
+      "grounded_tick_fraction": 0.49504186956533586,
+      "handbrake_fraction": 0.09961633097920922,
+      "horizontal_speed_uu_per_second": {
+        "count": 181667,
+        "maximum": 2300.000244140625,
+        "mean": 1007.7719239014426,
+        "minimum": 0.03849228098988533,
+        "p50": 1005.0396728515625,
+        "p90": 1803.7249755859375,
+        "p95": 2112.894775390625,
+        "p99": 2299.6773291015625
+      },
+      "supersonic_state_fraction": 0.035658650167614374
+    },
+    "jump_flip_recovery": {
+      "flip_active_landings": 1254,
+      "flip_active_landings_with_100uu_speed_gain": 8,
+      "flip_onsets": 1260,
+      "flip_onsets_per_minute": 24.721164772340202,
+      "jump_onsets": 4184,
+      "jump_onsets_per_minute": 82.0899630218027,
+      "landing_speed_retention_ratio": {
+        "count": 1309,
+        "maximum": 2.172664060387772,
+        "mean": 0.8727143387018456,
+        "minimum": 0.0036551564474429587,
+        "p50": 0.9724996618402075,
+        "p90": 1.0245754208075217,
+        "p95": 1.044031325886229,
+        "p99": 1.269807477300914
+      },
+      "landings": 1309,
+      "productive_dash_chain_proxy": 0,
+      "productive_floor_landing_proxy": 0,
+      "productive_wall_landing_proxy": 8,
+      "short_air_flip_active_landings": 104,
+      "wavedash_interpretation": "Flip-active landing counts are a broad physics proxy. They include ordinary dodge landings and are not proof of intentional wavedashes."
+    },
+    "match_minutes": 50.96847222222222,
+    "scoring": {
+      "goals": 105,
+      "goals_from_elevated_aerial_proxy": 6,
+      "goals_from_high_aerial_proxy": 0,
+      "goals_last_touched_while_airborne_any_height": 92,
+      "goals_with_rival_as_last_toucher": 93,
+      "last_touch_ball_height_uu": {
+        "count": 93,
+        "maximum": 255.36753845214844,
+        "mean": 106.34624120240571,
+        "minimum": 91.19998931884766,
+        "p50": 93.68394470214844,
+        "p90": 124.85517425537108,
+        "p95": 179.8343872070312,
+        "p99": 248.5352020263672
+      },
+      "last_touch_car_height_uu": {
+        "count": 93,
+        "maximum": 135.96458435058594,
+        "mean": 92.88559854158791,
+        "minimum": 15.49026107788086,
+        "p50": 86.735107421875,
+        "p90": 130.47684631347656,
+        "p95": 135.6368865966797,
+        "p99": 135.96458435058594
+      },
+      "last_touch_to_goal_seconds": {
+        "count": 93,
+        "maximum": 2.9583333333333335,
+        "mean": 1.4340501792114693,
+        "minimum": 0.058333333333333334,
+        "p50": 1.3833333333333333,
+        "p90": 2.54,
+        "p95": 2.6133333333333333,
+        "p99": 2.943
+      }
+    },
+    "touches": {
+      "airborne_any_height": 627,
+      "elevated_aerial_proxy": 135,
+      "grounded": 41,
+      "grounded_forward_momentum_fraction": 0.6829268292682927,
+      "grounded_fraction": 0.061377245508982034,
+      "grounded_longitudinal_ball_velocity_delta_uu_per_second": {
+        "count": 41,
+        "maximum": 1711.049072265625,
+        "mean": 422.60287289503145,
+        "minimum": -656.4832763671875,
+        "p50": 335.50701904296875,
+        "p90": 1374.5482177734375,
+        "p95": 1711.049072265625,
+        "p99": 1711.049072265625
+      },
+      "grounded_post_touch_ball_speed_uu_per_second": {
+        "count": 41,
+        "maximum": 2429.76611328125,
+        "mean": 1369.9567387278487,
+        "minimum": 328.2762756347656,
+        "p50": 1326.3544921875,
+        "p90": 1833.49072265625,
+        "p95": 1942.153564453125,
+        "p99": 2234.721093750001
+      },
+      "high_aerial_proxy": 1,
+      "per_minute": 13.106141323748615,
+      "total": 668
+    },
+    "worlds": 10
+  },
+  "rival_as_blue": {
+    "air": {
+      "air_episode_count": 675,
+      "air_episode_duration_seconds": {
+        "count": 675,
+        "maximum": 3.5,
+        "mean": 1.1518395061728395,
+        "minimum": 0.016666666666666666,
+        "p50": 1.2083333333333333,
+        "p90": 1.35,
+        "p95": 1.4824999999999988,
+        "p99": 2.1633333333333327
+      },
+      "air_episode_max_height_uu": {
+        "count": 675,
+        "maximum": 988.9613037109375,
+        "mean": 136.7074338051125,
+        "minimum": 32.340179443359375,
+        "p50": 127.62452697753906,
+        "p90": 137.7421142578125,
+        "p95": 165.56263732910156,
+        "p99": 666.9218310546868
+      },
+      "airborne_horizontal_speed_uu_per_second": {
+        "count": 93299,
+        "maximum": 2299.998291015625,
+        "mean": 1346.9226888285814,
+        "minimum": 6.807368278503418,
+        "p50": 1444.109619140625,
+        "p90": 2112.63134765625,
+        "p95": 2243.506713867187,
+        "p99": 2292.226318359375
+      },
+      "airborne_tick_fraction": 0.4989971814112198,
+      "episodes_reaching_1000uu": 0,
+      "episodes_reaching_100uu": 547,
+      "episodes_reaching_300uu": 16,
+      "maximum_car_height_uu": 988.9613037109375,
+      "multi_elevated_touch_air_episodes": 0
+    },
+    "demolitions": {
+      "followed_by_rival_goal_within_5_seconds": 0,
+      "followed_by_rival_touch_within_5_seconds": 0,
+      "interpretation": "Counts are authoritative simulator demolition events. Offensive context and five-second follow-ups are descriptive telemetry, not rewards.",
+      "offensive_route_context": 0,
+      "opponent_distance_uu": {
+        "count": 0
+      },
+      "opponent_half": 0,
+      "per_minute": 0.0,
+      "total": 0
+    },
+    "ground": {
+      "boost_fraction": 0.49554839122915645,
+      "fraction_above_1400uu_per_second": 0.23191066891560091,
+      "fraction_above_2000uu_per_second": 0.05806306979524735,
+      "full_throttle_fraction": 0.25726455579990176,
+      "grounded_tick_fraction": 0.5010028185887802,
+      "handbrake_fraction": 0.10979567436001451,
+      "horizontal_speed_uu_per_second": {
+        "count": 93674,
+        "maximum": 2300.000244140625,
+        "mean": 1007.4016188888069,
+        "minimum": 0.03849228098988533,
+        "p50": 1031.4157104492188,
+        "p90": 1756.076904296875,
+        "p95": 2067.8466796875,
+        "p99": 2299.283447265625
+      },
+      "supersonic_state_fraction": 0.02897282063326003
+    },
+    "jump_flip_recovery": {
+      "flip_active_landings": 641,
+      "flip_active_landings_with_100uu_speed_gain": 4,
+      "flip_onsets": 645,
+      "flip_onsets_per_minute": 24.83781080690795,
+      "jump_onsets": 2116,
+      "jump_onsets_per_minute": 81.48342274018174,
+      "landing_speed_retention_ratio": {
+        "count": 671,
+        "maximum": 2.086988493922907,
+        "mean": 0.8714717627874916,
+        "minimum": 0.003682442173971885,
+        "p50": 0.9726987318652722,
+        "p90": 1.02536065188779,
+        "p95": 1.0463830854838774,
+        "p99": 1.156420924807352
+      },
+      "landings": 671,
+      "productive_dash_chain_proxy": 0,
+      "productive_floor_landing_proxy": 0,
+      "productive_wall_landing_proxy": 4,
+      "short_air_flip_active_landings": 58,
+      "wavedash_interpretation": "Flip-active landing counts are a broad physics proxy. They include ordinary dodge landings and are not proof of intentional wavedashes."
+    },
+    "match_minutes": 25.96847222222222,
+    "scoring": {
+      "goals": 51,
+      "goals_from_elevated_aerial_proxy": 1,
+      "goals_from_high_aerial_proxy": 0,
+      "goals_last_touched_while_airborne_any_height": 44,
+      "goals_with_rival_as_last_toucher": 44,
+      "last_touch_ball_height_uu": {
+        "count": 44,
+        "maximum": 255.36753845214844,
+        "mean": 101.2718093178489,
+        "minimum": 91.28881072998047,
+        "p50": 93.00954055786133,
+        "p90": 117.2612602233887,
+        "p95": 132.75077972412112,
+        "p99": 204.7150331115723
+      },
+      "last_touch_car_height_uu": {
+        "count": 44,
+        "maximum": 135.96458435058594,
+        "mean": 93.07184306058016,
+        "minimum": 50.285945892333984,
+        "p50": 81.37471771240234,
+        "p90": 130.4779510498047,
+        "p95": 134.99619598388674,
+        "p99": 135.96458435058594
+      },
+      "last_touch_to_goal_seconds": {
+        "count": 44,
+        "maximum": 2.9583333333333335,
+        "mean": 1.396780303030303,
+        "minimum": 0.058333333333333334,
+        "p50": 1.3833333333333333,
+        "p90": 2.58,
+        "p95": 2.6,
+        "p99": 2.80425
+      }
+    },
+    "touches": {
+      "airborne_any_height": 342,
+      "elevated_aerial_proxy": 70,
+      "grounded": 26,
+      "grounded_forward_momentum_fraction": 0.6923076923076923,
+      "grounded_fraction": 0.07065217391304347,
+      "grounded_longitudinal_ball_velocity_delta_uu_per_second": {
+        "count": 26,
+        "maximum": 1374.5482177734375,
+        "mean": 357.33967062143176,
+        "minimum": -475.2686767578125,
+        "p50": 317.37034606933594,
+        "p90": 1068.0009765625,
+        "p95": 1304.8051452636719,
+        "p99": 1374.5482177734375
+      },
+      "grounded_post_touch_ball_speed_uu_per_second": {
+        "count": 26,
+        "maximum": 1833.49072265625,
+        "mean": 1359.8191680908203,
+        "minimum": 328.2762756347656,
+        "p50": 1303.4959716796875,
+        "p90": 1833.49072265625,
+        "p95": 1833.49072265625,
+        "p99": 1833.49072265625
+      },
+      "high_aerial_proxy": 1,
+      "per_minute": 14.171030041770738,
+      "total": 368
+    },
+    "worlds": 5
+  },
+  "rival_as_orange": {
+    "air": {
+      "air_episode_count": 640,
+      "air_episode_duration_seconds": {
+        "count": 640,
+        "maximum": 4.125,
+        "mean": 1.1980078125,
+        "minimum": 0.008333333333333333,
+        "p50": 1.2166666666666666,
+        "p90": 1.3758333333333335,
+        "p95": 1.5845833333333321,
+        "p99": 2.1416666666666666
+      },
+      "air_episode_max_height_uu": {
+        "count": 640,
+        "maximum": 995.8189697265625,
+        "mean": 134.1404194355011,
+        "minimum": 25.185298919677734,
+        "p50": 127.62438201904297,
+        "p90": 140.7317657470703,
+        "p95": 250.0360420227042,
+        "p99": 324.6792297363281
+      },
+      "airborne_horizontal_speed_uu_per_second": {
+        "count": 92007,
+        "maximum": 2299.955078125,
+        "mean": 1368.4771756638222,
+        "minimum": 5.764598369598389,
+        "p50": 1385.469970703125,
+        "p90": 2136.763916015625,
+        "p95": 2233.35205078125,
+        "p99": 2288.866943359375
+      },
+      "airborne_tick_fraction": 0.51115,
+      "episodes_reaching_1000uu": 0,
+      "episodes_reaching_100uu": 520,
+      "episodes_reaching_300uu": 19,
+      "maximum_car_height_uu": 995.8189697265625,
+      "multi_elevated_touch_air_episodes": 0
+    },
+    "demolitions": {
+      "followed_by_rival_goal_within_5_seconds": 0,
+      "followed_by_rival_touch_within_5_seconds": 0,
+      "interpretation": "Counts are authoritative simulator demolition events. Offensive context and five-second follow-ups are descriptive telemetry, not rewards.",
+      "offensive_route_context": 0,
+      "opponent_distance_uu": {
+        "count": 0
+      },
+      "opponent_half": 0,
+      "per_minute": 0.0,
+      "total": 0
+    },
+    "ground": {
+      "boost_fraction": 0.5261100314797768,
+      "fraction_above_1400uu_per_second": 0.244235336901799,
+      "fraction_above_2000uu_per_second": 0.07472185287466049,
+      "full_throttle_fraction": 0.23132521905151546,
+      "grounded_tick_fraction": 0.48885,
+      "handbrake_fraction": 0.0887797893014217,
+      "horizontal_speed_uu_per_second": {
+        "count": 87993,
+        "maximum": 2300.000244140625,
+        "mean": 1008.1661365291931,
+        "minimum": 0.7696807980537415,
+        "p50": 972.0869140625,
+        "p90": 1826.9776611328125,
+        "p95": 2159.9296875,
+        "p99": 2299.999755859375
+      },
+      "supersonic_state_fraction": 0.04277612991942541
+    },
+    "jump_flip_recovery": {
+      "flip_active_landings": 613,
+      "flip_active_landings_with_100uu_speed_gain": 4,
+      "flip_onsets": 615,
+      "flip_onsets_per_minute": 24.6,
+      "jump_onsets": 2068,
+      "jump_onsets_per_minute": 82.72,
+      "landing_speed_retention_ratio": {
+        "count": 638,
+        "maximum": 2.172664060387772,
+        "mean": 0.8740211857841832,
+        "minimum": 0.0036551564474429587,
+        "p50": 0.9724961485276454,
+        "p90": 1.0243961114493372,
+        "p95": 1.0362246752661723,
+        "p99": 1.3269331153178892
+      },
+      "landings": 638,
+      "productive_dash_chain_proxy": 0,
+      "productive_floor_landing_proxy": 0,
+      "productive_wall_landing_proxy": 4,
+      "short_air_flip_active_landings": 46,
+      "wavedash_interpretation": "Flip-active landing counts are a broad physics proxy. They include ordinary dodge landings and are not proof of intentional wavedashes."
+    },
+    "match_minutes": 25.0,
+    "scoring": {
+      "goals": 54,
+      "goals_from_elevated_aerial_proxy": 5,
+      "goals_from_high_aerial_proxy": 0,
+      "goals_last_touched_while_airborne_any_height": 48,
+      "goals_with_rival_as_last_toucher": 49,
+      "last_touch_ball_height_uu": {
+        "count": 49,
+        "maximum": 247.9410858154297,
+        "mean": 110.90287391506895,
+        "minimum": 91.19998931884766,
+        "p50": 94.1402816772461,
+        "p90": 176.83489990234375,
+        "p95": 199.86481628417954,
+        "p99": 229.83445983886705
+      },
+      "last_touch_car_height_uu": {
+        "count": 49,
+        "maximum": 135.80128479003906,
+        "mean": 92.71835856534997,
+        "minimum": 15.49026107788086,
+        "p50": 86.735107421875,
+        "p90": 127.27088012695313,
+        "p95": 134.35072937011716,
+        "p99": 135.80128479003906
+      },
+      "last_touch_to_goal_seconds": {
+        "count": 49,
+        "maximum": 2.941666666666667,
+        "mean": 1.467517006802721,
+        "minimum": 0.06666666666666667,
+        "p50": 1.4916666666666667,
+        "p90": 2.5349999999999997,
+        "p95": 2.8183333333333316,
+        "p99": 2.941666666666667
+      }
+    },
+    "touches": {
+      "airborne_any_height": 285,
+      "elevated_aerial_proxy": 65,
+      "grounded": 15,
+      "grounded_forward_momentum_fraction": 0.6666666666666666,
+      "grounded_fraction": 0.05,
+      "grounded_longitudinal_ball_velocity_delta_uu_per_second": {
+        "count": 15,
+        "maximum": 1711.049072265625,
+        "mean": 535.7257568359375,
+        "minimum": -656.4832763671875,
+        "p50": 534.0811767578125,
+        "p90": 1711.049072265625,
+        "p95": 1711.049072265625,
+        "p99": 1711.049072265625
+      },
+      "grounded_post_touch_ball_speed_uu_per_second": {
+        "count": 15,
+        "maximum": 2429.76611328125,
+        "mean": 1387.5285278320312,
+        "minimum": 604.0302124023438,
+        "p50": 1326.3544921875,
+        "p90": 1942.153564453125,
+        "p95": 2088.4373291015618,
+        "p99": 2361.5003564453123
+      },
+      "high_aerial_proxy": 0,
+      "per_minute": 12.0,
+      "total": 300
+    },
+    "worlds": 5
+  },
+  "router": {
+    "summary": {
+      "activations": {
+        "aerial": 33,
+        "base": 0,
+        "offensive_demo": 0,
+        "recovery": 577
+      },
+      "active_lanes": 0,
+      "active_ticks": {
+        "aerial": 3805,
+        "base": 0,
+        "offensive_demo": 0,
+        "recovery": 18968
+      },
+      "config": {
+        "aerial_maximum_ball_height_uu": 1200.0,
+        "aerial_maximum_car_height_uu": 900.0,
+        "aerial_maximum_distance_uu": 700.0,
+        "aerial_maximum_ticks": 240,
+        "aerial_minimum_ball_height_uu": 250.0,
+        "aerial_minimum_boost_fraction": 0.1,
+        "aerial_minimum_canonical_ball_y_uu": 300.0,
+        "aerial_minimum_car_height_uu": 95.0,
+        "aerial_minimum_distance_uu": 90.0,
+        "aerial_minimum_opponent_ball_distance_uu": 500.0,
+        "aerial_minimum_relative_ball_y_uu": -100.0,
+        "aerial_release_grounded_after_ticks": 24,
+        "demo_maximum_opponent_distance_uu": 1250.0,
+        "demo_maximum_opponent_forward_uu": 1200.0,
+        "demo_maximum_opponent_lateral_uu": 375.0,
+        "demo_maximum_ticks": 90,
+        "demo_minimum_ball_forward_uu": 150.0,
+        "demo_minimum_canonical_ball_y_uu": 500.0,
+        "demo_minimum_canonical_self_y_uu": 0.0,
+        "demo_minimum_opponent_forward_uu": 220.0,
+        "pop_maximum_ball_height_uu": 260.0,
+        "pop_maximum_planar_distance_uu": 260.0,
+        "pop_minimum_ball_height_uu": 100.0,
+        "pop_minimum_boost_fraction": 0.4,
+        "pop_minimum_canonical_ball_y_uu": 1200.0,
+        "pop_minimum_forward_alignment": 0.72,
+        "pop_minimum_opponent_ball_distance_uu": 800.0,
+        "pop_minimum_planar_distance_uu": 90.0,
+        "recovery_maximum_car_height_uu": 150.0,
+        "recovery_maximum_ticks": 36,
+        "recovery_maximum_vertical_speed_uu_per_second": -90.0,
+        "recovery_minimum_ball_distance_uu": 800.0,
+        "recovery_minimum_speed_uu_per_second": 700.0,
+        "recovery_wall_minimum_abs_up_x": 0.65,
+        "recovery_wall_minimum_abs_x_uu": 3800.0,
+        "specialist_cooldown_ticks": 90
+      },
+      "format": "RIVAL2_OFFICIAL_CAPABILITY_ROUTER_V1_TELEMETRY",
+      "releases": {
+        "aerial": 33,
+        "base": 0,
+        "offensive_demo": 0,
+        "recovery": 565
+      }
+    },
+    "trace": {
+      "aerial": {
+        "activations": 33,
+        "active_fraction": 0.010368610224730429,
+        "active_seconds": 31.708333333333332,
+        "active_ticks": 3805,
+        "mean_action": [
+          0.11047887987563994,
+          -0.10663378864561016,
+          -0.18828651861833168,
+          0.12883724919812503,
+          -0.0011476217956788858,
+          0.4583442838370565,
+          0.4375821287779238,
+          0.13745072273324574
+        ]
+      },
+      "base": {
+        "activations": 619,
+        "active_fraction": 0.9379436634302796,
+        "active_seconds": 2868.3333333333335,
+        "active_ticks": 344200,
+        "mean_action": [
+          0.4197467558149445,
+          -0.027839325319646172,
+          -0.11369059378480954,
+          -0.11260310102160177,
+          -0.08471297616355337,
+          0.3519726902963393,
+          0.45047937245787334,
+          0.32808832074375366
+        ]
+      },
+      "offensive_demo": {
+        "activations": 0,
+        "active_fraction": 0.0,
+        "active_seconds": 0.0,
+        "active_ticks": 0,
+        "mean_action": null
+      },
+      "recovery": {
+        "activations": 577,
+        "active_fraction": 0.05168772634498996,
+        "active_seconds": 158.06666666666666,
+        "active_ticks": 18968,
+        "mean_action": [
+          0.30186234225004266,
+          -0.0952121904876828,
+          -0.18032109089040751,
+          -0.004201857596012498,
+          -0.030762568073646253,
+          0.5607865879375791,
+          0.3709932517924926,
+          0.5520350063264445
+        ]
+      }
+    }
+  }
+}
