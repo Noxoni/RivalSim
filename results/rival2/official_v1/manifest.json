@@ -1,8 +1,8 @@
 {
   "checkpoint": {
-    "bytes": 12545437,
+    "bytes": 12545501,
     "path": "checkpoints/rival2/official_v1/rival2_official_v1.pt",
-    "sha256": "95657F2E5772CF84B4E3E1D8A8A56DD39F14D707BD75377F3108E9D71425FA51"
+    "sha256": "20D03ECFAD8680D9F5464AEBA7C45B3FF86B3FD7FFDA50BE5160F3A4BF1EBC19"
   },
   "contracts": {
     "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
@@ -12,7 +12,7 @@
   "optimizer_steps": 0,
   "policy_mutation": false,
   "reward_changes": 0,
-  "rivalsim_commit": "72792488f34769aef7960d2e7705575c8735b0a4",
+  "rivalsim_commit": "89379bdb301df48ae16248c7c986c525b29cac4d",
   "router_config": {
     "aerial_maximum_ball_height_uu": 1200.0,
     "aerial_maximum_car_height_uu": 900.0,
@@ -54,6 +54,39 @@
     "recovery_wall_minimum_abs_x_uu": 3800.0,
     "specialist_cooldown_ticks": 90
   },
+  "physical_validation": {
+    "carried_forward_by_exact_rebuild_parity": true,
+    "checkpoint_sha256": "95657F2E5772CF84B4E3E1D8A8A56DD39F14D707BD75377F3108E9D71425FA51",
+    "losses": 2,
+    "nexto_goals": 111,
+    "path": "results/rival2/official_v1/candidate_03_fail_closed_physical_validation.json",
+    "rival_goals": 159,
+    "touches": 687,
+    "verdict": "PASS",
+    "wins": 8
+  },
+  "rebuild_parity": {
+    "actions_compared": 4096,
+    "components_byte_exact": true,
+    "path": "results/rival2/official_v1/rebuild_parity.json",
+    "route_modes_byte_exact": true,
+    "verdict": "PASS"
+  },
+  "rlbot_deployment": {
+    "commit": "644f2c2cdf6d62c097a4568fe19cbc742d4d288f",
+    "path": "bot/rival2_official",
+    "repository": "Noxoni/Rival",
+    "self_test": "PASS"
+  },
+  "specialist_status": {
+    "automatic_takeover": false,
+    "embedded": [
+      "aerial",
+      "capability_blue",
+      "capability_orange"
+    ],
+    "reason": "automatic takeover candidates failed the frozen physical gate"
+  },
   "sources": {
     "aerial": {
       "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
@@ -76,5 +109,5 @@
       "sha256": "E1E27300D58CFB57CEDE9A0E49E1F1C1392EA3DB59B44C22674BCB4B953AAC34"
     }
   },
-  "status": "candidate_pending_physical_validation"
+  "status": "ready_for_playtest_fail_closed"
 }

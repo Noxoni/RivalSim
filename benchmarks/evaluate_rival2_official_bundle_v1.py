@@ -37,7 +37,7 @@ from rivalsim.rival2_official_bundle_v1 import (  # noqa: E402
 )
 
 OFFICIAL = ROOT / "checkpoints/rival2/official_v1/rival2_official_v1.pt"
-OFFICIAL_SHA256 = "F7EC3AB4B28097F7BBC63B037B35DF93157A67B82B3FD8F5F853ACA729182BDD"
+OFFICIAL_SHA256 = "20D03ECFAD8680D9F5464AEBA7C45B3FF86B3FD7FFDA50BE5160F3A4BF1EBC19"
 BASE_BLUE = ROOT / "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt"
 BASELINE = (
     ROOT
