@@ -21,6 +21,10 @@ SETUP_LOW_BOUNCE = 0
 SETUP_INCOMING_CHIP = 1
 SETUP_MATCHED_DRIBBLE = 2
 SETUP_NAMES = ("low_bounce", "incoming_chip", "matched_dribble")
+DEFENDER_PARKED = "parked"
+DEFENDER_LIVE = "live"
+DEFENDER_MIXED = "mixed"
+DEFENDER_MODES = (DEFENDER_PARKED, DEFENDER_LIVE, DEFENDER_MIXED)
 
 
 def _yaw_quat(yaw: float) -> np.ndarray:
@@ -34,6 +38,7 @@ def _yaw_quat(yaw: float) -> np.ndarray:
 class NaturalGroundToAirScenarioBatch:
     state: StateSnapshot
     setup: np.ndarray
+    defender_active: np.ndarray
     attacker_side: int
 
 
@@ -43,6 +48,9 @@ def build_natural_ground_to_air_scenarios(
     seed: int,
     attacker_side: int,
     setup: int | None = None,
+    defender_mode: str = DEFENDER_PARKED,
+    live_defender_fraction: float = 0.5,
+    attacker_boost_range: tuple[float, float] = (35.0, 100.0),
 ) -> NaturalGroundToAirScenarioBatch:
     """Build low-bounce, incoming-chip, and matched dribble opportunities.
 
@@ -56,6 +64,13 @@ def build_natural_ground_to_air_scenarios(
         raise ValueError("invalid natural ground-to-air scenario request")
     if setup is not None and setup not in range(len(SETUP_NAMES)):
         raise ValueError("unknown natural ground-to-air setup")
+    if defender_mode not in DEFENDER_MODES:
+        raise ValueError("unknown natural ground-to-air defender mode")
+    if not 0.0 <= live_defender_fraction <= 1.0:
+        raise ValueError("live defender fraction must be in [0, 1]")
+    boost_low, boost_high = attacker_boost_range
+    if boost_low < 0.0 or boost_high > 100.0 or boost_low > boost_high:
+        raise ValueError("attacker boost range must be ordered inside [0, 100]")
     rng = np.random.default_rng(seed)
     side_sign = 1.0 if attacker_side == 0 else -1.0
     other = 1 - attacker_side
@@ -66,6 +81,12 @@ def build_natural_ground_to_air_scenarios(
         if setup is not None
         else rng.integers(0, len(SETUP_NAMES), size=worlds, dtype=np.int32)
     )
+    if defender_mode == DEFENDER_LIVE:
+        defender_active = np.ones(worlds, dtype=np.bool_)
+    elif defender_mode == DEFENDER_PARKED:
+        defender_active = np.zeros(worlds, dtype=np.bool_)
+    else:
+        defender_active = rng.random(worlds) < live_defender_fraction
 
     state = StateSnapshot.empty(worlds)
     state.car_pos[..., 2] = 17.0
@@ -115,13 +136,32 @@ def build_natural_ground_to_air_scenarios(
             side_sign * car_speed,
             0.0,
         )
-        state.boost[world, attacker_side] = float(rng.uniform(35.0, 100.0))
+        state.boost[world, attacker_side] = float(rng.uniform(boost_low, boost_high))
 
-        state.car_pos[world, other] = (
-            float(rng.uniform(-1_000.0, 1_000.0)),
-            -side_sign * float(rng.uniform(3_700.0, 4_500.0)),
-            17.0,
-        )
+        if defender_active[world]:
+            defender_y = min(
+                canonical_y + float(rng.uniform(650.0, 1_350.0)),
+                4_450.0,
+            )
+            state.car_pos[world, other] = (
+                x + float(rng.uniform(-650.0, 650.0)),
+                side_sign * defender_y,
+                17.0,
+            )
+            # The live defender begins between the ball and its own goal,
+            # oriented back toward the attacker.  Its policy owns all later
+            # movement; the scenario injects no scripted defensive action.
+            state.car_vel[world, other] = (
+                float(rng.uniform(-150.0, 150.0)),
+                -side_sign * float(rng.uniform(0.0, 450.0)),
+                0.0,
+            )
+        else:
+            state.car_pos[world, other] = (
+                float(rng.uniform(-1_000.0, 1_000.0)),
+                -side_sign * float(rng.uniform(3_700.0, 4_500.0)),
+                17.0,
+            )
         state.car_quat[world, other] = reverse
         state.boost[world, other] = float(rng.uniform(20.0, 100.0))
 
@@ -129,11 +169,16 @@ def build_natural_ground_to_air_scenarios(
     return NaturalGroundToAirScenarioBatch(
         state=state,
         setup=setup_id,
+        defender_active=defender_active,
         attacker_side=attacker_side,
     )
 
 
 __all__ = [
+    "DEFENDER_LIVE",
+    "DEFENDER_MIXED",
+    "DEFENDER_MODES",
+    "DEFENDER_PARKED",
     "GROUND_TO_AIR_NATURAL_V4_VERSION",
     "SETUP_INCOMING_CHIP",
     "SETUP_LOW_BOUNCE",

@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 
 from rivalsim.rival2_ground_to_air_natural_v4 import (
+    DEFENDER_LIVE,
+    DEFENDER_MIXED,
     SETUP_INCOMING_CHIP,
     SETUP_LOW_BOUNCE,
     SETUP_MATCHED_DRIBBLE,
@@ -28,6 +30,8 @@ def test_natural_ground_to_air_scenarios_are_deterministic_and_side_aware(
     assert np.array_equal(first.state.ball_vel, second.state.ball_vel)
     assert np.array_equal(first.state.car_pos, second.state.car_pos)
     assert np.array_equal(first.state.car_vel, second.state.car_vel)
+    assert np.array_equal(first.defender_active, second.defender_active)
+    assert not np.any(first.defender_active)
     assert np.all(first.setup == setup)
     sign = 1.0 if side == 0 else -1.0
     gap = sign * (
@@ -61,6 +65,46 @@ def test_random_mixture_contains_every_setup_family() -> None:
     assert set(np.unique(batch.setup).tolist()) == set(range(len(SETUP_NAMES)))
 
 
+@pytest.mark.parametrize("side", [0, 1])
+def test_live_defender_starts_between_ball_and_target_goal(side: int) -> None:
+    batch = build_natural_ground_to_air_scenarios(
+        256,
+        seed=73,
+        attacker_side=side,
+        defender_mode=DEFENDER_LIVE,
+        attacker_boost_range=(20.0, 60.0),
+    )
+    sign = 1.0 if side == 0 else -1.0
+    other = 1 - side
+    goalward_gap = sign * (
+        batch.state.car_pos[:, other, 1] - batch.state.ball_pos[:, 1]
+    )
+    assert np.all(batch.defender_active)
+    assert np.all(goalward_gap > 0.0)
+    assert np.all(batch.state.boost[:, side] >= 20.0)
+    assert np.all(batch.state.boost[:, side] <= 60.0)
+
+
+def test_mixed_defender_batch_contains_live_and_parked_worlds() -> None:
+    first = build_natural_ground_to_air_scenarios(
+        2_000,
+        seed=81,
+        attacker_side=0,
+        defender_mode=DEFENDER_MIXED,
+        live_defender_fraction=0.5,
+    )
+    second = build_natural_ground_to_air_scenarios(
+        2_000,
+        seed=81,
+        attacker_side=0,
+        defender_mode=DEFENDER_MIXED,
+        live_defender_fraction=0.5,
+    )
+    assert np.array_equal(first.defender_active, second.defender_active)
+    assert np.any(first.defender_active)
+    assert np.any(~first.defender_active)
+
+
 def test_invalid_scenario_request_fails_closed() -> None:
     with pytest.raises(ValueError):
         build_natural_ground_to_air_scenarios(
@@ -70,3 +114,15 @@ def test_invalid_scenario_request_fails_closed() -> None:
         build_natural_ground_to_air_scenarios(1, seed=1, attacker_side=2)
     with pytest.raises(ValueError):
         build_natural_ground_to_air_scenarios(1, seed=1, attacker_side=0, setup=99)
+    with pytest.raises(ValueError):
+        build_natural_ground_to_air_scenarios(
+            1, seed=1, attacker_side=0, defender_mode="unknown"
+        )
+    with pytest.raises(ValueError):
+        build_natural_ground_to_air_scenarios(
+            1, seed=1, attacker_side=0, live_defender_fraction=1.1
+        )
+    with pytest.raises(ValueError):
+        build_natural_ground_to_air_scenarios(
+            1, seed=1, attacker_side=0, attacker_boost_range=(50.0, 20.0)
+        )
