@@ -1,0 +1,93 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V7_RESULT",
+  "created_utc": "2026-09-03T07:54:33Z",
+  "authority_sha256": "6192B823A13993A0C883D83E35AC128F3C2D964BA172F36589356E91E6FCE2A6",
+  "disposition": "not_promoted",
+  "stop_reason": "bounded_diagnostic_stop_at_block_16_after_orientation_only_control_failed_to_consolidate_elevated_follow_through",
+  "accepted_training_blocks": 16,
+  "optimizer_steps_per_block": 8,
+  "best_block": 16,
+  "baseline_selection_key": [
+    0.0,
+    0.016357421875
+  ],
+  "best_selection_key": [
+    0.0,
+    0.032958984375
+  ],
+  "validation_boundaries": [
+    {
+      "block": 4,
+      "selection_key": [0.0, 0.0010986328125],
+      "nonzero_elevated_rows": 2,
+      "high_follow_rows": 0,
+      "productive_continuation_rows": 0,
+      "goal_rows": 0,
+      "maximum_elevated_follow_fraction": 0.00390625,
+      "approximate_kl": 0.0013931489344353545
+    },
+    {
+      "block": 8,
+      "selection_key": [0.0, 0.0322265625],
+      "nonzero_elevated_rows": 4,
+      "high_follow_rows": 0,
+      "productive_continuation_rows": 0,
+      "goal_rows": 1,
+      "maximum_elevated_follow_fraction": 0.0078125,
+      "maximum_goal_fraction": 0.0078125,
+      "approximate_kl": 0.0014570016431226425
+    },
+    {
+      "block": 12,
+      "selection_key": [0.0, 0.018798828125],
+      "nonzero_elevated_rows": 4,
+      "high_follow_rows": 0,
+      "productive_continuation_rows": 0,
+      "goal_rows": 1,
+      "maximum_elevated_follow_fraction": 0.01171875,
+      "maximum_goal_fraction": 0.00390625,
+      "approximate_kl": 0.0010798486809638539
+    },
+    {
+      "block": 16,
+      "selection_key": [0.0, 0.032958984375],
+      "nonzero_elevated_rows": 4,
+      "high_follow_rows": 0,
+      "productive_continuation_rows": 0,
+      "goal_rows": 2,
+      "maximum_elevated_follow_fraction": 0.01171875,
+      "maximum_goal_fraction": 0.00390625,
+      "approximate_kl": 0.0015504226367966112
+    }
+  ],
+  "evidence": {
+    "preflight": {
+      "path": "results/rival2/ground_to_air_natural_v7/preflight.json",
+      "sha256": "F8D18A08409EBBBCBA1CA086C009EB1096887C669AE132E4D9F61F114B9BE376"
+    },
+    "training_curve": {
+      "path": "results/rival2/ground_to_air_natural_v7/training_curve.jsonl",
+      "sha256": "C479D6528CB503BC1B1420A93A8150E50A469F2F1C7F8A23C8C512361670A88A"
+    },
+    "best_diagnostic_checkpoint": {
+      "path": "G:/dev/RivalSim-runs/ground-to-air-natural-v7/best_validation.pt",
+      "sha256": "682004DE01E184FA2F29F1C834A1A263A80CB5E77827FD224956A4BBFAFF4B8C",
+      "model_tensor_sha256": "541E73963496C4262EC095A1BBD95F82F79D0EB02BF5E8436B2772E2FE28744D",
+      "block": 16,
+      "disposition": "diagnostic_only"
+    },
+    "rolling_checkpoint": {
+      "path": "G:/dev/RivalSim-runs/ground-to-air-natural-v7/rolling.pt",
+      "sha256": "F62CDE7C0C84C926C78982D14669DA925E921923E3D246A6E62C0878823017B2",
+      "block": 16,
+      "disposition": "diagnostic_only"
+    }
+  },
+  "controlled_gate_passed": false,
+  "untouched_test_opened": false,
+  "promoted_into_competitive_policy": false,
+  "hard_safety_failure": false,
+  "production_reward_unchanged": true,
+  "protected_parent_hashes_unchanged": true,
+  "conclusion": "The bounded steer/yaw/roll residual reached physics and occasionally changed the deterministic outcome, but it did not produce any high follow touch or productive continuation and never raised the worst-row gate above zero. The next prospective experiment must isolate first-jump hold and second-jump transition timing while keeping the easy launch geometry and production policy protected."
+}
