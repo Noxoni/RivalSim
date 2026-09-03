@@ -25,9 +25,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from benchmarks import run_rival2_unified_capability_distillation_v1 as v1
-from rivalsim.rival2_policy import Rival2ActorCritic, deterministic_hybrid_action
-from rivalsim.rival2_unified_policy import (
+from benchmarks import run_rival2_unified_capability_distillation_v1 as v1  # noqa: E402
+from rivalsim.rival2_policy import (  # noqa: E402
+    Rival2ActorCritic,
+    deterministic_hybrid_action,
+)
+from rivalsim.rival2_unified_policy import (  # noqa: E402
     Rival2UnifiedActorCritic,
     Rival2UnifiedPolicyConfig,
     deterministic_unified_action,
