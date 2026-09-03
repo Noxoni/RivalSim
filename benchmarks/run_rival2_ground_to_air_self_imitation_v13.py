@@ -13,6 +13,7 @@ import copy
 import gc
 import json
 import os
+import subprocess
 import sys
 import time
 from dataclasses import asdict
@@ -27,7 +28,6 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from benchmarks import evaluate_rival2_ground_to_air_selfplay_v12_natural as natural  # noqa: E402
 from benchmarks import run_rival2_codex_autonomous_v1 as autonomous  # noqa: E402
 from benchmarks import run_rival2_ground_to_air_selfplay_v12 as v12  # noqa: E402
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes  # noqa: E402
@@ -312,6 +312,7 @@ def evaluate_validation(
     authority: dict[str, Any],
     collision_dir: Path,
     device: str,
+    natural_output: Path,
 ) -> dict[str, Any]:
     selection = authority["selection"]
     controlled = v12.controlled_evaluation(
@@ -326,15 +327,40 @@ def evaluate_validation(
     checkpoint_path = Path(checkpoint["path"])
     if not checkpoint_path.is_absolute():
         checkpoint_path = ROOT / checkpoint_path
-    natural_result = natural.evaluate_checkpoint(
-        checkpoint_path,
-        checkpoint["sha256"],
-        worlds=int(selection["natural_validation_worlds"]),
-        ticks=int(selection["natural_validation_ticks"]),
-        seed=int(selection["natural_validation_seed"]),
-        device=device,
-        collision_root=collision_dir,
+    command = [
+        sys.executable,
+        str(ROOT / "benchmarks/evaluate_rival2_ground_to_air_selfplay_v12_natural.py"),
+        "--checkpoint",
+        str(checkpoint_path),
+        "--checkpoint-sha256",
+        str(checkpoint["sha256"]),
+        "--worlds",
+        str(selection["natural_validation_worlds"]),
+        "--ticks",
+        str(selection["natural_validation_ticks"]),
+        "--seed",
+        str(selection["natural_validation_seed"]),
+        "--device",
+        device,
+        "--collision-root",
+        str(collision_dir),
+        "--output",
+        str(natural_output),
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=600,
+        check=False,
     )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "isolated natural validation failed: "
+            f"{completed.stderr[-2000:]} {completed.stdout[-2000:]}"
+        )
+    natural_result = json.loads(natural_output.read_text(encoding="utf-8"))
     checks = validation_checks(macro, natural_result, authority)
     return {
         "accepted_block": campaign.accepted_blocks,
@@ -345,6 +371,31 @@ def evaluate_validation(
         "checks": checks,
         "eligible": all(checks.values()),
     }
+
+
+def restore_checkpoint(
+    collector: AerialOptionSelfPlayTrainerV12,
+    campaign: AerialSuccessfulSelfImitationV13,
+    path: Path,
+    provenance: dict[str, Any],
+) -> None:
+    payload = torch.load(path, map_location="cpu", weights_only=False)
+    if payload.get("format") != f"{VERSION}_CHECKPOINT":
+        raise RuntimeError("unsupported V13 resume checkpoint")
+    if payload.get("provenance") != provenance:
+        raise RuntimeError("V13 resume provenance differs from frozen authority")
+    campaign.model.load_state_dict(payload["model"], strict=True)
+    campaign.optimizer.load_state_dict(payload["optimizer"])
+    campaign.accepted_blocks = int(payload["accepted_blocks"])
+    campaign.total_success_samples = int(payload["total_success_samples"])
+    collector.total_option_samples = int(payload["total_option_samples"])
+    collector.total_physics_ticks = int(payload["total_physics_ticks"])
+    collector.policy_generator.set_state(
+        payload["collector_policy_generator_state"].to(collector.device)
+    )
+    campaign.generator.set_state(
+        payload["self_imitation_generator_state"].to(collector.device)
+    )
 
 
 def run(args: argparse.Namespace) -> int:
@@ -411,20 +462,87 @@ def run(args: argparse.Namespace) -> int:
         return 0
 
     curve = RESULTS / "training_curve.jsonl"
-    if curve.exists():
+    if args.resume is None and curve.exists():
         raise RuntimeError("V13 training curve already exists")
+    if args.resume is not None:
+        restore_checkpoint(collector, campaign, args.resume, provenance)
     rolling = args.run_dir / "rolling.pt"
-    validation_rows: list[dict[str, Any]] = []
+    manifest_path = RESULTS / "validation_manifest.json"
+    if manifest_path.exists():
+        validation_rows = json.loads(manifest_path.read_text(encoding="utf-8"))["rows"]
+    else:
+        validation_rows = []
     hard_failure: dict[str, Any] | None = None
     rollout_boundaries = 0
     stale_boundaries = 0
-    best: dict[str, Any] | None = None
+    best: dict[str, Any] | None = (
+        max(validation_rows, key=selection_key) if validation_rows else None
+    )
     started = time.monotonic()
     maximum_blocks = min(
         int(args.maximum_blocks), int(authority["optimization"]["accepted_block_ceiling"])
     )
     interval = int(authority["selection"]["validation_interval_blocks"])
     patience = int(authority["selection"]["early_stop_patience_boundaries"])
+
+    pending_validation_path = RESULTS / f"validation_b{campaign.accepted_blocks:04d}.json"
+    if (
+        args.resume is not None
+        and campaign.accepted_blocks > 0
+        and campaign.accepted_blocks % interval == 0
+        and not pending_validation_path.exists()
+    ):
+        resume_checkpoint = {
+            "accepted_block": campaign.accepted_blocks,
+            "path": str(args.resume.resolve()),
+            "sha256": v12.sha256_file(args.resume),
+            "bytes": args.resume.stat().st_size,
+        }
+        validation = evaluate_validation(
+            collector,
+            campaign,
+            geometry,
+            meshes,
+            resume_checkpoint,
+            authority=authority,
+            collision_dir=args.collision_dir,
+            device=args.device,
+            natural_output=RESULTS
+            / f"natural_validation_b{campaign.accepted_blocks:04d}.json",
+        )
+        write_json(pending_validation_path, validation)
+        compact = {
+            "accepted_block": campaign.accepted_blocks,
+            "checkpoint": resume_checkpoint,
+            "controlled_macro": validation["controlled_macro"],
+            "natural": {
+                "touches": validation["natural"]["touches"],
+                "scoring": validation["natural"]["scoring"],
+                "router": validation["natural"]["router"],
+                "derived": validation["natural"]["derived"],
+            },
+            "checks": validation["checks"],
+            "eligible": validation["eligible"],
+        }
+        validation_rows.append(compact)
+        if best is None or selection_key(compact) > selection_key(best):
+            best = compact
+        write_json(
+            manifest_path,
+            {"format": f"{VERSION}_VALIDATION_MANIFEST", "rows": validation_rows},
+        )
+        print(
+            json.dumps(
+                {
+                    "resumed_boundary": campaign.accepted_blocks,
+                    "eligible": validation["eligible"],
+                    "controlled": validation["controlled_macro"],
+                    "natural_router": validation["natural"]["router"]["counters"],
+                },
+                sort_keys=True,
+            ),
+            flush=True,
+        )
 
     while campaign.accepted_blocks < maximum_blocks:
         rollout = collector.collect_rollout()
@@ -486,6 +604,8 @@ def run(args: argparse.Namespace) -> int:
             authority=authority,
             collision_dir=args.collision_dir,
             device=args.device,
+            natural_output=RESULTS
+            / f"natural_validation_b{campaign.accepted_blocks:04d}.json",
         )
         write_json(
             RESULTS / f"validation_b{campaign.accepted_blocks:04d}.json", validation
@@ -571,6 +691,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--collision-dir", type=Path, default=DEFAULT_COLLISION_DIR)
     parser.add_argument("--run-dir", type=Path, default=DEFAULT_RUN_DIR)
+    parser.add_argument("--resume", type=Path)
     parser.add_argument("--preflight-only", action="store_true")
     return parser.parse_args()
 
