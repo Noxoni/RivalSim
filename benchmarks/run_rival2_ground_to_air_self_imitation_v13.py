@@ -391,10 +391,10 @@ def restore_checkpoint(
     collector.total_option_samples = int(payload["total_option_samples"])
     collector.total_physics_ticks = int(payload["total_physics_ticks"])
     collector.policy_generator.set_state(
-        payload["collector_policy_generator_state"].to(collector.device)
+        payload["collector_policy_generator_state"].to(dtype=torch.uint8, device="cpu")
     )
     campaign.generator.set_state(
-        payload["self_imitation_generator_state"].to(collector.device)
+        payload["self_imitation_generator_state"].to(dtype=torch.uint8, device="cpu")
     )
 
 
