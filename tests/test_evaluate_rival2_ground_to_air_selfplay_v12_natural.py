@@ -3,11 +3,19 @@ from __future__ import annotations
 import torch
 
 from benchmarks.evaluate_rival2_ground_to_air_selfplay_v12_natural import (
+    AERIAL_OPTION_CHECKPOINT_FORMATS,
     HANDOFF_FEATURE_NAMES,
     RouteFeatureMoments,
     handoff_features,
 )
 from rivalsim.rival2_aerial_option import FIELD
+
+
+def test_integrated_v17_checkpoint_format_is_read_only_compatible() -> None:
+    assert (
+        "RIVAL2_GROUND_TO_AIR_INTEGRATED_SELFPLAY_V17_CHECKPOINT"
+        in AERIAL_OPTION_CHECKPOINT_FORMATS
+    )
 
 
 def test_handoff_features_include_physical_state_and_exact_action() -> None:

@@ -55,6 +55,16 @@ SELECTED = (
 SELECTED_SHA256 = "0A80DD35040D5FE354240D4E4E4F4B2CD50EB342CC95985647D3B0947DB092B2"
 OUTPUT = ROOT / "results/rival2/ground_to_air_selfplay_v12/natural_selfplay_u0060.json"
 
+AERIAL_OPTION_CHECKPOINT_FORMATS = frozenset(
+    {
+        "RIVAL2_CHECKPOINT_V1",
+        "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_CHECKPOINT",
+        "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13_CHECKPOINT",
+        "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14_CHECKPOINT",
+        "RIVAL2_GROUND_TO_AIR_INTEGRATED_SELFPLAY_V17_CHECKPOINT",
+    }
+)
+
 HANDOFF_FEATURE_NAMES = (
     "ball_y_uu",
     "ball_height_uu",
@@ -247,12 +257,7 @@ class V12NaturalSelfPlayRunner(SideSpecializedSelfPlayRunner):
             raise RuntimeError("natural self-play option identity mismatch")
         payload = torch.load(option_checkpoint, map_location="cpu", weights_only=False)
         checkpoint_format = payload.get("format")
-        if checkpoint_format not in {
-            "RIVAL2_CHECKPOINT_V1",
-            "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_CHECKPOINT",
-            "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13_CHECKPOINT",
-            "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14_CHECKPOINT",
-        }:
+        if checkpoint_format not in AERIAL_OPTION_CHECKPOINT_FORMATS:
             raise RuntimeError("unexpected aerial-option checkpoint format")
         config = Rival2PolicyConfig(**payload["policy_config"])
         if asdict(config) != self.checkpoint_identity["policy_config"]:
