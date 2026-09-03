@@ -1,0 +1,229 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V7_AUTHORITY",
+  "created_utc": "2026-09-03T07:04:39Z",
+  "purpose": "Preserve the proven fixed-pitch plain-double-jump launch while learning only bounded steer/yaw/roll corrections for optional front-corner or partial-tornado ground-to-air transitions across low-bounce, incoming-chip, and matched-dribble setups.",
+  "bound_inputs": {
+    "passing_controlled_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "natural_scenario_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_natural_v4.py",
+      "sha256": "6C95203EF5E4C59505C8318C7CD80E2FB65AB29A0BC5E1DA17CC186A0E15D36E"
+    },
+    "narrow_pop_mask_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_pop_control_v7.py",
+      "sha256": "0964B7FACFCA3315A37BCF13B161FE017E0E46124AA8E9F19AD4B2D9437C7F29"
+    },
+    "mechanics_research": {
+      "path": "results/rival2/ground_to_air_natural_v7/MECHANICS_RESEARCH.md",
+      "sha256": "F8B6F0DF5A6D88B67E0DC95121BAFECA5A53085E6AD56E39F4BFECBEE18A2F0A"
+    },
+    "v6_authority": {
+      "path": "results/rival2/ground_to_air_natural_v6/authority.json",
+      "sha256": "AFB6D57B3A6A2AB204C132EF1AA37EDE6EFF9C903493D772321E753211358ADA"
+    },
+    "v6_result": {
+      "path": "results/rival2/ground_to_air_natural_v6/result.json",
+      "sha256": "A7F42D975BFCCB3510AA2ED1576763E6EE775019FDD65365656B051C39003E12"
+    },
+    "v6_review": {
+      "path": "results/rival2/ground_to_air_natural_v6/V6_REVIEW.md",
+      "sha256": "823000390E60E631B16FC4658582A7FD5F2D28A1EF15BFB17D8DF93E4DABFF79"
+    },
+    "v6_training_curve": {
+      "path": "results/rival2/ground_to_air_natural_v6/training_curve.jsonl",
+      "sha256": "6FC6DBF7C550A42B6879359ACD8A95C42987B5314AF94F63DC132391C83E3366"
+    }
+  },
+  "mechanics_interpretation": {
+    "dead_ball_vertical_launcher": "rejected and excluded",
+    "low_bounce": "the ball already has vertical separation; one light forward or underside touch creates a close rising trajectory for immediate follow",
+    "incoming_chip": "a rolling ball approaches Rival and a low-front physical touch converts relative momentum into an upward trajectory",
+    "matched_dribble": "matched car and ball ground velocity followed by a held first jump, release, second jump, and optional bounded orientation correction",
+    "plain_double_jump": "the fixed pitch path remains exactly available when existing geometry already puts the nose under the rising ball",
+    "partial_tornado_corner_touch": "bounded steer, yaw, and roll may place a front corner under the ball; the named motion is neither required nor rewarded",
+    "jump_timing": "the existing successful press-release-second-jump timing remains fixed in V7 so orientation is the only changed launch variable",
+    "air_control": "match ball momentum, stay behind and under the ball, and feather boost rather than repeatedly striking through it",
+    "airtime": "never rewarded by itself",
+    "contact_budget": "one to four follow contacts are normal and six distinct native self-touch onsets is the hard maximum; continuous contact cannot farm credit"
+  },
+  "option_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 205.0,
+    "maximum_option_ticks": 720,
+    "maximum_planar_distance_uu": 180.0,
+    "minimum_ball_height_uu": 90.0,
+    "minimum_boost_fraction": 0.2,
+    "minimum_forward_alignment": 0.15,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 90.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "pop_orientation_control": {
+    "pitch_center": 0.5,
+    "pitch_residual_scale": 0.0,
+    "steer_scale": 0.25,
+    "yaw_scale": 0.35,
+    "roll_scale": 0.35
+  },
+  "scenario": {
+    "setup_families": [
+      "low_bounce",
+      "incoming_chip",
+      "matched_dribble"
+    ],
+    "training_strata": [
+      {"setup": "low_bounce", "defender_mode": "parked", "side": 0},
+      {"setup": "low_bounce", "defender_mode": "parked", "side": 1},
+      {"setup": "low_bounce", "defender_mode": "live", "side": 0},
+      {"setup": "low_bounce", "defender_mode": "live", "side": 1},
+      {"setup": "incoming_chip", "defender_mode": "parked", "side": 0},
+      {"setup": "incoming_chip", "defender_mode": "parked", "side": 1},
+      {"setup": "incoming_chip", "defender_mode": "live", "side": 0},
+      {"setup": "incoming_chip", "defender_mode": "live", "side": 1},
+      {"setup": "matched_dribble", "defender_mode": "parked", "side": 0},
+      {"setup": "matched_dribble", "defender_mode": "parked", "side": 1},
+      {"setup": "matched_dribble", "defender_mode": "live", "side": 0},
+      {"setup": "matched_dribble", "defender_mode": "live", "side": 1}
+    ],
+    "training_worlds_per_stratum": 256,
+    "training_boost_range": [20.0, 80.0],
+    "validation_boost_range": [20.0, 80.0],
+    "live_defender": "frozen side-correct V23 inference between the ball and target goal",
+    "parked_control": "zero-action remote opponent outside the play",
+    "production_state_injection": false
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "actor_learning_rate": 0.00002,
+    "trunk_learning_rate": 0.0000075,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.99875,
+    "ppo_clip": 0.2,
+    "balanced_optimizer_steps_per_block": 8,
+    "samples_per_stratum_per_step": 8192,
+    "maximum_blocks": 64,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 12,
+    "minimum_score_improvement": 0.0005,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "advantage_normalization": "independent within each setup/defender/side rollout",
+    "gradient_aggregation": "equal mean of twelve stratum PPO losses before every optimizer step",
+    "success_volume_rehearsal": false,
+    "exploration": {
+      "analog_sigma": 0.12,
+      "button_temperature": 0.9
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "post_contact_goalward_progress_per_uu": 0.001,
+    "goal_target_progress_per_uu": 0.004,
+    "low_pop_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "third_airborne_touch_event": 4.0,
+    "fourth_airborne_touch_event": 2.0,
+    "fifth_airborne_touch_event": 1.0,
+    "goalward_velocity_contact_event": 2.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "sustained_control_shell_uu": 160.0,
+    "sustained_control_minimum_ticks": 12,
+    "sustained_control_interval_event": 3.0,
+    "goal_within_contact_budget_event": 25.0,
+    "other_goal": -1.0,
+    "failure": -1.0,
+    "over_contact_budget_failure": -12.0
+  },
+  "episode": {
+    "horizon_ticks": 600,
+    "maximum_distinct_chain_contacts": 6,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_tick": 110,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026110101,
+    "validation": 2026110201,
+    "optimizer_and_exploration": 2026110301,
+    "balanced_minibatch": 2026110401,
+    "test": 2026110501
+  },
+  "selection": {
+    "primary": "maximum worst-row ratio to its frozen minimum gate",
+    "secondary": "weighted physical outcome score",
+    "test_not_used": true
+  },
+  "acceptance": {
+    "per_defender_mode": {
+      "parked": {
+        "pop_touch_fraction_min": 0.75,
+        "elevated_follow_touch_fraction_min": 0.15,
+        "high_follow_touch_fraction_min": 0.015,
+        "productive_continuation_fraction_min": 0.02,
+        "goal_within_contact_budget_fraction_min": 0.005
+      },
+      "live": {
+        "pop_touch_fraction_min": 0.75,
+        "elevated_follow_touch_fraction_min": 0.1,
+        "high_follow_touch_fraction_min": 0.005,
+        "productive_continuation_fraction_min": 0.015,
+        "goal_within_contact_budget_fraction_min": 0.003
+      }
+    },
+    "contact_budget_exceeded_fraction_max": 0.01,
+    "unassisted_or_ground_goal_fraction_max": 0.1,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "controlled_scorer_parent_unchanged": true,
+    "v5_or_v6_diagnostic_descendant_not_used": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "scripted_jump_timing_preserved": true,
+    "fixed_pop_pitch_preserved": true,
+    "only_active_pop_channels_in_likelihood": true,
+    "live_defender_is_inference_only": true,
+    "distinct_contact_rewards_capped": true,
+    "optimizer_steps_before_authority_commit": 0,
+    "test_seed_unopened_before_validation_pass": true,
+    "full_match_integration_deferred_until_controlled_pass": true
+  }
+}

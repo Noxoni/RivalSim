@@ -9,6 +9,7 @@ import json
 import math
 import os
 import sys
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -180,6 +181,8 @@ def collect_rollout(
     setup: int,
     defender_mode: str,
     attacker_boost_range: tuple[float, float],
+    pop_mask_factory: Callable[[Any, LearnedPopOrientationConfig], torch.Tensor]
+    | None = None,
 ) -> tuple[MaskedOptionRollout | None, dict[str, Any]]:
     batch = build_natural_ground_to_air_scenarios(
         worlds,
@@ -259,7 +262,11 @@ def collect_rollout(
             kickoff_active=false,
             match_done=~active_before,
         )
-        channel_mask = pop_orientation_channel_mask(option) & active_before[:, None]
+        channel_mask = (
+            pop_orientation_channel_mask(option)
+            if pop_mask_factory is None
+            else pop_mask_factory(option, orientation)
+        ) & active_before[:, None]
         learned_active = channel_mask.any(dim=1)
         action = torch.zeros((worlds, 2, 8), dtype=torch.float32, device=device)
         action[:, side] = torch.where(active_before[:, None], option.action, 0.0)
