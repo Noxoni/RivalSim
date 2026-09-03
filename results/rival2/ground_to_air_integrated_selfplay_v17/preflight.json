@@ -1,0 +1,126 @@
+{
+  "aerial_reward": {
+    "entry_airborne_contact_event": 4.0,
+    "fifth_goalward_airborne_contact_event": 1.0,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "fourth_goalward_airborne_contact_event": 2.0,
+    "goal_within_contact_budget_event": 25.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "high_airborne_contact_event": 2.0,
+    "maximum_supplemental_reward_per_attempt": 40.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "productive_goalward_contact_event": 2.0,
+    "raw_airtime_reward": 0.0,
+    "second_goalward_airborne_contact_event": 5.0,
+    "third_goalward_airborne_contact_event": 4.0
+  },
+  "authority_source_checks": {
+    "aerial_scorer_v3": true,
+    "blue_v23": true,
+    "high_speed_protected_scorer_baseline": true,
+    "orange_v23": true,
+    "v15_handoff_diagnosis": true
+  },
+  "checks": {
+    "all_authority_sources_exact": true,
+    "all_v11_setups_present": true,
+    "authority_hash_exact": true,
+    "base_policies_frozen": true,
+    "both_curricula_side_balanced": true,
+    "entry_failure_cancels_entry_reward": true,
+    "fresh_optimizer": true,
+    "high_speed_worlds_quarter": true,
+    "kl_is_telemetry_only": true,
+    "no_named_mechanics_arrays": true,
+    "no_named_mechanics_state": true,
+    "no_optimizer_steps_before_authority": true,
+    "no_raw_airtime_reward": true,
+    "option_trunk_frozen": true,
+    "ordinary_worlds_half": true,
+    "physics_and_policy_120_hz": true,
+    "ppo_hash_exact": true,
+    "reward_contract_exact": true,
+    "reward_hash_exact": true,
+    "six_contact_budget": true,
+    "source_hashes_exact": true,
+    "v11_worlds_quarter": true
+  },
+  "continuation_failure_reward": {
+    "ball_ground_before_second_contact": -4.0,
+    "landing_before_second_contact": -4.0
+  },
+  "created_utc": "2026-09-03T13:59:03Z",
+  "format": "RIVAL2_GROUND_TO_AIR_INTEGRATED_SELFPLAY_V17_PREFLIGHT",
+  "initial_distribution": {
+    "by_category": {
+      "ordinary_v23_selfplay": 16384,
+      "v11_controlled": 8192,
+      "v16_high_speed": 8192
+    },
+    "by_category_and_attacker_side": {
+      "v11_controlled": {
+        "0": 4096,
+        "1": 4096
+      },
+      "v16_high_speed": {
+        "0": 4096,
+        "1": 4096
+      }
+    },
+    "refresh_index": 0,
+    "seed": 2026090324,
+    "v11_by_setup": {
+      "assisted_low_bounce": 2896,
+      "rising_double_jump": 1636,
+      "roof_carry": 2442,
+      "soft_incoming_chip": 1218
+    },
+    "worlds": 32768
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 0.0003,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "provenance": {
+    "aerial_scorer_v3": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "authority": {
+      "path": "results/rival2/ground_to_air_integrated_selfplay_v17/authority.json",
+      "sha256": "84D937E3DF2DAE5C0DF19B02E1A2D174BC83DDEBF7710F5B53DDC8D6B97A681A"
+    },
+    "blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "router": {
+    "airborne_ball_height_uu": 130.0,
+    "contact_separation_ticks": 4,
+    "cooldown_ticks": 90,
+    "grounded_ball_height_uu": 100.0,
+    "maximum_distinct_contacts": 6,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 480.0,
+    "minimum_boost_fraction": 0.15,
+    "minimum_canonical_ball_y_uu": -3000.0,
+    "minimum_forward_alignment": 0.55,
+    "minimum_landing_release_tick": 72,
+    "ownership_margin_uu": 200.0
+  },
+  "verdict": "PASS"
+}

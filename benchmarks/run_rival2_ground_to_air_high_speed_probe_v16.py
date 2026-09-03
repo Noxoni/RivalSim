@@ -201,8 +201,11 @@ def collect_side(
 def run(args: argparse.Namespace) -> int:
     checkpoint = args.checkpoint.resolve()
     before = capability.sha256_file(checkpoint)
-    if before != natural_v4.PARENT_SHA256:
-        raise RuntimeError("high-speed probe requires the exact protected V3 scorer")
+    expected = args.checkpoint_sha256 or natural_v4.PARENT_SHA256
+    if before != expected:
+        raise RuntimeError(
+            f"high-speed probe checkpoint identity mismatch: {before} != {expected}"
+        )
     payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
     model = natural_v4.make_model(payload, args.device).eval().requires_grad_(False)
     defenders = natural_v4.load_defender_policies(args.device)
@@ -264,6 +267,7 @@ def run(args: argparse.Namespace) -> int:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, default=natural_v4.PARENT)
+    parser.add_argument("--checkpoint-sha256")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument(
