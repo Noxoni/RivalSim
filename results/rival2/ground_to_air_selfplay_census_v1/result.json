@@ -1,0 +1,172 @@
+{
+  "census": {
+    "broad_envelope_boost_histogram_by_side": [
+      {
+        "[0.00,0.01)": 26,
+        "[0.01,0.10)": 0,
+        "[0.10,0.25)": 0,
+        "[0.25,0.50)": 0,
+        "[0.50,0.75)": 0,
+        "[0.75,1.01)": 0
+      },
+      {
+        "[0.00,0.01)": 6387,
+        "[0.01,0.10)": 0,
+        "[0.10,0.25)": 0,
+        "[0.25,0.50)": 0,
+        "[0.50,0.75)": 0,
+        "[0.75,1.01)": 0
+      }
+    ],
+    "broad_envelope_feature_means_by_side": [
+      {
+        "ball_height_uu": 107.17705917358398,
+        "boost_fraction": 0.0,
+        "forward_alignment": 0.8876109719276428,
+        "observation_ball_vy_uu_per_second": -98.09137725830078,
+        "observation_ball_y_uu": -4732.87939453125,
+        "planar_distance_uu": 159.37689208984375
+      },
+      {
+        "ball_height_uu": 145.24985394612975,
+        "boost_fraction": 0.0,
+        "forward_alignment": 0.6372394325850024,
+        "observation_ball_vy_uu_per_second": -54.94485905063307,
+        "observation_ball_y_uu": 4443.114836724316,
+        "planar_distance_uu": 135.914259822637
+      }
+    ],
+    "broad_envelope_observation_direction_by_side": [
+      {
+        "denominator": 26,
+        "positive_ball_vy": 13,
+        "positive_ball_y": 0
+      },
+      {
+        "denominator": 6387,
+        "positive_ball_vy": 570,
+        "positive_ball_y": 6023
+      }
+    ],
+    "sequence_starts_by_side": {
+      "broad_with_boost": [
+        0,
+        0
+      ],
+      "broad_without_boost": [
+        13,
+        166
+      ],
+      "natural_gate": [
+        0,
+        0
+      ],
+      "physical_with_boost": [
+        0,
+        0
+      ],
+      "physical_without_boost": [
+        0,
+        0
+      ]
+    },
+    "tick_counts_by_side": {
+      "alignment_ge_050": [
+        247708,
+        262907
+      ],
+      "broad_with_boost": [
+        0,
+        0
+      ],
+      "broad_without_boost": [
+        26,
+        6387
+      ],
+      "distance_le_100": [
+        2258,
+        5033
+      ],
+      "grounded": [
+        529298,
+        503552
+      ],
+      "height_125_190": [
+        66325,
+        66325
+      ],
+      "natural_gate": [
+        0,
+        0
+      ],
+      "physical_with_boost": [
+        0,
+        0
+      ],
+      "physical_without_boost": [
+        0,
+        0
+      ],
+      "player_ticks": [
+        768000,
+        768000
+      ],
+      "touch_in_broad_envelope": [
+        13,
+        206
+      ]
+    }
+  },
+  "format": "RIVAL2_V23_GROUND_TO_AIR_SELFPLAY_CENSUS_V1",
+  "option_authority": {
+    "natural_gate": {
+      "maximum_goalward_ball_speed_uu_per_second": 900.0,
+      "maximum_goalward_ball_y_uu": 4400.0,
+      "minimum_goalward_ball_speed_uu_per_second": 100.0,
+      "minimum_goalward_ball_y_uu": 3000.0
+    },
+    "option_config": {
+      "approach_steer_gain": 3.5,
+      "boost_during_pop": false,
+      "carry_boost": true,
+      "carry_boost_min_forward_error_uu": 20.0,
+      "carry_boost_min_relative_speed_uu_per_second": 20.0,
+      "carry_pitch": 1.0,
+      "carry_ticks_after_second_jump": 36,
+      "cooldown_ticks": 120,
+      "first_jump_hold_ticks": 8,
+      "jump_release_ticks": 8,
+      "launch_delay_ticks": 0,
+      "learned_after_second_jump": true,
+      "maximum_ball_height_uu": 190.0,
+      "maximum_option_ticks": 720,
+      "maximum_planar_distance_uu": 100.0,
+      "minimum_ball_height_uu": 125.0,
+      "minimum_boost_fraction": 0.25,
+      "minimum_forward_alignment": 0.5,
+      "minimum_planar_distance_uu": 5.0,
+      "pop_pitch": 0.5,
+      "release_ball_height_uu": 105.0,
+      "release_grounded_after_tick": 70,
+      "second_jump": true
+    },
+    "path": "results/rival2/ground_to_air_hybrid_v1/authority.json",
+    "sha256": "E6BA74060E8FA7ED84779F8175A757B831FD2DC6AB75F6248D65A674708138ED"
+  },
+  "policies": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "policy_mutation": false,
+  "reward_mutation": false,
+  "seed": 2026092101,
+  "ticks": 6000,
+  "world_ticks": 768000,
+  "worlds": 128
+}
