@@ -1,0 +1,122 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_HYBRID_V1_AUTHORITY",
+  "created_utc": "2026-09-03T01:28:00Z",
+  "purpose": "Evaluate the controlled pop-to-aerial scorer as a narrow attacking-goal-area option while the protected V23 side policies remain responsible for all ordinary gameplay.",
+  "protected_competitive_base": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C",
+      "model_tensor_sha256": "C5B44186C1625A289F45F39459378EF353242CB842874F06E8E64A46E0B57EBA"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A",
+      "model_tensor_sha256": "2081095F83F3CCC964DCBA2B7F3BCA818D1B39DE1FE4B7CD97A95505D54FD514"
+    }
+  },
+  "controlled_option": {
+    "checkpoint": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154",
+      "model_tensor_sha256": "AD3BB2C3721288C1D99A5C6B1537DA65AAAAD9A9E1C15E92807A5A1DB1878C81"
+    },
+    "result": {
+      "path": "results/rival2/ground_to_air_goal_v3/result.json",
+      "sha256": "21F2A27C3C5E1A92D943FB5DAD76676A49EF7583B08E5BA6A706874052A73D0F"
+    },
+    "selected_block": 68,
+    "untouched_test_goal_rates": [
+      0.02001953125,
+      0.02294921875
+    ],
+    "untouched_test_contact_overrun_rate": 0.000244140625,
+    "critic_unchanged": true,
+    "competitive_policy_not_previously_modified": true
+  },
+  "selector_implementation": {
+    "path": "rivalsim/rival2_ground_to_air_hybrid.py",
+    "sha256": "25FCF56A51757AED4EB07D0388310E1D40F1386721EF23DD9060741A0ACE48E4",
+    "semantics": "The natural envelope may block a new activation only. Once latched, the original controller owns its established low-ball, grounded, reset, and timeout releases."
+  },
+  "option_config": {
+    "minimum_boost_fraction": 0.25,
+    "minimum_ball_height_uu": 125.0,
+    "maximum_ball_height_uu": 190.0,
+    "minimum_planar_distance_uu": 5.0,
+    "maximum_planar_distance_uu": 100.0,
+    "minimum_forward_alignment": 0.5,
+    "approach_steer_gain": 3.5,
+    "launch_delay_ticks": 0,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "second_jump": true,
+    "pop_pitch": 0.5,
+    "boost_during_pop": false,
+    "carry_ticks_after_second_jump": 36,
+    "carry_pitch": 1.0,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "learned_after_second_jump": true,
+    "release_ball_height_uu": 105.0,
+    "release_grounded_after_tick": 70,
+    "maximum_option_ticks": 720,
+    "cooldown_ticks": 120
+  },
+  "gate": {
+    "minimum_goalward_ball_y_uu": 3000.0,
+    "maximum_goalward_ball_y_uu": 4400.0,
+    "minimum_goalward_ball_speed_uu_per_second": 100.0,
+    "maximum_goalward_ball_speed_uu_per_second": 900.0
+  },
+  "validation": {
+    "matrix": "five standard kickoff layouts x both physical Rival sides against pinned Nexto",
+    "seed": 2026092001,
+    "baseline": {
+      "source": {
+        "path": "results/rival2/codex_autonomous_v23/physical_behavior_telemetry.json",
+        "sha256": "A8FD635470827E350404852AD14A729525F0FE2E1AAC7EAA7E12EE114FE6818B"
+      },
+      "wins": 8,
+      "losses": 2,
+      "rival_goals": 159,
+      "nexto_goals": 111,
+      "touches": 687,
+      "touches_per_minute": 13.74,
+      "no_touch_worlds": 0,
+      "high_aerial_contacts": 0,
+      "high_aerial_goals": 0
+    },
+    "promotion_gate": {
+      "minimum_wins": 6,
+      "maximum_losses": 4,
+      "minimum_goal_differential": 0,
+      "minimum_touch_fraction": 0.85,
+      "minimum_touch_rate_fraction": 0.85,
+      "maximum_no_touch_worlds": 0,
+      "minimum_activations": 2,
+      "minimum_activations_per_side": 1,
+      "minimum_pop_starts": 2,
+      "minimum_elevated_option_touches": 2,
+      "minimum_high_option_touches": 1,
+      "minimum_option_goals": 1,
+      "maximum_activations_over_six_contacts": 0
+    }
+  },
+  "contact_semantics": {
+    "maximum_distinct_chain_contacts": 6,
+    "expected_efficient_chain": "one low pop plus one to three separated airborne contacts",
+    "glued_carry": "a continuous native contact interval is not counted as repeated contact onsets",
+    "over_budget_activation_is_not_promotable": true
+  },
+  "integrity": {
+    "optimizer_steps_allowed": 0,
+    "ppo_steps_allowed": 0,
+    "reward_changes_allowed": 0,
+    "protected_v23_must_remain_byte_identical": true,
+    "controlled_option_must_remain_byte_identical": true,
+    "named_mechanic_classifier_used": false,
+    "policy_selector_reads_only_182_field_observation_and_match_lifecycle": true,
+    "authority_committed_before_natural_evaluation": true
+  }
+}
