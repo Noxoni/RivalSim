@@ -55,6 +55,8 @@ class Rival2RecurrentTrainer:
             "phase_a_acquisition",
             "phase_b_gameplay_120_v2",
             "unified_ground_selfplay_v1",
+            "unified_ground_acquisition_v2",
+            "unified_ground_gameplay_v2",
         }:
             raise ValueError(f"unsupported recurrent PPO phase: {phase}")
         self.env = env
@@ -400,6 +402,10 @@ class Rival2RecurrentTrainer:
             "model": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict() if include_optimizer else None,
             "optimizer_included": include_optimizer,
+            "optimizer_group_lrs": {
+                str(group.get("name", f"group_{index}")): float(group["lr"])
+                for index, group in enumerate(self.optimizer.param_groups)
+            },
             "policy_config": asdict(self.policy_config),
             "policy_config_sha256": self.policy_config.content_hash,
             "ppo_config": asdict(self.ppo_config),

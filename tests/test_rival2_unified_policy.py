@@ -63,3 +63,12 @@ def test_policy_config_hash_is_stable_and_versioned() -> None:
     right = Rival2UnifiedPolicyConfig()
     assert left.content_hash == right.content_hash
     assert len(left.content_hash) == 64
+
+
+def test_isolated_value_trains_critic_without_trunk_gradient() -> None:
+    _parent, unified = make_pair()
+    unified.zero_grad(set_to_none=True)
+    value = unified.isolated_value(torch.randn(5, 182))
+    value.sum().backward()
+    assert any(parameter.grad is not None for parameter in unified.critic.parameters())
+    assert all(parameter.grad is None for parameter in unified.trunk.parameters())

@@ -1,0 +1,93 @@
+{
+  "campaign": {
+    "accepted_updates_total": 300,
+    "checkpoint_interval": 30,
+    "phase_a_maximum_updates": 120,
+    "purpose": "teach reliable ball acquisition before competitive possession, shooting, challenge, and scoring self-play"
+  },
+  "created_utc": "2026-09-03T23:02:00Z",
+  "exploration": {
+    "analog_sigma": "0.02 through global update 30, smooth log-space ramp to 0.04 at global update 150",
+    "button_temperature": "0.10 through global update 30, smooth ramp to 0.25 at global update 150",
+    "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
+  },
+  "format": "RIVAL2_UNIFIED_GROUND_CURRICULUM_PPO_V2_AUTHORITY",
+  "integrity": {
+    "abandoned_v1_update_loaded": false,
+    "distillation_optimizer_loaded": false,
+    "fresh_optimizer_at_source": true,
+    "fresh_optimizer_at_phase_transition": true,
+    "named_mechanics_hot_path": false,
+    "policy_and_physics_hz": 120,
+    "source_checkpoint_immutable": true,
+    "value_loss_to_shared_trunk": false
+  },
+  "opponents": {
+    "both_current_sides_trainable": true,
+    "current_selfplay": 1.0,
+    "historical": 0.0,
+    "nexto": 0.0,
+    "wisp": 0.0
+  },
+  "phase_a": {
+    "evaluation": {
+      "consecutive_passing_boundaries": 2,
+      "evaluation_interval_updates": 15,
+      "evaluation_worlds": 2048,
+      "first_evaluation_update": 30,
+      "physics_ticks": 1920,
+      "minimum_completed_agent_episodes": 2048,
+      "minimum_episode_touch_fraction": 0.5,
+      "minimum_touches_per_minute": 2.0
+    },
+    "learning": "dense physical approach plus legitimate contact acquisition",
+    "maximum_updates": 120,
+    "reward_contract_sha256": "64CC214FEA0D53C10633975064EBD9334B22FA8599099549041B73DC450F4657",
+    "reward_version": "RIVAL2_REWARD_ACQUISITION_120_V1"
+  },
+  "phase_b": {
+    "learning": "competitive possession, goalward progress, shooting, challenges, 50 outcomes, saves, boost routing, and scoring",
+    "reward_contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "reward_version": "RIVAL2_REWARD_GAMEPLAY_120_V2"
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "critic_learning_rate": 0.0003,
+    "entropy_coefficient": 0.0,
+    "epochs": 1,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "kl_policy": "telemetry_only_no_rejection_or_retry",
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "nonfinite_transactional_rollback": true,
+    "phase_a_policy_learning_rate": 0.0000005,
+    "phase_b_policy_learning_rate": 0.000001,
+    "rollout_horizon": 128,
+    "sequence_preserving": true,
+    "value_loss_coefficient": 0.5,
+    "value_loss_isolation": "critic head only; actor and shared trunk receive no value-loss gradient",
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "worlds": 32768
+  },
+  "reward_design": {
+    "competency_list_role": "behavioral evaluation taxonomy, not one proxy reward per item",
+    "mechanics_reward": 0.0,
+    "ordinary_touch_reward_in_phase_b": 0.0,
+    "possession": "physical proximity times car-ball velocity match",
+    "shooting": "goal reward plus signed goalward ball progress",
+    "useful_50": "learned through retained control, progress, and scoring outcomes; no generic 50 bonus"
+  },
+  "source": {
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+    "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
+    "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+  },
+  "v1_diagnostic": {
+    "accepted_update_loaded": false,
+    "completed_update_mean_kl": 98.62973022460938,
+    "reason_for_replacement": "a zero-reward 1.07-second symmetric opening plus 256 minibatch steps caused a large uncontrolled actor displacement",
+    "source_restart_required": true
+  }
+}

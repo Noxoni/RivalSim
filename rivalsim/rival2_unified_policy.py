@@ -227,6 +227,16 @@ class Rival2UnifiedActorCritic(nn.Module):
             value = value[:, 0]
         return actor, value, next_hidden
 
+    def isolated_value(self, observation: torch.Tensor) -> torch.Tensor:
+        """Evaluate the critic without allowing value loss into the shared trunk."""
+
+        if observation.ndim not in {2, 3} or observation.shape[-1] != self.config.obs_dim:
+            raise ValueError("unified observation must have shape [B,T,182] or [B,182]")
+        leading_shape = observation.shape[:-1]
+        flat = observation.reshape(-1, self.config.obs_dim)
+        features = self.trunk(flat).detach()
+        return self.critic(features).reshape(leading_shape)
+
     @property
     def context_parameters(self) -> tuple[nn.Parameter, ...]:
         return tuple(

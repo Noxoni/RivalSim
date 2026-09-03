@@ -324,7 +324,11 @@ def recurrent_ppo_update(
                 reset_before=batch_reset,
             )
             actor_flat = actor[batch_mask]
-            value_flat = value[batch_mask]
+            if hasattr(model, "isolated_value"):
+                value_for_loss = model.isolated_value(batch_observation)
+                value_flat = value_for_loss[batch_mask]
+            else:
+                value_flat = value[batch_mask]
             action_flat = action.index_select(0, sequence_index)[batch_mask]
             pre_tanh_flat = pre_tanh.index_select(0, sequence_index)[batch_mask]
             old_log_probability_flat = old_log_probability.index_select(0, sequence_index)[
