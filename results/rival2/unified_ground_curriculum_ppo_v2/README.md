@@ -11,6 +11,10 @@ before contact; its contact terms end when the deterministic evaluation shows
 routine acquisition at two consecutive boundaries. Phase A is capped and
 fails closed if the policy cannot acquire the ball.
 
+The evaluation denominator includes completed episodes plus the still-live
+right-censored episode for each agent at the fixed horizon. Omitting those
+live trials makes a successful no-reset evaluation report a zero denominator.
+
 Phase B creates a fresh optimizer and uses Gameplay 120 V2. Possession is the
 existing proximity-times-velocity-match control score. Shooting is learned
 from signed goalward progress and goals. A useful 50 is learned from retained

@@ -345,6 +345,19 @@ def checkpoint_record(
     }
 
 
+def include_live_fixed_horizon_episodes(
+    completed_agent_episodes: int,
+    touched_agent_episodes: int,
+    live_episode_touched: torch.Tensor,
+) -> tuple[int, int]:
+    """Count right-censored live episodes in a fixed-horizon evaluation."""
+
+    return (
+        completed_agent_episodes + live_episode_touched.numel(),
+        touched_agent_episodes + int(live_episode_touched.sum().item()),
+    )
+
+
 @torch.no_grad()
 def deterministic_selfplay_evaluation(
     trainer: Rival2RecurrentTrainer,
@@ -419,8 +432,11 @@ def deterministic_selfplay_evaluation(
     player_minutes = EVALUATION_WORLDS * 2 * EVALUATION_TICKS / (120.0 * 60.0)
     action_count = EVALUATION_WORLDS * 2 * EVALUATION_TICKS
     touches = int(touch_events.item())
-    completed = int(completed_agent_episodes.item())
-    touched = int(touched_agent_episodes.item())
+    completed, touched = include_live_fixed_horizon_episodes(
+        int(completed_agent_episodes.item()),
+        int(touched_agent_episodes.item()),
+        episode_touched,
+    )
     result = {
         "phase_accepted_updates": trainer.phase_accepted_updates,
         "worlds": EVALUATION_WORLDS,
@@ -431,6 +447,7 @@ def deterministic_selfplay_evaluation(
         "goals": int(goals.item()),
         "no_touch_resets": int(no_touch_resets.item()),
         "completed_agent_episodes": completed,
+        "live_fixed_horizon_episodes_included": EVALUATION_WORLDS * 2,
         "episode_touch_fraction": touched / max(1, completed),
         "mean_speed_uu_per_second": (
             float(speed_sum.item()) / action_count * CAR_LINEAR_SPEED_SCALE
@@ -523,6 +540,14 @@ def load_resume(
         phase=str(payload["phase"]),
     )
     trainer.load_checkpoint(path)
+    if trainer.phase_transition is None:
+        raise ValueError("resume checkpoint is missing transition provenance")
+    trainer.phase_transition["evaluation_denominator_correction"] = {
+        "reason": "successful fixed-horizon trials remain live and were omitted",
+        "semantics": "include one right-censored live episode per agent at horizon end",
+        "policy_reward_or_threshold_changed": False,
+        "authority_sha256": sha256_file(AUTHORITY),
+    }
     return trainer, source
 
 

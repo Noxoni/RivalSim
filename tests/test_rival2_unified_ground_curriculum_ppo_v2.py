@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import torch
+
 from benchmarks import run_rival2_unified_ground_curriculum_ppo_v2 as campaign
 from rivalsim.rival2_contracts import (
     RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
@@ -49,3 +51,13 @@ def test_optimizer_separates_policy_and_critic_learning_rates() -> None:
     }
     assert policy_ids.isdisjoint(critic_ids)
     assert optimizer_critic_ids == critic_ids
+
+
+def test_fixed_horizon_touch_fraction_includes_live_successful_trials() -> None:
+    completed, touched = campaign.include_live_fixed_horizon_episodes(
+        4,
+        3,
+        torch.tensor([[True, True], [True, False]]),
+    )
+    assert completed == 8
+    assert touched == 6
