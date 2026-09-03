@@ -1,0 +1,129 @@
+{
+  "checks": {
+    "all_parameters_trainable": true,
+    "controlled_flick_arrays_absent": true,
+    "counter_state_valid": true,
+    "distillation_optimizer_not_loaded": true,
+    "kl_telemetry_only": true,
+    "named_mechanics_arrays_absent": true,
+    "named_mechanics_hot_path_absent": true,
+    "native_120hz": true,
+    "nexto_wisp_historical_training_absent": true,
+    "resume_lineage_valid": true,
+    "reward_contract_exact": true,
+    "sequence_ppo": true,
+    "source_model_exact": true,
+    "source_sha256_exact": true,
+    "worlds_exact": true
+  },
+  "contracts": {
+    "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "RIVAL2_REWARD_GAMEPLAY_120_V2": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C"
+  },
+  "created_utc": "2026-09-03T22:35:56.905625+00:00",
+  "exploration": {
+    "analog": {
+      "interpolation": "linear_in_log_sigma",
+      "sigma_end": 0.04,
+      "sigma_start": 0.02
+    },
+    "buttons": {
+      "effective_logits": "learned_logits/positive_temperature",
+      "temperature_end": 0.25,
+      "temperature_start": 0.1
+    },
+    "coherence": [
+      "rollout sampling",
+      "stored old log probability",
+      "PPO recomputation",
+      "ratio",
+      "entropy telemetry",
+      "KL telemetry"
+    ],
+    "purpose": "bounded stochastic PPO exploration without overwhelming Unified V5 behavior",
+    "schedule": {
+      "interior": "smoothstep x*x*(3-2*x)",
+      "ramp_end_accepted_update": 150,
+      "ramp_start_accepted_update": 30
+    },
+    "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+  },
+  "exploration_contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+  "format": "RIVAL2_UNIFIED_GROUND_SELFPLAY_PPO_V1_PREFLIGHT",
+  "gameplay_120_memory_inventory": {
+    "arrays": {
+      "bad_flip_component": 131072,
+      "bad_flip_total": 262144,
+      "contest_exempt_total": 262144,
+      "control_component": 131072,
+      "control_reward_sum_total": 131072,
+      "control_score_current": 262144,
+      "control_score_ge_025_total": 262144,
+      "control_score_ge_05_total": 262144,
+      "control_score_positive_total": 262144,
+      "control_score_sum_total": 262144,
+      "control_score_tick_total": 262144,
+      "flip_touch_total": 262144,
+      "interval_bad_flip": 262144,
+      "interval_contest_exempt": 262144,
+      "interval_power_exempt": 262144,
+      "interval_retained_control_exempt": 262144,
+      "legitimate_touch_total": 262144,
+      "opponent_touch_latched": 262144,
+      "pending_active": 262144,
+      "pending_age": 262144,
+      "pending_ball_position": 786432,
+      "pending_contest": 262144,
+      "pending_power": 262144,
+      "pending_retained_control": 262144,
+      "pending_self_contact_tick": 262144,
+      "power_exempt_total": 262144,
+      "recent_opponent_contact_ball_position": 786432,
+      "recent_opponent_contact_tick": 262144,
+      "retained_control_exempt_total": 262144,
+      "touch_latched": 262144
+    },
+    "controlled_flick_arrays": 0,
+    "logical_bytes": 8519680,
+    "named_mechanics_arrays": 0
+  },
+  "ppo_config": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 3e-05,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "ppo_config_sha256": "8BF65CDCC8D7BCF4BD4FDDDC84BF5A486663B99B463C20A74E4A43B3246C020D",
+  "resuming": false,
+  "source": {
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+    "model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
+    "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216",
+    "used_fields": [
+      "model",
+      "policy_config"
+    ]
+  },
+  "transition": {
+    "all_model_parameters_trainable": true,
+    "authority_sha256": "CDDF993E3B7BE1541C312A4A7EDF92DAF515D42F7305B1D44F8629199DD65ACC",
+    "format": "RIVAL2_UNIFIED_GROUND_SELFPLAY_PPO_V1_TRANSITION",
+    "fresh_ppo_optimizer": true,
+    "fresh_rng_and_counters": true,
+    "loaded_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "model_exact_before_first_update": true,
+    "source_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "source_optimizer_loaded": false,
+    "source_rng_loaded": false
+  },
+  "verdict": "PASS"
+}

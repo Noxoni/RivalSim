@@ -79,6 +79,18 @@ class Rival2UnifiedPolicyConfig:
             zero_previous_action_inputs=False,
         )
 
+    @property
+    def recurrent_layers(self) -> int:
+        """Compatibility alias for the shared sequence-PPO infrastructure."""
+
+        return self.context_layers
+
+    @property
+    def hidden_dim(self) -> int:
+        """Compatibility alias for the recurrent residual state width."""
+
+        return self.context_hidden_dim
+
 
 class Rival2UnifiedActorCritic(nn.Module):
     """One actor with a parity-preserving V23 base and recurrent residual.

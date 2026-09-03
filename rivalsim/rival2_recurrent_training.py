@@ -31,6 +31,8 @@ CHECKPOINT_FORMAT = "RIVAL2_HUMAN_SEQUENCE_RECURRENT_PPO_V1_CHECKPOINT"
 _TOUCH_EVENT_INDEX = OBS_FIELD_NAMES.index("lifecycle.self_touch_event")
 _NO_TOUCH_AGE_INDEX = OBS_FIELD_NAMES.index("lifecycle.no_touch_age")
 _SELF_VELOCITY_START = OBS_FIELD_NAMES.index("self.linear_velocity.x")
+_SELF_SUPERSONIC_INDEX = OBS_FIELD_NAMES.index("self.is_supersonic")
+_BALL_VELOCITY_Y_INDEX = OBS_FIELD_NAMES.index("ball.linear_velocity.y")
 
 
 class Rival2RecurrentTrainer:
@@ -45,8 +47,15 @@ class Rival2RecurrentTrainer:
         phase: str,
         source_identity: dict[str, Any],
         seed: int,
+        model: torch.nn.Module | None = None,
+        checkpoint_format: str = CHECKPOINT_FORMAT,
+        lineage: str = "Human Sequence Seed v1 recurrent PPO",
     ):
-        if phase not in {"phase_a_acquisition", "phase_b_gameplay_120_v2"}:
+        if phase not in {
+            "phase_a_acquisition",
+            "phase_b_gameplay_120_v2",
+            "unified_ground_selfplay_v1",
+        }:
             raise ValueError(f"unsupported recurrent PPO phase: {phase}")
         self.env = env
         self.device = env.device
@@ -54,7 +63,13 @@ class Rival2RecurrentTrainer:
         self.ppo_config = ppo_config
         self.phase = phase
         self.source_identity = copy.deepcopy(source_identity)
-        self.model = Rival2RecurrentActorCritic(policy_config).to(self.device)
+        self.checkpoint_format = checkpoint_format
+        self.lineage = lineage
+        self.model = (
+            Rival2RecurrentActorCritic(policy_config) if model is None else model
+        ).to(self.device)
+        if getattr(self.model, "config", None) != policy_config:
+            raise ValueError("recurrent PPO model/config mismatch")
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=self.ppo_config.learning_rate
         )
@@ -119,7 +134,11 @@ class Rival2RecurrentTrainer:
             "contest_exempt_total",
             "power_exempt_total",
             "retained_control_exempt_total",
+            "control_score_sum_total",
+            "control_score_tick_total",
             "control_score_positive_total",
+            "control_score_ge_025_total",
+            "control_score_ge_05_total",
             "control_reward_sum_total",
         )
         return {
@@ -144,11 +163,13 @@ class Rival2RecurrentTrainer:
         touch_events = torch.zeros((), dtype=torch.int64, device=self.device)
         first_touch_events = torch.zeros((), dtype=torch.int64, device=self.device)
         goal_events = torch.zeros((), dtype=torch.int64, device=self.device)
+        goalward_touch_events = torch.zeros((), dtype=torch.int64, device=self.device)
         no_touch_truncations = torch.zeros((), dtype=torch.int64, device=self.device)
         hard_limit_truncations = torch.zeros((), dtype=torch.int64, device=self.device)
         reward_sum = torch.zeros((), dtype=torch.float64, device=self.device)
         reward_abs_sum = torch.zeros((), dtype=torch.float64, device=self.device)
         speed_sum = torch.zeros((), dtype=torch.float64, device=self.device)
+        supersonic_ticks = torch.zeros((), dtype=torch.int64, device=self.device)
         saturation_count = torch.zeros((), dtype=torch.int64, device=self.device)
         action_samples = config.rollout_horizon * self.env.num_envs * 2
 
@@ -202,6 +223,15 @@ class Rival2RecurrentTrainer:
                 first_touch = touch & ~self.episode_has_touch
                 self.episode_has_touch.logical_or_(touch)
                 touch_events += touch.sum()
+                goalward_touch_events += (
+                    touch
+                    & (
+                        transition.transition_observation[
+                            ..., _BALL_VELOCITY_Y_INDEX
+                        ]
+                        > 0.0
+                    )
+                ).sum()
                 first_touch_events += first_touch.sum()
                 goal_events += transition.terminated.sum()
                 no_touch_terminal = transition.truncated & (
@@ -219,6 +249,9 @@ class Rival2RecurrentTrainer:
                     dim=-1,
                 )
                 speed_sum += speed.sum(dtype=torch.float64)
+                supersonic_ticks += (
+                    observation[..., _SELF_SUPERSONIC_INDEX] > 0.5
+                ).sum()
                 saturation_count += (
                     transition.emitted_action[..., :5].abs() > 0.95
                 ).sum()
@@ -255,6 +288,34 @@ class Rival2RecurrentTrainer:
                     gameplay_delta[name] = float(delta.sum(dtype=torch.float64).item())
                 else:
                     gameplay_delta[name] = int(delta.sum(dtype=torch.int64).item())
+        control_ticks = int(gameplay_delta.get("control_score_tick_total", 0))
+        control_summary = {
+            "mean": (
+                float(gameplay_delta.get("control_score_sum_total", 0.0))
+                / control_ticks
+                if control_ticks
+                else 0.0
+            ),
+            "positive_fraction": (
+                int(gameplay_delta.get("control_score_positive_total", 0))
+                / control_ticks
+                if control_ticks
+                else 0.0
+            ),
+            "ge_025_fraction": (
+                int(gameplay_delta.get("control_score_ge_025_total", 0))
+                / control_ticks
+                if control_ticks
+                else 0.0
+            ),
+            "ge_05_fraction": (
+                int(gameplay_delta.get("control_score_ge_05_total", 0))
+                / control_ticks
+                if control_ticks
+                else 0.0
+            ),
+            "reward_sum": float(gameplay_delta.get("control_reward_sum_total", 0.0)),
+        }
         self.last_rollout_metrics = {
             "reward_version": self.env.reward_version,
             "policy_hz": self.env.policy_hz,
@@ -262,6 +323,10 @@ class Rival2RecurrentTrainer:
             "physical_player_minutes": physical_player_minutes,
             "touch_events": int(touch_events.item()),
             "touches_per_minute": float(touch_events.item()) / physical_player_minutes,
+            "goalward_touch_events": int(goalward_touch_events.item()),
+            "goalward_touch_fraction": (
+                int(goalward_touch_events.item()) / max(1, int(touch_events.item()))
+            ),
             "first_touch_events_per_player_episode": int(first_touch_events.item()),
             "goal_events": int(goal_events.item()),
             "no_touch_truncations": int(no_touch_truncations.item()),
@@ -271,10 +336,14 @@ class Rival2RecurrentTrainer:
             "mean_movement_speed_uu_per_second": (
                 float(speed_sum.item()) / action_samples * CAR_LINEAR_SPEED_SCALE
             ),
+            "supersonic_occupancy_fraction": (
+                int(supersonic_ticks.item()) / action_samples
+            ),
             "analog_action_saturation_fraction": (
                 int(saturation_count.item()) / (action_samples * 5)
             ),
             "gameplay_120_counter_delta": gameplay_delta,
+            "control_score": control_summary,
             "named_mechanics_hot_path_absent": self.env.world.gameplay_v3 is None,
             "recurrent_hidden_continuous_within_episode": True,
             "recurrent_reset_only_on_native_reset": True,
@@ -324,8 +393,8 @@ class Rival2RecurrentTrainer:
 
     def checkpoint_payload(self, *, include_optimizer: bool = True) -> dict[str, Any]:
         return {
-            "format": CHECKPOINT_FORMAT,
-            "lineage": "Human Sequence Seed v1 recurrent PPO",
+            "format": self.checkpoint_format,
+            "lineage": self.lineage,
             "source": copy.deepcopy(self.source_identity),
             "phase": self.phase,
             "model": self.model.state_dict(),
@@ -383,7 +452,7 @@ class Rival2RecurrentTrainer:
 
     def load_checkpoint(self, path: str | Path) -> dict[str, Any]:
         payload = torch.load(Path(path), map_location=self.device, weights_only=False)
-        if payload.get("format") != CHECKPOINT_FORMAT:
+        if payload.get("format") != self.checkpoint_format:
             raise ValueError("unsupported recurrent PPO checkpoint")
         if payload.get("policy_config_sha256") != self.policy_config.content_hash:
             raise ValueError("recurrent PPO policy contract mismatch")

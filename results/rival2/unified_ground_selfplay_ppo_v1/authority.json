@@ -1,0 +1,96 @@
+{
+  "campaign": {
+    "accepted_updates": 300,
+    "checkpoint_interval": 30,
+    "purpose": "establish reliable 1v1 ground possession, useful contacts, shooting pressure, challenges, and scoring before advanced-mechanic curricula"
+  },
+  "competency_scope": {
+    "direct_reward_support": [
+      "scoring and preventing goals",
+      "signed ball progress toward the opponent goal",
+      "physically close velocity-matched ball control",
+      "legitimate saves",
+      "boost-pad acquisition",
+      "authoritative supersonic movement",
+      "demolitions",
+      "avoidance of unnecessary flip-through contacts"
+    ],
+    "expected_to_emerge_from_competitive_outcomes": [
+      "basic car control",
+      "ball acquisition",
+      "ground possession",
+      "shooting",
+      "useful 50 outcomes",
+      "challenges",
+      "shadow and goal-line defense",
+      "offense-defense transitions",
+      "boost routing and risk management"
+    ],
+    "not_claimed_or_directly_rewarded": [
+      "wavedash",
+      "wall dash",
+      "double dash",
+      "aerial",
+      "air dribble",
+      "flip reset",
+      "named flicks",
+      "pinches",
+      "other inferred named mechanics"
+    ],
+    "principle": "do not create one proxy reward per checklist item; reward competitive physical outcomes and verify competencies behaviorally"
+  },
+  "created_utc": "2026-09-03T22:31:16.3397128Z",
+  "exploration": {
+    "analog_sigma": "0.02 through update 30, smooth log-space ramp to 0.04 at update 150",
+    "button_temperature": "0.10 through update 30, smooth ramp to 0.25 at update 150",
+    "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+    "rationale": "retain meaningful stochastic support for policy gradients without repeating the earlier excessive exploration problem"
+  },
+  "format": "RIVAL2_UNIFIED_GROUND_SELFPLAY_PPO_V1_AUTHORITY",
+  "integrity": {
+    "distillation_optimizer_loaded": false,
+    "fresh_ppo_optimizer": true,
+    "named_mechanics_hot_path": false,
+    "policy_and_physics_hz": 120,
+    "source_checkpoint_immutable": true
+  },
+  "opponents": {
+    "both_current_sides_trainable": true,
+    "current_selfplay": 1.0,
+    "historical": 0.0,
+    "nexto": 0.0,
+    "wisp": 0.0
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "kl_policy": "telemetry_only_no_rejection_or_retry",
+    "learning_rate": 0.00003,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "nonfinite_transactional_rollback": true,
+    "rollout_horizon": 128,
+    "sequence_preserving": true,
+    "value_loss_coefficient": 0.5,
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "worlds": 32768
+  },
+  "reward": {
+    "contract_sha256": "E63920316F04ED66F02065D0DEDBEF500CDAF8F485BD2602E21AFECBA72EFF6C",
+    "fifty_semantics": "no contact bonus; contested contacts are allowed and their physical progress, retained control, recovery, and scoring consequences determine return",
+    "mechanics_reward": 0.0,
+    "ordinary_touch_reward": 0.0,
+    "possession_semantics": "proximity times car-ball velocity match, composed competitively",
+    "shooting_semantics": "goal reward plus signed goalward ball progress; no farmable generic shot-touch bonus",
+    "version": "RIVAL2_REWARD_GAMEPLAY_120_V2"
+  },
+  "source": {
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+    "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
+    "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+  }
+}
