@@ -1,0 +1,208 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V5_AUTHORITY",
+  "created_utc": "2026-09-03T00:00:00Z",
+  "purpose": "Restart from the accepted controlled scorer and train low-bounce, incoming-chip, and matched-dribble aerial entries with equal setup/defender/side PPO weight and family-local advantages.",
+  "bound_inputs": {
+    "passing_controlled_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "natural_scenario_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_natural_v4.py",
+      "sha256": "6C95203EF5E4C59505C8318C7CD80E2FB65AB29A0BC5E1DA17CC186A0E15D36E"
+    },
+    "v4_authority": {
+      "path": "results/rival2/ground_to_air_natural_v4/authority.json",
+      "sha256": "17E5EB27B316BB048BD55DB7AA62DE4590A81DFF4753E7D2A624821BA4F9BB5A"
+    },
+    "v4_result": {
+      "path": "results/rival2/ground_to_air_natural_v4/result.json",
+      "sha256": "37BAFCF92DDA19382517723CF07A2757D84C81C52CA1EF84CAB134D55EFC3185"
+    },
+    "v4_review": {
+      "path": "results/rival2/ground_to_air_natural_v4/V4_REVIEW.md",
+      "sha256": "03EB7FD84475D1A7982AD9EB1E749F1EFA38D0D11D022C8F753DE9F7F1F379A9"
+    },
+    "v4_training_curve": {
+      "path": "results/rival2/ground_to_air_natural_v4/training_curve.jsonl",
+      "sha256": "F95D11B713B158F6EB382BA9565514E9BAB04D0E9A5BB2A62B0D3AAA88100AA0"
+    }
+  },
+  "mechanics_interpretation": {
+    "dead_ball_vertical_launcher": "rejected and excluded",
+    "low_bounce": "ball already has a low bounce; one light forward touch creates close rising separation for an immediate follow",
+    "incoming_chip": "a rolling ball approaches Rival and a low-front physical touch redirects it upward for a follow",
+    "matched_dribble": "matched car/ball ground velocity followed by a held first jump, released double jump, and learned orientation touch",
+    "tornado_spin": "an optional partial air-roll/yaw/pitch orientation solution that may put the front corner under the ball; no named animation is forced or rewarded",
+    "simple_double_jump": "valid without a tornado spin when the car-to-ball geometry already supports the follow contact",
+    "airtime": "never rewarded by itself",
+    "contact_budget": "at most six distinct native self-touch onsets; a continuous glued interval cannot farm contact credit"
+  },
+  "option_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 205.0,
+    "maximum_option_ticks": 720,
+    "maximum_planar_distance_uu": 180.0,
+    "minimum_ball_height_uu": 90.0,
+    "minimum_boost_fraction": 0.2,
+    "minimum_forward_alignment": 0.15,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 90.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "scenario": {
+    "setup_families": ["low_bounce", "incoming_chip", "matched_dribble"],
+    "training_strata": [
+      {"setup": "low_bounce", "defender_mode": "parked", "optimizer_weight": 1.0},
+      {"setup": "low_bounce", "defender_mode": "live", "optimizer_weight": 1.0},
+      {"setup": "incoming_chip", "defender_mode": "parked", "optimizer_weight": 1.0},
+      {"setup": "incoming_chip", "defender_mode": "live", "optimizer_weight": 1.0},
+      {"setup": "matched_dribble", "defender_mode": "parked", "optimizer_weight": 1.0},
+      {"setup": "matched_dribble", "defender_mode": "live", "optimizer_weight": 1.0}
+    ],
+    "training_stratum_order": "fixed membership with deterministic block rotation",
+    "training_worlds_per_stratum_per_side": 256,
+    "training_boost_range": [20.0, 80.0],
+    "validation_boost_range": [20.0, 80.0],
+    "live_defender": "frozen side-correct V23 inference between the ball and target goal",
+    "parked_control": "zero-action remote opponent outside the play",
+    "production_state_injection": false
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "actor_learning_rate": 0.00002,
+    "trunk_learning_rate": 0.0000075,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.99875,
+    "ppo_clip": 0.2,
+    "epochs": 2,
+    "minibatch_size": 65536,
+    "maximum_blocks": 96,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 12,
+    "minimum_score_improvement": 0.0005,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "advantage_normalization": "independent_within_each_setup_defender_side_rollout",
+    "optimizer_weighting": "one PPO and rehearsal update per setup/defender/side stratum per block",
+    "successful_rehearsal": {
+      "source": "sampled trajectories with a literal elevated physical contact event",
+      "event_reward_threshold": 3.5,
+      "history_ticks": 48,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.1,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "goal_rehearsal": {
+      "source": "sampled trajectories with a causal goal after an elevated follow contact",
+      "event_reward_threshold": 20.0,
+      "history_ticks": 96,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.2,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "exploration": {"analog_sigma": 0.12, "button_temperature": 0.9}
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "post_contact_goalward_progress_per_uu": 0.001,
+    "goal_target_progress_per_uu": 0.004,
+    "low_pop_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "third_airborne_touch_event": 4.0,
+    "fourth_airborne_touch_event": 2.0,
+    "fifth_airborne_touch_event": 1.0,
+    "goalward_velocity_contact_event": 2.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "sustained_control_shell_uu": 160.0,
+    "sustained_control_minimum_ticks": 12,
+    "sustained_control_interval_event": 3.0,
+    "goal_within_contact_budget_event": 25.0,
+    "other_goal": -1.0,
+    "failure": -1.0,
+    "over_contact_budget_failure": -12.0
+  },
+  "episode": {
+    "horizon_ticks": 600,
+    "maximum_distinct_chain_contacts": 6,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_tick": 110,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026100101,
+    "validation": 2026100201,
+    "optimizer_and_exploration": 2026100301,
+    "test": 2026100401
+  },
+  "acceptance": {
+    "per_defender_mode": {
+      "parked": {
+        "pop_touch_fraction_min": 0.75,
+        "elevated_follow_touch_fraction_min": 0.15,
+        "high_follow_touch_fraction_min": 0.015,
+        "productive_continuation_fraction_min": 0.02,
+        "goal_within_contact_budget_fraction_min": 0.005
+      },
+      "live": {
+        "pop_touch_fraction_min": 0.75,
+        "elevated_follow_touch_fraction_min": 0.1,
+        "high_follow_touch_fraction_min": 0.005,
+        "productive_continuation_fraction_min": 0.015,
+        "goal_within_contact_budget_fraction_min": 0.003
+      }
+    },
+    "contact_budget_exceeded_fraction_max": 0.01,
+    "unassisted_or_ground_goal_fraction_max": 0.1,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "controlled_scorer_parent_unchanged": true,
+    "v4_diagnostic_descendant_not_used": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "live_defender_is_inference_only": true,
+    "distinct_contact_rewards_capped": true,
+    "optimizer_steps_before_authority_commit": 0,
+    "test_seed_unopened_before_validation_pass": true,
+    "full_match_integration_deferred_until_controlled_pass": true
+  }
+}
