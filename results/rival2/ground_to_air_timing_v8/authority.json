@@ -1,0 +1,131 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_TIMING_V8_AUTHORITY",
+  "created_utc": "2026-09-03T07:54:33Z",
+  "purpose": "Measure the physical effect of first-jump hold and release timing on the protected scorer across matched natural entry states before any further optimizer step.",
+  "bound_inputs": {
+    "passing_controlled_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "v7_authority": {
+      "path": "results/rival2/ground_to_air_natural_v7/authority.json",
+      "sha256": "6192B823A13993A0C883D83E35AC128F3C2D964BA172F36589356E91E6FCE2A6"
+    },
+    "v7_result": {
+      "path": "results/rival2/ground_to_air_natural_v7/result.json",
+      "sha256": "3D15AD2BB9B509C1FC455E008BE639C60659D72D19FA918E7AC56889E6C8897C"
+    },
+    "v7_review": {
+      "path": "results/rival2/ground_to_air_natural_v7/V7_REVIEW.md",
+      "sha256": "327293ADD424F8D603BB80638B1881D447527EA0B1D5329E812FBA9A30F7E263"
+    },
+    "v7_training_curve": {
+      "path": "results/rival2/ground_to_air_natural_v7/training_curve.jsonl",
+      "sha256": "C479D6528CB503BC1B1420A93A8150E50A469F2F1C7F8A23C8C512361670A88A"
+    },
+    "timing_candidate_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_timing_v8.py",
+      "sha256": "90BDEF4F87C2016F53F23D7CBFEB020474A5A80836D597B8A39B8513E527300D"
+    }
+  },
+  "calibration": {
+    "physics_hz": 120,
+    "worlds_per_row": 256,
+    "seed": 2026110601,
+    "matched_initial_states_across_candidates": true,
+    "setup_families": [
+      "low_bounce",
+      "incoming_chip",
+      "matched_dribble"
+    ],
+    "defender_modes": [
+      "parked",
+      "live"
+    ],
+    "sides": [0, 1],
+    "timing_candidates": [
+      {
+        "name": "inherited_hold_8_release_8",
+        "first_jump_hold_ticks": 8,
+        "jump_release_ticks": 8,
+        "first_jump_hold_milliseconds": 66.66666666666667,
+        "second_jump_milliseconds_after_launch": 133.33333333333334
+      },
+      {
+        "name": "hold_12_release_4",
+        "first_jump_hold_ticks": 12,
+        "jump_release_ticks": 4,
+        "first_jump_hold_milliseconds": 100.0,
+        "second_jump_milliseconds_after_launch": 133.33333333333334
+      },
+      {
+        "name": "hold_16_release_4",
+        "first_jump_hold_ticks": 16,
+        "jump_release_ticks": 4,
+        "first_jump_hold_milliseconds": 133.33333333333334,
+        "second_jump_milliseconds_after_launch": 166.66666666666666
+      },
+      {
+        "name": "hold_20_release_4",
+        "first_jump_hold_ticks": 20,
+        "jump_release_ticks": 4,
+        "first_jump_hold_milliseconds": 166.66666666666666,
+        "second_jump_milliseconds_after_launch": 200.0
+      },
+      {
+        "name": "hold_24_release_4",
+        "first_jump_hold_ticks": 24,
+        "jump_release_ticks": 4,
+        "first_jump_hold_milliseconds": 200.0,
+        "second_jump_milliseconds_after_launch": 233.33333333333334
+      }
+    ],
+    "fixed_across_candidates": {
+      "parent_model": "protected controlled scorer",
+      "initial_state_seed": 2026110601,
+      "pop_pitch": 0.5,
+      "pitch_residual_scale": 0.0,
+      "steer_scale": 0.25,
+      "yaw_scale": 0.35,
+      "roll_scale": 0.35,
+      "boost_during_pop": false,
+      "reward": "unchanged diagnostic return and event accounting",
+      "maximum_distinct_chain_contacts": 6
+    }
+  },
+  "selection": {
+    "lexicographic_order": [
+      "existing worst-row controlled-gate ratio",
+      "worst-row elevated-follow fraction",
+      "worst-row post-pop within-160uu fraction",
+      "worst-row takeoff-after-pop fraction",
+      "worst-row median maximum self height",
+      "worst-row median maximum upward self speed",
+      "negative maximum-row median closest post-pop ball distance",
+      "mean elevated-follow fraction",
+      "existing aggregate physical outcome score"
+    ],
+    "purpose": "calibration for a future prospectively frozen training authority only",
+    "no_checkpoint_promotion": true,
+    "no_test_corpus": true
+  },
+  "integrity": {
+    "optimizer_steps": 0,
+    "policy_parameters_mutated": false,
+    "production_reward_unchanged": true,
+    "natural_scenario_geometry_unchanged": true,
+    "dead_ball_vertical_launcher_used": false,
+    "raw_airtime_reward_used": false,
+    "named_mechanic_reward_or_detector_used": false,
+    "v7_diagnostic_checkpoint_used": false,
+    "protected_v23_unchanged": true
+  }
+}

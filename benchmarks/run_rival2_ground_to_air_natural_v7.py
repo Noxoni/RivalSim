@@ -88,6 +88,7 @@ def validation_rows(
     generators: list[torch.Generator],
     distribution: HybridDistributionOverride,
     collision_dir: Path,
+    physical_probe: bool = False,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     horizon = int(authority["episode"]["horizon_ticks"])
@@ -118,6 +119,7 @@ def validation_rows(
                     attacker_boost_range=tuple(
                         authority["scenario"]["validation_boost_range"]
                     ),
+                    physical_probe=physical_probe,
                 )
                 rows.append(metrics)
     return rows

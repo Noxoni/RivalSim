@@ -27,7 +27,11 @@ from benchmarks import run_rival2_codex_autonomous_v1 as autonomous  # noqa: E40
 from benchmarks import run_rival2_ground_to_air_goal_v3 as goal_v3  # noqa: E402
 from benchmarks import run_rival2_ground_to_air_natural_v4 as natural_v4  # noqa: E402
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes  # noqa: E402
-from rivalsim.rival2_contracts import RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION  # noqa: E402
+from rivalsim.rival2_contracts import (  # noqa: E402
+    CAR_LINEAR_SPEED_SCALE,
+    POSITION_SCALE,
+    RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+)
 from rivalsim.rival2_env import Rival2Env  # noqa: E402
 from rivalsim.rival2_ground_to_air_natural_v4 import (  # noqa: E402
     DEFENDER_LIVE,
@@ -35,7 +39,7 @@ from rivalsim.rival2_ground_to_air_natural_v4 import (  # noqa: E402
     SETUP_NAMES,
     build_natural_ground_to_air_scenarios,
 )
-from rivalsim.rival2_ground_to_air_option import GroundToAirConfig  # noqa: E402
+from rivalsim.rival2_ground_to_air_option import FIELD, GroundToAirConfig  # noqa: E402
 from rivalsim.rival2_ground_to_air_pop_control_v6 import (  # noqa: E402
     GROUND_TO_AIR_POP_CONTROL_V6_VERSION,
     LearnedPopOrientationConfig,
@@ -183,6 +187,7 @@ def collect_rollout(
     attacker_boost_range: tuple[float, float],
     pop_mask_factory: Callable[[Any, LearnedPopOrientationConfig], torch.Tensor]
     | None = None,
+    physical_probe: bool = False,
 ) -> tuple[MaskedOptionRollout | None, dict[str, Any]]:
     batch = build_natural_ground_to_air_scenarios(
         worlds,
@@ -233,6 +238,30 @@ def collect_rollout(
     button_sum = torch.zeros(3, dtype=torch.float64, device=device)
     action_count = torch.zeros((), dtype=torch.float64, device=device)
     pop_orientation_ticks = torch.zeros((), dtype=torch.int64, device=device)
+    if physical_probe:
+        position_scale = torch.as_tensor(
+            POSITION_SCALE,
+            dtype=observation.dtype,
+            device=observation.device,
+        )
+        max_self_height = (
+            observation[:, side, FIELD["self.position.z"]] * POSITION_SCALE[2]
+        )
+        max_ball_height = (
+            observation[:, side, FIELD["ball.position.z"]] * POSITION_SCALE[2]
+        )
+        max_self_vertical_speed = (
+            observation[:, side, FIELD["self.linear_velocity.z"]]
+            * CAR_LINEAR_SPEED_SCALE
+        )
+        minimum_post_pop_distance = torch.full(
+            (worlds,),
+            torch.inf,
+            dtype=observation.dtype,
+            device=observation.device,
+        )
+        pop_seen = torch.zeros(worlds, dtype=torch.bool, device=device)
+        airborne_after_pop = torch.zeros(worlds, dtype=torch.bool, device=device)
     other = 1 - side
     defender = defenders[other]
     model.eval()
@@ -273,6 +302,38 @@ def collect_rollout(
         live = active_before & defender_active
         action[:, other] = torch.where(live[:, None], defender_action, 0.0)
         transition = env.step(action)
+        if physical_probe:
+            physical_observation = transition.transition_observation[:, side]
+            max_self_height = torch.maximum(
+                max_self_height,
+                physical_observation[:, FIELD["self.position.z"]] * POSITION_SCALE[2],
+            )
+            max_ball_height = torch.maximum(
+                max_ball_height,
+                physical_observation[:, FIELD["ball.position.z"]] * POSITION_SCALE[2],
+            )
+            max_self_vertical_speed = torch.maximum(
+                max_self_vertical_speed,
+                physical_observation[:, FIELD["self.linear_velocity.z"]]
+                * CAR_LINEAR_SPEED_SCALE,
+            )
+            pop_seen |= option.pop_started & active_before
+            probe_active = pop_seen & active_before
+            relative_position = torch.stack(
+                [
+                    physical_observation[:, FIELD[f"relative.ball_position.{axis}"]]
+                    for axis in "xyz"
+                ],
+                dim=-1,
+            ) * position_scale
+            distance = torch.linalg.vector_norm(relative_position, dim=-1)
+            minimum_post_pop_distance = torch.minimum(
+                minimum_post_pop_distance,
+                torch.where(probe_active, distance, torch.inf),
+            )
+            airborne_after_pop |= probe_active & (
+                physical_observation[:, FIELD["self.on_ground"]] < 0.5
+            )
         scoring_team = env.bridge.views["rival2.scoring_team_latched"].to(torch.int64)
         goal_for = active_before & transition.terminated & (scoring_team == side)
         reward, skill_done = tracker.step(
@@ -371,6 +432,51 @@ def collect_rollout(
         ).cpu().tolist(),
         "finite": bool(torch.isfinite(observation).all()),
     }
+    if physical_probe:
+        def summary(values: torch.Tensor) -> dict[str, float | int | None]:
+            finite_values = values[torch.isfinite(values)]
+            if finite_values.numel() == 0:
+                return {
+                    "count": 0,
+                    "minimum": None,
+                    "p10": None,
+                    "p50": None,
+                    "p90": None,
+                    "maximum": None,
+                }
+            quantiles = torch.quantile(
+                finite_values.to(torch.float64),
+                torch.tensor(
+                    [0.1, 0.5, 0.9],
+                    dtype=torch.float64,
+                    device=finite_values.device,
+                ),
+            )
+            return {
+                "count": int(finite_values.numel()),
+                "minimum": float(finite_values.min()),
+                "p10": float(quantiles[0]),
+                "p50": float(quantiles[1]),
+                "p90": float(quantiles[2]),
+                "maximum": float(finite_values.max()),
+            }
+
+        metrics["physical_probe"] = {
+            "takeoff_after_pop_fraction": float(
+                airborne_after_pop.float().mean().cpu()
+            ),
+            "post_pop_within_160uu_fraction": float(
+                (minimum_post_pop_distance <= 160.0).float().mean().cpu()
+            ),
+            "maximum_self_height_uu": summary(max_self_height),
+            "maximum_ball_height_uu": summary(max_ball_height),
+            "maximum_self_vertical_speed_uu_per_second": summary(
+                max_self_vertical_speed
+            ),
+            "minimum_post_pop_ball_distance_uu": summary(
+                minimum_post_pop_distance
+            ),
+        }
     del env
     gc.collect()
     torch.cuda.empty_cache()
