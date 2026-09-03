@@ -1,0 +1,135 @@
+{
+  "authority_sha256": "8086113EAFC8F5E0946CDA85137EBCC8B2218D0E41C3E730858817EDDE8B671C",
+  "created_utc": "2026-09-03T18:14:09.274027+00:00",
+  "format": "RIVAL2_UNIFIED_CORPUS_MANIFEST_V4",
+  "splits": {
+    "train": {
+      "aerial": {
+        "bytes": 225186963,
+        "observation_shape": [
+          600,
+          512,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/train/aerial.pt",
+        "sha256": "70558DD5E8C9D59E5B89593144C0DFDA7BDA0D3747C616D7FEE7BF0B5B703843",
+        "valid_samples": 125583
+      },
+      "capability": {
+        "bytes": 192171578,
+        "observation_shape": [
+          256,
+          1024,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/train/capability.pt",
+        "sha256": "1B63C26B240FB5EB3E6334B71F7B736BC97A4C161CD7EF8C6F1B05D9CB37FC8E",
+        "valid_samples": 245394
+      },
+      "natural": {
+        "bytes": 47778913,
+        "observation_shape": [
+          512,
+          128,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/train/natural.pt",
+        "sha256": "7EC9169AD14632A35F14D23658F9776AB78C4C4D15696903DCFB5B2713C95803",
+        "valid_samples": 65536
+      },
+      "student_aerial": {
+        "bytes": 447911456,
+        "observation_shape": [
+          600,
+          1024,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/train/student_aerial.pt",
+        "sha256": "C9E3F12A97C4047FB20A3EFD52AC0911DC3CE5D0CB79687CB320C3D7F6353EC0",
+        "valid_samples": 211795
+      },
+      "student_natural": {
+        "bytes": 382209513,
+        "observation_shape": [
+          4096,
+          128,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/train/student_natural.pt",
+        "reset_boundary_samples_excluded": 269,
+        "sha256": "C98E5F7302E97D515374B7386A1840448F77C3880F0EE8972DC36B7318434E0E",
+        "valid_samples": 524019
+      }
+    },
+    "validation": {
+      "aerial": {
+        "bytes": 112596115,
+        "observation_shape": [
+          600,
+          256,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/validation/aerial.pt",
+        "sha256": "2FFD7EEEBCE19199691E1B4FE07218604700C9CE6EA653D9E82AF238D11E0D39",
+        "valid_samples": 63030
+      },
+      "capability": {
+        "bytes": 96087610,
+        "observation_shape": [
+          256,
+          512,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/validation/capability.pt",
+        "sha256": "5A4A0671976E10C21D1CB5059C1875526E8281639558AC1D8FA7C4E624DAE218",
+        "valid_samples": 122723
+      },
+      "natural": {
+        "bytes": 23890529,
+        "observation_shape": [
+          512,
+          64,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/validation/natural.pt",
+        "sha256": "DB7B3A93B0D506FEF370260F80FF1E54A6D8B509C2F8D861BEA3359A616DD1BA",
+        "valid_samples": 32768
+      },
+      "student_aerial": {
+        "bytes": 223958560,
+        "observation_shape": [
+          600,
+          512,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/validation/student_aerial.pt",
+        "sha256": "D447BD3DBEEC323C081DA7532AEC75C121EEB61C015FB96CB469C366086D24C3",
+        "valid_samples": 105726
+      },
+      "student_natural": {
+        "bytes": 382209513,
+        "observation_shape": [
+          4096,
+          128,
+          182
+        ],
+        "path": "G:/dev/RivalSim-runs/unified-capability-distillation-v4/corpora/validation/student_natural.pt",
+        "reset_boundary_samples_excluded": 269,
+        "sha256": "E23402CFBF5AC391320A02C98D4CB1D3351B707782F8AFB471F2C35B33D5B2B5",
+        "valid_samples": 524019
+      }
+    }
+  },
+  "student_aerial_policy": {
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V3",
+    "path": "checkpoints/rival2/unified_capability_distillation_v3/rival2_unified_capability_v3.pt",
+    "selected_step": 1800,
+    "sha256": "3E7EDB5AEC58B5C02E271B9E256B650D6EC9E68696ED52610B2DAED2488D4FEA"
+  },
+  "student_natural_policy": {
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V3",
+    "path": "checkpoints/rival2/unified_capability_distillation_v3/rival2_unified_capability_v3.pt",
+    "selected_step": 1800,
+    "sha256": "3E7EDB5AEC58B5C02E271B9E256B650D6EC9E68696ED52610B2DAED2488D4FEA"
+  }
+}
