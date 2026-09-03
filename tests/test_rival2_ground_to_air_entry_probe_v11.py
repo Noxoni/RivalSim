@@ -258,6 +258,38 @@ def test_seventh_contact_exceeds_budget_and_prevents_later_goal_credit() -> None
     assert not bool(goal.goal_within_contact_budget.item())
 
 
+def test_airborne_ball_returning_to_floor_is_a_failure_event() -> None:
+    probe = GroundToAirEntryProbeV11(
+        torch.tensor([SETUP_RISING_DOUBLE_JUMP]),
+        attacker_side=0,
+        envelope_config=_config(),
+    )
+    active = torch.tensor([True])
+    before = _observation(
+        car_height=90.0,
+        ball_height=210.0,
+        car_vertical_speed=300.0,
+        relative_y=80.0,
+        relative_z=120.0,
+        on_ground=False,
+    )
+    entry = before.clone()
+    entry[:, :, FIELD["lifecycle.self_touch_event"]] = 1.0
+    first = probe.step(before, entry, tick=0, active=active)
+    assert not bool(first.ball_ground_failure.item())
+    floor = _observation(
+        car_height=17.0,
+        ball_height=99.0,
+        car_vertical_speed=0.0,
+        relative_y=500.0,
+        relative_z=82.0,
+        on_ground=True,
+    )
+    failed = probe.step(entry, floor, tick=40, active=active)
+    assert bool(failed.ball_ground_failure.item())
+    assert probe.telemetry()["fractions"]["ball_ground_failure"] == 1.0
+
+
 def test_invalid_probe_fails_closed() -> None:
     try:
         GroundToAirEntryProbeV11(

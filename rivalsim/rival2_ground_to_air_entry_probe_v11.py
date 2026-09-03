@@ -58,6 +58,7 @@ class EntryProbeStepEvents:
     second_airborne_contact: torch.Tensor
     goal_within_contact_budget: torch.Tensor
     contact_budget_exceeded: torch.Tensor
+    ball_ground_failure: torch.Tensor
 
 
 class GroundToAirEntryProbeV11:
@@ -120,6 +121,8 @@ class GroundToAirEntryProbeV11:
         self.second_seen = torch.zeros_like(self.first_contact_seen)
         self.goal_seen = torch.zeros_like(self.first_contact_seen)
         self.budget_exceeded_seen = torch.zeros_like(self.first_contact_seen)
+        self.ball_was_airborne = torch.zeros_like(self.first_contact_seen)
+        self.ball_ground_failure_seen = torch.zeros_like(self.first_contact_seen)
         self.contact_count = torch.zeros(
             self.worlds, dtype=torch.int64, device=self.device
         )
@@ -254,6 +257,18 @@ class GroundToAirEntryProbeV11:
             & (age >= 0)
             & (age <= self.continuation_ticks)
         )
+        # Do not let a later ordinary bounce masquerade as aerial
+        # continuation.  The 120 Hz scenario runner ends an attempt on this
+        # event, matching the training-pack semantics requested by the user.
+        self.ball_was_airborne |= continuation & (ball_height > 120.0)
+        ball_ground_failure = (
+            continuation
+            & self.ball_was_airborne
+            & (ball_height <= 100.0)
+            & ~goal_for_attacker
+            & ~self.ball_ground_failure_seen
+        )
+        self.ball_ground_failure_seen |= ball_ground_failure
         self.maximum_car_height = torch.where(
             continuation,
             torch.maximum(self.maximum_car_height, car_height),
@@ -313,6 +328,7 @@ class GroundToAirEntryProbeV11:
             second_airborne_contact=second_contact,
             goal_within_contact_budget=goal_event,
             contact_budget_exceeded=budget_event,
+            ball_ground_failure=ball_ground_failure,
         )
 
     def telemetry(self) -> dict[str, Any]:
@@ -346,6 +362,9 @@ class GroundToAirEntryProbeV11:
                 ),
                 "contact_budget_exceeded": float(
                     self.budget_exceeded_seen.to(torch.float32).mean().cpu()
+                ),
+                "ball_ground_failure": float(
+                    self.ball_ground_failure_seen.to(torch.float32).mean().cpu()
                 ),
             },
             "first_contact": {
