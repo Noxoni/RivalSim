@@ -40,6 +40,11 @@ AUTHORITY = ROOT / "results/rival2/ground_to_air_natural_v7/authority.json"
 AUTHORITY_SHA256 = "6192B823A13993A0C883D83E35AC128F3C2D964BA172F36589356E91E6FCE2A6"
 RESULTS = ROOT / "results/rival2/ground_to_air_natural_v7"
 CHECKPOINTS = ROOT / "checkpoints/rival2/ground_to_air_natural_v7"
+CHECKPOINT_NAME = "rival2_ground_to_air_natural_v7.pt"
+STAGE_NAME = "ground_to_air_natural_v7"
+OPTIMIZER_FORMAT = "RIVAL2_GROUND_TO_AIR_NATURAL_V7_FRESH_BALANCED_ADAMW"
+POP_CONTROL_IDENTITY = GROUND_TO_AIR_POP_CONTROL_V7_VERSION
+VALIDATION_PHYSICAL_PROBE = False
 PARENT = natural_v4.PARENT
 PARENT_SHA256 = natural_v4.PARENT_SHA256
 BLUE = natural_v4.BLUE
@@ -140,12 +145,12 @@ def save_checkpoint(
         name: value.detach().cpu().clone() for name, value in model.state_dict().items()
     }
     payload["optimizer"] = {
-        "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V7_FRESH_BALANCED_ADAMW",
+        "format": OPTIMIZER_FORMAT,
         "option": optimizer.state_dict(),
     }
     payload["curriculum_transition"] = {
         "identity": VERSION,
-        "pop_control_identity": GROUND_TO_AIR_POP_CONTROL_V7_VERSION,
+        "pop_control_identity": POP_CONTROL_IDENTITY,
         "created_utc": natural_v6.utc_now(),
         "authority": {
             "path": AUTHORITY.relative_to(ROOT).as_posix(),
@@ -214,6 +219,7 @@ def run(args: argparse.Namespace) -> int:
         generators=generators,
         distribution=distribution,
         collision_dir=args.collision_dir,
+        physical_probe=VALIDATION_PHYSICAL_PROBE,
     )
     preflight = {
         "format": f"{VERSION}_PREFLIGHT",
@@ -243,7 +249,7 @@ def run(args: argparse.Namespace) -> int:
 
     run_dir = Path(args.run_dir)
     if run_dir.exists() and any(run_dir.iterdir()):
-        raise RuntimeError("natural V7 training requires a fresh run directory")
+        raise RuntimeError(f"{VERSION} training requires a fresh run directory")
     run_dir.mkdir(parents=True, exist_ok=True)
     curve = RESULTS / "training_curve.jsonl"
     if curve.exists():
@@ -315,7 +321,7 @@ def run(args: argparse.Namespace) -> int:
             if not all(
                 bool(torch.isfinite(parameter).all()) for parameter in model.parameters()
             ):
-                raise FloatingPointError("nonfinite V7 aerial-option parameter")
+                raise FloatingPointError(f"nonfinite {VERSION} aerial-option parameter")
         except (FloatingPointError, RuntimeError) as error:
             model.load_state_dict(block_model, strict=True)
             optimizer.load_state_dict(block_optimizer)
@@ -344,6 +350,7 @@ def run(args: argparse.Namespace) -> int:
                 generators=generators,
                 distribution=distribution,
                 collision_dir=args.collision_dir,
+                physical_probe=VALIDATION_PHYSICAL_PROBE,
             )
             key = natural_v6.selection_key(validation, authority)
             passed = natural_v4.passes_gate(validation, authority)
@@ -394,7 +401,7 @@ def run(args: argparse.Namespace) -> int:
             print(
                 json.dumps(
                     {
-                        "stage": "ground_to_air_natural_v7",
+                        "stage": STAGE_NAME,
                         "block": block,
                         "selection_key": key,
                         "best_block": best_block,
@@ -420,7 +427,7 @@ def run(args: argparse.Namespace) -> int:
         {name: value.detach().cpu() for name, value in model.critic.state_dict().items()}
     )
     if observed_critic != critic_hash:
-        raise RuntimeError("natural V7 aerial option changed the frozen critic")
+        raise RuntimeError(f"{VERSION} aerial option changed the frozen critic")
     validation_pass = natural_v4.passes_gate(best_evaluation, authority)
     test: list[dict[str, Any]] | None = None
     if validation_pass:
@@ -436,6 +443,7 @@ def run(args: argparse.Namespace) -> int:
             generators=generators,
             distribution=distribution,
             collision_dir=args.collision_dir,
+            physical_probe=VALIDATION_PHYSICAL_PROBE,
         )
     controlled_pass = bool(
         validation_pass
@@ -449,7 +457,7 @@ def run(args: argparse.Namespace) -> int:
                 source,
                 model,
                 optimizer,
-                CHECKPOINTS / "rival2_ground_to_air_natural_v7.pt",
+                CHECKPOINTS / CHECKPOINT_NAME,
                 block=best_block,
                 evaluation={"validation": best_evaluation, "test": test},
                 disposition="promoted_controlled_option",
