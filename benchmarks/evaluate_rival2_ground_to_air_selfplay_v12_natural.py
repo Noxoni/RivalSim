@@ -1,4 +1,4 @@
-"""Deterministic natural V23 self-play evaluation of the selected V12 option."""
+"""Deterministic natural V23 self-play evaluation of compatible aerial options."""
 
 from __future__ import annotations
 
@@ -67,6 +67,7 @@ class V12NaturalSelfPlayRunner(SideSpecializedSelfPlayRunner):
         if payload.get("format") not in {
             "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_CHECKPOINT",
             "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13_CHECKPOINT",
+            "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14_CHECKPOINT",
         }:
             raise RuntimeError("unexpected aerial-option checkpoint format")
         config = Rival2PolicyConfig(**payload["policy_config"])
