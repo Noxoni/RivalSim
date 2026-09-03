@@ -1,0 +1,89 @@
+{
+  "census": {
+    "eligible_fraction": 0.000630859375,
+    "eligible_player_ticks": 1938,
+    "player_ticks": 3072000,
+    "routes": {
+      "assisted_low_bounce": {
+        "eligible_fraction": 9.9609375e-05,
+        "eligible_player_ticks": 306,
+        "feature_means": {
+          "ball_height_uu": 116.1521504720052,
+          "ball_vertical_speed_uu_per_second": 43.783976554870605,
+          "forward_alignment": 0.8112249771753947,
+          "opponent_ball_distance_uu": 1327.2072143554688,
+          "planar_distance_uu": 413.3489532470703
+        },
+        "sequence_starts": 51
+      },
+      "rising_double_jump": {
+        "eligible_fraction": 0.0001328125,
+        "eligible_player_ticks": 408,
+        "feature_means": {
+          "ball_height_uu": 152.43416213989258,
+          "ball_vertical_speed_uu_per_second": 106.19555282592773,
+          "forward_alignment": 0.9219790771603584,
+          "opponent_ball_distance_uu": 605.9740982055664,
+          "planar_distance_uu": 415.5720748901367
+        },
+        "sequence_starts": 51
+      },
+      "roof_carry": {
+        "eligible_fraction": 0.0,
+        "eligible_player_ticks": 0,
+        "feature_means": {
+          "ball_height_uu": null,
+          "ball_vertical_speed_uu_per_second": null,
+          "forward_alignment": null,
+          "opponent_ball_distance_uu": null,
+          "planar_distance_uu": null
+        },
+        "sequence_starts": 0
+      },
+      "soft_incoming_chip": {
+        "eligible_fraction": 0.0003984375,
+        "eligible_player_ticks": 1224,
+        "feature_means": {
+          "ball_height_uu": 115.18995889027913,
+          "ball_vertical_speed_uu_per_second": -37.45734574397405,
+          "forward_alignment": 0.718059703707695,
+          "opponent_ball_distance_uu": 1334.645055135091,
+          "planar_distance_uu": 338.8262990315755
+        },
+        "sequence_starts": 51
+      }
+    },
+    "sequence_starts": 153
+  },
+  "format": "RIVAL2_V23_GROUND_TO_AIR_SELFPLAY_V12_CENSUS",
+  "policies": {
+    "blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "policy_mutation": false,
+  "reward_mutation": false,
+  "router_config": {
+    "airborne_ball_height_uu": 130.0,
+    "contact_separation_ticks": 4,
+    "cooldown_ticks": 90,
+    "grounded_ball_height_uu": 100.0,
+    "maximum_distinct_contacts": 6,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 480.0,
+    "minimum_boost_fraction": 0.15,
+    "minimum_canonical_ball_y_uu": -3000.0,
+    "minimum_forward_alignment": 0.55,
+    "minimum_landing_release_tick": 72,
+    "ownership_margin_uu": 200.0
+  },
+  "router_version": "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12",
+  "seed": 2026090301,
+  "ticks": 6000,
+  "worlds": 256
+}
