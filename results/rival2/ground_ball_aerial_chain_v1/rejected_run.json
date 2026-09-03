@@ -1,0 +1,37 @@
+{
+  "format": "RIVAL2_GROUND_BALL_AERIAL_CHAIN_V1_REJECTED_RUN",
+  "authority_sha256": "F3DE606FC5E0EA6FDBB8FA9494EA30D20735BEFCAAE0EEB4E5C150D84F4B1BE7",
+  "completed_training_blocks": 25,
+  "ppo_minibatch_optimizer_steps": 300,
+  "successful_rehearsal_samples": 0,
+  "goal_rehearsal_samples": 0,
+  "rolling_checkpoint": {
+    "path": "G:/dev/RivalSim-runs/ground-ball-aerial-chain-v1/rolling.pt",
+    "accepted_block": 24,
+    "sha256": "6CC1F88AFD84161E588A71B6282B44CBE6D51AB4A73F6A40A865D9D5CCF25C22",
+    "promoted": false
+  },
+  "block_1_training_return_mean": [-4.092592716217041, -4.0805511474609375],
+  "block_25_training_return_mean": [-1.983827829360962, -1.9308353662490845],
+  "deterministic_elevated_follow_fraction_at_block_24": [0.0, 0.0],
+  "training_elevated_follow_fraction_through_block_25": [0.0, 0.0],
+  "trajectory_diagnosis": {
+    "worlds_per_side": 512,
+    "source": "selected block-24 rolling checkpoint",
+    "median_maximum_car_height_uu": [317.1, 326.54],
+    "median_maximum_ball_height_uu": [254.3, 253.68],
+    "median_high_ball_minimum_planar_gap_uu": [296.82, 297.14],
+    "minimum_gap_tick_q10_p50_p90": [[13.0, 16.0, 19.0], [13.0, 16.0, 19.0]],
+    "any_second_touch_fraction": [0.072265625, 0.068359375],
+    "elevated_second_touch_fraction": [0.0, 0.0],
+    "median_second_touch_ball_height_uu": [96.87, 95.93],
+    "median_second_touch_car_height_uu": [69.47, 70.27],
+    "conclusion": "hard source pop creates an approximately 297-uu forward separation before learned continuation"
+  },
+  "hard_failure": false,
+  "production_reward_changed": false,
+  "protected_v23_changed": false,
+  "controlled_aerial_parent_changed": false,
+  "self_play_started": false,
+  "promotion_verdict": "REJECTED_HARD_POP_HANDOFF_GEOMETRY"
+}
