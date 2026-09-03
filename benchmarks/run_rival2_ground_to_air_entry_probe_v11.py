@@ -19,6 +19,10 @@ if str(ROOT) not in sys.path:
 
 from benchmarks import run_rival2_capability_curriculum_v1 as capability  # noqa: E402
 from benchmarks import run_rival2_ground_to_air_natural_v4 as natural_v4  # noqa: E402
+from benchmarks.evaluate_rival2_ground_to_air_selfplay_v12_natural import (  # noqa: E402
+    HANDOFF_FEATURE_NAMES,
+    handoff_features,
+)
 from rivalsim.arena import ArenaGeometry, WarpArenaMeshes  # noqa: E402
 from rivalsim.rival2_contracts import RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION  # noqa: E402
 from rivalsim.rival2_env import Rival2Env  # noqa: E402
@@ -95,6 +99,35 @@ def human_envelope_config() -> HumanAerialEnvelopeConfig:
     )
 
 
+def _feature_distribution(
+    values: torch.Tensor,
+    mask: torch.Tensor,
+) -> dict[str, Any]:
+    selected = values[mask].detach().to(torch.float64).cpu()
+    if selected.shape[0] == 0:
+        return {"count": 0, "features": {}}
+    quantiles = torch.quantile(
+        selected,
+        torch.tensor((0.1, 0.5, 0.9), dtype=torch.float64),
+        dim=0,
+    )
+    mean = selected.mean(dim=0)
+    standard_deviation = selected.std(dim=0, correction=0)
+    return {
+        "count": int(selected.shape[0]),
+        "features": {
+            name: {
+                "mean": float(mean[index]),
+                "standard_deviation": float(standard_deviation[index]),
+                "p10": float(quantiles[0, index]),
+                "p50": float(quantiles[1, index]),
+                "p90": float(quantiles[2, index]),
+            }
+            for index, name in enumerate(HANDOFF_FEATURE_NAMES)
+        },
+    }
+
+
 def collect_row(
     model: Rival2ActorCritic,
     defenders: dict[int, Rival2ActorCritic],
@@ -157,6 +190,12 @@ def collect_row(
     goals_against = torch.zeros((), dtype=torch.int64, device=device)
     ball_ground_failures = torch.zeros((), dtype=torch.int64, device=device)
     contact_budget_failures = torch.zeros((), dtype=torch.int64, device=device)
+    entry_feature_values = torch.zeros(
+        (worlds, len(HANDOFF_FEATURE_NAMES)),
+        dtype=torch.float32,
+        device=device,
+    )
+    entry_feature_seen = torch.zeros(worlds, dtype=torch.bool, device=device)
     other = 1 - side
     defender = defenders[other]
     model.eval()
@@ -193,6 +232,17 @@ def collect_row(
             goal_for_attacker=goal_for,
         )
         emitted = transition.emitted_action[:, side]
+        entry_features = handoff_features(
+            transition.transition_observation[:, side], emitted
+        )
+        entry_feature_values.copy_(
+            torch.where(
+                events.entry_airborne_contact[:, None],
+                entry_features,
+                entry_feature_values,
+            )
+        )
+        entry_feature_seen |= events.entry_airborne_contact
         action_count += active_before.sum(dtype=torch.float64)
         analog_sum += (emitted[:, :5] * active_before[:, None]).sum(
             dim=0, dtype=torch.float64
@@ -248,6 +298,18 @@ def collect_row(
             saturation / action_count.clamp_min(1.0)
         ).cpu().tolist(),
         "finite": bool(torch.isfinite(observation).all()),
+        "handoff_entry_features": {
+            "feature_names": list(HANDOFF_FEATURE_NAMES),
+            "all": _feature_distribution(entry_feature_values, entry_feature_seen),
+            "second_contact_success": _feature_distribution(
+                entry_feature_values,
+                entry_feature_seen & probe.second_seen,
+            ),
+            "no_second_contact": _feature_distribution(
+                entry_feature_values,
+                entry_feature_seen & ~probe.second_seen,
+            ),
+        },
     }
     del env
     gc.collect()
