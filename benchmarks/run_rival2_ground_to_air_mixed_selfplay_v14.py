@@ -529,11 +529,80 @@ def run(args: argparse.Namespace) -> int:
         restore(trainer, args.resume, provenance)
     elif curve.exists():
         raise RuntimeError("V14 training curve already exists; pass --resume")
-    refresh_rows = [initial_summary]
-    validation_rows: list[dict[str, Any]] = []
+    refresh_manifest = RESULTS / "curriculum_refresh_manifest.json"
+    validation_manifest = RESULTS / "validation_manifest.json"
+    refresh_rows = (
+        json.loads(refresh_manifest.read_text(encoding="utf-8"))["rows"]
+        if refresh_manifest.exists()
+        else [initial_summary]
+    )
+    validation_rows: list[dict[str, Any]] = (
+        json.loads(validation_manifest.read_text(encoding="utf-8"))["rows"]
+        if validation_manifest.exists()
+        else []
+    )
     hard_failure: dict[str, Any] | None = None
     rollout_boundaries = 0
     start = time.monotonic()
+    completed_boundaries = {
+        int(row["accepted_update"]) for row in validation_rows
+    }
+    if (
+        args.resume
+        and trainer.iteration > 0
+        and trainer.iteration % SNAPSHOT_INTERVAL == 0
+        and trainer.iteration not in completed_boundaries
+    ):
+        snapshot_path = args.run_dir / f"snapshot_u{trainer.iteration:04d}.pt"
+        snapshot = {
+            "accepted_update": trainer.iteration,
+            "path": str(snapshot_path),
+            "sha256": v12.sha256_file(snapshot_path),
+            "bytes": snapshot_path.stat().st_size,
+            "total_option_samples": trainer.total_option_samples,
+            "total_physics_ticks": trainer.total_physics_ticks,
+        }
+        validation = evaluate_boundary(
+            trainer,
+            geometry,
+            meshes,
+            snapshot,
+            authority=authority,
+            collision_dir=args.collision_dir,
+            device=args.device,
+        )
+        validation_rows.append(validation)
+        write_json(
+            validation_manifest,
+            {"format": f"{VERSION}_VALIDATION_MANIFEST", "rows": validation_rows},
+        )
+        if trainer.iteration < args.target_updates:
+            refreshed = replace_curriculum_environment(
+                trainer,
+                geometry,
+                meshes,
+                worlds=args.worlds,
+                device=args.device,
+                refresh_index=trainer.iteration // SNAPSHOT_INTERVAL,
+                collision_dir=args.collision_dir,
+            )
+            refresh_rows.append(refreshed)
+            write_json(
+                refresh_manifest,
+                {"format": f"{VERSION}_REFRESH_MANIFEST", "rows": refresh_rows},
+            )
+        print(
+            json.dumps(
+                {
+                    "resumed_boundary": trainer.iteration,
+                    "controlled": validation["controlled_macro"],
+                    "natural_router": validation["natural"]["router"]["counters"],
+                    "eligible": validation["eligible"],
+                },
+                sort_keys=True,
+            ),
+            flush=True,
+        )
     while trainer.iteration < args.target_updates:
         rollout_started = time.monotonic()
         rollout = trainer.collect_rollout()
