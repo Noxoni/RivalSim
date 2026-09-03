@@ -1,0 +1,149 @@
+{
+  "format": "RIVAL2_UNIFIED_CAPABILITY_DISTILLATION_V3_AUTHORITY",
+  "created_utc": "2026-09-03T17:45:00Z",
+  "purpose": "Correct compounding natural closed-loop error using student-induced V23-teacher rehearsal while retaining aerial and capability behavior in one network.",
+  "parent": {
+    "path": "checkpoints/rival2/unified_capability_distillation_v2/rival2_unified_capability_v2.pt",
+    "sha256": "371C52C2FBC2D0098CF0AC451DDF5625E703B334E4339DF268C46D04430F66BD",
+    "format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V2",
+    "selected_step": 2900
+  },
+  "sources": {
+    "base_blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "base_orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "aerial_teacher": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "capability_blue": {
+      "path": "checkpoints/rival2/capability_curriculum_v2/rival2_blue.pt",
+      "sha256": "8F3942F30AFF00655D5A83CC2FA8EA8B9AC5314907CCB4D0AE2888C0F48C5442"
+    },
+    "capability_orange": {
+      "path": "checkpoints/rival2/capability_curriculum_v2/rival2_orange.pt",
+      "sha256": "E1E27300D58CFB57CEDE9A0E49E1F1C1392EA3DB59B44C22674BCB4B953AAC34"
+    }
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "observation_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "action_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "physics_hz": 120,
+    "policy_hz": 120
+  },
+  "student": {
+    "architecture": "RIVAL2_UNIFIED_CAPABILITY_POLICY_V1",
+    "initialization": "selected V2 single-network checkpoint",
+    "trainable": ["context_encoder", "context_gru", "context_actor"],
+    "frozen": ["capability-baked trunk", "capability-baked actor", "critic"],
+    "runtime_router": false,
+    "task_identifier_input": false,
+    "expert_action_splice": false
+  },
+  "corpora": {
+    "sequence_ticks": 80,
+    "burn_in_ticks": 16,
+    "train": {
+      "natural_worlds": 128,
+      "natural_ticks": 512,
+      "student_natural_worlds": 128,
+      "student_natural_ticks": 4096,
+      "aerial_worlds_per_side": 256,
+      "aerial_horizon_ticks": 600,
+      "capability_worlds_per_side": 512,
+      "capability_horizon_ticks": 256
+    },
+    "validation": {
+      "natural_worlds": 64,
+      "natural_ticks": 512,
+      "student_natural_worlds": 128,
+      "student_natural_ticks": 4096,
+      "aerial_worlds_per_side": 128,
+      "aerial_horizon_ticks": 600,
+      "capability_worlds_per_side": 256,
+      "capability_horizon_ticks": 256
+    },
+    "student_natural_opponent": "pinned Nexto",
+    "student_natural_policy": "immutable selected V2 parent",
+    "student_natural_target": "side-correct frozen V23 actor",
+    "reset_crossing_windows_excluded": true
+  },
+  "seeds": {
+    "train_natural": 202609033101,
+    "train_aerial": 202609033102,
+    "train_capability": 202609033103,
+    "train_student_natural": 202609033104,
+    "validation_natural": 202609033201,
+    "validation_aerial": 202609033202,
+    "validation_capability": 202609033203,
+    "validation_student_natural": 202609033204,
+    "physical_aerial": 202609033301,
+    "physical_capability": 202609033302,
+    "physical_nexto": 202609033303,
+    "optimizer": 202609033401
+  },
+  "optimization": {
+    "optimizer": "fresh AdamW on recurrent context only",
+    "learning_rate": 0.0001,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "batch_sequences_per_family": 32,
+    "maximum_accepted_steps": 2000,
+    "validation_interval_steps": 100,
+    "plateau_patience_boundaries": 10,
+    "minimum_score_improvement": 0.00005,
+    "analog_loss": "SmoothL1(tanh(student_mean), tanh(teacher_mean)), beta=0.1",
+    "button_loss": "BCEWithLogits(student_logits, sigmoid(teacher_logits))",
+    "log_std_loss": "SmoothL1(student_log_std, teacher_log_std), beta=0.1",
+    "button_weight": 0.25,
+    "log_std_weight": 0.05,
+    "family_weights": {
+      "natural_v23": 0.2,
+      "student_natural_v2": 0.35,
+      "aerial_v3": 0.3,
+      "offensive_demo_v2": 0.05,
+      "floor_landing_v2": 0.05,
+      "wall_landing_v2": 0.05
+    },
+    "kl_policy": "telemetry only",
+    "hard_failures": [
+      "nonfinite loss",
+      "nonfinite gradient",
+      "nonfinite parameter",
+      "source, parent, corpus, or contract hash mismatch"
+    ]
+  },
+  "selection": {
+    "validation_only": true,
+    "natural_expected_action_rmse_max": 0.01,
+    "student_natural_expected_action_rmse_max": 0.01,
+    "aerial_expected_action_rmse_max": 0.06,
+    "capability_family_expected_action_rmse_max": 0.005,
+    "score": "weighted mean validation expected-action RMSE across six frozen families",
+    "physical_results_not_used_for_checkpoint_reselection": true
+  },
+  "final_evaluation": {
+    "single_policy_direct_control": true,
+    "runtime_router": false,
+    "aerial_worlds_per_side": 1024,
+    "capability_worlds_per_side": 2048,
+    "nexto_worlds_per_side": 128,
+    "five_kickoff_layouts": true,
+    "deterministic": true
+  },
+  "integrity": {
+    "ppo_authorized": false,
+    "reward_change_authorized": false,
+    "mechanic_classifier_authorized": false,
+    "simulator_mutation_authorized": false,
+    "official_promotion_authorized": false,
+    "optimizer_steps_before_authority_commit": 0
+  }
+}

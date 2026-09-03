@@ -313,6 +313,7 @@ class UnifiedNextoRunner:
         self.open_play = OpenPlayTelemetry(self.world)
         self.open_play.attach(self.world)
         self.host_tick = 0
+        self.last_reset_mask = torch.zeros(num_worlds, dtype=torch.bool, device=self.device)
         self.world.reset_transfer_counters()
         self.world.capture_graph(block_ticks=1)
 
@@ -340,8 +341,10 @@ class UnifiedNextoRunner:
         self.bridge.set_actions(self.actions)
         self.world.step_graph(1)
         self.host_tick += 1
+        self.last_reset_mask.zero_()
         if self.host_tick % RIVAL_CADENCE_TICKS == 0:
             reset = self.bridge.views["rival2.reset_mask"].to(torch.bool)
+            self.last_reset_mask.copy_(reset)
             self.nexto.notify_kickoff(reset)
             self.world.apply_interval_resets()
             if bool(torch.any(reset)):
