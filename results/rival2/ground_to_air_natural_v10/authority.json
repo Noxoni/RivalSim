@@ -1,0 +1,306 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V10_AUTHORITY",
+  "created_utc": "2026-09-03T09:20:00Z",
+  "purpose": "Learn the causal first airborne recontact for natural bounce, incoming-chip, and matched-dribble entries before requiring the existing strict elevated continuation and controlled finish.",
+  "bound_inputs": {
+    "passing_controlled_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "natural_scenario_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_natural_v4.py",
+      "sha256": "6C95203EF5E4C59505C8318C7CD80E2FB65AB29A0BC5E1DA17CC186A0E15D36E"
+    },
+    "narrow_pop_mask_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_pop_control_v7.py",
+      "sha256": "0964B7FACFCA3315A37BCF13B161FE017E0E46124AA8E9F19AD4B2D9437C7F29"
+    },
+    "touch_geometry_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_touch_geometry.py",
+      "sha256": "EE86CE62C8E06FD9103731367DE51991544F14EF765D72433D1FD3407B4D7DFB"
+    },
+    "prompt_follow_reward_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_prompt_follow_v10.py",
+      "sha256": "66B9AEF6C3B14A58E87C6D81365A516BC7D9F75B46FC4953C09E44ECB9A98A7F"
+    },
+    "generic_balanced_runner": {
+      "path": "benchmarks/run_rival2_ground_to_air_natural_v7.py",
+      "sha256": "F35328637694F669A47C162491C04D53524BFFCDE92312184E7FF601CE238FC8"
+    },
+    "timing_candidate_implementation": {
+      "path": "rivalsim/rival2_ground_to_air_timing_v8.py",
+      "sha256": "90BDEF4F87C2016F53F23D7CBFEB020474A5A80836D597B8A39B8513E527300D"
+    },
+    "timing_v8_authority": {
+      "path": "results/rival2/ground_to_air_timing_v8/authority.json",
+      "sha256": "D74DBA3DF55549FF3DDE8A9DA3C44714008BC8C2C3A0CEF7C3D8EB48ADC78592"
+    },
+    "timing_v8_result": {
+      "path": "results/rival2/ground_to_air_timing_v8/result.json",
+      "sha256": "29D38180FF227F7DA3FFAADDE3E3900483235F1960FD13718F92010082156427"
+    },
+    "v9_authority": {
+      "path": "results/rival2/ground_to_air_natural_v9/authority.json",
+      "sha256": "CF3250FA583951E78DEF6011B738CEA7CCDF19B4BA46ACAE79A7661FABFECCA2"
+    },
+    "v9_result": {
+      "path": "results/rival2/ground_to_air_natural_v9/result.json",
+      "sha256": "7E128B9427ACAE135955E9C433A4AE56B728C435ADDEC918DC4A71936A230408"
+    },
+    "v9_review": {
+      "path": "results/rival2/ground_to_air_natural_v9/V9_REVIEW.md",
+      "sha256": "366D0CFB3D3139069C22F27FC0AE3AE94045145D70A17BC40BFB4D89F10C30C3"
+    },
+    "protected_parent_touch_geometry": {
+      "path": "results/rival2/ground_to_air_natural_v9/touch_geometry_parent.json",
+      "sha256": "D7B5B04B2041F79E1DEE87025BD49291B6030B9B1477339DF9FF5907447F47BF"
+    },
+    "v9_best_touch_geometry": {
+      "path": "results/rival2/ground_to_air_natural_v9/touch_geometry_v9_best.json",
+      "sha256": "D3469862FF75868CCE509DBB084334D40F0939294AF41895D8664EB9F92E87F0"
+    },
+    "mechanics_and_curriculum": {
+      "path": "results/rival2/ground_to_air_natural_v10/MECHANICS_AND_CURRICULUM.md",
+      "sha256": "53579BBEEBEAD08B7517AD2DD65761377BE8535868545E2CB699E7A61537440F"
+    }
+  },
+  "reference_clip": {
+    "path": "C:/Users/patri/Videos/Medal/Edits/MedalTVRocketLeague20260902174434464-trim-1788386200969.mp4",
+    "sha256": "5085071BCADC19F9CE90CB4DBE376DE739F421E350F03F7A861B0989F12D8728",
+    "duration_seconds": 20.866,
+    "interpretation": "natural bounce, compact lift, immediate under-ball follow, and a few soft airborne contacts before scoring"
+  },
+  "mechanics_interpretation": {
+    "dead_ball_vertical_launcher": "excluded",
+    "low_bounce": "use the existing rise, make a light lower/front setup touch, and leave the ground immediately",
+    "incoming_chip": "convert an incoming low ball into a rising path and follow the new path within the causal window",
+    "matched_dribble": "use matched momentum and a double-jump transition to create controllable separation",
+    "plain_double_jump": "valid without air roll when existing geometry is aligned",
+    "partial_tornado_corner_touch": "simultaneous learned yaw and roll may briefly expose a front corner; continuous spin is not required or rewarded",
+    "jump_timing": "hold the first jump for 24 ticks (200 ms), release for four ticks, then use the second-jump impulse",
+    "contact_budget": "one to four follow touches are normal and six total distinct contact onsets is the hard maximum"
+  },
+  "option_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 24,
+    "jump_release_ticks": 4,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 205.0,
+    "maximum_option_ticks": 720,
+    "maximum_planar_distance_uu": 180.0,
+    "minimum_ball_height_uu": 90.0,
+    "minimum_boost_fraction": 0.2,
+    "minimum_forward_alignment": 0.15,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 90.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "pop_orientation_control": {
+    "pitch_center": 0.5,
+    "pitch_residual_scale": 0.0,
+    "steer_scale": 0.25,
+    "yaw_scale": 0.35,
+    "roll_scale": 0.35
+  },
+  "scenario": {
+    "setup_families": [
+      "low_bounce",
+      "incoming_chip",
+      "matched_dribble"
+    ],
+    "training_strata": [
+      {"setup": "low_bounce", "defender_mode": "parked", "side": 0},
+      {"setup": "low_bounce", "defender_mode": "parked", "side": 1},
+      {"setup": "low_bounce", "defender_mode": "live", "side": 0},
+      {"setup": "low_bounce", "defender_mode": "live", "side": 1},
+      {"setup": "incoming_chip", "defender_mode": "parked", "side": 0},
+      {"setup": "incoming_chip", "defender_mode": "parked", "side": 1},
+      {"setup": "incoming_chip", "defender_mode": "live", "side": 0},
+      {"setup": "incoming_chip", "defender_mode": "live", "side": 1},
+      {"setup": "matched_dribble", "defender_mode": "parked", "side": 0},
+      {"setup": "matched_dribble", "defender_mode": "parked", "side": 1},
+      {"setup": "matched_dribble", "defender_mode": "live", "side": 0},
+      {"setup": "matched_dribble", "defender_mode": "live", "side": 1}
+    ],
+    "training_worlds_per_stratum": 256,
+    "training_boost_range": [20.0, 80.0],
+    "validation_boost_range": [20.0, 80.0],
+    "live_defender": "frozen side-correct V23 inference between the ball and target goal",
+    "parked_control": "zero-action remote opponent outside the play",
+    "production_state_injection": false
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "actor_learning_rate": 0.00002,
+    "trunk_learning_rate": 0.0000075,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.99875,
+    "ppo_clip": 0.2,
+    "balanced_optimizer_steps_per_block": 8,
+    "samples_per_stratum_per_step": 8192,
+    "maximum_blocks": 96,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 16,
+    "minimum_score_improvement": 0.0005,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "advantage_normalization": "independent within each setup/defender/side rollout",
+    "gradient_aggregation": "equal mean of twelve stratum PPO losses before every optimizer step",
+    "success_volume_rehearsal": false,
+    "exploration": {
+      "analog_sigma": 0.12,
+      "button_temperature": 0.9
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "post_contact_goalward_progress_per_uu": 0.001,
+    "goal_target_progress_per_uu": 0.004,
+    "low_pop_event": 0.25,
+    "prompt_airborne_follow_event": 1.5,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "third_airborne_touch_event": 4.0,
+    "fourth_airborne_touch_event": 2.0,
+    "fifth_airborne_touch_event": 1.0,
+    "goalward_velocity_contact_event": 2.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "sustained_control_shell_uu": 160.0,
+    "sustained_control_minimum_ticks": 12,
+    "sustained_control_interval_event": 3.0,
+    "goal_within_contact_budget_event": 25.0,
+    "other_goal": -1.0,
+    "failure": -1.0,
+    "over_contact_budget_failure": -12.0
+  },
+  "episode": {
+    "horizon_ticks": 600,
+    "maximum_distinct_chain_contacts": 6,
+    "prompt_airborne_follow_maximum_ticks": 60,
+    "pop_deadline_tick": 60,
+    "ground_failure_after_tick": 110,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026111001,
+    "validation": 2026111002,
+    "optimizer_and_exploration": 2026111003,
+    "balanced_minibatch": 2026111004,
+    "test": 2026111005
+  },
+  "selection": {
+    "primary": "minimum capped prompt-airborne-follow gate ratio across all twelve rows",
+    "secondary": "existing complete physical outcome score plus a bounded prompt-recontact term",
+    "test_not_used": true
+  },
+  "acceptance": {
+    "per_setup_and_defender": {
+      "low_bounce": {
+        "parked": {
+          "pop_touch_fraction_min": 0.7,
+          "prompt_airborne_follow_fraction_min": 0.4,
+          "elevated_follow_touch_fraction_min": 0.03,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        },
+        "live": {
+          "pop_touch_fraction_min": 0.7,
+          "prompt_airborne_follow_fraction_min": 0.42,
+          "elevated_follow_touch_fraction_min": 0.02,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        }
+      },
+      "incoming_chip": {
+        "parked": {
+          "pop_touch_fraction_min": 0.95,
+          "prompt_airborne_follow_fraction_min": 0.08,
+          "elevated_follow_touch_fraction_min": 0.02,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        },
+        "live": {
+          "pop_touch_fraction_min": 0.95,
+          "prompt_airborne_follow_fraction_min": 0.06,
+          "elevated_follow_touch_fraction_min": 0.02,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        }
+      },
+      "matched_dribble": {
+        "parked": {
+          "pop_touch_fraction_min": 0.95,
+          "prompt_airborne_follow_fraction_min": 0.85,
+          "elevated_follow_touch_fraction_min": 0.03,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        },
+        "live": {
+          "pop_touch_fraction_min": 0.95,
+          "prompt_airborne_follow_fraction_min": 0.84,
+          "elevated_follow_touch_fraction_min": 0.02,
+          "high_follow_touch_fraction_min": 0.004,
+          "productive_continuation_fraction_min": 0.008,
+          "goal_within_contact_budget_fraction_min": 0.003
+        }
+      }
+    },
+    "contact_budget_exceeded_fraction_max": 0.01,
+    "unassisted_or_ground_goal_fraction_max": 0.1,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "controlled_scorer_parent_unchanged": true,
+    "v9_diagnostic_descendant_not_used": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "prompt_event_is_native_contact_onset": true,
+    "prompt_event_once_per_attempt": true,
+    "prompt_event_causal_window_ticks": 60,
+    "old_strict_and_complete_outcome_gates_preserved": true,
+    "only_active_pop_channels_in_likelihood": true,
+    "live_defender_is_inference_only": true,
+    "distinct_contact_rewards_capped": true,
+    "maximum_distinct_contact_onsets": 6,
+    "optimizer_steps_before_authority_commit": 0,
+    "test_seed_unopened_before_validation_pass": true,
+    "full_match_integration_deferred_until_controlled_pass": true
+  }
+}
