@@ -445,6 +445,10 @@ def nexto_evaluation(
 
 
 def run(args: argparse.Namespace) -> int:
+    args.checkpoint = args.checkpoint.resolve()
+    args.authority = args.authority.resolve()
+    args.output = args.output.resolve()
+    args.collision_root = args.collision_root.resolve()
     authority = json.loads(args.authority.read_text(encoding="utf-8"))
     checkpoint_sha = sha256_file(args.checkpoint)
     payload, policy = load_unified(args.checkpoint, args.device)
