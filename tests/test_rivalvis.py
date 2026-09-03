@@ -225,8 +225,18 @@ def test_buffered_replay_preserves_every_authoritative_frame(
 
 
 def test_viewer_cli_accepts_frozen_wisp_opponent() -> None:
-    args = parse_args(["--checkpoint", str(CHECKPOINT), "--opponent", "wisp"])
+    args = parse_args(
+        [
+            "--checkpoint",
+            str(CHECKPOINT),
+            "--opponent",
+            "wisp",
+            "--window-title",
+            "RivalVis - capability specialist",
+        ]
+    )
     assert args.opponent == "wisp"
+    assert args.window_title == "RivalVis - capability specialist"
 
 
 def test_wisp_viewer_drives_orange_with_pinned_adapter(

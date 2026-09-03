@@ -397,6 +397,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--seed", type=int, default=20260827)
     parser.add_argument("--speed", type=float, choices=PLAYBACK_SPEEDS, default=1.0)
+    parser.add_argument(
+        "--window-title",
+        help="Optional RivalVis window title for distinguishing concurrent replays.",
+    )
     behavior = parser.add_mutually_exclusive_group()
     behavior.add_argument("--stochastic", dest="stochastic", action="store_true")
     behavior.add_argument("--deterministic", dest="stochastic", action="store_false")
@@ -419,15 +423,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    window_title = args.window_title or (
+        "RivalVis - Rival vs Wisp"
+        if args.opponent == "wisp"
+        else "RivalVis - RivalSim checkpoint spectator"
+    )
     loadPrcFileData(
         "",
         "\n".join(
             (
-                (
-                    "window-title RivalVis - Rival vs Wisp"
-                    if args.opponent == "wisp"
-                    else "window-title RivalVis - RivalSim checkpoint spectator"
-                ),
+                f"window-title {window_title}",
                 "win-size 1600 900",
                 "sync-video true",
                 "show-frame-rate-meter false",

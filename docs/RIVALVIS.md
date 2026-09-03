@@ -46,6 +46,7 @@ seconds. Once the window opens, playback is entirely in memory: policy inference
 physics no longer block rendering, `1x` follows wall-clock time, and every consecutive
 120 Hz frame remains available for interpolation or single-tick stepping. Restarting
 with `R` or `N` builds a fresh complete replay before playback resumes.
+Use `--window-title "RivalVis - NAME"` to distinguish concurrent buffered replays.
 
 ## Camera controls
 
