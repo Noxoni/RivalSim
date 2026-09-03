@@ -89,7 +89,10 @@ def write_json(path: Path, payload: Any) -> None:
 
 def load_unified(path: Path, device: str) -> tuple[dict[str, Any], Rival2UnifiedActorCritic]:
     payload = torch.load(path, map_location="cpu", weights_only=False)
-    if payload.get("format") != "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V2":
+    if payload.get("format") not in {
+        "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V2",
+        "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V3",
+    }:
         raise RuntimeError("unsupported unified checkpoint format")
     config = Rival2UnifiedPolicyConfig(**payload["policy_config"])
     if payload.get("policy_config_sha256") != config.content_hash:
@@ -442,7 +445,7 @@ def nexto_evaluation(
 
 
 def run(args: argparse.Namespace) -> int:
-    authority = json.loads(AUTHORITY.read_text(encoding="utf-8"))
+    authority = json.loads(args.authority.read_text(encoding="utf-8"))
     checkpoint_sha = sha256_file(args.checkpoint)
     payload, policy = load_unified(args.checkpoint, args.device)
     _payloads, teachers = distill.load_teachers(authority, args.device)
@@ -452,7 +455,11 @@ def run(args: argparse.Namespace) -> int:
         authority=authority,
         collision_root=args.collision_root,
         worlds_per_side=args.aerial_worlds_per_side,
-        seed=int(authority["seeds"]["untouched_test_aerial"]),
+        seed=int(
+            authority["seeds"].get(
+                "physical_aerial", authority["seeds"].get("untouched_test_aerial")
+            )
+        ),
         device=args.device,
     )
     capability_rows = capability_evaluation(
@@ -460,14 +467,23 @@ def run(args: argparse.Namespace) -> int:
         teachers,
         collision_root=args.collision_root,
         worlds_per_side=args.capability_worlds_per_side,
-        seed=int(authority["seeds"]["untouched_test_capability"]),
+        seed=int(
+            authority["seeds"].get(
+                "physical_capability",
+                authority["seeds"].get("untouched_test_capability"),
+            )
+        ),
         device=args.device,
     )
     nexto_rows = nexto_evaluation(
         policy,
         collision_root=args.collision_root,
         worlds_per_side=args.nexto_worlds_per_side,
-        seed=int(authority["seeds"]["untouched_test_natural"]),
+        seed=int(
+            authority["seeds"].get(
+                "physical_nexto", authority["seeds"].get("untouched_test_natural")
+            )
+        ),
         device=args.device,
     )
     result = {
@@ -505,6 +521,7 @@ def run(args: argparse.Namespace) -> int:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=Path, default=CHECKPOINT)
+    parser.add_argument("--authority", type=Path, default=AUTHORITY)
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--collision-root", type=Path, default=COLLISION_ROOT)
     parser.add_argument("--device", default="cuda:0")
