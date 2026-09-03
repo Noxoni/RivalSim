@@ -101,3 +101,19 @@ def test_timing_v8_forbids_reward_or_scenario_broadening() -> None:
     assert integrity["dead_ball_vertical_launcher_used"] is False
     assert integrity["raw_airtime_reward_used"] is False
     assert integrity["named_mechanic_reward_or_detector_used"] is False
+
+
+def test_timing_v8_result_follows_frozen_selection_and_preserves_parents() -> None:
+    result_path = timing.RESULTS / "result.json"
+    if not result_path.exists():
+        return
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    selected = max(
+        result["candidates"], key=lambda item: tuple(item["selection_key"])
+    )
+    assert result["selected_candidate"] == selected["candidate"]
+    assert result["selected_candidate"]["name"] == "hold_24_release_4"
+    assert result["optimizer_steps"] == 0
+    assert result["parent_unchanged"]
+    assert result["protected_v23_unchanged"]
+    assert result["untouched_test_opened"] is False
