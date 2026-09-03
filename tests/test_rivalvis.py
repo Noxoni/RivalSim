@@ -17,7 +17,11 @@ from rivalsim.rival2_policy import deterministic_hybrid_action
 from rivalsim.viewer.app import PHYSICS_SECONDS, PlaybackState, parse_args
 from rivalsim.viewer.frame import interpolate_viewer_frame
 from rivalsim.viewer.rendering import make_arena_collision_geometry, panda_quaternion
-from rivalsim.viewer.spectator import RivalVisSession, ViewerStateAdapter
+from rivalsim.viewer.spectator import (
+    RivalVisReplay,
+    RivalVisSession,
+    ViewerStateAdapter,
+)
 
 CHECKPOINT = Path(
     "checkpoints/rival2/acquisition_v1/rival2_acquisition_resume.pt"
@@ -167,25 +171,15 @@ def test_goal_updates_score_and_applies_standard_kickoff_reset(
 
 def test_visual_interpolation_quaternion_and_playback_controls() -> None:
     playback = PlaybackState()
-    # Normal playback never enters a multi-tick catch-up spiral.  It advances
-    # one consecutive authoritative tick and drops only the wall-clock debt.
-    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 1
-    assert playback.last_overrun_ticks == 3
-    assert playback.total_overrun_ticks == 3
-    assert 0.0 <= playback.accumulator < PHYSICS_SECONDS
-    assert playback.due_ticks(0.0) == 0
-    assert playback.last_overrun_ticks == 0
+    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 4
     playback.paused = True
     assert playback.due_ticks(1.0) == 0
-    assert playback.last_overrun_ticks == 0
     playback.paused = False
     playback.slower()
     assert playback.speed == 0.5
     playback.faster()
     playback.faster()
     assert playback.speed == 2.0
-    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 2
-    assert playback.last_overrun_ticks == 6
     playback.normal()
     assert playback.speed == 1.0
 
@@ -204,6 +198,30 @@ def test_visual_interpolation_quaternion_and_playback_controls() -> None:
     assert visual.physics_tick == current.physics_tick
     assert visual.blue_score == current.blue_score
     session.close()
+
+
+def test_buffered_replay_preserves_every_authoritative_frame(
+    arena_assets: tuple[str, ArenaGeometry, WarpArenaMeshes],
+) -> None:
+    root, _geometry, _meshes = arena_assets
+    live = RivalVisSession(
+        CHECKPOINT,
+        collision_root=root,
+        seed=20260827,
+        stochastic=False,
+    )
+    replay = RivalVisReplay.record(
+        live,
+        maximum_frames=9,
+        progress_interval=0,
+    )
+    assert len(replay.frames) == 9
+    assert tuple(frame.physics_tick for frame in replay.frames) == tuple(range(9))
+    assert replay.current_frame.physics_tick == 0
+    for expected_tick in range(1, 9):
+        assert replay.advance_physics_tick().physics_tick == expected_tick
+    assert replay.match_finished
+    assert replay.checkpoint_unchanged()
 
 
 def test_viewer_cli_accepts_frozen_wisp_opponent() -> None:

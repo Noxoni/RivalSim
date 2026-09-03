@@ -39,14 +39,13 @@ Use `--collision-dir PATH` if the collision meshes are not in the normal sibling
 `RLBot-Rival/bot/collision_meshes` checkout. `RIVALSIM_COLLISION_DIR` is also
 accepted.
 
-Normal `1x` playback is smooth-first: RivalVis advances no more than one consecutive
-authoritative physics tick per rendered frame. If the simulator plus policy cannot
-sustain 120 ticks per wall-clock second, RivalVis discards the impossible wall-clock
-catch-up debt and temporarily runs slower instead of simulating a large batch before
-the next render. The HUD shows `SMOOTH-LIMIT` on an overrun frame. This never drops,
-synthesizes, or reorders a physics tick; it only prevents the presentation clock from
-running ahead of the simulation. Explicit `2x` and `4x` playback permit bounded
-two- and four-tick render batches respectively.
+RivalVis buffers the complete authoritative match before opening the rendered
+playback. Startup therefore takes as long as the one-world simulator needs to produce
+the five-minute match (and any overtime), with progress printed every ten simulated
+seconds. Once the window opens, playback is entirely in memory: policy inference and
+physics no longer block rendering, `1x` follows wall-clock time, and every consecutive
+120 Hz frame remains available for interpolation or single-tick stepping. Restarting
+with `R` or `N` builds a fresh complete replay before playback resumes.
 
 ## Camera controls
 

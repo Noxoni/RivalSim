@@ -14,7 +14,7 @@ from panda3d.core import ClockObject, Filename, TextNode, Vec3, loadPrcFileData
 
 from rivalsim.viewer.frame import ViewerFrame, interpolate_viewer_frame, quaternion_forward
 from rivalsim.viewer.rendering import WORLD_SCALE, RivalVisScene
-from rivalsim.viewer.spectator import RivalVisSession
+from rivalsim.viewer.spectator import RivalVisReplay, RivalVisSession
 
 PLAYBACK_SPEEDS = (0.25, 0.5, 1.0, 2.0, 4.0)
 PHYSICS_SECONDS = 1.0 / 120.0
@@ -25,8 +25,6 @@ class PlaybackState:
     speed: float = 1.0
     paused: bool = False
     accumulator: float = 0.0
-    last_overrun_ticks: int = 0
-    total_overrun_ticks: int = 0
 
     def __post_init__(self) -> None:
         if self.speed not in PLAYBACK_SPEEDS:
@@ -45,31 +43,12 @@ class PlaybackState:
 
     def due_ticks(self, wall_seconds: float) -> int:
         if self.paused:
-            self.last_overrun_ticks = 0
             return 0
         self.accumulator += max(0.0, min(0.25, wall_seconds)) * self.speed
-        due = int(self.accumulator / PHYSICS_SECONDS)
-
-        # A one-world GPU simulation can occasionally take longer than one
-        # 120 Hz interval, particularly on a frame that also evaluates an
-        # opponent policy.  Carrying that wall-clock debt forward creates a
-        # feedback loop: the next render attempts several ticks, takes even
-        # longer, and asks for an ever larger catch-up batch.  The renderer
-        # then visibly jumps over authoritative states.
-        #
-        # Smooth playback deliberately advances at most one consecutive
-        # physics tick per rendered frame at normal speed.  Faster playback is
-        # an explicit request to permit a correspondingly larger batch.  When
-        # production falls behind, discard only the impossible wall-clock
-        # debt; no simulator tick or policy decision is synthesized or
-        # skipped.  Playback therefore slows gracefully instead of entering a
-        # catch-up spiral.
-        tick_budget = max(1, math.ceil(self.speed))
-        ticks = min(due, tick_budget)
-        self.last_overrun_ticks = max(0, due - ticks)
-        self.total_overrun_ticks += self.last_overrun_ticks
-        if self.last_overrun_ticks:
-            self.accumulator -= due * PHYSICS_SECONDS
+        ticks = int(self.accumulator / PHYSICS_SECONDS)
+        if ticks > 32:
+            ticks = 32
+            self.accumulator = PHYSICS_SECONDS
         else:
             self.accumulator -= ticks * PHYSICS_SECONDS
         return ticks
@@ -118,7 +97,7 @@ class RivalVisApp(ShowBase):
 
     def __init__(
         self,
-        session: RivalVisSession,
+        session: RivalVisSession | RivalVisReplay,
         *,
         playback_speed: float = 1.0,
         smoke_frames: int = 0,
@@ -134,9 +113,7 @@ class RivalVisApp(ShowBase):
         self.camLens.setFov(72.0)
         self.camLens.setNearFar(0.05, 1000.0)
         self.setBackgroundColor(0.018, 0.026, 0.045, 1.0)
-        self.scene = RivalVisScene(
-            self.render, session.env.world.meshes.geometry
-        )
+        self.scene = RivalVisScene(self.render, session.geometry)
         self.camera_mode = 3
         self.follow_distance = 16.0
         self.follow_height = 6.2
@@ -346,8 +323,6 @@ class RivalVisApp(ShowBase):
         playback = f"{self.playback.speed:g}x"
         if self.playback.paused:
             playback += " PAUSED"
-        elif self.playback.last_overrun_ticks:
-            playback += " SMOOTH-LIMIT"
         touch = (
             "none"
             if frame.last_touch is None
@@ -462,7 +437,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     if args.smoke_frames:
         loadPrcFileData("", "window-type offscreen")
-    session = RivalVisSession(
+    session: RivalVisSession | RivalVisReplay = RivalVisSession(
         args.checkpoint,
         collision_root=args.collision_dir,
         device=args.device,
@@ -477,6 +452,8 @@ def main(argv: list[str] | None = None) -> int:
         f"opponent={args.opponent} seed={args.seed}",
         flush=True,
     )
+    if not args.smoke_frames:
+        session = RivalVisReplay.record(session)
     app = RivalVisApp(
         session,
         playback_speed=args.speed,

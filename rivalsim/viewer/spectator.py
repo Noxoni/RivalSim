@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -333,6 +334,7 @@ class RivalVisSession:
             self.wisp.activate(self.wisp_active)
             self.wisp_state = WispStateTensors.from_bridge(self.env.bridge)
         self.adapter = ViewerStateAdapter(self.env)
+        self.geometry = self.env.world.meshes.geometry
         self.current_action = torch.zeros((1, 2, 8), device=self.device)
         self.last_reward = torch.zeros((1, 2), device=self.device)
         self.last_touch: int | None = None
@@ -467,8 +469,168 @@ class RivalVisSession:
         self._closed = True
 
 
+class RivalVisReplay:
+    """A complete authoritative match buffered before presentation starts."""
+
+    def __init__(
+        self,
+        frames: tuple[ViewerFrame, ...],
+        *,
+        checkpoint_info: CheckpointInfo,
+        collision_root: Path,
+        device: str,
+        seed: int,
+        stochastic: bool,
+        opponent: str,
+        blue_label: str,
+        orange_label: str,
+        geometry: Any,
+        build_seconds: float,
+    ):
+        if not frames:
+            raise ValueError("RivalVis replay must contain at least one frame")
+        self.frames = frames
+        self.checkpoint_info = checkpoint_info
+        self.collision_root = collision_root
+        self.device = device
+        self.seed = int(seed)
+        self.stochastic = bool(stochastic)
+        self.opponent = opponent
+        self.blue_label = blue_label
+        self.orange_label = orange_label
+        self.geometry = geometry
+        self.build_seconds = float(build_seconds)
+        self.frame_index = 0
+
+    @classmethod
+    def record(
+        cls,
+        live: RivalVisSession,
+        *,
+        maximum_frames: int | None = None,
+        progress_interval: int = 1200,
+    ) -> RivalVisReplay:
+        """Consume a live session into an immutable, consecutive frame replay."""
+
+        if maximum_frames is not None and maximum_frames <= 0:
+            raise ValueError("maximum_frames must be positive when provided")
+        started = time.perf_counter()
+        frames = [live.current_frame]
+        try:
+            while not live.match_finished and (
+                maximum_frames is None or len(frames) < maximum_frames
+            ):
+                frames.append(live.advance_physics_tick())
+                if progress_interval > 0 and (len(frames) - 1) % progress_interval == 0:
+                    elapsed = max(time.perf_counter() - started, 1.0e-9)
+                    simulated_seconds = (len(frames) - 1) / 120.0
+                    print(
+                        "RivalVis buffering "
+                        f"tick={len(frames) - 1} simulated={simulated_seconds:.1f}s "
+                        f"rate={(len(frames) - 1) / elapsed:.1f} ticks/s",
+                        flush=True,
+                    )
+            if not live.checkpoint_unchanged():
+                raise RuntimeError(
+                    "RivalVis checkpoint changed while the replay was being buffered"
+                )
+            elapsed = time.perf_counter() - started
+            replay = cls(
+                tuple(frames),
+                checkpoint_info=live.checkpoint_info,
+                collision_root=Path(live.collision_root),
+                device=str(live.device),
+                seed=live.seed,
+                stochastic=live.stochastic,
+                opponent=live.opponent,
+                blue_label=live.blue_label,
+                orange_label=live.orange_label,
+                geometry=live.geometry,
+                build_seconds=elapsed,
+            )
+        finally:
+            live.close()
+        print(
+            f"RivalVis buffered {len(replay.frames)} consecutive frames "
+            f"in {replay.build_seconds:.1f}s",
+            flush=True,
+        )
+        return replay
+
+    @classmethod
+    def from_checkpoint(
+        cls,
+        checkpoint: str | Path,
+        *,
+        collision_root: str | Path | None = None,
+        device: str = "cuda:0",
+        seed: int = 20260827,
+        stochastic: bool = True,
+        opponent: str = "self",
+    ) -> RivalVisReplay:
+        live = RivalVisSession(
+            checkpoint,
+            collision_root=collision_root,
+            device=device,
+            seed=seed,
+            stochastic=stochastic,
+            opponent=opponent,
+        )
+        return cls.record(live)
+
+    @property
+    def previous_frame(self) -> ViewerFrame:
+        return self.frames[max(0, self.frame_index - 1)]
+
+    @property
+    def current_frame(self) -> ViewerFrame:
+        return self.frames[self.frame_index]
+
+    @property
+    def match_finished(self) -> bool:
+        return self.frame_index >= len(self.frames) - 1
+
+    @property
+    def winner(self) -> int | None:
+        return self.current_frame.winner
+
+    def advance_physics_tick(self) -> ViewerFrame:
+        if not self.match_finished:
+            self.frame_index += 1
+        return self.current_frame
+
+    def advance_policy_decision(self) -> ViewerFrame:
+        decision = self.current_frame.policy_decision
+        while (
+            not self.match_finished
+            and self.current_frame.policy_decision == decision
+        ):
+            self.frame_index += 1
+        return self.current_frame
+
+    def restart(self, *, new_seed: bool = False) -> ViewerFrame:
+        seed = self.seed + int(new_seed)
+        replacement = type(self).from_checkpoint(
+            self.checkpoint_info.path,
+            collision_root=self.collision_root,
+            device=self.device,
+            seed=seed,
+            stochastic=self.stochastic,
+            opponent=self.opponent,
+        )
+        self.__dict__.update(replacement.__dict__)
+        return self.current_frame
+
+    def checkpoint_unchanged(self) -> bool:
+        return _sha256(self.checkpoint_info.path) == self.checkpoint_info.sha256
+
+    def close(self) -> None:
+        return None
+
+
 __all__ = [
     "CheckpointInfo",
+    "RivalVisReplay",
     "RivalVisSession",
     "ViewerStateAdapter",
     "load_checkpoint_policy",
