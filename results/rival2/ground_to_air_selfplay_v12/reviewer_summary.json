@@ -1,0 +1,86 @@
+{
+  "campaign": {
+    "accepted_updates": 120,
+    "hard_failure": null,
+    "total_option_samples": 14201626,
+    "total_physics_ticks": 574619648,
+    "training_router_totals": {
+      "activations": 75858,
+      "entry_airborne_contacts": 36244,
+      "goals_within_six_contacts": 2965,
+      "second_airborne_contacts": 3334
+    }
+  },
+  "controlled_boundaries": [
+    {
+      "ball_ground_failure_fraction": 0.09765625,
+      "entry_airborne_contact_fraction": 0.705078125,
+      "goal_within_six_contacts_fraction": 0.169921875,
+      "second_airborne_contact_fraction": 0.23046875,
+      "update": 30
+    },
+    {
+      "ball_ground_failure_fraction": 0.080078125,
+      "entry_airborne_contact_fraction": 0.689453125,
+      "goal_within_six_contacts_fraction": 0.21484375,
+      "second_airborne_contact_fraction": 0.248046875,
+      "update": 60
+    },
+    {
+      "ball_ground_failure_fraction": 0.08203125,
+      "entry_airborne_contact_fraction": 0.67578125,
+      "goal_within_six_contacts_fraction": 0.177734375,
+      "second_airborne_contact_fraction": 0.240234375,
+      "update": 90
+    },
+    {
+      "ball_ground_failure_fraction": 0.09375,
+      "entry_airborne_contact_fraction": 0.68359375,
+      "goal_within_six_contacts_fraction": 0.162109375,
+      "second_airborne_contact_fraction": 0.224609375,
+      "update": 120
+    }
+  ],
+  "format": "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_REVIEWER_SUMMARY",
+  "nexto_evaluation": {
+    "baseline_equivalent_because_router_never_activated": true,
+    "losses": 2,
+    "nexto_goals": 111,
+    "option_activations": 0,
+    "rival_goals": 159,
+    "touches": 687,
+    "touches_per_minute": 13.74,
+    "wins": 8
+  },
+  "natural_deterministic_selfplay": {
+    "activations": 508,
+    "entry_airborne_contacts": 205,
+    "goals_within_six_contacts": 0,
+    "player_ticks": 12288000,
+    "players_without_touch": 0,
+    "second_airborne_contacts": 0,
+    "touches": 22664,
+    "touches_per_player_minute": 13.2796875,
+    "worlds": 1024
+  },
+  "protected_starting_scorer": {
+    "controlled_goal_within_six_contacts_fraction": 0.14892578125,
+    "controlled_second_airborne_contact_fraction": 0.241943359375,
+    "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+    "roof_carry_second_airborne_contact_fraction": 0.775390625,
+    "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+  },
+  "selected_checkpoint": {
+    "accepted_update": 60,
+    "path": "checkpoints/rival2/ground_to_air_selfplay_v12/rival2_ground_to_air_selfplay_v12_u0060.pt",
+    "selection_reason": "Best controlled goal-within-six rate, best separated-second-touch rate, and lowest ball-ground failure among the four frozen boundaries.",
+    "sha256": "0A80DD35040D5FE354240D4E4E4F4B2CD50EB342CC95985647D3B0947DB092B2"
+  },
+  "verdict": {
+    "controlled_multi_touch_capability_preserved": true,
+    "deterministic_natural_multi_touch_deployment_proven": false,
+    "nexto_competitive_base_preserved": true,
+    "promoted_as_general_policy": false,
+    "reason": "Stochastic PPO rollouts produced multi-touch goals, and controlled deterministic probes improved, but deterministic natural self-play produced entry contacts without separated second touches or routed goals."
+  }
+}
