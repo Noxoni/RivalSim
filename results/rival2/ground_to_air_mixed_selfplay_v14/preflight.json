@@ -1,0 +1,104 @@
+{
+  "aerial_reward": {
+    "entry_airborne_contact_event": 4.0,
+    "fifth_goalward_airborne_contact_event": 1.0,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "fourth_goalward_airborne_contact_event": 2.0,
+    "goal_within_contact_budget_event": 25.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "high_airborne_contact_event": 2.0,
+    "maximum_supplemental_reward_per_attempt": 40.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "productive_goalward_contact_event": 2.0,
+    "raw_airtime_reward": 0.0,
+    "second_goalward_airborne_contact_event": 5.0,
+    "third_goalward_airborne_contact_event": 4.0
+  },
+  "checks": {
+    "all_entry_families_present": true,
+    "attacker_side_balanced": true,
+    "base_policies_frozen": true,
+    "controlled_count_exact": true,
+    "failed_entry_cancels_entry_reward": true,
+    "fresh_optimizer": true,
+    "kl_rejection_disabled": true,
+    "no_named_mechanics_arrays": true,
+    "no_named_mechanics_state": true,
+    "no_raw_airtime_reward": true,
+    "option_trunk_frozen": true,
+    "ordinary_worlds_present": true,
+    "physics_and_policy_120_hz": true,
+    "ppo_hash_exact": true,
+    "reward_contract_exact": true,
+    "reward_hash_exact": true,
+    "six_contact_budget": true,
+    "source_hashes_exact": true
+  },
+  "continuation_failure_reward": {
+    "ball_ground_before_second_contact": -4.0,
+    "landing_before_second_contact": -4.0
+  },
+  "created_utc": "2026-09-03T13:16:21Z",
+  "format": "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14_PREFLIGHT",
+  "initial_distribution": {
+    "controlled_by_attacker_side": {
+      "0": 4096,
+      "1": 4096
+    },
+    "controlled_by_setup": {
+      "assisted_low_bounce": 2839,
+      "rising_double_jump": 1645,
+      "roof_carry": 2523,
+      "soft_incoming_chip": 1185
+    },
+    "controlled_worlds": 8192,
+    "ordinary_kickoff_worlds": 24576,
+    "worlds": 32768
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 0.0003,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "provenance": {
+    "aerial_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "authority": {
+      "path": "results/rival2/ground_to_air_mixed_selfplay_v14/authority.json",
+      "sha256": "E3C8BAB7BB7229DD3C78A39CD05ADEC8529A04D0E604C6F06D8AB9CE0B53DD6C"
+    },
+    "blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "router": {
+    "airborne_ball_height_uu": 130.0,
+    "contact_separation_ticks": 4,
+    "cooldown_ticks": 90,
+    "grounded_ball_height_uu": 100.0,
+    "maximum_distinct_contacts": 6,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 480.0,
+    "minimum_boost_fraction": 0.15,
+    "minimum_canonical_ball_y_uu": -3000.0,
+    "minimum_forward_alignment": 0.55,
+    "minimum_landing_release_tick": 72,
+    "ownership_margin_uu": 200.0
+  },
+  "verdict": "PASS"
+}
