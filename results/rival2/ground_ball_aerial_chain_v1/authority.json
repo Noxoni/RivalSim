@@ -1,0 +1,176 @@
+{
+  "format": "RIVAL2_GROUND_BALL_AERIAL_CHAIN_V1_AUTHORITY",
+  "created_utc": "2026-09-03T02:23:00Z",
+  "purpose": "Train only the missing connected continuation from a validated ordinary 92.75-uu ground-ball pop into Rival's already controlled aerial scoring option.",
+  "bound_inputs": {
+    "controlled_aerial_parent": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "controlled_aerial_result": {
+      "path": "results/rival2/ground_to_air_goal_v3/result.json",
+      "sha256": "21F2A27C3C5E1A92D943FB5DAD76676A49EF7583B08E5BA6A706874052A73D0F"
+    },
+    "source_launch_authority": {
+      "path": "results/rival2/ground_ball_pop_v1/authority.json",
+      "sha256": "03B5F83A448818B33F432B8630CDFE92357A1A757F3D66667318F8D0CD5C0DEB"
+    },
+    "source_launch_calibration": {
+      "path": "results/rival2/ground_ball_pop_v1/calibration.json",
+      "sha256": "4E4CB2D0A80A90C082FE01D0DE4F89E135608383EB48BD9483B0B9E76BFC943B"
+    },
+    "source_launch_physics": {
+      "path": "rivalsim/rival2_ground_ball_pop.py",
+      "sha256": "D57B968E1837AE95F7CE76226B0B9922E76D899F48642F6AF21268CDD8AF0328"
+    },
+    "protected_blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "protected_orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    }
+  },
+  "source_launch": {
+    "identity": "RIVAL2_GROUND_BALL_POP_V1",
+    "selected_candidate": 5,
+    "selected_config": {
+      "trigger_distance_uu": 185.0,
+      "first_jump_hold_ticks": 8,
+      "jump_release_ticks": 6,
+      "second_jump": true,
+      "pitch": 1.0,
+      "approach_steer_gain": 3.5,
+      "use_approach_boost": true
+    },
+    "controller_scope": "approach plus 15-tick jump primitive only; all later actions come from the learned policy",
+    "state_mutation_after_reset": false
+  },
+  "scenario": {
+    "ball_height_uu": 92.75,
+    "ball_goalward_y_range_uu": [2000.0, 2900.0],
+    "ball_goalward_speed_range_uu_per_second": [100.0, 350.0],
+    "approach_distance_range_uu": [300.0, 550.0],
+    "relative_closing_speed_range_uu_per_second": [400.0, 800.0],
+    "opponent": "non-interfering",
+    "mirrored_sides": [0, 1]
+  },
+  "training": {
+    "canonical_shared_policy": true,
+    "actor_learning_rate": 0.00004,
+    "trunk_learning_rate": 0.000015,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "discount_gamma": 0.99875,
+    "ppo_clip": 0.2,
+    "epochs": 2,
+    "minibatch_size": 65536,
+    "maximum_blocks": 160,
+    "evaluation_interval_blocks": 4,
+    "plateau_patience_boundaries": 24,
+    "minimum_score_improvement": 0.0001,
+    "critic_frozen": true,
+    "fresh_adamw": true,
+    "kl_is_telemetry_only": true,
+    "phase_schedule": [
+      {"first_block": 1, "phase": 0, "name": "ordinary_ground_ball"}
+    ],
+    "handoff_schedule": [
+      {"first_block": 1, "handoff_ticks": [15, 15]}
+    ],
+    "successful_rehearsal": {
+      "source": "sampled learned-action history preceding a literal elevated physical contact",
+      "event_reward_threshold": 3.5,
+      "history_ticks": 48,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.1,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "goal_rehearsal": {
+      "source": "sampled learned-action history preceding a causal within-budget aerial goal",
+      "event_reward_threshold": 20.0,
+      "history_ticks": 96,
+      "maximum_samples_per_rollout": 32768,
+      "loss_coefficient": 0.2,
+      "smooth_l1_beta": 0.1,
+      "button_loss_weight": 0.5
+    },
+    "exploration": {
+      "analog_sigma": 0.16,
+      "button_temperature": 0.9
+    }
+  },
+  "reward": {
+    "raw_airtime_reward": 0.0,
+    "contact_shell_distance_uu": 133.0,
+    "vertical_standoff_uu": 130.0,
+    "contact_shell_progress_per_uu": 0.01,
+    "horizontal_tracking_progress_per_uu": 0.005,
+    "vertical_tracking_progress_per_uu": 0.005,
+    "post_contact_goalward_progress_per_uu": 0.001,
+    "goal_target_progress_per_uu": 0.004,
+    "low_pop_event": 0.25,
+    "elevated_follow_touch_event": 4.0,
+    "high_follow_touch_event": 2.0,
+    "second_airborne_touch_event": 5.0,
+    "third_airborne_touch_event": 4.0,
+    "fourth_airborne_touch_event": 2.0,
+    "fifth_airborne_touch_event": 1.0,
+    "goalward_velocity_contact_event": 2.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "sustained_control_shell_uu": 160.0,
+    "sustained_control_minimum_ticks": 12,
+    "sustained_control_interval_event": 3.0,
+    "goal_within_contact_budget_event": 25.0,
+    "other_goal": -1.0,
+    "failure": -1.0,
+    "over_contact_budget_failure": -5.0
+  },
+  "episode": {
+    "horizon_ticks": 600,
+    "maximum_distinct_chain_contacts": 6,
+    "pop_deadline_tick": 100,
+    "ground_failure_after_tick": 150,
+    "ground_failure_ball_height_uu": 105.0
+  },
+  "seeds": {
+    "training": 2026092201,
+    "validation": 2026092301,
+    "optimizer_and_exploration": 2026092401,
+    "test": 2026092501
+  },
+  "acceptance": {
+    "source_launch_fraction_min": 0.95,
+    "pop_touch_fraction_min": 0.9,
+    "ball_rise_180_fraction_min": 0.8,
+    "ball_rise_250_fraction_min": 0.4,
+    "elevated_follow_touch_fraction_min": 0.08,
+    "high_follow_touch_fraction_min": 0.015,
+    "second_airborne_touch_fraction_min": 0.01,
+    "productive_continuation_fraction_min": 0.015,
+    "goal_within_contact_budget_fraction_min": 0.01,
+    "contact_budget_exceeded_fraction_max": 0.01,
+    "unassisted_or_ground_goal_fraction_max": 0.25,
+    "maximum_analog_saturation_fraction": 0.98,
+    "consecutive_boundaries": 2,
+    "validation_and_untouched_test_must_both_pass": true
+  },
+  "integrity": {
+    "protected_v23_unchanged": true,
+    "controlled_aerial_parent_unchanged": true,
+    "critic_frozen": true,
+    "production_reward_unchanged": true,
+    "raw_airtime_reward_absent": true,
+    "named_mechanic_classifier_used": false,
+    "six_distinct_contact_budget": true,
+    "glued_contact_cannot_farm_per_tick_credit": true,
+    "optimizer_steps_before_authority_commit": 0,
+    "test_seed_unopened_before_validation_pass": true,
+    "self_play_requires_controlled_validation_and_test_pass": true
+  }
+}
