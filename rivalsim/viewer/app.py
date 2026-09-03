@@ -25,6 +25,8 @@ class PlaybackState:
     speed: float = 1.0
     paused: bool = False
     accumulator: float = 0.0
+    last_overrun_ticks: int = 0
+    total_overrun_ticks: int = 0
 
     def __post_init__(self) -> None:
         if self.speed not in PLAYBACK_SPEEDS:
@@ -43,12 +45,31 @@ class PlaybackState:
 
     def due_ticks(self, wall_seconds: float) -> int:
         if self.paused:
+            self.last_overrun_ticks = 0
             return 0
         self.accumulator += max(0.0, min(0.25, wall_seconds)) * self.speed
-        ticks = int(self.accumulator / PHYSICS_SECONDS)
-        if ticks > 32:
-            ticks = 32
-            self.accumulator = PHYSICS_SECONDS
+        due = int(self.accumulator / PHYSICS_SECONDS)
+
+        # A one-world GPU simulation can occasionally take longer than one
+        # 120 Hz interval, particularly on a frame that also evaluates an
+        # opponent policy.  Carrying that wall-clock debt forward creates a
+        # feedback loop: the next render attempts several ticks, takes even
+        # longer, and asks for an ever larger catch-up batch.  The renderer
+        # then visibly jumps over authoritative states.
+        #
+        # Smooth playback deliberately advances at most one consecutive
+        # physics tick per rendered frame at normal speed.  Faster playback is
+        # an explicit request to permit a correspondingly larger batch.  When
+        # production falls behind, discard only the impossible wall-clock
+        # debt; no simulator tick or policy decision is synthesized or
+        # skipped.  Playback therefore slows gracefully instead of entering a
+        # catch-up spiral.
+        tick_budget = max(1, math.ceil(self.speed))
+        ticks = min(due, tick_budget)
+        self.last_overrun_ticks = max(0, due - ticks)
+        self.total_overrun_ticks += self.last_overrun_ticks
+        if self.last_overrun_ticks:
+            self.accumulator -= due * PHYSICS_SECONDS
         else:
             self.accumulator -= ticks * PHYSICS_SECONDS
         return ticks
@@ -325,6 +346,8 @@ class RivalVisApp(ShowBase):
         playback = f"{self.playback.speed:g}x"
         if self.playback.paused:
             playback += " PAUSED"
+        elif self.playback.last_overrun_ticks:
+            playback += " SMOOTH-LIMIT"
         touch = (
             "none"
             if frame.last_touch is None

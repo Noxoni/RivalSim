@@ -167,15 +167,25 @@ def test_goal_updates_score_and_applies_standard_kickoff_reset(
 
 def test_visual_interpolation_quaternion_and_playback_controls() -> None:
     playback = PlaybackState()
-    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 4
+    # Normal playback never enters a multi-tick catch-up spiral.  It advances
+    # one consecutive authoritative tick and drops only the wall-clock debt.
+    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 1
+    assert playback.last_overrun_ticks == 3
+    assert playback.total_overrun_ticks == 3
+    assert 0.0 <= playback.accumulator < PHYSICS_SECONDS
+    assert playback.due_ticks(0.0) == 0
+    assert playback.last_overrun_ticks == 0
     playback.paused = True
     assert playback.due_ticks(1.0) == 0
+    assert playback.last_overrun_ticks == 0
     playback.paused = False
     playback.slower()
     assert playback.speed == 0.5
     playback.faster()
     playback.faster()
     assert playback.speed == 2.0
+    assert playback.due_ticks(PHYSICS_SECONDS * 4.1) == 2
+    assert playback.last_overrun_ticks == 6
     playback.normal()
     assert playback.speed == 1.0
 
