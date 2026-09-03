@@ -146,8 +146,14 @@ class AerialOptionSelfPlayTrainerV12:
         speed_sum = torch.zeros((), dtype=torch.float64, device=self.device)
         saturation = torch.zeros((), dtype=torch.int64, device=self.device)
         action_samples = torch.zeros((), dtype=torch.int64, device=self.device)
+        success_events = torch.zeros(
+            (horizon, worlds, 2), dtype=torch.bool, device=self.device
+        )
+        entry_events = torch.zeros_like(success_events)
+        second_events = torch.zeros_like(success_events)
+        goal_events = torch.zeros_like(success_events)
         self.model.eval()
-        for _tick in range(horizon):
+        for tick in range(horizon):
             flat_observation = observation.reshape(-1, self.policy_config.obs_dim)
             kickoff = (
                 self.env.bridge.views["rival2.kickoff_indicator"] != 0
@@ -186,6 +192,16 @@ class AerialOptionSelfPlayTrainerV12:
                 active_before=selection.active,
                 goal_for_lane=goal_for.reshape(-1),
             )
+            entry_events[tick].copy_(
+                outcome.entry_airborne_contact.reshape(worlds, 2)
+            )
+            second_events[tick].copy_(
+                outcome.second_airborne_contact.reshape(worlds, 2)
+            )
+            goal_events[tick].copy_(
+                outcome.goal_within_contact_budget.reshape(worlds, 2)
+            )
+            success_events[tick].copy_(second_events[tick] | goal_events[tick])
             reward = transition.reward + outcome.supplemental_reward.reshape(worlds, 2)
             with torch.no_grad():
                 _, next_flat_value = self.model(
@@ -280,7 +296,19 @@ class AerialOptionSelfPlayTrainerV12:
             * CAR_LINEAR_SPEED_SCALE,
             "option_analog_saturation_fraction": int(saturation.item())
             / max(int(action_samples.item()) * 5, 1),
+            "successful_event_count": int(success_events.sum().item()),
+            "entry_event_count": int(entry_events.sum().item()),
+            "second_event_count": int(second_events.sum().item()),
+            "goal_event_count": int(goal_events.sum().item()),
         }
+        # These device-resident physical-event masks are intentionally attached
+        # to the rollout rather than added to the general PPO buffer contract.
+        # V12 ignores them; the V13 success-conditioned self-imitation stage
+        # consumes them without inferring success from reward magnitude.
+        rollout.aerial_success_events = success_events
+        rollout.aerial_entry_events = entry_events
+        rollout.aerial_second_events = second_events
+        rollout.aerial_goal_events = goal_events
         return rollout
 
     def update(self, rollout: Rival2RolloutBuffer) -> dict[str, torch.Tensor]:

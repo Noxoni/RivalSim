@@ -51,13 +51,24 @@ OUTPUT = ROOT / "results/rival2/ground_to_air_selfplay_v12/natural_selfplay_u006
 class V12NaturalSelfPlayRunner(SideSpecializedSelfPlayRunner):
     """Both V23 sides share the selected direct aerial option and router."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        option_checkpoint: Path = SELECTED,
+        option_sha256: str = SELECTED_SHA256,
+        **kwargs: Any,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        payload = torch.load(SELECTED, map_location="cpu", weights_only=False)
-        if payload.get("format") != "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_CHECKPOINT":
-            raise RuntimeError("unexpected selected V12 checkpoint format")
-        if int(payload.get("iteration", -1)) != 60:
-            raise RuntimeError("selected checkpoint is not update 60")
+        option_checkpoint = Path(option_checkpoint).resolve()
+        observed_sha256 = sha256_file(option_checkpoint)
+        if observed_sha256 != str(option_sha256).upper():
+            raise RuntimeError("natural self-play option identity mismatch")
+        payload = torch.load(option_checkpoint, map_location="cpu", weights_only=False)
+        if payload.get("format") not in {
+            "RIVAL2_GROUND_TO_AIR_SELFPLAY_V12_CHECKPOINT",
+            "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13_CHECKPOINT",
+        }:
+            raise RuntimeError("unexpected aerial-option checkpoint format")
         config = Rival2PolicyConfig(**payload["policy_config"])
         if asdict(config) != self.checkpoint_identity["policy_config"]:
             raise RuntimeError("selected option architecture differs from V23")
@@ -136,38 +147,49 @@ class V12NaturalSelfPlayRunner(SideSpecializedSelfPlayRunner):
         self.rival_observation = self.bridge.observation()
 
 
-def run(args: argparse.Namespace) -> int:
+def evaluate_checkpoint(
+    checkpoint: Path,
+    checkpoint_sha256: str,
+    *,
+    worlds: int,
+    ticks: int,
+    seed: int,
+    device: str,
+    collision_root: Path,
+) -> dict[str, Any]:
+    checkpoint = Path(checkpoint).resolve()
     identities = {
         "blue_v23": sha256_file(BLUE),
         "orange_v23": sha256_file(ORANGE),
-        "selected_v12_u0060": sha256_file(SELECTED),
+        "aerial_option": sha256_file(checkpoint),
     }
     expected = {
         "blue_v23": BLUE_SHA256,
         "orange_v23": ORANGE_SHA256,
-        "selected_v12_u0060": SELECTED_SHA256,
+        "aerial_option": str(checkpoint_sha256).upper(),
     }
     if identities != expected:
         raise RuntimeError(f"natural self-play identity mismatch: {identities}")
-    worlds = int(args.worlds)
     runner = V12NaturalSelfPlayRunner(
         worlds,
-        str(Path(args.collision_root).resolve()),
+        str(Path(collision_root).resolve()),
         BLUE,
         starting_layout=np.arange(worlds, dtype=np.int32) % 5,
         rival_side=np.arange(worlds, dtype=np.int32) % 2,
         stochastic_rival=False,
-        evaluation_seed=int(args.seed),
+        evaluation_seed=int(seed),
         orange_checkpoint=ORANGE,
-        device=args.device,
+        option_checkpoint=checkpoint,
+        option_sha256=checkpoint_sha256,
+        device=device,
     )
-    timing = runner.run_ticks(int(args.ticks))
+    timing = runner.run_ticks(int(ticks))
     raw = runner.export()["raw"]
     touch_count = raw["touch_count"]
     demo_count = raw["demo_count"]
     status = runner.phase_status()
     router = runner.aerial_router.telemetry()
-    player_minutes = worlds * 2 * int(args.ticks) / (120.0 * 60.0)
+    player_minutes = worlds * 2 * int(ticks) / (120.0 * 60.0)
     payload = {
         "format": VERSION,
         "diagnostic_only": True,
@@ -176,8 +198,8 @@ def run(args: argparse.Namespace) -> int:
         "reward_changes": 0,
         "checkpoint": identities,
         "worlds": worlds,
-        "ticks": int(args.ticks),
-        "seed": int(args.seed),
+        "ticks": int(ticks),
+        "seed": int(seed),
         "timing_seconds": timing.seconds,
         "touches": {
             "total": int(touch_count.sum()),
@@ -209,6 +231,21 @@ def run(args: argparse.Namespace) -> int:
             / max(int(router["counters"]["activations"]), 1),
         },
     }
+    del runner
+    return payload
+
+
+def run(args: argparse.Namespace) -> int:
+    checkpoint = Path(args.checkpoint).resolve()
+    payload = evaluate_checkpoint(
+        checkpoint,
+        args.checkpoint_sha256,
+        worlds=int(args.worlds),
+        ticks=int(args.ticks),
+        seed=int(args.seed),
+        device=args.device,
+        collision_root=args.collision_root,
+    )
     write_json(args.output, payload)
     print(json.dumps(payload, indent=2, sort_keys=True), flush=True)
     return 0
@@ -221,6 +258,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=2_026_090_301)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--collision-root", type=Path, default=COLLISION_ROOT)
+    parser.add_argument("--checkpoint", type=Path, default=SELECTED)
+    parser.add_argument("--checkpoint-sha256", default=SELECTED_SHA256)
     parser.add_argument("--output", type=Path, default=OUTPUT)
     return parser.parse_args()
 

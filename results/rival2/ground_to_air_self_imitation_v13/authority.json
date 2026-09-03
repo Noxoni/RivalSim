@@ -1,0 +1,104 @@
+{
+  "acceptance": {
+    "controlled_ball_ground_failure_fraction_max": 0.12,
+    "controlled_goal_within_six_contacts_fraction_min": 0.18,
+    "controlled_second_airborne_contact_fraction_min": 0.22,
+    "natural_deterministic_goal_count_min": 1,
+    "natural_deterministic_second_airborne_contact_count_min": 1,
+    "natural_players_without_touch_max": 0
+  },
+  "collection": {
+    "button_temperature": 1.25,
+    "candidate_seed": 2026090313,
+    "maximum_contact_count": 6,
+    "physics_hz": 120,
+    "policy_hz": 120,
+    "rollout_horizon": 128,
+    "success_definition": [
+      "authoritative separated second airborne contact",
+      "authoritative goal while the aerial option is active and within six contacts"
+    ],
+    "training_opponent": "pure current composite V23 self-play",
+    "worlds": 32768,
+    "analog_sigma": 0.05
+  },
+  "created_utc": "2026-09-03T17:30:00Z",
+  "format": "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13_AUTHORITY",
+  "integrity": {
+    "aerial_critic_frozen": true,
+    "aerial_trunk_frozen": true,
+    "named_mechanic_classifier_used": false,
+    "nexto_training_probability": 0.0,
+    "optimizer_steps_allowed_outside_aerial_actor": 0,
+    "ppo_steps": 0,
+    "production_gameplay_reward_changed": false,
+    "raw_airtime_reward": false,
+    "simulator_physics_changed": false,
+    "v23_base_policies_frozen": true
+  },
+  "optimization": {
+    "accepted_block_ceiling": 120,
+    "actor_learning_rate": 0.00002,
+    "analog_weight": 1.0,
+    "button_weight": 0.5,
+    "fresh_adamw": true,
+    "history_ticks": 96,
+    "log_std_weight": 0.05,
+    "maximum_gradient_norm": 0.5,
+    "maximum_retention_samples_per_block": 65536,
+    "maximum_success_samples_per_block": 65536,
+    "smooth_l1_beta": 0.1,
+    "teacher_actor_kl_weight": 0.02,
+    "weight_decay": 0.00001
+  },
+  "selection": {
+    "controlled_evaluation_worlds_per_row": 64,
+    "controlled_seed_base": 2026090316,
+    "early_stop_patience_boundaries": 3,
+    "natural_validation_seed": 2026090314,
+    "natural_validation_ticks": 6000,
+    "natural_validation_worlds": 512,
+    "priority": [
+      "eligible natural deterministic goal count",
+      "eligible natural deterministic separated second-contact count",
+      "controlled goal fraction",
+      "controlled second-contact fraction",
+      "lower controlled ball-ground failure"
+    ],
+    "validation_interval_blocks": 20
+  },
+  "sources": {
+    "blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "selected_v12_update_60": {
+      "path": "checkpoints/rival2/ground_to_air_selfplay_v12/rival2_ground_to_air_selfplay_v12_u0060.pt",
+      "sha256": "0A80DD35040D5FE354240D4E4E4F4B2CD50EB342CC95985647D3B0947DB092B2"
+    },
+    "v12_controlled_evaluation": {
+      "path": "results/rival2/ground_to_air_selfplay_v12/controlled_evaluation_u0060.json",
+      "sha256": "29B9D3739E72FED699D36DF818A9254C34A72F37CB3844E3C5A316857B6EBAFA"
+    },
+    "v12_natural_evaluation": {
+      "path": "results/rival2/ground_to_air_selfplay_v12/natural_selfplay_u0060.json",
+      "sha256": "B86CC4962702B7F68F6363DF464E6EF0A3020D004C4053A4D44869FB6D1EF16B"
+    },
+    "v12_reviewer_summary": {
+      "path": "results/rival2/ground_to_air_selfplay_v12/reviewer_summary.json",
+      "sha256": "B1BA80EC1AC479D977322693D7FD365BCB11CBF80BBEDB77A96D58DA59127FF3"
+    }
+  },
+  "test_discipline": {
+    "nexto_matrix_seed": 2026090206,
+    "untouched_natural_test_seed": 2026090315,
+    "untouched_natural_test_ticks": 6000,
+    "untouched_natural_test_worlds": 1024,
+    "use_test_only_after_selection": true
+  },
+  "version": "RIVAL2_GROUND_TO_AIR_SELF_IMITATION_V13"
+}
