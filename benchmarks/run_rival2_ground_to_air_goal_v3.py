@@ -507,6 +507,7 @@ def collect_rollout(
     handoff_tick: int | None = None,
     phase: int = PHASE_ATTACKING_HALF,
     record_deterministic: bool = False,
+    record_full_prefix: bool = False,
 ) -> tuple[aerial_v1.OptionRollout | None, dict[str, Any]]:
     initial = build_goal_directed_pop_scenarios(
         worlds,
@@ -544,6 +545,8 @@ def collect_rollout(
         if deterministic and not record_deterministic
         else aerial_v1.OptionRollout(horizon, worlds, device)
     )
+    if rollout is not None and record_full_prefix:
+        rollout.supervision_mask = torch.zeros_like(rollout.mask)
     active = torch.ones(worlds, dtype=torch.bool, device=device)
     observation = env.observation
     false = torch.zeros(worlds, dtype=torch.bool, device=device)
@@ -616,7 +619,9 @@ def collect_rollout(
             rollout.old_log_probability[tick].copy_(old_log_probability)
             rollout.reward[tick].copy_(reward)
             rollout.done[tick].copy_(terminal)
-            rollout.mask[tick].copy_(learned_active)
+            rollout.mask[tick].copy_(active_before if record_full_prefix else learned_active)
+            if record_full_prefix:
+                rollout.supervision_mask[tick].copy_(learned_active)
         saturation += (
             (transition.emitted_action[:, side, :5].abs() > 0.95) & learned_active[:, None]
         ).sum(dim=0, dtype=torch.float64)

@@ -388,6 +388,7 @@ def collect_scenario_rollout(
     generator: torch.Generator,
     distribution: HybridDistributionOverride,
     deterministic: bool,
+    record_deterministic: bool = False,
 ) -> tuple[Rival2RolloutBuffer | None, dict[str, Any]]:
     batch = build_capability_scenarios_v2(
         worlds, seed=seed, attacker_side=side
@@ -410,7 +411,11 @@ def collect_scenario_rollout(
     rows = torch.arange(worlds, device=device)
     opponent = 1 - side
     active = torch.ones(worlds, dtype=torch.bool, device=device)
-    rollout = None if deterministic else Rival2RolloutBuffer(horizon, worlds, device)
+    rollout = (
+        None
+        if deterministic and not record_deterministic
+        else Rival2RolloutBuffer(horizon, worlds, device)
+    )
     saturation = torch.zeros(5, dtype=torch.float64, device=device)
     action_count = torch.zeros((), dtype=torch.float64, device=device)
     observation = env.observation
@@ -459,8 +464,16 @@ def collect_scenario_rollout(
             train_mask = torch.zeros((worlds, 2), dtype=torch.bool, device=device)
             train_mask[:, side] = active
             if rollout is not None:
-                _, next_value_flat = model(transition.transition_observation.reshape(-1, 182))
-                next_value = next_value_flat.reshape(worlds, 2)
+                if deterministic and record_deterministic:
+                    # The buffer is diagnostic-only in this mode.  A second
+                    # recurrent call would advance hidden state and alter the
+                    # deterministic trajectory being recorded.
+                    next_value = torch.zeros_like(value)
+                else:
+                    _, next_value_flat = model(
+                        transition.transition_observation.reshape(-1, 182)
+                    )
+                    next_value = next_value_flat.reshape(worlds, 2)
                 version = torch.zeros((worlds, 2), dtype=torch.int64, device=device)
                 rollout.add(
                     observation=observation,
