@@ -1,0 +1,3867 @@
+{
+  "boost_values": [
+    0.0,
+    5.0,
+    10.0,
+    20.0,
+    35.0,
+    50.0
+  ],
+  "diagnostic_controller_config": {
+    "approach_steer_gain": 3.5,
+    "boost_during_pop": false,
+    "carry_boost": true,
+    "carry_boost_min_forward_error_uu": 20.0,
+    "carry_boost_min_relative_speed_uu_per_second": 20.0,
+    "carry_pitch": 1.0,
+    "carry_ticks_after_second_jump": 36,
+    "cooldown_ticks": 120,
+    "first_jump_hold_ticks": 8,
+    "jump_release_ticks": 8,
+    "launch_delay_ticks": 0,
+    "maximum_ball_height_uu": 205.0,
+    "maximum_option_ticks": 720,
+    "maximum_planar_distance_uu": 180.0,
+    "minimum_ball_height_uu": 90.0,
+    "minimum_boost_fraction": 0.0,
+    "minimum_forward_alignment": 0.15,
+    "minimum_planar_distance_uu": 5.0,
+    "pop_pitch": 0.5,
+    "release_ball_height_uu": 90.0,
+    "release_grounded_after_tick": 70,
+    "second_jump": true
+  },
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V4_BOOST_SENSITIVITY",
+  "optimizer_steps": 0,
+  "option": {
+    "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+    "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+  },
+  "policy_mutation": false,
+  "purpose": "read-only deterministic option performance by fixed initial boost",
+  "reward_contract_mutation": false,
+  "rows": [
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0234375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0234375,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 15922,
+      "learned_button_fraction": [
+        0.2074488129631956,
+        0.9207386006783067,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6786967002725908,
+        -0.027876372158304824,
+        0.2117676801938564,
+        0.10256115611524451,
+        -0.07287032978044697
+      ],
+      "phase": 1,
+      "reward_per_attempt": -5.346591401452315,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 3,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1171.030517578125,
+            "p10": 284.5604553222656,
+            "p50": 312.6607971191406,
+            "p90": 999.3565063476562
+          },
+          "attempts_with_elevated_state": 3,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 5023.041015625,
+            "p10": 3046.892333984375,
+            "p50": 4487.31494140625,
+            "p90": 4915.89599609375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3382.255859375,
+            "p10": 203.43399047851562,
+            "p50": 301.525390625,
+            "p90": 2766.109619140625
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 106.69320678710938,
+            "p10": 103.14820098876953,
+            "p50": 104.74728393554688,
+            "p90": 106.30402374267578
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 3401.5771484375,
+        "goalward_velocity_contacts": 3,
+        "goalward_velocity_transfer_sum": 503.0489501953125,
+        "ground_failures": 103,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -684.3636993858963,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0078125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.015625,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 15776,
+      "learned_button_fraction": [
+        0.20093813387423934,
+        0.9231110547667343,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6713597437973094,
+        -0.02850551834126236,
+        0.2117151716042596,
+        0.11499644569006148,
+        -0.07134733284752216
+      ],
+      "phase": 1,
+      "reward_per_attempt": -5.404987627756782,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 1,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1207.4705810546875,
+            "p10": 1207.4705810546875,
+            "p50": 1207.4705810546875,
+            "p90": 1207.4705810546875
+          },
+          "attempts_with_elevated_state": 1,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4941.12158203125,
+            "p10": 4941.12158203125,
+            "p50": 4941.12158203125,
+            "p90": 4941.12158203125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 373.1158752441406,
+            "p10": 373.1158752441406,
+            "p50": 373.1158752441406,
+            "p90": 373.1158752441406
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 103.38790130615234,
+            "p10": 103.38790130615234,
+            "p50": 103.38790130615234,
+            "p90": 103.38790130615234
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 1510.939453125,
+        "goalward_velocity_contacts": 2,
+        "goalward_velocity_transfer_sum": 211.57904052734375,
+        "ground_failures": 103,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -691.8384163528681,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0390625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.046875,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 15852,
+      "learned_button_fraction": [
+        0.22956093868281605,
+        0.9107998990663638,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6178173481332898,
+        0.0026044910863744423,
+        0.26233074811808993,
+        0.12042378623320661,
+        -0.0653369532244892
+      ],
+      "phase": 1,
+      "reward_per_attempt": -3.7094961693219375,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 5,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1210.3206787109375,
+            "p10": 173.6845245361328,
+            "p50": 436.82354736328125,
+            "p90": 958.9065551757812
+          },
+          "attempts_with_elevated_state": 5,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5225.84765625,
+            "p10": 2849.224609375,
+            "p50": 4501.48974609375,
+            "p90": 5148.3603515625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 2455.269775390625,
+            "p10": 99.87933349609375,
+            "p50": 344.1805419921875,
+            "p90": 2254.885009765625
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 207.30662536621094,
+            "p10": 101.63883209228516,
+            "p50": 102.7485122680664,
+            "p90": 182.529541015625
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 7629.8720703125,
+        "goalward_velocity_contacts": 6,
+        "goalward_velocity_transfer_sum": 1320.0825805664062,
+        "ground_failures": 100,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -474.815509673208,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.03125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.046875,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 16163,
+      "learned_button_fraction": [
+        0.20497432407350122,
+        0.9086803192476645,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6227292000033677,
+        0.0016547976162116563,
+        0.2575099136096624,
+        0.13359677037421633,
+        -0.07184410536480268
+      ],
+      "phase": 1,
+      "reward_per_attempt": -3.9546139634330757,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 4,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1228.324951171875,
+            "p10": 405.887451171875,
+            "p50": 804.2061767578125,
+            "p90": 1115.6475830078125
+          },
+          "attempts_with_elevated_state": 4,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5221.6171875,
+            "p10": 4399.8720703125,
+            "p50": 4827.40283203125,
+            "p90": 5161.1337890625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 561.8781127929688,
+            "p10": 110.43989562988281,
+            "p50": 390.18450927734375,
+            "p90": 516.9854736328125
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 220.26600646972656,
+            "p10": 101.60697937011719,
+            "p50": 105.3772964477539,
+            "p90": 186.71646118164062
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 5571.568298339844,
+        "goalward_velocity_contacts": 6,
+        "goalward_velocity_transfer_sum": 643.7208251953125,
+        "ground_failures": 101,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 112,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -506.1905873194337,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 112,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.0703125,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.0234375,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0234375,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 15763,
+      "learned_button_fraction": [
+        0.2532512846539364,
+        0.8991308761022648,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5584788760297406,
+        0.03018725351870938,
+        0.3130304361428427,
+        0.14073850567760646,
+        -0.06795268143616617
+      ],
+      "phase": 1,
+      "reward_per_attempt": -3.081133078536368,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 8,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1206.4676513671875,
+            "p10": 102.8232650756836,
+            "p50": 495.4367980957031,
+            "p90": 1014.8984375
+          },
+          "attempts_with_elevated_state": 8,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5217.7880859375,
+            "p10": 2906.154296875,
+            "p50": 4001.19384765625,
+            "p90": 5087.84521484375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4610.1416015625,
+            "p10": 1.4991852045059204,
+            "p50": 849.44140625,
+            "p90": 2847.011474609375
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 208.94293212890625,
+            "p10": 101.74608612060547,
+            "p50": 104.23927307128906,
+            "p90": 185.5581817626953
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 11194.372131347656,
+        "goalward_velocity_contacts": 9,
+        "goalward_velocity_transfer_sum": 1991.5870361328125,
+        "ground_failures": 100,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 32,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 3,
+        "reward_sum": -394.3850340526551,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 3,
+        "sustained_control_ticks": 78,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0078125,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.0859375,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 16184,
+      "learned_button_fraction": [
+        0.23164854176964902,
+        0.8973059812160158,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5650895542117617,
+        0.02714649131704327,
+        0.306389128202629,
+        0.15147200523063586,
+        -0.07391701845589335
+      ],
+      "phase": 1,
+      "reward_per_attempt": -3.183365870034322,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 8,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1219.16357421875,
+            "p10": 292.5755615234375,
+            "p50": 637.861083984375,
+            "p90": 1006.4533081054688
+          },
+          "attempts_with_elevated_state": 8,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.0341796875,
+            "p10": 3901.41357421875,
+            "p50": 4753.2412109375,
+            "p90": 5090.18408203125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 1605.4932861328125,
+            "p10": 121.65218353271484,
+            "p50": 291.3092041015625,
+            "p90": 1090.476806640625
+          },
+          "reached_deep_goal_area": 3,
+          "z_at_deepest_y_uu": {
+            "maximum": 777.02587890625,
+            "p10": 101.71368408203125,
+            "p50": 102.70523071289062,
+            "p90": 388.1278991699219
+          }
+        },
+        "fourth_airborne_touches": 1,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 10583.335632324219,
+        "goalward_velocity_contacts": 11,
+        "goalward_velocity_transfer_sum": 1218.5145874023438,
+        "ground_failures": 99,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 2,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 61,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -407.47083136439323,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 64,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.15625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.1796875,
+        "high_follow_touch": 0.015625,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.0390625,
+        "second_airborne_touch": 0.0234375,
+        "sustained_control": 0.0234375,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 15998,
+      "learned_button_fraction": [
+        0.25765720715089385,
+        0.8683585448181023,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.4945645843879471,
+        0.0564020458031399,
+        0.38016906835714454,
+        0.1571171329166669,
+        -0.07826504156821883
+      ],
+      "phase": 1,
+      "reward_per_attempt": -1.610637619291083,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 20,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1628.291748046875,
+            "p10": 115.89175415039062,
+            "p50": 549.6738891601562,
+            "p90": 1481.2130126953125
+          },
+          "attempts_with_elevated_state": 20,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5226.6005859375,
+            "p10": 3001.323974609375,
+            "p50": 3805.615234375,
+            "p90": 4629.0078125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 2988.4599609375,
+            "p10": 233.43728637695312,
+            "p50": 896.3582763671875,
+            "p90": 2368.668701171875
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 206.79757690429688,
+            "p10": 101.46080017089844,
+            "p50": 102.81024169921875,
+            "p90": 112.61927795410156
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 28463.91680908203,
+        "goalward_velocity_contacts": 23,
+        "goalward_velocity_transfer_sum": 5783.567932128906,
+        "ground_failures": 101,
+        "high_follow_touches": 2,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 76,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 5,
+        "reward_sum": -206.16161526925862,
+        "second_airborne_touches": 3,
+        "sustained_control_attempts": 3,
+        "sustained_control_ticks": 127,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.1953125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.015625,
+        "goalward_velocity_contact": 0.2109375,
+        "high_follow_touch": 0.0234375,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.0234375,
+        "second_airborne_touch": 0.015625,
+        "sustained_control": 0.015625,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 16563,
+      "learned_button_fraction": [
+        0.23606834510656283,
+        0.87822254422508,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5146847031107762,
+        0.058888481966682636,
+        0.3772010421487974,
+        0.18058741678628287,
+        -0.08451191825516116
+      ],
+      "phase": 1,
+      "reward_per_attempt": -0.9668114807573147,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 25,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1547.3531494140625,
+            "p10": 145.47010803222656,
+            "p50": 615.5377197265625,
+            "p90": 1156.5557861328125
+          },
+          "attempts_with_elevated_state": 25,
+          "deep_inside_goal_height": 4,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.4609375,
+            "p10": 3184.468017578125,
+            "p50": 4373.74951171875,
+            "p90": 5006.0048828125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5377.86328125,
+            "p10": 161.03538513183594,
+            "p50": 426.6519470214844,
+            "p90": 2128.555908203125
+          },
+          "reached_deep_goal_area": 4,
+          "z_at_deepest_y_uu": {
+            "maximum": 306.9736022949219,
+            "p10": 101.4449691772461,
+            "p50": 103.26557159423828,
+            "p90": 180.63461303710938
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 2,
+        "goalward_ball_speed_at_contact_sum": 30688.231323242188,
+        "goalward_velocity_contacts": 27,
+        "goalward_velocity_transfer_sum": 6131.9012451171875,
+        "ground_failures": 100,
+        "high_follow_touches": 3,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 56,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 3,
+        "reward_sum": -123.75186953693628,
+        "second_airborne_touches": 2,
+        "sustained_control_attempts": 2,
+        "sustained_control_ticks": 69,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.1953125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.2734375,
+        "high_follow_touch": 0.046875,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.09375,
+        "second_airborne_touch": 0.0625,
+        "sustained_control": 0.078125,
+        "third_airborne_touch": 0.0234375,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 17012,
+      "learned_button_fraction": [
+        0.23019045379731953,
+        0.8337056195626616,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5076527774577247,
+        0.05608171152840993,
+        0.4055264995232353,
+        0.14774464978920304,
+        -0.07888471878799941
+      ],
+      "phase": 1,
+      "reward_per_attempt": 0.12084158450306859,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 25,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2340.05126953125,
+            "p10": 36.24706268310547,
+            "p50": 554.9026489257812,
+            "p90": 1569.5029296875
+          },
+          "attempts_with_elevated_state": 25,
+          "deep_inside_goal_height": 4,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5222.453125,
+            "p10": 3199.86083984375,
+            "p50": 3940.01416015625,
+            "p90": 5033.40087890625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3329.991455078125,
+            "p10": 218.19764709472656,
+            "p50": 1021.586181640625,
+            "p90": 2391.81884765625
+          },
+          "reached_deep_goal_area": 4,
+          "z_at_deepest_y_uu": {
+            "maximum": 208.40548706054688,
+            "p10": 100.91861724853516,
+            "p50": 102.69741821289062,
+            "p90": 107.07276916503906
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 43407.0901184082,
+        "goalward_velocity_contacts": 35,
+        "goalward_velocity_transfer_sum": 7529.228332519531,
+        "ground_failures": 101,
+        "high_follow_touches": 6,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 74,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 12,
+        "reward_sum": 15.46772281639278,
+        "second_airborne_touches": 8,
+        "sustained_control_attempts": 10,
+        "sustained_control_ticks": 499,
+        "third_airborne_touches": 3,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.1875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.25,
+        "high_follow_touch": 0.0390625,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.078125,
+        "second_airborne_touch": 0.0546875,
+        "sustained_control": 0.0625,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 16857,
+      "learned_button_fraction": [
+        0.2154001305095806,
+        0.8349053805540725,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5163721942752056,
+        0.05739886619167607,
+        0.40526303293690985,
+        0.17348200543778805,
+        -0.08105942599193085
+      ],
+      "phase": 1,
+      "reward_per_attempt": -0.14737339924249682,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 24,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1477.1634521484375,
+            "p10": 118.7574234008789,
+            "p50": 636.691650390625,
+            "p90": 1149.02001953125
+          },
+          "attempts_with_elevated_state": 24,
+          "deep_inside_goal_height": 5,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5219.76025390625,
+            "p10": 3245.266845703125,
+            "p50": 4490.18359375,
+            "p90": 4979.88818359375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5537.220703125,
+            "p10": 109.49559020996094,
+            "p50": 391.74798583984375,
+            "p90": 1643.4842529296875
+          },
+          "reached_deep_goal_area": 5,
+          "z_at_deepest_y_uu": {
+            "maximum": 238.0777587890625,
+            "p10": 101.16712188720703,
+            "p50": 103.66352844238281,
+            "p90": 104.84205627441406
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 39017.14990234375,
+        "goalward_velocity_contacts": 32,
+        "goalward_velocity_transfer_sum": 6964.890930175781,
+        "ground_failures": 101,
+        "high_follow_touches": 5,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 75,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 10,
+        "reward_sum": -18.863795103039593,
+        "second_airborne_touches": 7,
+        "sustained_control_attempts": 8,
+        "sustained_control_ticks": 383,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.2109375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.2578125,
+        "high_follow_touch": 0.0390625,
+        "pop_touch": 0.8046875,
+        "productive_continuation": 0.0859375,
+        "second_airborne_touch": 0.046875,
+        "sustained_control": 0.0703125,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 16949,
+      "learned_button_fraction": [
+        0.18585167266505398,
+        0.7966251696265266,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5403200771096912,
+        0.045162749409032525,
+        0.3886201520838879,
+        0.13546377284537367,
+        -0.07880095361359059
+      ],
+      "phase": 1,
+      "reward_per_attempt": -0.16311339711319306,
+      "seed": 2026092301,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 27,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2364.051513671875,
+            "p10": 113.94263458251953,
+            "p50": 578.9087524414062,
+            "p90": 1416.7698974609375
+          },
+          "attempts_with_elevated_state": 27,
+          "deep_inside_goal_height": 5,
+          "deep_inside_goal_mouth": 3,
+          "deep_inside_goal_width": 3,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5218.92041015625,
+            "p10": 3186.828369140625,
+            "p50": 4109.98974609375,
+            "p90": 5019.91259765625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 2339.324462890625,
+            "p10": 118.85377502441406,
+            "p50": 769.06640625,
+            "p90": 1884.4423828125
+          },
+          "reached_deep_goal_area": 5,
+          "z_at_deepest_y_uu": {
+            "maximum": 147.50009155273438,
+            "p10": 101.36318969726562,
+            "p50": 103.13265228271484,
+            "p90": 108.54779815673828
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 38922.01513671875,
+        "goalward_velocity_contacts": 33,
+        "goalward_velocity_transfer_sum": 7455.755859375,
+        "ground_failures": 102,
+        "high_follow_touches": 5,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 103,
+        "maximum_connected_control_ticks": 69,
+        "no_pop_failures": 25,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 11,
+        "reward_sum": -20.87851483048871,
+        "second_airborne_touches": 6,
+        "sustained_control_attempts": 9,
+        "sustained_control_ticks": 400,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.2109375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.234375,
+        "high_follow_touch": 0.03125,
+        "pop_touch": 0.8125,
+        "productive_continuation": 0.0703125,
+        "second_airborne_touch": 0.0234375,
+        "sustained_control": 0.0625,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 16889,
+      "learned_button_fraction": [
+        0.20480786310616378,
+        0.7945408253893067,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5424171191162771,
+        0.05525475920436544,
+        0.3985689191421739,
+        0.1622630938643892,
+        -0.08026088935403183
+      ],
+      "phase": 1,
+      "reward_per_attempt": -0.08609181015344802,
+      "seed": 2026092300,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 27,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1285.443359375,
+            "p10": 172.22140502929688,
+            "p50": 522.3212890625,
+            "p90": 1043.280029296875
+          },
+          "attempts_with_elevated_state": 27,
+          "deep_inside_goal_height": 4,
+          "deep_inside_goal_mouth": 4,
+          "deep_inside_goal_width": 4,
+          "linear_goal_projection_seen": 3,
+          "maximum_goalward_y_uu": {
+            "maximum": 5230.64501953125,
+            "p10": 3046.711181640625,
+            "p50": 4477.41259765625,
+            "p90": 4980.8994140625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5965.65478515625,
+            "p10": 21.306486129760742,
+            "p50": 424.00872802734375,
+            "p90": 2696.301025390625
+          },
+          "reached_deep_goal_area": 4,
+          "z_at_deepest_y_uu": {
+            "maximum": 108.69593811035156,
+            "p10": 100.05152130126953,
+            "p50": 103.09077453613281,
+            "p90": 104.79121398925781
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 37381.133728027344,
+        "goalward_velocity_contacts": 30,
+        "goalward_velocity_transfer_sum": 7006.8077392578125,
+        "ground_failures": 102,
+        "high_follow_touches": 4,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 104,
+        "maximum_connected_control_ticks": 54,
+        "no_pop_failures": 24,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 9,
+        "reward_sum": -11.019751699641347,
+        "second_airborne_touches": 3,
+        "sustained_control_attempts": 8,
+        "sustained_control_ticks": 358,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0234375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0234375,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0859375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 25137,
+      "learned_button_fraction": [
+        0.05541631857421331,
+        0.9887019135139435,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.7602834758710516,
+        -0.08631311739980016,
+        -0.004297649409475209,
+        0.07239282526544387,
+        -0.0935956140978103
+      ],
+      "phase": 1,
+      "reward_per_attempt": -7.866940044419607,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 3,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 662.2599487304688,
+            "p10": 125.80621337890625,
+            "p50": 312.8525390625,
+            "p90": 592.3784790039062
+          },
+          "attempts_with_elevated_state": 3,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5088.1240234375,
+            "p10": 4352.7392578125,
+            "p50": 4992.263671875,
+            "p90": 5068.9521484375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 706.8043212890625,
+            "p10": 5.5010986328125,
+            "p50": 27.5054931640625,
+            "p90": 570.9445190429688
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 100.29499816894531,
+            "p10": 99.18377685546875,
+            "p50": 99.57872009277344,
+            "p90": 100.15174102783203
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 2816.6663818359375,
+        "goalward_velocity_contacts": 3,
+        "goalward_velocity_transfer_sum": 392.500732421875,
+        "ground_failures": 117,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 2,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -1006.9683256857097,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 2,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 11
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.015625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.015625,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 23603,
+      "learned_button_fraction": [
+        0.0501207473626234,
+        0.9950430030080922,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.7689919903116333,
+        -0.0915467925519186,
+        0.00031845407981166837,
+        0.06658265858457071,
+        -0.08449412558568728
+      ],
+      "phase": 1,
+      "reward_per_attempt": -7.738317710522097,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 2,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 797.8389892578125,
+            "p10": 444.8684997558594,
+            "p50": 601.7442626953125,
+            "p90": 758.6200561523438
+          },
+          "attempts_with_elevated_state": 2,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5222.41650390625,
+            "p10": 4677.3388671875,
+            "p50": 4919.595703125,
+            "p90": 5161.85205078125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 375.9796142578125,
+            "p10": 37.59796142578125,
+            "p50": 187.98980712890625,
+            "p90": 338.38165283203125
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 293.6468811035156,
+            "p10": 121.27085876464844,
+            "p50": 197.88241577148438,
+            "p90": 274.4939880371094
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 2156.9834594726562,
+        "goalward_velocity_contacts": 2,
+        "goalward_velocity_transfer_sum": 513.8544311523438,
+        "ground_failures": 123,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 6,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -990.5046669468284,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 6,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0859375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.015625,
+        "goalward_velocity_contact": 0.0859375,
+        "high_follow_touch": 0.0546875,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0859375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 25512,
+      "learned_button_fraction": [
+        0.08262778300407651,
+        0.988005644402634,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6958598064565211,
+        -0.06961999371166266,
+        0.0561612253170063,
+        0.09657785933547067,
+        -0.08121036402849136
+      ],
+      "phase": 1,
+      "reward_per_attempt": -3.9378493620752124,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 11,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 862.8236083984375,
+            "p10": 74.4757080078125,
+            "p50": 323.293701171875,
+            "p90": 846.0574951171875
+          },
+          "attempts_with_elevated_state": 11,
+          "deep_inside_goal_height": 4,
+          "deep_inside_goal_mouth": 4,
+          "deep_inside_goal_width": 4,
+          "linear_goal_projection_seen": 4,
+          "maximum_goalward_y_uu": {
+            "maximum": 5219.25390625,
+            "p10": 3295.28515625,
+            "p50": 4533.41015625,
+            "p90": 5218.85693359375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4166.99267578125,
+            "p10": 0.0,
+            "p50": 701.376220703125,
+            "p90": 3525.784423828125
+          },
+          "reached_deep_goal_area": 4,
+          "z_at_deepest_y_uu": {
+            "maximum": 197.7283935546875,
+            "p10": 99.65736389160156,
+            "p50": 101.5086441040039,
+            "p90": 158.8610382080078
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 2,
+        "goalward_ball_speed_at_contact_sum": 11156.649780273438,
+        "goalward_velocity_contacts": 11,
+        "goalward_velocity_transfer_sum": 1722.5032958984375,
+        "ground_failures": 115,
+        "high_follow_touches": 7,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 9,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -504.0447183456272,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 20,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 11
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.046875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.046875,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 23792,
+      "learned_button_fraction": [
+        0.0812457969065232,
+        0.992308338937458,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.7155148867294092,
+        -0.06935922270546882,
+        0.06321070144570365,
+        0.09450435760820766,
+        -0.08112849392449496
+      ],
+      "phase": 1,
+      "reward_per_attempt": -4.704842109204037,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 6,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 797.1224975585938,
+            "p10": 269.1837463378906,
+            "p50": 506.02618408203125,
+            "p90": 767.76416015625
+          },
+          "attempts_with_elevated_state": 6,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5218.626953125,
+            "p10": 3329.920654296875,
+            "p50": 4608.94287109375,
+            "p90": 4929.052734375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3009.67236328125,
+            "p10": 189.05642700195312,
+            "p50": 410.40325927734375,
+            "p90": 1934.506591796875
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 437.9666748046875,
+            "p10": 101.13681030273438,
+            "p50": 103.23912048339844,
+            "p90": 271.26611328125
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 6039.550231933594,
+        "goalward_velocity_contacts": 6,
+        "goalward_velocity_transfer_sum": 1275.3109741210938,
+        "ground_failures": 123,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 13,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -602.2197899781168,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 13,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.1484375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.015625,
+        "goalward_velocity_contact": 0.15625,
+        "high_follow_touch": 0.078125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.09375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 26105,
+      "learned_button_fraction": [
+        0.11066845431909596,
+        0.9797739896571538,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6520719372670093,
+        -0.052547288602423615,
+        0.11577324712168544,
+        0.12375076972529778,
+        -0.08758513162352066
+      ],
+      "phase": 1,
+      "reward_per_attempt": -1.6550364439754048,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 19,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 944.8628540039062,
+            "p10": 76.98741912841797,
+            "p50": 498.432861328125,
+            "p90": 786.1309814453125
+          },
+          "attempts_with_elevated_state": 19,
+          "deep_inside_goal_height": 6,
+          "deep_inside_goal_mouth": 6,
+          "deep_inside_goal_width": 6,
+          "linear_goal_projection_seen": 5,
+          "maximum_goalward_y_uu": {
+            "maximum": 5222.3818359375,
+            "p10": 3606.636962890625,
+            "p50": 4108.48974609375,
+            "p90": 5181.30126953125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3467.95263671875,
+            "p10": 0.0,
+            "p50": 627.7288208007812,
+            "p90": 2518.5966796875
+          },
+          "reached_deep_goal_area": 6,
+          "z_at_deepest_y_uu": {
+            "maximum": 389.0057373046875,
+            "p10": 99.52440643310547,
+            "p50": 103.12722778320312,
+            "p90": 127.3167495727539
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 2,
+        "goalward_ball_speed_at_contact_sum": 19709.74884033203,
+        "goalward_velocity_contacts": 20,
+        "goalward_velocity_transfer_sum": 4204.8753662109375,
+        "ground_failures": 113,
+        "high_follow_touches": 10,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 10,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -211.84466482885182,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 38,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 12
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.09375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.1015625,
+        "high_follow_touch": 0.0234375,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 24234,
+      "learned_button_fraction": [
+        0.09560947429231657,
+        0.9902616159115293,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6673159437080116,
+        -0.052033424810919625,
+        0.12197135423386775,
+        0.11572088044314008,
+        -0.08216146731510711
+      ],
+      "phase": 1,
+      "reward_per_attempt": -2.504221446761221,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 12,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 925.0888061523438,
+            "p10": 92.51139831542969,
+            "p50": 601.6605224609375,
+            "p90": 872.4564208984375
+          },
+          "attempts_with_elevated_state": 12,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5221.880859375,
+            "p10": 2931.21484375,
+            "p50": 4051.21533203125,
+            "p90": 5118.99560546875
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3448.74072265625,
+            "p10": 11.4859037399292,
+            "p50": 965.9866333007812,
+            "p90": 3190.270751953125
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 460.225830078125,
+            "p10": 99.38011169433594,
+            "p50": 101.62047576904297,
+            "p90": 104.5622787475586
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 12674.777282714844,
+        "goalward_velocity_contacts": 13,
+        "goalward_velocity_transfer_sum": 2977.8228759765625,
+        "ground_failures": 123,
+        "high_follow_touches": 3,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 8,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -320.5403451854363,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 12,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.34375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0546875,
+        "goalward_velocity_contact": 0.3671875,
+        "high_follow_touch": 0.2421875,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.046875,
+        "second_airborne_touch": 0.03125,
+        "sustained_control": 0.0234375,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0546875
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 27456,
+      "learned_button_fraction": [
+        0.14976689976689977,
+        0.965034965034965,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6020017226153843,
+        -0.03179709182973639,
+        0.19745002117498656,
+        0.15991967911134924,
+        -0.11043559045397468
+      ],
+      "phase": 1,
+      "reward_per_attempt": 2.598519947787281,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 44,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1306.298095703125,
+            "p10": 56.45743942260742,
+            "p50": 377.74908447265625,
+            "p90": 894.75
+          },
+          "attempts_with_elevated_state": 44,
+          "deep_inside_goal_height": 14,
+          "deep_inside_goal_mouth": 13,
+          "deep_inside_goal_width": 16,
+          "linear_goal_projection_seen": 12,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.31640625,
+            "p10": 3617.93994140625,
+            "p50": 4707.9208984375,
+            "p90": 5216.97412109375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4698.7763671875,
+            "p10": 0.0,
+            "p50": 310.29736328125,
+            "p90": 1552.3834228515625
+          },
+          "reached_deep_goal_area": 18,
+          "z_at_deepest_y_uu": {
+            "maximum": 948.9142456054688,
+            "p10": 100.25545501708984,
+            "p50": 102.95972442626953,
+            "p90": 456.41461181640625
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 7,
+        "goalward_ball_speed_at_contact_sum": 52508.119134902954,
+        "goalward_velocity_contacts": 47,
+        "goalward_velocity_transfer_sum": 12072.810546875,
+        "ground_failures": 114,
+        "high_follow_touches": 31,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 33,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 6,
+        "reward_sum": 332.610553316772,
+        "second_airborne_touches": 4,
+        "sustained_control_attempts": 3,
+        "sustained_control_ticks": 126,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 7
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.3046875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0546875,
+        "goalward_velocity_contact": 0.3359375,
+        "high_follow_touch": 0.25,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.046875,
+        "second_airborne_touch": 0.0390625,
+        "sustained_control": 0.03125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 25089,
+      "learned_button_fraction": [
+        0.1405396787436725,
+        0.9726573398700625,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5926793476103319,
+        -0.0499307774392251,
+        0.19113137391463217,
+        0.1291553726932024,
+        -0.0960089915374805
+      ],
+      "phase": 1,
+      "reward_per_attempt": 2.4973375890840543,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 39,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1986.266845703125,
+            "p10": 181.9574432373047,
+            "p50": 501.75958251953125,
+            "p90": 1004.7760620117188
+          },
+          "attempts_with_elevated_state": 39,
+          "deep_inside_goal_height": 14,
+          "deep_inside_goal_mouth": 11,
+          "deep_inside_goal_width": 11,
+          "linear_goal_projection_seen": 11,
+          "maximum_goalward_y_uu": {
+            "maximum": 5225.7890625,
+            "p10": 3351.360107421875,
+            "p50": 4439.63037109375,
+            "p90": 5218.65771484375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3101.477783203125,
+            "p10": 0.0,
+            "p50": 757.7156982421875,
+            "p90": 1726.3056640625
+          },
+          "reached_deep_goal_area": 14,
+          "z_at_deepest_y_uu": {
+            "maximum": 601.905029296875,
+            "p10": 100.36377716064453,
+            "p50": 103.36772155761719,
+            "p90": 353.9085693359375
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 7,
+        "goalward_ball_speed_at_contact_sum": 50196.142028808594,
+        "goalward_velocity_contacts": 43,
+        "goalward_velocity_transfer_sum": 11543.365783691406,
+        "ground_failures": 117,
+        "high_follow_touches": 32,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 66,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 6,
+        "reward_sum": 319.65921140275896,
+        "second_airborne_touches": 5,
+        "sustained_control_attempts": 4,
+        "sustained_control_ticks": 211,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0625,
+        "goalward_velocity_contact": 0.390625,
+        "high_follow_touch": 0.3515625,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.1015625,
+        "second_airborne_touch": 0.03125,
+        "sustained_control": 0.078125,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0390625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 27965,
+      "learned_button_fraction": [
+        0.19835508671553728,
+        0.9251564455569462,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5505113759584522,
+        -0.03813440079560211,
+        0.24308876660505507,
+        0.1419273042686089,
+        -0.10093414613393811
+      ],
+      "phase": 1,
+      "reward_per_attempt": 0.6031952440389432,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 48,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1718.06396484375,
+            "p10": 71.84217834472656,
+            "p50": 473.2801208496094,
+            "p90": 1239.1802978515625
+          },
+          "attempts_with_elevated_state": 48,
+          "deep_inside_goal_height": 15,
+          "deep_inside_goal_mouth": 13,
+          "deep_inside_goal_width": 18,
+          "linear_goal_projection_seen": 14,
+          "maximum_goalward_y_uu": {
+            "maximum": 5225.54248046875,
+            "p10": 3920.409912109375,
+            "p50": 4898.2158203125,
+            "p90": 5222.18505859375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4529.267578125,
+            "p10": 0.0,
+            "p50": 356.19683837890625,
+            "p90": 1403.2991943359375
+          },
+          "reached_deep_goal_area": 24,
+          "z_at_deepest_y_uu": {
+            "maximum": 1018.1781005859375,
+            "p10": 100.74185943603516,
+            "p50": 104.44729614257812,
+            "p90": 759.3677978515625
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 8,
+        "goalward_ball_speed_at_contact_sum": 60848.52795410156,
+        "goalward_velocity_contacts": 50,
+        "goalward_velocity_transfer_sum": 15034.748229980469,
+        "ground_failures": 115,
+        "high_follow_touches": 45,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 54,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 13,
+        "reward_sum": 77.20899123698473,
+        "second_airborne_touches": 4,
+        "sustained_control_attempts": 10,
+        "sustained_control_ticks": 424,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 5
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0078125,
+        "elevated_follow_touch": 0.2890625,
+        "fifth_airborne_touch": 0.0078125,
+        "fourth_airborne_touch": 0.0078125,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0703125,
+        "goalward_velocity_contact": 0.34375,
+        "high_follow_touch": 0.2734375,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0703125,
+        "second_airborne_touch": 0.03125,
+        "sustained_control": 0.0546875,
+        "third_airborne_touch": 0.015625,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 24881,
+      "learned_button_fraction": [
+        0.15566094610345244,
+        0.9286202323057755,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5557282799784317,
+        -0.045645838495288096,
+        0.2613697537484597,
+        0.12466727478465604,
+        -0.09237033087306765
+      ],
+      "phase": 1,
+      "reward_per_attempt": 0.8284167177334893,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 1,
+        "elevated_follow_touches": 37,
+        "fifth_airborne_touches": 1,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2040.216796875,
+            "p10": 189.9647216796875,
+            "p50": 484.9256591796875,
+            "p90": 1180.9154052734375
+          },
+          "attempts_with_elevated_state": 37,
+          "deep_inside_goal_height": 14,
+          "deep_inside_goal_mouth": 10,
+          "deep_inside_goal_width": 10,
+          "linear_goal_projection_seen": 10,
+          "maximum_goalward_y_uu": {
+            "maximum": 5224.291015625,
+            "p10": 3264.777099609375,
+            "p50": 4553.908203125,
+            "p90": 5221.3212890625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5506.40087890625,
+            "p10": 0.0,
+            "p50": 550.2594604492188,
+            "p90": 2029.3568115234375
+          },
+          "reached_deep_goal_area": 15,
+          "z_at_deepest_y_uu": {
+            "maximum": 752.2113037109375,
+            "p10": 101.3093032836914,
+            "p50": 104.24411010742188,
+            "p90": 482.4013977050781
+          }
+        },
+        "fourth_airborne_touches": 1,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 9,
+        "goalward_ball_speed_at_contact_sum": 55036.01550292969,
+        "goalward_velocity_contacts": 44,
+        "goalward_velocity_transfer_sum": 14410.029602050781,
+        "ground_failures": 115,
+        "high_follow_touches": 35,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 43,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 1,
+        "productive_continuation_attempts": 9,
+        "reward_sum": 106.03733986988664,
+        "second_airborne_touches": 4,
+        "sustained_control_attempts": 7,
+        "sustained_control_ticks": 246,
+        "third_airborne_touches": 2,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.296875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0625,
+        "goalward_velocity_contact": 0.3046875,
+        "high_follow_touch": 0.296875,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0859375,
+        "second_airborne_touch": 0.0234375,
+        "sustained_control": 0.0703125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0390625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 27305,
+      "learned_button_fraction": [
+        0.19483611060245376,
+        0.8928401391686505,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5516421619127287,
+        -0.0392011412867986,
+        0.26063479802089057,
+        0.13040131311659012,
+        -0.08960056550220066
+      ],
+      "phase": 1,
+      "reward_per_attempt": -2.563147031381959,
+      "seed": 2026192301,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 38,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1916.910888671875,
+            "p10": 81.01639556884766,
+            "p50": 471.57391357421875,
+            "p90": 1174.2933349609375
+          },
+          "attempts_with_elevated_state": 38,
+          "deep_inside_goal_height": 13,
+          "deep_inside_goal_mouth": 11,
+          "deep_inside_goal_width": 18,
+          "linear_goal_projection_seen": 12,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.28564453125,
+            "p10": 3919.580078125,
+            "p50": 5028.587890625,
+            "p90": 5221.6708984375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 2396.87353515625,
+            "p10": 0.0,
+            "p50": 270.3994140625,
+            "p90": 1302.5760498046875
+          },
+          "reached_deep_goal_area": 22,
+          "z_at_deepest_y_uu": {
+            "maximum": 980.0982666015625,
+            "p10": 100.08072662353516,
+            "p50": 184.60443115234375,
+            "p90": 774.559326171875
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 8,
+        "goalward_ball_speed_at_contact_sum": 49900.999938964844,
+        "goalward_velocity_contacts": 39,
+        "goalward_velocity_transfer_sum": 14577.570495605469,
+        "ground_failures": 115,
+        "high_follow_touches": 38,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 48,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 11,
+        "reward_sum": -328.08282001689076,
+        "second_airborne_touches": 3,
+        "sustained_control_attempts": 9,
+        "sustained_control_ticks": 366,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 5
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.2421875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.046875,
+        "goalward_velocity_contact": 0.2578125,
+        "high_follow_touch": 0.2421875,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0390625,
+        "second_airborne_touch": 0.0234375,
+        "sustained_control": 0.0390625,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 24584,
+      "learned_button_fraction": [
+        0.1614871461112919,
+        0.8637325089489098,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5494456973920515,
+        -0.04521939781331692,
+        0.27229937092405765,
+        0.11481498111238865,
+        -0.09505884379611587
+      ],
+      "phase": 1,
+      "reward_per_attempt": -2.4392123507132055,
+      "seed": 2026192300,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 31,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2508.272216796875,
+            "p10": 211.57350158691406,
+            "p50": 448.81292724609375,
+            "p90": 1715.5985107421875
+          },
+          "attempts_with_elevated_state": 31,
+          "deep_inside_goal_height": 11,
+          "deep_inside_goal_mouth": 7,
+          "deep_inside_goal_width": 8,
+          "linear_goal_projection_seen": 7,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.07373046875,
+            "p10": 3340.3984375,
+            "p50": 4637.220703125,
+            "p90": 5218.501953125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5652.0146484375,
+            "p10": 0.0,
+            "p50": 767.0706176757812,
+            "p90": 2092.220947265625
+          },
+          "reached_deep_goal_area": 13,
+          "z_at_deepest_y_uu": {
+            "maximum": 764.2935791015625,
+            "p10": 100.34843444824219,
+            "p50": 104.10232543945312,
+            "p90": 618.289794921875
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 6,
+        "goalward_ball_speed_at_contact_sum": 42114.01330566406,
+        "goalward_velocity_contacts": 33,
+        "goalward_velocity_transfer_sum": 10475.343811035156,
+        "ground_failures": 121,
+        "high_follow_touches": 31,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 42,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 5,
+        "reward_sum": -312.2191808912903,
+        "second_airborne_touches": 3,
+        "sustained_control_attempts": 5,
+        "sustained_control_ticks": 215,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0005510509328505078,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.03125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.03125,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.015625,
+        "second_airborne_touch": 0.015625,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 25406,
+      "learned_button_fraction": [
+        0.17810753365346768,
+        0.9347004644572149,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6697481026230032,
+        -0.03233877435314947,
+        0.16677511895365763,
+        0.047503565618172136,
+        -0.05524455838360653
+      ],
+      "phase": 1,
+      "reward_per_attempt": -5.65111517108744,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 4,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 3097.87255859375,
+            "p10": 246.63246154785156,
+            "p50": 482.02197265625,
+            "p90": 2361.441162109375
+          },
+          "attempts_with_elevated_state": 4,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4681.22802734375,
+            "p10": 3544.3671875,
+            "p50": 4425.3759765625,
+            "p90": 4633.43603515625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 2880.0009765625,
+            "p10": 372.3667907714844,
+            "p50": 932.5719604492188,
+            "p90": 2395.452880859375
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 103.45541381835938,
+            "p10": 103.27256774902344,
+            "p50": 103.40824890136719,
+            "p90": 103.44611358642578
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 4260.165283203125,
+        "goalward_velocity_contacts": 4,
+        "goalward_velocity_transfer_sum": 208.72042846679688,
+        "ground_failures": 125,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 28,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 2,
+        "reward_sum": -723.3427418991923,
+        "second_airborne_touches": 2,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 28,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.002550918729323608,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.03125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.03125,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0234375,
+        "second_airborne_touch": 0.0234375,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.015625,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 0.0,
+      "learned_action_ticks": 25089,
+      "learned_button_fraction": [
+        0.18438359440392205,
+        0.9336761130375862,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6806587671488064,
+        -0.028125344383087197,
+        0.1660706920811933,
+        0.04332688316293484,
+        -0.04849196501629195
+      ],
+      "phase": 1,
+      "reward_per_attempt": -5.054330939048668,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 4,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1167.0577392578125,
+            "p10": 311.0719909667969,
+            "p50": 895.0203857421875,
+            "p90": 1150.5086669921875
+          },
+          "attempts_with_elevated_state": 4,
+          "deep_inside_goal_height": 2,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5216.765625,
+            "p10": 4333.2705078125,
+            "p50": 4844.34375,
+            "p90": 5135.6376953125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 1068.783203125,
+            "p10": 2.286273241043091,
+            "p50": 282.8865966796875,
+            "p90": 915.5938110351562
+          },
+          "reached_deep_goal_area": 2,
+          "z_at_deepest_y_uu": {
+            "maximum": 213.45126342773438,
+            "p10": 102.61184692382812,
+            "p50": 103.12831115722656,
+            "p90": 180.3562774658203
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 6559.501800537109,
+        "goalward_velocity_contacts": 4,
+        "goalward_velocity_transfer_sum": 2209.920379638672,
+        "ground_failures": 127,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 26,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 3,
+        "reward_sum": -646.9543601982296,
+        "second_airborne_touches": 3,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 26,
+        "third_airborne_touches": 2,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0546875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0078125,
+        "goalward_velocity_contact": 0.0546875,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.015625,
+        "second_airborne_touch": 0.015625,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 25751,
+      "learned_button_fraction": [
+        0.21447710768513845,
+        0.918177934837482,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5893425454652866,
+        0.0025006110383721664,
+        0.22109611676032287,
+        0.07721390927063303,
+        -0.06422339102860955
+      ],
+      "phase": 1,
+      "reward_per_attempt": -4.265364877232059,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 7,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1499.79052734375,
+            "p10": 287.3278503417969,
+            "p50": 940.8947143554688,
+            "p90": 1464.4140625
+          },
+          "attempts_with_elevated_state": 7,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5224.6171875,
+            "p10": 2901.212890625,
+            "p50": 4683.587890625,
+            "p90": 5018.51171875
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3606.840576171875,
+            "p10": 120.46491241455078,
+            "p50": 595.0684814453125,
+            "p90": 2383.501220703125
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 758.429443359375,
+            "p10": 103.43822479248047,
+            "p50": 104.92405700683594,
+            "p90": 435.68035888671875
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 8236.58432006836,
+        "goalward_velocity_contacts": 7,
+        "goalward_velocity_transfer_sum": 1252.1930541992188,
+        "ground_failures": 120,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 4,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 28,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 2,
+        "reward_sum": -545.9667042857036,
+        "second_airborne_touches": 2,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 28,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.000669739589489028,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0390625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0234375,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0078125,
+        "second_airborne_touch": 0.0078125,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 5.0,
+      "learned_action_ticks": 25383,
+      "learned_button_fraction": [
+        0.21278020722530827,
+        0.9175038411535279,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.6001300279499716,
+        0.012597659478377163,
+        0.22465800612877374,
+        0.06542809455779457,
+        -0.052807664372647015
+      ],
+      "phase": 1,
+      "reward_per_attempt": -4.464457122667227,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 5,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 569.7345581054688,
+            "p10": 86.76542663574219,
+            "p50": 142.52589416503906,
+            "p90": 518.9049682617188
+          },
+          "attempts_with_elevated_state": 5,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4620.5576171875,
+            "p10": 3327.40673828125,
+            "p50": 3887.04638671875,
+            "p90": 4549.06396484375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3146.9296875,
+            "p10": 494.503173828125,
+            "p50": 1337.43505859375,
+            "p90": 2686.32275390625
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 142.93545532226562,
+            "p10": 101.44337463378906,
+            "p50": 103.29348754882812,
+            "p90": 127.15814208984375
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 4635.978485107422,
+        "goalward_velocity_contacts": 3,
+        "goalward_velocity_transfer_sum": 569.573486328125,
+        "ground_failures": 126,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 1,
+        "reward_sum": -571.450511701405,
+        "second_airborne_touches": 1,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.1015625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0234375,
+        "goalward_velocity_contact": 0.1015625,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.015625,
+        "second_airborne_touch": 0.015625,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 26051,
+      "learned_button_fraction": [
+        0.23265901500902075,
+        0.9043030977697594,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5158170339069756,
+        0.035368227200077935,
+        0.28258656696541096,
+        0.10856420821050712,
+        -0.07513897466642455
+      ],
+      "phase": 1,
+      "reward_per_attempt": -2.471855168136244,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 13,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1560.825439453125,
+            "p10": 277.9918212890625,
+            "p50": 667.5728149414062,
+            "p90": 1470.299560546875
+          },
+          "attempts_with_elevated_state": 13,
+          "deep_inside_goal_height": 5,
+          "deep_inside_goal_mouth": 3,
+          "deep_inside_goal_width": 3,
+          "linear_goal_projection_seen": 3,
+          "maximum_goalward_y_uu": {
+            "maximum": 5222.7060546875,
+            "p10": 2680.26904296875,
+            "p50": 4665.75634765625,
+            "p90": 5221.03271484375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3605.791015625,
+            "p10": 0.0,
+            "p50": 969.41650390625,
+            "p90": 3032.693603515625
+          },
+          "reached_deep_goal_area": 5,
+          "z_at_deepest_y_uu": {
+            "maximum": 287.34271240234375,
+            "p10": 100.10208129882812,
+            "p50": 102.39443969726562,
+            "p90": 217.701904296875
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 3,
+        "goalward_ball_speed_at_contact_sum": 13450.275695800781,
+        "goalward_velocity_contacts": 13,
+        "goalward_velocity_transfer_sum": 2121.841278076172,
+        "ground_failures": 120,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 2,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 28,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 2,
+        "reward_sum": -316.39746152143925,
+        "second_airborne_touches": 2,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 28,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.109375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.09375,
+        "high_follow_touch": 0.0078125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0234375,
+        "second_airborne_touch": 0.015625,
+        "sustained_control": 0.0078125,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 10.0,
+      "learned_action_ticks": 25674,
+      "learned_button_fraction": [
+        0.23739970398068083,
+        0.9021967749474176,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5203933372320851,
+        0.05238703090571,
+        0.29757804678789257,
+        0.09595157330149486,
+        -0.06650191227849665
+      ],
+      "phase": 1,
+      "reward_per_attempt": -2.734476472280221,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 14,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1395.1790771484375,
+            "p10": 121.98690795898438,
+            "p50": 537.5643310546875,
+            "p90": 1102.6610107421875
+          },
+          "attempts_with_elevated_state": 14,
+          "deep_inside_goal_height": 3,
+          "deep_inside_goal_mouth": 2,
+          "deep_inside_goal_width": 2,
+          "linear_goal_projection_seen": 2,
+          "maximum_goalward_y_uu": {
+            "maximum": 5029.8154296875,
+            "p10": 2907.131103515625,
+            "p50": 4204.47265625,
+            "p90": 4979.63720703125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3732.1845703125,
+            "p10": 87.21568298339844,
+            "p50": 633.1271362304688,
+            "p90": 3505.23291015625
+          },
+          "reached_deep_goal_area": 3,
+          "z_at_deepest_y_uu": {
+            "maximum": 335.7174377441406,
+            "p10": 101.83296966552734,
+            "p50": 103.8726806640625,
+            "p90": 108.46501159667969
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 13356.329956054688,
+        "goalward_velocity_contacts": 12,
+        "goalward_velocity_transfer_sum": 1419.8387451171875,
+        "ground_failures": 126,
+        "high_follow_touches": 1,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 45,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 3,
+        "reward_sum": -350.0129884518683,
+        "second_airborne_touches": 2,
+        "sustained_control_attempts": 1,
+        "sustained_control_ticks": 45,
+        "third_airborne_touches": 0,
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.5,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0078125,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.03125,
+        "goalward_velocity_contact": 0.4921875,
+        "high_follow_touch": 0.03125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0390625,
+        "second_airborne_touch": 0.03125,
+        "sustained_control": 0.015625,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 27786,
+      "learned_button_fraction": [
+        0.2291441733246959,
+        0.8761966457928453,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.4802172682129717,
+        0.05870722020184503,
+        0.3602743766307399,
+        0.15474034628197067,
+        -0.10438116661895015
+      ],
+      "phase": 1,
+      "reward_per_attempt": 2.5484303837874904,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 64,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2904.479736328125,
+            "p10": 170.1781005859375,
+            "p50": 638.236572265625,
+            "p90": 1475.6136474609375
+          },
+          "attempts_with_elevated_state": 64,
+          "deep_inside_goal_height": 7,
+          "deep_inside_goal_mouth": 5,
+          "deep_inside_goal_width": 5,
+          "linear_goal_projection_seen": 5,
+          "maximum_goalward_y_uu": {
+            "maximum": 5224.90771484375,
+            "p10": 3050.095703125,
+            "p50": 3969.23486328125,
+            "p90": 4926.802734375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4401.15625,
+            "p10": 135.35812377929688,
+            "p50": 1047.720947265625,
+            "p90": 3549.652099609375
+          },
+          "reached_deep_goal_area": 7,
+          "z_at_deepest_y_uu": {
+            "maximum": 409.98602294921875,
+            "p10": 100.82978820800781,
+            "p50": 103.41412353515625,
+            "p90": 104.8465805053711
+          }
+        },
+        "fourth_airborne_touches": 1,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 4,
+        "goalward_ball_speed_at_contact_sum": 69355.14321899414,
+        "goalward_velocity_contacts": 63,
+        "goalward_velocity_transfer_sum": 11903.636352539062,
+        "ground_failures": 118,
+        "high_follow_touches": 4,
+        "horizon_timeouts": 2,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 27,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 5,
+        "reward_sum": 326.1990891247988,
+        "second_airborne_touches": 4,
+        "sustained_control_attempts": 2,
+        "sustained_control_ticks": 54,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.5625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0390625,
+        "goalward_velocity_contact": 0.5390625,
+        "high_follow_touch": 0.0234375,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0390625,
+        "second_airborne_touch": 0.03125,
+        "sustained_control": 0.015625,
+        "third_airborne_touch": 0.0078125,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 20.0,
+      "learned_action_ticks": 27516,
+      "learned_button_fraction": [
+        0.2271769152493095,
+        0.8702936473324611,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.4898212873140075,
+        0.0758700655894292,
+        0.3674834230074354,
+        0.14624044008686557,
+        -0.09569505527913778
+      ],
+      "phase": 1,
+      "reward_per_attempt": 2.558096576074604,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 72,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 3340.88330078125,
+            "p10": 137.37037658691406,
+            "p50": 667.623046875,
+            "p90": 1371.0821533203125
+          },
+          "attempts_with_elevated_state": 72,
+          "deep_inside_goal_height": 10,
+          "deep_inside_goal_mouth": 8,
+          "deep_inside_goal_width": 10,
+          "linear_goal_projection_seen": 6,
+          "maximum_goalward_y_uu": {
+            "maximum": 5224.65576171875,
+            "p10": 3115.345458984375,
+            "p50": 4159.0478515625,
+            "p90": 5033.1708984375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4906.99658203125,
+            "p10": 51.35735321044922,
+            "p50": 1238.51611328125,
+            "p90": 3233.468017578125
+          },
+          "reached_deep_goal_area": 12,
+          "z_at_deepest_y_uu": {
+            "maximum": 909.99365234375,
+            "p10": 100.80435180664062,
+            "p50": 103.20292663574219,
+            "p90": 165.79550170898438
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 5,
+        "goalward_ball_speed_at_contact_sum": 73446.4245300293,
+        "goalward_velocity_contacts": 69,
+        "goalward_velocity_transfer_sum": 12810.516052246094,
+        "ground_failures": 121,
+        "high_follow_touches": 3,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 47,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 5,
+        "reward_sum": 327.4363617375493,
+        "second_airborne_touches": 4,
+        "sustained_control_attempts": 2,
+        "sustained_control_ticks": 79,
+        "third_airborne_touches": 1,
+        "unassisted_or_ground_goals": 1
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.609375,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.03125,
+        "goalward_velocity_contact": 0.828125,
+        "high_follow_touch": 0.078125,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.3359375,
+        "second_airborne_touch": 0.265625,
+        "sustained_control": 0.15625,
+        "third_airborne_touch": 0.0234375,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 30271,
+      "learned_button_fraction": [
+        0.18304648012949687,
+        0.8440091176373427,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5221299618282492,
+        0.05645832625503273,
+        0.4012785277753068,
+        0.16211766740642966,
+        -0.11041191232712558
+      ],
+      "phase": 1,
+      "reward_per_attempt": 6.635057510284241,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 78,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 3037.206787109375,
+            "p10": 137.10903930664062,
+            "p50": 619.214599609375,
+            "p90": 1541.1282958984375
+          },
+          "attempts_with_elevated_state": 78,
+          "deep_inside_goal_height": 11,
+          "deep_inside_goal_mouth": 8,
+          "deep_inside_goal_width": 8,
+          "linear_goal_projection_seen": 7,
+          "maximum_goalward_y_uu": {
+            "maximum": 5225.115234375,
+            "p10": 3145.6025390625,
+            "p50": 4116.7763671875,
+            "p90": 4940.29541015625
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4536.880859375,
+            "p10": 39.67723846435547,
+            "p50": 1051.4967041015625,
+            "p90": 3312.578857421875
+          },
+          "reached_deep_goal_area": 11,
+          "z_at_deepest_y_uu": {
+            "maximum": 278.59613037109375,
+            "p10": 100.28800201416016,
+            "p50": 102.91633605957031,
+            "p90": 104.53199768066406
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 4,
+        "goalward_ball_speed_at_contact_sum": 121218.88708496094,
+        "goalward_velocity_contacts": 106,
+        "goalward_velocity_transfer_sum": 18869.177001953125,
+        "ground_failures": 121,
+        "high_follow_touches": 10,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 113,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 43,
+        "reward_sum": 849.2873613163829,
+        "second_airborne_touches": 34,
+        "sustained_control_attempts": 20,
+        "sustained_control_ticks": 822,
+        "third_airborne_touches": 3,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.6875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0078125,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.046875,
+        "goalward_velocity_contact": 0.9765625,
+        "high_follow_touch": 0.1015625,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.3515625,
+        "second_airborne_touch": 0.2890625,
+        "sustained_control": 0.1328125,
+        "third_airborne_touch": 0.046875,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 35.0,
+      "learned_action_ticks": 30280,
+      "learned_button_fraction": [
+        0.18999339498018494,
+        0.8392998678996036,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5290644276890014,
+        0.05952975742791082,
+        0.38953320786918316,
+        0.1468330399597052,
+        -0.09885788384769224
+      ],
+      "phase": 1,
+      "reward_per_attempt": 8.736596402537543,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 88,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 2117.85546875,
+            "p10": 63.106746673583984,
+            "p50": 637.8939208984375,
+            "p90": 1349.597412109375
+          },
+          "attempts_with_elevated_state": 88,
+          "deep_inside_goal_height": 15,
+          "deep_inside_goal_mouth": 11,
+          "deep_inside_goal_width": 11,
+          "linear_goal_projection_seen": 8,
+          "maximum_goalward_y_uu": {
+            "maximum": 5224.5791015625,
+            "p10": 3323.020751953125,
+            "p50": 4174.947265625,
+            "p90": 5027.9287109375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4708.91943359375,
+            "p10": 69.05645751953125,
+            "p50": 828.4534301757812,
+            "p90": 3184.599365234375
+          },
+          "reached_deep_goal_area": 15,
+          "z_at_deepest_y_uu": {
+            "maximum": 344.0452575683594,
+            "p10": 100.59728240966797,
+            "p50": 102.80843353271484,
+            "p90": 114.34276580810547
+          }
+        },
+        "fourth_airborne_touches": 1,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 6,
+        "goalward_ball_speed_at_contact_sum": 135581.89324951172,
+        "goalward_velocity_contacts": 125,
+        "goalward_velocity_transfer_sum": 22036.90118408203,
+        "ground_failures": 121,
+        "high_follow_touches": 13,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 107,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 45,
+        "reward_sum": 1118.2843395248055,
+        "second_airborne_touches": 37,
+        "sustained_control_attempts": 17,
+        "sustained_control_ticks": 950,
+        "third_airborne_touches": 6,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.703125,
+        "fifth_airborne_touch": 0.0078125,
+        "fourth_airborne_touch": 0.0078125,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.03125,
+        "goalward_velocity_contact": 0.8359375,
+        "high_follow_touch": 0.1484375,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.3671875,
+        "second_airborne_touch": 0.1875,
+        "sustained_control": 0.2578125,
+        "third_airborne_touch": 0.0234375,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 30408,
+      "learned_button_fraction": [
+        0.15374243620099973,
+        0.8201460142067877,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5589487183283476,
+        0.03689818168904082,
+        0.38711237965862255,
+        0.13532727511366094,
+        -0.10192589851707859
+      ],
+      "phase": 1,
+      "reward_per_attempt": 7.459111730146105,
+      "seed": 2026292301,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 90,
+        "fifth_airborne_touches": 1,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 3190.63330078125,
+            "p10": 118.69073486328125,
+            "p50": 645.0975341796875,
+            "p90": 1467.6666259765625
+          },
+          "attempts_with_elevated_state": 90,
+          "deep_inside_goal_height": 15,
+          "deep_inside_goal_mouth": 12,
+          "deep_inside_goal_width": 12,
+          "linear_goal_projection_seen": 12,
+          "maximum_goalward_y_uu": {
+            "maximum": 5227.10400390625,
+            "p10": 2962.24853515625,
+            "p50": 4117.53515625,
+            "p90": 5099.83740234375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 5560.90673828125,
+            "p10": 0.0,
+            "p50": 930.615234375,
+            "p90": 3203.677978515625
+          },
+          "reached_deep_goal_area": 15,
+          "z_at_deepest_y_uu": {
+            "maximum": 296.8130798339844,
+            "p10": 100.60311889648438,
+            "p50": 102.91259002685547,
+            "p90": 104.66100311279297
+          }
+        },
+        "fourth_airborne_touches": 1,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 4,
+        "goalward_ball_speed_at_contact_sum": 125110.5881652832,
+        "goalward_velocity_contacts": 107,
+        "goalward_velocity_transfer_sum": 22311.554931640625,
+        "ground_failures": 120,
+        "high_follow_touches": 19,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 70,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 47,
+        "reward_sum": 954.7663014587015,
+        "second_airborne_touches": 24,
+        "sustained_control_attempts": 33,
+        "sustained_control_ticks": 1380,
+        "third_airborne_touches": 3,
+        "unassisted_or_ground_goals": 3
+      },
+      "worlds": 128
+    },
+    {
+      "analog_saturation_fraction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.7421875,
+        "fifth_airborne_touch": 0.015625,
+        "fourth_airborne_touch": 0.0234375,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.03125,
+        "goalward_velocity_contact": 1.046875,
+        "high_follow_touch": 0.140625,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.390625,
+        "second_airborne_touch": 0.2734375,
+        "sustained_control": 0.25,
+        "third_airborne_touch": 0.0546875,
+        "unassisted_or_ground_goal": 0.0
+      },
+      "handoff_tick": null,
+      "horizon": 600,
+      "initial_boost": 50.0,
+      "learned_action_ticks": 30119,
+      "learned_button_fraction": [
+        0.15329194196354462,
+        0.8006905939772236,
+        0.0
+      ],
+      "mean_learned_analog_action": [
+        0.5607649379223699,
+        0.04120798035411834,
+        0.3754290200581093,
+        0.1214808557862476,
+        -0.09046573738462209
+      ],
+      "phase": 1,
+      "reward_per_attempt": 9.450956521170156,
+      "seed": 2026292300,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 128,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 95,
+        "fifth_airborne_touches": 2,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1794.4610595703125,
+            "p10": 121.41967010498047,
+            "p50": 630.2244873046875,
+            "p90": 1381.185791015625
+          },
+          "attempts_with_elevated_state": 95,
+          "deep_inside_goal_height": 19,
+          "deep_inside_goal_mouth": 13,
+          "deep_inside_goal_width": 13,
+          "linear_goal_projection_seen": 8,
+          "maximum_goalward_y_uu": {
+            "maximum": 5223.26171875,
+            "p10": 3140.588623046875,
+            "p50": 4230.47119140625,
+            "p90": 5030.1376953125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 4221.232421875,
+            "p10": 58.20486068725586,
+            "p50": 787.1087036132812,
+            "p90": 2446.69873046875
+          },
+          "reached_deep_goal_area": 19,
+          "z_at_deepest_y_uu": {
+            "maximum": 363.210693359375,
+            "p10": 100.52516174316406,
+            "p50": 102.6972885131836,
+            "p90": 104.95484161376953
+          }
+        },
+        "fourth_airborne_touches": 3,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 4,
+        "goalward_ball_speed_at_contact_sum": 148045.2839050293,
+        "goalward_velocity_contacts": 134,
+        "goalward_velocity_transfer_sum": 27494.889099121094,
+        "ground_failures": 123,
+        "high_follow_touches": 18,
+        "horizon_timeouts": 1,
+        "low_pop_touches": 128,
+        "maximum_connected_control_ticks": 69,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 50,
+        "reward_sum": 1209.72243470978,
+        "second_airborne_touches": 35,
+        "sustained_control_attempts": 32,
+        "sustained_control_ticks": 1241,
+        "third_airborne_touches": 7,
+        "unassisted_or_ground_goals": 0
+      },
+      "worlds": 128
+    }
+  ],
+  "seed": 2026092301,
+  "source_authority": {
+    "path": "results/rival2/ground_to_air_goal_v3/authority.json",
+    "sha256": "E0E5786EDAF1107FD6A24A4345417F6BFDB3A0D8E49176D8728B71F2A40A66B8"
+  },
+  "worlds_per_side_per_setup_and_boost": 128
+}

@@ -73,6 +73,23 @@ state into an impossible or low-ceiling jump.  The integration stage must keep
 a physical minimum-boost gate and teach the ordinary policy to arrive with
 enough boost, rather than hiding the problem by lowering the gate to zero.
 
+A paired fixed-state boost sweep makes the threshold concrete.  Across both
+physical sides, elevated-follow rates were:
+
+| initial boost | low bounce | incoming chip | matched dribble |
+|---:|---:|---:|---:|
+| 0 | 1.56% | 1.95% | 3.12% |
+| 5 | 3.52% | 6.64% | 4.69% |
+| 10 | 6.25% | 12.11% | 10.55% |
+| 20 | 17.58% | 32.42% | 53.12% |
+| 35 | 19.14% | 33.20% | 64.84% |
+| 50 | 21.09% | 26.95% | 72.27% |
+
+The same 128 states per side/setup were reused at every boost level.  Twenty
+boost is the first broadly useful operating point.  More boost chiefly helps a
+matched dribble become a connected carry; incoming-chip results saturate
+earlier because contact geometry, not fuel, becomes the limiting variable.
+
 ## Frozen forward decision
 
 The next capability stage should:
