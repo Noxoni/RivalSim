@@ -1,0 +1,161 @@
+{
+  "format": "RIVAL2_UNIFIED_CAPABILITY_DISTILLATION_V1_AUTHORITY",
+  "created_utc": "2026-09-03T16:56:43.8547565Z",
+  "purpose": "Distill ordinary play, aerial offense, offensive demos, and surface recovery into one recurrent Rival policy with no runtime router.",
+  "sources": {
+    "base_blue": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "base_orange": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "aerial_teacher": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "capability_blue": {
+      "path": "checkpoints/rival2/capability_curriculum_v2/rival2_blue.pt",
+      "sha256": "8F3942F30AFF00655D5A83CC2FA8EA8B9AC5314907CCB4D0AE2888C0F48C5442"
+    },
+    "capability_orange": {
+      "path": "checkpoints/rival2/capability_curriculum_v2/rival2_orange.pt",
+      "sha256": "E1E27300D58CFB57CEDE9A0E49E1F1C1392EA3DB59B44C22674BCB4B953AAC34"
+    }
+  },
+  "contracts": {
+    "observation": "RIVAL2_OBS_V2_120HZ",
+    "observation_sha256": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "action": "RIVAL2_ACTION_V2_120HZ",
+    "action_sha256": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "physics_hz": 120,
+    "policy_hz": 120
+  },
+  "student": {
+    "version": "RIVAL2_UNIFIED_CAPABILITY_POLICY_V1",
+    "base_path": "frozen copied V23 Blue trunk actor and critic",
+    "context_encoder_dim": 256,
+    "context_hidden_dim": 256,
+    "context_layers": 1,
+    "context_actor": "13-output additive residual initialized exactly zero",
+    "initial_parent_parity": "bit-exact actor value and deterministic action",
+    "trainable": [
+      "context_encoder",
+      "context_gru",
+      "context_actor"
+    ],
+    "frozen": [
+      "base_trunk",
+      "base_actor",
+      "base_critic"
+    ],
+    "runtime_router": false,
+    "task_identifier_input": false,
+    "expert_action_splice": false
+  },
+  "corpora": {
+    "sequence_ticks": 80,
+    "burn_in_ticks": 16,
+    "train": {
+      "natural_worlds": 128,
+      "natural_ticks": 512,
+      "aerial_worlds_per_side": 256,
+      "aerial_horizon_ticks": 600,
+      "capability_worlds_per_side": 512,
+      "capability_horizon_ticks": 256
+    },
+    "validation": {
+      "natural_worlds": 64,
+      "natural_ticks": 512,
+      "aerial_worlds_per_side": 128,
+      "aerial_horizon_ticks": 600,
+      "capability_worlds_per_side": 256,
+      "capability_horizon_ticks": 256
+    },
+    "test": {
+      "generated_only_after_selection": true,
+      "natural_worlds": 128,
+      "natural_ticks": 1024,
+      "aerial_worlds_per_side": 512,
+      "capability_worlds_per_side": 1024
+    },
+    "families": [
+      "natural_v23",
+      "aerial_v3",
+      "offensive_demo_v2",
+      "floor_landing_v2",
+      "wall_landing_v2"
+    ],
+    "excluded": {
+      "capability_v2_ground_origin_high_ball": "accepted teacher produced zero high contacts",
+      "scenario_or_teacher_identity_as_policy_input": true
+    }
+  },
+  "seeds": {
+    "train_natural": 202609031101,
+    "train_aerial": 202609031102,
+    "train_capability": 202609031103,
+    "validation_natural": 202609031201,
+    "validation_aerial": 202609031202,
+    "validation_capability": 202609031203,
+    "untouched_test_natural": 202609031301,
+    "untouched_test_aerial": 202609031302,
+    "untouched_test_capability": 202609031303,
+    "optimizer": 202609031401
+  },
+  "optimization": {
+    "optimizer": "fresh AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.00001,
+    "maximum_gradient_norm": 0.5,
+    "batch_sequences_per_family": 32,
+    "maximum_accepted_steps": 3000,
+    "validation_interval_steps": 100,
+    "plateau_patience_boundaries": 10,
+    "minimum_score_improvement": 0.0001,
+    "analog_loss": "SmoothL1(tanh(student_mean), tanh(teacher_mean)), beta=0.1",
+    "button_loss": "BCEWithLogits(student_logits, sigmoid(teacher_logits))",
+    "log_std_loss": "SmoothL1(student_log_std, teacher_log_std), beta=0.1",
+    "button_weight": 0.25,
+    "log_std_weight": 0.05,
+    "family_weights": {
+      "natural_v23": 0.4,
+      "aerial_v3": 0.2,
+      "offensive_demo_v2": 0.16,
+      "floor_landing_v2": 0.12,
+      "wall_landing_v2": 0.12
+    },
+    "kl_policy": "teacher-student KL is objective and telemetry only; never a rejection guard",
+    "hard_failures": [
+      "nonfinite loss",
+      "nonfinite gradient",
+      "nonfinite parameter",
+      "source or contract hash mismatch"
+    ]
+  },
+  "selection": {
+    "validation_only": true,
+    "natural_expected_action_rmse_max": 0.04,
+    "capability_teacher_rmse_improvement_required": true,
+    "score": "weighted mean validation expected-action RMSE across the five frozen families",
+    "test_reselection_forbidden": true
+  },
+  "final_evaluation": {
+    "single_policy_direct_control": true,
+    "runtime_router": false,
+    "aerial_controlled_worlds_per_side": 1024,
+    "capability_controlled_worlds_per_side": 2048,
+    "nexto_matrix": "five standard kickoff layouts x both Rival sides",
+    "nexto_deterministic": true,
+    "physical_telemetry": true
+  },
+  "integrity": {
+    "ppo_authorized": false,
+    "reward_change_authorized": false,
+    "mechanic_classifier_authorized": false,
+    "simulator_mutation_authorized": false,
+    "existing_official_promotion_authorized": false,
+    "optimizer_steps_before_authority_commit": 0
+  }
+}
