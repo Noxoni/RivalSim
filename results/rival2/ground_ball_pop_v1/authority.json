@@ -1,0 +1,65 @@
+{
+  "format": "RIVAL2_GROUND_BALL_POP_V1_CALIBRATION_AUTHORITY",
+  "created_utc": "2026-09-03T02:02:00Z",
+  "purpose": "Select a deterministic pre-contact launch primitive that raises a real 92.75 uu ground ball before training the missing connected pop-to-carry transition.",
+  "bound_inputs": {
+    "controlled_aerial_option": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "controlled_aerial_result": {
+      "path": "results/rival2/ground_to_air_goal_v3/result.json",
+      "sha256": "21F2A27C3C5E1A92D943FB5DAD76676A49EF7583B08E5BA6A706874052A73D0F"
+    },
+    "rejected_natural_integration": {
+      "path": "results/rival2/ground_to_air_hybrid_v1/result.json",
+      "sha256": "57544DB383C4AD3E10F87F0242AFBDE58F3AF33B4423BDA682B7A44AC056EA52"
+    }
+  },
+  "scenario": {
+    "ball_height_uu": 92.75,
+    "ball_goalward_y_range_uu": [2000.0, 2900.0],
+    "ball_goalward_speed_range_uu_per_second": [100.0, 350.0],
+    "approach_distance_range_uu": [300.0, 550.0],
+    "relative_closing_speed_range_uu_per_second": [400.0, 800.0],
+    "opponent": "non-interfering",
+    "mutated_during_episode": false
+  },
+  "candidates": [
+    {"trigger_distance_uu": 175.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": -1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 175.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 0.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 175.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 185.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": -1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 185.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 0.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 185.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 195.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": -1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 195.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 0.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 195.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 205.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": -1.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 205.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 0.0, "approach_steer_gain": 3.5, "use_approach_boost": true},
+    {"trigger_distance_uu": 205.0, "first_jump_hold_ticks": 8, "jump_release_ticks": 6, "second_jump": true, "pitch": 1.0, "approach_steer_gain": 3.5, "use_approach_boost": true}
+  ],
+  "execution": {
+    "worlds_per_side": 256,
+    "horizon": 300,
+    "seed": 2026092101
+  },
+  "selection": {
+    "score": "2 * minimum mirrored ball-rise-250 fraction + 4 * minimum mirrored elevated-follow-touch fraction + 0.25 * minimum mirrored ball-rise-180 fraction",
+    "tie_break": "first candidate in frozen order"
+  },
+  "acceptance": {
+    "minimum_launch_fraction_each_side": 0.9,
+    "minimum_ball_rise_180_fraction_each_side": 0.8,
+    "minimum_ball_rise_250_fraction_each_side": 0.25,
+    "elevated_follow_touch_required_for_bootstrap_selection": false,
+    "reason": "This calibration selects only a source launch bootstrap; learned connected continuation is a separate gate."
+  },
+  "integrity": {
+    "optimizer_steps": 0,
+    "reward_changes": 0,
+    "named_mechanic_classifier_used": false,
+    "source_state_mutation_after_reset": false,
+    "full_measurement_runs_once_after_authority_commit": true
+  }
+}
