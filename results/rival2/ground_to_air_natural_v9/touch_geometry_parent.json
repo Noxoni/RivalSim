@@ -1,0 +1,4839 @@
+{
+  "aggregate": {
+    "first_airborne_follow": {
+      "mean_attempt_fraction": 0.4261067708333333,
+      "nonzero_rows": 11
+    },
+    "first_distinct_follow": {
+      "mean_attempt_fraction": 0.4274088541666667,
+      "nonzero_rows": 11
+    },
+    "first_prompt_airborne_follow": {
+      "mean_attempt_fraction": 0.3990885416666667,
+      "nonzero_rows": 10
+    },
+    "first_strict_elevated_follow": {
+      "mean_attempt_fraction": 0.0032552083333333335,
+      "nonzero_rows": 6
+    }
+  },
+  "authority": {
+    "path": "results/rival2/ground_to_air_natural_v9/authority.json",
+    "sha256": "CF3250FA583951E78DEF6011B738CEA7CCDF19B4BA46ACAE79A7661FABFECCA2"
+  },
+  "checkpoint": {
+    "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+    "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+  },
+  "created_utc": "2026-09-03T09:08:28+00:00",
+  "deterministic": true,
+  "format": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_DIAGNOSTIC_V1",
+  "policy_and_reward_unchanged": true,
+  "probe_identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+  "rows": [
+    {
+      "analog_saturation_fraction": [
+        0.20989660265878876,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.765625,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "horizon": 600,
+      "learned_action_ticks": 27080,
+      "learned_button_fraction": [
+        0.22511078286558345,
+        0.6887370753323486,
+        0.0020310192023633676
+      ],
+      "learned_pop_orientation_ticks": 5684,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.8182499942819428,
+        -0.09554562679686529,
+        0.1963449613074514,
+        0.0570939863282921,
+        -0.1702110911431937
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1420.99560546875,
+          "minimum": 113.02793884277344,
+          "p10": 165.07305908203125,
+          "p50": 215.1450424194336,
+          "p90": 373.6571502685547
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 400.75970458984375,
+          "minimum": 17.031984329223633,
+          "p10": 17.031986236572266,
+          "p50": 149.11410522460938,
+          "p90": 168.12620544433594
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 671.4137573242188,
+          "minimum": 0.3776751458644867,
+          "p10": 0.3806084543466568,
+          "p50": 387.17236328125,
+          "p90": 428.32505798339844
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 196,
+          "maximum": 179.44854736328125,
+          "minimum": 133.8848419189453,
+          "p10": 140.39132690429688,
+          "p50": 159.01520538330078,
+          "p90": 172.75688934326172
+        },
+        "post_pop_within_160uu_fraction": 0.390625,
+        "takeoff_after_pop_fraction": 0.765625
+      },
+      "reward_per_attempt": -9.482180077160592,
+      "seed": 2026110912,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 194,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 196,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 60,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -2427.4380997531116,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.3671875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 94,
+                  "maximum": 258.4591064453125,
+                  "minimum": 141.9233856201172,
+                  "p10": 163.08316345214843,
+                  "p50": 183.024169921875,
+                  "p90": 212.09776458740234
+                },
+                "car_height_uu": {
+                  "count": 94,
+                  "maximum": 146.47885131835938,
+                  "minimum": 31.03835678100586,
+                  "p10": 46.45651817321777,
+                  "p50": 74.05953598022461,
+                  "p90": 106.64386596679688
+                },
+                "distance_uu": {
+                  "count": 94,
+                  "maximum": 179.39031982421875,
+                  "minimum": 133.8848419189453,
+                  "p10": 140.44397888183593,
+                  "p50": 152.56104278564453,
+                  "p90": 171.25212860107422
+                },
+                "on_ground": {
+                  "count": 94,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 94,
+                  "maximum": 123.40631103515625,
+                  "minimum": -117.05657958984375,
+                  "p10": -49.556085205078126,
+                  "p50": -3.3748779296875,
+                  "p90": 51.63862304687501
+                },
+                "relative_y_uu": {
+                  "count": 94,
+                  "maximum": 153.0501708984375,
+                  "minimum": 3.624267578125,
+                  "p10": 59.1327392578125,
+                  "p50": 92.5693359375,
+                  "p90": 138.72823486328124
+                },
+                "relative_z_uu": {
+                  "count": 94,
+                  "maximum": 132.28662109375,
+                  "minimum": 56.72523498535156,
+                  "p10": 88.4797607421875,
+                  "p50": 111.90682983398438,
+                  "p90": 123.47080764770507
+                },
+                "tick": {
+                  "count": 94,
+                  "maximum": 165.0,
+                  "minimum": 8.0,
+                  "p10": 17.0,
+                  "p50": 27.5,
+                  "p90": 64.20000000000002
+                },
+                "ticks_after_pop": {
+                  "count": 94,
+                  "maximum": 131.0,
+                  "minimum": 6.0,
+                  "p10": 12.3,
+                  "p50": 22.0,
+                  "p90": 33.7
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.3671875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 94,
+                  "maximum": 258.4591064453125,
+                  "minimum": 141.9233856201172,
+                  "p10": 163.08316345214843,
+                  "p50": 183.024169921875,
+                  "p90": 212.09776458740234
+                },
+                "car_height_uu": {
+                  "count": 94,
+                  "maximum": 146.47885131835938,
+                  "minimum": 31.03835678100586,
+                  "p10": 46.45651817321777,
+                  "p50": 74.05953598022461,
+                  "p90": 106.64386596679688
+                },
+                "distance_uu": {
+                  "count": 94,
+                  "maximum": 179.39031982421875,
+                  "minimum": 133.8848419189453,
+                  "p10": 140.44397888183593,
+                  "p50": 152.56104278564453,
+                  "p90": 171.25212860107422
+                },
+                "on_ground": {
+                  "count": 94,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 94,
+                  "maximum": 123.40631103515625,
+                  "minimum": -117.05657958984375,
+                  "p10": -49.556085205078126,
+                  "p50": -3.3748779296875,
+                  "p90": 51.63862304687501
+                },
+                "relative_y_uu": {
+                  "count": 94,
+                  "maximum": 153.0501708984375,
+                  "minimum": 3.624267578125,
+                  "p10": 59.1327392578125,
+                  "p50": 92.5693359375,
+                  "p90": 138.72823486328124
+                },
+                "relative_z_uu": {
+                  "count": 94,
+                  "maximum": 132.28662109375,
+                  "minimum": 56.72523498535156,
+                  "p10": 88.4797607421875,
+                  "p50": 111.90682983398438,
+                  "p90": 123.47080764770507
+                },
+                "tick": {
+                  "count": 94,
+                  "maximum": 165.0,
+                  "minimum": 8.0,
+                  "p10": 17.0,
+                  "p50": 27.5,
+                  "p90": 64.20000000000002
+                },
+                "ticks_after_pop": {
+                  "count": 94,
+                  "maximum": 131.0,
+                  "minimum": 6.0,
+                  "p10": 12.3,
+                  "p50": 22.0,
+                  "p90": 33.7
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.36328125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 93,
+                  "maximum": 258.4591064453125,
+                  "minimum": 141.9233856201172,
+                  "p10": 162.80471496582032,
+                  "p50": 183.24322509765625,
+                  "p90": 212.10516967773438
+                },
+                "car_height_uu": {
+                  "count": 93,
+                  "maximum": 146.47885131835938,
+                  "minimum": 31.03835678100586,
+                  "p10": 46.32868957519531,
+                  "p50": 73.9259033203125,
+                  "p90": 106.8292022705078
+                },
+                "distance_uu": {
+                  "count": 93,
+                  "maximum": 179.39031982421875,
+                  "minimum": 133.8848419189453,
+                  "p10": 140.3965057373047,
+                  "p50": 152.5498809814453,
+                  "p90": 171.30404663085938
+                },
+                "on_ground": {
+                  "count": 93,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 93,
+                  "maximum": 123.40631103515625,
+                  "minimum": -117.05657958984375,
+                  "p10": -49.608587646484374,
+                  "p50": -3.6778564453125,
+                  "p90": 52.09978027343749
+                },
+                "relative_y_uu": {
+                  "count": 93,
+                  "maximum": 153.0501708984375,
+                  "minimum": 3.624267578125,
+                  "p10": 59.126416015625,
+                  "p50": 91.060546875,
+                  "p90": 137.3119140625
+                },
+                "relative_z_uu": {
+                  "count": 93,
+                  "maximum": 132.28662109375,
+                  "minimum": 56.72523498535156,
+                  "p10": 89.64751892089843,
+                  "p50": 112.05215454101562,
+                  "p90": 123.48102416992188
+                },
+                "tick": {
+                  "count": 93,
+                  "maximum": 95.0,
+                  "minimum": 8.0,
+                  "p10": 17.0,
+                  "p50": 27.0,
+                  "p90": 59.8
+                },
+                "ticks_after_pop": {
+                  "count": 93,
+                  "maximum": 45.0,
+                  "minimum": 6.0,
+                  "p10": 12.200000000000001,
+                  "p50": 22.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 0.765625
+        },
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.21407095610342755,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.765625,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "horizon": 600,
+      "learned_action_ticks": 26608,
+      "learned_button_fraction": [
+        0.21418370414912807,
+        0.6767889356584486,
+        0.0
+      ],
+      "learned_pop_orientation_ticks": 5684,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.82559509471321,
+        -0.10042394027024244,
+        0.19112743937779822,
+        0.04598304816445924,
+        -0.16885610927516526
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1067.4202880859375,
+          "minimum": 128.09576416015625,
+          "p10": 166.38414001464844,
+          "p50": 203.90262603759766,
+          "p90": 346.9223327636719
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 181.02891540527344,
+          "minimum": 17.031984329223633,
+          "p10": 17.031986236572266,
+          "p50": 147.02186584472656,
+          "p90": 167.85221099853516
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 621.1962280273438,
+          "minimum": 0.37705230712890625,
+          "p10": 0.38072913885116577,
+          "p50": 387.54795837402344,
+          "p90": 420.6055145263672
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 196,
+          "maximum": 175.9704132080078,
+          "minimum": 135.28897094726562,
+          "p10": 143.2310333251953,
+          "p50": 160.05866241455078,
+          "p90": 173.16034698486328
+        },
+        "post_pop_within_160uu_fraction": 0.3828125,
+        "takeoff_after_pop_fraction": 0.765625
+      },
+      "reward_per_attempt": -9.157496525804163,
+      "seed": 2026110913,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 194,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 196,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 60,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -2344.3191106058657,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.34765625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 89,
+                  "maximum": 287.5693054199219,
+                  "minimum": 143.01641845703125,
+                  "p10": 164.2249542236328,
+                  "p50": 179.7329864501953,
+                  "p90": 205.58543395996094
+                },
+                "car_height_uu": {
+                  "count": 89,
+                  "maximum": 149.7069854736328,
+                  "minimum": 40.36901092529297,
+                  "p10": 53.50841445922852,
+                  "p50": 74.69489288330078,
+                  "p90": 106.12664794921875
+                },
+                "distance_uu": {
+                  "count": 89,
+                  "maximum": 177.34144592285156,
+                  "minimum": 135.28897094726562,
+                  "p10": 142.44706115722656,
+                  "p50": 156.45408630371094,
+                  "p90": 172.6139129638672
+                },
+                "on_ground": {
+                  "count": 89,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 89,
+                  "maximum": 118.75726318359375,
+                  "minimum": -115.19676208496094,
+                  "p10": -50.08017578125,
+                  "p50": -6.550537109375,
+                  "p90": 49.8818115234375
+                },
+                "relative_y_uu": {
+                  "count": 89,
+                  "maximum": 165.8760986328125,
+                  "minimum": -61.98291015625,
+                  "p10": 74.35810546875,
+                  "p50": 101.79931640625,
+                  "p90": 137.171240234375
+                },
+                "relative_z_uu": {
+                  "count": 89,
+                  "maximum": 137.86231994628906,
+                  "minimum": 58.79795837402344,
+                  "p10": 75.58047332763672,
+                  "p50": 109.3886489868164,
+                  "p90": 122.73062896728516
+                },
+                "tick": {
+                  "count": 89,
+                  "maximum": 94.0,
+                  "minimum": 10.0,
+                  "p10": 19.0,
+                  "p50": 29.0,
+                  "p90": 57.2
+                },
+                "ticks_after_pop": {
+                  "count": 89,
+                  "maximum": 49.0,
+                  "minimum": 10.0,
+                  "p10": 15.0,
+                  "p50": 22.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.34765625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 89,
+                  "maximum": 287.5693054199219,
+                  "minimum": 143.01641845703125,
+                  "p10": 163.6255615234375,
+                  "p50": 179.30027770996094,
+                  "p90": 205.58543395996094
+                },
+                "car_height_uu": {
+                  "count": 89,
+                  "maximum": 149.7069854736328,
+                  "minimum": 26.277175903320312,
+                  "p10": 52.462415313720705,
+                  "p50": 74.1493911743164,
+                  "p90": 106.12664794921875
+                },
+                "distance_uu": {
+                  "count": 89,
+                  "maximum": 177.34144592285156,
+                  "minimum": 135.28897094726562,
+                  "p10": 142.44706115722656,
+                  "p50": 156.45408630371094,
+                  "p90": 172.6139129638672
+                },
+                "on_ground": {
+                  "count": 89,
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 89,
+                  "maximum": 118.75726318359375,
+                  "minimum": -115.19676208496094,
+                  "p10": -49.92489013671875,
+                  "p50": -6.550537109375,
+                  "p90": 49.8818115234375
+                },
+                "relative_y_uu": {
+                  "count": 89,
+                  "maximum": 165.8760986328125,
+                  "minimum": -61.98291015625,
+                  "p10": 74.35810546875,
+                  "p50": 101.79931640625,
+                  "p90": 137.171240234375
+                },
+                "relative_z_uu": {
+                  "count": 89,
+                  "maximum": 137.86231994628906,
+                  "minimum": 58.79795837402344,
+                  "p10": 75.58047332763672,
+                  "p50": 109.80050659179688,
+                  "p90": 123.24800109863281
+                },
+                "tick": {
+                  "count": 89,
+                  "maximum": 94.0,
+                  "minimum": 10.0,
+                  "p10": 19.0,
+                  "p50": 29.0,
+                  "p90": 57.2
+                },
+                "ticks_after_pop": {
+                  "count": 89,
+                  "maximum": 49.0,
+                  "minimum": 4.0,
+                  "p10": 14.8,
+                  "p50": 22.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.34765625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 89,
+                  "maximum": 287.5693054199219,
+                  "minimum": 143.01641845703125,
+                  "p10": 164.2249542236328,
+                  "p50": 179.7329864501953,
+                  "p90": 205.58543395996094
+                },
+                "car_height_uu": {
+                  "count": 89,
+                  "maximum": 149.7069854736328,
+                  "minimum": 40.36901092529297,
+                  "p10": 53.50841445922852,
+                  "p50": 74.69489288330078,
+                  "p90": 106.12664794921875
+                },
+                "distance_uu": {
+                  "count": 89,
+                  "maximum": 177.34144592285156,
+                  "minimum": 135.28897094726562,
+                  "p10": 142.44706115722656,
+                  "p50": 156.45408630371094,
+                  "p90": 172.6139129638672
+                },
+                "on_ground": {
+                  "count": 89,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 89,
+                  "maximum": 118.75726318359375,
+                  "minimum": -115.19676208496094,
+                  "p10": -50.08017578125,
+                  "p50": -6.550537109375,
+                  "p90": 49.8818115234375
+                },
+                "relative_y_uu": {
+                  "count": 89,
+                  "maximum": 165.8760986328125,
+                  "minimum": -61.98291015625,
+                  "p10": 74.35810546875,
+                  "p50": 101.79931640625,
+                  "p90": 137.171240234375
+                },
+                "relative_z_uu": {
+                  "count": 89,
+                  "maximum": 137.86231994628906,
+                  "minimum": 58.79795837402344,
+                  "p10": 75.58047332763672,
+                  "p50": 109.3886489868164,
+                  "p90": 122.73062896728516
+                },
+                "tick": {
+                  "count": 89,
+                  "maximum": 94.0,
+                  "minimum": 10.0,
+                  "p10": 19.0,
+                  "p50": 29.0,
+                  "p90": 57.2
+                },
+                "ticks_after_pop": {
+                  "count": 89,
+                  "maximum": 49.0,
+                  "minimum": 10.0,
+                  "p10": 15.0,
+                  "p50": 22.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 0.765625
+        },
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.19211272705328586,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.00390625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.00390625,
+        "goalward_velocity_contact": 0.00390625,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.8359375,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0078125
+      },
+      "horizon": 600,
+      "learned_action_ticks": 33142,
+      "learned_button_fraction": [
+        0.7121175547643473,
+        0.43361897290447166,
+        0.13411984792710158
+      ],
+      "learned_pop_orientation_ticks": 6206,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.520727077141715,
+        0.06872675809825123,
+        0.18202779210103093,
+        0.09906216701809749,
+        -0.12119480966106824
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1960.102783203125,
+          "minimum": 115.7990951538086,
+          "p10": 192.68682861328125,
+          "p50": 411.2962341308594,
+          "p90": 989.2530822753906
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 724.9129028320312,
+          "minimum": 17.031984329223633,
+          "p10": 17.031986236572266,
+          "p50": 142.7454833984375,
+          "p90": 159.07137298583984
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1411.0849609375,
+          "minimum": 0.37711039185523987,
+          "p10": 0.38123391568660736,
+          "p50": 398.21728515625,
+          "p90": 675.0049743652344
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 214,
+          "maximum": 177.99386596679688,
+          "minimum": 80.80467987060547,
+          "p10": 137.73098602294922,
+          "p50": 153.53653717041016,
+          "p90": 171.2332000732422
+        },
+        "post_pop_within_160uu_fraction": 0.52734375,
+        "takeoff_after_pop_fraction": 0.8359375
+      },
+      "reward_per_attempt": -15.158911231847014,
+      "seed": 2026120912,
+      "setup": "low_bounce",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 1,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 180.76109313964844,
+            "p10": 180.76109313964844,
+            "p50": 180.76109313964844,
+            "p90": 180.76109313964844
+          },
+          "attempts_with_elevated_state": 1,
+          "deep_inside_goal_height": 1,
+          "deep_inside_goal_mouth": 1,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 1,
+          "maximum_goalward_y_uu": {
+            "maximum": 5216.9736328125,
+            "p10": 5216.9736328125,
+            "p50": 5216.9736328125,
+            "p90": 5216.9736328125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 0.0,
+            "p10": 0.0,
+            "p50": 0.0,
+            "p90": 0.0
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 301.2337341308594,
+            "p10": 301.2337341308594,
+            "p50": 301.2337341308594,
+            "p90": 301.2337341308594
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 1,
+        "goalward_ball_speed_at_contact_sum": 1350.2540283203125,
+        "goalward_velocity_contacts": 1,
+        "goalward_velocity_transfer_sum": 751.6018676757812,
+        "ground_failures": 195,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 16,
+        "low_pop_touches": 214,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 42,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -3880.6812753528357,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.4453125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 114,
+                  "maximum": 274.9794921875,
+                  "minimum": 107.45147705078125,
+                  "p10": 163.72311706542968,
+                  "p50": 182.67182159423828,
+                  "p90": 217.04043579101562
+                },
+                "car_height_uu": {
+                  "count": 114,
+                  "maximum": 148.55519104003906,
+                  "minimum": 39.960609436035156,
+                  "p10": 51.05461235046387,
+                  "p50": 76.30237197875977,
+                  "p90": 138.06158599853515
+                },
+                "distance_uu": {
+                  "count": 114,
+                  "maximum": 175.0585174560547,
+                  "minimum": 104.15888214111328,
+                  "p10": 137.6875457763672,
+                  "p50": 152.0197296142578,
+                  "p90": 171.6551712036133
+                },
+                "on_ground": {
+                  "count": 114,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 114,
+                  "maximum": 126.320556640625,
+                  "minimum": -114.6280517578125,
+                  "p10": -49.519204711914064,
+                  "p50": 10.329925537109375,
+                  "p90": 59.46993408203127
+                },
+                "relative_y_uu": {
+                  "count": 114,
+                  "maximum": 166.5751953125,
+                  "minimum": 26.2333984375,
+                  "p10": 55.568981933593754,
+                  "p50": 97.46844482421875,
+                  "p90": 130.84395751953124
+                },
+                "relative_z_uu": {
+                  "count": 114,
+                  "maximum": 136.58230590820312,
+                  "minimum": -41.10371398925781,
+                  "p10": 80.35149307250977,
+                  "p50": 110.12531280517578,
+                  "p90": 124.90791702270508
+                },
+                "tick": {
+                  "count": 114,
+                  "maximum": 586.0,
+                  "minimum": 13.0,
+                  "p10": 20.0,
+                  "p50": 32.0,
+                  "p90": 67.7
+                },
+                "ticks_after_pop": {
+                  "count": 114,
+                  "maximum": 586.0,
+                  "minimum": 10.0,
+                  "p10": 14.0,
+                  "p50": 22.5,
+                  "p90": 51.10000000000001
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.4453125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 114,
+                  "maximum": 274.9794921875,
+                  "minimum": 107.45147705078125,
+                  "p10": 163.72311706542968,
+                  "p50": 182.67182159423828,
+                  "p90": 217.04043579101562
+                },
+                "car_height_uu": {
+                  "count": 114,
+                  "maximum": 148.55519104003906,
+                  "minimum": 39.960609436035156,
+                  "p10": 51.05461235046387,
+                  "p50": 76.30237197875977,
+                  "p90": 138.06158599853515
+                },
+                "distance_uu": {
+                  "count": 114,
+                  "maximum": 175.0585174560547,
+                  "minimum": 104.15888214111328,
+                  "p10": 137.6875457763672,
+                  "p50": 152.0197296142578,
+                  "p90": 171.6551712036133
+                },
+                "on_ground": {
+                  "count": 114,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 114,
+                  "maximum": 126.320556640625,
+                  "minimum": -114.6280517578125,
+                  "p10": -49.519204711914064,
+                  "p50": 10.329925537109375,
+                  "p90": 59.46993408203127
+                },
+                "relative_y_uu": {
+                  "count": 114,
+                  "maximum": 166.5751953125,
+                  "minimum": 26.2333984375,
+                  "p10": 55.568981933593754,
+                  "p50": 97.46844482421875,
+                  "p90": 130.84395751953124
+                },
+                "relative_z_uu": {
+                  "count": 114,
+                  "maximum": 136.58230590820312,
+                  "minimum": -41.10371398925781,
+                  "p10": 80.35149307250977,
+                  "p50": 110.12531280517578,
+                  "p90": 124.90791702270508
+                },
+                "tick": {
+                  "count": 114,
+                  "maximum": 586.0,
+                  "minimum": 13.0,
+                  "p10": 20.0,
+                  "p50": 32.0,
+                  "p90": 67.7
+                },
+                "ticks_after_pop": {
+                  "count": 114,
+                  "maximum": 586.0,
+                  "minimum": 10.0,
+                  "p10": 14.0,
+                  "p50": 22.5,
+                  "p90": 51.10000000000001
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.4140625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 106,
+                  "maximum": 274.9794921875,
+                  "minimum": 150.80474853515625,
+                  "p10": 163.88922119140625,
+                  "p50": 183.4735107421875,
+                  "p90": 214.69048309326172
+                },
+                "car_height_uu": {
+                  "count": 106,
+                  "maximum": 144.91497802734375,
+                  "minimum": 39.960609436035156,
+                  "p10": 50.70988082885742,
+                  "p50": 73.12137985229492,
+                  "p90": 122.04443740844727
+                },
+                "distance_uu": {
+                  "count": 106,
+                  "maximum": 175.0585174560547,
+                  "minimum": 117.13595581054688,
+                  "p10": 139.79345703125,
+                  "p50": 152.7387466430664,
+                  "p90": 171.9341583251953
+                },
+                "on_ground": {
+                  "count": 106,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 106,
+                  "maximum": 126.320556640625,
+                  "minimum": -102.28218078613281,
+                  "p10": -45.97776794433594,
+                  "p50": 10.901275634765625,
+                  "p90": 57.6409912109375
+                },
+                "relative_y_uu": {
+                  "count": 106,
+                  "maximum": 166.5751953125,
+                  "minimum": 26.2333984375,
+                  "p10": 59.371337890625,
+                  "p50": 97.46844482421875,
+                  "p90": 130.83465576171875
+                },
+                "relative_z_uu": {
+                  "count": 106,
+                  "maximum": 136.58230590820312,
+                  "minimum": 6.1215057373046875,
+                  "p10": 89.6071891784668,
+                  "p50": 110.37450408935547,
+                  "p90": 124.6784782409668
+                },
+                "tick": {
+                  "count": 106,
+                  "maximum": 79.0,
+                  "minimum": 13.0,
+                  "p10": 20.0,
+                  "p50": 30.0,
+                  "p90": 60.5
+                },
+                "ticks_after_pop": {
+                  "count": 106,
+                  "maximum": 56.0,
+                  "minimum": 10.0,
+                  "p10": 14.0,
+                  "p50": 22.0,
+                  "p90": 37.5
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.00390625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 1,
+                  "maximum": 297.1937561035156,
+                  "minimum": 297.1937561035156,
+                  "p10": 297.1937561035156,
+                  "p50": 297.1937561035156,
+                  "p90": 297.1937561035156
+                },
+                "car_height_uu": {
+                  "count": 1,
+                  "maximum": 150.9197235107422,
+                  "minimum": 150.9197235107422,
+                  "p10": 150.9197235107422,
+                  "p50": 150.9197235107422,
+                  "p90": 150.9197235107422
+                },
+                "distance_uu": {
+                  "count": 1,
+                  "maximum": 160.22607421875,
+                  "minimum": 160.22607421875,
+                  "p10": 160.22607421875,
+                  "p50": 160.22607421875,
+                  "p90": 160.22607421875
+                },
+                "on_ground": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 1,
+                  "maximum": -33.64094543457031,
+                  "minimum": -33.64094543457031,
+                  "p10": -33.64094543457031,
+                  "p50": -33.64094543457031,
+                  "p90": -33.64094543457031
+                },
+                "relative_y_uu": {
+                  "count": 1,
+                  "maximum": 56.07666015625,
+                  "minimum": 56.07666015625,
+                  "p10": 56.07666015625,
+                  "p50": 56.07666015625,
+                  "p90": 56.07666015625
+                },
+                "relative_z_uu": {
+                  "count": 1,
+                  "maximum": 146.27403259277344,
+                  "minimum": 146.27403259277344,
+                  "p10": 146.27403259277344,
+                  "p50": 146.27403259277344,
+                  "p90": 146.27403259277344
+                },
+                "tick": {
+                  "count": 1,
+                  "maximum": 367.0,
+                  "minimum": 367.0,
+                  "p10": 367.0,
+                  "p50": 367.0,
+                  "p90": 367.0
+                },
+                "ticks_after_pop": {
+                  "count": 1,
+                  "maximum": 355.0,
+                  "minimum": 355.0,
+                  "p10": 355.0,
+                  "p50": 355.0,
+                  "p90": 355.0
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 0.8359375
+        },
+        "unassisted_or_ground_goals": 2
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.19917952084017065,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 0.76953125,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.015625
+      },
+      "horizon": 600,
+      "learned_action_ticks": 30470,
+      "learned_button_fraction": [
+        0.7015425008204792,
+        0.4343288480472596,
+        0.15329832622251394
+      ],
+      "learned_pop_orientation_ticks": 5742,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.5383068421354805,
+        0.05490658832206889,
+        0.1864811944923429,
+        0.10086074005771048,
+        -0.1296910397051225
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1955.843505859375,
+          "minimum": 115.35384368896484,
+          "p10": 182.4344024658203,
+          "p50": 366.32545471191406,
+          "p90": 935.8443603515625
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 856.5594482421875,
+          "minimum": 17.031984329223633,
+          "p10": 17.031986236572266,
+          "p50": 142.1181411743164,
+          "p90": 163.31187438964844
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1135.7130126953125,
+          "minimum": 0.3771454095840454,
+          "p10": 0.38067662715911865,
+          "p50": 393.4264373779297,
+          "p90": 672.6534729003906
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 197,
+          "maximum": 177.19459533691406,
+          "minimum": 91.458984375,
+          "p10": 137.32058410644532,
+          "p50": 156.2158966064453,
+          "p90": 172.53951416015624
+        },
+        "post_pop_within_160uu_fraction": 0.44921875,
+        "takeoff_after_pop_fraction": 0.76953125
+      },
+      "reward_per_attempt": -15.183530141512165,
+      "seed": 2026120913,
+      "setup": "low_bounce",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 177,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 16,
+        "low_pop_touches": 197,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 59,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -3886.983716227114,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.41796875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 107,
+                  "maximum": 268.35723876953125,
+                  "minimum": 110.29588317871094,
+                  "p10": 155.48088989257812,
+                  "p50": 179.73907470703125,
+                  "p90": 214.8106903076172
+                },
+                "car_height_uu": {
+                  "count": 107,
+                  "maximum": 184.53707885742188,
+                  "minimum": 35.910491943359375,
+                  "p10": 51.07623901367188,
+                  "p50": 70.578125,
+                  "p90": 134.313720703125
+                },
+                "distance_uu": {
+                  "count": 107,
+                  "maximum": 183.2338409423828,
+                  "minimum": 121.7784652709961,
+                  "p10": 137.5863494873047,
+                  "p50": 153.845458984375,
+                  "p90": 174.06106262207032
+                },
+                "on_ground": {
+                  "count": 107,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 107,
+                  "maximum": 122.26858520507812,
+                  "minimum": -108.53738403320312,
+                  "p10": -51.851062011718746,
+                  "p50": 0.5591888427734375,
+                  "p90": 56.30910034179688
+                },
+                "relative_y_uu": {
+                  "count": 107,
+                  "maximum": 167.91162109375,
+                  "minimum": -5.241943359375,
+                  "p10": 54.52265625,
+                  "p50": 101.646240234375,
+                  "p90": 143.235205078125
+                },
+                "relative_z_uu": {
+                  "count": 107,
+                  "maximum": 134.74783325195312,
+                  "minimum": -32.97343444824219,
+                  "p10": 77.73726501464844,
+                  "p50": 109.11173248291016,
+                  "p90": 125.48830566406251
+                },
+                "tick": {
+                  "count": 107,
+                  "maximum": 479.0,
+                  "minimum": 14.0,
+                  "p10": 19.6,
+                  "p50": 29.0,
+                  "p90": 70.4
+                },
+                "ticks_after_pop": {
+                  "count": 107,
+                  "maximum": 436.0,
+                  "minimum": 8.0,
+                  "p10": 14.0,
+                  "p50": 21.0,
+                  "p90": 45.80000000000001
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.421875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 108,
+                  "maximum": 268.35723876953125,
+                  "minimum": 110.29588317871094,
+                  "p10": 155.63158721923827,
+                  "p50": 179.83414459228516,
+                  "p90": 214.54108886718748
+                },
+                "car_height_uu": {
+                  "count": 108,
+                  "maximum": 184.53707885742188,
+                  "minimum": 35.910491943359375,
+                  "p10": 51.253273773193364,
+                  "p50": 71.07912063598633,
+                  "p90": 135.8755096435547
+                },
+                "distance_uu": {
+                  "count": 108,
+                  "maximum": 183.2338409423828,
+                  "minimum": 91.61119842529297,
+                  "p10": 137.52296752929686,
+                  "p50": 153.48261260986328,
+                  "p90": 174.00885162353515
+                },
+                "on_ground": {
+                  "count": 108,
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 108,
+                  "maximum": 122.26858520507812,
+                  "minimum": -108.53738403320312,
+                  "p10": -51.730856323242186,
+                  "p50": 0.7821578979492188,
+                  "p90": 56.30821838378906
+                },
+                "relative_y_uu": {
+                  "count": 108,
+                  "maximum": 167.91162109375,
+                  "minimum": -5.241943359375,
+                  "p10": 54.5261474609375,
+                  "p50": 99.71099853515625,
+                  "p90": 143.214306640625
+                },
+                "relative_z_uu": {
+                  "count": 108,
+                  "maximum": 134.74783325195312,
+                  "minimum": -32.97343444824219,
+                  "p10": 73.95410690307618,
+                  "p50": 108.4498405456543,
+                  "p90": 125.41213912963867
+                },
+                "tick": {
+                  "count": 108,
+                  "maximum": 479.0,
+                  "minimum": 14.0,
+                  "p10": 19.700000000000003,
+                  "p50": 29.0,
+                  "p90": 71.0
+                },
+                "ticks_after_pop": {
+                  "count": 108,
+                  "maximum": 436.0,
+                  "minimum": 8.0,
+                  "p10": 14.0,
+                  "p50": 21.0,
+                  "p90": 49.09999999999998
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.38671875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 99,
+                  "maximum": 237.570068359375,
+                  "minimum": 110.29588317871094,
+                  "p10": 159.70289306640626,
+                  "p50": 179.73907470703125,
+                  "p90": 209.5721893310547
+                },
+                "car_height_uu": {
+                  "count": 99,
+                  "maximum": 143.26931762695312,
+                  "minimum": 35.910491943359375,
+                  "p10": 49.41931838989258,
+                  "p50": 68.88286590576172,
+                  "p90": 120.08088684082031
+                },
+                "distance_uu": {
+                  "count": 99,
+                  "maximum": 183.2338409423828,
+                  "minimum": 132.967041015625,
+                  "p10": 138.03887939453125,
+                  "p50": 154.17593383789062,
+                  "p90": 173.97728576660157
+                },
+                "on_ground": {
+                  "count": 99,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 99,
+                  "maximum": 122.26858520507812,
+                  "minimum": -108.53738403320312,
+                  "p10": -52.65460205078125,
+                  "p50": -2.047607421875,
+                  "p90": 51.09238281250001
+                },
+                "relative_y_uu": {
+                  "count": 99,
+                  "maximum": 167.91162109375,
+                  "minimum": 15.57861328125,
+                  "p10": 55.23037109375,
+                  "p50": 101.646240234375,
+                  "p90": 143.193408203125
+                },
+                "relative_z_uu": {
+                  "count": 99,
+                  "maximum": 131.35723876953125,
+                  "minimum": -32.97343444824219,
+                  "p10": 84.02161865234375,
+                  "p50": 110.0764389038086,
+                  "p90": 125.14399719238281
+                },
+                "tick": {
+                  "count": 99,
+                  "maximum": 86.0,
+                  "minimum": 14.0,
+                  "p10": 19.0,
+                  "p50": 29.0,
+                  "p90": 54.60000000000001
+                },
+                "ticks_after_pop": {
+                  "count": 99,
+                  "maximum": 60.0,
+                  "minimum": 8.0,
+                  "p10": 13.8,
+                  "p50": 20.0,
+                  "p90": 37.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 0.76953125
+        },
+        "unassisted_or_ground_goals": 4
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.18910240329135516,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.02734375
+      },
+      "horizon": 600,
+      "learned_action_ticks": 39862,
+      "learned_button_fraction": [
+        0.1738246951984346,
+        0.7763032461993878,
+        0.00047664442326024784
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.8429154298680347,
+        -0.13810307345497436,
+        0.10719365930327909,
+        0.03502593357796765,
+        -0.19877747779839958
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 676.0389404296875,
+          "minimum": 154.0038604736328,
+          "p10": 241.37224578857422,
+          "p50": 351.88511657714844,
+          "p90": 500.852294921875
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 297.51873779296875,
+          "minimum": 156.8832550048828,
+          "p10": 162.20779418945312,
+          "p50": 169.4821548461914,
+          "p90": 177.6850128173828
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 677.8032836914062,
+          "minimum": 397.053955078125,
+          "p10": 405.7506408691406,
+          "p50": 420.1571960449219,
+          "p90": 440.974365234375
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 181.71658325195312,
+          "minimum": 156.03353881835938,
+          "p10": 164.08523559570312,
+          "p50": 176.34992218017578,
+          "p90": 179.5305938720703
+        },
+        "post_pop_within_160uu_fraction": 0.0625,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -18.62979133841145,
+      "seed": 2026210912,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 250,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -4769.226582633331,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 7
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.19080004946209966,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0234375
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40435,
+      "learned_button_fraction": [
+        0.17128725114381105,
+        0.7784839866452331,
+        0.0
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.8420799163675609,
+        -0.13620773518335783,
+        0.09479669748735906,
+        0.041640653731757994,
+        -0.2007939983230186
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 850.5191650390625,
+          "minimum": 187.08966064453125,
+          "p10": 239.04085540771484,
+          "p50": 355.5138397216797,
+          "p90": 487.40863037109375
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 589.2339477539062,
+          "minimum": 152.2517547607422,
+          "p10": 162.53656768798828,
+          "p50": 169.53466033935547,
+          "p90": 177.19448852539062
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 874.9879760742188,
+          "minimum": 395.0506286621094,
+          "p10": 404.9724578857422,
+          "p50": 418.644775390625,
+          "p90": 445.6850280761719
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 181.9635772705078,
+          "minimum": 155.13882446289062,
+          "p10": 162.78746032714844,
+          "p50": 176.5554962158203,
+          "p90": 179.48155212402344
+        },
+        "post_pop_within_160uu_fraction": 0.06640625,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -18.72550012119609,
+      "seed": 2026210913,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 250,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -4793.7280310261995,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.0078125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 2,
+                  "maximum": 132.25372314453125,
+                  "minimum": 117.08747100830078,
+                  "p10": 118.60409622192383,
+                  "p50": 124.67059707641602,
+                  "p90": 130.7370979309082
+                },
+                "car_height_uu": {
+                  "count": 2,
+                  "maximum": 135.95370483398438,
+                  "minimum": 119.64118194580078,
+                  "p10": 121.27243423461914,
+                  "p50": 127.79744338989258,
+                  "p90": 134.32245254516602
+                },
+                "distance_uu": {
+                  "count": 2,
+                  "maximum": 173.23690795898438,
+                  "minimum": 163.27490234375,
+                  "p10": 164.27110290527344,
+                  "p50": 168.2559051513672,
+                  "p90": 172.24070739746094
+                },
+                "on_ground": {
+                  "count": 2,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 2,
+                  "maximum": 72.00390625,
+                  "minimum": -68.5814208984375,
+                  "p10": -54.52288818359375,
+                  "p50": 1.71124267578125,
+                  "p90": 57.94537353515625
+                },
+                "relative_y_uu": {
+                  "count": 2,
+                  "maximum": 157.54345703125,
+                  "minimum": 148.126953125,
+                  "p10": 149.068603515625,
+                  "p50": 152.835205078125,
+                  "p90": 156.601806640625
+                },
+                "relative_z_uu": {
+                  "count": 2,
+                  "maximum": -2.5537109375,
+                  "minimum": -3.699981689453125,
+                  "p10": -3.5853546142578123,
+                  "p50": -3.1268463134765625,
+                  "p90": -2.6683380126953127
+                },
+                "tick": {
+                  "count": 2,
+                  "maximum": 308.0,
+                  "minimum": 281.0,
+                  "p10": 283.7,
+                  "p50": 294.5,
+                  "p90": 305.3
+                },
+                "ticks_after_pop": {
+                  "count": 2,
+                  "maximum": 308.0,
+                  "minimum": 281.0,
+                  "p10": 283.7,
+                  "p50": 294.5,
+                  "p90": 305.3
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.0078125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 2,
+                  "maximum": 132.25372314453125,
+                  "minimum": 117.08747100830078,
+                  "p10": 118.60409622192383,
+                  "p50": 124.67059707641602,
+                  "p90": 130.7370979309082
+                },
+                "car_height_uu": {
+                  "count": 2,
+                  "maximum": 135.95370483398438,
+                  "minimum": 119.64118194580078,
+                  "p10": 121.27243423461914,
+                  "p50": 127.79744338989258,
+                  "p90": 134.32245254516602
+                },
+                "distance_uu": {
+                  "count": 2,
+                  "maximum": 173.23690795898438,
+                  "minimum": 163.27490234375,
+                  "p10": 164.27110290527344,
+                  "p50": 168.2559051513672,
+                  "p90": 172.24070739746094
+                },
+                "on_ground": {
+                  "count": 2,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 2,
+                  "maximum": 72.00390625,
+                  "minimum": -68.5814208984375,
+                  "p10": -54.52288818359375,
+                  "p50": 1.71124267578125,
+                  "p90": 57.94537353515625
+                },
+                "relative_y_uu": {
+                  "count": 2,
+                  "maximum": 157.54345703125,
+                  "minimum": 148.126953125,
+                  "p10": 149.068603515625,
+                  "p50": 152.835205078125,
+                  "p90": 156.601806640625
+                },
+                "relative_z_uu": {
+                  "count": 2,
+                  "maximum": -2.5537109375,
+                  "minimum": -3.699981689453125,
+                  "p10": -3.5853546142578123,
+                  "p50": -3.1268463134765625,
+                  "p90": -2.6683380126953127
+                },
+                "tick": {
+                  "count": 2,
+                  "maximum": 308.0,
+                  "minimum": 281.0,
+                  "p10": 283.7,
+                  "p50": 294.5,
+                  "p90": 305.3
+                },
+                "ticks_after_pop": {
+                  "count": 2,
+                  "maximum": 308.0,
+                  "minimum": 281.0,
+                  "p10": 283.7,
+                  "p50": 294.5,
+                  "p90": 305.3
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 6
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.18800515693955472,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0078125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.05078125
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40334,
+      "learned_button_fraction": [
+        0.6396588486140725,
+        0.47892596816581545,
+        0.09289929092081123
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.5898583393641987,
+        0.10133563722849588,
+        0.15413658074416184,
+        0.15650820763184475,
+        -0.13117097790490614
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1964.7027587890625,
+          "minimum": 204.93836975097656,
+          "p10": 313.29212951660156,
+          "p50": 490.3459777832031,
+          "p90": 1237.0756225585938
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 805.4749755859375,
+          "minimum": 149.24099731445312,
+          "p10": 152.94859313964844,
+          "p50": 157.50006103515625,
+          "p90": 196.11219787597656
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1764.204345703125,
+          "minimum": 393.5257568359375,
+          "p10": 406.0700988769531,
+          "p50": 440.0148162841797,
+          "p90": 680.9638061523438
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 181.60121154785156,
+          "minimum": 74.71842193603516,
+          "p10": 156.15036010742188,
+          "p50": 174.78070068359375,
+          "p90": 179.43544006347656
+        },
+        "post_pop_within_160uu_fraction": 0.171875,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -17.060548552428372,
+      "seed": 2026220912,
+      "setup": "incoming_chip",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 2,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 3363.838134765625,
+            "p10": 2189.71728515625,
+            "p50": 2711.548828125,
+            "p90": 3233.380126953125
+          },
+          "attempts_with_elevated_state": 2,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4173.8857421875,
+            "p10": 1845.2967529296875,
+            "p50": 2880.22509765625,
+            "p90": 3915.153564453125
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 50.01123046875,
+            "p10": 50.01123046875,
+            "p50": 50.01123046875,
+            "p90": 50.01123046875
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 638.708251953125,
+            "p10": 304.366455078125,
+            "p50": 452.96282958984375,
+            "p90": 601.5591430664062
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": -394.8307800292969,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 4.6663055419921875,
+        "ground_failures": 205,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 38,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -4367.500429421663,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.1328125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 34,
+                  "maximum": 324.4352722167969,
+                  "minimum": 115.0455322265625,
+                  "p10": 140.94499664306642,
+                  "p50": 212.81912231445312,
+                  "p90": 271.8935089111328
+                },
+                "car_height_uu": {
+                  "count": 34,
+                  "maximum": 164.19618225097656,
+                  "minimum": 60.43987274169922,
+                  "p10": 84.21318817138672,
+                  "p50": 133.8185806274414,
+                  "p90": 137.77476348876954
+                },
+                "distance_uu": {
+                  "count": 34,
+                  "maximum": 181.6022186279297,
+                  "minimum": 116.38720703125,
+                  "p10": 132.31168212890626,
+                  "p50": 151.13531494140625,
+                  "p90": 173.16568145751953
+                },
+                "on_ground": {
+                  "count": 34,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 34,
+                  "maximum": 97.6900634765625,
+                  "minimum": -106.707763671875,
+                  "p10": -67.20371093749999,
+                  "p50": 11.835784912109375,
+                  "p90": 41.950146484375
+                },
+                "relative_y_uu": {
+                  "count": 34,
+                  "maximum": 172.63037109375,
+                  "minimum": -32.708740234375,
+                  "p10": 36.623730468750004,
+                  "p50": 102.896240234375,
+                  "p90": 149.77949218749998
+                },
+                "relative_z_uu": {
+                  "count": 34,
+                  "maximum": 160.2390899658203,
+                  "minimum": -6.2294158935546875,
+                  "p10": 29.832596588134766,
+                  "p50": 96.98698806762695,
+                  "p90": 139.12591857910155
+                },
+                "tick": {
+                  "count": 34,
+                  "maximum": 590.0,
+                  "minimum": 25.0,
+                  "p10": 90.90000000000006,
+                  "p50": 315.0,
+                  "p90": 517.8
+                },
+                "ticks_after_pop": {
+                  "count": 34,
+                  "maximum": 590.0,
+                  "minimum": 25.0,
+                  "p10": 90.90000000000006,
+                  "p50": 315.0,
+                  "p90": 516.8
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.13671875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 35,
+                  "maximum": 324.4352722167969,
+                  "minimum": 110.32454681396484,
+                  "p10": 138.21068725585937,
+                  "p50": 208.63426208496094,
+                  "p90": 271.4144287109375
+                },
+                "car_height_uu": {
+                  "count": 35,
+                  "maximum": 164.19618225097656,
+                  "minimum": 16.582120895385742,
+                  "p10": 75.27955474853516,
+                  "p50": 133.4648895263672,
+                  "p90": 137.51457519531252
+                },
+                "distance_uu": {
+                  "count": 35,
+                  "maximum": 181.6022186279297,
+                  "minimum": 116.38720703125,
+                  "p10": 132.3187744140625,
+                  "p50": 151.25526428222656,
+                  "p90": 173.14808349609376
+                },
+                "on_ground": {
+                  "count": 35,
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 35,
+                  "maximum": 97.6900634765625,
+                  "minimum": -106.707763671875,
+                  "p10": -66.02861328124999,
+                  "p50": 10.53350830078125,
+                  "p90": 41.567358398437506
+                },
+                "relative_y_uu": {
+                  "count": 35,
+                  "maximum": 172.63037109375,
+                  "minimum": -32.708740234375,
+                  "p10": 37.601782226562506,
+                  "p50": 103.669189453125,
+                  "p90": 149.056005859375
+                },
+                "relative_z_uu": {
+                  "count": 35,
+                  "maximum": 160.2390899658203,
+                  "minimum": -6.2294158935546875,
+                  "p10": 30.30421295166016,
+                  "p50": 96.61778259277344,
+                  "p90": 138.50441894531252
+                },
+                "tick": {
+                  "count": 35,
+                  "maximum": 590.0,
+                  "minimum": 25.0,
+                  "p10": 112.20000000000007,
+                  "p50": 315.0,
+                  "p90": 516.4
+                },
+                "ticks_after_pop": {
+                  "count": 35,
+                  "maximum": 590.0,
+                  "minimum": 25.0,
+                  "p10": 112.20000000000007,
+                  "p50": 315.0,
+                  "p90": 515.4
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.015625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 4,
+                  "maximum": 223.843505859375,
+                  "minimum": 220.8159942626953,
+                  "p10": 221.24554138183595,
+                  "p50": 222.50022888183594,
+                  "p90": 223.51624603271483
+                },
+                "car_height_uu": {
+                  "count": 4,
+                  "maximum": 97.54042053222656,
+                  "minimum": 90.19778442382812,
+                  "p10": 90.2907470703125,
+                  "p50": 92.57157135009766,
+                  "p90": 96.66893920898437
+                },
+                "distance_uu": {
+                  "count": 4,
+                  "maximum": 173.97640991210938,
+                  "minimum": 165.21063232421875,
+                  "p10": 166.5082778930664,
+                  "p50": 169.89510345458984,
+                  "p90": 172.85971374511718
+                },
+                "on_ground": {
+                  "count": 4,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 4,
+                  "maximum": 31.8580322265625,
+                  "minimum": -11.21282958984375,
+                  "p10": -4.688928222656249,
+                  "p50": 21.12694549560547,
+                  "p90": 31.816737365722656
+                },
+                "relative_y_uu": {
+                  "count": 4,
+                  "maximum": 115.365234375,
+                  "minimum": 98.044921875,
+                  "p10": 99.7322021484375,
+                  "p50": 107.90557861328125,
+                  "p90": 114.39825439453125
+                },
+                "relative_z_uu": {
+                  "count": 4,
+                  "maximum": 132.5548553466797,
+                  "minimum": 126.30308532714844,
+                  "p10": 126.69586029052735,
+                  "p50": 128.96033477783203,
+                  "p90": 131.88089904785156
+                },
+                "tick": {
+                  "count": 4,
+                  "maximum": 27.0,
+                  "minimum": 25.0,
+                  "p10": 25.0,
+                  "p50": 25.5,
+                  "p90": 26.7
+                },
+                "ticks_after_pop": {
+                  "count": 4,
+                  "maximum": 27.0,
+                  "minimum": 25.0,
+                  "p10": 25.0,
+                  "p50": 25.5,
+                  "p90": 26.7
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0078125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 2,
+                  "maximum": 324.4352722167969,
+                  "minimum": 267.2173767089844,
+                  "p10": 272.9391662597656,
+                  "p50": 295.8263244628906,
+                  "p90": 318.71348266601564
+                },
+                "car_height_uu": {
+                  "count": 2,
+                  "maximum": 164.19618225097656,
+                  "minimum": 160.23533630371094,
+                  "p10": 160.6314208984375,
+                  "p50": 162.21575927734375,
+                  "p90": 163.80009765625
+                },
+                "distance_uu": {
+                  "count": 2,
+                  "maximum": 170.75047302246094,
+                  "minimum": 151.25526428222656,
+                  "p10": 153.20478515625,
+                  "p50": 161.00286865234375,
+                  "p90": 168.8009521484375
+                },
+                "on_ground": {
+                  "count": 2,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 2,
+                  "maximum": 97.6900634765625,
+                  "minimum": -58.97802734375,
+                  "p10": -43.31121826171875,
+                  "p50": 19.35601806640625,
+                  "p90": 82.02325439453125
+                },
+                "relative_y_uu": {
+                  "count": 2,
+                  "maximum": 43.4700927734375,
+                  "minimum": 0.865234375,
+                  "p10": 5.12572021484375,
+                  "p50": 22.16766357421875,
+                  "p90": 39.20960693359375
+                },
+                "relative_z_uu": {
+                  "count": 2,
+                  "maximum": 160.2390899658203,
+                  "minimum": 106.98204040527344,
+                  "p10": 112.30774536132813,
+                  "p50": 133.61056518554688,
+                  "p90": 154.91338500976562
+                },
+                "tick": {
+                  "count": 2,
+                  "maximum": 565.0,
+                  "minimum": 480.0,
+                  "p10": 488.5,
+                  "p50": 522.5,
+                  "p90": 556.5
+                },
+                "ticks_after_pop": {
+                  "count": 2,
+                  "maximum": 565.0,
+                  "minimum": 480.0,
+                  "p10": 488.5,
+                  "p50": 522.5,
+                  "p90": 556.5
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 13
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.1878864635327423,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0078125,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.02734375
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40269,
+      "learned_button_fraction": [
+        0.6394993667585488,
+        0.47940102808612084,
+        0.07852193995381063
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.5878712543936613,
+        0.10341645071255041,
+        0.15219653537789488,
+        0.1534834449521223,
+        -0.13005646441186872
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1955.7125244140625,
+          "minimum": 173.80014038085938,
+          "p10": 298.0113220214844,
+          "p50": 446.5346221923828,
+          "p90": 1119.1785278320312
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 934.3494262695312,
+          "minimum": 148.94461059570312,
+          "p10": 153.54751586914062,
+          "p50": 157.93607330322266,
+          "p90": 166.1788101196289
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1731.504150390625,
+          "minimum": 394.6607360839844,
+          "p10": 407.96604919433594,
+          "p50": 438.70166015625,
+          "p90": 681.8205871582031
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 181.26141357421875,
+          "minimum": 91.32846069335938,
+          "p10": 157.16470336914062,
+          "p50": 174.70447540283203,
+          "p90": 179.25301361083984
+        },
+        "post_pop_within_160uu_fraction": 0.1484375,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -16.005693390994566,
+      "seed": 2026220913,
+      "setup": "incoming_chip",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 2,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1132.4609375,
+            "p10": 409.5959777832031,
+            "p50": 730.8692626953125,
+            "p90": 1052.142578125
+          },
+          "attempts_with_elevated_state": 2,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 1598.594970703125,
+            "p10": 853.4962768554688,
+            "p50": 1184.6512451171875,
+            "p90": 1515.80615234375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 3015.45263671875,
+            "p10": 3015.45263671875,
+            "p50": 3015.45263671875,
+            "p90": 3015.45263671875
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 600.31005859375,
+            "p10": 295.5478515625,
+            "p50": 430.99774169921875,
+            "p90": 566.4475708007812
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": -128.64465713500977,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 1623.7540893554688,
+        "ground_failures": 214,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 35,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 1,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -4097.457508094609,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 1,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.109375,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 28,
+                  "maximum": 282.66705322265625,
+                  "minimum": 105.76453399658203,
+                  "p10": 140.02792739868164,
+                  "p50": 223.01583099365234,
+                  "p90": 274.1184997558594
+                },
+                "car_height_uu": {
+                  "count": 28,
+                  "maximum": 176.25375366210938,
+                  "minimum": 51.42826843261719,
+                  "p10": 75.91692810058593,
+                  "p50": 133.09221649169922,
+                  "p90": 167.3724624633789
+                },
+                "distance_uu": {
+                  "count": 28,
+                  "maximum": 182.52955627441406,
+                  "minimum": 97.12568664550781,
+                  "p10": 131.34357833862305,
+                  "p50": 155.060546875,
+                  "p90": 176.06415252685548
+                },
+                "on_ground": {
+                  "count": 28,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 28,
+                  "maximum": 141.2584228515625,
+                  "minimum": -154.16064453125,
+                  "p10": -64.92420654296875,
+                  "p50": 16.453903198242188,
+                  "p90": 68.06359939575195
+                },
+                "relative_y_uu": {
+                  "count": 28,
+                  "maximum": 179.798828125,
+                  "minimum": -1.961181640625,
+                  "p10": 55.92220458984375,
+                  "p50": 95.734130859375,
+                  "p90": 137.932275390625
+                },
+                "relative_z_uu": {
+                  "count": 28,
+                  "maximum": 150.94281005859375,
+                  "minimum": -22.002914428710938,
+                  "p10": 35.570343780517575,
+                  "p50": 94.7945785522461,
+                  "p90": 146.34619140625
+                },
+                "tick": {
+                  "count": 28,
+                  "maximum": 598.0,
+                  "minimum": 16.0,
+                  "p10": 187.40000000000003,
+                  "p50": 378.5,
+                  "p90": 582.9
+                },
+                "ticks_after_pop": {
+                  "count": 28,
+                  "maximum": 598.0,
+                  "minimum": 16.0,
+                  "p10": 186.80000000000004,
+                  "p50": 378.5,
+                  "p90": 582.9
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.1171875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 30,
+                  "maximum": 282.66705322265625,
+                  "minimum": 105.76453399658203,
+                  "p10": 124.76296005249024,
+                  "p50": 212.6617660522461,
+                  "p90": 272.9670715332031
+                },
+                "car_height_uu": {
+                  "count": 30,
+                  "maximum": 176.25375366210938,
+                  "minimum": 16.66706657409668,
+                  "p10": 57.03426895141602,
+                  "p50": 132.2217254638672,
+                  "p90": 167.30959930419922
+                },
+                "distance_uu": {
+                  "count": 30,
+                  "maximum": 182.52955627441406,
+                  "minimum": 97.12568664550781,
+                  "p10": 132.4916114807129,
+                  "p50": 156.03517150878906,
+                  "p90": 176.00821075439453
+                },
+                "on_ground": {
+                  "count": 30,
+                  "maximum": 1.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 30,
+                  "maximum": 141.2584228515625,
+                  "minimum": -154.16064453125,
+                  "p10": -74.67976379394531,
+                  "p50": 16.453903198242188,
+                  "p90": 67.92336044311523
+                },
+                "relative_y_uu": {
+                  "count": 30,
+                  "maximum": 179.798828125,
+                  "minimum": -1.961181640625,
+                  "p10": 49.4059814453125,
+                  "p50": 95.734130859375,
+                  "p90": 137.29838867187502
+                },
+                "relative_z_uu": {
+                  "count": 30,
+                  "maximum": 150.94281005859375,
+                  "minimum": -22.002914428710938,
+                  "p10": 35.71422348022461,
+                  "p50": 95.01183319091797,
+                  "p90": 146.17340087890625
+                },
+                "tick": {
+                  "count": 30,
+                  "maximum": 598.0,
+                  "minimum": 16.0,
+                  "p10": 225.80000000000007,
+                  "p50": 378.5,
+                  "p90": 580.3000000000001
+                },
+                "ticks_after_pop": {
+                  "count": 30,
+                  "maximum": 598.0,
+                  "minimum": 16.0,
+                  "p10": 225.60000000000008,
+                  "p50": 378.5,
+                  "p90": 580.3000000000001
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.01171875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 3,
+                  "maximum": 247.95474243164062,
+                  "minimum": 183.079345703125,
+                  "p10": 189.37327880859374,
+                  "p50": 214.54901123046875,
+                  "p90": 241.27359619140626
+                },
+                "car_height_uu": {
+                  "count": 3,
+                  "maximum": 151.57656860351562,
+                  "minimum": 57.65715789794922,
+                  "p10": 62.781080627441405,
+                  "p50": 83.27677154541016,
+                  "p90": 137.91660919189454
+                },
+                "distance_uu": {
+                  "count": 3,
+                  "maximum": 165.64012145996094,
+                  "minimum": 159.09901428222656,
+                  "p10": 159.8092529296875,
+                  "p50": 162.65020751953125,
+                  "p90": 165.042138671875
+                },
+                "on_ground": {
+                  "count": 3,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 3,
+                  "maximum": 68.55443572998047,
+                  "minimum": -2.50390625,
+                  "p10": -1.2360168457031249,
+                  "p50": 3.835540771484375,
+                  "p90": 55.61065673828125
+                },
+                "relative_y_uu": {
+                  "count": 3,
+                  "maximum": 111.654052734375,
+                  "minimum": 97.8544921875,
+                  "p10": 98.4722412109375,
+                  "p50": 100.9432373046875,
+                  "p90": 109.5118896484375
+                },
+                "relative_z_uu": {
+                  "count": 3,
+                  "maximum": 131.27224731445312,
+                  "minimum": 96.378173828125,
+                  "p10": 102.18697662353516,
+                  "p50": 125.42218780517578,
+                  "p90": 130.10223541259765
+                },
+                "tick": {
+                  "count": 3,
+                  "maximum": 53.0,
+                  "minimum": 16.0,
+                  "p10": 17.4,
+                  "p50": 23.0,
+                  "p90": 47.0
+                },
+                "ticks_after_pop": {
+                  "count": 3,
+                  "maximum": 51.0,
+                  "minimum": 16.0,
+                  "p10": 17.4,
+                  "p50": 23.0,
+                  "p90": 45.4
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0078125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 2,
+                  "maximum": 268.3014831542969,
+                  "minimum": 266.28936767578125,
+                  "p10": 266.49057922363284,
+                  "p50": 267.29542541503906,
+                  "p90": 268.1002716064453
+                },
+                "car_height_uu": {
+                  "count": 2,
+                  "maximum": 176.25375366210938,
+                  "minimum": 171.05801391601562,
+                  "p10": 171.577587890625,
+                  "p50": 173.6558837890625,
+                  "p90": 175.7341796875
+                },
+                "distance_uu": {
+                  "count": 2,
+                  "maximum": 153.58511352539062,
+                  "minimum": 127.3254623413086,
+                  "p10": 129.9514274597168,
+                  "p50": 140.4552879333496,
+                  "p90": 150.95914840698242
+                },
+                "on_ground": {
+                  "count": 2,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 2,
+                  "maximum": 12.531036376953125,
+                  "minimum": 2.18780517578125,
+                  "p10": 3.222128295898438,
+                  "p50": 7.3594207763671875,
+                  "p90": 11.496713256835937
+                },
+                "relative_y_uu": {
+                  "count": 2,
+                  "maximum": 118.2161865234375,
+                  "minimum": 90.00318908691406,
+                  "p10": 92.82448883056641,
+                  "p50": 104.10968780517578,
+                  "p90": 115.39488677978515
+                },
+                "relative_z_uu": {
+                  "count": 2,
+                  "maximum": 97.24346923828125,
+                  "minimum": 90.03561401367188,
+                  "p10": 90.75639953613282,
+                  "p50": 93.63954162597656,
+                  "p90": 96.5226837158203
+                },
+                "tick": {
+                  "count": 2,
+                  "maximum": 596.0,
+                  "minimum": 504.0,
+                  "p10": 513.2,
+                  "p50": 550.0,
+                  "p90": 586.8
+                },
+                "ticks_after_pop": {
+                  "count": 2,
+                  "maximum": 596.0,
+                  "minimum": 504.0,
+                  "p10": 513.2,
+                  "p50": 550.0,
+                  "p90": 586.8
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 7
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.1838467614533965,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.0,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.03125
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40512,
+      "learned_button_fraction": [
+        0.1695053317535545,
+        0.7716232227488151,
+        0.00032089257503949446
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.8484693336415312,
+        -0.09145689006144447,
+        0.1824804061277946,
+        0.019130919839730694,
+        -0.17955727395950635
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1348.705810546875,
+          "minimum": 215.73129272460938,
+          "p10": 237.01769256591797,
+          "p50": 322.59776306152344,
+          "p90": 723.2568359375
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 675.08251953125,
+          "minimum": 138.16786193847656,
+          "p10": 145.86204528808594,
+          "p50": 157.62097930908203,
+          "p90": 169.96749877929688
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1104.4000244140625,
+          "minimum": 375.6035461425781,
+          "p10": 386.96937561035156,
+          "p50": 401.08888244628906,
+          "p90": 584.6694030761719
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 157.5205841064453,
+          "minimum": 132.79248046875,
+          "p10": 134.8925018310547,
+          "p50": 141.93800354003906,
+          "p90": 153.31548309326172
+        },
+        "post_pop_within_160uu_fraction": 1.0,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -13.982009244471556,
+      "seed": 2026310912,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 0,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "attempts_with_elevated_state": 0,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": null,
+            "p10": null,
+            "p50": null,
+            "p90": null
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 0.0,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 0.0,
+        "ground_failures": 248,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 0,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -3579.3943665847182,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.8125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 208,
+                  "maximum": 256.3704833984375,
+                  "minimum": 179.22396850585938,
+                  "p10": 185.49986572265624,
+                  "p50": 194.78271484375,
+                  "p90": 226.67824401855475
+                },
+                "car_height_uu": {
+                  "count": 208,
+                  "maximum": 118.29348754882812,
+                  "minimum": 57.909423828125,
+                  "p10": 64.92785568237305,
+                  "p50": 80.64892196655273,
+                  "p90": 107.86506423950195
+                },
+                "distance_uu": {
+                  "count": 208,
+                  "maximum": 173.21014404296875,
+                  "minimum": 135.19821166992188,
+                  "p10": 137.72348327636718,
+                  "p50": 145.5907974243164,
+                  "p90": 159.83575286865235
+                },
+                "on_ground": {
+                  "count": 208,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 208,
+                  "maximum": 64.15580749511719,
+                  "minimum": -51.22173309326172,
+                  "p10": -34.014471435546874,
+                  "p50": 2.753570556640625,
+                  "p90": 35.09856872558594
+                },
+                "relative_y_uu": {
+                  "count": 208,
+                  "maximum": 134.318115234375,
+                  "minimum": 38.7510986328125,
+                  "p10": 53.97685546875,
+                  "p50": 83.3956298828125,
+                  "p90": 112.5752197265625
+                },
+                "relative_z_uu": {
+                  "count": 208,
+                  "maximum": 138.07699584960938,
+                  "minimum": 100.01776885986328,
+                  "p10": 107.78201065063476,
+                  "p50": 118.39566802978516,
+                  "p90": 126.50064544677734
+                },
+                "tick": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                },
+                "ticks_after_pop": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.8125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 208,
+                  "maximum": 256.3704833984375,
+                  "minimum": 179.22396850585938,
+                  "p10": 185.49986572265624,
+                  "p50": 194.78271484375,
+                  "p90": 226.67824401855475
+                },
+                "car_height_uu": {
+                  "count": 208,
+                  "maximum": 118.29348754882812,
+                  "minimum": 57.909423828125,
+                  "p10": 64.92785568237305,
+                  "p50": 80.64892196655273,
+                  "p90": 107.86506423950195
+                },
+                "distance_uu": {
+                  "count": 208,
+                  "maximum": 173.21014404296875,
+                  "minimum": 135.19821166992188,
+                  "p10": 137.72348327636718,
+                  "p50": 145.5907974243164,
+                  "p90": 159.83575286865235
+                },
+                "on_ground": {
+                  "count": 208,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 208,
+                  "maximum": 64.15580749511719,
+                  "minimum": -51.22173309326172,
+                  "p10": -34.014471435546874,
+                  "p50": 2.753570556640625,
+                  "p90": 35.09856872558594
+                },
+                "relative_y_uu": {
+                  "count": 208,
+                  "maximum": 134.318115234375,
+                  "minimum": 38.7510986328125,
+                  "p10": 53.97685546875,
+                  "p50": 83.3956298828125,
+                  "p90": 112.5752197265625
+                },
+                "relative_z_uu": {
+                  "count": 208,
+                  "maximum": 138.07699584960938,
+                  "minimum": 100.01776885986328,
+                  "p10": 107.78201065063476,
+                  "p50": 118.39566802978516,
+                  "p90": 126.50064544677734
+                },
+                "tick": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                },
+                "ticks_after_pop": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.8125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 208,
+                  "maximum": 256.3704833984375,
+                  "minimum": 179.22396850585938,
+                  "p10": 185.49986572265624,
+                  "p50": 194.78271484375,
+                  "p90": 226.67824401855475
+                },
+                "car_height_uu": {
+                  "count": 208,
+                  "maximum": 118.29348754882812,
+                  "minimum": 57.909423828125,
+                  "p10": 64.92785568237305,
+                  "p50": 80.64892196655273,
+                  "p90": 107.86506423950195
+                },
+                "distance_uu": {
+                  "count": 208,
+                  "maximum": 173.21014404296875,
+                  "minimum": 135.19821166992188,
+                  "p10": 137.72348327636718,
+                  "p50": 145.5907974243164,
+                  "p90": 159.83575286865235
+                },
+                "on_ground": {
+                  "count": 208,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 208,
+                  "maximum": 64.15580749511719,
+                  "minimum": -51.22173309326172,
+                  "p10": -34.014471435546874,
+                  "p50": 2.753570556640625,
+                  "p90": 35.09856872558594
+                },
+                "relative_y_uu": {
+                  "count": 208,
+                  "maximum": 134.318115234375,
+                  "minimum": 38.7510986328125,
+                  "p10": 53.97685546875,
+                  "p50": 83.3956298828125,
+                  "p90": 112.5752197265625
+                },
+                "relative_z_uu": {
+                  "count": 208,
+                  "maximum": 138.07699584960938,
+                  "minimum": 100.01776885986328,
+                  "p10": 107.78201065063476,
+                  "p50": 118.39566802978516,
+                  "p90": 126.50064544677734
+                },
+                "tick": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                },
+                "ticks_after_pop": {
+                  "count": 208,
+                  "maximum": 36.0,
+                  "minimum": 17.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.0,
+              "measurements": {}
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 8
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.1845173132255184,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "parked",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.00390625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.0,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.0625
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40316,
+      "learned_button_fraction": [
+        0.16978370870126006,
+        0.7706865760492112,
+        0.0
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 0.0,
+      "mean_learned_analog_action": [
+        0.8467695265801396,
+        -0.08928225846111006,
+        0.19164551810966243,
+        0.021211724768830115,
+        -0.18045732874643733
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1485.97216796875,
+          "minimum": 214.83802795410156,
+          "p10": 233.97649383544922,
+          "p50": 326.3466033935547,
+          "p90": 741.4633178710938
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 769.432861328125,
+          "minimum": 136.7980194091797,
+          "p10": 146.04552459716797,
+          "p50": 157.03781127929688,
+          "p90": 167.92166900634766
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1011.2498168945312,
+          "minimum": 378.1391296386719,
+          "p10": 386.9001922607422,
+          "p50": 401.8302001953125,
+          "p90": 442.4510803222656
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 157.77523803710938,
+          "minimum": 127.08573150634766,
+          "p10": 134.31597900390625,
+          "p50": 140.77547454833984,
+          "p90": 153.87247467041016
+        },
+        "post_pop_within_160uu_fraction": 1.0,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -13.852253950550221,
+      "seed": 2026310913,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 1,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 675.2433471679688,
+            "p10": 675.2433471679688,
+            "p50": 675.2433471679688,
+            "p90": 675.2433471679688
+          },
+          "attempts_with_elevated_state": 1,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 1,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4988.99169921875,
+            "p10": 4988.99169921875,
+            "p50": 4988.99169921875,
+            "p90": 4988.99169921875
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 223.0634765625,
+            "p10": 223.0634765625,
+            "p50": 223.0634765625,
+            "p90": 223.0634765625
+          },
+          "reached_deep_goal_area": 1,
+          "z_at_deepest_y_uu": {
+            "maximum": 710.9141235351562,
+            "p10": 710.9141235351562,
+            "p50": 710.9141235351562,
+            "p90": 710.9141235351562
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 252.26426696777344,
+        "goalward_velocity_contacts": 0,
+        "goalward_velocity_transfer_sum": 843.7874755859375,
+        "ground_failures": 237,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 3,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 0,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -3546.1770113408566,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 0,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.81640625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 209,
+                  "maximum": 249.23582458496094,
+                  "minimum": 178.11949157714844,
+                  "p10": 184.9294860839844,
+                  "p50": 195.7963104248047,
+                  "p90": 239.26237792968752
+                },
+                "car_height_uu": {
+                  "count": 209,
+                  "maximum": 116.56298828125,
+                  "minimum": 52.904701232910156,
+                  "p10": 64.1933837890625,
+                  "p50": 81.75791931152344,
+                  "p90": 109.8296615600586
+                },
+                "distance_uu": {
+                  "count": 209,
+                  "maximum": 174.8853759765625,
+                  "minimum": 134.651123046875,
+                  "p10": 137.6814392089844,
+                  "p50": 145.0105743408203,
+                  "p90": 160.89592590332032
+                },
+                "on_ground": {
+                  "count": 209,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 209,
+                  "maximum": 51.79254150390625,
+                  "minimum": -55.125816345214844,
+                  "p10": -33.395599365234375,
+                  "p50": 4.2269287109375,
+                  "p90": 38.13124389648439
+                },
+                "relative_y_uu": {
+                  "count": 209,
+                  "maximum": 143.8165283203125,
+                  "minimum": 36.985107421875,
+                  "p10": 56.817431640625,
+                  "p50": 79.5469970703125,
+                  "p90": 110.311962890625
+                },
+                "relative_z_uu": {
+                  "count": 209,
+                  "maximum": 134.33087158203125,
+                  "minimum": 95.75311279296875,
+                  "p10": 108.64371032714844,
+                  "p50": 119.06224822998047,
+                  "p90": 128.079345703125
+                },
+                "tick": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.81640625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 209,
+                  "maximum": 249.23582458496094,
+                  "minimum": 178.11949157714844,
+                  "p10": 184.9294860839844,
+                  "p50": 195.7963104248047,
+                  "p90": 239.26237792968752
+                },
+                "car_height_uu": {
+                  "count": 209,
+                  "maximum": 116.56298828125,
+                  "minimum": 52.904701232910156,
+                  "p10": 64.1933837890625,
+                  "p50": 81.75791931152344,
+                  "p90": 109.8296615600586
+                },
+                "distance_uu": {
+                  "count": 209,
+                  "maximum": 174.8853759765625,
+                  "minimum": 134.651123046875,
+                  "p10": 137.6814392089844,
+                  "p50": 145.0105743408203,
+                  "p90": 160.89592590332032
+                },
+                "on_ground": {
+                  "count": 209,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 209,
+                  "maximum": 51.79254150390625,
+                  "minimum": -55.125816345214844,
+                  "p10": -33.395599365234375,
+                  "p50": 4.2269287109375,
+                  "p90": 38.13124389648439
+                },
+                "relative_y_uu": {
+                  "count": 209,
+                  "maximum": 143.8165283203125,
+                  "minimum": 36.985107421875,
+                  "p10": 56.817431640625,
+                  "p50": 79.5469970703125,
+                  "p90": 110.311962890625
+                },
+                "relative_z_uu": {
+                  "count": 209,
+                  "maximum": 134.33087158203125,
+                  "minimum": 95.75311279296875,
+                  "p10": 108.64371032714844,
+                  "p50": 119.06224822998047,
+                  "p90": 128.079345703125
+                },
+                "tick": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.81640625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 209,
+                  "maximum": 249.23582458496094,
+                  "minimum": 178.11949157714844,
+                  "p10": 184.9294860839844,
+                  "p50": 195.7963104248047,
+                  "p90": 239.26237792968752
+                },
+                "car_height_uu": {
+                  "count": 209,
+                  "maximum": 116.56298828125,
+                  "minimum": 52.904701232910156,
+                  "p10": 64.1933837890625,
+                  "p50": 81.75791931152344,
+                  "p90": 109.8296615600586
+                },
+                "distance_uu": {
+                  "count": 209,
+                  "maximum": 174.8853759765625,
+                  "minimum": 134.651123046875,
+                  "p10": 137.6814392089844,
+                  "p50": 145.0105743408203,
+                  "p90": 160.89592590332032
+                },
+                "on_ground": {
+                  "count": 209,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 209,
+                  "maximum": 51.79254150390625,
+                  "minimum": -55.125816345214844,
+                  "p10": -33.395599365234375,
+                  "p50": 4.2269287109375,
+                  "p90": 38.13124389648439
+                },
+                "relative_y_uu": {
+                  "count": 209,
+                  "maximum": 143.8165283203125,
+                  "minimum": 36.985107421875,
+                  "p10": 56.817431640625,
+                  "p50": 79.5469970703125,
+                  "p90": 110.311962890625
+                },
+                "relative_z_uu": {
+                  "count": 209,
+                  "maximum": 134.33087158203125,
+                  "minimum": 95.75311279296875,
+                  "p10": 108.64371032714844,
+                  "p50": 119.06224822998047,
+                  "p90": 128.079345703125
+                },
+                "tick": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 209,
+                  "maximum": 36.0,
+                  "minimum": 15.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.00390625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 1,
+                  "maximum": 333.9301452636719,
+                  "minimum": 333.9301452636719,
+                  "p10": 333.9301452636719,
+                  "p50": 333.9301452636719,
+                  "p90": 333.9301452636719
+                },
+                "car_height_uu": {
+                  "count": 1,
+                  "maximum": 209.0831756591797,
+                  "minimum": 209.0831756591797,
+                  "p10": 209.0831756591797,
+                  "p50": 209.0831756591797,
+                  "p90": 209.0831756591797
+                },
+                "distance_uu": {
+                  "count": 1,
+                  "maximum": 145.51148986816406,
+                  "minimum": 145.51148986816406,
+                  "p10": 145.51148986816406,
+                  "p50": 145.51148986816406,
+                  "p90": 145.51148986816406
+                },
+                "on_ground": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 1,
+                  "maximum": -37.48345947265625,
+                  "minimum": -37.48345947265625,
+                  "p10": -37.48345947265625,
+                  "p50": -37.48345947265625,
+                  "p90": -37.48345947265625
+                },
+                "relative_y_uu": {
+                  "count": 1,
+                  "maximum": 64.6669921875,
+                  "minimum": 64.6669921875,
+                  "p10": 64.6669921875,
+                  "p50": 64.6669921875,
+                  "p90": 64.6669921875
+                },
+                "relative_z_uu": {
+                  "count": 1,
+                  "maximum": 124.84696960449219,
+                  "minimum": 124.84696960449219,
+                  "p10": 124.84696960449219,
+                  "p50": 124.84696960449219,
+                  "p90": 124.84696960449219
+                },
+                "tick": {
+                  "count": 1,
+                  "maximum": 377.0,
+                  "minimum": 377.0,
+                  "p10": 377.0,
+                  "p50": 377.0,
+                  "p90": 377.0
+                },
+                "ticks_after_pop": {
+                  "count": 1,
+                  "maximum": 377.0,
+                  "minimum": 377.0,
+                  "p10": 377.0,
+                  "p50": 377.0,
+                  "p90": 377.0
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 16
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.18408263938069305,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.00390625,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.00390625,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.07421875
+      },
+      "horizon": 600,
+      "learned_action_ticks": 40949,
+      "learned_button_fraction": [
+        0.6918606070966324,
+        0.5384014261642531,
+        0.0531881120418081
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.6359407666526223,
+        0.10566248810925899,
+        0.22337043236400114,
+        0.179653888188156,
+        -0.12671269774506666
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1962.31494140625,
+          "minimum": 218.01907348632812,
+          "p10": 287.9416809082031,
+          "p50": 668.8602600097656,
+          "p90": 1215.7036743164062
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 1034.17041015625,
+          "minimum": 136.4220733642578,
+          "p10": 140.2158203125,
+          "p50": 145.03682708740234,
+          "p90": 224.7680892944336
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1312.1566162109375,
+          "minimum": 369.43768310546875,
+          "p10": 387.94578552246094,
+          "p50": 420.8800354003906,
+          "p90": 683.4672241210938
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 159.1543731689453,
+          "minimum": 46.37633514404297,
+          "p10": 133.46918487548828,
+          "p50": 139.7068634033203,
+          "p90": 152.8725814819336
+        },
+        "post_pop_within_160uu_fraction": 1.0,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -15.454850954178255,
+      "seed": 2026320912,
+      "setup": "matched_dribble",
+      "side": 0,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 1,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 260.6665344238281,
+            "p10": 260.6665344238281,
+            "p50": 260.6665344238281,
+            "p90": 260.6665344238281
+          },
+          "attempts_with_elevated_state": 1,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4724.06005859375,
+            "p10": 4724.06005859375,
+            "p50": 4724.06005859375,
+            "p90": 4724.06005859375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 485.76025390625,
+            "p10": 485.76025390625,
+            "p50": 485.76025390625,
+            "p90": 485.76025390625
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 860.8253173828125,
+            "p10": 860.8253173828125,
+            "p50": 860.8253173828125,
+            "p90": 860.8253173828125
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": 936.8566284179688,
+        "goalward_velocity_contacts": 1,
+        "goalward_velocity_transfer_sum": 1614.114013671875,
+        "ground_failures": 199,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 38,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 3,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -3956.4418442696333,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 3,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.84765625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 217,
+                  "maximum": 249.2207794189453,
+                  "minimum": 122.97308349609375,
+                  "p10": 185.5674591064453,
+                  "p50": 196.5002899169922,
+                  "p90": 238.9484405517578
+                },
+                "car_height_uu": {
+                  "count": 217,
+                  "maximum": 135.50770568847656,
+                  "minimum": 55.11897659301758,
+                  "p10": 64.724169921875,
+                  "p50": 80.74395751953125,
+                  "p90": 110.0491943359375
+                },
+                "distance_uu": {
+                  "count": 217,
+                  "maximum": 178.6334686279297,
+                  "minimum": 135.00975036621094,
+                  "p10": 137.4401123046875,
+                  "p50": 145.5189666748047,
+                  "p90": 161.1643280029297
+                },
+                "on_ground": {
+                  "count": 217,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 217,
+                  "maximum": 127.08206176757812,
+                  "minimum": -87.09457397460938,
+                  "p10": -34.4130859375,
+                  "p50": -0.311279296875,
+                  "p90": 37.362377929687504
+                },
+                "relative_y_uu": {
+                  "count": 217,
+                  "maximum": 155.6962890625,
+                  "minimum": 37.3203125,
+                  "p10": 54.321728515625004,
+                  "p50": 79.16552734375,
+                  "p90": 109.56103515625
+                },
+                "relative_z_uu": {
+                  "count": 217,
+                  "maximum": 136.2386474609375,
+                  "minimum": -9.1168212890625,
+                  "p10": 106.94183807373047,
+                  "p50": 119.37491607666016,
+                  "p90": 128.55262756347656
+                },
+                "tick": {
+                  "count": 217,
+                  "maximum": 445.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 217,
+                  "maximum": 445.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.84765625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 217,
+                  "maximum": 249.2207794189453,
+                  "minimum": 122.97308349609375,
+                  "p10": 185.5674591064453,
+                  "p50": 196.5002899169922,
+                  "p90": 238.9484405517578
+                },
+                "car_height_uu": {
+                  "count": 217,
+                  "maximum": 135.50770568847656,
+                  "minimum": 55.11897659301758,
+                  "p10": 64.724169921875,
+                  "p50": 80.74395751953125,
+                  "p90": 110.0491943359375
+                },
+                "distance_uu": {
+                  "count": 217,
+                  "maximum": 178.6334686279297,
+                  "minimum": 135.00975036621094,
+                  "p10": 137.4401123046875,
+                  "p50": 145.5189666748047,
+                  "p90": 161.1643280029297
+                },
+                "on_ground": {
+                  "count": 217,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 217,
+                  "maximum": 127.08206176757812,
+                  "minimum": -87.09457397460938,
+                  "p10": -34.4130859375,
+                  "p50": -0.311279296875,
+                  "p90": 37.362377929687504
+                },
+                "relative_y_uu": {
+                  "count": 217,
+                  "maximum": 155.6962890625,
+                  "minimum": 37.3203125,
+                  "p10": 54.321728515625004,
+                  "p50": 79.16552734375,
+                  "p90": 109.56103515625
+                },
+                "relative_z_uu": {
+                  "count": 217,
+                  "maximum": 136.2386474609375,
+                  "minimum": -9.1168212890625,
+                  "p10": 106.94183807373047,
+                  "p50": 119.37491607666016,
+                  "p90": 128.55262756347656
+                },
+                "tick": {
+                  "count": 217,
+                  "maximum": 445.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 217,
+                  "maximum": 445.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.83203125,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 213,
+                  "maximum": 249.2207794189453,
+                  "minimum": 177.63397216796875,
+                  "p10": 185.76523132324218,
+                  "p50": 196.5002899169922,
+                  "p90": 238.78781127929688
+                },
+                "car_height_uu": {
+                  "count": 213,
+                  "maximum": 114.90052795410156,
+                  "minimum": 55.11897659301758,
+                  "p10": 64.66071166992188,
+                  "p50": 80.65481567382812,
+                  "p90": 109.64126892089844
+                },
+                "distance_uu": {
+                  "count": 213,
+                  "maximum": 169.97227478027344,
+                  "minimum": 135.00975036621094,
+                  "p10": 137.43106689453126,
+                  "p50": 144.98056030273438,
+                  "p90": 160.90616455078126
+                },
+                "on_ground": {
+                  "count": 213,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 213,
+                  "maximum": 50.44378662109375,
+                  "minimum": -53.70843505859375,
+                  "p10": -33.609063720703126,
+                  "p50": -0.311279296875,
+                  "p90": 37.091432952880865
+                },
+                "relative_y_uu": {
+                  "count": 213,
+                  "maximum": 127.5986328125,
+                  "minimum": 37.3203125,
+                  "p10": 54.039453125,
+                  "p50": 78.887451171875,
+                  "p90": 109.06875
+                },
+                "relative_z_uu": {
+                  "count": 213,
+                  "maximum": 136.2386474609375,
+                  "minimum": 100.76547241210938,
+                  "p10": 108.05244598388671,
+                  "p50": 119.4371566772461,
+                  "p90": 128.7154083251953
+                },
+                "tick": {
+                  "count": 213,
+                  "maximum": 35.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 213,
+                  "maximum": 35.0,
+                  "minimum": 16.0,
+                  "p10": 19.0,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.00390625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 1,
+                  "maximum": 343.2830810546875,
+                  "minimum": 343.2830810546875,
+                  "p10": 343.2830810546875,
+                  "p50": 343.2830810546875,
+                  "p90": 343.2830810546875
+                },
+                "car_height_uu": {
+                  "count": 1,
+                  "maximum": 223.85304260253906,
+                  "minimum": 223.85304260253906,
+                  "p10": 223.85304260253906,
+                  "p50": 223.85304260253906,
+                  "p90": 223.85304260253906
+                },
+                "distance_uu": {
+                  "count": 1,
+                  "maximum": 140.92654418945312,
+                  "minimum": 140.92654418945312,
+                  "p10": 140.92654418945312,
+                  "p50": 140.92654418945312,
+                  "p90": 140.92654418945312
+                },
+                "on_ground": {
+                  "count": 1,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 1,
+                  "maximum": -33.72454833984375,
+                  "minimum": -33.72454833984375,
+                  "p10": -33.72454833984375,
+                  "p50": -33.72454833984375,
+                  "p90": -33.72454833984375
+                },
+                "relative_y_uu": {
+                  "count": 1,
+                  "maximum": 66.77880859375,
+                  "minimum": 66.77880859375,
+                  "p10": 66.77880859375,
+                  "p50": 66.77880859375,
+                  "p90": 66.77880859375
+                },
+                "relative_z_uu": {
+                  "count": 1,
+                  "maximum": 119.43003845214844,
+                  "minimum": 119.43003845214844,
+                  "p10": 119.43003845214844,
+                  "p50": 119.43003845214844,
+                  "p90": 119.43003845214844
+                },
+                "tick": {
+                  "count": 1,
+                  "maximum": 528.0,
+                  "minimum": 528.0,
+                  "p10": 528.0,
+                  "p50": 528.0,
+                  "p90": 528.0
+                },
+                "ticks_after_pop": {
+                  "count": 1,
+                  "maximum": 528.0,
+                  "minimum": 528.0,
+                  "p10": 528.0,
+                  "p50": 528.0,
+                  "p90": 528.0
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 19
+      },
+      "worlds": 256
+    },
+    {
+      "analog_saturation_fraction": [
+        0.18580042133811173,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "attacker_boost_range": [
+        20.0,
+        80.0
+      ],
+      "defender_mode": "live",
+      "finite": true,
+      "fractions": {
+        "contact_budget_exceeded": 0.0,
+        "elevated_follow_touch": 0.01171875,
+        "fifth_airborne_touch": 0.0,
+        "fourth_airborne_touch": 0.0,
+        "goal_over_contact_budget": 0.0,
+        "goal_within_contact_budget": 0.0,
+        "goalward_velocity_contact": 0.00390625,
+        "high_follow_touch": 0.0,
+        "pop_touch": 1.0,
+        "productive_continuation": 0.0,
+        "second_airborne_touch": 0.0,
+        "sustained_control": 0.0,
+        "third_airborne_touch": 0.0,
+        "unassisted_or_ground_goal": 0.06640625
+      },
+      "horizon": 600,
+      "learned_action_ticks": 41297,
+      "learned_button_fraction": [
+        0.7119645494830132,
+        0.5217570283555706,
+        0.11606169939705063
+      ],
+      "learned_pop_orientation_ticks": 7424,
+      "live_defender_fraction": 1.0,
+      "mean_learned_analog_action": [
+        0.6008319711730999,
+        0.10261401203409154,
+        0.2086535193224278,
+        0.17142884193903954,
+        -0.14274980712208024
+      ],
+      "physical_probe": {
+        "maximum_ball_height_uu": {
+          "count": 256,
+          "maximum": 1964.0010986328125,
+          "minimum": 211.7277374267578,
+          "p10": 290.341064453125,
+          "p50": 632.7037353515625,
+          "p90": 1264.71337890625
+        },
+        "maximum_self_height_uu": {
+          "count": 256,
+          "maximum": 1235.7821044921875,
+          "minimum": 136.31741333007812,
+          "p10": 140.18643188476562,
+          "p50": 144.53402709960938,
+          "p90": 177.51854705810547
+        },
+        "maximum_self_vertical_speed_uu_per_second": {
+          "count": 256,
+          "maximum": 1819.2454833984375,
+          "minimum": 377.4510192871094,
+          "p10": 388.1052551269531,
+          "p50": 585.1724853515625,
+          "p90": 682.9008483886719
+        },
+        "minimum_post_pop_ball_distance_uu": {
+          "count": 256,
+          "maximum": 158.2906951904297,
+          "minimum": 129.1428680419922,
+          "p10": 134.66683197021484,
+          "p50": 144.1531753540039,
+          "p90": 154.45948028564453
+        },
+        "post_pop_within_160uu_fraction": 1.0,
+        "takeoff_after_pop_fraction": 1.0
+      },
+      "reward_per_attempt": -15.744860446138773,
+      "seed": 2026320913,
+      "setup": "matched_dribble",
+      "side": 1,
+      "telemetry": {
+        "attempts": 256,
+        "contact_budget_exceeded": 0,
+        "elevated_follow_touches": 3,
+        "fifth_airborne_touches": 0,
+        "finish_geometry": {
+          "absolute_x_at_deepest_y_uu": {
+            "maximum": 1620.0771484375,
+            "p10": 306.58056640625,
+            "p50": 322.30987548828125,
+            "p90": 1360.5235595703125
+          },
+          "attempts_with_elevated_state": 3,
+          "deep_inside_goal_height": 0,
+          "deep_inside_goal_mouth": 0,
+          "deep_inside_goal_width": 0,
+          "linear_goal_projection_seen": 0,
+          "maximum_goalward_y_uu": {
+            "maximum": 4312.60009765625,
+            "p10": -299.7947998046875,
+            "p50": 3951.31298828125,
+            "p90": 4240.3427734375
+          },
+          "minimum_linear_goal_projection_error_uu": {
+            "maximum": 875.3486328125,
+            "p10": 875.3486328125,
+            "p50": 875.3486328125,
+            "p90": 875.3486328125
+          },
+          "reached_deep_goal_area": 0,
+          "z_at_deepest_y_uu": {
+            "maximum": 336.59149169921875,
+            "p10": 142.529541015625,
+            "p50": 300.1772766113281,
+            "p90": 329.30865478515625
+          }
+        },
+        "fourth_airborne_touches": 0,
+        "goals_over_contact_budget": 0,
+        "goals_within_contact_budget": 0,
+        "goalward_ball_speed_at_contact_sum": -1254.2605285644531,
+        "goalward_velocity_contacts": 1,
+        "goalward_velocity_transfer_sum": 668.6103210449219,
+        "ground_failures": 194,
+        "high_follow_touches": 0,
+        "horizon_timeouts": 47,
+        "low_pop_touches": 256,
+        "maximum_connected_control_ticks": 2,
+        "no_pop_failures": 0,
+        "over_contact_budget_failures": 0,
+        "productive_continuation_attempts": 0,
+        "reward_sum": -4030.684274211526,
+        "second_airborne_touches": 0,
+        "sustained_control_attempts": 0,
+        "sustained_control_ticks": 2,
+        "third_airborne_touches": 0,
+        "touch_geometry_probe": {
+          "attempts": 256,
+          "categories": {
+            "first_airborne_follow": {
+              "attempt_fraction": 0.80859375,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 207,
+                  "maximum": 304.3700256347656,
+                  "minimum": 143.6989288330078,
+                  "p10": 184.04110107421874,
+                  "p50": 194.68582153320312,
+                  "p90": 237.19365234375002
+                },
+                "car_height_uu": {
+                  "count": 207,
+                  "maximum": 146.5236358642578,
+                  "minimum": 55.03828430175781,
+                  "p10": 66.62500457763672,
+                  "p50": 80.54431915283203,
+                  "p90": 109.2650390625
+                },
+                "distance_uu": {
+                  "count": 207,
+                  "maximum": 168.87730407714844,
+                  "minimum": 135.80654907226562,
+                  "p10": 138.7407653808594,
+                  "p50": 147.55374145507812,
+                  "p90": 160.61097106933593
+                },
+                "on_ground": {
+                  "count": 207,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 207,
+                  "maximum": 132.37451171875,
+                  "minimum": -45.946075439453125,
+                  "p10": -29.51419677734375,
+                  "p50": -0.58343505859375,
+                  "p90": 32.915441894531256
+                },
+                "relative_y_uu": {
+                  "count": 207,
+                  "maximum": 150.40625,
+                  "minimum": -40.48779296875,
+                  "p10": 61.1506591796875,
+                  "p50": 87.154541015625,
+                  "p90": 112.7478759765625
+                },
+                "relative_z_uu": {
+                  "count": 207,
+                  "maximum": 160.7478485107422,
+                  "minimum": 7.2516326904296875,
+                  "p10": 106.95915374755859,
+                  "p50": 117.65962219238281,
+                  "p90": 127.35048980712891
+                },
+                "tick": {
+                  "count": 207,
+                  "maximum": 376.0,
+                  "minimum": 16.0,
+                  "p10": 19.6,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 207,
+                  "maximum": 376.0,
+                  "minimum": 16.0,
+                  "p10": 19.6,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_distinct_follow": {
+              "attempt_fraction": 0.80859375,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 207,
+                  "maximum": 304.3700256347656,
+                  "minimum": 143.6989288330078,
+                  "p10": 184.04110107421874,
+                  "p50": 194.68582153320312,
+                  "p90": 237.19365234375002
+                },
+                "car_height_uu": {
+                  "count": 207,
+                  "maximum": 146.5236358642578,
+                  "minimum": 55.03828430175781,
+                  "p10": 66.62500457763672,
+                  "p50": 80.54431915283203,
+                  "p90": 109.2650390625
+                },
+                "distance_uu": {
+                  "count": 207,
+                  "maximum": 168.87730407714844,
+                  "minimum": 135.80654907226562,
+                  "p10": 138.7407653808594,
+                  "p50": 147.55374145507812,
+                  "p90": 160.61097106933593
+                },
+                "on_ground": {
+                  "count": 207,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 207,
+                  "maximum": 132.37451171875,
+                  "minimum": -45.946075439453125,
+                  "p10": -29.51419677734375,
+                  "p50": -0.58343505859375,
+                  "p90": 32.915441894531256
+                },
+                "relative_y_uu": {
+                  "count": 207,
+                  "maximum": 150.40625,
+                  "minimum": -40.48779296875,
+                  "p10": 61.1506591796875,
+                  "p50": 87.154541015625,
+                  "p90": 112.7478759765625
+                },
+                "relative_z_uu": {
+                  "count": 207,
+                  "maximum": 160.7478485107422,
+                  "minimum": 7.2516326904296875,
+                  "p10": 106.95915374755859,
+                  "p50": 117.65962219238281,
+                  "p90": 127.35048980712891
+                },
+                "tick": {
+                  "count": 207,
+                  "maximum": 376.0,
+                  "minimum": 16.0,
+                  "p10": 19.6,
+                  "p50": 24.0,
+                  "p90": 34.0
+                },
+                "ticks_after_pop": {
+                  "count": 207,
+                  "maximum": 376.0,
+                  "minimum": 16.0,
+                  "p10": 19.6,
+                  "p50": 24.0,
+                  "p90": 34.0
+                }
+              }
+            },
+            "first_prompt_airborne_follow": {
+              "attempt_fraction": 0.7890625,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 202,
+                  "maximum": 280.544677734375,
+                  "minimum": 178.34426879882812,
+                  "p10": 184.25928955078126,
+                  "p50": 194.63159942626953,
+                  "p90": 236.9585922241211
+                },
+                "car_height_uu": {
+                  "count": 202,
+                  "maximum": 146.5236358642578,
+                  "minimum": 55.03828430175781,
+                  "p10": 66.12680130004883,
+                  "p50": 80.20623016357422,
+                  "p90": 108.90261001586914
+                },
+                "distance_uu": {
+                  "count": 202,
+                  "maximum": 168.87730407714844,
+                  "minimum": 135.80654907226562,
+                  "p10": 138.74688110351562,
+                  "p50": 147.41423797607422,
+                  "p90": 160.11370849609375
+                },
+                "on_ground": {
+                  "count": 202,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 202,
+                  "maximum": 51.29302978515625,
+                  "minimum": -45.946075439453125,
+                  "p10": -29.738623046875,
+                  "p50": -0.6953964233398438,
+                  "p90": 32.68025169372559
+                },
+                "relative_y_uu": {
+                  "count": 202,
+                  "maximum": 136.731201171875,
+                  "minimum": 40.680419921875,
+                  "p10": 61.7829833984375,
+                  "p50": 87.147216796875,
+                  "p90": 112.0020263671875
+                },
+                "relative_z_uu": {
+                  "count": 202,
+                  "maximum": 135.13162231445312,
+                  "minimum": 97.45045471191406,
+                  "p10": 107.41758575439454,
+                  "p50": 117.703369140625,
+                  "p90": 127.12382278442382
+                },
+                "tick": {
+                  "count": 202,
+                  "maximum": 51.0,
+                  "minimum": 16.0,
+                  "p10": 19.1,
+                  "p50": 24.0,
+                  "p90": 33.0
+                },
+                "ticks_after_pop": {
+                  "count": 202,
+                  "maximum": 51.0,
+                  "minimum": 16.0,
+                  "p10": 19.1,
+                  "p50": 24.0,
+                  "p90": 33.0
+                }
+              }
+            },
+            "first_strict_elevated_follow": {
+              "attempt_fraction": 0.01171875,
+              "measurements": {
+                "ball_height_uu": {
+                  "count": 3,
+                  "maximum": 336.59149169921875,
+                  "minimum": 269.56549072265625,
+                  "p10": 275.68784790039064,
+                  "p50": 300.1772766113281,
+                  "p90": 329.30864868164065
+                },
+                "car_height_uu": {
+                  "count": 3,
+                  "maximum": 207.44091796875,
+                  "minimum": 178.7323760986328,
+                  "p10": 179.78438415527344,
+                  "p50": 183.99241638183594,
+                  "p90": 202.7512176513672
+                },
+                "distance_uu": {
+                  "count": 3,
+                  "maximum": 158.126953125,
+                  "minimum": 133.18505859375,
+                  "p10": 136.47203674316407,
+                  "p50": 149.6199493408203,
+                  "p90": 156.42555236816406
+                },
+                "on_ground": {
+                  "count": 3,
+                  "maximum": 0.0,
+                  "minimum": 0.0,
+                  "p10": 0.0,
+                  "p50": 0.0,
+                  "p90": 0.0
+                },
+                "relative_x_uu": {
+                  "count": 3,
+                  "maximum": -29.340423583984375,
+                  "minimum": -69.593994140625,
+                  "p10": -62.96583862304688,
+                  "p50": -36.453216552734375,
+                  "p90": -30.762982177734376
+                },
+                "relative_y_uu": {
+                  "count": 3,
+                  "maximum": 117.1944580078125,
+                  "minimum": -14.054443359375,
+                  "p10": 3.4696289062500014,
+                  "p50": 73.56591796875,
+                  "p90": 108.46875
+                },
+                "relative_z_uu": {
+                  "count": 3,
+                  "maximum": 129.15057373046875,
+                  "minimum": 85.57307434082031,
+                  "p10": 92.74743957519532,
+                  "p50": 121.44490051269531,
+                  "p90": 127.60943908691407
+                },
+                "tick": {
+                  "count": 3,
+                  "maximum": 476.0,
+                  "minimum": 292.0,
+                  "p10": 324.0,
+                  "p50": 452.0,
+                  "p90": 471.2
+                },
+                "ticks_after_pop": {
+                  "count": 3,
+                  "maximum": 476.0,
+                  "minimum": 292.0,
+                  "p10": 324.0,
+                  "p50": 452.0,
+                  "p90": 471.2
+                }
+              }
+            }
+          },
+          "identity": "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1",
+          "setup_touch_fraction": 1.0
+        },
+        "unassisted_or_ground_goals": 17
+      },
+      "worlds": 256
+    }
+  ],
+  "seed": 2026110912,
+  "worlds_per_row": 256
+}

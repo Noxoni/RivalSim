@@ -69,6 +69,7 @@ def _aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     categories = (
         "first_distinct_follow",
         "first_airborne_follow",
+        "first_prompt_airborne_follow",
         "first_strict_elevated_follow",
     )
     return {

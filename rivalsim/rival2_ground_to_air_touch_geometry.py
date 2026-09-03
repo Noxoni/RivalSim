@@ -10,6 +10,7 @@ from rivalsim.rival2_contracts import POSITION_SCALE
 from rivalsim.rival2_ground_to_air_option import FIELD
 
 GROUND_TO_AIR_TOUCH_GEOMETRY_VERSION = "RIVAL2_GROUND_TO_AIR_TOUCH_GEOMETRY_V1"
+PROMPT_FOLLOW_MAXIMUM_TICKS = 60
 
 
 def _summary(values: list[torch.Tensor]) -> dict[str, float | int | None]:
@@ -51,6 +52,7 @@ class NaturalAerialTouchGeometryProbe:
             for name in (
                 "first_distinct_follow",
                 "first_airborne_follow",
+                "first_prompt_airborne_follow",
                 "first_strict_elevated_follow",
             )
         }
@@ -61,6 +63,9 @@ class NaturalAerialTouchGeometryProbe:
             self.worlds, dtype=torch.bool, device=device
         )
         self.airborne_follow_seen = torch.zeros(
+            self.worlds, dtype=torch.bool, device=device
+        )
+        self.prompt_airborne_follow_seen = torch.zeros(
             self.worlds, dtype=torch.bool, device=device
         )
         self.strict_follow_seen = torch.zeros(
@@ -144,6 +149,12 @@ class NaturalAerialTouchGeometryProbe:
         follow = separated & self.pop_seen & ~setup
         first_any = follow & ~self.any_follow_seen
         first_airborne = follow & (on_ground < 0.5) & ~self.airborne_follow_seen
+        first_prompt_airborne = (
+            follow
+            & (on_ground < 0.5)
+            & ((tick - self.pop_tick) <= PROMPT_FOLLOW_MAXIMUM_TICKS)
+            & ~self.prompt_airborne_follow_seen
+        )
         first_strict = (
             follow
             & (car_height >= 150.0)
@@ -169,6 +180,15 @@ class NaturalAerialTouchGeometryProbe:
             on_ground=on_ground,
         )
         self._record(
+            "first_prompt_airborne_follow",
+            first_prompt_airborne,
+            tick=tick,
+            car_height=car_height,
+            ball_height=ball_height,
+            relative=relative,
+            on_ground=on_ground,
+        )
+        self._record(
             "first_strict_elevated_follow",
             first_strict,
             tick=tick,
@@ -179,6 +199,7 @@ class NaturalAerialTouchGeometryProbe:
         )
         self.any_follow_seen |= first_any
         self.airborne_follow_seen |= first_airborne
+        self.prompt_airborne_follow_seen |= first_prompt_airborne
         self.strict_follow_seen |= first_strict
         self.pop_seen |= setup
         self.pop_tick.copy_(
@@ -200,6 +221,9 @@ class NaturalAerialTouchGeometryProbe:
                     {
                         "first_distinct_follow": self.any_follow_seen,
                         "first_airborne_follow": self.airborne_follow_seen,
+                        "first_prompt_airborne_follow": (
+                            self.prompt_airborne_follow_seen
+                        ),
                         "first_strict_elevated_follow": self.strict_follow_seen,
                     }[category]
                     .to(torch.float32)
@@ -222,5 +246,6 @@ class NaturalAerialTouchGeometryProbe:
 
 __all__ = [
     "GROUND_TO_AIR_TOUCH_GEOMETRY_VERSION",
+    "PROMPT_FOLLOW_MAXIMUM_TICKS",
     "NaturalAerialTouchGeometryProbe",
 ]

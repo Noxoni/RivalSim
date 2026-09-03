@@ -40,6 +40,7 @@ def test_probe_separates_low_airborne_follow_from_strict_threshold() -> None:
     categories = telemetry["categories"]
     assert categories["first_distinct_follow"]["attempt_fraction"] == 1.0
     assert categories["first_airborne_follow"]["attempt_fraction"] == 1.0
+    assert categories["first_prompt_airborne_follow"]["attempt_fraction"] == 1.0
     assert categories["first_strict_elevated_follow"]["attempt_fraction"] == 0.0
     assert (
         categories["first_airborne_follow"]["measurements"]["car_height_uu"][
@@ -71,3 +72,20 @@ def test_probe_counts_strict_follow_and_ignores_continuous_duplicate() -> None:
     categories = probe.telemetry()["categories"]
     assert categories["first_strict_elevated_follow"]["attempt_fraction"] == 1.0
     assert categories["first_distinct_follow"]["attempt_fraction"] == 1.0
+
+
+def test_probe_excludes_late_airborne_recontact_from_prompt_category() -> None:
+    probe = NaturalAerialTouchGeometryProbe(1, attacker_side=0)
+    active = torch.ones(1, dtype=torch.bool)
+    setup_before = _observation(
+        car_z=17.0, ball_z=130.0, touch=False, grounded=True
+    )
+    setup = _observation(car_z=25.0, ball_z=140.0, touch=True, grounded=False)
+    probe.step(setup_before, setup, tick=4, active=active)
+    late_follow = _observation(
+        car_z=110.0, ball_z=210.0, touch=True, grounded=False
+    )
+    probe.step(setup, late_follow, tick=70, active=active)
+    categories = probe.telemetry()["categories"]
+    assert categories["first_airborne_follow"]["attempt_fraction"] == 1.0
+    assert categories["first_prompt_airborne_follow"]["attempt_fraction"] == 0.0

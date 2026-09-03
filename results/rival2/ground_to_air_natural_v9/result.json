@@ -1,0 +1,82 @@
+{
+  "format": "RIVAL2_GROUND_TO_AIR_NATURAL_V9_RESULT",
+  "disposition": "DIAGNOSTIC_NON_PROMOTION",
+  "authority_sha256": "CF3250FA583951E78DEF6011B738CEA7CCDF19B4BA46ACAE79A7661FABFECCA2",
+  "accepted_blocks": 12,
+  "accepted_optimizer_steps": 96,
+  "stop_reason": "durable block-12 stop after strict elevated-contact score regressed and no high, second-airborne, productive-continuation, or controlled-goal outcome appeared; independent native touch geometry showed the first-follow event was materially undercounted",
+  "best_validation": {
+    "block": 8,
+    "selection_key": [0.0, 0.0089111328125],
+    "strict_elevated_follow_mean_fraction": 0.005208333333333333,
+    "strict_elevated_follow_nonzero_rows": 6,
+    "high_follow_rows": 0,
+    "second_airborne_rows": 0,
+    "productive_continuation_rows": 0,
+    "controlled_goal_rows": 0,
+    "checkpoint": {
+      "path": "G:/dev/RivalSim-runs/ground-to-air-natural-v9/best_validation.pt",
+      "sha256": "2EBF0A052E6C75C5EA4B4AB8F9133B785EBAA8DFCC381042A435A357BD13756F",
+      "disposition": "diagnostic_only"
+    }
+  },
+  "last_durable_boundary": {
+    "block": 12,
+    "selection_key": [0.0, 0.0067138671875],
+    "strict_elevated_follow_mean_fraction": 0.00390625,
+    "strict_elevated_follow_nonzero_rows": 5,
+    "high_follow_rows": 0,
+    "second_airborne_rows": 0,
+    "productive_continuation_rows": 0,
+    "controlled_goal_rows": 0,
+    "checkpoint": {
+      "path": "G:/dev/RivalSim-runs/ground-to-air-natural-v9/rolling.pt",
+      "sha256": "B2B44EC3B8576A33B3E8C788F2CC8C586D90E9674DDA04328587BDB6A3AD3C31",
+      "disposition": "diagnostic_only"
+    }
+  },
+  "native_touch_geometry": {
+    "matched_worlds_per_row": 256,
+    "row_count": 12,
+    "seed": 2026110912,
+    "parent": {
+      "prompt_airborne_follow_mean_fraction": 0.3990885416666667,
+      "prompt_airborne_follow_nonzero_rows": 10,
+      "any_airborne_follow_mean_fraction": 0.4261067708333333,
+      "strict_elevated_follow_mean_fraction": 0.0032552083333333335,
+      "artifact": {
+        "path": "results/rival2/ground_to_air_natural_v9/touch_geometry_parent.json",
+        "sha256": "D7B5B04B2041F79E1DEE87025BD49291B6030B9B1477339DF9FF5907447F47BF"
+      }
+    },
+    "v9_best": {
+      "prompt_airborne_follow_mean_fraction": 0.4007161458333333,
+      "prompt_airborne_follow_nonzero_rows": 10,
+      "any_airborne_follow_mean_fraction": 0.42578125,
+      "strict_elevated_follow_mean_fraction": 0.0026041666666666665,
+      "artifact": {
+        "path": "results/rival2/ground_to_air_natural_v9/touch_geometry_v9_best.json",
+        "sha256": "D3469862FF75868CCE509DBB084334D40F0939294AF41895D8664EB9F92E87F0"
+      }
+    },
+    "finding": "The protected scorer already makes a prompt separated airborne follow contact in about 39.91 percent of matched attempts, but the old 150-uu car / 250-uu ball strict event observes only about 0.33 percent. V9 left prompt follow essentially flat while its strict metric fluctuated."
+  },
+  "evidence": {
+    "preflight": {
+      "path": "results/rival2/ground_to_air_natural_v9/preflight.json",
+      "sha256": "2902B35EE5FAB1541DE7AA59CCDF3002CA391B52D02E7F2749698082E80417F7"
+    },
+    "training_curve": {
+      "path": "results/rival2/ground_to_air_natural_v9/training_curve.jsonl",
+      "sha256": "4AD99946D91A4F3A2EC1D1181F4A05F0AD71C85AE30CFCCF5A5F622ACD80E7F3"
+    }
+  },
+  "untouched_test_opened": false,
+  "controlled_pass": false,
+  "checkpoint_promoted": false,
+  "promoted_into_v23": false,
+  "protected_parent_unchanged": true,
+  "protected_v23_unchanged": true,
+  "production_reward_unchanged": true,
+  "next_action": "Freeze a successor physical curriculum that credits a prompt separated airborne recontact within 60 ticks, preserves strict elevated/high/second-contact stages, and still requires productive continuation and a goal before promotion."
+}
