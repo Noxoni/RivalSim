@@ -14,11 +14,16 @@ import argparse
 import copy
 import json
 import subprocess
+import sys
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 import torch
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from benchmarks import run_rival2_unified_capability_distillation_v1 as v1
 from rivalsim.rival2_policy import Rival2ActorCritic, deterministic_hybrid_action
@@ -28,7 +33,6 @@ from rivalsim.rival2_unified_policy import (
     deterministic_unified_action,
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY = ROOT / "results/rival2/unified_capability_distillation_v2/authority.json"
 RESULTS = ROOT / "results/rival2/unified_capability_distillation_v2"
 CHECKPOINT = (
