@@ -10,6 +10,7 @@ from rivalsim.rival2_contracts import (
 )
 from rivalsim.rival2_ground_to_air_option import FIELD
 from rivalsim.rival2_ground_to_air_prompt_continuation_probe import (
+    PromptContinuationDiagnosticTracker,
     PromptContinuationProbe,
 )
 
@@ -178,3 +179,82 @@ def test_probe_rejects_misaligned_shapes_and_empty_telemetry() -> None:
             tick=0,
             active=torch.ones(1, dtype=torch.bool),
         )
+
+
+def test_diagnostic_tracker_adds_probe_without_changing_reward() -> None:
+    authority = {
+        "episode": {
+            "maximum_distinct_chain_contacts": 6,
+            "ground_failure_after_tick": 300,
+            "ground_failure_ball_height_uu": 95.0,
+            "pop_deadline_tick": 300,
+        },
+        "reward": {
+            "minimum_productive_goalward_speed_uu_per_second": 600.0,
+            "contact_shell_distance_uu": 133.0,
+            "vertical_standoff_uu": 130.0,
+            "contact_shell_progress_per_uu": 0.0,
+            "horizontal_tracking_progress_per_uu": 0.0,
+            "vertical_tracking_progress_per_uu": 0.0,
+            "post_contact_goalward_progress_per_uu": 0.0,
+            "goal_target_progress_per_uu": 0.0,
+            "low_pop_event": 0.0,
+            "prompt_airborne_follow_event": 1.5,
+            "elevated_follow_touch_event": 0.0,
+            "high_follow_touch_event": 0.0,
+            "second_airborne_touch_event": 0.0,
+            "third_airborne_touch_event": 0.0,
+            "fourth_airborne_touch_event": 0.0,
+            "fifth_airborne_touch_event": 0.0,
+            "goalward_velocity_contact_event": 0.0,
+            "goalward_speed_neutral_uu_per_second": 500.0,
+            "goalward_speed_at_contact_per_uu_per_second": 0.0,
+            "forward_velocity_transfer_per_uu_per_second": 0.0,
+            "sustained_control_shell_uu": 160.0,
+            "sustained_control_minimum_ticks": 12,
+            "sustained_control_interval_event": 0.0,
+            "goal_within_contact_budget_event": 0.0,
+            "other_goal": 0.0,
+            "failure": 0.0,
+            "over_contact_budget_failure": 0.0,
+        },
+    }
+    tracker = PromptContinuationDiagnosticTracker(
+        1,
+        attacker_side=0,
+        horizon=600,
+        authority=authority,
+    )
+    before = _observation()
+    after = before.clone()
+    _set_geometry(
+        before,
+        car_z=17.0,
+        ball_z=190.0,
+        relative=(0.0, 80.0, 173.0),
+        on_ground=True,
+        touch=False,
+    )
+    _set_geometry(
+        after,
+        car_z=17.0,
+        ball_z=195.0,
+        relative=(0.0, 80.0, 178.0),
+        on_ground=True,
+        touch=True,
+    )
+    reward, done = tracker.step(
+        before,
+        after,
+        tick=0,
+        goal_for_attacker=torch.zeros(1, dtype=torch.bool),
+        any_goal=torch.zeros(1, dtype=torch.bool),
+        active=torch.ones(1, dtype=torch.bool),
+    )
+    assert reward.item() == pytest.approx(0.0)
+    assert not done.item()
+    telemetry = tracker.telemetry()
+    assert "prompt_continuation_probe" in telemetry
+    assert telemetry["prompt_continuation_probe"][
+        "prompt_airborne_follow_fraction"
+    ] == pytest.approx(0.0)

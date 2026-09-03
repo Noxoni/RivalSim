@@ -19,6 +19,9 @@ from rivalsim.rival2_contracts import (
     POSITION_SCALE,
 )
 from rivalsim.rival2_ground_to_air_option import FIELD
+from rivalsim.rival2_ground_to_air_prompt_follow_v10 import (
+    PromptAerialFollowTrainingTracker,
+)
 from rivalsim.rival2_ground_to_air_touch_geometry import (
     NaturalAerialTouchGeometryProbe,
 )
@@ -412,7 +415,45 @@ class PromptContinuationProbe:
         }
 
 
+class PromptContinuationDiagnosticTracker(PromptAerialFollowTrainingTracker):
+    """Attach the read-only continuation probe to an unchanged V10 rollout.
+
+    This adapter exists only for deterministic, no-learning calibration.  Its
+    reward return is exactly the V10 tracker return; the additional probe is
+    telemetry-only.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.continuation_probe = PromptContinuationProbe(
+            self.worlds,
+            attacker_side=self.side,
+        )
+
+    def step(
+        self,
+        before: torch.Tensor,
+        after: torch.Tensor,
+        **kwargs: Any,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        self.continuation_probe.step(
+            before,
+            after,
+            tick=int(kwargs["tick"]),
+            active=kwargs["active"],
+        )
+        return super().step(before, after, **kwargs)
+
+    def telemetry(self) -> dict[str, Any]:
+        result = super().telemetry()
+        result["prompt_continuation_probe"] = (
+            self.continuation_probe.telemetry()
+        )
+        return result
+
+
 __all__ = [
     "GROUND_TO_AIR_PROMPT_CONTINUATION_PROBE_VERSION",
+    "PromptContinuationDiagnosticTracker",
     "PromptContinuationProbe",
 ]
