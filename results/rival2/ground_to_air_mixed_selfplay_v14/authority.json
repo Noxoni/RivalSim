@@ -1,0 +1,154 @@
+{
+  "acceptance": {
+    "controlled_ball_ground_failure_fraction_max": 0.12,
+    "controlled_goal_within_six_contacts_fraction_min": 0.14,
+    "controlled_second_airborne_contact_fraction_min": 0.22,
+    "natural_goal_within_contact_budget_count_min": 1,
+    "natural_players_without_touch_max": 0,
+    "natural_second_airborne_contact_count_min": 1
+  },
+  "aerial_reward": {
+    "entry_airborne_contact_event": 4.0,
+    "fifth_goalward_airborne_contact_event": 1.0,
+    "forward_velocity_transfer_per_uu_per_second": 0.004,
+    "fourth_goalward_airborne_contact_event": 2.0,
+    "goal_within_contact_budget_event": 25.0,
+    "goalward_speed_at_contact_per_uu_per_second": 0.003,
+    "goalward_speed_neutral_uu_per_second": 500.0,
+    "high_airborne_contact_event": 2.0,
+    "maximum_supplemental_reward_per_attempt": 40.0,
+    "minimum_productive_goalward_speed_uu_per_second": 600.0,
+    "productive_goalward_contact_event": 2.0,
+    "raw_airtime_reward": 0.0,
+    "second_goalward_airborne_contact_event": 5.0,
+    "third_goalward_airborne_contact_event": 4.0
+  },
+  "campaign": {
+    "accepted_updates": 120,
+    "checkpoint_interval": 30,
+    "current_composite_self_play_both_sides": true,
+    "nexto_training_probability": 0.0,
+    "worlds": 32768
+  },
+  "continuation_failure_reward": {
+    "ball_ground_before_second_contact": -4.0,
+    "landing_before_second_contact": -4.0
+  },
+  "created_utc": "2026-09-03T13:05:00Z",
+  "curriculum": {
+    "controlled_world_fraction": 0.25,
+    "difficulty": 0.0,
+    "entry_state_source": "authoritative RivalSim V11 physical scenario generators",
+    "ordinary_world_fraction": 0.75,
+    "refresh_interval_accepted_updates": 30,
+    "setup_names": [
+      "assisted_low_bounce",
+      "soft_incoming_chip",
+      "rising_double_jump",
+      "roof_carry"
+    ],
+    "setup_weights": [
+      0.35,
+      0.15,
+      0.2,
+      0.3
+    ],
+    "side_balanced": true
+  },
+  "format": "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14_AUTHORITY",
+  "integrity": {
+    "base_policy_mutation_allowed": false,
+    "controlled_state_injection_is_training_only": true,
+    "mechanic_classifier_used": false,
+    "named_mechanic_reward": false,
+    "option_trunk_frozen": true,
+    "production_gameplay_reward_changed": false,
+    "raw_airtime_reward": false
+  },
+  "optimizer": {
+    "actor_learning_rate": 2e-06,
+    "critic_learning_rate": 0.0003,
+    "fresh_adam": true,
+    "loaded_parent_optimizer": false,
+    "trainable": [
+      "aerial option actor head",
+      "aerial option critic head"
+    ]
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "entropy_coefficient": 0.0,
+    "epochs": 2,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "kl_telemetry_only": true,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "nonfinite_failure_is_hard": true,
+    "rollout_horizon": 128,
+    "value_coefficient": 0.5,
+    "version": "RIVAL2_PPO_120HZ_V1"
+  },
+  "purpose": "Fold the exact protected deterministic multi-touch scorer into a mixed controlled-opportunity and ordinary V23 self-play distribution while closing the rewarded-entry-then-land loophole.",
+  "router": {
+    "airborne_ball_height_uu": 130.0,
+    "contact_separation_ticks": 4,
+    "cooldown_ticks": 90,
+    "grounded_ball_height_uu": 100.0,
+    "maximum_distinct_contacts": 6,
+    "maximum_option_ticks": 420,
+    "maximum_planar_distance_uu": 480.0,
+    "minimum_boost_fraction": 0.15,
+    "minimum_canonical_ball_y_uu": -3000.0,
+    "minimum_forward_alignment": 0.55,
+    "minimum_landing_release_tick": 72,
+    "ownership_margin_uu": 200.0
+  },
+  "seed": 2026090314,
+  "selection": {
+    "controlled_seed": 2026090317,
+    "controlled_worlds_per_row": 64,
+    "natural_validation_seed": 2026090318,
+    "natural_validation_ticks": 6000,
+    "natural_validation_worlds": 512,
+    "selection_order": [
+      "all gates pass",
+      "natural in-budget goals",
+      "natural second airborne contacts",
+      "controlled in-budget goal fraction",
+      "controlled second airborne contact fraction",
+      "lowest controlled ball-ground failure"
+    ],
+    "untouched_test_seed": 2026090319,
+    "untouched_test_ticks": 6000,
+    "untouched_test_worlds": 1024
+  },
+  "sources": {
+    "aerial_scorer": {
+      "path": "checkpoints/rival2/ground_to_air_goal_v3/rival2_ground_to_air_goal_v3.pt",
+      "sha256": "F7049F8EF6CC4D1EE3F7303D6D9CE1AA2207A10F6651A33BC71B7C344CC77154"
+    },
+    "blue_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_blue.pt",
+      "sha256": "0263546263285384D2D9A0CE55A471C41A41A8B7D4870DD9504D0ACCEA76723C"
+    },
+    "human_aerial_physics": {
+      "path": "results/rival2/ground_to_air_human_physics_v1/human_transition.json",
+      "sha256": "3B29ABE1CEBE1272ADC5D12D1FFB849209EADF1FF82C71582121791E08931B9E"
+    },
+    "orange_v23": {
+      "path": "checkpoints/rival2/codex_autonomous_v23/rival2_orange.pt",
+      "sha256": "56E4ECA5075EB5748402BA3C5D8D51AC91FC1AFF55219E64EA5CE688DAD3491A"
+    },
+    "protected_scorer_calibration": {
+      "path": "results/rival2/ground_to_air_natural_v11/entry_scorer.json",
+      "sha256": "5EB8F6C02D3F065FC693FB1B9104B9D89143C40379C9C1BFBC0CF07D2AB0646B"
+    },
+    "v13_negative_result": {
+      "path": "results/rival2/ground_to_air_self_imitation_v13/training_summary.json",
+      "sha256": "B6C28C8AD2ADB80511908267208F43183F7075E22EFBA1EC16B2391F436756C6"
+    }
+  },
+  "version": "RIVAL2_GROUND_TO_AIR_MIXED_SELFPLAY_V14"
+}
