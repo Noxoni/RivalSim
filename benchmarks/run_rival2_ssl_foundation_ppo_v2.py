@@ -111,7 +111,13 @@ def launch_authority_payload() -> dict[str, Any]:
         },
         "evaluation_and_snapshot_interval": SNAPSHOT_INTERVAL,
         "continuation_review_marker": CONTINUATION_REVIEW_MARKER,
-        "reward_model_optimizer_or_data_changed": False,
+        "reward_or_ppo_hyperparameters_changed": False,
+        "scenario_corpus_changed_from_broken_v1": True,
+        "scenario_corpus_changes": [
+            "standard kickoff reset family",
+            "coherent ground heading and momentum with off-angle coverage",
+            "grounded, side-wall, and airborne wall/aerial variants",
+        ],
         "broken_v1_update_20_resume_forbidden": True,
     }
 
@@ -169,7 +175,8 @@ def load_schedule_authority() -> dict[str, Any]:
         "interval": payload.get("evaluation_and_snapshot_interval") == SNAPSHOT_INTERVAL,
         "marker": payload.get("continuation_review_marker") == CONTINUATION_REVIEW_MARKER,
         "old_update_20_forbidden": payload.get("broken_v1_update_20_resume_forbidden") is True,
-        "no_semantic_changes": payload.get("reward_model_optimizer_or_data_changed") is False,
+        "reward_and_ppo_unchanged": payload.get("reward_or_ppo_hyperparameters_changed") is False,
+        "scenario_corpus_corrected": payload.get("scenario_corpus_changed_from_broken_v1") is True,
     }
     if not all(checks.values()):
         raise RuntimeError(f"corrected SSL launch authority mismatch: {checks}")

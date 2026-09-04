@@ -123,6 +123,23 @@ def _state_sha256(state: Any) -> str:
     return digest.hexdigest().upper()
 
 
+def _scenario_metadata_sha256(batch: Any) -> str:
+    digest = hashlib.sha256()
+    for name in (
+        "family",
+        "focal_side",
+        "kickoff_indicator",
+        "kickoff_layout",
+        "wall_aerial_variant",
+    ):
+        value = getattr(batch, name)
+        digest.update(name.encode("utf-8"))
+        digest.update(str(value.dtype).encode("ascii"))
+        digest.update(str(value.shape).encode("ascii"))
+        digest.update(value.tobytes())
+    return digest.hexdigest().upper()
+
+
 def authority_payload(implementation_commit: str) -> dict[str, Any]:
     batch = build_ssl_foundation_scenarios(WORLD_COUNT, seed=SCENARIO_SEED)
     return {
@@ -161,6 +178,7 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
             "probabilities": list(SCENARIO_PROBABILITIES),
             "realized": batch.summary(),
             "state_tensor_sha256": _state_sha256(batch.state),
+            "scenario_metadata_sha256": _scenario_metadata_sha256(batch),
             "deterministic_full_cycle_reset_bank": True,
             "new_source_state_after_each_reset": True,
             "standard_kickoff_starts": batch.summary()["standard_kickoff_starts"],

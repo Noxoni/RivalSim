@@ -36,6 +36,7 @@ def test_corrected_authority_is_v5_rooted_and_has_no_resume_parent() -> None:
         "airborne_intercept",
     }
     assert all(count > 0 for count in variants.values())
+    assert len(payload["reset_curriculum"]["scenario_metadata_sha256"]) == 64
     assert payload["campaign"]["snapshot_interval"] == 50
     assert payload["campaign"]["evaluation_interval"] == 50
 
