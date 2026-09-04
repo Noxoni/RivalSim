@@ -45,6 +45,8 @@ def test_v2_engine_configuration_removes_update_20_binding() -> None:
     campaign._configure_engine()
     assert campaign.engine.BOUND_RESUME_UPDATE is None
     assert campaign.engine.BOUND_RESUME_SHA256 is None
+    assert campaign.engine.TRAINER_PHASE == "ssl_foundation_v1"
+    assert campaign.engine.LINEAGE == "Unified Capability V5 -> SSL Foundation PPO V2"
     assert campaign.engine.AUTHORITY == campaign.AUTHORITY
     assert campaign.engine.SCHEDULE_AUTHORITY == campaign.SCHEDULE_AUTHORITY
     assert campaign.engine.SOURCE_SHA256 == (

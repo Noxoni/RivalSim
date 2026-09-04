@@ -40,7 +40,9 @@ _base_load_authority = engine.load_authority
 def _configure_engine() -> None:
     engine.FORMAT = FORMAT
     engine.CHECKPOINT_FORMAT = f"{FORMAT}_CHECKPOINT"
-    engine.TRAINER_PHASE = "ssl_foundation_v2"
+    # The trainer phase names the unchanged reward/rollout implementation;
+    # checkpoint format and lineage provide the V2 campaign isolation.
+    engine.TRAINER_PHASE = "ssl_foundation_v1"
     engine.LINEAGE = "Unified Capability V5 -> SSL Foundation PPO V2"
     engine.RESULTS = RESULTS
     engine.AUTHORITY = AUTHORITY
