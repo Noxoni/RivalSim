@@ -827,6 +827,9 @@ def run(args: argparse.Namespace) -> int:
         try:
             rollout = trainer.collect_rollout()
             metrics = trainer.update(rollout)
+            # Release the finished rollout before the next collection/evaluation.
+            # Keeping it until assignment completes doubles resident rollout memory.
+            del rollout
         except Rival2RecurrentPPOCorruption as error:
             hard_failure = {
                 "format": f"{FORMAT}_HARD_FAILURE",
