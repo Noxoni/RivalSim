@@ -73,7 +73,7 @@ from third_party.nexto.adapter import NextoPolicyAdapter, NextoStateTensors  # n
 
 FORMAT = "RIVAL2_SSL_FOUNDATION_PPO_V1"
 CHECKPOINT_FORMAT = f"{FORMAT}_CHECKPOINT"
-SUPERSEDED_AUTHORITY_SHA256 = "DCA2822CB83AF3C2A3B546038CD9B9F482FAD0536D67FDF88BD092F2FA1F16E1"
+SUPERSEDED_AUTHORITY_SHA256 = "C625349F05877CC85A1D2F7BD9256D0DAD759750A96D9D1F7BF19558EFDA0DB4"
 RESULTS = ROOT / "results/rival2/ssl_foundation_ppo_v1"
 AUTHORITY = RESULTS / "authority.json"
 CHECKPOINT = ROOT / "checkpoints/rival2/ssl_foundation_ppo_v1" / "rival2_ssl_foundation_ppo_v1.pt"
@@ -119,7 +119,7 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
         "created_utc": utc_now(),
         "implementation_commit": implementation_commit,
         "supersedes_authority_sha256": SUPERSEDED_AUTHORITY_SHA256,
-        "supersession_reason": "user-authorized six-potential reward amendment before PPO",
+        "supersession_reason": "bind actual PPO gamma after six-potential amendment before PPO",
         "source": {
             "path": SOURCE.relative_to(ROOT).as_posix(),
             "sha256": SOURCE_SHA256,

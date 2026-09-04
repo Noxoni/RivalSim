@@ -852,6 +852,7 @@ REWARD_SSL_FOUNDATION_V1_CONTRACT: Final = {
                 "dot(unit(car_to_ball), unit(ball_to_target)) * "
                 "clip(1-(self_ball_distance-150)/2850,0,1)"
             ),
+            "car_facing_or_controller_action_used": False,
             "not_an_event_or_action_reward": True,
         },
         "boost_reserve": {
