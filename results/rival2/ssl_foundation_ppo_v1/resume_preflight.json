@@ -1,0 +1,87 @@
+{
+  "authority_sha256": "F4745DCD19AE968E2B844DAA5F8E4350F20928DCD0B13B6D3938A62D69713FF3",
+  "checks": {
+    "current_model_exact_at_update_zero": true,
+    "direct_non_goal_reward_terms_zero": true,
+    "exact_scale": true,
+    "exact_unified_v5_source_sha256": true,
+    "frozen_v5_model_exact": true,
+    "goal_only_native_kernel": true,
+    "kl_telemetry_only": true,
+    "native_120hz": true,
+    "no_gameplay_v2_or_v3_state": true,
+    "nonfinite_rollback_enabled": true,
+    "only_six_potential_components": true,
+    "opponent_probabilities_exact": true,
+    "optimizer_lrs_exact": true,
+    "optimizer_state_matches_offset": true,
+    "plus_174_not_loaded": true,
+    "reward_contract_exact": true,
+    "scenario_id_absent": true,
+    "scenario_reset_template_resident": true,
+    "source_optimizer_not_loaded": true,
+    "value_loss_isolated": true
+  },
+  "contracts": {
+    "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+    "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+    "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+    "RIVAL2_REWARD_SSL_FOUNDATION_V1": "C960B465914395BD7181DE0C1FC737165ACD69D507C65C563E575A8E017028D5"
+  },
+  "created_utc": "2026-09-04T03:03:54.758275+00:00",
+  "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_PREFLIGHT",
+  "initial_opponent_counts": {
+    "current": 13259,
+    "frozen_unified_v5": 9651,
+    "nexto": 9858
+  },
+  "optimizer_group_lrs": {
+    "critic": 0.0003,
+    "policy": 1e-06
+  },
+  "ppo_config": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.0,
+    "epochs": 1,
+    "gae_lambda": 0.9872585449014338,
+    "gamma": 0.9987476493904754,
+    "learning_rate": 1e-06,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 128,
+    "value_loss_coefficient": 0.5
+  },
+  "reset_curriculum": {
+    "counts": {
+      "catch_control_possession": 4915,
+      "contested_fifty": 3277,
+      "defensive_shadow_save": 3277,
+      "loose_ball_access": 4915,
+      "natural_ongoing": 8192,
+      "recovery_scramble_low_boost": 1638,
+      "shooting_finishing": 3277,
+      "wall_aerial": 3277
+    },
+    "focal_side_counts": {
+      "0": 16384,
+      "1": 16384
+    },
+    "scripted_solution_prefix_ticks": 0,
+    "task_or_scenario_id_in_observation": false,
+    "worlds": 32768
+  },
+  "schedule_authority_sha256": "3C84D809400756E8D1AFF939F6160A6DB6BDD651C3077502FECDE23944E3BE28",
+  "source": {
+    "authority_sha256": "F4745DCD19AE968E2B844DAA5F8E4350F20928DCD0B13B6D3938A62D69713FF3",
+    "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_SOURCE_TRANSITION",
+    "fresh_ppo_optimizer": true,
+    "loaded_current_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "loaded_frozen_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "plus_174_descendant_loaded": false,
+    "schedule_authority_sha256": "3C84D809400756E8D1AFF939F6160A6DB6BDD651C3077502FECDE23944E3BE28",
+    "source_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+    "source_optimizer_loaded": false,
+    "source_sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+  },
+  "verdict": "PASS"
+}
