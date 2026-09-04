@@ -17,6 +17,7 @@ from dataclasses import asdict, dataclass
 import torch
 from torch import nn
 
+from rivalsim.recurrent_execution import gru_reset_spans
 from rivalsim.rival2_contracts import OBS_DIM
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -173,19 +174,7 @@ class Rival2UnifiedActorCritic(nn.Module):
         hidden: torch.Tensor,
         reset_before: torch.Tensor | None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        if reset_before is None or not bool(torch.any(reset_before)):
-            return self.context_gru(encoded, hidden)
-        if reset_before.shape != encoded.shape[:2]:
-            raise ValueError("reset_before must have shape [batch, sequence]")
-        outputs: list[torch.Tensor] = []
-        current = hidden
-        for tick in range(encoded.shape[1]):
-            reset = reset_before[:, tick].to(torch.bool)
-            if bool(torch.any(reset)):
-                current = current.masked_fill(reset.view(1, -1, 1), 0.0)
-            output, current = self.context_gru(encoded[:, tick : tick + 1], current)
-            outputs.append(output)
-        return torch.cat(outputs, dim=1), current
+        return gru_reset_spans(self.context_gru, encoded, hidden, reset_before)
 
     def forward(
         self,

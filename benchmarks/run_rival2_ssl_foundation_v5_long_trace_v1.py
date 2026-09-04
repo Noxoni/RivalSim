@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import shutil
 import sys
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -17,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from benchmarks import run_rival2_ssl_foundation_v5_restart_v1 as prior  # noqa: E402
+from rivalsim.recurrent_execution import RESET_EXECUTION_VERSION  # noqa: E402
 from rivalsim.rival2_recurrent_ppo import _sequence_major, recurrent_minibatch_step  # noqa: E402
 
 engine = prior.engine
@@ -33,12 +35,15 @@ PARENT_SHA256 = "EFDB7725D8DBFAFBFA75A66F4AAF618AC561DE6BDC660B0976B6AFDAE775927
 PARENT_AUTHORITY_SHA256 = "AB4E37BE9A4D93EDA7578868B3831B5FFD7EF46A44ADA1EA4FC9CF59399A73C5"
 PARENT_UPDATE = 10
 HORIZON = 360
-SEQUENCE_MICROBATCH_SIZE = 32
+SEQUENCE_MICROBATCH_SIZE = 182
+PRE_REPAIR_AUTHORITY_SHA256 = "6DB1F9F8EE1C564853CE0C731DC8DAC24FBA0DF26D5513EC9B308F4B57E1ADAE"
+PRE_REPAIR_STARTUP_SHA256 = "FDDDE55887CCD9AD44B62AC672E9C05C078D5146FFC309E2098FAED65E89A37E"
 TRACE_HALF_LIFE_SECONDS = 3.0
 IMPLEMENTATION_PATHS = (
     *prior.IMPLEMENTATION_PATHS,
     "benchmarks/run_rival2_ssl_foundation_v5_long_trace_v1.py",
     "rivalsim/rival2_ppo.py",
+    "rivalsim/recurrent_execution.py",
 )
 
 
@@ -119,6 +124,19 @@ def authority_payload(commit: str, created_utc: str):
             "trainable-frame-weighted microbatches; full effective minibatch, one clip/Adam step"
         ),
         "limits": "not causal action labels; boundaries cut traces; longer traces raise variance",
+    }
+    payload["operational_execution_repair"] = {
+        "version": RESET_EXECUTION_VERSION,
+        "supersedes_authority_sha256": PRE_REPAIR_AUTHORITY_SHA256,
+        "reason": "batch reset-free spans instead of synchronizing and calling GRU every tick",
+        "effective_minibatch_unchanged": True,
+        "full_sequence_gradients_preserved": True,
+        "model_architecture_and_contracts_unchanged": True,
+        "precision_settings_unchanged": True,
+        "checkpoint_learning_state_unchanged": True,
+        "selected_microbatch_sequences": SEQUENCE_MICROBATCH_SIZE,
+        "candidate_evidence": "performance_repair/exact_scale_comparison.json",
+        "memory_stress_evidence": "performance_repair/reset_stress_memory.json",
     }
     return payload
 
@@ -340,6 +358,93 @@ def prepare(commit):
     engine.write_json(RUN_DIR / "campaign_state.json", state)
 
 
+def prepare_execution_repair(commit):
+    """Rebind only execution metadata at the preserved update-10 boundary.
+
+    Original authorities, logs, and checkpoint stay archived. No model tensor,
+    optimizer moment/counter, random state, PPO setting or reward is changed.
+    This bounded migration must never discard a newly accepted checkpoint.
+    """
+    if engine.sha256_file(AUTHORITY) != PRE_REPAIR_AUTHORITY_SHA256:
+        raise ValueError("repair requires the exact pre-repair authority")
+    if engine.sha256_file(STARTUP) != PRE_REPAIR_STARTUP_SHA256:
+        raise ValueError("repair requires the exact preserved update-10 checkpoint")
+    if (RUN_DIR / "rolling.pt").exists() or (RESULTS / "training_curve.jsonl").exists():
+        raise ValueError("a new accepted boundary exists; do not discard it")
+    benchmark = json.loads((RESULTS / "performance_repair/exact_scale_comparison.json").read_text())
+    stress = json.loads((RESULTS / "performance_repair/reset_stress_memory.json").read_text())
+    for report in (benchmark, stress):
+        selected = next(
+            row
+            for row in report["rows"]
+            if row["method"] == "spans" and row["microbatch"] == SEQUENCE_MICROBATCH_SIZE
+        )
+        if not (
+            report["no_optimizer_step"]
+            and all(report["protected_state_unchanged"].values())
+            and selected["gradient_close"]
+            and selected["output_close"]
+            and selected["physical_tensor_headroom"]
+        ):
+            raise ValueError("execution comparison or stress preflight did not pass")
+    archive = RESULTS / "performance_repair/original"
+    archive.mkdir(parents=True, exist_ok=False)
+    for path in (
+        AUTHORITY,
+        LAUNCH,
+        RESULTS / "transition.json",
+        RESULTS / "memory_preflight.json",
+        RESULTS / "resume_preflight.json",
+        RUN_DIR / "campaign_state.json",
+    ):
+        shutil.copy2(path, archive / path.name)
+    before = torch.load(STARTUP, map_location="cpu", weights_only=False)
+    authority = authority_payload(commit, engine.utc_now())
+    old = json.loads(AUTHORITY.read_text())
+    for key in (
+        "ppo",
+        "reward",
+        "source",
+        "reset_curriculum",
+        "opponents",
+        "exploration",
+        "campaign",
+    ):
+        if authority[key] != old[key]:
+            raise ValueError(f"protected authority field changed: {key}")
+    engine.write_json(AUTHORITY, authority)
+    engine.write_json(LAUNCH, launch_payload())
+    parent = torch.load(PARENT, map_location="cpu", weights_only=False)
+    migrated = migrate_payload(parent, engine.sha256_file(AUTHORITY), engine.sha256_file(LAUNCH))
+    unchanged = {
+        key: tree_sha256(before[key]) == tree_sha256(migrated[key])
+        for key in before
+        if key not in {"source", "phase_transition"}
+    }
+    if not all(unchanged.values()):
+        raise ValueError("execution repair changed checkpoint learning state")
+    temporary = STARTUP.with_suffix(".repair.tmp")
+    torch.save(migrated, temporary)
+    temporary.replace(STARTUP)
+    transition = json.loads((RESULTS / "transition.json").read_text())
+    transition["startup_sha256"] = engine.sha256_file(STARTUP)
+    transition["execution_repair"] = {
+        "version": RESET_EXECUTION_VERSION,
+        "previous_startup_sha256": PRE_REPAIR_STARTUP_SHA256,
+        "unchanged_fields": unchanged,
+        "optimizer_step_taken": False,
+    }
+    engine.write_json(RESULTS / "transition.json", transition)
+    for path in (RUN_DIR / "campaign_state.json", RESULTS / "snapshot_manifest.json"):
+        record = json.loads(path.read_text())
+        record.update(
+            authority_sha256=engine.sha256_file(AUTHORITY),
+            schedule_authority_sha256=engine.sha256_file(LAUNCH),
+        )
+        engine.write_json(path, record)
+    print(json.dumps(transition["execution_repair"], indent=2))
+
+
 def memory_preflight(args):
     """Full-size real rollout + real recurrent backward; no optimizer step or saved learning."""
     trainer, source = make_trainer(Path(args.collision_root), worlds=args.worlds)
@@ -427,6 +532,7 @@ def parser():
     result = engine.parser()
     result.add_argument("--prepare-amendment", action="store_true")
     result.add_argument("--memory-preflight-only", action="store_true")
+    result.add_argument("--prepare-execution-repair", action="store_true")
     result.set_defaults(run_dir=str(RUN_DIR), resume=str(STARTUP), continue_after_600=False)
     return result
 
@@ -439,6 +545,11 @@ def run(args):
         if not args.implementation_commit:
             raise ValueError("implementation commit required before freezing authority")
         prepare(args.implementation_commit)
+        return 0
+    if args.prepare_execution_repair:
+        if not args.implementation_commit:
+            raise ValueError("implementation commit required before freezing repair")
+        prepare_execution_repair(args.implementation_commit)
         return 0
     if args.write_authority or args.rollout_preflight_only:
         raise ValueError("use --prepare-amendment or --memory-preflight-only")
