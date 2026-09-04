@@ -625,7 +625,14 @@ def run(args: argparse.Namespace) -> int:
     (run_dir / "snapshots").mkdir(parents=True, exist_ok=True)
     trainer, source = make_trainer(collision_root, worlds=args.worlds)
     if args.resume:
-        trainer.load_checkpoint(Path(args.resume).resolve())
+        resume_path = Path(args.resume).resolve()
+        resume_sha256 = sha256_file(resume_path)
+        trainer.load_checkpoint(resume_path)
+        if (
+            trainer.accepted_updates_total == 20
+            and resume_sha256 != "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E"
+        ):
+            raise RuntimeError("schedule-amendment update-20 checkpoint hash mismatch")
         trainer.phase_transition = {
             **(trainer.phase_transition or {}),
             "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
