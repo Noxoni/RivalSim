@@ -27,8 +27,9 @@ def run(args):
     # Isolated NO-STEP candidate comparison, not the production launch path.
     # Retain the frozen environment/config authority while comparing execution
     # implementations. Production must separately rebind and commit its hashes.
-    frozen = json.loads(campaign.AUTHORITY.read_text())
-    if campaign.engine.sha256_file(campaign.AUTHORITY) != (
+    authority_path = Path(args.authority)
+    frozen = json.loads(authority_path.read_text())
+    if campaign.engine.sha256_file(authority_path) != (
         "6DB1F9F8EE1C564853CE0C731DC8DAC24FBA0DF26D5513EC9B308F4B57E1ADAE"
     ):
         raise ValueError("comparison requires the archived pre-repair authority")
@@ -168,6 +169,9 @@ def run(args):
         )
     }
     report = dict(
+        source_checkpoint=str(Path(args.resume).resolve()),
+        source_checkpoint_sha256=campaign.engine.sha256_file(Path(args.resume)),
+        frozen_authority_sha256=campaign.engine.sha256_file(authority_path),
         worlds=32768,
         horizon=360,
         effective_minibatch_sequences=size,
@@ -188,6 +192,10 @@ def run(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--authority",
+        default=str(campaign.RESULTS / "performance_repair/original/authority.json"),
+    )
     parser.add_argument("--resume", default=str(campaign.STARTUP))
     parser.add_argument("--collision-root", default="G:/dev/RLBot-Rival/bot/collision_meshes")
     parser.add_argument("--repeats", type=int, default=3)

@@ -113,3 +113,29 @@ authority. It is not a production-launch bypass. Production independently
 requires new committed authority hashes and its exact-scale memory preflight.
 See the subsequent production verification artifact for full-update timing;
 the component benchmarks above alone do not establish production throughput.
+
+## Production verification
+
+The new authority and launch bindings were committed and pushed before
+resuming. The repaired process resumed the same update-10 learning state at
+19:47:09 Eastern on 2026-09-04. It accepted and saved:
+
+- Update 11: **82.3701 seconds**, 722 Adam steps, 21.023 GiB peak PyTorch tensor
+  allocation / 21.463 GiB reserved.
+- Update 12: **91.72 seconds**, 722 Adam steps, approximately 20.84 GiB peak
+  PyTorch tensor allocation / 21.47 GiB reserved.
+
+These are real complete rollout-plus-PPO updates, not disposable benchmark
+updates. The immutable verification snapshot is
+`checkpoints/rival2/ssl_foundation_v5_long_trace_v1/execution_repair_u0012.pt`.
+Its exact hash and read-only audit are in `production_verification.json`.
+The audit checks model/optimizer finiteness, 1,444 additional Adam steps for
+every optimizer state, contiguous accepted boundaries, sample/physics counters,
+unchanged incoming learning state, unchanged source checkpoint, and unchanged
+deadline. It performs no additional learning. Training continues from the
+live rolling checkpoint rather than restarting from the verification copy.
+
+The first two full updates average about 87 seconds. Approximately 38 further
+updates to evaluation 50 would therefore take 55 minutes plus evaluation time
+at that rate; this is an estimate from two updates, not a promised completion
+time. No gameplay-improvement claim follows from this performance repair.
