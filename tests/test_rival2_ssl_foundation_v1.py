@@ -94,12 +94,80 @@ def test_reset_curriculum_is_deterministic_balanced_and_has_no_task_feature() ->
     assert first.summary()["standard_kickoff_starts"] == 16
     assert sorted(first.summary()["standard_kickoff_layout_counts"].values()) == [3, 3, 3, 3, 4]
     assert set(first.kickoff_layout[first.kickoff_indicator != 0]) == set(range(5))
+    assert sorted(first.summary()["wall_aerial_variant_counts"].values()) == [5, 5, 6]
+    assert first.summary()["ground_heading_momentum_semantics"] == (
+        "coherent_with_off_angle_coverage"
+    )
     assert first.summary()["task_or_scenario_id_in_observation"] is False
     for name in first.state.__dataclass_fields__:
         torch.testing.assert_close(
             torch.from_numpy(getattr(first.state, name)),
             torch.from_numpy(getattr(second.state, name)),
         )
+
+
+def _quaternion_forward(quaternion: np.ndarray) -> np.ndarray:
+    x, y, z, w = np.moveaxis(quaternion, -1, 0)
+    return np.stack(
+        (
+            1.0 - 2.0 * (y * y + z * z),
+            2.0 * (x * y + w * z),
+            2.0 * (x * z - w * y),
+        ),
+        axis=-1,
+    )
+
+
+def test_ground_routes_have_coherent_heading_and_cover_off_angle_approaches() -> None:
+    batch = build_ssl_foundation_scenarios(900, seed=77123)
+    state = batch.state
+    forward = _quaternion_forward(state.car_quat)
+    speed = np.linalg.norm(state.car_vel[..., :2], axis=-1)
+    moving_ground = (state.on_ground != 0) & (speed > 50.0)
+    velocity_direction = state.car_vel[..., :2] / np.maximum(speed[..., None], 1.0)
+    heading_velocity_alignment = np.sum(forward[..., :2] * velocity_direction, axis=-1)
+    assert np.min(heading_velocity_alignment[moving_ground]) > 0.95
+
+    natural = batch.family == SCENARIO_NAMES.index("natural_ongoing")
+    car_to_ball = state.ball_pos[natural, None, :2] - state.car_pos[natural, :, :2]
+    car_to_ball /= np.maximum(np.linalg.norm(car_to_ball, axis=-1, keepdims=True), 1.0)
+    approach_alignment = np.sum(forward[natural, :, :2] * car_to_ball, axis=-1)
+    # Natural play contains ordinary good and off-angle approaches; cars are
+    # no longer globally handed an exact face-the-ball orientation.
+    assert float(np.quantile(approach_alignment, 0.10)) < 0.55
+    assert float(np.quantile(approach_alignment, 0.90)) > 0.90
+    assert not np.allclose(approach_alignment, 1.0, rtol=0.0, atol=1.0e-5)
+
+
+def test_wall_aerial_family_contains_ground_wall_and_airborne_car_states() -> None:
+    batch = build_ssl_foundation_scenarios(900, seed=77124)
+    state = batch.state
+    rows = np.flatnonzero(batch.family == SCENARIO_NAMES.index("wall_aerial"))
+    assert set(batch.wall_aerial_variant[rows]) == {0, 1, 2}
+
+    focal = batch.focal_side[rows].astype(np.int64)
+    car_pos = state.car_pos[rows, focal]
+    car_vel = state.car_vel[rows, focal]
+    on_ground = state.on_ground[rows, focal]
+    has_jumped = state.has_jumped[rows, focal]
+    variants = batch.wall_aerial_variant[rows]
+
+    grounded = variants == 0
+    assert np.all(on_ground[grounded] == 1)
+    assert np.allclose(car_pos[grounded, 2], 17.0)
+    assert np.all(state.ball_pos[rows[grounded], 2] >= 450.0)
+
+    wall = variants == 1
+    assert np.all(on_ground[wall] == 0)
+    assert np.all(np.abs(car_pos[wall, 0]) >= 4000.0)
+    assert np.all((car_pos[wall, 2] >= 250.0) & (car_pos[wall, 2] <= 1050.0))
+    assert np.all(np.linalg.norm(car_vel[wall], axis=-1) >= 650.0)
+
+    airborne = variants == 2
+    assert np.all(on_ground[airborne] == 0)
+    assert np.all(has_jumped[airborne] == 1)
+    assert np.all(car_pos[airborne, 2] > 45.0)
+    assert np.all(np.linalg.norm(car_vel[airborne], axis=-1) >= 550.0)
 
 
 @pytest.fixture(scope="module")
@@ -137,7 +205,9 @@ def test_ssl_120hz_goal_timeout_and_curriculum_reset_are_single_tick(
     ssl_arena_assets: tuple[str, ArenaGeometry, WarpArenaMeshes],
 ) -> None:
     root, geometry, meshes = ssl_arena_assets
-    worlds = len(SCENARIO_NAMES) * 2
+    # Ten copies of every family ensure the live physics smoke contains all
+    # three wall/aerial variants as well as every kickoff layout.
+    worlds = len(SCENARIO_NAMES) * 10
     batch = build_ssl_foundation_scenarios(worlds, seed=99120)
     env = Rival2Env(
         worlds,

@@ -74,6 +74,8 @@ from third_party.nexto.adapter import NextoPolicyAdapter, NextoStateTensors  # n
 
 FORMAT = "RIVAL2_SSL_FOUNDATION_PPO_V1"
 CHECKPOINT_FORMAT = f"{FORMAT}_CHECKPOINT"
+TRAINER_PHASE = "ssl_foundation_v1"
+LINEAGE = "Unified Capability V5 -> SSL Foundation PPO V1"
 SUPERSEDED_AUTHORITY_SHA256 = "C625349F05877CC85A1D2F7BD9256D0DAD759750A96D9D1F7BF19558EFDA0DB4"
 RESULTS = ROOT / "results/rival2/ssl_foundation_ppo_v1"
 AUTHORITY = RESULTS / "authority.json"
@@ -86,6 +88,10 @@ MAXIMUM_ACCEPTED_UPDATES = 600
 SNAPSHOT_INTERVAL = 30
 ACTIVE_SNAPSHOT_INTERVAL = 50
 CONTINUATION_REVIEW_MARKER = 600
+BOUND_RESUME_UPDATE: int | None = 20
+BOUND_RESUME_SHA256: str | None = (
+    "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E"
+)
 POLICY_LEARNING_RATE = 1.0e-6
 CRITIC_LEARNING_RATE = 3.0e-4
 PPO_EPOCHS = 1
@@ -281,8 +287,9 @@ def load_schedule_authority() -> dict[str, Any]:
         "format": payload.get("format") == f"{FORMAT}_SCHEDULE_AMENDMENT_V1",
         "parent_authority": payload.get("parent_authority_sha256") == sha256_file(AUTHORITY),
         "checkpoint": payload.get("resume_checkpoint", {}).get("sha256")
-        == "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E",
-        "offset": payload.get("resume_checkpoint", {}).get("accepted_updates") == 20,
+        == BOUND_RESUME_SHA256,
+        "offset": payload.get("resume_checkpoint", {}).get("accepted_updates")
+        == (0 if BOUND_RESUME_UPDATE is None else BOUND_RESUME_UPDATE),
         "interval": payload.get("evaluation_and_snapshot_interval") == ACTIVE_SNAPSHOT_INTERVAL,
         "review_marker": payload.get("continuation_review_marker") == CONTINUATION_REVIEW_MARKER,
         "no_semantic_changes": payload.get("reward_model_optimizer_or_data_changed") is False,
@@ -343,7 +350,7 @@ def make_trainer(
         env,
         policy_config=config,
         ppo_config=ppo,
-        phase="ssl_foundation_v1",
+        phase=TRAINER_PHASE,
         source_identity={
             **copy.deepcopy(authority["source"]),
             "authority_sha256": sha256_file(AUTHORITY),
@@ -355,7 +362,7 @@ def make_trainer(
         opponent_config=OPPONENT_CONFIG,
         scenario_family=torch.from_numpy(batch.family),
         checkpoint_format=CHECKPOINT_FORMAT,
-        lineage="Unified Capability V5 -> SSL Foundation PPO V1",
+        lineage=LINEAGE,
     )
     configure_optimizer(trainer)
     trainer.phase_transition = {
@@ -418,6 +425,16 @@ def preflight(
             count > 0
             for count in trainer.env.world.ssl_foundation_reset.summary[
                 "standard_kickoff_layout_counts"
+            ].values()
+        ),
+        "ground_heading_momentum_coherent": trainer.env.world.ssl_foundation_reset.summary[
+            "ground_heading_momentum_semantics"
+        ]
+        == "coherent_with_off_angle_coverage",
+        "wall_aerial_variants_present": all(
+            count > 0
+            for count in trainer.env.world.ssl_foundation_reset.summary[
+                "wall_aerial_variant_counts"
             ].values()
         ),
         "scenario_id_absent": trainer.env.world.ssl_foundation_reset.summary[
@@ -672,8 +689,9 @@ def run(args: argparse.Namespace) -> int:
         resume_sha256 = sha256_file(resume_path)
         trainer.load_checkpoint(resume_path)
         if (
-            trainer.accepted_updates_total == 20
-            and resume_sha256 != "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E"
+            BOUND_RESUME_UPDATE is not None
+            and trainer.accepted_updates_total == BOUND_RESUME_UPDATE
+            and resume_sha256 != BOUND_RESUME_SHA256
         ):
             raise RuntimeError("schedule-amendment update-20 checkpoint hash mismatch")
         trainer.phase_transition = {
