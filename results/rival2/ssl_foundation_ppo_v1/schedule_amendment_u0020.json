@@ -1,0 +1,63 @@
+{
+  "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_SCHEDULE_AMENDMENT_V1",
+  "created_utc": "2026-09-04T03:02:00.1698008Z",
+  "implementation_commit": "3226d2390bc37c2f796861be43b84ad110fbbce9",
+  "parent_authority_path": "results/rival2/ssl_foundation_ppo_v1/authority.json",
+  "parent_authority_sha256": "F4745DCD19AE968E2B844DAA5F8E4350F20928DCD0B13B6D3938A62D69713FF3",
+  "request": "Evaluate every 50 updates and continue after marker 600 when progress remains until interrupted by the user.",
+  "resume_checkpoint": {
+    "accepted_updates": 20,
+    "path": "G:/dev/RivalSim-runs/ssl-foundation-ppo-v1/snapshots/ssl_foundation_schedule_amendment_u0020.pt",
+    "sha256": "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E",
+    "bytes": 13148415
+  },
+  "evaluation_and_snapshot_interval": 50,
+  "continuation_review_marker": 600,
+  "continuation": {
+    "normal_run_stops_for_review_at": 600,
+    "resume_flag_after_positive_review": "--continue-after-600",
+    "continued_run_has_update_or_wall_clock_ceiling": false,
+    "continued_run_stops_on": [
+      "explicit user interruption",
+      "nonfinite or checkpoint-corruption guard",
+      "reward-path or capability-affecting failure"
+    ]
+  },
+  "progress_review": {
+    "fixed_evaluation_corpus": {
+      "seed": 2026090304,
+      "worlds": 1024,
+      "ticks": 1200,
+      "opponents": [
+        "Nexto",
+        "frozen original Unified V5"
+      ]
+    },
+    "review_markers": [
+      500,
+      550,
+      600
+    ],
+    "objective_aligned_signals": [
+      "goals-for minus goals-against",
+      "mean reward per decision under the frozen reward",
+      "mean weighted state potential",
+      "touches per minute",
+      "goalward-touch fraction",
+      "no-touch reset count"
+    ],
+    "decision": "Continue when the fixed deterministic marker series shows a positive gameplay or objective-aligned trend through update 600 without a material scoring, touch-acquisition, or no-touch collapse. KL magnitude is telemetry only."
+  },
+  "reward_model_optimizer_or_data_changed": false,
+  "unchanged": [
+    "Unified V5 root lineage",
+    "model parameters at resume boundary",
+    "fresh PPO optimizer state and moments",
+    "PPO and exploration configuration",
+    "six-potential reward contract and weights",
+    "scenario reset corpus and proportions",
+    "40/30/30 opponent mixture",
+    "120 Hz action and observation contracts",
+    "KL telemetry-only semantics"
+  ]
+}
