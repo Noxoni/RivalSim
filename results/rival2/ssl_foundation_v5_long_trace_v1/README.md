@@ -60,6 +60,13 @@ must not be inferred from goalward-touch counts or training losses.
 
 The 65,536-tick minibatch cap yields 182 complete 360-tick sequences = 65,520 ticks,
 with the normal smaller final minibatch. No sequence/frame shuffling change.
+Backward computation uses at most 32 complete sequences per microbatch. Gradients
+are accumulated with actual trainable-frame weighting, then clipped once and
+passed to Adam once per original effective minibatch. No extra optimizer steps
+or sequence truncation. CPU regression compares the original full-minibatch path
+against accumulation with unequal training masks, episode resets and family-local
+normalization: gradients, weights and Adam moments agree within FP32 tolerance;
+exact bitwise post-update equality across different GEMM batch shapes is not claimed.
 Raw rollout storage is about 17.99 GiB. The shared runner now releases the completed
 rollout before collecting another, preventing accidental double residency without
 changing samples or gradients. Exact-scale preflight performs a real 360-tick

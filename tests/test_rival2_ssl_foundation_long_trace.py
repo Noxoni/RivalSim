@@ -13,6 +13,103 @@ from rivalsim.rival2_ppo import compute_gae_gpu
 from rivalsim.rival2_recurrent_ppo import Rival2RecurrentRolloutBuffer, _sequence_major
 
 
+def test_microbatch_preserves_full_batch_gradients_adam_steps_and_mask_weighting():
+    from rivalsim.rival2_policy import sample_hybrid_action
+    from rivalsim.rival2_recurrent_policy import (
+        Rival2RecurrentActorCritic,
+        Rival2RecurrentPolicyConfig,
+    )
+    from rivalsim.rival2_recurrent_ppo import recurrent_ppo_update
+
+    threads = torch.get_num_threads()
+    torch.set_num_threads(2)
+    try:
+        torch.manual_seed(913)
+        model = Rival2RecurrentActorCritic(
+            Rival2RecurrentPolicyConfig(
+                encoder_dim=16,
+                hidden_dim=16,
+                post_dim=16,
+            )
+        )
+        config = campaign.new_ppo_config()
+        from dataclasses import replace
+
+        config = replace(config, rollout_horizon=12, minibatch_size=72)
+        hidden = model.initial_hidden(6)
+        rollout = Rival2RecurrentRolloutBuffer(
+            12, 3, hidden.reshape(1, 3, 2, 16), "cpu", store_opponent_family=True
+        )
+        exploration = campaign.prior.restart_exploration(10).distribution_override
+        generator = torch.Generator().manual_seed(31)
+        for tick in range(12):
+            obs = torch.randn(3, 2, 182)
+            reset = torch.zeros(3, 2, dtype=torch.bool)
+            if tick == 5:
+                reset[1] = True
+            with torch.no_grad():
+                actor, value, next_hidden = model(
+                    obs.reshape(6, 182), hidden, reset_before=reset.reshape(6)
+                )
+                sample = sample_hybrid_action(
+                    actor,
+                    generator=generator,
+                    config=model.config,
+                    distribution_override=exploration,
+                )
+            mask = torch.ones(3, 2, dtype=torch.bool)
+            mask[0, 1] = tick % 2 == 0
+            mask[1, 0] = False  # unequal trainable frame counts in microbatches
+            terminal = torch.zeros(3, 2, dtype=torch.bool)
+            terminal[1] = tick == 4
+            terminal[:] |= tick == 11
+            rollout.add(
+                observation=obs,
+                action=sample.action.reshape(3, 2, 8),
+                pre_tanh=sample.pre_tanh.reshape(3, 2, 5),
+                old_log_probability=sample.log_probability.reshape(3, 2),
+                value=value.reshape(3, 2),
+                reward=torch.randn(3, 2) * 0.2,
+                terminated=terminal,
+                truncated=torch.zeros_like(terminal),
+                next_value=torch.zeros(3, 2),
+                train_mask=mask,
+                reset_before=reset,
+                opponent_family=torch.tensor([[0, 0], [1, 1], [2, 2]]),
+            )
+            hidden = next_hidden
+        whole, micro = copy.deepcopy(model), copy.deepcopy(model)
+        optimizers = [torch.optim.Adam(m.parameters(), lr=1e-4) for m in (whole, micro)]
+        metrics = []
+        for m, optimizer, chunk in zip((whole, micro), optimizers, (None, 2), strict=True):
+            metrics.append(
+                recurrent_ppo_update(
+                    m,
+                    optimizer,
+                    rollout,
+                    config,
+                    generator=torch.Generator().manual_seed(412),
+                    distribution_override=exploration,
+                    sequence_microbatch_size=chunk,
+                )
+            )
+        assert metrics[0]["optimizer_steps"] == metrics[1]["optimizer_steps"] == 2
+        for name in ("policy_loss", "value_loss", "gradient_norm", "post_clip_gradient_norm"):
+            torch.testing.assert_close(metrics[0][name], metrics[1][name], rtol=5e-5, atol=5e-6)
+        for a, b in zip(whole.parameters(), micro.parameters(), strict=True):
+            torch.testing.assert_close(a, b, rtol=1e-5, atol=2e-6)
+        for left, right in zip(
+            optimizers[0].state.values(), optimizers[1].state.values(), strict=True
+        ):
+            assert left["step"] == right["step"] == 2
+            torch.testing.assert_close(left["exp_avg"], right["exp_avg"], rtol=1e-4, atol=1e-7)
+            torch.testing.assert_close(
+                left["exp_avg_sq"], right["exp_avg_sq"], rtol=1e-4, atol=1e-9
+            )
+    finally:
+        torch.set_num_threads(threads)
+
+
 def test_only_horizon_and_lambda_change_and_gamma_is_preserved():
     old = asdict(campaign.prior.amended.new_ppo_config())
     new = asdict(campaign.new_ppo_config())

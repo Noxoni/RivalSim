@@ -28,8 +28,7 @@ class Rival2RecurrentPPOCorruption(RuntimeError):
     def __init__(self, diagnostics: dict[str, Any]):
         self.diagnostics = diagnostics
         super().__init__(
-            "recurrent PPO numerical corruption: "
-            f"{diagnostics.get('reason', 'unknown')}"
+            f"recurrent PPO numerical corruption: {diagnostics.get('reason', 'unknown')}"
         )
 
 
@@ -271,14 +270,142 @@ def _completed_diagnostics(
     }
     for channel, name in enumerate(ANALOG_ACTION_NAMES):
         result[f"actor_mean_mean_{name}"] = (mean_sum[channel] / sample_count).to(torch.float32)
-        result[f"actor_log_std_mean_{name}"] = (
-            log_std_sum[channel] / sample_count
-        ).to(torch.float32)
+        result[f"actor_log_std_mean_{name}"] = (log_std_sum[channel] / sample_count).to(
+            torch.float32
+        )
     for channel, name in enumerate(BUTTON_ACTION_NAMES):
         result[f"actor_button_probability_{name}"] = (
             button_probability_sum[channel] / sample_count
         ).to(torch.float32)
     return result
+
+
+def recurrent_minibatch_step(
+    model,
+    optimizer,
+    config,
+    distribution_override,
+    *,
+    observation,
+    initial_hidden,
+    reset_before,
+    action,
+    pre_tanh,
+    old_log_probability,
+    normalized_advantage,
+    returns,
+    train_mask,
+    sequence_index,
+    sequence_microbatch_size,
+    take_step=True,
+):
+    """One effective minibatch, accumulated over complete sequences, clipped once.
+
+    Weight each microbatch by its *trainable frame count*, not sequence count.
+    No optimizer step, parameter change, hidden detach, or advantage renormalization
+    occurs between microbatches. take_step=False is the full backward preflight.
+    """
+    if sequence_microbatch_size < 1:
+        raise ValueError("sequence microbatch size must be positive")
+    total_frames = int(train_mask.index_select(0, sequence_index).sum().item())
+    if total_frames == 0:
+        raise ValueError("effective recurrent minibatch has no trainable frames")
+    optimizer.zero_grad(set_to_none=True)
+    accumulated = {}
+    model.train()
+    for indices in sequence_index.split(sequence_microbatch_size):
+        mask = train_mask.index_select(0, indices)
+        count = int(mask.sum().item())
+        if not count:
+            continue
+        obs = observation.index_select(0, indices)
+        actor, value, _ = model(
+            obs,
+            initial_hidden.index_select(1, indices),
+            reset_before=reset_before.index_select(0, indices),
+        )
+        actor_flat = actor[mask]
+        if getattr(model, "critic_is_independent", False):
+            value_flat = value[mask]
+        elif hasattr(model, "isolated_value"):
+            value_flat = model.isolated_value(obs)[mask]
+        else:
+            value_flat = value[mask]
+        log_probability = hybrid_log_probability(
+            actor_flat,
+            action.index_select(0, indices)[mask],
+            config=model.config,
+            pre_tanh=pre_tanh.index_select(0, indices)[mask],
+            distribution_override=distribution_override,
+        )
+        log_ratio = log_probability - old_log_probability.index_select(0, indices)[mask]
+        ratio = log_ratio.exp()
+        advantage = normalized_advantage.index_select(0, indices)[mask]
+        policy_loss = -torch.minimum(
+            ratio * advantage,
+            ratio.clamp(1 - config.clip_range, 1 + config.clip_range) * advantage,
+        ).mean()
+        value_loss = 0.5 * (value_flat - returns.index_select(0, indices)[mask]).square().mean()
+        entropy = hybrid_entropy(
+            actor_flat, model.config, distribution_override=distribution_override
+        ).mean()
+        loss = (
+            policy_loss
+            + config.value_loss_coefficient * value_loss
+            - config.entropy_coefficient * entropy
+        )
+        if not bool(torch.isfinite(loss)):
+            raise Rival2RecurrentPPOCorruption({"reason": "nonfinite_total_loss"})
+        weight = count / total_frames
+        (loss * weight).backward()
+        with torch.no_grad():
+            values = {
+                "policy_loss": policy_loss,
+                "value_loss": value_loss,
+                "entropy": entropy,
+                "total_loss": loss,
+                "approx_kl": ((ratio - 1) - log_ratio).mean(),
+                "clip_fraction": ((ratio - 1).abs() > config.clip_range).float().mean(),
+            }
+            for name, metric in values.items():
+                accumulated[name] = accumulated.get(name, 0) + metric.detach() * weight
+        # Do not hold one microbatch's graph/activations through the next forward.
+        del actor, value, actor_flat, value_flat, loss, policy_loss, value_loss, entropy
+        del log_probability, log_ratio, ratio, values
+    norm = torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_gradient_norm)
+    after = torch.linalg.vector_norm(
+        torch.stack([p.grad.detach().norm(2) for p in model.parameters() if p.grad is not None]), 2
+    )
+    if not bool(torch.isfinite(norm) and torch.isfinite(after)):
+        raise Rival2RecurrentPPOCorruption({"reason": "nonfinite_gradient"})
+    accumulated.update(gradient_norm=norm.detach(), post_clip_gradient_norm=after.detach())
+    if take_step:
+        optimizer.step()
+    if not _finite_parameters(model):
+        raise Rival2RecurrentPPOCorruption({"reason": "nonfinite_parameter"})
+    post_kl = torch.zeros((), device=observation.device)
+    with torch.no_grad():
+        for indices in sequence_index.split(sequence_microbatch_size):
+            mask = train_mask.index_select(0, indices)
+            count = int(mask.sum().item())
+            if not count:
+                continue
+            actor, _, _ = model(
+                observation.index_select(0, indices),
+                initial_hidden.index_select(1, indices),
+                reset_before=reset_before.index_select(0, indices),
+            )
+            log_prob = hybrid_log_probability(
+                actor[mask],
+                action.index_select(0, indices)[mask],
+                config=model.config,
+                pre_tanh=pre_tanh.index_select(0, indices)[mask],
+                distribution_override=distribution_override,
+            )
+            log_ratio = log_prob - old_log_probability.index_select(0, indices)[mask]
+            post_kl += ((log_ratio.exp() - 1) - log_ratio).sum() / total_frames
+    accumulated["post_step_kl"] = post_kl
+    return accumulated
 
 
 def recurrent_ppo_update(
@@ -289,6 +416,7 @@ def recurrent_ppo_update(
     *,
     generator: torch.Generator,
     distribution_override: HybridDistributionOverride,
+    sequence_microbatch_size: int | None = None,
 ) -> dict[str, torch.Tensor]:
     """Optimize complete recurrent sequences; KL is measured but never gates updates."""
 
@@ -339,6 +467,29 @@ def recurrent_ppo_update(
         )
         for start in range(0, layout.sequence_count, layout.sequences_per_minibatch):
             sequence_index = permutation[start : start + layout.sequences_per_minibatch]
+            if sequence_microbatch_size is not None:
+                micro_metrics = recurrent_minibatch_step(
+                    model,
+                    optimizer,
+                    config,
+                    distribution_override,
+                    observation=observation,
+                    initial_hidden=initial_hidden,
+                    reset_before=reset_before,
+                    action=action,
+                    pre_tanh=pre_tanh,
+                    old_log_probability=old_log_probability,
+                    normalized_advantage=normalized_advantage,
+                    returns=returns,
+                    train_mask=train_mask,
+                    sequence_index=sequence_index,
+                    sequence_microbatch_size=sequence_microbatch_size,
+                )
+                for name in metric_names:
+                    metrics[name].append(micro_metrics[name])
+                post_step_kl.append(micro_metrics["post_step_kl"])
+                optimizer_step_index += 1
+                continue
             batch_observation = observation.index_select(0, sequence_index)
             batch_hidden = initial_hidden.index_select(1, sequence_index)
             batch_reset = reset_before.index_select(0, sequence_index)
@@ -373,8 +524,7 @@ def recurrent_ppo_update(
             batch_advantage = normalized_advantage.index_select(0, sequence_index)[batch_mask]
             unclipped = ratio * batch_advantage
             clipped = (
-                ratio.clamp(1.0 - config.clip_range, 1.0 + config.clip_range)
-                * batch_advantage
+                ratio.clamp(1.0 - config.clip_range, 1.0 + config.clip_range) * batch_advantage
             )
             policy_loss = -torch.minimum(unclipped, clipped).mean()
             batch_returns = returns.index_select(0, sequence_index)[batch_mask]
@@ -485,7 +635,9 @@ def recurrent_ppo_update(
             train_mask,
             model.config,
             distribution_override,
-            layout.sequences_per_minibatch,
+            min(layout.sequences_per_minibatch, sequence_microbatch_size)
+            if sequence_microbatch_size is not None
+            else layout.sequences_per_minibatch,
         )
     )
     result["approx_kl"] = result["completed_update_mean_kl"]
@@ -496,7 +648,8 @@ def recurrent_ppo_update(
     if any(
         not math.isfinite(float(value.item()))
         for name, value in result.items()
-        if name not in {
+        if name
+        not in {
             "approx_kl",
             "completed_update_mean_kl",
             "completed_update_sample_kl_max",

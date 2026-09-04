@@ -17,8 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from benchmarks import run_rival2_ssl_foundation_v5_restart_v1 as prior  # noqa: E402
-from rivalsim.rival2_policy import hybrid_log_probability  # noqa: E402
-from rivalsim.rival2_recurrent_ppo import _sequence_major  # noqa: E402
+from rivalsim.rival2_recurrent_ppo import _sequence_major, recurrent_minibatch_step  # noqa: E402
 
 engine = prior.engine
 FORMAT = "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1"
@@ -34,6 +33,7 @@ PARENT_SHA256 = "EFDB7725D8DBFAFBFA75A66F4AAF618AC561DE6BDC660B0976B6AFDAE775927
 PARENT_AUTHORITY_SHA256 = "AB4E37BE9A4D93EDA7578868B3831B5FFD7EF46A44ADA1EA4FC9CF59399A73C5"
 PARENT_UPDATE = 10
 HORIZON = 360
+SEQUENCE_MICROBATCH_SIZE = 32
 TRACE_HALF_LIFE_SECONDS = 3.0
 IMPLEMENTATION_PATHS = (
     *prior.IMPLEMENTATION_PATHS,
@@ -114,6 +114,10 @@ def authority_payload(commit: str, created_utc: str):
         "evaluations": "unchanged 3600-tick protocol at boundary 10, then 50 and 100",
         "comparison": "report cumulative samples and elapsed time, not just update count",
         "operational_memory_fix": "release completed rollout before collecting next one",
+        "sequence_microbatch_size": SEQUENCE_MICROBATCH_SIZE,
+        "gradient_accumulation": (
+            "trainable-frame-weighted microbatches; full effective minibatch, one clip/Adam step"
+        ),
         "limits": "not causal action labels; boundaries cut traces; longer traces raise variance",
     }
     return payload
@@ -224,6 +228,7 @@ def configure_engine():
 def make_trainer(collision_root, *, worlds):
     trainer, source = prior.make_trainer(collision_root, worlds=worlds)
     trainer.ppo_config = new_ppo_config()
+    trainer.sequence_microbatch_size = SEQUENCE_MICROBATCH_SIZE
     collect, update = trainer.collect_rollout, trainer.update
 
     def measured_collect():
@@ -237,6 +242,7 @@ def make_trainer(collision_root, *, worlds):
             "cuda_peak_reserved_gib": torch.cuda.max_memory_reserved(trainer.device) / 2**30,
             "rollout_logical_gib": rollout.logical_bytes / 2**30,
             "rollout_horizon": HORIZON,
+            "sequence_microbatch_size": SEQUENCE_MICROBATCH_SIZE,
             "gae_lambda": trainer.ppo_config.gae_lambda,
         }.items():
             metrics[name] = torch.tensor(value, dtype=torch.float64, device=trainer.device)
@@ -252,6 +258,7 @@ def preflight(trainer, source, *, exact_scale):
         long_trace_config=trainer.ppo_config == new_ppo_config(),
         gamma_and_reward_unchanged=trainer.ppo_config.gamma == engine.SSL_FOUNDATION_GAMMA,
         optimizer_continued=bool(trainer.optimizer.state),
+        effective_minibatch_preserved=trainer.sequence_microbatch_size == SEQUENCE_MICROBATCH_SIZE,
     )
     if trainer.accepted_updates_total == PARENT_UPDATE:
         transition = json.loads((RESULTS / "transition.json").read_text())
@@ -351,38 +358,51 @@ def memory_preflight(args):
     # trainer.update path, must explicitly enter training mode before forward.
     trainer.model.train()
     count = rollout.sequence_layout(trainer.ppo_config.minibatch_size).sequences_per_minibatch
-    obs = _sequence_major(rollout.observations)[:count].contiguous()
-    reset = _sequence_major(rollout.reset_before)[:count].contiguous()
-    mask = _sequence_major(rollout.train_mask)[:count]
-    hidden = rollout.initial_hidden.reshape(1, -1, trainer.policy_config.hidden_dim)[:, :count]
-    actor, values, _ = trainer.model(obs, hidden, reset_before=reset)
-    log_prob = hybrid_log_probability(
-        actor[mask],
-        _sequence_major(rollout.actions)[:count][mask],
-        config=trainer.policy_config,
-        pre_tanh=_sequence_major(rollout.pre_tanh)[:count][mask],
-        distribution_override=trainer.exploration.distribution_override,
+    mask = _sequence_major(rollout.train_mask)
+    advantage = _sequence_major(rollout.advantages)
+    family = _sequence_major(rollout.opponent_family)
+    normalized = torch.zeros_like(advantage)
+    for family_id in torch.unique(family[mask]).tolist():
+        selected = mask & (family == int(family_id))
+        values = advantage[selected]
+        normalized[selected] = (values - values.mean()) / values.std(unbiased=False).clamp_min(1e-8)
+    metrics = recurrent_minibatch_step(
+        trainer.model,
+        trainer.optimizer,
+        trainer.ppo_config,
+        trainer.exploration.distribution_override,
+        observation=_sequence_major(rollout.observations),
+        initial_hidden=rollout.initial_hidden.reshape(1, -1, trainer.policy_config.hidden_dim),
+        reset_before=_sequence_major(rollout.reset_before),
+        action=_sequence_major(rollout.actions),
+        pre_tanh=_sequence_major(rollout.pre_tanh),
+        old_log_probability=_sequence_major(rollout.old_log_probability),
+        normalized_advantage=normalized,
+        returns=_sequence_major(rollout.returns),
+        train_mask=mask,
+        sequence_index=torch.arange(count, device=trainer.device),
+        sequence_microbatch_size=SEQUENCE_MICROBATCH_SIZE,
+        take_step=False,
     )
-    advantage = _sequence_major(rollout.advantages)[:count][mask]
-    loss = (
-        -(log_prob * advantage.detach()).mean()
-        + 0.5 * (values[mask] - _sequence_major(rollout.returns)[:count][mask]).square().mean()
-    )
-    loss.backward()
     report["checks"].update(
-        finite_loss=bool(torch.isfinite(loss)),
+        finite_loss=bool(torch.isfinite(metrics["total_loss"])),
         finite_gradients=all(
             bool(torch.isfinite(p.grad).all())
             for p in trainer.model.parameters()
             if p.grad is not None
         ),
         finite_rollout=all(
-            bool(torch.isfinite(getattr(rollout, name)).all())
+            bool(torch.isfinite(chunk).all())
             for name in ("observations", "actions", "rewards", "values", "advantages")
+            for chunk in getattr(rollout, name).split(16)
         ),
         model_unchanged=tree_sha256(trainer.model.state_dict()) == before_model,
         optimizer_unchanged=tree_sha256(trainer.optimizer.state_dict()) == before_optimizer,
         no_update_accepted=trainer.accepted_updates_total == PARENT_UPDATE,
+        physical_vram_headroom=(
+            torch.cuda.max_memory_allocated(trainer.device)
+            < torch.cuda.get_device_properties(trainer.device).total_memory - 2 * 2**30
+        ),
     )
     trainer.optimizer.zero_grad(set_to_none=True)
     report.update(
@@ -393,6 +413,7 @@ def memory_preflight(args):
         rollout_logical_gib=rollout.logical_bytes / 2**30,
         minibatch_sequences=count,
         minibatch_ticks=count * HORIZON,
+        sequence_microbatch_size=SEQUENCE_MICROBATCH_SIZE,
         cuda_peak_allocated_gib=torch.cuda.max_memory_allocated(trainer.device) / 2**30,
         cuda_peak_reserved_gib=torch.cuda.max_memory_reserved(trainer.device) / 2**30,
         scope="one full-size rollout and one full recurrent-minibatch backward, no Adam step",
