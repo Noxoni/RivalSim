@@ -1,0 +1,48 @@
+{
+  "accepted_update": 601,
+  "checkpoint_path": "G:\\dev\\RivalSim-runs\\ssl-foundation-ppo-v2-amendment-v1\\rolling.pt",
+  "checkpoint_sha256": "97FAF11471327A3A623C1D47624AB9A24B45EAE46D072C9FE31D06FA51CA1F37",
+  "policy_config_sha256": "7B42A108A32916C1088C2BA86C28400AA271446916A9183BC48AE49222500E79",
+  "critic_architecture": "RIVAL2_INDEPENDENT_CRITIC_MLP_3X512_V1",
+  "ppo_config": {
+    "gamma": 0.9987476493904754,
+    "gae_lambda": 0.9872585449014338,
+    "clip_range": 0.2,
+    "value_loss_coefficient": 0.5,
+    "entropy_coefficient": 0,
+    "max_gradient_norm": 0.5,
+    "learning_rate": 0.0001,
+    "epochs": 2,
+    "rollout_horizon": 128,
+    "minibatch_size": 65536
+  },
+  "optimizer_group_lrs": {
+    "policy": 0.0001,
+    "critic": 0.0003
+  },
+  "all_model_parameters_finite": true,
+  "critic_feature_tensors_changed": {
+    "critic.features.0.weight": true,
+    "critic.features.0.bias": true,
+    "critic.features.2.weight": true,
+    "critic.features.2.bias": true,
+    "critic.features.4.weight": true,
+    "critic.features.4.bias": true
+  },
+  "opponents": {
+    "current_probability": 0.4,
+    "nexto_probability": 0.4,
+    "frozen_v5_probability": 0.2,
+    "seed": 2026090302
+  },
+  "parent_checkpoint_sha256": "0A5956ABE92B23CDFA5B2F10CFC610957B5559FA0AFA2EFE51B0BB1B758C94A5",
+  "existing_parent_unchanged": true,
+  "prelaunch_commit": "3b8375806a5a3a347e9617b203b87dcd998e979a",
+  "checkpoint_hash_observed_at_accepted_update": 601,
+  "checkpoint_is_rolling_not_immutable": true,
+  "accepted_optimizer_steps": 256,
+  "focused_tests_passed": 19,
+  "training_validation_verdict": "PASS",
+  "behavioral_improvement_not_yet_evaluated": true,
+  "note": "The checkpoint hash was measured after update 601. The external rolling checkpoint continues advancing; this report does not claim that the rolling path still contains update 601. The unchanged update-600 source and migrated startup are preserved in Git."
+}
