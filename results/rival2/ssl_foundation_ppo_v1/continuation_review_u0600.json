@@ -1,0 +1,92 @@
+{
+  "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_CONTINUATION_REVIEW_V1",
+  "created_utc": "2026-09-04T04:45:00Z",
+  "reward_authority_sha256": "F4745DCD19AE968E2B844DAA5F8E4350F20928DCD0B13B6D3938A62D69713FF3",
+  "schedule_authority_sha256": "3C84D809400756E8D1AFF939F6160A6DB6BDD651C3077502FECDE23944E3BE28",
+  "review_markers": [
+    500,
+    550,
+    600
+  ],
+  "checkpoint": {
+    "accepted_updates": 600,
+    "path": "G:/dev/RivalSim-runs/ssl-foundation-ppo-v1/snapshots/ssl_foundation_u0600.pt",
+    "sha256": "027D3EC99D999C8975ECB9506F7CF5E1251FE57E9A12BF89288D398CD4D8A6D0",
+    "total_agent_samples": 3533987840
+  },
+  "fixed_deterministic_series": {
+    "frozen_unified_v5": {
+      "mean_reward_per_decision": [
+        -0.00022008930493181347,
+        -0.0002380874896642382,
+        -0.0002448754954439399
+      ],
+      "mean_weighted_state_potential": [
+        0.10475750323143378,
+        0.10494936342029358,
+        0.10871041981319574
+      ],
+      "touches_per_minute": [
+        15.5390625,
+        15.31640625,
+        16.65234375
+      ],
+      "goalward_touch_fraction": [
+        0.8318250377073907,
+        0.8293802601377199,
+        0.8106966924700915
+      ],
+      "goals_for": [0, 0, 0],
+      "goals_against": [0, 0, 0],
+      "no_touch_resets": [0, 0, 0]
+    },
+    "nexto": {
+      "mean_reward_per_decision": [
+        -0.0004957863206230684,
+        -0.00047987994434924036,
+        -0.0004567835484136988
+      ],
+      "mean_weighted_state_potential": [
+        -0.2557007128578827,
+        -0.28180339305797947,
+        -0.28334673032516794
+      ],
+      "touches_per_minute": [
+        15.43359375,
+        14.3203125,
+        15.7734375
+      ],
+      "goalward_touch_fraction": [
+        0.8337129840546698,
+        0.8453355155482815,
+        0.8462109955423477
+      ],
+      "goals_for": [0, 0, 0],
+      "goals_against": [0, 0, 0],
+      "no_touch_resets": [0, 0, 0]
+    }
+  },
+  "review": {
+    "positive_objective_aligned_trend": true,
+    "material_scoring_collapse": false,
+    "material_touch_acquisition_collapse": false,
+    "no_touch_collapse": false,
+    "positive_evidence": [
+      "Nexto mean reward per decision improved monotonically from update 500 through 600.",
+      "Nexto goalward-touch fraction improved from 0.833713 to 0.846211.",
+      "Nexto touches per minute finished above update 500 after the update-550 dip.",
+      "Frozen-V5 touches per minute rose from 15.539063 to 16.652344.",
+      "Frozen-V5 weighted state potential rose from 0.104758 to 0.108710.",
+      "No-touch resets remained zero for both opponents at all three markers."
+    ],
+    "mixed_or_negative_evidence": [
+      "Frozen-V5 mean reward per decision and goalward-touch fraction declined.",
+      "Nexto weighted state potential declined despite reward, touch, and goalward-touch improvement.",
+      "The short fixed windows recorded no goals or concessions and therefore do not establish scoring progress."
+    ],
+    "decision": "CONTINUE_AFTER_600",
+    "decision_basis": "The frozen prospective rule requires a positive gameplay or objective-aligned trend without material scoring, touch-acquisition, or no-touch collapse. The series is mixed but satisfies that condition, led by monotonically improving Nexto reward and goalward-touch quality, recovered touches against Nexto, stronger frozen-V5 touch acquisition and state potential, and zero no-touch resets."
+  },
+  "kl_used_as_gate": false,
+  "reward_model_optimizer_or_data_changed": false
+}
