@@ -426,7 +426,7 @@ def run(args):
     validate_resume_payload(payload)
     if payload["accepted_updates_total"] == PARENT_UPDATE:
         record = json.loads((RESULTS / "transition.json").read_text())
-        if engine.sha256_file(args.resume) != record["startup_sha256"]:
+        if engine.sha256_file(Path(args.resume)) != record["startup_sha256"]:
             raise ValueError("initial transition checkpoint identity mismatch")
     del payload
     if args.memory_preflight_only:
