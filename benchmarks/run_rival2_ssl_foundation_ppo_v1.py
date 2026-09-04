@@ -172,6 +172,7 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
             "physics_hz": 120,
             "policy_hz": 120,
             "rollout_horizon": 128,
+            "gamma": rival2_ppo_120hz_config().gamma,
             "epochs": PPO_EPOCHS,
             "minibatch_size": 65_536,
             "policy_learning_rate": POLICY_LEARNING_RATE,
