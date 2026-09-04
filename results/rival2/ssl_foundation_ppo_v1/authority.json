@@ -9,7 +9,7 @@
     "snapshot_interval": 30,
     "wall_clock_seconds": 36000
   },
-  "created_utc": "2026-09-04T02:46:47.790231+00:00",
+  "created_utc": "2026-09-04T02:51:19.494909+00:00",
   "exploration": {
     "contract": {
       "analog": {
@@ -41,7 +41,7 @@
     "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
   },
   "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_AUTHORITY",
-  "implementation_commit": "c8d01e63133f4f28ff34b03060b45802de232e42",
+  "implementation_commit": "e9c86e6907faa488923ba6d2ba310db32af0ecb5",
   "integrity": {
     "no_old_optimizer_loaded": true,
     "no_plus_174_model_loaded": true,
@@ -50,6 +50,7 @@
       "action_hold_ticks": 1,
       "action_version": "RIVAL2_ACTION_V2_120HZ",
       "cadence_hz": 120,
+      "combined_potential": "Phi_total=1.25*Phi_field+0.75*Phi_access+0.75*Phi_control+0.50*Phi_defense+0.30*Phi_alignment+0.15*Phi_boost; shaping=gamma*Phi_total(s_next)-Phi_total(s)",
       "composition": "terminal goal (+10/-10) plus sum_k w_k * (gamma * Phi_k(s_next) - Phi_k(s)); an absorbing goal has Phi(s_next)=0",
       "direct_reward_exactly_zero": [
         "ordinary_touch",
@@ -74,6 +75,17 @@
       "observation_version": "RIVAL2_OBS_V2_120HZ",
       "physics_hz": 120,
       "potentials": {
+        "boost_reserve": {
+          "formula": "sqrt(clamp(self_boost_fraction,0,1))",
+          "not_pad_pickup_or_boost_use_reward": true,
+          "weight": 0.15
+        },
+        "car_ball_target_approach_alignment": {
+          "formula": "dot(unit(car_to_ball), unit(ball_to_target)) * clip(1-(self_ball_distance-150)/2850,0,1)",
+          "not_an_event_or_action_reward": true,
+          "target": "canonical opponent goal center (0,5120,321)",
+          "weight": 0.3
+        },
         "control_advantage": {
           "formula": "C_self-C_opp",
           "weight": 0.75
@@ -99,14 +111,16 @@
         "new_episode": "first transition starts from the actual reset state",
         "timeout": "pre-reset final state is bootstrapped; no reset-state potential is mixed in"
       },
+      "shaping_zero_sum": false,
       "task_identifier_in_observation": false,
       "terminal": {
         "goal_against": -10.0,
         "goal_for": 10.0,
         "timeout": 0.0
       },
+      "terminal_zero_sum": true,
       "version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
-      "zero_sum": true
+      "zero_sum": false
     }
   },
   "opponents": {
@@ -189,17 +203,20 @@
   },
   "reward": {
     "all_shaping_is_gamma_phi_next_minus_phi": true,
-    "contract_sha256": "C5761B2474F9254D5C860B692ED11C53AD33F3448A3A00D69D0B8D5D65ED9323",
+    "contract_sha256": "1197EA771ECF0D226F7D3139875CCDB58292905959DA0B82578D21E7A3B843BE",
     "direct_non_goal_reward_terms": 0,
     "gamma": 0.9987476493904754,
     "legacy_gameplay_reward_module_allocated": false,
     "named_mechanics": false,
+    "one_combined_potential": true,
     "terminal_goal_against": -10.0,
     "terminal_goal_for": 10.0,
     "timeout": 0.0,
     "version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
     "weights": {
       "access": 0.75,
+      "alignment": 0.3,
+      "boost": 0.15,
       "control": 0.75,
       "defense": 0.5,
       "field": 1.25
@@ -211,5 +228,7 @@
     "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
     "required_format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
     "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
-  }
+  },
+  "supersedes_authority_sha256": "DCA2822CB83AF3C2A3B546038CD9B9F482FAD0536D67FDF88BD092F2FA1F16E1",
+  "supersession_reason": "user-authorized six-potential reward amendment before PPO"
 }
