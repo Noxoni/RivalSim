@@ -9,6 +9,7 @@ observation.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import gcd
 from typing import Any
 
 import numpy as np
@@ -40,6 +41,7 @@ SSL_FOUNDATION_WEIGHTS = {
 }
 SCENARIO_NAMES = (
     "natural_ongoing",
+    "standard_kickoff",
     "loose_ball_access",
     "catch_control_possession",
     "shooting_finishing",
@@ -48,7 +50,7 @@ SCENARIO_NAMES = (
     "wall_aerial",
     "recovery_scramble_low_boost",
 )
-SCENARIO_PROBABILITIES = (0.25, 0.15, 0.15, 0.10, 0.10, 0.10, 0.10, 0.05)
+SCENARIO_PROBABILITIES = (0.15, 0.10, 0.15, 0.15, 0.10, 0.10, 0.10, 0.10, 0.05)
 
 _INDEX = {
     name: OBS_FIELD_NAMES.index(name)
@@ -282,6 +284,7 @@ class SslFoundationScenarioBatch:
     family: np.ndarray
     focal_side: np.ndarray
     kickoff_indicator: np.ndarray
+    kickoff_layout: np.ndarray
 
     def summary(self) -> dict[str, Any]:
         return {
@@ -292,6 +295,10 @@ class SslFoundationScenarioBatch:
             "focal_side_counts": {
                 str(side): int((self.focal_side == side).sum()) for side in (0, 1)
             },
+            "standard_kickoff_starts": int(self.kickoff_indicator.sum()),
+            "standard_kickoff_layout_counts": {
+                str(layout): int((self.kickoff_layout == layout).sum()) for layout in range(5)
+            },
             "task_or_scenario_id_in_observation": False,
             "scripted_solution_prefix_ticks": 0,
         }
@@ -301,7 +308,9 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
     """Build a deterministic, role-balanced batch of physically valid starts."""
 
     if worlds < len(SCENARIO_NAMES) * 2:
-        raise ValueError("SSL Foundation scenario batch needs at least 16 worlds")
+        raise ValueError(
+            f"SSL Foundation scenario batch needs at least {len(SCENARIO_NAMES) * 2} worlds"
+        )
     rng = np.random.default_rng(seed)
     counts = _scenario_counts(worlds)
     family = np.concatenate(
@@ -323,6 +332,21 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
     state.ball_pos[..., 2] = 93.15
     state.boost[:] = rng.uniform(15.0, 100.0, size=(worlds, 2)).astype(np.float32)
     kickoff_indicator = np.zeros(worlds, dtype=np.int32)
+    kickoff_layout = np.full(worlds, -1, dtype=np.int32)
+
+    kickoff_rows = np.flatnonzero(family == 1)
+    if kickoff_rows.size:
+        # Use every authoritative Soccar spawn layout, balanced to within one
+        # world.  Standard kickoffs are a reset family, not a scripted prefix.
+        layouts = (np.arange(kickoff_rows.size, dtype=np.int32) + seed) % 5
+        rng.shuffle(layouts)
+        from rivalsim.static_world import make_standard_kickoff_state
+
+        kickoff_state = make_standard_kickoff_state(int(kickoff_rows.size), layouts)
+        for field in kickoff_state.__dataclass_fields__:
+            getattr(state, field)[kickoff_rows] = getattr(kickoff_state, field)
+        kickoff_indicator[kickoff_rows] = 1
+        kickoff_layout[kickoff_rows] = layouts
 
     for row, kind in enumerate(family):
         ball = state.ball_pos[row]
@@ -336,7 +360,9 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
             cars[1, :2] = (rng.uniform(-3000, 3000), rng.uniform(-1800, 4200))
             velocities[:] = rng.uniform(-1200, 1200, size=(2, 3))
             velocities[:, 2] = 0.0
-        elif kind == 1:  # genuinely loose ball and two access routes
+        elif kind == 1:  # standard kickoff; populated as an exact batch above
+            continue
+        elif kind == 2:  # genuinely loose ball and two access routes
             ball[:2] = (rng.uniform(-2600, 2600), rng.uniform(-2600, 2600))
             state.ball_vel[row, :2] = rng.uniform(-800, 800, size=2)
             for car, angle in enumerate((rng.uniform(-2.7, -0.4), rng.uniform(0.4, 2.7))):
@@ -347,7 +373,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
                     * (ball[:2] - cars[car, :2])
                     / np.linalg.norm(ball[:2] - cars[car, :2])
                 )
-        elif kind == 2:  # catch/control/possession
+        elif kind == 3:  # catch/control/possession
             cars[0, :2] = (rng.uniform(-2200, 2200), rng.uniform(-3200, 800))
             speed = rng.uniform(350, 1250)
             heading = rng.uniform(0.85, 2.30)
@@ -356,7 +382,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
             ball[:2] = cars[0, :2] + rng.uniform(170, 360) * direction
             state.ball_vel[row, :2] = velocities[0, :2] + rng.uniform(-180, 180, size=2)
             cars[1, :2] = ball[:2] + np.asarray((rng.uniform(-1500, 1500), rng.uniform(1000, 2400)))
-        elif kind == 3:  # shooting and finishing
+        elif kind == 4:  # shooting and finishing
             ball[:2] = (rng.uniform(-2200, 2200), rng.uniform(300, 3600))
             cars[0, :2] = ball[:2] + np.asarray((rng.uniform(-500, 500), -rng.uniform(450, 1100)))
             cars[1, :2] = (rng.uniform(-1700, 1700), rng.uniform(ball[1] + 350, 4700))
@@ -366,7 +392,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
                 / np.linalg.norm(ball[:2] - cars[0, :2])
             )
             state.ball_vel[row, 1] = rng.uniform(100, 900)
-        elif kind == 4:  # defensive shadow/save
+        elif kind == 5:  # defensive shadow/save
             ball[:2] = (rng.uniform(-2500, 2500), rng.uniform(-4000, -1200))
             state.ball_vel[row, :2] = (rng.uniform(-450, 450), -rng.uniform(600, 1900))
             cars[0, :2] = (rng.uniform(-1800, 1800), rng.uniform(-4750, ball[1] - 250))
@@ -376,7 +402,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
                 * (ball[:2] - cars[0, :2])
                 / max(1.0, np.linalg.norm(ball[:2] - cars[0, :2]))
             )
-        elif kind == 5:  # contested ball / 50
+        elif kind == 6:  # contested ball / 50
             ball[:2] = (rng.uniform(-1800, 1800), rng.uniform(-2200, 2200))
             offset = np.asarray((rng.uniform(-450, 450), rng.uniform(550, 1050)))
             cars[0, :2] = ball[:2] - offset
@@ -384,7 +410,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
             for car in (0, 1):
                 direction = ball[:2] - cars[car, :2]
                 velocities[car, :2] = rng.uniform(600, 1500) * direction / np.linalg.norm(direction)
-        elif kind == 6:  # wall and aerial opportunities
+        elif kind == 7:  # wall and aerial opportunities
             wall = rng.random() < 0.5
             ball[:2] = (
                 rng.choice((-1.0, 1.0)) * rng.uniform(2800, 3700)
@@ -419,7 +445,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
             state.boost[row, 0] = rng.uniform(0, 20)
 
         for car in (0, 1):
-            if not (kind == 7 and car == 0):
+            if not (kind == 8 and car == 0):
                 state.car_quat[row, car] = _face(cars[car, :2], ball[:2])
 
     state.car_pos[..., 0] = np.clip(state.car_pos[..., 0], -3800.0, 3800.0)
@@ -430,7 +456,7 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
     # Assign the focal role to either physical side while preserving the same
     # canonical geometry.  A 180-degree team rotation keeps each focal player
     # attacking +Y in its own observation.
-    for row in np.flatnonzero(focal_side == 1):
+    for row in np.flatnonzero((focal_side == 1) & (family != 1)):
         for name in (*CAR_VEC3_FIELDS, *CAR_FLOAT_FIELDS, *CAR_INT_FIELDS, "car_quat"):
             value = getattr(state, name)
             value[row] = value[row, ::-1].copy()
@@ -447,15 +473,35 @@ def build_ssl_foundation_scenarios(worlds: int, *, seed: int) -> SslFoundationSc
         state.ball_quat[row] = np.asarray((-by, bx, bw, -bz), dtype=np.float32)
 
     state.validate()
-    return SslFoundationScenarioBatch(state, family, focal_side, kickoff_indicator)
+    return SslFoundationScenarioBatch(state, family, focal_side, kickoff_indicator, kickoff_layout)
+
+
+def _coprime_reset_stride(worlds: int) -> int:
+    """Choose a deterministic full-cycle stride through the reset-state bank."""
+
+    stride = max(1, worlds // 2 + 1)
+    while gcd(stride, worlds) != 1:
+        stride += 1
+    return stride
 
 
 @wp.kernel(enable_backward=False)
 def _apply_reset_template(
     reset_mask: wp.array(dtype=wp.int32),
+    reset_generation: wp.array(dtype=wp.int32),
+    reset_stride: int,
+    source_world_count: int,
+    source_family: wp.array(dtype=wp.int32),
+    source_focal_side: wp.array(dtype=wp.int32),
     kickoff_flag: wp.array(dtype=wp.int32),
+    source_kickoff_layout: wp.array(dtype=wp.int32),
+    current_source_index: wp.array(dtype=wp.int32),
+    current_family: wp.array(dtype=wp.int32),
+    current_focal_side: wp.array(dtype=wp.int32),
+    current_kickoff_flag: wp.array(dtype=wp.int32),
     kickoff_indicator: wp.array(dtype=wp.int32),
     kickoff_reset: wp.array(dtype=wp.int32),
+    kickoff_layout: wp.array(dtype=wp.int32),
     source_car_pos: wp.array(dtype=wp.vec3),
     source_car_vel: wp.array(dtype=wp.vec3),
     source_car_quat: wp.array(dtype=wp.quat),
@@ -548,72 +594,99 @@ def _apply_reset_template(
     env = wp.tid()
     if reset_mask[env] == 0:
         return
-    kickoff_indicator[env] = kickoff_flag[env]
-    kickoff_reset[env] = kickoff_flag[env]
+    generation = reset_generation[env] + 1
+    source_env = (env + generation * reset_stride) % source_world_count
+    reset_generation[env] = generation
+    current_source_index[env] = source_env
+    current_family[env] = source_family[source_env]
+    current_focal_side[env] = source_focal_side[source_env]
+    current_kickoff_flag[env] = kickoff_flag[source_env]
+    kickoff_indicator[env] = kickoff_flag[source_env]
+    kickoff_reset[env] = kickoff_flag[source_env]
+    kickoff_layout[env] = source_kickoff_layout[source_env]
     for local_car in range(2):
         car = env * 2 + local_car
-        car_pos[car] = source_car_pos[car]
-        car_vel[car] = source_car_vel[car]
-        car_quat[car] = source_car_quat[car]
-        car_ang_vel[car] = source_car_ang_vel[car]
-        boost[car] = source_boost[car]
-        boosting_time[car] = source_boosting_time[car]
-        time_since_boosted[car] = source_time_since_boosted[car]
-        on_ground[car] = source_on_ground[car]
+        source_car = source_env * 2 + local_car
+        car_pos[car] = source_car_pos[source_car]
+        car_vel[car] = source_car_vel[source_car]
+        car_quat[car] = source_car_quat[source_car]
+        car_ang_vel[car] = source_car_ang_vel[source_car]
+        boost[car] = source_boost[source_car]
+        boosting_time[car] = source_boosting_time[source_car]
+        time_since_boosted[car] = source_time_since_boosted[source_car]
+        on_ground[car] = source_on_ground[source_car]
         air_control_disabled[car] = 0
-        has_jumped[car] = source_has_jumped[car]
-        is_jumping[car] = source_is_jumping[car]
-        has_double_jumped[car] = source_has_double_jumped[car]
-        has_flipped[car] = source_has_flipped[car]
-        is_flipping[car] = source_is_flipping[car]
-        sticky_ticks[car] = source_sticky_ticks[car]
-        jump_time[car] = source_jump_time[car]
-        air_time[car] = source_air_time[car]
-        air_time_since_jump[car] = source_air_time_since_jump[car]
-        flip_time[car] = source_flip_time[car]
-        flip_rel_torque[car] = source_flip_rel_torque[car]
-        auto_flip_timer[car] = source_auto_flip_timer[car]
-        auto_flip_torque_scale[car] = source_auto_flip_torque_scale[car]
-        is_auto_flipping[car] = source_is_auto_flipping[car]
-        is_boosting[car] = source_is_boosting[car]
-        is_supersonic[car] = source_is_supersonic[car]
-        supersonic_time[car] = source_supersonic_time[car]
-        prev_throttle[car] = source_prev_throttle[car]
-        prev_steer[car] = source_prev_steer[car]
-        prev_pitch[car] = source_prev_pitch[car]
-        prev_yaw[car] = source_prev_yaw[car]
-        prev_roll[car] = source_prev_roll[car]
-        prev_jump[car] = source_prev_jump[car]
-        prev_boost[car] = source_prev_boost[car]
-        prev_handbrake[car] = source_prev_handbrake[car]
-        rigid_position_bt[car] = source_car_pos[car] * 0.02
-        rigid_velocity_bt[car] = source_car_vel[car] * 0.02
-        solver_position[car] = source_car_pos[car]
-        solver_orientation[car] = source_car_quat[car]
-        solver_velocity[car] = source_car_vel[car]
-        solver_angular_velocity[car] = source_car_ang_vel[car]
+        has_jumped[car] = source_has_jumped[source_car]
+        is_jumping[car] = source_is_jumping[source_car]
+        has_double_jumped[car] = source_has_double_jumped[source_car]
+        has_flipped[car] = source_has_flipped[source_car]
+        is_flipping[car] = source_is_flipping[source_car]
+        sticky_ticks[car] = source_sticky_ticks[source_car]
+        jump_time[car] = source_jump_time[source_car]
+        air_time[car] = source_air_time[source_car]
+        air_time_since_jump[car] = source_air_time_since_jump[source_car]
+        flip_time[car] = source_flip_time[source_car]
+        flip_rel_torque[car] = source_flip_rel_torque[source_car]
+        auto_flip_timer[car] = source_auto_flip_timer[source_car]
+        auto_flip_torque_scale[car] = source_auto_flip_torque_scale[source_car]
+        is_auto_flipping[car] = source_is_auto_flipping[source_car]
+        is_boosting[car] = source_is_boosting[source_car]
+        is_supersonic[car] = source_is_supersonic[source_car]
+        supersonic_time[car] = source_supersonic_time[source_car]
+        prev_throttle[car] = source_prev_throttle[source_car]
+        prev_steer[car] = source_prev_steer[source_car]
+        prev_pitch[car] = source_prev_pitch[source_car]
+        prev_yaw[car] = source_prev_yaw[source_car]
+        prev_roll[car] = source_prev_roll[source_car]
+        prev_jump[car] = source_prev_jump[source_car]
+        prev_boost[car] = source_prev_boost[source_car]
+        prev_handbrake[car] = source_prev_handbrake[source_car]
+        rigid_position_bt[car] = source_car_pos[source_car] * 0.02
+        rigid_velocity_bt[car] = source_car_vel[source_car] * 0.02
+        solver_position[car] = source_car_pos[source_car]
+        solver_orientation[car] = source_car_quat[source_car]
+        solver_velocity[car] = source_car_vel[source_car]
+        solver_angular_velocity[car] = source_car_ang_vel[source_car]
         wheels_with_contact[car] = 0
         contact_count[car] = 0
         handbrake_value[car] = 0.0
         for wheel in range(4):
             wheel_contact[car * 4 + wheel] = 0
             wheel_world_contact[car * 4 + wheel] = 0
-    ball_pos[env] = source_ball_pos[env]
-    ball_vel[env] = source_ball_vel[env]
-    ball_quat[env] = source_ball_quat[env]
-    ball_ang_vel[env] = source_ball_ang_vel[env]
-    ball_position_bt[env] = source_ball_pos[env] * 0.02
-    ball_velocity_bt[env] = source_ball_vel[env] * 0.02
+    ball_pos[env] = source_ball_pos[source_env]
+    ball_vel[env] = source_ball_vel[source_env]
+    ball_quat[env] = source_ball_quat[source_env]
+    ball_ang_vel[env] = source_ball_ang_vel[source_env]
+    ball_position_bt[env] = source_ball_pos[source_env] * 0.02
+    ball_velocity_bt[env] = source_ball_vel[source_env] * 0.02
 
 
 class SslFoundationResetTemplate:
-    """GPU-resident immutable reset-state bank, one template per world."""
+    """GPU reset-state bank with a deterministic full-cycle source schedule."""
 
     def __init__(self, batch: SslFoundationScenarioBatch, *, device: str):
         self.state = GpuState(batch.state, device)
+        self.family = wp.array(batch.family, dtype=wp.int32, device=device)
+        self.focal_side = wp.array(batch.focal_side, dtype=wp.int32, device=device)
         self.kickoff_indicator = wp.array(batch.kickoff_indicator, dtype=wp.int32, device=device)
+        self.kickoff_layout = wp.array(batch.kickoff_layout, dtype=wp.int32, device=device)
+        self.reset_generation = wp.zeros(batch.family.size, dtype=wp.int32, device=device)
+        self.current_source_index = wp.array(
+            np.arange(batch.family.size, dtype=np.int32), dtype=wp.int32, device=device
+        )
+        self.current_family = wp.array(batch.family, dtype=wp.int32, device=device)
+        self.current_focal_side = wp.array(batch.focal_side, dtype=wp.int32, device=device)
+        self.current_kickoff_indicator = wp.array(
+            batch.kickoff_indicator, dtype=wp.int32, device=device
+        )
+        self.reset_stride = _coprime_reset_stride(int(batch.family.size))
         self.summary = batch.summary()
-        self.logical_bytes = batch.state.nbytes + batch.kickoff_indicator.nbytes
+        self.summary["reset_source_schedule"] = {
+            "mode": "deterministic_full_cycle",
+            "source_worlds": int(batch.family.size),
+            "coprime_stride": self.reset_stride,
+        }
+        self.logical_bytes = batch.state.nbytes + int(batch.family.size) * 9 * 4
 
     def apply(self, world: Any, reset_mask: wp.array) -> None:
         source = self.state
@@ -624,9 +697,20 @@ class SslFoundationResetTemplate:
             dim=world.num_envs,
             inputs=[
                 reset_mask,
+                self.reset_generation,
+                self.reset_stride,
+                self.state.num_envs,
+                self.family,
+                self.focal_side,
                 self.kickoff_indicator,
+                self.kickoff_layout,
+                self.current_source_index,
+                self.current_family,
+                self.current_focal_side,
+                self.current_kickoff_indicator,
                 world.rival2.kickoff_indicator,
                 world.lifecycle.kickoff_reset,
+                world.lifecycle.kickoff_layout,
                 source.car_pos,
                 source.car_vel,
                 source.car_quat,

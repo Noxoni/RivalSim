@@ -150,7 +150,13 @@ class Rival2EpisodeState:
 class Rival2WorldSim(CompleteWorldSim):
     """CompleteWorldSim plus contract-selected policy-interval accounting."""
 
-    def __init__(self, *args: Any, reward_mode: int = REWARD_MODE_BASE, **kwargs: Any):
+    def __init__(
+        self,
+        *args: Any,
+        reward_mode: int = REWARD_MODE_BASE,
+        physics_ticks_per_decision: int = PHYSICS_TICKS_PER_DECISION,
+        **kwargs: Any,
+    ):
         if kwargs.get("auto_kickoff") not in (None, False):
             raise ValueError("Rival2WorldSim owns reset timing at decision boundaries")
         kwargs["auto_kickoff"] = False
@@ -162,6 +168,9 @@ class Rival2WorldSim(CompleteWorldSim):
                 raise ValueError("scenario curriculum owns the initial state")
             kwargs["initial"] = scenario_batch.state
         self.reward_mode = int(reward_mode)
+        self.physics_ticks_per_decision = int(physics_ticks_per_decision)
+        if self.physics_ticks_per_decision not in (1, PHYSICS_TICKS_PER_DECISION):
+            raise ValueError("physics_ticks_per_decision must be 1 or 4")
         if self.reward_mode not in (
             REWARD_MODE_BASE,
             REWARD_MODE_ACQUISITION,
@@ -185,7 +194,15 @@ class Rival2WorldSim(CompleteWorldSim):
         if self.ssl_foundation_reset is not None:
             wp.copy(
                 self.rival2.kickoff_indicator,
-                self.ssl_foundation_reset.kickoff_indicator,
+                self.ssl_foundation_reset.current_kickoff_indicator,
+            )
+            wp.copy(
+                self.lifecycle.kickoff_reset,
+                self.ssl_foundation_reset.current_kickoff_indicator,
+            )
+            wp.copy(
+                self.lifecycle.kickoff_layout,
+                self.ssl_foundation_reset.kickoff_layout,
             )
         self.gameplay_v3 = (
             Rival2GameplayV3State(
@@ -329,6 +346,7 @@ class Rival2WorldSim(CompleteWorldSim):
             dim=self.num_envs,
             inputs=[
                 self.reward_mode,
+                self.physics_ticks_per_decision,
                 self.state.ball_pos,
                 self.state.ball_vel,
                 self.state.car_vel,
@@ -486,7 +504,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 (
                     self.lifecycle.kickoff_reset
                     if self.ssl_foundation_reset is None
-                    else self.ssl_foundation_reset.kickoff_indicator
+                    else self.ssl_foundation_reset.current_kickoff_indicator
                 ),
                 0 if self.ssl_foundation_reset is None else 1,
                 self.rival2.episode_ticks,
@@ -1042,6 +1060,7 @@ class Rival2Env:
             device=device,
             seed=seed,
             reward_mode=reward_mode,
+            physics_ticks_per_decision=self.physics_ticks_per_decision,
             **world_kwargs,
         )
         self.device = torch.device(self.world.device)

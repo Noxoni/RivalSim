@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
+import warp as wp
 
 from rivalsim.rival2_contracts import CAR_LINEAR_SPEED_SCALE, OBS_FIELD_NAMES
 from rivalsim.rival2_policy import sample_hybrid_action
@@ -306,6 +307,10 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
             self.frozen_hidden = next_frozen_hidden
             self.reset_before = reset_agent.clone()
             self.assign_opponents_at_reset(transition.reset_mask)
+            if self.env.world.ssl_foundation_reset is not None:
+                self.scenario_family.copy_(
+                    wp.to_torch(self.env.world.ssl_foundation_reset.current_family).to(torch.int64)
+                )
             observation = transition.observation
 
         self.env.observation = observation

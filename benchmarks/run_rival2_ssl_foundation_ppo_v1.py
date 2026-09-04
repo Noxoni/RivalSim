@@ -155,7 +155,12 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
             "probabilities": list(SCENARIO_PROBABILITIES),
             "realized": batch.summary(),
             "state_tensor_sha256": _state_sha256(batch.state),
-            "persistent_at_every_episode_reset": True,
+            "deterministic_full_cycle_reset_bank": True,
+            "new_source_state_after_each_reset": True,
+            "standard_kickoff_starts": batch.summary()["standard_kickoff_starts"],
+            "standard_kickoff_layout_counts": batch.summary()[
+                "standard_kickoff_layout_counts"
+            ],
             "same_reward_all_families": True,
             "task_or_scenario_id_in_observation": False,
             "scripted_solution_prefix_ticks": 0,
@@ -176,6 +181,8 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
             "worlds": WORLD_COUNT,
             "physics_hz": 120,
             "policy_hz": 120,
+            "physics_ticks_per_decision": 1,
+            "episode_boundary_cadence_source": "actual_physics_ticks_per_decision",
             "rollout_horizon": 128,
             "gamma": rival2_ppo_120hz_config().gamma,
             "epochs": PPO_EPOCHS,
@@ -242,6 +249,23 @@ def load_authority() -> dict[str, Any]:
         ),
         "scenarios": payload.get("reset_curriculum", {}).get("probabilities")
         == list(SCENARIO_PROBABILITIES),
+        "actual_cadence_bound": payload.get("ppo", {}).get("physics_ticks_per_decision") == 1
+        and payload.get("ppo", {}).get("episode_boundary_cadence_source")
+        == "actual_physics_ticks_per_decision",
+        "full_cycle_reset_bank": payload.get("reset_curriculum", {}).get(
+            "deterministic_full_cycle_reset_bank"
+        )
+        is True,
+        "standard_kickoffs": payload.get("reset_curriculum", {}).get(
+            "standard_kickoff_starts", 0
+        )
+        > 0
+        and all(
+            count > 0
+            for count in payload.get("reset_curriculum", {})
+            .get("standard_kickoff_layout_counts", {})
+            .values()
+        ),
         "no_task_id": payload.get("reset_curriculum", {}).get("task_or_scenario_id_in_observation")
         is False,
         "no_preservation_kl": payload.get("ppo", {}).get("preservation_kl") is False,
@@ -377,6 +401,25 @@ def preflight(
         )
         == 14,
         "scenario_reset_template_resident": trainer.env.world.ssl_foundation_reset is not None,
+        "episode_boundary_uses_actual_120hz_cadence": (
+            trainer.env.physics_ticks_per_decision
+            == trainer.env.world.physics_ticks_per_decision
+            == 1
+        ),
+        "scenario_reset_cycles_full_bank": trainer.env.world.ssl_foundation_reset.summary[
+            "reset_source_schedule"
+        ]["mode"]
+        == "deterministic_full_cycle",
+        "standard_kickoffs_present": trainer.env.world.ssl_foundation_reset.summary[
+            "standard_kickoff_starts"
+        ]
+        > 0,
+        "all_kickoff_layouts_present": all(
+            count > 0
+            for count in trainer.env.world.ssl_foundation_reset.summary[
+                "standard_kickoff_layout_counts"
+            ].values()
+        ),
         "scenario_id_absent": trainer.env.world.ssl_foundation_reset.summary[
             "task_or_scenario_id_in_observation"
         ]

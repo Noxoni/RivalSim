@@ -259,6 +259,7 @@ def rival2_begin_decision(
 @wp.kernel(enable_backward=False)
 def rival2_accumulate_tick(
     reward_mode: int,
+    physics_ticks_per_decision: int,
     ball_pos: wp.array(dtype=wp.vec3),
     ball_vel: wp.array(dtype=wp.vec3),
     car_vel: wp.array(dtype=wp.vec3),
@@ -405,13 +406,10 @@ def rival2_accumulate_tick(
     next_interval_tick = interval_tick[env] + 1
     interval_tick[env] = next_interval_tick
 
-    decision_ticks = PHYSICS_TICKS_PER_DECISION
-    if (
-        reward_mode == REWARD_MODE_GAMEPLAY_120_V1
-        or reward_mode == REWARD_MODE_GAMEPLAY_120_V2
-    ):
-        decision_ticks = 1
-    if next_interval_tick == decision_ticks:
+    # Episode/reward finalization follows the environment's actual action
+    # cadence.  It must never be inferred from the selected reward mode: a
+    # 120 Hz policy can legitimately use goal-only or another reward contract.
+    if next_interval_tick == physics_ticks_per_decision:
         terminal = goal_latched[env]
         timeout = wp.int32(
             terminal == 0
