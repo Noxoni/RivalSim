@@ -815,9 +815,13 @@ def run(args: argparse.Namespace) -> int:
 
     rolling = run_dir / "rolling.pt"
     hard_failure: dict[str, Any] | None = None
+    stop_requested = False
     while args.continue_after_600 or (
         time.time() < deadline and trainer.accepted_updates_total < CONTINUATION_REVIEW_MARKER
     ):
+        if (run_dir / "STOP_REQUESTED").exists():
+            stop_requested = True
+            break
         trainer.set_exploration(exploration_for_update(trainer.accepted_updates_total))
         started_update = time.perf_counter()
         try:
@@ -875,6 +879,8 @@ def run(args: argparse.Namespace) -> int:
     stop_reason = (
         "hard_nonfinite_or_corruption_guard"
         if hard_failure is not None
+        else "user_requested_stop_at_accepted_boundary"
+        if stop_requested
         else "continuation_interrupted"
         if args.continue_after_600
         else "continuation_review_marker"

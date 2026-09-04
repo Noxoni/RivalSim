@@ -1,0 +1,330 @@
+{
+  "amendment": {
+    "architecture_changed": true,
+    "continue_until": "user interruption or nonfinite/corruption failure",
+    "critic": {
+      "activation": "silu",
+      "architecture": [
+        182,
+        512,
+        512,
+        512,
+        1
+      ],
+      "initial_actor_and_value_parity": "exact",
+      "initialization": "copy update-600 trunk and critic head into independent value network",
+      "learning_rate": 0.0003,
+      "value_gradients_into_actor": false,
+      "version": "RIVAL2_INDEPENDENT_CRITIC_MLP_3X512_V1"
+    },
+    "evaluation_comparison": "new 30-second baseline at unchanged update-600 weights",
+    "evaluation_seconds": 30,
+    "exploration_changed": false,
+    "opponent_probabilities_apply_at": "episode assignment; sample shares also reported",
+    "optimizer_state": "preserve actor and value-head Adam; new critic features start fresh Adam",
+    "parent_authority_sha256": "7FD6999C948D8A2EB0AEF3DA5C35B83BBD71D98C761948F8623C43F1274D39E6",
+    "parent_launch_authority_sha256": "8E23A6C991F2EB6B018FCF47116F8405C40C48F1587197A7BE38E2565E2EFF37",
+    "resume_parent": {
+      "accepted_updates": 600,
+      "path": "checkpoints/rival2/ssl_foundation_ppo_v2/rival2_ssl_foundation_ppo_v2.pt",
+      "sha256": "0A5956ABE92B23CDFA5B2F10CFC610957B5559FA0AFA2EFE51B0BB1B758C94A5"
+    },
+    "resume_simulator": "fresh scenario episodes and zero hidden state, as in V2 resumes",
+    "reward_changed": false,
+    "training_episode_contract_changed": false,
+    "version": "RIVAL2_SSL_FOUNDATION_PPO_V2_AMENDMENT_V1"
+  },
+  "campaign": {
+    "continuation_after_marker": "user-authorized amended continuation",
+    "continuation_review_marker": 600,
+    "evaluation_interval": 50,
+    "evaluation_is_telemetry_not_gate": true,
+    "evaluation_ticks": 3600,
+    "evaluation_worlds": 1024,
+    "maximum_accepted_updates": null,
+    "rolling_checkpoint_every_update": true,
+    "snapshot_interval": 50,
+    "wall_clock_seconds": 36000
+  },
+  "created_utc": "2026-09-04T15:28:35.724849+00:00",
+  "exploration": {
+    "contract": {
+      "analog": {
+        "interpolation": "linear_in_log_sigma",
+        "sigma_end": 0.04,
+        "sigma_start": 0.02
+      },
+      "buttons": {
+        "effective_logits": "learned_logits/positive_temperature",
+        "temperature_end": 0.25,
+        "temperature_start": 0.1
+      },
+      "coherence": [
+        "rollout sampling",
+        "stored old log probability",
+        "PPO recomputation",
+        "ratio",
+        "entropy telemetry",
+        "KL telemetry"
+      ],
+      "purpose": "bounded stochastic PPO exploration without overwhelming Unified V5 behavior",
+      "schedule": {
+        "interior": "smoothstep x*x*(3-2*x)",
+        "ramp_end_accepted_update": 150,
+        "ramp_start_accepted_update": 30
+      },
+      "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+    },
+    "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
+  },
+  "format": "RIVAL2_SSL_FOUNDATION_PPO_V2_AUTHORITY",
+  "implementation_commit": "3281ebb024e0e61db5a7ab9881bfed6736cd11e8",
+  "integrity": {
+    "no_old_optimizer_loaded": true,
+    "no_plus_174_model_loaded": true,
+    "no_ppo_step_before_authority_commit": true,
+    "reward_contract": {
+      "action_hold_ticks": 1,
+      "action_version": "RIVAL2_ACTION_V2_120HZ",
+      "cadence_hz": 120,
+      "combined_potential": "Phi_total=1.25*Phi_field+0.75*Phi_access+0.75*Phi_control+0.50*Phi_defense+0.30*Phi_alignment+0.15*Phi_boost; shaping=gamma*Phi_total(s_next)-Phi_total(s)",
+      "composition": "terminal goal (+10/-10) plus sum_k w_k * (gamma * Phi_k(s_next) - Phi_k(s)); an absorbing goal has Phi(s_next)=0",
+      "direct_reward_exactly_zero": [
+        "ordinary_touch",
+        "jump",
+        "dodge_or_flip",
+        "bad_flip",
+        "speed",
+        "supersonic",
+        "boost_spend",
+        "boost_collection_or_pad",
+        "demolition",
+        "save_event",
+        "aerial_touch",
+        "recovery",
+        "dash",
+        "named_or_inferred_mechanic"
+      ],
+      "episode_version": "RIVAL2_EPISODE_V1",
+      "gamma": 0.9987476493904754,
+      "named_mechanics_hot_path": false,
+      "named_mechanics_reward": 0.0,
+      "observation_version": "RIVAL2_OBS_V2_120HZ",
+      "physics_hz": 120,
+      "potentials": {
+        "boost_reserve": {
+          "formula": "sqrt(clamp(self_boost_fraction,0,1))",
+          "not_pad_pickup_or_boost_use_reward": true,
+          "weight": 0.15
+        },
+        "car_ball_target_approach_alignment": {
+          "car_facing_or_controller_action_used": false,
+          "formula": "dot(unit(car_to_ball), unit(ball_to_target)) * clip(1-(self_ball_distance-150)/2850,0,1)",
+          "not_an_event_or_action_reward": true,
+          "target": "canonical opponent goal center (0,5120,321)",
+          "weight": 0.3
+        },
+        "control_advantage": {
+          "formula": "C_self-C_opp",
+          "weight": 0.75
+        },
+        "defensive_coverage": {
+          "coverage": "smooth between-ball-and-own-goal longitudinal gate times clip(1-cross_track_distance/1500,0,1)",
+          "formula": "threat_self*coverage_self - threat_opp*coverage_opp",
+          "threat": "clip(0.45*territorial_depth + 0.30*goalward_velocity + 0.25*opponent_controllability,0,1)",
+          "weight": 0.5
+        },
+        "field": {
+          "formula": "clip(canonical_ball_y / 5120, -1, 1)",
+          "weight": 1.25
+        },
+        "free_ball_access": {
+          "controllability": "C_i = clip((500-distance_i)/350,0,1) * clip(1-relative_speed_i/1200,0,1)",
+          "formula": "(1-max(C_self,C_opp)) * clip((distance_opp-distance_self)/3000,-1,1)",
+          "weight": 0.75
+        }
+      },
+      "reset_semantics": {
+        "goal": "absorbing successor potential is exactly zero",
+        "new_episode": "first transition starts from the actual reset state",
+        "timeout": "pre-reset final state is bootstrapped; no reset-state potential is mixed in"
+      },
+      "shaping_zero_sum": false,
+      "task_identifier_in_observation": false,
+      "terminal": {
+        "goal_against": -10.0,
+        "goal_for": 10.0,
+        "timeout": 0.0
+      },
+      "terminal_zero_sum": true,
+      "version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+      "zero_sum": false
+    }
+  },
+  "opponents": {
+    "current_probability": 0.4,
+    "current_selfplay_both_sides_trainable": true,
+    "episode_fixed_assignment": true,
+    "frozen_v5_deterministic": true,
+    "frozen_v5_inference_only": true,
+    "frozen_v5_probability": 0.2,
+    "nexto_deterministic": true,
+    "nexto_inference_only": true,
+    "nexto_probability": 0.4,
+    "seed": 2026090302
+  },
+  "ppo": {
+    "base_contract_sha256": "F5DF4C30EE80BC39E52CFCB4E2813E03D8D26C795A9FC18BC62DD2140D9C9F8A",
+    "critic_learning_rate": 0.0003,
+    "episode_boundary_cadence_source": "actual_physics_ticks_per_decision",
+    "epochs": 2,
+    "family_local_advantage_normalization": true,
+    "fresh_optimizer": true,
+    "gamma": 0.9987476493904754,
+    "kl_policy": "telemetry_only_no_rejection_retry_or_rollback",
+    "minibatch_size": 65536,
+    "nonfinite_transactional_rollback": true,
+    "physics_hz": 120,
+    "physics_ticks_per_decision": 1,
+    "policy_hz": 120,
+    "policy_learning_rate": 0.0001,
+    "preservation_kl": false,
+    "rollout_horizon": 128,
+    "value_loss_isolated_from_policy_trunk": true,
+    "version": "RIVAL2_PPO_120HZ_V1",
+    "worlds": 32768
+  },
+  "reset_curriculum": {
+    "deterministic_full_cycle_reset_bank": true,
+    "heading_generation": {
+      "global_face_ball_postprocess": false,
+      "ground_heading_momentum": "coherent_with_off_angle_coverage",
+      "intentionally_aligned_families": [
+        "shooting_finishing",
+        "contested_fifty"
+      ]
+    },
+    "names": [
+      "natural_ongoing",
+      "standard_kickoff",
+      "loose_ball_access",
+      "catch_control_possession",
+      "shooting_finishing",
+      "defensive_shadow_save",
+      "contested_fifty",
+      "wall_aerial",
+      "recovery_scramble_low_boost"
+    ],
+    "new_source_state_after_each_reset": true,
+    "policy_controls_from_tick": 1,
+    "probabilities": [
+      0.15,
+      0.1,
+      0.15,
+      0.15,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.05
+    ],
+    "realized": {
+      "counts": {
+        "catch_control_possession": 4915,
+        "contested_fifty": 3277,
+        "defensive_shadow_save": 3277,
+        "loose_ball_access": 4915,
+        "natural_ongoing": 4915,
+        "recovery_scramble_low_boost": 1638,
+        "shooting_finishing": 3277,
+        "standard_kickoff": 3277,
+        "wall_aerial": 3277
+      },
+      "focal_side_counts": {
+        "0": 16384,
+        "1": 16384
+      },
+      "ground_heading_momentum_semantics": "coherent_with_off_angle_coverage",
+      "scripted_solution_prefix_ticks": 0,
+      "standard_kickoff_layout_counts": {
+        "0": 655,
+        "1": 655,
+        "2": 655,
+        "3": 656,
+        "4": 656
+      },
+      "standard_kickoff_starts": 3277,
+      "task_or_scenario_id_in_observation": false,
+      "wall_aerial_variant_counts": {
+        "airborne_intercept": 1092,
+        "grounded_elevated_ball": 1092,
+        "side_wall_car": 1093
+      },
+      "worlds": 32768
+    },
+    "same_reward_all_families": true,
+    "scenario_metadata_sha256": "5F44EF0D3CFF9A1DC9E47C8B1B411CD8FF93BB681F15EE16933BDB43E90BD7A5",
+    "scripted_solution_prefix_ticks": 0,
+    "seed": 2026090303,
+    "standard_kickoff_layout_counts": {
+      "0": 655,
+      "1": 655,
+      "2": 655,
+      "3": 656,
+      "4": 656
+    },
+    "standard_kickoff_starts": 3277,
+    "state_tensor_sha256": "8E4CE353523A234D8C0F888A996CFA045BAB1D2863C027E135DEF5BD231E1FFB",
+    "task_or_scenario_id_in_observation": false,
+    "wall_aerial_variants": {
+      "airborne_intercept": 1092,
+      "grounded_elevated_ball": 1092,
+      "side_wall_car": 1093
+    }
+  },
+  "reward": {
+    "all_shaping_is_gamma_phi_next_minus_phi": true,
+    "contract_sha256": "C960B465914395BD7181DE0C1FC737165ACD69D507C65C563E575A8E017028D5",
+    "direct_non_goal_reward_terms": 0,
+    "gamma": 0.9987476493904754,
+    "legacy_gameplay_reward_module_allocated": false,
+    "named_mechanics": false,
+    "one_combined_potential": true,
+    "terminal_goal_against": -10.0,
+    "terminal_goal_for": 10.0,
+    "timeout": 0.0,
+    "version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+    "weights": {
+      "access": 0.75,
+      "alignment": 0.3,
+      "boost": 0.15,
+      "control": 0.75,
+      "defense": 0.5,
+      "field": 1.25
+    }
+  },
+  "source": {
+    "excluded_descendant": "G:/dev/RivalSim-runs/unified-ground-curriculum-ppo-v2/snapshots/ground_curriculum_midpoint_u0174.pt",
+    "overwrite_source": false,
+    "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
+    "required_format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+    "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+  },
+  "source_transition": {
+    "forbidden_lineage": "RIVAL2_SSL_FOUNDATION_PPO_V1",
+    "forbidden_update_20_sha256": "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E",
+    "fresh_optimizer": true,
+    "initial_accepted_ppo_updates": 0,
+    "initial_checkpoint": {
+      "excluded_descendant": "G:/dev/RivalSim-runs/unified-ground-curriculum-ppo-v2/snapshots/ground_curriculum_midpoint_u0174.pt",
+      "overwrite_source": false,
+      "path": "checkpoints/rival2/unified_capability_distillation_v5/rival2_unified_capability_v5.pt",
+      "required_format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+      "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+    },
+    "initial_policy_version_increment": 0,
+    "initial_resume_checkpoint": null
+  },
+  "supersedes_authority_sha256": "F4745DCD19AE968E2B844DAA5F8E4350F20928DCD0B13B6D3938A62D69713FF3",
+  "supersession_reason": "replace invalid 120 Hz lifecycle and update-20-bound launch lineage with a fresh Unified-V5-rooted corrected campaign"
+}

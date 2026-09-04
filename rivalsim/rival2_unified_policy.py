@@ -218,7 +218,7 @@ class Rival2UnifiedActorCritic(nn.Module):
         base_actor = self.actor(base_features).reshape(
             observation.shape[0], observation.shape[1], self.config.actor_outputs
         )
-        value = self.critic(base_features).reshape(observation.shape[:2])
+        value = self._value_from_features(flat, base_features).reshape(observation.shape[:2])
         encoded = self.context_activation(self.context_encoder(observation))
         context, next_hidden = self._context_with_resets(encoded, hidden, reset_before)
         actor = base_actor + self.context_actor(context)
@@ -226,6 +226,11 @@ class Rival2UnifiedActorCritic(nn.Module):
             actor = actor[:, 0]
             value = value[:, 0]
         return actor, value, next_hidden
+
+    def _value_from_features(
+        self, observation: torch.Tensor, base_features: torch.Tensor
+    ) -> torch.Tensor:
+        return self.critic(base_features)
 
     def isolated_value(self, observation: torch.Tensor) -> torch.Tensor:
         """Evaluate the critic without allowing value loss into the shared trunk."""

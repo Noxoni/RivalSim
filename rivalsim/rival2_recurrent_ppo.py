@@ -349,7 +349,9 @@ def recurrent_ppo_update(
                 reset_before=batch_reset,
             )
             actor_flat = actor[batch_mask]
-            if hasattr(model, "isolated_value"):
+            if getattr(model, "critic_is_independent", False):
+                value_flat = value[batch_mask]
+            elif hasattr(model, "isolated_value"):
                 value_for_loss = model.isolated_value(batch_observation)
                 value_flat = value_for_loss[batch_mask]
             else:
