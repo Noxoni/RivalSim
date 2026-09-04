@@ -68,6 +68,7 @@ from rivalsim.ssl_foundation_v1 import (  # noqa: E402
     SSL_FOUNDATION_GAMMA,
     SSL_FOUNDATION_WEIGHTS,
     build_ssl_foundation_scenarios,
+    ssl_foundation_potentials,
 )
 from third_party.nexto.adapter import NextoPolicyAdapter, NextoStateTensors  # noqa: E402
 
@@ -76,12 +77,15 @@ CHECKPOINT_FORMAT = f"{FORMAT}_CHECKPOINT"
 SUPERSEDED_AUTHORITY_SHA256 = "C625349F05877CC85A1D2F7BD9256D0DAD759750A96D9D1F7BF19558EFDA0DB4"
 RESULTS = ROOT / "results/rival2/ssl_foundation_ppo_v1"
 AUTHORITY = RESULTS / "authority.json"
+SCHEDULE_AUTHORITY = RESULTS / "schedule_amendment_u0020.json"
 CHECKPOINT = ROOT / "checkpoints/rival2/ssl_foundation_ppo_v1" / "rival2_ssl_foundation_ppo_v1.pt"
 DEFAULT_RUN_DIR = Path("G:/dev/RivalSim-runs/ssl-foundation-ppo-v1")
 WORLD_COUNT = 32_768
 WALL_CLOCK_SECONDS = 10 * 60 * 60
 MAXIMUM_ACCEPTED_UPDATES = 600
 SNAPSHOT_INTERVAL = 30
+ACTIVE_SNAPSHOT_INTERVAL = 50
+CONTINUATION_REVIEW_MARKER = 600
 POLICY_LEARNING_RATE = 1.0e-6
 CRITIC_LEARNING_RATE = 3.0e-4
 PPO_EPOCHS = 1
@@ -95,6 +99,7 @@ OPPONENT_CONFIG = SslFoundationOpponentConfig()
 _TOUCH_INDEX = OBS_FIELD_NAMES.index("lifecycle.self_touch_event")
 _NO_TOUCH_INDEX = OBS_FIELD_NAMES.index("lifecycle.no_touch_age")
 _SPEED_START = OBS_FIELD_NAMES.index("self.linear_velocity.x")
+_BALL_VELOCITY_Y_INDEX = OBS_FIELD_NAMES.index("ball.linear_velocity.y")
 
 
 def utc_now() -> str:
@@ -246,6 +251,23 @@ def load_authority() -> dict[str, Any]:
     return payload
 
 
+def load_schedule_authority() -> dict[str, Any]:
+    payload = json.loads(SCHEDULE_AUTHORITY.read_text(encoding="utf-8"))
+    checks = {
+        "format": payload.get("format") == f"{FORMAT}_SCHEDULE_AMENDMENT_V1",
+        "parent_authority": payload.get("parent_authority_sha256") == sha256_file(AUTHORITY),
+        "checkpoint": payload.get("resume_checkpoint", {}).get("sha256")
+        == "95B38C239F38B86E6699410813F73ACCC21C23D872AF6284F383F2B17BB1E05E",
+        "offset": payload.get("resume_checkpoint", {}).get("accepted_updates") == 20,
+        "interval": payload.get("evaluation_and_snapshot_interval") == ACTIVE_SNAPSHOT_INTERVAL,
+        "review_marker": payload.get("continuation_review_marker") == CONTINUATION_REVIEW_MARKER,
+        "no_semantic_changes": payload.get("reward_model_optimizer_or_data_changed") is False,
+    }
+    if not all(checks.values()):
+        raise RuntimeError(f"SSL Foundation schedule authority mismatch: {checks}")
+    return payload
+
+
 def configure_optimizer(trainer: Rival2SslFoundationTrainer) -> None:
     critic = tuple(trainer.model.critic.parameters())
     critic_ids = {id(parameter) for parameter in critic}
@@ -301,6 +323,7 @@ def make_trainer(
         source_identity={
             **copy.deepcopy(authority["source"]),
             "authority_sha256": sha256_file(AUTHORITY),
+            "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
         },
         seed=CAMPAIGN_SEED,
         model=current,
@@ -321,6 +344,7 @@ def make_trainer(
         "plus_174_descendant_loaded": False,
         "fresh_ppo_optimizer": True,
         "authority_sha256": sha256_file(AUTHORITY),
+        "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
     }
     return trainer, source
 
@@ -359,7 +383,11 @@ def preflight(
         is False,
         "opponent_probabilities_exact": asdict(trainer.opponent_config) == asdict(OPPONENT_CONFIG),
         "native_120hz": trainer.env.physics_hz == trainer.env.policy_hz == 120,
-        "fresh_optimizer_state_empty": len(trainer.optimizer.state) == 0,
+        "optimizer_state_matches_offset": (
+            len(trainer.optimizer.state) == 0
+            if trainer.accepted_updates_total == 0
+            else len(trainer.optimizer.state) > 0
+        ),
         "optimizer_lrs_exact": lrs
         == {"policy": POLICY_LEARNING_RATE, "critic": CRITIC_LEARNING_RATE},
         "value_loss_isolated": hasattr(trainer.model, "isolated_value"),
@@ -373,6 +401,7 @@ def preflight(
         "verdict": "PASS" if all(checks.values()) else "FAIL",
         "checks": checks,
         "authority_sha256": sha256_file(AUTHORITY),
+        "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
         "source": transition,
         "contracts": trainer.env.contract_hashes,
         "ppo_config": asdict(trainer.ppo_config),
@@ -394,6 +423,7 @@ def _checkpoint_record(trainer: Rival2SslFoundationTrainer, path: Path) -> dict[
         "bytes": path.stat().st_size,
         "policy_version": trainer.policy_version,
         "total_agent_samples": trainer.total_agent_samples,
+        "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
     }
 
 
@@ -441,6 +471,12 @@ def deterministic_anchor_evaluation(
     goals_against = torch.zeros_like(touches)
     no_touch = torch.zeros_like(touches)
     speed_sum = torch.zeros(2, dtype=torch.float64, device=env.device)
+    reward_sum = torch.zeros(2, dtype=torch.float64, device=env.device)
+    goalward_touches = torch.zeros(2, dtype=torch.int64, device=env.device)
+    potential_sum = {
+        name: torch.zeros(2, dtype=torch.float64, device=env.device)
+        for name in (*SSL_FOUNDATION_WEIGHTS, "weighted_total")
+    }
     decisions = torch.zeros(2, dtype=torch.int64, device=env.device)
     trainer.model.eval()
     trainer.frozen_v5.eval()
@@ -481,6 +517,7 @@ def deterministic_anchor_evaluation(
             return tick
 
         transition = env.step_with_tick_actions(action, tick_action)
+        potentials = ssl_foundation_potentials(transition.transition_observation)
         for family_id in range(2):
             selected = family == (OPPONENT_NEXTO if family_id == 0 else OPPONENT_FROZEN_V5)
             touch = (
@@ -490,6 +527,27 @@ def deterministic_anchor_evaluation(
                 > 0.5
             )
             touches[family_id] += touch.sum()
+            goalward_touches[family_id] += (
+                touch
+                & (
+                    transition.transition_observation[
+                        rows[selected],
+                        rival_side[selected],
+                        _BALL_VELOCITY_Y_INDEX,
+                    ]
+                    > 0.0
+                )
+            ).sum()
+            reward_sum[family_id] += transition.reward[rows[selected], rival_side[selected]].sum(
+                dtype=torch.float64
+            )
+            for name in SSL_FOUNDATION_WEIGHTS:
+                potential_sum[name][family_id] += getattr(potentials, name)[
+                    rows[selected], rival_side[selected]
+                ].sum(dtype=torch.float64)
+            potential_sum["weighted_total"][family_id] += potentials.weighted_total[
+                rows[selected], rival_side[selected]
+            ].sum(dtype=torch.float64)
             speed = torch.linalg.vector_norm(
                 observation[
                     rows[selected],
@@ -534,6 +592,14 @@ def deterministic_anchor_evaluation(
             "goals_for": int(goals_for[index].item()),
             "goals_against": int(goals_against[index].item()),
             "no_touch_resets": int(no_touch[index].item()),
+            "goalward_touch_fraction": int(goalward_touches[index].item())
+            / max(1, int(touches[index].item())),
+            "mean_reward_per_decision": float(reward_sum[index].item())
+            / max(1, int(decisions[index].item())),
+            "mean_state_potentials": {
+                potential_name: float(value[index].item()) / max(1, int(decisions[index].item()))
+                for potential_name, value in potential_sum.items()
+            },
             "mean_speed_uu_per_second": (
                 float(speed_sum[index].item()) / max(1, int(decisions[index].item())) * 2300.0
             ),
@@ -552,6 +618,7 @@ def run(args: argparse.Namespace) -> int:
     if args.worlds != WORLD_COUNT:
         raise ValueError("production authority freezes 32768 worlds")
     load_authority()
+    load_schedule_authority()
     run_dir = Path(args.run_dir).resolve()
     collision_root = Path(args.collision_root).resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -559,6 +626,12 @@ def run(args: argparse.Namespace) -> int:
     trainer, source = make_trainer(collision_root, worlds=args.worlds)
     if args.resume:
         trainer.load_checkpoint(Path(args.resume).resolve())
+        trainer.phase_transition = {
+            **(trainer.phase_transition or {}),
+            "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
+        }
+    if args.continue_after_600 and trainer.accepted_updates_total < CONTINUATION_REVIEW_MARKER:
+        raise ValueError("--continue-after-600 requires a checkpoint at or beyond update 600")
     preflight_payload = preflight(trainer, source, exact_scale=args.worlds == WORLD_COUNT)
     write_json(
         RESULTS / ("resume_preflight.json" if args.resume else "preflight.json"),
@@ -613,6 +686,10 @@ def run(args: argparse.Namespace) -> int:
     if campaign_state_path.exists():
         campaign_state = json.loads(campaign_state_path.read_text(encoding="utf-8"))
         deadline = float(campaign_state["deadline_unix"])
+        campaign_state["schedule_authority_sha256"] = sha256_file(SCHEDULE_AUTHORITY)
+        campaign_state["evaluation_and_snapshot_interval"] = ACTIVE_SNAPSHOT_INTERVAL
+        campaign_state["continuation_review_marker"] = CONTINUATION_REVIEW_MARKER
+        write_json(campaign_state_path, campaign_state)
     else:
         started = time.time()
         deadline = started + WALL_CLOCK_SECONDS
@@ -623,6 +700,9 @@ def run(args: argparse.Namespace) -> int:
             "deadline_unix": deadline,
             "wall_clock_seconds": WALL_CLOCK_SECONDS,
             "authority_sha256": sha256_file(AUTHORITY),
+            "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
+            "evaluation_and_snapshot_interval": ACTIVE_SNAPSHOT_INTERVAL,
+            "continuation_review_marker": CONTINUATION_REVIEW_MARKER,
         }
         write_json(campaign_state_path, campaign_state)
 
@@ -634,10 +714,12 @@ def run(args: argparse.Namespace) -> int:
         else {
             "format": f"{FORMAT}_SNAPSHOT_MANIFEST",
             "authority_sha256": sha256_file(AUTHORITY),
+            "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
             "snapshots": [],
             "evaluations": [],
         }
     )
+    manifest["schedule_authority_sha256"] = sha256_file(SCHEDULE_AUTHORITY)
     if not args.resume and (curve.exists() or manifest["snapshots"]):
         raise RuntimeError("campaign evidence exists; use --resume")
     if not manifest["evaluations"]:
@@ -647,7 +729,9 @@ def run(args: argparse.Namespace) -> int:
 
     rolling = run_dir / "rolling.pt"
     hard_failure: dict[str, Any] | None = None
-    while time.time() < deadline and trainer.accepted_updates_total < MAXIMUM_ACCEPTED_UPDATES:
+    while args.continue_after_600 or (
+        time.time() < deadline and trainer.accepted_updates_total < CONTINUATION_REVIEW_MARKER
+    ):
         trainer.set_exploration(exploration_for_update(trainer.accepted_updates_total))
         started_update = time.perf_counter()
         try:
@@ -677,7 +761,7 @@ def run(args: argparse.Namespace) -> int:
         }
         append_jsonl(curve, record)
         _checkpoint_record(trainer, rolling)
-        if trainer.accepted_updates_total % SNAPSHOT_INTERVAL == 0:
+        if trainer.accepted_updates_total % ACTIVE_SNAPSHOT_INTERVAL == 0:
             snapshot = _checkpoint_record(
                 trainer,
                 run_dir / "snapshots" / f"ssl_foundation_u{trainer.accepted_updates_total:04d}.pt",
@@ -705,8 +789,10 @@ def run(args: argparse.Namespace) -> int:
     stop_reason = (
         "hard_nonfinite_or_corruption_guard"
         if hard_failure is not None
-        else "maximum_accepted_updates"
-        if trainer.accepted_updates_total >= MAXIMUM_ACCEPTED_UPDATES
+        else "continuation_interrupted"
+        if args.continue_after_600
+        else "continuation_review_marker"
+        if trainer.accepted_updates_total >= CONTINUATION_REVIEW_MARKER
         else "wall_clock_deadline"
     )
     summary = {
@@ -718,6 +804,7 @@ def run(args: argparse.Namespace) -> int:
         "final_checkpoint": final_record,
         "hard_failure": hard_failure,
         "authority_sha256": sha256_file(AUTHORITY),
+        "schedule_authority_sha256": sha256_file(SCHEDULE_AUTHORITY),
         "source_sha256": SOURCE_SHA256,
         "last_evaluation": manifest["evaluations"][-1],
     }
@@ -735,6 +822,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--worlds", type=int, default=WORLD_COUNT)
     result.add_argument("--run-dir", default=str(DEFAULT_RUN_DIR))
     result.add_argument("--resume")
+    result.add_argument("--continue-after-600", action="store_true")
     result.add_argument("--preflight-only", action="store_true")
     result.add_argument("--rollout-preflight-only", action="store_true")
     result.add_argument("--write-authority", action="store_true")
