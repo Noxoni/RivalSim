@@ -18,7 +18,7 @@ from rivalsim.ssl_foundation_v1 import (
 )
 
 
-def test_reward_contract_has_only_goals_and_four_potential_differences() -> None:
+def test_reward_contract_has_only_goals_and_six_potential_differences() -> None:
     contract = REWARD_SSL_FOUNDATION_V1_CONTRACT
     assert contract["terminal"] == {
         "goal_for": 10.0,
@@ -30,6 +30,8 @@ def test_reward_contract_has_only_goals_and_four_potential_differences() -> None
         "free_ball_access",
         "control_advantage",
         "defensive_coverage",
+        "car_ball_target_approach_alignment",
+        "boost_reserve",
     }
     assert contract["named_mechanics_reward"] == 0.0
     assert contract["named_mechanics_hot_path"] is False
@@ -44,7 +46,7 @@ def test_potentials_are_bounded_and_terminal_successor_is_absorbing() -> None:
     after = torch.randn(5, 2, OBS_DIM, generator=generator)
     terminated = torch.tensor([False, True, False, True, False])
     potentials = ssl_foundation_potentials(before)
-    for name in ("field", "access", "control", "defense"):
+    for name in ("field", "access", "control", "defense", "alignment", "boost"):
         value = getattr(potentials, name)
         assert torch.isfinite(value).all()
         assert (value.abs() <= 1.0 + 1.0e-6).all()
@@ -52,6 +54,8 @@ def test_potentials_are_bounded_and_terminal_successor_is_absorbing() -> None:
     for name, weight in SSL_FOUNDATION_WEIGHTS.items():
         expected = -weight * getattr(potentials, name)[terminated]
         torch.testing.assert_close(shaping[name][terminated], expected)
+    component_sum = sum(shaping[name] for name in SSL_FOUNDATION_WEIGHTS)
+    torch.testing.assert_close(shaping["total"], component_sum)
 
 
 def test_nonterminal_potential_shaping_telescopes() -> None:

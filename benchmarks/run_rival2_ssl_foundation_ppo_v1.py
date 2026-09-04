@@ -73,6 +73,7 @@ from third_party.nexto.adapter import NextoPolicyAdapter, NextoStateTensors  # n
 
 FORMAT = "RIVAL2_SSL_FOUNDATION_PPO_V1"
 CHECKPOINT_FORMAT = f"{FORMAT}_CHECKPOINT"
+SUPERSEDED_AUTHORITY_SHA256 = "DCA2822CB83AF3C2A3B546038CD9B9F482FAD0536D67FDF88BD092F2FA1F16E1"
 RESULTS = ROOT / "results/rival2/ssl_foundation_ppo_v1"
 AUTHORITY = RESULTS / "authority.json"
 CHECKPOINT = ROOT / "checkpoints/rival2/ssl_foundation_ppo_v1" / "rival2_ssl_foundation_ppo_v1.pt"
@@ -117,6 +118,8 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
         "format": f"{FORMAT}_AUTHORITY",
         "created_utc": utc_now(),
         "implementation_commit": implementation_commit,
+        "supersedes_authority_sha256": SUPERSEDED_AUTHORITY_SHA256,
+        "supersession_reason": "user-authorized six-potential reward amendment before PPO",
         "source": {
             "path": SOURCE.relative_to(ROOT).as_posix(),
             "sha256": SOURCE_SHA256,
@@ -132,6 +135,7 @@ def authority_payload(implementation_commit: str) -> dict[str, Any]:
             "contract_sha256": REWARD_SSL_FOUNDATION_V1_CONTRACT_HASH,
             "gamma": SSL_FOUNDATION_GAMMA,
             "weights": SSL_FOUNDATION_WEIGHTS,
+            "one_combined_potential": True,
             "terminal_goal_for": 10.0,
             "terminal_goal_against": -10.0,
             "timeout": 0.0,
@@ -210,8 +214,15 @@ def load_authority() -> dict[str, Any]:
         "source_file": sha256_file(SOURCE) == SOURCE_SHA256,
         "reward": payload.get("reward", {}).get("contract_sha256")
         == REWARD_SSL_FOUNDATION_V1_CONTRACT_HASH,
+        "ppo_and_shaping_gamma_match": payload.get("reward", {}).get("gamma")
+        == payload.get("ppo", {}).get("gamma")
+        == SSL_FOUNDATION_GAMMA,
+        "weights": payload.get("reward", {}).get("weights") == SSL_FOUNDATION_WEIGHTS,
         "potential_only": payload.get("reward", {}).get("all_shaping_is_gamma_phi_next_minus_phi")
         is True,
+        "combined_potential": payload.get("reward", {}).get("one_combined_potential") is True,
+        "supersedes_four_potential_authority": payload.get("supersedes_authority_sha256")
+        == SUPERSEDED_AUTHORITY_SHA256,
         "zero_direct": payload.get("reward", {}).get("direct_non_goal_reward_terms") == 0,
         "worlds": payload.get("ppo", {}).get("worlds") == WORLD_COUNT,
         "wall_clock": payload.get("campaign", {}).get("wall_clock_seconds") == WALL_CLOCK_SECONDS,
@@ -334,8 +345,8 @@ def preflight(
         "goal_only_native_kernel": trainer.env.world.reward_mode == 2,
         "no_gameplay_v2_or_v3_state": trainer.env.world.gameplay_120 is None
         and trainer.env.world.gameplay_v3 is None,
-        "only_four_potential_components": set(SSL_FOUNDATION_WEIGHTS)
-        == {"field", "access", "control", "defense"},
+        "only_six_potential_components": set(SSL_FOUNDATION_WEIGHTS)
+        == {"field", "access", "control", "defense", "alignment", "boost"},
         "direct_non_goal_reward_terms_zero": len(
             REWARD_SSL_FOUNDATION_V1_CONTRACT["direct_reward_exactly_zero"]
         )
@@ -571,10 +582,10 @@ def run(args: argparse.Namespace) -> int:
             "rollout_logical_bytes": rollout.logical_bytes,
             "rollout_position": rollout.position,
             "finite": {
-                "observation": bool(torch.isfinite(rollout.observation).all()),
-                "action": bool(torch.isfinite(rollout.action).all()),
-                "reward": bool(torch.isfinite(rollout.reward).all()),
-                "value": bool(torch.isfinite(rollout.value).all()),
+                "observation": bool(torch.isfinite(rollout.observations).all()),
+                "action": bool(torch.isfinite(rollout.actions).all()),
+                "reward": bool(torch.isfinite(rollout.rewards).all()),
+                "value": bool(torch.isfinite(rollout.values).all()),
             },
             "model_unchanged": state_dict_sha256(trainer.model.state_dict()) == model_before,
             "source_checkpoint_unchanged": sha256_file(SOURCE) == source_before,

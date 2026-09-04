@@ -149,7 +149,15 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
         family_reward = torch.zeros(len(OPPONENT_NAMES), dtype=torch.float64, device=self.device)
         component_sum = {
             name: torch.zeros((), dtype=torch.float64, device=self.device)
-            for name in ("field", "access", "control", "defense", "total")
+            for name in (
+                "field",
+                "access",
+                "control",
+                "defense",
+                "alignment",
+                "boost",
+                "total",
+            )
         }
         touch_events = torch.zeros((), dtype=torch.int64, device=self.device)
         goalward_touches = torch.zeros((), dtype=torch.int64, device=self.device)

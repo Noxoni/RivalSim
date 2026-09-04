@@ -1,6 +1,6 @@
 """State-space-learning foundation reward and reset curriculum.
 
-The reward surface in this module is deliberately small.  It contains four
+The reward surface in this module is deliberately small.  It contains six
 bounded state potentials and no event or occupancy reward.  Scenario families
 are reset-state diversity only; their identity is never included in the policy
 observation.
@@ -35,6 +35,8 @@ SSL_FOUNDATION_WEIGHTS = {
     "access": 0.75,
     "control": 0.75,
     "defense": 0.50,
+    "alignment": 0.30,
+    "boost": 0.15,
 }
 SCENARIO_NAMES = (
     "natural_ongoing",
@@ -69,6 +71,7 @@ _INDEX = {
         "opponent.linear_velocity.x",
         "opponent.linear_velocity.y",
         "opponent.linear_velocity.z",
+        "self.boost",
     )
 }
 
@@ -79,6 +82,8 @@ class SslFoundationPotentials:
     access: torch.Tensor
     control: torch.Tensor
     defense: torch.Tensor
+    alignment: torch.Tensor
+    boost: torch.Tensor
 
     @property
     def weighted_total(self) -> torch.Tensor:
@@ -87,6 +92,8 @@ class SslFoundationPotentials:
             + self.access * SSL_FOUNDATION_WEIGHTS["access"]
             + self.control * SSL_FOUNDATION_WEIGHTS["control"]
             + self.defense * SSL_FOUNDATION_WEIGHTS["defense"]
+            + self.alignment * SSL_FOUNDATION_WEIGHTS["alignment"]
+            + self.boost * SSL_FOUNDATION_WEIGHTS["boost"]
         )
 
 
@@ -153,7 +160,7 @@ def _coverage(
 
 
 def ssl_foundation_potentials(observation: torch.Tensor) -> SslFoundationPotentials:
-    """Compute the four normalized, agent-canonical state potentials."""
+    """Compute the six normalized, agent-canonical state potentials."""
 
     if observation.shape[-1] != len(OBS_FIELD_NAMES):
         raise ValueError("SSL Foundation requires the complete 182-field observation")
@@ -190,7 +197,23 @@ def ssl_foundation_potentials(observation: torch.Tensor) -> SslFoundationPotenti
     self_coverage = _coverage(vectors["self_position"], ball_position, -5120.0)
     opponent_coverage = _coverage(vectors["opponent_position"], ball_position, 5120.0)
     defense = self_threat * self_coverage - opponent_threat * opponent_coverage
-    return SslFoundationPotentials(field, access, control, defense)
+
+    car_to_ball = ball_position - vectors["self_position"]
+    ball_to_target = torch.zeros_like(ball_position)
+    ball_to_target[..., 1] = 5120.0
+    ball_to_target[..., 2] = 321.0
+    ball_to_target -= ball_position
+    car_to_ball_unit = car_to_ball / torch.linalg.vector_norm(
+        car_to_ball, dim=-1, keepdim=True
+    ).clamp_min(1.0)
+    ball_to_target_unit = ball_to_target / torch.linalg.vector_norm(
+        ball_to_target, dim=-1, keepdim=True
+    ).clamp_min(1.0)
+    approach_geometry = (car_to_ball_unit * ball_to_target_unit).sum(dim=-1)
+    contact_relevance = (1.0 - (self_distance - 150.0) / 2850.0).clamp(0.0, 1.0)
+    alignment = (approach_geometry * contact_relevance).clamp(-1.0, 1.0)
+    boost = observation[..., _INDEX["self.boost"]].clamp(0.0, 1.0).sqrt()
+    return SslFoundationPotentials(field, access, control, defense, alignment, boost)
 
 
 def ssl_foundation_shaping(
@@ -208,13 +231,14 @@ def ssl_foundation_shaping(
     successor = ssl_foundation_potentials(after)
     absorbing = terminated[..., None]
     result: dict[str, torch.Tensor] = {}
-    for name in ("field", "access", "control", "defense"):
+    for name in ("field", "access", "control", "defense", "alignment", "boost"):
         before_value = getattr(prior, name)
         after_value = getattr(successor, name).masked_fill(absorbing, 0.0)
         result[name] = SSL_FOUNDATION_WEIGHTS[name] * (
             SSL_FOUNDATION_GAMMA * after_value - before_value
         )
-    result["total"] = sum(result.values())
+    successor_total = successor.weighted_total.masked_fill(absorbing, 0.0)
+    result["total"] = SSL_FOUNDATION_GAMMA * successor_total - prior.weighted_total
     return result
 
 

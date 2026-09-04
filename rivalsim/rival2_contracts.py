@@ -808,7 +808,9 @@ REWARD_SSL_FOUNDATION_V1_CONTRACT: Final = {
     "observation_version": RIVAL2_OBS_V2_120HZ_VERSION,
     "action_version": RIVAL2_ACTION_V2_120HZ_VERSION,
     "episode_version": RIVAL2_EPISODE_VERSION,
-    "zero_sum": True,
+    "terminal_zero_sum": True,
+    "shaping_zero_sum": False,
+    "zero_sum": False,
     "gamma": 0.9987476493904754,
     "composition": (
         "terminal goal (+10/-10) plus sum_k w_k * "
@@ -843,7 +845,26 @@ REWARD_SSL_FOUNDATION_V1_CONTRACT: Final = {
             ),
             "formula": "threat_self*coverage_self - threat_opp*coverage_opp",
         },
+        "car_ball_target_approach_alignment": {
+            "weight": 0.30,
+            "target": "canonical opponent goal center (0,5120,321)",
+            "formula": (
+                "dot(unit(car_to_ball), unit(ball_to_target)) * "
+                "clip(1-(self_ball_distance-150)/2850,0,1)"
+            ),
+            "not_an_event_or_action_reward": True,
+        },
+        "boost_reserve": {
+            "weight": 0.15,
+            "formula": "sqrt(clamp(self_boost_fraction,0,1))",
+            "not_pad_pickup_or_boost_use_reward": True,
+        },
     },
+    "combined_potential": (
+        "Phi_total=1.25*Phi_field+0.75*Phi_access+0.75*Phi_control+"
+        "0.50*Phi_defense+0.30*Phi_alignment+0.15*Phi_boost; "
+        "shaping=gamma*Phi_total(s_next)-Phi_total(s)"
+    ),
     "reset_semantics": {
         "goal": "absorbing successor potential is exactly zero",
         "timeout": "pre-reset final state is bootstrapped; no reset-state potential is mixed in",
