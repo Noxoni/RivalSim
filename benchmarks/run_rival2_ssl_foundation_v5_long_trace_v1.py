@@ -347,6 +347,9 @@ def memory_preflight(args):
     trainer.set_exploration(prior.restart_exploration(trainer.accepted_updates_total))
     rollout = trainer.collect_rollout()
     rollout.compute_gae(trainer.ppo_config)
+    # Collection switches to eval mode. cuDNN recurrent backward, like the real
+    # trainer.update path, must explicitly enter training mode before forward.
+    trainer.model.train()
     count = rollout.sequence_layout(trainer.ppo_config.minibatch_size).sequences_per_minibatch
     obs = _sequence_major(rollout.observations)[:count].contiguous()
     reset = _sequence_major(rollout.reset_before)[:count].contiguous()
