@@ -59,6 +59,7 @@ from rivalsim.rival2_contracts import (
     RIVAL2_REWARD_GAMEPLAY_V3_VERSION,
     RIVAL2_REWARD_GOAL_ONLY_VERSION,
     RIVAL2_REWARD_SCORING_V1_VERSION,
+    RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION,
     RIVAL2_REWARD_V2_VERSION,
     RIVAL2_REWARD_VERSION,
     SCORING_APPROACH_COEFFICIENT,
@@ -68,6 +69,11 @@ from rivalsim.rival2_contracts import (
     SUPERSONIC_TIME_SCALE,
     TIME_SINCE_BOOSTED_SCALE,
     contract_hashes_for_reward,
+)
+from rivalsim.ssl_foundation_v1 import (
+    SslFoundationResetTemplate,
+    SslFoundationScenarioBatch,
+    ssl_foundation_shaping,
 )
 from rivalsim.static_world import CompleteWorldSim
 
@@ -112,9 +118,7 @@ class Rival2EpisodeState:
         self.strict_dash_previous_has_flipped = wp.zeros(car_count, dtype=wp.int32, device=device)
         self.strict_dash_previous_air_time = wp.zeros(car_count, dtype=wp.float32, device=device)
         self.strict_dash_previous_wheel_mask = wp.zeros(car_count, dtype=wp.int32, device=device)
-        self.strict_dash_pending_flip_tick = wp.full(
-            car_count, -1, dtype=wp.int32, device=device
-        )
+        self.strict_dash_pending_flip_tick = wp.full(car_count, -1, dtype=wp.int32, device=device)
         self.strict_dash_last_success_flip_tick = wp.full(
             car_count, -1, dtype=wp.int32, device=device
         )
@@ -150,6 +154,13 @@ class Rival2WorldSim(CompleteWorldSim):
         if kwargs.get("auto_kickoff") not in (None, False):
             raise ValueError("Rival2WorldSim owns reset timing at decision boundaries")
         kwargs["auto_kickoff"] = False
+        scenario_batch = kwargs.pop("ssl_foundation_scenarios", None)
+        if scenario_batch is not None:
+            if not isinstance(scenario_batch, SslFoundationScenarioBatch):
+                raise TypeError("ssl_foundation_scenarios must be an SslFoundationScenarioBatch")
+            if kwargs.get("initial") is not None:
+                raise ValueError("scenario curriculum owns the initial state")
+            kwargs["initial"] = scenario_batch.state
         self.reward_mode = int(reward_mode)
         if self.reward_mode not in (
             REWARD_MODE_BASE,
@@ -166,6 +177,16 @@ class Rival2WorldSim(CompleteWorldSim):
         evidence_capacity = int(kwargs.pop("v3_evidence_capacity", 0))
         super().__init__(*args, **kwargs)
         self.rival2 = Rival2EpisodeState(self.num_envs, self.device)
+        self.ssl_foundation_reset = (
+            None
+            if scenario_batch is None
+            else SslFoundationResetTemplate(scenario_batch, device=self.device)
+        )
+        if self.ssl_foundation_reset is not None:
+            wp.copy(
+                self.rival2.kickoff_indicator,
+                self.ssl_foundation_reset.kickoff_indicator,
+            )
         self.gameplay_v3 = (
             Rival2GameplayV3State(
                 self,
@@ -210,11 +231,13 @@ class Rival2WorldSim(CompleteWorldSim):
         state = getattr(self, "rival2", None)
         gameplay_v3 = getattr(self, "gameplay_v3", None)
         gameplay_120 = getattr(self, "gameplay_120", None)
+        ssl_foundation_reset = getattr(self, "ssl_foundation_reset", None)
         return (
             super().logical_state_bytes
             + (0 if state is None else state.logical_bytes)
             + (0 if gameplay_v3 is None else gameplay_v3.logical_bytes)
             + (0 if gameplay_120 is None else gameplay_120.logical_bytes)
+            + (0 if ssl_foundation_reset is None else ssl_foundation_reset.logical_bytes)
         )
 
     def begin_decision(self) -> None:
@@ -443,6 +466,8 @@ class Rival2WorldSim(CompleteWorldSim):
             ],
             device=self.device,
         )
+        if self.ssl_foundation_reset is not None:
+            self.ssl_foundation_reset.apply(self, mask)
         if self.gameplay_v3 is not None:
             self.gameplay_v3.reset(mask)
         if self.gameplay_120 is not None:
@@ -458,6 +483,12 @@ class Rival2WorldSim(CompleteWorldSim):
             dim=self.num_envs,
             inputs=[
                 mask,
+                (
+                    self.lifecycle.kickoff_reset
+                    if self.ssl_foundation_reset is None
+                    else self.ssl_foundation_reset.kickoff_indicator
+                ),
+                0 if self.ssl_foundation_reset is None else 1,
                 self.rival2.episode_ticks,
                 self.rival2.no_touch_ticks,
                 self.rival2.kickoff_indicator,
@@ -968,25 +999,31 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V1
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V2
+        elif reward_version == RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION:
+            reward_mode = REWARD_MODE_GOAL_ONLY
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         self.reward_version = reward_version
         self.episode_version = episode_version
         self.observation_version = observation_version or (
             RIVAL2_OBS_V2_120HZ_VERSION
-            if reward_version in (
+            if reward_version
+            in (
                 RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+                RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION,
             )
             else "RIVAL2_OBS_V1"
         )
         self.action_version = action_version or (
             RIVAL2_ACTION_V2_120HZ_VERSION
-            if reward_version in (
+            if reward_version
+            in (
                 RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
                 RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+                RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION,
             )
             else "RIVAL2_ACTION_V1"
         )
@@ -1012,6 +1049,7 @@ class Rival2Env:
         self.bridge = Rival2TensorBridge(self.world)
         self.observation = self.bridge.observation()
         self.decision_count = 0
+        self.last_ssl_foundation_components: dict[str, torch.Tensor] | None = None
 
     @property
     def num_envs(self) -> int:
@@ -1057,6 +1095,17 @@ class Rival2Env:
                     emitted,
                 )
             )
+        elif self.reward_version == RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION:
+            terminated_for_shaping = self.bridge.views["rival2.terminated"].to(torch.bool)
+            components = ssl_foundation_shaping(
+                decision_observation,
+                transition_observation,
+                terminated_for_shaping,
+            )
+            reward.add_(components["total"])
+            self.last_ssl_foundation_components = {
+                name: value.detach() for name, value in components.items()
+            }
         terminated = self.bridge.views["rival2.terminated"].to(torch.bool).clone()
         truncated = self.bridge.views["rival2.truncated"].to(torch.bool).clone()
         reset_mask = self.bridge.views["rival2.reset_mask"].to(torch.bool).clone()
@@ -1102,6 +1151,8 @@ class Rival2Env:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V1
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION:
             reward_mode = REWARD_MODE_GAMEPLAY_120_V2
+        elif reward_version == RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION:
+            reward_mode = REWARD_MODE_GOAL_ONLY
         else:
             raise ValueError(f"unsupported Rival 2.0 reward: {reward_version}")
         if reward_mode == REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is None:
@@ -1110,17 +1161,23 @@ class Rival2Env:
             )
         if reward_mode != REWARD_MODE_GAMEPLAY_V3 and self.world.gameplay_v3 is not None:
             raise ValueError("Gameplay V3 native state cannot be removed in-place")
-        if reward_mode in (
-            REWARD_MODE_GAMEPLAY_120_V1,
-            REWARD_MODE_GAMEPLAY_120_V2,
-        ) and self.world.gameplay_120 is None:
-            raise ValueError(
-                "Gameplay 120 requires a freshly constructed 120 Hz environment"
+        if (
+            reward_mode
+            in (
+                REWARD_MODE_GAMEPLAY_120_V1,
+                REWARD_MODE_GAMEPLAY_120_V2,
             )
-        if reward_mode not in (
-            REWARD_MODE_GAMEPLAY_120_V1,
-            REWARD_MODE_GAMEPLAY_120_V2,
-        ) and self.world.gameplay_120 is not None:
+            and self.world.gameplay_120 is None
+        ):
+            raise ValueError("Gameplay 120 requires a freshly constructed 120 Hz environment")
+        if (
+            reward_mode
+            not in (
+                REWARD_MODE_GAMEPLAY_120_V1,
+                REWARD_MODE_GAMEPLAY_120_V2,
+            )
+            and self.world.gameplay_120 is not None
+        ):
             raise ValueError("Gameplay 120 physical-guard state cannot be removed in-place")
         expected_type = (
             Rival2Gameplay120State

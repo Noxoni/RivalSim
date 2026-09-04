@@ -21,6 +21,7 @@ RIVAL2_REWARD_GAMEPLAY_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V2"
 RIVAL2_REWARD_GAMEPLAY_V3_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_V3"
 RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_120_V1"
 RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION: Final = "RIVAL2_REWARD_GAMEPLAY_120_V2"
+RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION: Final = "RIVAL2_REWARD_SSL_FOUNDATION_V1"
 RIVAL2_EPISODE_VERSION: Final = "RIVAL2_EPISODE_V1"
 RIVAL2_FULL_MATCH_EPISODE_VERSION: Final = "RIVAL2_EPISODE_FULL_MATCH_V1"
 
@@ -745,9 +746,7 @@ REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
         "small_pad_pickup": GAMEPLAY_SMALL_PAD_PICKUP_REWARD,
         "large_pad_pickup": GAMEPLAY_BIG_PAD_PICKUP_REWARD,
         "save": GAMEPLAY_SAVE_REWARD,
-        "unnecessary_flip_through_contact": (
-            GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY
-        ),
+        "unnecessary_flip_through_contact": (GAMEPLAY_120_V2_UNNECESSARY_FLIP_PENALTY),
         "cadence_scaling": "none; paid once per authoritative physical event",
     },
     "progress": {
@@ -764,9 +763,7 @@ REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
     "competitive_ball_control": {
         "distance": "norm(ball_position - car_position)",
         "relative_speed": "norm(ball_velocity - car_velocity)",
-        "proximity": (
-            "clamp((500 - distance) / 350, 0, 1)"
-        ),
+        "proximity": ("clamp((500 - distance) / 350, 0, 1)"),
         "velocity_match": "clamp(1 - relative_speed / 1200, 0, 1)",
         "score": "proximity * velocity_match",
         "coefficient": GAMEPLAY_120_V2_CONTROL_REWARD,
@@ -782,9 +779,7 @@ REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
             "new legitimate car-ball contact onset during active directional dodge: "
             "is_flipping and has_flipped and non-zero directional flip_rel_torque"
         ),
-        "pending_window_ticks_at_120_hz": (
-            GAMEPLAY_120_V2_RETAINED_CONTROL_WINDOW_TICKS
-        ),
+        "pending_window_ticks_at_120_hz": (GAMEPLAY_120_V2_RETAINED_CONTROL_WINDOW_TICKS),
         "active_exemptions_in_precedence_order": [
             "EXEMPT_CONTESTED_50",
             "EXEMPT_POWER_CONTACT",
@@ -792,9 +787,7 @@ REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
         ],
         "retained_control": {
             "window": "the next 12 authoritative ticks after contact",
-            "minimum_control_score": (
-                GAMEPLAY_120_V2_RETAINED_CONTROL_THRESHOLD
-            ),
+            "minimum_control_score": (GAMEPLAY_120_V2_RETAINED_CONTROL_THRESHOLD),
             "ends_on": "reset or termination",
         },
         "recognized_mechanic_exemption": False,
@@ -805,6 +798,76 @@ REWARD_GAMEPLAY_120_V2_CONTRACT: Final = {
     "quarantined_experimental_labels": list(
         REWARD_GAMEPLAY_V3_CONTRACT["mechanics"]["canonical_rewardable"]
     ),
+}
+
+REWARD_SSL_FOUNDATION_V1_CONTRACT: Final = {
+    "version": RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION,
+    "cadence_hz": 120,
+    "physics_hz": 120,
+    "action_hold_ticks": 1,
+    "observation_version": RIVAL2_OBS_V2_120HZ_VERSION,
+    "action_version": RIVAL2_ACTION_V2_120HZ_VERSION,
+    "episode_version": RIVAL2_EPISODE_VERSION,
+    "zero_sum": True,
+    "gamma": 0.9987476493904754,
+    "composition": (
+        "terminal goal (+10/-10) plus sum_k w_k * "
+        "(gamma * Phi_k(s_next) - Phi_k(s)); an absorbing goal has Phi(s_next)=0"
+    ),
+    "terminal": {"goal_for": 10.0, "goal_against": -10.0, "timeout": 0.0},
+    "potentials": {
+        "field": {
+            "weight": 1.25,
+            "formula": "clip(canonical_ball_y / 5120, -1, 1)",
+        },
+        "free_ball_access": {
+            "weight": 0.75,
+            "controllability": (
+                "C_i = clip((500-distance_i)/350,0,1) * clip(1-relative_speed_i/1200,0,1)"
+            ),
+            "formula": ("(1-max(C_self,C_opp)) * clip((distance_opp-distance_self)/3000,-1,1)"),
+        },
+        "control_advantage": {
+            "weight": 0.75,
+            "formula": "C_self-C_opp",
+        },
+        "defensive_coverage": {
+            "weight": 0.50,
+            "threat": (
+                "clip(0.45*territorial_depth + 0.30*goalward_velocity + "
+                "0.25*opponent_controllability,0,1)"
+            ),
+            "coverage": (
+                "smooth between-ball-and-own-goal longitudinal gate times "
+                "clip(1-cross_track_distance/1500,0,1)"
+            ),
+            "formula": "threat_self*coverage_self - threat_opp*coverage_opp",
+        },
+    },
+    "reset_semantics": {
+        "goal": "absorbing successor potential is exactly zero",
+        "timeout": "pre-reset final state is bootstrapped; no reset-state potential is mixed in",
+        "new_episode": "first transition starts from the actual reset state",
+    },
+    "direct_reward_exactly_zero": [
+        "ordinary_touch",
+        "jump",
+        "dodge_or_flip",
+        "bad_flip",
+        "speed",
+        "supersonic",
+        "boost_spend",
+        "boost_collection_or_pad",
+        "demolition",
+        "save_event",
+        "aerial_touch",
+        "recovery",
+        "dash",
+        "named_or_inferred_mechanic",
+    ],
+    "named_mechanics_reward": 0.0,
+    "named_mechanics_hot_path": False,
+    "task_identifier_in_observation": False,
 }
 
 EPISODE_CONTRACT: Final = {
@@ -839,20 +902,15 @@ ACTION_CONTRACT_V2_120HZ_HASH: Final = _canonical_hash(ACTION_CONTRACT_V2_120HZ)
 REWARD_CONTRACT_HASH: Final = _canonical_hash(REWARD_CONTRACT)
 REWARD_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_V2_CONTRACT)
 REWARD_ACQUISITION_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_ACQUISITION_V1_CONTRACT)
-REWARD_ACQUISITION_120_V1_CONTRACT_HASH: Final = _canonical_hash(
-    REWARD_ACQUISITION_120_V1_CONTRACT
-)
+REWARD_ACQUISITION_120_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_ACQUISITION_120_V1_CONTRACT)
 REWARD_GOAL_ONLY_CONTRACT_HASH: Final = _canonical_hash(REWARD_GOAL_ONLY_CONTRACT)
 REWARD_SCORING_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SCORING_V1_CONTRACT)
 REWARD_GAMEPLAY_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V1_CONTRACT)
 REWARD_GAMEPLAY_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V2_CONTRACT)
 REWARD_GAMEPLAY_V3_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_V3_CONTRACT)
-REWARD_GAMEPLAY_120_V1_CONTRACT_HASH: Final = _canonical_hash(
-    REWARD_GAMEPLAY_120_V1_CONTRACT
-)
-REWARD_GAMEPLAY_120_V2_CONTRACT_HASH: Final = _canonical_hash(
-    REWARD_GAMEPLAY_120_V2_CONTRACT
-)
+REWARD_GAMEPLAY_120_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_120_V1_CONTRACT)
+REWARD_GAMEPLAY_120_V2_CONTRACT_HASH: Final = _canonical_hash(REWARD_GAMEPLAY_120_V2_CONTRACT)
+REWARD_SSL_FOUNDATION_V1_CONTRACT_HASH: Final = _canonical_hash(REWARD_SSL_FOUNDATION_V1_CONTRACT)
 EPISODE_CONTRACT_HASH: Final = _canonical_hash(EPISODE_CONTRACT)
 FULL_MATCH_EPISODE_CONTRACT_HASH: Final = _canonical_hash(FULL_MATCH_EPISODE_CONTRACT)
 
@@ -884,6 +942,7 @@ def contract_hashes_for_reward(
         RIVAL2_REWARD_ACQUISITION_120_V1_VERSION,
         RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION,
         RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION,
+        RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION,
     ):
         selected_observation = observation_version or RIVAL2_OBS_V2_120HZ_VERSION
         selected_action = action_version or RIVAL2_ACTION_V2_120HZ_VERSION
@@ -895,8 +954,10 @@ def contract_hashes_for_reward(
             reward_hash = REWARD_ACQUISITION_120_V1_CONTRACT_HASH
         elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V1_VERSION:
             reward_hash = REWARD_GAMEPLAY_120_V1_CONTRACT_HASH
-        else:
+        elif reward_version == RIVAL2_REWARD_GAMEPLAY_120_V2_VERSION:
             reward_hash = REWARD_GAMEPLAY_120_V2_CONTRACT_HASH
+        else:
+            reward_hash = REWARD_SSL_FOUNDATION_V1_CONTRACT_HASH
         return {
             RIVAL2_OBS_V2_120HZ_VERSION: OBSERVATION_SCHEMA_V2_120HZ_HASH,
             RIVAL2_ACTION_V2_120HZ_VERSION: ACTION_CONTRACT_V2_120HZ_HASH,
@@ -1034,6 +1095,8 @@ __all__ = [
     "REWARD_GOAL_ONLY_CONTRACT_HASH",
     "REWARD_SCORING_V1_CONTRACT",
     "REWARD_SCORING_V1_CONTRACT_HASH",
+    "REWARD_SSL_FOUNDATION_V1_CONTRACT",
+    "REWARD_SSL_FOUNDATION_V1_CONTRACT_HASH",
     "REWARD_V2_CONTRACT",
     "REWARD_V2_CONTRACT_HASH",
     "RIVAL2_ACTION_V2_120HZ_VERSION",
@@ -1048,6 +1111,7 @@ __all__ = [
     "RIVAL2_REWARD_GAMEPLAY_V3_VERSION",
     "RIVAL2_REWARD_GOAL_ONLY_VERSION",
     "RIVAL2_REWARD_SCORING_V1_VERSION",
+    "RIVAL2_REWARD_SSL_FOUNDATION_V1_VERSION",
     "RIVAL2_REWARD_V2_VERSION",
     "SCORING_APPROACH_COEFFICIENT",
     "SCORING_DEMOLITION_REWARD",

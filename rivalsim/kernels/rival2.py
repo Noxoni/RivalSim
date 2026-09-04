@@ -765,6 +765,8 @@ def rival2_accumulate_tick(
 @wp.kernel(enable_backward=False)
 def rival2_after_interval_reset(
     reset_mask: wp.array(dtype=wp.int32),
+    reset_kickoff_indicator: wp.array(dtype=wp.int32),
+    use_reset_kickoff_indicator: int,
     episode_ticks: wp.array(dtype=wp.int32),
     no_touch_ticks: wp.array(dtype=wp.int32),
     kickoff_indicator: wp.array(dtype=wp.int32),
@@ -783,6 +785,8 @@ def rival2_after_interval_reset(
         episode_ticks[env] = 0
         no_touch_ticks[env] = 0
         kickoff_indicator[env] = 1
+        if use_reset_kickoff_indicator != 0:
+            kickoff_indicator[env] = reset_kickoff_indicator[env]
         car_base = env * 2
         for local_car in range(2):
             car = car_base + local_car

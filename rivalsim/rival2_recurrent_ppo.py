@@ -53,6 +53,7 @@ class Rival2RecurrentRolloutBuffer:
         device: torch.device | str,
         *,
         obs_dim: int = OBS_DIM,
+        store_opponent_family: bool = False,
     ):
         if horizon <= 0 or num_envs <= 0:
             raise ValueError("horizon and num_envs must be positive")
@@ -75,6 +76,11 @@ class Rival2RecurrentRolloutBuffer:
         self.truncated = torch.empty(agent_shape, dtype=torch.bool, device=self.device)
         self.next_values = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
         self.train_mask = torch.empty(agent_shape, dtype=torch.bool, device=self.device)
+        self.opponent_family = (
+            torch.full(agent_shape, -1, dtype=torch.int64, device=self.device)
+            if store_opponent_family
+            else None
+        )
         self.reset_before = torch.empty(agent_shape, dtype=torch.bool, device=self.device)
         self.advantages = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
         self.returns = torch.empty(agent_shape, dtype=torch.float32, device=self.device)
@@ -98,6 +104,8 @@ class Rival2RecurrentRolloutBuffer:
             self.advantages,
             self.returns,
         )
+        if self.opponent_family is not None:
+            tensors = (*tensors, self.opponent_family)
         return sum(tensor.numel() * tensor.element_size() for tensor in tensors)
 
     def add(
@@ -114,6 +122,7 @@ class Rival2RecurrentRolloutBuffer:
         next_value: torch.Tensor,
         train_mask: torch.Tensor,
         reset_before: torch.Tensor,
+        opponent_family: torch.Tensor | None = None,
     ) -> None:
         if self.position >= self.horizon:
             raise RuntimeError("rollout buffer is full")
@@ -133,6 +142,12 @@ class Rival2RecurrentRolloutBuffer:
         }
         for name, value_tensor in fields.items():
             getattr(self, name)[index].copy_(value_tensor)
+        if self.opponent_family is not None:
+            if opponent_family is None:
+                raise ValueError("opponent family is required by this rollout buffer")
+            self.opponent_family[index].copy_(opponent_family)
+        elif opponent_family is not None:
+            raise ValueError("rollout buffer was not configured for opponent families")
         self.position += 1
 
     def compute_gae(self, config: Rival2PPOConfig) -> None:
@@ -292,7 +307,17 @@ def recurrent_ppo_update(
     selected_advantage = raw_advantage[train_mask]
     advantage_mean = selected_advantage.mean()
     advantage_std = selected_advantage.std(unbiased=False).clamp_min(1.0e-8)
-    normalized_advantage = (raw_advantage - advantage_mean) / advantage_std
+    if rollout.opponent_family is None:
+        normalized_advantage = (raw_advantage - advantage_mean) / advantage_std
+    else:
+        family = _sequence_major(rollout.opponent_family)
+        normalized_advantage = torch.zeros_like(raw_advantage)
+        for family_id in torch.unique(family[train_mask]).tolist():
+            selected = train_mask & (family == int(family_id))
+            values = raw_advantage[selected]
+            family_mean = values.mean()
+            family_std = values.std(unbiased=False).clamp_min(1.0e-8)
+            normalized_advantage[selected] = (values - family_mean) / family_std
 
     metric_names = (
         "policy_loss",
