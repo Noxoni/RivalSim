@@ -9,7 +9,7 @@
     "snapshot_interval": 30,
     "wall_clock_seconds": 36000
   },
-  "created_utc": "2026-09-04T02:51:19.494909+00:00",
+  "created_utc": "2026-09-04T02:52:49.823941+00:00",
   "exploration": {
     "contract": {
       "analog": {
@@ -41,7 +41,7 @@
     "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
   },
   "format": "RIVAL2_SSL_FOUNDATION_PPO_V1_AUTHORITY",
-  "implementation_commit": "e9c86e6907faa488923ba6d2ba310db32af0ecb5",
+  "implementation_commit": "422359bf58be8ceb579899c30a9445a7e8cbd44d",
   "integrity": {
     "no_old_optimizer_loaded": true,
     "no_plus_174_model_loaded": true,
@@ -81,6 +81,7 @@
           "weight": 0.15
         },
         "car_ball_target_approach_alignment": {
+          "car_facing_or_controller_action_used": false,
           "formula": "dot(unit(car_to_ball), unit(ball_to_target)) * clip(1-(self_ball_distance-150)/2850,0,1)",
           "not_an_event_or_action_reward": true,
           "target": "canonical opponent goal center (0,5120,321)",
@@ -141,6 +142,7 @@
     "epochs": 1,
     "family_local_advantage_normalization": true,
     "fresh_optimizer": true,
+    "gamma": 0.9987476493904754,
     "kl_policy": "telemetry_only_no_rejection_retry_or_rollback",
     "minibatch_size": 65536,
     "nonfinite_transactional_rollback": true,
@@ -203,7 +205,7 @@
   },
   "reward": {
     "all_shaping_is_gamma_phi_next_minus_phi": true,
-    "contract_sha256": "1197EA771ECF0D226F7D3139875CCDB58292905959DA0B82578D21E7A3B843BE",
+    "contract_sha256": "C960B465914395BD7181DE0C1FC737165ACD69D507C65C563E575A8E017028D5",
     "direct_non_goal_reward_terms": 0,
     "gamma": 0.9987476493904754,
     "legacy_gameplay_reward_module_allocated": false,
@@ -229,6 +231,6 @@
     "required_format": "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
     "sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
   },
-  "supersedes_authority_sha256": "DCA2822CB83AF3C2A3B546038CD9B9F482FAD0536D67FDF88BD092F2FA1F16E1",
-  "supersession_reason": "user-authorized six-potential reward amendment before PPO"
+  "supersedes_authority_sha256": "C625349F05877CC85A1D2F7BD9256D0DAD759750A96D9D1F7BF19558EFDA0DB4",
+  "supersession_reason": "bind actual PPO gamma after six-potential amendment before PPO"
 }
