@@ -5,6 +5,7 @@ from pathlib import Path
 
 import torch
 
+from benchmarks.evaluate_rival2_unified_capability_v2 import load_unified, report_path
 from benchmarks.run_rival2_unified_capability_distillation_v5 import (
     FAMILIES,
     PrefixSequencePool,
@@ -56,3 +57,24 @@ def test_v5_authority_has_one_weight_for_every_family() -> None:
     assert abs(sum(weights.values()) - 1.0) < 1.0e-9
     assert authority["corpora"]["prefix_sequence_ticks"] == 192
     assert authority["integrity"]["optimizer_steps_before_authority_commit"] == 0
+
+
+def test_physical_evaluator_accepts_ground_curriculum_checkpoint(
+    tmp_path: Path,
+) -> None:
+    source = (
+        ROOT
+        / "checkpoints/rival2/unified_capability_distillation_v5"
+        / "rival2_unified_capability_v5.pt"
+    )
+    payload = torch.load(source, map_location="cpu", weights_only=False)
+    payload["format"] = "RIVAL2_UNIFIED_GROUND_CURRICULUM_PPO_V2_CHECKPOINT"
+    payload["accepted_updates_total"] = 174
+    target = tmp_path / "outside-repo-ground-checkpoint.pt"
+    torch.save(payload, target)
+
+    loaded, model = load_unified(target.resolve(), "cpu")
+
+    assert loaded["accepted_updates_total"] == 174
+    assert report_path(target.resolve()) == target.resolve().as_posix()
+    assert sum(parameter.numel() for parameter in model.parameters()) == 1_071_131

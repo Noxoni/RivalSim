@@ -87,6 +87,13 @@ def write_json(path: Path, payload: Any) -> None:
     os.replace(temporary, path)
 
 
+def report_path(path: Path) -> str:
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def load_unified(path: Path, device: str) -> tuple[dict[str, Any], Rival2UnifiedActorCritic]:
     payload = torch.load(path, map_location="cpu", weights_only=False)
     if payload.get("format") not in {
@@ -94,6 +101,7 @@ def load_unified(path: Path, device: str) -> tuple[dict[str, Any], Rival2Unified
         "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V3",
         "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V4",
         "RIVAL2_UNIFIED_CAPABILITY_CHECKPOINT_V5",
+        "RIVAL2_UNIFIED_GROUND_CURRICULUM_PPO_V2_CHECKPOINT",
     }:
         raise RuntimeError("unsupported unified checkpoint format")
     config = Rival2UnifiedPolicyConfig(**payload["policy_config"])
@@ -502,9 +510,18 @@ def run(args: argparse.Namespace) -> int:
         "runtime_router": False,
         "task_identifier_input": False,
         "checkpoint": {
-            "path": args.checkpoint.relative_to(ROOT).as_posix(),
+            "path": report_path(args.checkpoint),
             "sha256": checkpoint_sha,
-            "selected_step": int(payload["accepted_supervised_steps"]),
+            "selected_step": (
+                None
+                if payload.get("accepted_supervised_steps") is None
+                else int(payload["accepted_supervised_steps"])
+            ),
+            "accepted_updates_total": (
+                None
+                if payload.get("accepted_updates_total") is None
+                else int(payload["accepted_updates_total"])
+            ),
         },
         "execution": {
             "deterministic": True,
