@@ -1,0 +1,109 @@
+{
+  "format": "RIVAL2_LONG_TRACE_SPEED_INVESTIGATION_V1",
+  "mode": "diagnosis_only",
+  "capture": {
+    "started_utc": "2026-09-05T00:36:10Z",
+    "duration_seconds": 120,
+    "requested_hz": 50,
+    "worker_pid": 44708,
+    "tool": "py-spy 0.4.2",
+    "nonblocking": true,
+    "reported_samples": 5728,
+    "reported_errors": 271,
+    "unresolved_empty_stacks": 1026,
+    "identifiable_stacks": 4702
+  },
+  "identifiable_stack_counts": {
+    "rollout": 1906,
+    "ppo_minibatch_other": 1397,
+    "post_step_kl": 744,
+    "completed_diagnostics": 635,
+    "ppo_setup_other": 10,
+    "checkpoint": 5,
+    "other": 5
+  },
+  "identifiable_stack_percent": {
+    "rollout": 40.54,
+    "ppo_minibatch_other": 29.71,
+    "post_step_kl": 15.82,
+    "completed_diagnostics": 13.5,
+    "ppo_setup_other": 0.21,
+    "checkpoint": 0.11,
+    "other": 0.11
+  },
+  "inclusive_observations": {
+    "gru_reset_spans": 1908,
+    "reset_boundary_metadata_line32": 664,
+    "multi_tensor_adam": 53,
+    "finite_parameters": 128
+  },
+  "profile_caveats": [
+    "Python stack samples, not CUDA kernel timing; host synchronization can be charged for previously queued GPU work.",
+    "1026 empty stacks and 271 sample errors constrain attribution; percentages exclude empty stacks.",
+    "Window crosses update boundaries and is not aligned to a full update.",
+    "No exact production speedup estimate is established."
+  ],
+  "current_updates": [
+    {
+      "update": 33,
+      "seconds": 83.89038540003821
+    },
+    {
+      "update": 34,
+      "seconds": 85.89598980010487
+    },
+    {
+      "update": 35,
+      "seconds": 86.61826059990562
+    },
+    {
+      "update": 36,
+      "seconds": 87.07749879988842
+    }
+  ],
+  "training_process_not_interrupted": true,
+  "production_files_changed": false,
+  "no_optimization_implemented": true,
+  "priorities": [
+    {
+      "rank": 1,
+      "proposal": "Use existing independent-critic-only path for rollout next values; add actor-only inference for post-step KL without dropping telemetry.",
+      "proof": "Direct value-only computation matched full-forward values exactly in CPU structural probe; full CUDA rollout/gradient/optimizer/RNG verification remains required."
+    },
+    {
+      "rank": 2,
+      "proposal": "Cache and reuse reset/mask metadata across gradient and post-step forwards; batch finite checks into one host decision while checking every parameter at every existing boundary.",
+      "proof": "Repeated reset metadata synchronization observed. 24 parameter tensors times 722 optimizer steps produces up to 17328 per-parameter host checks per update."
+    },
+    {
+      "rank": 3,
+      "proposal": "Restrict frozen-V5 forward computation to its active opponent rows, preserving reset/hidden semantics and the current actor's RNG draws.",
+      "proof": "Code evaluates all65536 agent rows, but nominal 20% frozen-opponent worlds require one frozen car each, about10% of those rows."
+    },
+    {
+      "rank": 4,
+      "proposal": "Consider fused Adam only after measuring higher-value paths; current CUDA execution is already multi-tensor.",
+      "proof": "53 inclusive profile samples in multi_tensor_adam, not a dominant observed location."
+    }
+  ],
+  "unchanged": [
+    "model weights",
+    "Adam state",
+    "reward",
+    "rollout360",
+    "GAE lambda",
+    "worlds32768",
+    "effective minibatch",
+    "two epochs",
+    "opponent mix",
+    "nonfinite safeguards",
+    "KL telemetry",
+    "deadline",
+    "evaluation schedule"
+  ],
+  "sources": [
+    "https://docs.pytorch.org/tutorials/recipes/recipes/tuning_guide.html",
+    "https://docs.pytorch.org/docs/main/generated/torch.optim.Adam.html",
+    "https://github.com/benfred/py-spy"
+  ]
+}
