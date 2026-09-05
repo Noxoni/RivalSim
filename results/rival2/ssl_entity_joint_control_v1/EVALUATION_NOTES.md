@@ -10,6 +10,7 @@ are numbers of focal cases with a touch, or goals, not percentages.
 | Entity/joint-control initialization | 11 | 61 | 11 | 26 | 0 / 64 |
 | Entity candidate +10 | 20 | 58 | 14 | 13 | 0 / 64 |
 | Entity candidate +20 | 18 | 58 | 14 | 13 | 0 / 64 |
+| Entity candidate +50 | 35 | 55 | 17 | 13 | 0 / 64 |
 
 The +10 acquisition change is +9cases relative to the changed-control
 initialization, and +4cases relative to the original hybrid parent. Finishing
@@ -37,3 +38,20 @@ Nexto results are unchanged. This is not a monotonic improvement curve and does
 not establish competitive progress. The immutable +20 checkpoint and its
 optimizer/parameter audit are retained; all expected parameter groups changed,
 all Adam counters equal3640, and model/optimizer values remain finite.
+
+At +50 the acquisition coverage rises to35/64 (+19 versus the original parent,
++24 versus the changed-control initialization, +17 versus +20). Total contact
+events are38; acquisition goals are7 for /2 against. Finishing coverage is53/64
+with65 total contacts and17 goals, exceeding the parent's46/64 and14 goals.
+No-touch resets decline modestly in both families. This is materially stronger
+basic-acquisition evidence on the fixed development cases than the +10/+20
+results, but only one such boundary so far; it is not independent generalization
+or proof that attention alone caused the improvement.
+
+Nexto still produces64 goals against Rival and Rival scores0. Contact coverage
+there remains13/64, with26 total contacts. Do not call the improved self-play
+scenario scores competitive progress against Nexto. No deployment or opponent
+mixture change is made; complete the prospectively frozen +100 pilot and the
+fixed post-pilot match comparison. The +50 model/optimizer integrity audit
+passes, with9100 steps per Adam counter and no nonfinite states. All50 detailed
+training rows are independently preserved in `training_summary_050.json`.

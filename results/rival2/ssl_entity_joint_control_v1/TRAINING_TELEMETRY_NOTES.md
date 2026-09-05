@@ -49,3 +49,31 @@ is deliberately not staged while the worker is writing it.
 The fixed development evaluations remain the behavioral comparison: at +20,
 acquisition18/64 vs original parent16/64, finishing14 goals unchanged, and
 Nexto0 goals for /64 against. These training trends do not supersede that result.
+
+## Extension through +50
+
+The same count-weighted method, without changing its definitions, yields:
+
+| Metric | Updates31-40 | Updates41-50 |
+|---|---:|---:|
+| Touches / player-minute | 1.9731 | 2.1787 |
+| Physical goals / world-minute | 0.6166 | 0.6964 |
+| Ended player episodes with a touch | 36.74% | 40.08% |
+| No-touch fraction of world resets | 84.81% | 82.66% |
+| Conditional first-touch seconds | 1.7611 | 1.7615 |
+| Goalward fraction of touch events | 84.64% | 85.51% |
+| Mean movement speed, uu/s | 715.75 | 686.82 |
+| Jump requested fraction | 14.89% | 11.76% |
+| Boost requested fraction | 23.45% | 23.12% |
+| Handbrake requested fraction | 26.69% | 24.45% |
+| Categorical entropy, nats | 3.4709 | 3.4817 |
+
+Training contacts and goal rates continue upward; no-touch share now declines,
+although most completed world episodes still end by no-touch timeout. Speed is
+lower, not higher. First-touch time remains flat after the initial block. The
+fixed +50 evaluation independently measures35/64 acquisition cases with a touch
+and17 finishing goals, while Nexto scoring remains0for/64against. This is better
+basic acquisition, not evidence of useful aerials, possession, or match strength.
+
+`training_summary_050.json` binds all50 source rows and their original byte
+prefix hash. Its presence does not authorize changing the live pilot budget.
