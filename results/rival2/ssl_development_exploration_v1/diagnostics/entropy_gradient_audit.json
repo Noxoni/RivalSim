@@ -1,0 +1,317 @@
+{
+  "arms": {
+    "control": {
+      "batches": [
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": -0.06348252296447754,
+              "entropy_norm": 0.009921363554894924,
+              "entropy_to_policy_norm_ratio": 0.12723198533058167,
+              "policy_norm": 0.07797852903604507
+            },
+            "button_heads": {
+              "cosine": 0.641477108001709,
+              "entropy_norm": 0.0006703154067508876,
+              "entropy_to_policy_norm_ratio": 0.06548770517110825,
+              "policy_norm": 0.010235744528472424
+            },
+            "log_std_heads": {
+              "cosine": -0.4312852621078491,
+              "entropy_norm": 0.004124938044697046,
+              "entropy_to_policy_norm_ratio": 0.08041318506002426,
+              "policy_norm": 0.051296789199113846
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.22471138834953308
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.18122099339962006,
+            "below_floor_fraction": 0.3591941297054291
+          },
+          "sequence_count": 728,
+          "sequence_start": 0
+        },
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": 0.6767483949661255,
+              "entropy_norm": 0.009793754667043686,
+              "entropy_to_policy_norm_ratio": 0.09684423357248306,
+              "policy_norm": 0.1011289432644844
+            },
+            "button_heads": {
+              "cosine": 0.6451322436332703,
+              "entropy_norm": 0.0006416754913516343,
+              "entropy_to_policy_norm_ratio": 0.05209534987807274,
+              "policy_norm": 0.012317327782511711
+            },
+            "log_std_heads": {
+              "cosine": 0.6654837727546692,
+              "entropy_norm": 0.0038340638857334852,
+              "entropy_to_policy_norm_ratio": 0.051426712423563004,
+              "policy_norm": 0.07455393671989441
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.22814317047595978
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.2002655565738678,
+            "below_floor_fraction": 0.34606531262397766
+          },
+          "sequence_count": 728,
+          "sequence_start": 10000
+        },
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": -0.5866768956184387,
+              "entropy_norm": 0.009752237237989902,
+              "entropy_to_policy_norm_ratio": 0.09158022701740265,
+              "policy_norm": 0.10648845881223679
+            },
+            "button_heads": {
+              "cosine": -0.6296103596687317,
+              "entropy_norm": 0.000670603767503053,
+              "entropy_to_policy_norm_ratio": 0.06868286430835724,
+              "policy_norm": 0.00976377073675394
+            },
+            "log_std_heads": {
+              "cosine": -0.36084529757499695,
+              "entropy_norm": 0.004018852487206459,
+              "entropy_to_policy_norm_ratio": 0.0660000890493393,
+              "policy_norm": 0.06089162454009056
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.27517566084861755
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.1780799776315689,
+            "below_floor_fraction": 0.361486554145813
+          },
+          "sequence_count": 728,
+          "sequence_start": 40000
+        }
+      ],
+      "caveat": "Three predetermined minibatches from fresh scenario episodes; descriptive gradient evidence, not a causal learning ablation or all-state claim.",
+      "checkpoint_sha256": "BE89AC04CDE58DF881C2C0B16D3945C515531950AE3BA7F67C6EFAE3E64E5F55",
+      "model_and_optimizer_unchanged": true,
+      "native_rollout": {
+        "analog_saturation_fraction": 0.010583902994791667,
+        "boost": 3833598.0,
+        "concedes": 1709.0,
+        "ended_player_episode_touch_fraction": 0.5002925687536571,
+        "ended_player_episodes": 3418.0,
+        "episodes_with_touch": 1710.0,
+        "first_touch_age": 33386.47684434056,
+        "first_touches": 20883.0,
+        "goals": 1709.0,
+        "goalward_touch_definition": "native contacts; ball canonical velocity at decision end (not shot success)",
+        "goalward_touch_fraction": 0.8474853534200715,
+        "goalward_touches": 22277.0,
+        "handbrake": 1324807.0,
+        "jump": 527267.0,
+        "mean_first_touch_seconds_if_touched": 1.5987394935756627,
+        "movement_speed": 1220.954663977027,
+        "nexto_samples": 0.0,
+        "no_touch": 0.0,
+        "opponent_nexto_probability": 0.0,
+        "physical_player_minutes": 3276.8,
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "potential_reward_components": {
+          "access": -8968.604339951493,
+          "alignment": -6081.325187506565,
+          "boost": -6878.319590305453,
+          "control": 0.0,
+          "defense": 0.0,
+          "field": 0.0,
+          "goal_velocity": -590.6402998766973,
+          "terminal_goal": 0.0,
+          "total": -22518.889364388444
+        },
+        "resets": 1709.0,
+        "samples": 5898240.0,
+        "saturation": 312132.0,
+        "speed": 3131079.8422851562,
+        "time_limit": 0.0,
+        "touches": 26286.0,
+        "touches_per_minute": 8.0218505859375,
+        "trainable_agent_samples": 5898240
+      },
+      "optimizer_steps_taken": 0
+    },
+    "half_sigma": {
+      "batches": [
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": 0.2920398414134979,
+              "entropy_norm": 0.010276568122208118,
+              "entropy_to_policy_norm_ratio": 0.037683337926864624,
+              "policy_norm": 0.272708535194397
+            },
+            "button_heads": {
+              "cosine": -0.08591816574335098,
+              "entropy_norm": 0.0005487101734615862,
+              "entropy_to_policy_norm_ratio": 0.07387395948171616,
+              "policy_norm": 0.007427653297781944
+            },
+            "log_std_heads": {
+              "cosine": 0.46277081966400146,
+              "entropy_norm": 0.003977211657911539,
+              "entropy_to_policy_norm_ratio": 0.06617186218500137,
+              "policy_norm": 0.06010427325963974
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.5984907150268555
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.23024418950080872,
+            "below_floor_fraction": 0.2767765522003174
+          },
+          "sequence_count": 728,
+          "sequence_start": 0
+        },
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": 0.029105057939887047,
+              "entropy_norm": 0.010411803610622883,
+              "entropy_to_policy_norm_ratio": 0.06309089809656143,
+              "policy_norm": 0.1650286167860031
+            },
+            "button_heads": {
+              "cosine": 0.745155394077301,
+              "entropy_norm": 0.0005286358646117151,
+              "entropy_to_policy_norm_ratio": 0.043112657964229584,
+              "policy_norm": 0.01226173248142004
+            },
+            "log_std_heads": {
+              "cosine": 0.28876984119415283,
+              "entropy_norm": 0.0038161533884704113,
+              "entropy_to_policy_norm_ratio": 0.07729679346084595,
+              "policy_norm": 0.049370139837265015
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.4380851686000824
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.23740841448307037,
+            "below_floor_fraction": 0.26535409688949585
+          },
+          "sequence_count": 728,
+          "sequence_start": 10000
+        },
+        {
+          "gradients": {
+            "actor_features": {
+              "cosine": 0.12687310576438904,
+              "entropy_norm": 0.010347086004912853,
+              "entropy_to_policy_norm_ratio": 0.10899993032217026,
+              "policy_norm": 0.09492745250463486
+            },
+            "button_heads": {
+              "cosine": -0.04073452204465866,
+              "entropy_norm": 0.0005488033639267087,
+              "entropy_to_policy_norm_ratio": 0.0677194595336914,
+              "policy_norm": 0.008104071952402592
+            },
+            "log_std_heads": {
+              "cosine": -0.2284136414527893,
+              "entropy_norm": 0.003937790635973215,
+              "entropy_to_policy_norm_ratio": 0.07679513096809387,
+              "policy_norm": 0.051276564598083496
+            },
+            "mean_heads": {
+              "cosine": 0.0,
+              "entropy_norm": 0.0,
+              "entropy_to_policy_norm_ratio": 0.0,
+              "policy_norm": 0.4116702973842621
+            }
+          },
+          "old_logp_max_error": 0.0,
+          "raw_log_std_clamp": {
+            "above_ceiling_fraction": 0.22238095104694366,
+            "below_floor_fraction": 0.278324156999588
+          },
+          "sequence_count": 728,
+          "sequence_start": 40000
+        }
+      ],
+      "caveat": "Three predetermined minibatches from fresh scenario episodes; descriptive gradient evidence, not a causal learning ablation or all-state claim.",
+      "checkpoint_sha256": "A3F7B4C17D03C8A7397D98378B7352E5A0ED1BD000F69FF9DD2ACAAEBC6A6471",
+      "model_and_optimizer_unchanged": true,
+      "native_rollout": {
+        "analog_saturation_fraction": 9.94873046875e-05,
+        "boost": 3536080.0,
+        "concedes": 1735.0,
+        "ended_player_episode_touch_fraction": 0.5,
+        "ended_player_episodes": 3470.0,
+        "episodes_with_touch": 1735.0,
+        "first_touch_age": 30646.609639436007,
+        "first_touches": 19603.0,
+        "goals": 1735.0,
+        "goalward_touch_definition": "native contacts; ball canonical velocity at decision end (not shot success)",
+        "goalward_touch_fraction": 0.8185374421203896,
+        "goalward_touches": 20506.0,
+        "handbrake": 1516535.0,
+        "jump": 669629.0,
+        "mean_first_touch_seconds_if_touched": 1.5633632423320925,
+        "movement_speed": 1199.2960641698705,
+        "nexto_samples": 0.0,
+        "no_touch": 0.0,
+        "opponent_nexto_probability": 0.0,
+        "physical_player_minutes": 3276.8,
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "potential_reward_components": {
+          "access": -8914.510427070125,
+          "alignment": -5708.053106999785,
+          "boost": -6606.873308627768,
+          "control": 0.0,
+          "defense": 0.0,
+          "field": 0.0,
+          "goal_velocity": -451.68490777256534,
+          "terminal_goal": 0.0,
+          "total": -21681.121695248927
+        },
+        "resets": 1735.0,
+        "samples": 5898240.0,
+        "saturation": 2934.0,
+        "speed": 3075537.3989257812,
+        "time_limit": 0.0,
+        "touches": 25052.0,
+        "touches_per_minute": 7.645263671875,
+        "trainable_agent_samples": 5898240
+      },
+      "optimizer_steps_taken": 0
+    }
+  },
+  "utc": "2026-09-05T19:01:02.721517+00:00"
+}
