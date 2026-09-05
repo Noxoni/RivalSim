@@ -11,7 +11,7 @@
     "snapshot_interval": 50,
     "wall_clock_seconds": 36000
   },
-  "created_utc": "2026-09-05T01:03:42.005565+00:00",
+  "created_utc": "2026-09-04T23:46:05.445882+00:00",
   "credit_assignment_amendment": {
     "bound": "stop at total local update 100, not 100 additional updates",
     "comparison": "report cumulative samples and elapsed time, not just update count",
@@ -72,18 +72,18 @@
     "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
   },
   "format": "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1_AUTHORITY",
-  "implementation_commit": "c8955d0592f6549b5953affc4ec0082aa52b0698",
+  "implementation_commit": "8986576fc77aaa4ed76bbbd8f7b9ab07c61fbc04",
   "implementation_sha256": {
     "benchmarks/run_rival2_ssl_foundation_ppo_v1.py": "FB318C32CDACF0CB5CD9423A4DC12101F4BB94C3086801BC1B987303FE2ACBFB",
-    "benchmarks/run_rival2_ssl_foundation_v5_long_trace_v1.py": "F930BDA84D527AAEE43E4E4E25B06BF1A6B256404A950102CB52C608B6592835",
+    "benchmarks/run_rival2_ssl_foundation_v5_long_trace_v1.py": "D24DD6F999C260FD1B3F7DB825F6AD57C774271CE84CE5D74965D500ACAD54C6",
     "benchmarks/run_rival2_ssl_foundation_v5_restart_v1.py": "5FEAFD669A49DF25E50EE8CCF51DF28C8FD8A729E75A2BE5199C9EA32E80FA0A",
-    "rivalsim/recurrent_execution.py": "04C11878F3109A2868E7A9D1E52FF355DE706A5E792DFF247AFBC507AA404562",
+    "rivalsim/recurrent_execution.py": "B3018CFCFAAC78B45AA3B13CDCC552A47E695D52AA7954A94DF16AB95EEF7871",
     "rivalsim/rival2_independent_critic.py": "A613DD9FF3F1EEC0F9E01F3214F77085EC2C4E6C02196934CA93325503D8BC57",
     "rivalsim/rival2_ppo.py": "3758505AD5E9F230F2F783459C2A11698C46C086DA14235608EEE587631A1BEE",
-    "rivalsim/rival2_recurrent_ppo.py": "1C95DAB1BFFFED90046024CCD6F1CA5706B300CC83EB637B55B9DACE3C39542B",
-    "rivalsim/rival2_recurrent_training.py": "7F33FF23EF2F60370B1C587E6C46950ED509FCE74E47968A1DBD5C4EFC83A456",
-    "rivalsim/rival2_ssl_foundation_training.py": "A3B26F6BE620B2A350385ED91DEE64B0CB317FE56D6E03AADCDF10B90B956A16",
-    "rivalsim/rival2_unified_policy.py": "E1031E6CC3C7F117BE60C9EBCC613A4A42F81AA6D4159F982B3EFA67097200FD",
+    "rivalsim/rival2_recurrent_ppo.py": "8C296BB1D5039BA05DC6413FC67117D66F18941CB119C4A0BA4EA3E31AA9C44B",
+    "rivalsim/rival2_recurrent_training.py": "756CAE93A749BC0297D09A1CA066FB07574C4FF8F71671ED69C324EB69F24BE8",
+    "rivalsim/rival2_ssl_foundation_training.py": "C8F433EF453B8CE4F268BF05B981D922478C8425EA0A2CC9CB26731A334A0477",
+    "rivalsim/rival2_unified_policy.py": "7AFD8F41A61657D2EC247C7BC6BCAD27904CB0100E1C839BD184FDD17222FD93",
     "rivalsim/ssl_foundation_v1.py": "46CB0A188B1612124EBD5E120FCA0C1B2956230CAA4B78927E96E30C84EAB980"
   },
   "integrity": {
@@ -180,24 +180,6 @@
     "selected_microbatch_sequences": 182,
     "supersedes_authority_sha256": "6DB1F9F8EE1C564853CE0C731DC8DAC24FBA0DF26D5513EC9B308F4B57E1ADAE",
     "version": "RIVAL2_RESET_BOUNDARY_GRU_V1"
-  },
-  "operational_inference_optimization": {
-    "current_policy_rng": "unchanged full agent-batch action sampling",
-    "evidence": "execution_optimization/exact_scale.json",
-    "frozen_gru_batch": "full encoder/GRU batch preserved; compact base trunk and actor heads",
-    "frozen_opponents": "assigned rows only; both hidden rows zero before reassignment",
-    "learning_semantics_changed": false,
-    "parameter_finite_guard": "every parameter checked at same boundary; single host result",
-    "parity_tolerance": {
-      "atol": 3e-06,
-      "rtol": 0.0001
-    },
-    "post_step_kl": "actor only; unchanged complete trainable-frame telemetry",
-    "precision_changed": false,
-    "reset_metadata": "minibatch-local immutable-mask cache reused after Adam",
-    "unused_frozen_hidden": "advance full recurrent path unless no frozen opponent is active",
-    "value_bootstrap": "independent critic only; same transition observation",
-    "version": "RIVAL2_EXECUTION_REUSE_V1"
   },
   "opponents": {
     "current_probability": 0.4,
