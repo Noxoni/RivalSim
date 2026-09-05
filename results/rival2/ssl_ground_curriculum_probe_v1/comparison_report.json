@@ -1,6 +1,11 @@
 {
   "authority_sha256": "CB9CB1D679A9F6A0D6E65992B7A2CF8BEF6B95301BA3F640A07A1F2D99999F04",
-  "checks": {},
+  "checks": {
+    "acquisition_better_at_20": false,
+    "acquisition_better_at_30": false,
+    "acquisition_improves_parent": false,
+    "finishing_goal_nonregression": false
+  },
   "interpretation": "Original fixed development scenarios; no match win-rate or SSL claim. Complete the frozen experiment; do not select a lucky intermediate boundary.",
   "rows": [
     {
@@ -110,9 +115,45 @@
       "no_touch": 0,
       "offset": 20,
       "touched": 13.0
+    },
+    {
+      "case": "acquisition_selfplay",
+      "control_goals_against": 1,
+      "control_goals_for": 0,
+      "control_no_touch": 63,
+      "control_touched": 15.0,
+      "goals_against": 0,
+      "goals_for": 3,
+      "no_touch": 61,
+      "offset": 30,
+      "touched": 16.0
+    },
+    {
+      "case": "finishing_selfplay",
+      "control_goals_against": 0,
+      "control_goals_for": 16,
+      "control_no_touch": 48,
+      "control_touched": 46.0,
+      "goals_against": 0,
+      "goals_for": 12,
+      "no_touch": 52,
+      "offset": 30,
+      "touched": 48.0
+    },
+    {
+      "case": "standard_kickoff_nexto",
+      "control_goals_against": 64,
+      "control_goals_for": 0,
+      "control_no_touch": 0,
+      "control_touched": 26.0,
+      "goals_against": 64,
+      "goals_for": 0,
+      "no_touch": 0,
+      "offset": 30,
+      "touched": 26.0
     }
   ],
   "ssl_capability_demonstrated": false,
-  "utc": "2026-09-05T19:15:50.336304+00:00",
-  "verdict": "INCOMPLETE"
+  "utc": "2026-09-05T19:22:40.878238+00:00",
+  "verdict": "INCONCLUSIVE_OR_NEGATIVE_CURRICULUM_PILOT"
 }
