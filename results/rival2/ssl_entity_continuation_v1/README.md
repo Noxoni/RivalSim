@@ -123,6 +123,14 @@ Missing scheduled boundary evaluation is performed before resumed training.
 Permanent checkpoint and deterministic development evaluation every 50 global
 entity updates, beginning +150; rolling checkpoint every update. No arbitrary
 update/time ceiling replaces the user's continue-until-stop instruction.
+
+After a boundary evaluation completes, reproduce its saved checkpoint and sample
+ledger audit with `python benchmarks/audit_rival2_ssl_entity_boundary.py --update N`
+using that exact scheduled update number. This CPU-only report does not interrupt
+the learner or perform evaluation/training. See `BOUNDARY_AUDIT.md`; its integrity
+PASS is not a gameplay verdict. It freezes only the completed curve prefix, never
+the racing live append log.
+
 Inspect newly completed evaluations for sustained actual progress; investigate
 stagnation rather than silently changing rewards or spending billions without
 measurement. Full-match follow-ups remain separate bounded comparisons and
