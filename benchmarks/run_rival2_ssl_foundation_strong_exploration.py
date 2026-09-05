@@ -35,7 +35,9 @@ CONTRACT = {
     "version": VERSION,
     "analog": {"sigma": 0.30, "space": "pre_tanh", "raw_actor_log_std_bypassed": True},
     "buttons": {"temperature": 1.0, "effective_logits": "learned_logits/temperature"},
-    "activation": "first new rollout after preserved accepted-boundary restart; constant thereafter",
+    "activation": (
+        "first new rollout after preserved accepted-boundary restart; constant thereafter"
+    ),
     "coherence": ["sampling", "stored log probability", "PPO log probability", "entropy", "KL"],
     "scope": "current trainable Rival only; opponents and deterministic evaluation unchanged",
     "entropy_loss_coefficient_changed": False,
@@ -76,7 +78,10 @@ def authority_payload(commit, created):
         implementation_commit=commit,
         created_utc=created,
         supersedes_authority_sha256=OLD_AUTHORITY,
-        supersession_reason="user requested substantially stronger exploration before any 30Hz/fresh-weight transition",
+        supersession_reason=(
+            "user requested substantially stronger exploration "
+            "before any 30Hz/fresh-weight transition"
+        ),
     )
     path = Path(__file__).relative_to(ROOT).as_posix()
     payload["implementation_sha256"][path] = c.engine.sha256_file(Path(__file__))
@@ -88,7 +93,9 @@ def authority_payload(commit, created):
         "new_rollout_required": True,
         "old_rollout_reused": False,
         "budget_and_deadline_unchanged": True,
-        "restart_metadata_is_historical": "restart block describes local zero, not active exploration",
+        "restart_metadata_is_historical": (
+            "restart block describes local zero, not active exploration"
+        ),
     }
     return payload
 
@@ -125,12 +132,12 @@ def validate_resume(payload):
     if payload["accepted_updates_total"] < anchor["accepted_update"]:
         raise ValueError("cannot roll back before exploration transition")
     # The transition checkpoint truthfully retains its last old rollout metadata.
-    if payload["accepted_updates_total"] > anchor["accepted_update"]:
-        if (
-            payload["exploration"]
-            != exploration_for_update(payload["accepted_updates_total"] - 1).as_dict()
-        ):
-            raise ValueError("checkpoint trained with unexpected exploration")
+    if (
+        payload["accepted_updates_total"] > anchor["accepted_update"]
+        and payload["exploration"]
+        != exploration_for_update(payload["accepted_updates_total"] - 1).as_dict()
+    ):
+        raise ValueError("checkpoint trained with unexpected exploration")
 
 
 def preflight(trainer, source, *, exact_scale):
@@ -167,13 +174,10 @@ def no_training_process():
         if (
             "run_rival2_ssl_foundation_v5_long_trace_v1.py" in command
             or "run_rival2_ssl_foundation_strong_exploration.py" in command
+        ) and not any(
+            flag in command for flag in ("--prepare-exploration", "--no-step-validation")
         ):
-            if not any(
-                flag in command for flag in ("--prepare-exploration", "--no-step-validation")
-            ):
-                raise RuntimeError(
-                    f"training/evaluation worker still active: {process.info['pid']}"
-                )
+            raise RuntimeError(f"training/evaluation worker still active: {process.info['pid']}")
 
 
 def prepare(args):
@@ -273,7 +277,9 @@ def prepare(args):
             "launch_authority_sha256": lh,
             "unchanged_checkpoint_fields": checks,
             "optimizer_step_taken": False,
-            "resume_physics": "existing fresh episodes and zero recurrent hidden; saved RNG restored",
+            "resume_physics": (
+                "existing fresh episodes and zero recurrent hidden; saved RNG restored"
+            ),
         },
     )
     configure()
