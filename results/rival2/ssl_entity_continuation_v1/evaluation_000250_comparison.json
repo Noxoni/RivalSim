@@ -1,0 +1,91 @@
+{
+  "checkpoint": {
+    "accepted_updates": 250,
+    "path": "G:\\dev\\RivalSim\\checkpoints\\rival2\\ssl_entity_continuation_v1\\plus_000250.pt",
+    "sha256": "22C3D4762784F7AC9D48DD429DFDFCA7E88333DFC2DABE2B11A9C01ED4C53878"
+  },
+  "comparison": {
+    "acquisition_selfplay": {
+      "after": {
+        "focal_touch_count": 101,
+        "focal_touch_fraction": 0.9375,
+        "goals_against": 9,
+        "goals_for": 42,
+        "goalward_touch_fraction": 0.9603960514068604,
+        "no_touch_truncations": 7,
+        "seconds_of_exposure": 775.70068359375,
+        "touches_per_minute": 7.812291145324707
+      },
+      "before": {
+        "focal_touch_count": 85,
+        "focal_touch_fraction": 0.953125,
+        "goals_against": 4,
+        "goals_for": 40,
+        "goalward_touch_fraction": 0.929411768913269,
+        "no_touch_truncations": 13,
+        "seconds_of_exposure": 796.9329833984375,
+        "touches_per_minute": 6.399534225463867
+      },
+      "derived_time_limit_episodes": 6
+    },
+    "finishing_selfplay": {
+      "after": {
+        "focal_touch_count": 93,
+        "focal_touch_fraction": 1.0,
+        "goals_against": 5,
+        "goals_for": 55,
+        "goalward_touch_fraction": 0.9677419066429138,
+        "no_touch_truncations": 2,
+        "seconds_of_exposure": 387.333251953125,
+        "touches_per_minute": 14.40619945526123
+      },
+      "before": {
+        "focal_touch_count": 92,
+        "focal_touch_fraction": 1.0,
+        "goals_against": 2,
+        "goals_for": 53,
+        "goalward_touch_fraction": 1.0,
+        "no_touch_truncations": 7,
+        "seconds_of_exposure": 456.4667053222656,
+        "touches_per_minute": 12.092885971069336
+      },
+      "derived_time_limit_episodes": 2
+    },
+    "standard_kickoff_nexto": {
+      "after": {
+        "focal_touch_count": 43,
+        "focal_touch_fraction": 0.46875,
+        "goals_against": 60,
+        "goals_for": 0,
+        "goalward_touch_fraction": 0.39534884691238403,
+        "no_touch_truncations": 0,
+        "seconds_of_exposure": 787.7332763671875,
+        "touches_per_minute": 3.2752201557159424
+      },
+      "before": {
+        "focal_touch_count": 63,
+        "focal_touch_fraction": 0.390625,
+        "goals_against": 64,
+        "goals_for": 0,
+        "goalward_touch_fraction": 0.8095238208770752,
+        "no_touch_truncations": 0,
+        "seconds_of_exposure": 837.6365966796875,
+        "touches_per_minute": 4.512696743011475
+      },
+      "derived_time_limit_episodes": 4
+    }
+  },
+  "evaluation_utc": "2026-09-05T23:34:38.238861+00:00",
+  "interval201_250": {
+    "maximum_update_seconds": 169.0760190000292,
+    "minimum_update_seconds": 35.682869399897754,
+    "nexto_current_agent_samples": 18630094,
+    "optimizer_steps": 8684,
+    "trainable_samples": 276281906
+  },
+  "semantics": {
+    "case_time_limit": "Derived by exhaustive mutually exclusive goal/no-touch/30second-time-limit/horizon accounting in evaluate and FreshGroundEnv, not a directly recorded field or a match draw.",
+    "comparison": "Fixed development scenarios; current-current opponent evolves. No new full-match250 evaluation occurred.",
+    "goalward": "Positive canonical ball y velocity at decision end for contacts, not shot direction impulse or shot success."
+  }
+}
