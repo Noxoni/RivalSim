@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "G:\dev\RivalSim\benchmarks\run_rival2_ssl_foundation_strong_exploration.py", line 452, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "G:\dev\RivalSim\benchmarks\run_rival2_ssl_foundation_strong_exploration.py", line 448, in main
+    return c.engine.run(args)
+           ~~~~~~~~~~~~^^^^^^
+  File "G:\dev\RivalSim\benchmarks\run_rival2_ssl_foundation_ppo_v1.py", line 871, in run
+    final_record = _checkpoint_record(
+        trainer,
+        CHECKPOINT if hard_failure is None else rolling,
+    )
+  File "G:\dev\RivalSim\benchmarks\run_rival2_ssl_foundation_ppo_v1.py", line 496, in _checkpoint_record
+    trainer.save_checkpoint(path, include_optimizer=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\dev\RivalSim\rivalsim\rival2_recurrent_training.py", line 460, in save_checkpoint
+    torch.save(self.checkpoint_payload(include_optimizer=include_optimizer), destination)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\dev\RivalSim\.venv\Lib\site-packages\torch\serialization.py", line 1002, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+         ~~~~~~~~~~~~~~~~~~~~^^^
+  File "G:\dev\RivalSim\.venv\Lib\site-packages\torch\serialization.py", line 864, in _open_zipfile_writer
+    return container(name_or_buffer)  # type: ignore[arg-type]
+  File "G:\dev\RivalSim\.venv\Lib\site-packages\torch\serialization.py", line 828, in __init__
+    torch._C.PyTorchFileWriter(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.name, get_crc32_options(), _get_storage_alignment()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+RuntimeError: [enforce fail at inline_container.cc:745] . open file failed with error code: 1224

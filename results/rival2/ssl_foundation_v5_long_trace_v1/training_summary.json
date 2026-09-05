@@ -1,67 +1,77 @@
 {
-  "accepted_updates": 84,
-  "authority_sha256": "AEA37884836DD4055BACCD605E3F660A0EC2D70162DF5C3032DF6C43134DFD72",
-  "created_utc": "2026-09-05T01:45:11.808672+00:00",
+  "accepted_updates": 100,
+  "authority_sha256": "FC2A8F9EBFDD64F2E00206D574AA039F00DED17D9A7F4BDCA1D231C405276F96",
+  "created_utc": "2026-09-05T02:11:42.275293+00:00",
   "final_checkpoint": {
-    "accepted_updates": 84,
-    "bytes": 20582627,
-    "path": "checkpoints/rival2/ssl_foundation_v5_long_trace_v1/final.pt",
-    "policy_version": 84,
-    "schedule_authority_sha256": "E8B08BD9A0FA0CBAF81B352F98AC94DECBFBAA79E32EA932103B35B2AE10BB1A",
-    "sha256": "B30BCFE1D4860C6F13F8A8E52A1991D481037909151EA78378A911979A05E2A0",
-    "total_agent_samples": 1328874808
+    "accepted_updates": 100,
+    "bytes": 20586807,
+    "path": "checkpoints/rival2/ssl_foundation_v5_long_trace_v1/strong_exploration_verified_u0100.pt",
+    "policy_version": 100,
+    "schedule_authority_sha256": "7D8B4A1405D9CBA79988E2D3F8C930299C379D8921FCC47E3A2730928D8F9330",
+    "sha256": "76AD396FDB541865CACEEE07A9AD564B13649D853C5BE6188F82C4ECE40EFFCF",
+    "total_agent_samples": 1604423795
   },
   "format": "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1_TRAINING_SUMMARY",
   "hard_failure": null,
   "last_evaluation": {
-    "accepted_updates": 84,
+    "accepted_updates": 100,
     "deterministic_policy": true,
     "evaluation_is_gate": false,
     "opponents": {
       "frozen_unified_v5": {
-        "goals_against": 333,
-        "goals_for": 388,
-        "goalward_touch_fraction": 0.8596273291925466,
-        "mean_reward_per_decision": 2.7969028893080307e-05,
-        "mean_speed_uu_per_second": 1169.3422438049083,
+        "goals_against": 362,
+        "goals_for": 357,
+        "goalward_touch_fraction": 0.8386783284742468,
+        "mean_reward_per_decision": -0.00022185351450625194,
+        "mean_speed_uu_per_second": 1162.5838673375895,
         "mean_state_potentials": {
-          "access": 0.005681142875004764,
-          "alignment": 0.1586154437397686,
-          "boost": 0.36707453063346557,
-          "control": 8.611088752331557e-05,
-          "defense": 0.002322839375489639,
-          "field": 0.014406379496441453,
-          "weighted_total": 0.1261406512444312
-        },
-        "no_touch_resets": 1,
-        "touches": 4025,
-        "touches_per_minute": 15.72265625
-      },
-      "nexto": {
-        "goals_against": 992,
-        "goals_for": 172,
-        "goalward_touch_fraction": 0.8598870056497175,
-        "mean_reward_per_decision": -0.004411369035371853,
-        "mean_speed_uu_per_second": 1169.243372401044,
-        "mean_state_potentials": {
-          "access": -0.10165184167150557,
-          "alignment": 0.07000126092818477,
-          "boost": 0.3632034093824546,
-          "control": -0.0655749143952085,
-          "defense": 0.0048549433845134155,
-          "field": -0.12689750142565354,
-          "weighted_total": -0.2061335776474631
+          "access": -0.0002361223489926562,
+          "alignment": 0.12293605107437354,
+          "boost": 0.34970666074756507,
+          "control": 0.009919588006068788,
+          "defense": -0.0009334262567805404,
+          "field": -0.00525370798442148,
+          "weighted_total": 0.08956556945556862
         },
         "no_touch_resets": 0,
-        "touches": 3540,
-        "touches_per_minute": 13.828125
+        "touches": 4116,
+        "touches_per_minute": 16.078125
+      },
+      "nexto": {
+        "goals_against": 991,
+        "goals_for": 149,
+        "goalward_touch_fraction": 0.879865944831142,
+        "mean_reward_per_decision": -0.004590223420028836,
+        "mean_speed_uu_per_second": 1160.5870363675863,
+        "mean_state_potentials": {
+          "access": -0.09210315298131869,
+          "alignment": 0.062412638286488645,
+          "boost": 0.36139346975552256,
+          "control": -0.05244250678956807,
+          "defense": 0.0015812184831477478,
+          "field": -0.11158986055376095,
+          "weighted_total": -0.17417314444118592
+        },
+        "no_touch_resets": 2,
+        "touches": 3879,
+        "touches_per_minute": 15.15234375
       }
     },
     "ticks": 3600,
     "worlds": 1024
   },
-  "schedule_authority_sha256": "E8B08BD9A0FA0CBAF81B352F98AC94DECBFBAA79E32EA932103B35B2AE10BB1A",
+  "operational_recovery": {
+    "additional_evaluations": 0,
+    "additional_optimizer_steps": 0,
+    "authority_sha256": "8AEFE9A413B3BBE46AEC775DC4BD19F80D6EF7359FAFBE5DAE8F10294716BEBA",
+    "checkpoint_origin": "exact accepted rolling100, pre-evaluation RNG preserved",
+    "old_final_unchanged": true,
+    "reason": "Windows ERROR_USER_MAPPED_FILE 1224 while overwriting old final.pt",
+    "snapshot_and_rolling_payload_exact_parity": true
+  },
+  "schedule_authority_sha256": "7D8B4A1405D9CBA79988E2D3F8C930299C379D8921FCC47E3A2730928D8F9330",
   "source_sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216",
-  "stop_reason": "user_requested_stop_at_accepted_boundary",
-  "verdict": "PASS"
+  "stop_reason": "continuation_review_marker",
+  "verdict": "PASS",
+  "verdict_scope": "completed campaign; not gameplay improvement"
 }

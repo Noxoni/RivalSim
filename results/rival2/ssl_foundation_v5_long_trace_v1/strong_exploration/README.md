@@ -1,5 +1,10 @@
 # Stronger exploration on the current 120 Hz policy
 
+**Completed at update 100.** See `COMPLETION.md` and `completion_audit.json` for
+the final deterministic results and recovered Windows final-file publication
+failure. Training is stopped. The final artifact is
+`strong_exploration_verified_u0100.pt`, **not** the old generic `final.pt`.
+
 User requested a substantial exploration increase **before** any fresh-weight or
 30 Hz transition. This is a continuation of the same bounded long-trace campaign,
 not a new model lineage or a fresh optimizer.
