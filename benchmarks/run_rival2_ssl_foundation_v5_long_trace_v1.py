@@ -138,6 +138,20 @@ def authority_payload(commit: str, created_utc: str):
         "candidate_evidence": "performance_repair/exact_scale_comparison.json",
         "memory_stress_evidence": "performance_repair/reset_stress_memory.json",
     }
+    payload["operational_inference_optimization"] = {
+        "version": "RIVAL2_EXECUTION_REUSE_V1",
+        "value_bootstrap": "independent critic only; same transition observation",
+        "post_step_kl": "actor only; unchanged complete trainable-frame telemetry",
+        "reset_metadata": "minibatch-local immutable-mask cache reused after Adam",
+        "parameter_finite_guard": "every parameter checked at same boundary; single host result",
+        "frozen_opponents": "assigned rows only; both hidden rows zero before reassignment",
+        "unused_frozen_hidden": "not advanced; never used before mandatory reset",
+        "current_policy_rng": "unchanged full agent-batch action sampling",
+        "learning_semantics_changed": False,
+        "precision_changed": False,
+        "parity_tolerance": {"atol": 3e-6, "rtol": 1e-4},
+        "evidence": "execution_optimization/exact_scale.json",
+    }
     return payload
 
 
@@ -247,6 +261,7 @@ def make_trainer(collision_root, *, worlds):
     trainer, source = prior.make_trainer(collision_root, worlds=worlds)
     trainer.ppo_config = new_ppo_config()
     trainer.sequence_microbatch_size = SEQUENCE_MICROBATCH_SIZE
+    trainer.optimize_execution = True
     collect, update = trainer.collect_rollout, trainer.update
 
     def measured_collect():
@@ -277,6 +292,7 @@ def preflight(trainer, source, *, exact_scale):
         gamma_and_reward_unchanged=trainer.ppo_config.gamma == engine.SSL_FOUNDATION_GAMMA,
         optimizer_continued=bool(trainer.optimizer.state),
         effective_minibatch_preserved=trainer.sequence_microbatch_size == SEQUENCE_MICROBATCH_SIZE,
+        execution_reuse_enabled=trainer.optimize_execution is True,
     )
     if trainer.accepted_updates_total == PARENT_UPDATE:
         transition = json.loads((RESULTS / "transition.json").read_text())

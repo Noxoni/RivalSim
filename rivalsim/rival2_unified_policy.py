@@ -17,7 +17,7 @@ from dataclasses import asdict, dataclass
 import torch
 from torch import nn
 
-from rivalsim.recurrent_execution import gru_reset_spans
+from rivalsim.recurrent_execution import ResetMetadata, gru_reset_spans
 from rivalsim.rival2_contracts import OBS_DIM
 from rivalsim.rival2_policy import (
     Rival2ActorCritic,
@@ -59,9 +59,7 @@ class Rival2UnifiedPolicyConfig:
 
     @property
     def content_hash(self) -> str:
-        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode(
-            "ascii"
-        )
+        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode("ascii")
         return hashlib.sha256(payload).hexdigest().upper()
 
     @property
@@ -109,9 +107,7 @@ class Rival2UnifiedActorCritic(nn.Module):
         self.trunk = base.trunk
         self.actor = base.actor
         self.critic = base.critic
-        self.context_encoder = nn.Linear(
-            self.config.obs_dim, self.config.context_encoder_dim
-        )
+        self.context_encoder = nn.Linear(self.config.obs_dim, self.config.context_encoder_dim)
         self.context_activation = nn.SiLU()
         self.context_gru = nn.GRU(
             self.config.context_encoder_dim,
@@ -119,9 +115,7 @@ class Rival2UnifiedActorCritic(nn.Module):
             num_layers=self.config.context_layers,
             batch_first=True,
         )
-        self.context_actor = nn.Linear(
-            self.config.context_hidden_dim, self.config.actor_outputs
-        )
+        self.context_actor = nn.Linear(self.config.context_hidden_dim, self.config.actor_outputs)
         self._initialize_context()
 
     def _initialize_context(self) -> None:
@@ -173,16 +167,53 @@ class Rival2UnifiedActorCritic(nn.Module):
         encoded: torch.Tensor,
         hidden: torch.Tensor,
         reset_before: torch.Tensor | None,
+        reset_metadata: ResetMetadata | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        return gru_reset_spans(self.context_gru, encoded, hidden, reset_before)
+        return gru_reset_spans(self.context_gru, encoded, hidden, reset_before, reset_metadata)
 
     def forward(
+        self,
+        observation,
+        hidden=None,
+        *,
+        reset_before=None,
+        reset_metadata=None,
+    ):
+        return self._forward(
+            observation,
+            hidden,
+            reset_before=reset_before,
+            reset_metadata=reset_metadata,
+            include_value=True,
+        )
+
+    def forward_actor(
+        self,
+        observation,
+        hidden=None,
+        *,
+        reset_before=None,
+        reset_metadata=None,
+    ):
+        """Same actor/hidden computation, without an unused critic evaluation."""
+        actor, _, next_hidden = self._forward(
+            observation,
+            hidden,
+            reset_before=reset_before,
+            reset_metadata=reset_metadata,
+            include_value=False,
+        )
+        return actor, next_hidden
+
+    def _forward(
         self,
         observation: torch.Tensor,
         hidden: torch.Tensor | None = None,
         *,
         reset_before: torch.Tensor | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        reset_metadata: ResetMetadata | None = None,
+        include_value: bool = True,
+    ) -> tuple[torch.Tensor, torch.Tensor | None, torch.Tensor]:
         step_input = observation.ndim == 2
         if step_input:
             observation = observation.unsqueeze(1)
@@ -207,13 +238,23 @@ class Rival2UnifiedActorCritic(nn.Module):
         base_actor = self.actor(base_features).reshape(
             observation.shape[0], observation.shape[1], self.config.actor_outputs
         )
-        value = self._value_from_features(flat, base_features).reshape(observation.shape[:2])
+        value = (
+            self._value_from_features(flat, base_features).reshape(observation.shape[:2])
+            if include_value
+            else None
+        )
         encoded = self.context_activation(self.context_encoder(observation))
-        context, next_hidden = self._context_with_resets(encoded, hidden, reset_before)
+        if reset_metadata is None:
+            context, next_hidden = self._context_with_resets(encoded, hidden, reset_before)
+        else:
+            context, next_hidden = self._context_with_resets(
+                encoded, hidden, reset_before, reset_metadata
+            )
         actor = base_actor + self.context_actor(context)
         if step_input:
             actor = actor[:, 0]
-            value = value[:, 0]
+            if value is not None:
+                value = value[:, 0]
         return actor, value, next_hidden
 
     def _value_from_features(

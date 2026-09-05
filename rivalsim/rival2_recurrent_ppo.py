@@ -8,6 +8,7 @@ from typing import Any
 
 import torch
 
+from rivalsim.recurrent_execution import ResetMetadata
 from rivalsim.rival2_contracts import ANALOG_ACTION_NAMES, BUTTON_ACTION_NAMES, OBS_DIM
 from rivalsim.rival2_policy import (
     HybridDistributionOverride,
@@ -189,6 +190,11 @@ def _hidden_sequence_major(hidden: torch.Tensor) -> torch.Tensor:
     return hidden.reshape(hidden.shape[0], hidden.shape[1] * hidden.shape[2], hidden.shape[3])
 
 
+def _finite_parameters_grouped(model: torch.nn.Module) -> bool:
+    checks = [torch.isfinite(parameter).all() for parameter in model.parameters()]
+    return bool(torch.stack(checks).all().item()) if checks else True
+
+
 def _finite_parameters(model: torch.nn.Module) -> bool:
     return all(bool(torch.isfinite(parameter).all().item()) for parameter in model.parameters())
 
@@ -298,6 +304,7 @@ def recurrent_minibatch_step(
     sequence_index,
     sequence_microbatch_size,
     take_step=True,
+    optimize_execution=False,
 ):
     """One effective minibatch, accumulated over complete sequences, clipped once.
 
@@ -312,17 +319,29 @@ def recurrent_minibatch_step(
         raise ValueError("effective recurrent minibatch has no trainable frames")
     optimizer.zero_grad(set_to_none=True)
     accumulated = {}
+    cached = {}
     model.train()
-    for indices in sequence_index.split(sequence_microbatch_size):
+    for chunk, indices in enumerate(sequence_index.split(sequence_microbatch_size)):
         mask = train_mask.index_select(0, indices)
-        count = int(mask.sum().item())
+        count = (
+            total_frames
+            if optimize_execution and len(sequence_index) <= sequence_microbatch_size
+            else int(mask.sum().item())
+        )
         if not count:
             continue
         obs = observation.index_select(0, indices)
+        hidden = initial_hidden.index_select(1, indices)
+        reset = reset_before.index_select(0, indices)
+        metadata = ResetMetadata.from_mask(reset) if optimize_execution else None
+        extra = {"reset_metadata": metadata} if optimize_execution else {}
+        if optimize_execution:
+            cached[chunk] = (mask, count, obs, hidden, reset, metadata)
         actor, value, _ = model(
             obs,
-            initial_hidden.index_select(1, indices),
-            reset_before=reset_before.index_select(0, indices),
+            hidden,
+            reset_before=reset,
+            **extra,
         )
         actor_flat = actor[mask]
         if getattr(model, "critic_is_independent", False):
@@ -381,20 +400,31 @@ def recurrent_minibatch_step(
     accumulated.update(gradient_norm=norm.detach(), post_clip_gradient_norm=after.detach())
     if take_step:
         optimizer.step()
-    if not _finite_parameters(model):
+    finite = _finite_parameters_grouped(model) if optimize_execution else _finite_parameters(model)
+    if not finite:
         raise Rival2RecurrentPPOCorruption({"reason": "nonfinite_parameter"})
     post_kl = torch.zeros((), device=observation.device)
     with torch.no_grad():
-        for indices in sequence_index.split(sequence_microbatch_size):
-            mask = train_mask.index_select(0, indices)
-            count = int(mask.sum().item())
+        for chunk, indices in enumerate(sequence_index.split(sequence_microbatch_size)):
+            if optimize_execution:
+                if chunk not in cached:
+                    continue
+                mask, count, obs, hidden, reset, metadata = cached.pop(chunk)
+            else:
+                mask = train_mask.index_select(0, indices)
+                count = int(mask.sum().item())
             if not count:
                 continue
-            actor, _, _ = model(
-                observation.index_select(0, indices),
-                initial_hidden.index_select(1, indices),
-                reset_before=reset_before.index_select(0, indices),
-            )
+            if optimize_execution:
+                actor, _ = model.forward_actor(
+                    obs, hidden, reset_before=reset, reset_metadata=metadata
+                )
+            else:
+                actor, _, _ = model(
+                    observation.index_select(0, indices),
+                    initial_hidden.index_select(1, indices),
+                    reset_before=reset_before.index_select(0, indices),
+                )
             log_prob = hybrid_log_probability(
                 actor[mask],
                 action.index_select(0, indices)[mask],
@@ -417,6 +447,7 @@ def recurrent_ppo_update(
     generator: torch.Generator,
     distribution_override: HybridDistributionOverride,
     sequence_microbatch_size: int | None = None,
+    optimize_execution: bool = False,
 ) -> dict[str, torch.Tensor]:
     """Optimize complete recurrent sequences; KL is measured but never gates updates."""
 
@@ -484,6 +515,7 @@ def recurrent_ppo_update(
                     train_mask=train_mask,
                     sequence_index=sequence_index,
                     sequence_microbatch_size=sequence_microbatch_size,
+                    optimize_execution=optimize_execution,
                 )
                 for name in metric_names:
                     metrics[name].append(micro_metrics[name])

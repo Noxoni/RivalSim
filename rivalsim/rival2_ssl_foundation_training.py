@@ -129,6 +129,28 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
             self.policy_config.hidden_dim,
         )
 
+    def active_frozen_forward(self, observation, step_reset):
+        """Advance only assigned frozen opponents. Reassignments occur after world resets.
+
+        Unused hidden rows are intentionally not advanced; the existing reset path
+        zeroes both sides before any new assignment can become active.
+        Current-policy sampling still consumes exactly the original full RNG draw.
+        """
+        rows = self.world_rows[self.opponent_family == OPPONENT_FROZEN_V5]
+        flat_index = rows * 2 + 1 - self.rival_side.index_select(0, rows)
+        hidden = self._flat_frozen_hidden()
+        actors = observation.new_zeros((self.env.num_envs * 2, 13))
+        next_hidden = hidden.clone()
+        if flat_index.numel():
+            selected, selected_hidden = self.frozen_v5.forward_actor(
+                observation.reshape(-1, self.policy_config.obs_dim).index_select(0, flat_index),
+                hidden.index_select(1, flat_index),
+                reset_before=step_reset.reshape(-1).index_select(0, flat_index),
+            )
+            actors.index_copy_(0, flat_index, selected)
+            next_hidden.index_copy_(1, flat_index, selected_hidden)
+        return actors, next_hidden
+
     @torch.no_grad()
     def collect_rollout(self) -> Rival2RecurrentRolloutBuffer:
         if self.exploration is None:
@@ -175,11 +197,16 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
                 self._flat_hidden(),
                 reset_before=step_reset.reshape(-1),
             )
-            frozen_actor_flat, _frozen_value, frozen_hidden_after_flat = self.frozen_v5(
-                observation.reshape(-1, self.policy_config.obs_dim),
-                self._flat_frozen_hidden(),
-                reset_before=step_reset.reshape(-1),
-            )
+            if getattr(self, "optimize_execution", False):
+                frozen_actor_flat, frozen_hidden_after_flat = self.active_frozen_forward(
+                    observation, step_reset
+                )
+            else:
+                frozen_actor_flat, _frozen_value, frozen_hidden_after_flat = self.frozen_v5(
+                    observation.reshape(-1, self.policy_config.obs_dim),
+                    self._flat_frozen_hidden(),
+                    reset_before=step_reset.reshape(-1),
+                )
             value = value_flat.reshape(self.env.num_envs, 2)
             frozen_actor = frozen_actor_flat.reshape(self.env.num_envs, 2, 13)
             sample = sample_hybrid_action(
@@ -222,10 +249,17 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
                 return tick
 
             transition = self.env.step_with_tick_actions(action, tick_action)
-            _next_actor, next_value_flat, _ = self.model(
-                transition.transition_observation.reshape(-1, self.policy_config.obs_dim),
-                hidden_after_flat,
-            )
+            if getattr(self, "optimize_execution", False) and getattr(
+                self.model, "critic_is_independent", False
+            ):
+                next_value_flat = self.model.isolated_value(
+                    transition.transition_observation.reshape(-1, self.policy_config.obs_dim)
+                )
+            else:
+                _next_actor, next_value_flat, _ = self.model(
+                    transition.transition_observation.reshape(-1, self.policy_config.obs_dim),
+                    hidden_after_flat,
+                )
             next_value = next_value_flat.reshape(self.env.num_envs, 2)
             terminated = transition.terminated[:, None].expand(-1, 2)
             truncated = transition.truncated[:, None].expand(-1, 2)

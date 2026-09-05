@@ -373,6 +373,7 @@ class Rival2RecurrentTrainer:
                 generator=self.shuffle_generator,
                 distribution_override=self.exploration.distribution_override,
                 sequence_microbatch_size=getattr(self, "sequence_microbatch_size", None),
+                optimize_execution=getattr(self, "optimize_execution", False),
             )
         except Rival2RecurrentPPOCorruption as error:
             self.model.load_state_dict(rollback["model"])

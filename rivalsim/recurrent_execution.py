@@ -2,10 +2,31 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import torch
 from torch import nn
 
 RESET_EXECUTION_VERSION = "RIVAL2_RESET_BOUNDARY_GRU_V1"
+
+
+@dataclass(frozen=True)
+class ResetMetadata:
+    """Minibatch-local reset times, reusable only with the same unmodified mask."""
+
+    mask: torch.Tensor
+    version: int
+    boundaries: tuple[int, ...]
+
+    @classmethod
+    def from_mask(cls, mask: torch.Tensor) -> ResetMetadata:
+        if mask.ndim != 2 or mask.dtype != torch.bool:
+            raise ValueError("cached reset mask must be bool [batch, sequence]")
+        return cls(mask, mask._version, tuple(mask.any(dim=0).nonzero().flatten().cpu().tolist()))
+
+    def validate(self, mask: torch.Tensor) -> None:
+        if mask is not self.mask or mask._version != self.version:
+            raise ValueError("reset metadata does not match this unmodified mask")
 
 
 def gru_reset_spans(
@@ -13,6 +34,7 @@ def gru_reset_spans(
     encoded: torch.Tensor,
     hidden: torch.Tensor,
     reset_before: torch.Tensor | None,
+    metadata: ResetMetadata | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Fuse reset-free spans; preserve gradients until each row's actual reset.
 
@@ -23,13 +45,20 @@ def gru_reset_spans(
     The one-tick inference path needs no host synchronization at all.
     """
     if reset_before is None:
+        if metadata is not None:
+            raise ValueError("reset metadata requires a mask")
         return gru(encoded, hidden)
     if reset_before.shape != encoded.shape[:2]:
         raise ValueError("reset_before must have shape [batch, sequence]")
     resets = reset_before.to(torch.bool)
+    if metadata is not None:
+        metadata.validate(reset_before)
     if encoded.shape[1] == 1:
         return gru(encoded, hidden.masked_fill(resets[:, 0].view(1, -1, 1), 0.0))
-    boundaries = resets.any(dim=0).nonzero().flatten().cpu().tolist()
+    if metadata is not None:
+        boundaries = metadata.boundaries
+    else:
+        boundaries = resets.any(dim=0).nonzero().flatten().cpu().tolist()
     if not boundaries:
         return gru(encoded, hidden)
     outputs = []
