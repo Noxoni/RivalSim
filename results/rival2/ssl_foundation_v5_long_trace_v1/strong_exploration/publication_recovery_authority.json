@@ -1,0 +1,16 @@
+{
+  "version": "RIVAL2_SSL_UPDATE100_PUBLICATION_RECOVERY_V1",
+  "scope": "Publication only after training and the sole update100 evaluation completed",
+  "error": "Windows ERROR_USER_MAPPED_FILE 1224 while overwriting old final.pt",
+  "stderr_sha256": "4FBC224C21E14E46331737389F5A1D4AA01E8F3DCB6A5B61DB3E52C3916BA292",
+  "old_final_sha256": "B30BCFE1D4860C6F13F8A8E52A1991D481037909151EA78378A911979A05E2A0",
+  "rolling_sha256": "76AD396FDB541865CACEEE07A9AD564B13649D853C5BE6188F82C4ECE40EFFCF",
+  "snapshot_sha256": "5E861D27C12F1137955AB41F237A112F6B8703948F06081FBC75D0E1A5D69A46",
+  "final_path": "checkpoints/rival2/ssl_foundation_v5_long_trace_v1/strong_exploration_verified_u0100.pt",
+  "accepted_updates": 100,
+  "additional_optimizer_steps": 0,
+  "additional_evaluations": 0,
+  "checkpoint_tensors_and_rng_changed": false,
+  "locked_old_final_overwritten": false,
+  "recovery": "Use the exact already-published rolling100 bytes as final; preserve pre-evaluation RNG and existing fresh-episode resume semantics. Verify parity with the evaluated periodic snapshot. Preserve error and old summary. Publish completed evaluation and corrected final pointer without relaunching training or evaluation."
+}
