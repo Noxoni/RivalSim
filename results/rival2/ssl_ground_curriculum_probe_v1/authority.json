@@ -1,0 +1,73 @@
+{
+  "additional_updates": 30,
+  "base_authority_sha256": "8734A6C70DEA8CB415BD9F6A8D5EEE241648CD3E2D66E284DD7AE4B13959DF2D",
+  "checkpoints": "Rolling each update; immutable at +10,+20,+30",
+  "curriculum": {
+    "additional_rewards": false,
+    "base_training_seed": 2026090501,
+    "canonical_team_mirroring": true,
+    "changed_fraction": 0.8,
+    "close_approach": {
+      "approach_to_goal_angle": [
+        -0.3,
+        0.3
+      ],
+      "ball_planar_velocity": [
+        -80,
+        80
+      ],
+      "ball_x": [
+        -700,
+        700
+      ],
+      "ball_y": [
+        1800,
+        3200
+      ],
+      "distance": [
+        350,
+        850
+      ],
+      "heading_error_bounds": [
+        0.3,
+        0.7
+      ],
+      "initial_speed": [
+        100,
+        500
+      ]
+    },
+    "constraints_on_actions": false,
+    "explanation": "Test learnability through easier reset geometry; not an SSL capability claim.",
+    "model_receives_curriculum_id": false,
+    "reset_only": true,
+    "same_policy_both_sides": true,
+    "scripted_prefix": false,
+    "seed": 2026091601,
+    "untouched_original_fraction": 0.2,
+    "version": "RIVAL2_SSL_GROUND_CURRICULUM_PROBE_V1"
+  },
+  "evaluation": "Original deterministic acquisition, finishing, Nexto protocols at +0,+10,+20,+30. Development cases, not untouched tests, not full matches or SSL proof.",
+  "goal_continues": "SSL development continues after pilot analysis; never silently resume original stalled campaign.",
+  "interpretation": "Promising only if original acquisition exceeds matched control by >=4/64 at BOTH +20 and +30, and exceeds parent by >=4/64 at +30, without finishing goals falling >3 below control. This bounds an experiment, not a permanent capability/deployment gate. Report every boundary.",
+  "no_automatic_extension": true,
+  "only_change": "Training reset-state bank. Inherit parent model, Adam, RNG; no sigma multiplier.",
+  "parent_path": "checkpoints\\rival2\\ssl_development_exploration_v1\\parent_u000597.pt",
+  "parent_sha256": "B0B35CDAF3B3551EC667776EB99C3822F863AAA1F17A0BA2F013B5F216BD87A5",
+  "parent_update": 597,
+  "resume": "Same probe only, verified checkpoint SHA, retained Adam/RNG/counters; fresh scenario episodes and zero hidden.",
+  "unchanged": [
+    "reward",
+    "physics",
+    "observations",
+    "actions",
+    "actor_and_critic_architecture",
+    "PPO",
+    "exploration",
+    "current_selfplay",
+    "finite_safety",
+    "KL_telemetry_only"
+  ],
+  "version": "RIVAL2_SSL_GROUND_CURRICULUM_PROBE_V1",
+  "worlds": 32768
+}
