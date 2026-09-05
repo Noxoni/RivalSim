@@ -1,0 +1,150 @@
+{
+  "comparisons": [
+    {
+      "checkpoint": {
+        "action": "joint90_argmax",
+        "format": "RIVAL2_ENTITY_JOINT_CONTROL90_RECURRENT_V1_CHECKPOINT",
+        "path": "checkpoints\\rival2\\ssl_entity_joint_control_v1\\plus_100.pt",
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "sha256": "B5F7D19471257758966EB0B407797CFCFBD0F6CE8E86BCF9E13D41FBA4EA7ABA"
+      },
+      "conceded_by_match": [
+        35,
+        31,
+        37,
+        38,
+        36,
+        31,
+        30,
+        29,
+        28,
+        29
+      ],
+      "contacts": {
+        "ball_displacement_until_next_contact_or_goal": {
+          "backward": 41,
+          "forward": 35,
+          "neutral": 169
+        },
+        "ball_velocity_change": {
+          "backward": 11,
+          "forward": 233,
+          "neutral": 1
+        },
+        "conceded_with_at_most_one_contact_since_reset": 69,
+        "native_rival_demo_events": 27,
+        "nexto": 1869,
+        "opponent_followup": 237,
+        "resolved_followups": 245,
+        "rival": 245,
+        "same_player_followup": 8,
+        "same_player_followup_fraction": 0.0326530612244898
+      },
+      "integrity": {
+        "all_goals_valid": true,
+        "checkpoint_unchanged": true,
+        "hidden_reset_per_goal": true,
+        "model_unchanged": true,
+        "no_goal_overflow": true,
+        "ten_full_regulation_matches": true,
+        "zero_optimizer_steps": true
+      },
+      "source": "results/rival2/ssl_entity_joint_control_v1/full_match_entity100.json",
+      "source_text_sha256": "31393E1EF7DDC9B381EB317040B1CAF8B1F8AA45CE67DC1ECB9B8A93520CD8A1",
+      "summary": {
+        "goals_against": 324,
+        "goals_for": 0,
+        "kickoff_first_touches": 0,
+        "losses": 10,
+        "matches_without_rival_touch": 0,
+        "native_goal_resets": true,
+        "no_touch_semantics": "Zero by protocol; use matches_without_rival_touch, not reset count",
+        "no_touch_truncations": 0,
+        "touches": 245,
+        "touches_per_minute": 4.9,
+        "unresolved": 0,
+        "wins": 0
+      }
+    },
+    {
+      "checkpoint": {
+        "action": "joint90_argmax",
+        "format": "RIVAL2_SSL_ENTITY_CONTINUATION_V1_CHECKPOINT",
+        "path": "checkpoints\\rival2\\ssl_entity_continuation_v1\\plus_000200.pt",
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "sha256": "2A01B1280BD1385FDD56FEC0FB65C7C8432FB3B0EE2668EBD1B00288EEC99652"
+      },
+      "conceded_by_match": [
+        25,
+        24,
+        24,
+        25,
+        24,
+        31,
+        24,
+        21,
+        23,
+        22
+      ],
+      "contacts": {
+        "ball_displacement_until_next_contact_or_goal": {
+          "backward": 22,
+          "forward": 88,
+          "neutral": 127
+        },
+        "ball_velocity_change": {
+          "backward": 2,
+          "forward": 234,
+          "neutral": 2
+        },
+        "conceded_with_at_most_one_contact_since_reset": 13,
+        "native_rival_demo_events": 7,
+        "nexto": 1763,
+        "opponent_followup": 215,
+        "resolved_followups": 237,
+        "rival": 238,
+        "same_player_followup": 22,
+        "same_player_followup_fraction": 0.09282700421940929
+      },
+      "integrity": {
+        "all_goals_valid": true,
+        "checkpoint_unchanged": true,
+        "hidden_reset_per_goal": true,
+        "model_unchanged": true,
+        "no_goal_overflow": true,
+        "ten_full_regulation_matches": true,
+        "zero_optimizer_steps": true
+      },
+      "source": "results/rival2/ssl_entity_continuation_v1/full_match_000200.json",
+      "source_text_sha256": "3AEF5566C31D5E9859ECE8CD6E93B748D33E1B92941CE77B40118C56662ADB9F",
+      "summary": {
+        "goals_against": 243,
+        "goals_for": 0,
+        "kickoff_first_touches": 0,
+        "losses": 10,
+        "matches_without_rival_touch": 0,
+        "native_goal_resets": true,
+        "no_touch_semantics": "Zero by protocol; use matches_without_rival_touch, not reset count",
+        "no_touch_truncations": 0,
+        "touches": 238,
+        "touches_per_minute": 4.76,
+        "unresolved": 0,
+        "wins": 0
+      }
+    }
+  ],
+  "meaning": "Match integrity only, not scoring, competitive or SSL capability",
+  "optimizer_steps_in_audit": 0,
+  "semantics": {
+    "demo": "Native demolition count; no inferred intent",
+    "displacement": "Canonical net ball y until next contact or goal; +/-100 uu bins",
+    "followup": "Next distinct contact identity, not possession time or controllability",
+    "kickoff_goal": "At most one distinct contact since reset, not elapsed time",
+    "no_touch": "No no-touch resets in full matches; use matches_without_rival_touch",
+    "velocity": "Canonical ball-velocity change at contact, not resulting ball velocity"
+  },
+  "source": "Existing native counters only; no new simulation or event detector",
+  "verdict": "PASS"
+}
