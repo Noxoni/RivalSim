@@ -1,0 +1,52 @@
+{
+  "accepted_updates_per_arm": 30,
+  "arms": {
+    "control": {
+      "button_changes": false,
+      "learned_effective_analog_sigma_multiplier": 1.0,
+      "optimizer_steps_inherited": true
+    },
+    "half_sigma": {
+      "button_changes": false,
+      "learned_effective_analog_sigma_multiplier": 0.5,
+      "optimizer_steps_inherited": true
+    }
+  },
+  "base_authority_sha256": "8734A6C70DEA8CB415BD9F6A8D5EEE241648CD3E2D66E284DD7AE4B13959DF2D",
+  "current_selfplay_probability": 1.0,
+  "evaluation": "Same frozen v1 deterministic 64-case protocols; diagnostic/selection, not untouched tests or match win rates",
+  "evaluation_offsets": [
+    0,
+    10,
+    20,
+    30
+  ],
+  "horizon": 90,
+  "nexto_training_probability": 0.0,
+  "optimizer": "Same parent Adam, counters and RNG in both arms; no reset of moments",
+  "parent": {
+    "accepted_updates": 597,
+    "path": "checkpoints/rival2/ssl_development_exploration_v1/parent_u000597.pt",
+    "sha256": "B0B35CDAF3B3551EC667776EB99C3822F863AAA1F17A0BA2F013B5F216BD87A5"
+  },
+  "parent_campaign": "Agent-requested pause, not abandoned user goal. Original STOP remains to prevent accidental concurrent resume.",
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "resume": "Same-arm only; preserve all optimizer/RNG/counters, reset simulator episodes/hidden as in v1",
+  "safety": "KL telemetry only; unchanged finite/corruption rollback; no reward changes",
+  "selection": "Compare final +30 and +20 boundaries, not cherry-picked best. Half-sigma is a promising pilot only if acquisition touch coverage exceeds control by >=4/64 at both boundaries and exceeds parent at +30 by >=4/64, with finishing touch coverage no worse than control by >4/64 and finishing goals no worse by >3 at +30. Otherwise inconclusive/negative. No SSL promotion.",
+  "unchanged": [
+    "reward",
+    "scenario_bank",
+    "optimizer_start_state",
+    "PPO_settings",
+    "actor_means_at_start",
+    "button_logits_at_start",
+    "model_tensors_at_start",
+    "recurrent_semantics",
+    "critic",
+    "initial_RNG_states"
+  ],
+  "version": "RIVAL2_SSL_DEVELOPMENT_EXPLORATION_V1",
+  "worlds": 32768
+}

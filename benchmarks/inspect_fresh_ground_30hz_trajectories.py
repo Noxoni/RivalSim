@@ -1,4 +1,4 @@
-"""Bounded CPU-only diagnostic; never trains or changes the running campaign.
+"""Bounded read-only trajectory diagnostic; never trains.
 
 Uses the production environment with only CUDA-stream activation replaced by
 a CPU device assertion. CPU trajectories are not GPU bitwise-parity evidence
@@ -36,33 +36,39 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--update", type=int, default=250)
     parser.add_argument("--decisions", type=int, default=480)
+    parser.add_argument("--device", choices=("cpu", "cuda:0"), default="cpu")
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     if not 1 <= args.decisions <= 900:
         raise ValueError("Bounded to at most 30 simulated seconds")
     torch.set_num_threads(2)
     check_package(require_preflight=True)
-    path = CHECKPOINTS / f"u{args.update:06d}.pt"
+    path = args.checkpoint or CHECKPOINTS / f"u{args.update:06d}.pt"
     digest = sha(path)
     payload = torch.load(path, map_location="cpu", weights_only=False)
-    assert payload["format"] == CHECKPOINT_FORMAT and payload["accepted_updates_total"] == args.update
+    assert payload["format"] == CHECKPOINT_FORMAT
+    args.update = payload["accepted_updates_total"]
     model = IndependentCriticActorCritic(IndependentCriticPolicyConfig(**payload["policy_config"]))
     model.load_state_dict(payload["model"], strict=True)
-    model.eval().requires_grad_(False)
+    model.to(args.device).eval().requires_grad_(False)
     bank = scenarios(64, SEED+100, family_only=2)
     started = time.monotonic()
-    env = CPUInspectionEnv(64, "G:/dev/RLBot-Rival/bot/collision_meshes", device="cpu",
+    env_type = CPUInspectionEnv if args.device == "cpu" else FreshGroundEnv
+    env = env_type(64, "G:/dev/RLBot-Rival/bot/collision_meshes", device=args.device,
                            seed=SEED+100, ssl_foundation_scenarios=bank)
-    rows, side = torch.arange(64), torch.tensor(bank.focal_side.astype("int64"))
-    hidden = model.initial_hidden(128, device="cpu")
-    reset = torch.ones(128, dtype=torch.bool)
-    alive = torch.ones(64, dtype=torch.bool)
+    rows = torch.arange(64, device=args.device)
+    side = torch.tensor(bank.focal_side.astype("int64"), device=args.device)
+    hidden = model.initial_hidden(128, device=args.device)
+    reset = torch.ones(128, dtype=torch.bool, device=args.device)
+    alive = torch.ones(64, dtype=torch.bool, device=args.device)
     history = {k: [] for k in ("active_before", "car_position", "ball_position", "car_velocity",
         "ball_velocity", "car_quaternion", "action", "speed", "forward_speed", "closing_speed",
         "nose_ball_cosine", "ball_distance", "on_ground", "is_flipping", "boost_fraction",
         "touches", "terminated", "truncated", "scoring_team")}
     initial_distance = None
-    final_distance = torch.full((64,), float("nan"))
-    position_scale = torch.tensor(POSITION_SCALE)
+    final_distance = torch.full((64,), float("nan"), device=args.device)
+    position_scale = torch.tensor(POSITION_SCALE, device=args.device)
     relative_ball_start = OBS_FIELD_NAMES.index("relative.ball_position.x")
     for tick in range(args.decisions):
         v = env.bridge.views
@@ -100,12 +106,12 @@ def main():
         reset = tr.reset_mask[:,None].expand(-1,2).reshape(-1)
         hidden = hidden.masked_fill(reset[None,:,None],0)
         if tick % 90 == 0:
-            print(f"CPU trajectory {tick/30:.1f}s / {args.decisions/30:.1f}s; {int(alive.sum())} original episodes active",flush=True)
+            print(f"{args.device} trajectory {tick/30:.1f}s / {args.decisions/30:.1f}s; {int(alive.sum())} original episodes active",flush=True)
         if not bool(alive.any()):
             break
     arrays = {k: np.stack(value) for k,value in history.items()}
-    arrays["focal_side"] = side.numpy()
-    arrays["final_ball_distance"] = final_distance.numpy()
+    arrays["focal_side"] = side.cpu().numpy()
+    arrays["final_ball_distance"] = final_distance.cpu().numpy()
     valid = arrays["active_before"]
     contact = (arrays["touches"]*valid).sum(0)
     min_distance = np.where(valid, arrays["ball_distance"],np.inf).min(0)
@@ -134,8 +140,8 @@ def main():
     for lo,hi in ((0,1),(1,3),(3,5),(5,10),(10,16)):
         bins[f"{lo}_{hi}_seconds"] = summary(valid & (t>=lo) & (t<hi))
     report = dict(utc=utc(),update=args.update,checkpoint=dict(path=str(path),sha256=digest),
-        scenario_sha256=scenario_hash(bank),worlds=64,device="cpu",optimizer_steps=0,
-        method="Production FreshGroundEnv on CPU; only CUDA-stream activation replaced by CPU assertion. No GPU parity claim; descriptive trajectory diagnostic, not acceptance authority.",
+        scenario_sha256=scenario_hash(bank),worlds=64,device=args.device,optimizer_steps=0,
+        method="Production FreshGroundEnv; CPU mode overrides stream activation. CUDA mode must run only while the learner is paused. Descriptive trajectory diagnostic, not acceptance authority.",
         thresholds="Speed thresholds +/-100 uu/s are descriptive reporting bins, not rewards or mechanic detectors.",
         decisions=len(valid),maximum_seconds=args.decisions/30,wall_seconds=time.monotonic()-started,
         total_contacts=int(contact.sum()),cases_with_touch=int((contact>0).sum()),
@@ -144,12 +150,16 @@ def main():
             minimum_distance=float(min_distance[i]),minimum_distance_seconds=float(min_tick[i]/30),
             final_distance=float(final_distance[i]),contacts=int(contact[i]),
             summary=summary(valid & (np.arange(64)[None,:]==i))) for i in range(64)])
-    assert sha(path)==digest and torch.cuda.memory_allocated()==0
+    assert sha(path)==digest
+    if args.device == "cpu":
+        assert torch.cuda.memory_allocated()==0
     check_package(require_preflight=True)
     report["checkpoint_unchanged"] = True
     report["frozen_training_sources_unchanged"] = True
-    report["torch_cuda_bytes_allocated"] = 0
-    out = RESULTS / "monitoring" / f"trajectory_u{args.update:06d}"
+    report["torch_cuda_bytes_allocated"] = torch.cuda.memory_allocated()
+    directory = args.output_dir or RESULTS / "monitoring"
+    directory.mkdir(parents=True, exist_ok=True)
+    out = directory / f"trajectory_{args.device.replace(':', '_')}_u{args.update:06d}"
     np.savez_compressed(out.with_suffix(".npz"), **arrays)
     report["raw_trace"] = dict(path=str(out.with_suffix(".npz")),sha256=sha(out.with_suffix(".npz")))
     write_json(out.with_suffix(".json"),report)
@@ -167,5 +177,5 @@ if __name__ == "__main__":
             command=sys.argv,script_sha256=sha(Path(__file__)),
             optimizer_steps=0,torch_cuda_bytes_allocated=torch.cuda.memory_allocated(),
             campaign_source_changes=False,campaign_process_interrupted=False,
-            interpretation="No completed trajectory evidence. This separate CPU diagnostic failure is not a failure of the active GPU learner."))
+            interpretation="No completed trajectory evidence. This separate diagnostic failure is not evidence of a learner failure."))
         raise
