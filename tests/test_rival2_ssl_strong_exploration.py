@@ -17,6 +17,26 @@ from rivalsim.rival2_policy import (
 )
 
 
+def test_publication_audit_allows_episode_resets_but_not_curriculum_changes():
+    from benchmarks.report_rival2_ssl_strong_exploration import curriculum_contract_preserved
+
+    parent = {
+        "reset_curriculum": {
+            "scenario_family": torch.tensor([0, 1, 2]),
+            "summary": {"counts": {"a": 1, "b": 1, "c": 1}},
+            "scenario_id_in_observation": False,
+        }
+    }
+    current = copy.deepcopy(parent)
+    current["reset_curriculum"]["scenario_family"] = torch.tensor([2, 0, 1])
+    assert curriculum_contract_preserved(parent, current)
+    current["reset_curriculum"]["scenario_family"][0] = 3
+    assert not curriculum_contract_preserved(parent, current)
+    current = copy.deepcopy(parent)
+    current["reset_curriculum"]["scenario_id_in_observation"] = True
+    assert not curriculum_contract_preserved(parent, current)
+
+
 @pytest.mark.parametrize("update", [0, 84, 85, 99, 100])
 def test_fixed_stronger_distribution_without_lr_or_cadence_changes(update):
     exploration = strong.exploration_for_update(update)
