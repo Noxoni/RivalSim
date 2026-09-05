@@ -1,0 +1,85 @@
+{
+  "computation": "Existing committed counters only; CPU; zero new simulation or training",
+  "counter_source": "rivalsim/full_match.py",
+  "counter_source_text_sha256": "55BA34D717A7053EDF2CC1A1970B9FA3F59B6E8B8466C2BD79BB947B58184FC3",
+  "policies": [
+    {
+      "backboard_surface_intervals": 18,
+      "ball_net_displacement_after_contact": {
+        "backward": 41,
+        "forward": 1,
+        "neutral": 84
+      },
+      "checkpoint": {
+        "action": "hybrid_mean_button_threshold",
+        "format": "RIVAL2_FRESH_GROUND_30HZ_V1_CHECKPOINT",
+        "path": "checkpoints\\rival2\\ssl_development_exploration_v1\\parent_u000597.pt",
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "sha256": "B0B35CDAF3B3551EC667776EB99C3822F863AAA1F17A0BA2F013B5F216BD87A5"
+      },
+      "contact_ball_velocity_change": {
+        "backward": 0,
+        "forward": 127,
+        "neutral": 0
+      },
+      "contacts": 127,
+      "followup_opponent": 126,
+      "followup_resolved_total": 126,
+      "followup_same_fraction": 0.0,
+      "followup_same_player": 0,
+      "fraction_conceded_with_at_most_one_contact": 0.49019607843137253,
+      "goals_conceded": 408,
+      "goals_conceded_with_at_most_one_contact_since_reset": 200,
+      "native_demo_events": 0,
+      "protocol_sha256": "E1A12AE603FCB001D909E9E19644A81B2A182B2A2CDDCBA01A03E00724E55067",
+      "source": "results/rival2/ssl_entity_joint_control_v1/full_match_parent597.json",
+      "source_text_sha256": "3F7ADFFBC5310C8BD93E3363824E8ACBD8D5B9CDCD9B5A5D3258882CDA6695FE",
+      "wall_surface_intervals": 24
+    },
+    {
+      "backboard_surface_intervals": 13,
+      "ball_net_displacement_after_contact": {
+        "backward": 41,
+        "forward": 35,
+        "neutral": 169
+      },
+      "checkpoint": {
+        "action": "joint90_argmax",
+        "format": "RIVAL2_ENTITY_JOINT_CONTROL90_RECURRENT_V1_CHECKPOINT",
+        "path": "checkpoints\\rival2\\ssl_entity_joint_control_v1\\plus_100.pt",
+        "physics_hz": 120,
+        "policy_hz": 30,
+        "sha256": "B5F7D19471257758966EB0B407797CFCFBD0F6CE8E86BCF9E13D41FBA4EA7ABA"
+      },
+      "contact_ball_velocity_change": {
+        "backward": 11,
+        "forward": 233,
+        "neutral": 1
+      },
+      "contacts": 245,
+      "followup_opponent": 237,
+      "followup_resolved_total": 245,
+      "followup_same_fraction": 0.0326530612244898,
+      "followup_same_player": 8,
+      "fraction_conceded_with_at_most_one_contact": 0.21296296296296297,
+      "goals_conceded": 324,
+      "goals_conceded_with_at_most_one_contact_since_reset": 69,
+      "native_demo_events": 27,
+      "protocol_sha256": "E1A12AE603FCB001D909E9E19644A81B2A182B2A2CDDCBA01A03E00724E55067",
+      "source": "results/rival2/ssl_entity_joint_control_v1/full_match_entity100.json",
+      "source_text_sha256": "31393E1EF7DDC9B381EB317040B1CAF8B1F8AA45CE67DC1ECB9B8A93520CD8A1",
+      "wall_surface_intervals": 37
+    }
+  ],
+  "semantics": {
+    "demo": "Native demolition events; no evidence of tactical intent.",
+    "displacement": "Signed net ball y displacement before next contact or goal, +/-100 uu. Not path length, velocity or goal probability.",
+    "followup": "Identity of next distinct contact after Rival contact, excluding goal/end censoring. Not measured controllability or possession duration.",
+    "kickoff_goal": "At most one registered distinct contact since kickoff reset, not every goal soon after kickoff and not an elapsed-time threshold.",
+    "velocity": "Canonical signed ball-velocity CHANGE at contact, +/-100 uu/s; forward does not mean the ball has positive resulting velocity or will score.",
+    "wall": "Ball contacted surface after this player's contact before interval end; does not establish a car wall mechanic or aerial."
+  },
+  "use": "Posthoc diagnosis only; no checkpoint selection, reward change or new detector",
+  "version": "ENTITY100_POSTHOC_CONTACT_BREAKDOWN_V1"
+}
