@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="2" failures="1" skipped="0" tests="26" time="7.491" timestamp="2026-09-04T21:45:49.932972-04:00" hostname="Brick"><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_fixed_stronger_distribution_without_lr_or_cadence_changes[0]" time="0.001" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_fixed_stronger_distribution_without_lr_or_cadence_changes[84]" time="0.001" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_fixed_stronger_distribution_without_lr_or_cadence_changes[85]" time="0.000" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_fixed_stronger_distribution_without_lr_or_cadence_changes[99]" time="0.000" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_fixed_stronger_distribution_without_lr_or_cadence_changes[100]" time="0.000" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_negative_counter_rejected" time="0.000" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_sampling_log_probability_ratio_and_finite_gradients" time="0.553" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_noise_is_7_5_times_wider_and_buttons_less_committed_not_forced" time="0.015" /><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_authority_changes_only_exploration_and_provenance" time="0.003"><error message="failed on setup with &quot;PermissionError: [WinError 5] Access is denied: 'C:\\Users\\patri\\AppData\\Local\\Temp\\pytest-of-patri'&quot;">cls = &lt;class '_pytest.runner.CallInfo'&gt;
+func = &lt;function call_and_report.&lt;locals&gt;.&lt;lambda&gt; at 0x000001CE0A9A8460&gt;
+when = 'setup'
+reraise = (&lt;class '_pytest.outcomes.Exit'&gt;, &lt;class 'KeyboardInterrupt'&gt;)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -&gt; CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        instant = timing.Instant()
+        try:
+&gt;           result: TResult | None = func()
+                                     ^^^^^^
+
+.venv\Lib\site-packages\_pytest\runner.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+.venv\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+.venv\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+.venv\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+.venv\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+.venv\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+.venv\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+.venv\Lib\site-packages\pluggy\_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+.venv\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+.venv\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\pathlib.py:228: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\pathlib.py:187: in extract_suffixes
+    for entry in iter:
+                 ^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/patri/AppData/Local/Temp/pytest-of-patri')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -&gt; Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+&gt;       for x in os.scandir(root):
+                 ^^^^^^^^^^^^^^^^
+E       PermissionError: [WinError 5] Access is denied: 'C:\\Users\\patri\\AppData\\Local\\Temp\\pytest-of-patri'
+
+.venv\Lib\site-packages\_pytest\pathlib.py:175: PermissionError</error></testcase><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_post_transition_checkpoint_cannot_silently_restore_old_noise" time="0.001"><error message="failed on setup with &quot;PermissionError: [WinError 5] Access is denied: 'C:\\Users\\patri\\AppData\\Local\\Temp\\pytest-of-patri'&quot;">cls = &lt;class '_pytest.runner.CallInfo'&gt;
+func = &lt;function call_and_report.&lt;locals&gt;.&lt;lambda&gt; at 0x000001CE0A9A8720&gt;
+when = 'setup'
+reraise = (&lt;class '_pytest.outcomes.Exit'&gt;, &lt;class 'KeyboardInterrupt'&gt;)
+
+    @classmethod
+    def from_call(
+        cls,
+        func: Callable[[], TResult],
+        when: Literal["collect", "setup", "call", "teardown"],
+        reraise: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+    ) -&gt; CallInfo[TResult]:
+        """Call func, wrapping the result in a CallInfo.
+    
+        :param func:
+            The function to call. Called without arguments.
+        :type func: Callable[[], _pytest.runner.TResult]
+        :param when:
+            The phase in which the function is called.
+        :param reraise:
+            Exception or exceptions that shall propagate if raised by the
+            function, instead of being wrapped in the CallInfo.
+        """
+        excinfo = None
+        instant = timing.Instant()
+        try:
+&gt;           result: TResult | None = func()
+                                     ^^^^^^
+
+.venv\Lib\site-packages\_pytest\runner.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+.venv\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+.venv\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+.venv\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+.venv\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+.venv\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+.venv\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+.venv\Lib\site-packages\pluggy\_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pluggy\_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+.venv\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+.venv\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\pathlib.py:228: in make_numbered_dir
+    max_existing = max(map(parse_num, find_suffixes(root, prefix)), default=-1)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\_pytest\pathlib.py:187: in extract_suffixes
+    for entry in iter:
+                 ^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+root = WindowsPath('C:/Users/patri/AppData/Local/Temp/pytest-of-patri')
+prefix = 'pytest-'
+
+    def find_prefixed(root: Path, prefix: str) -&gt; Iterator[os.DirEntry[str]]:
+        """Find all elements in root that begin with the prefix, case-insensitive."""
+        l_prefix = prefix.lower()
+&gt;       for x in os.scandir(root):
+                 ^^^^^^^^^^^^^^^^
+E       PermissionError: [WinError 5] Access is denied: 'C:\\Users\\patri\\AppData\\Local\\Temp\\pytest-of-patri'
+
+.venv\Lib\site-packages\_pytest\pathlib.py:175: PermissionError</error></testcase><testcase classname="tests.test_rival2_ssl_strong_exploration" name="test_configure_keeps_original_learning_settings" time="0.001" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_microbatch_preserves_full_batch_gradients_adam_steps_and_mask_weighting" time="0.667" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_only_horizon_and_lambda_change_and_gamma_is_preserved" time="0.001" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_delayed_outcome_impulse_preserves_sign_and_half_life[-1.0]" time="0.024" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_delayed_outcome_impulse_preserves_sign_and_half_life[1.0]" time="0.023" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_trace_does_not_cross_episode_boundary_and_truncation_bootstraps[terminal]" time="0.012" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_trace_does_not_cross_episode_boundary_and_truncation_bootstraps[truncation]" time="0.011" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_complete_360_tick_sequences_no_frame_shuffle_or_bulk_observation_copy" time="0.001" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_authority_preserves_reward_opponents_and_existing_bound" time="0.050" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_checkpoint_migration_preserves_every_learning_tensor_counter_and_rng" time="0.083" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_finished_rollout_released_before_next_collection" time="0.007" /><testcase classname="tests.test_rival2_ssl_foundation_long_trace" name="test_runtime_uses_three_second_config_without_unlimited_extension" time="0.001" /><testcase classname="tests.test_rival2_exploration_ramp" name="test_unified_schedule_exact_boundaries_and_smoothstep" time="0.000" /><testcase classname="tests.test_rival2_exploration_ramp" name="test_effective_distribution_bypasses_raw_log_std_and_preserves_button_boundary" time="0.001" /><testcase classname="tests.test_rival2_exploration_ramp" name="test_rollout_sampling_and_ppo_recompute_use_identical_scheduled_distribution" time="0.043" /><testcase classname="tests.test_rival2_exploration_ramp" name="test_kl_telemetry_only_mode_accepts_threshold_excess" time="0.015"><failure message="rivalsim.rival2_ppo.Rival2PolicyDisplacementRejected: Rival 2.0 PPO update rejected: nonfinite_total_loss">def test_kl_telemetry_only_mode_accepts_threshold_excess() -&gt; None:
+        torch.manual_seed(321)
+        config = Rival2PolicyConfig()
+        model = Rival2ActorCritic(config)
+        observation = torch.randn(4, 2, config.obs_dim)
+        with torch.no_grad():
+            actor, value = model(observation.reshape(-1, config.obs_dim))
+            actor = actor.reshape(4, 2, 13)
+            value = value.reshape(4, 2)
+            scheduled = fresh_human_seed_exploration(1)
+            sample = sample_hybrid_action(
+                actor,
+                generator=torch.Generator().manual_seed(654),
+                config=config,
+                distribution_override=scheduled.distribution_override,
+            )
+        rollout = Rival2RolloutBuffer(1, 4, "cpu")
+        rollout.add(
+            observation=observation,
+            action=sample.action,
+            pre_tanh=sample.pre_tanh,
+            old_log_probability=sample.log_probability,
+            value=value,
+            reward=torch.tensor(
+                [[1.0, -1.0], [0.5, -0.5], [0.75, -0.75], [0.25, -0.25]]
+            ),
+            terminated=torch.zeros(4, 2, dtype=torch.bool),
+            truncated=torch.zeros(4, 2, dtype=torch.bool),
+            next_value=value,
+            policy_version=torch.zeros(4, 2, dtype=torch.int64),
+            opponent_version=torch.zeros(4, 2, dtype=torch.int64),
+            train_mask=torch.ones(4, 2, dtype=torch.bool),
+        )
+        guard = Rival2KLGuardConfig(
+            minibatch_kl_limit=1.0e-20,
+            completed_update_mean_kl_limit=1.0e-20,
+            reject_minibatch_kl=False,
+            reject_completed_update_kl=False,
+        )
+&gt;       metrics = ppo_update(
+            model,
+            torch.optim.Adam(model.parameters(), lr=1.0e-4),
+            rollout,
+            Rival2PPOConfig(rollout_horizon=1, minibatch_size=8, epochs=1),
+            generator=torch.Generator().manual_seed(987),
+            gae_ready=True,
+            kl_guard=guard,
+            distribution_override=scheduled.distribution_override,
+        )
+
+tests\test_rival2_exploration_ramp.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+model = Rival2ActorCritic(
+  (trunk): Sequential(
+    (0): Linear(in_features=182, out_features=512, bias=True)
+    (1): SiLU(...): Linear(in_features=512, out_features=13, bias=True)
+  (critic): Linear(in_features=512, out_features=1, bias=True)
+)
+optimizer = Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    decoupled_weight_decay: ...tiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 0.0001
+    maximize: False
+    weight_decay: 0
+)
+rollout = &lt;rivalsim.rival2_ppo.Rival2RolloutBuffer object at 0x000001CE03FAD810&gt;
+config = Rival2PPOConfig(gamma=0.995, gae_lambda=0.95, clip_range=0.2, value_loss_coefficient=0.5, entropy_coefficient=0.01, max_gradient_norm=0.5, learning_rate=0.0003, epochs=1, rollout_horizon=1, minibatch_size=8)
+generator = &lt;torch._C.Generator object at 0x000001CE0CECB6F0&gt;
+policy_config = Rival2PolicyConfig(obs_dim=182, hidden_dim=512, hidden_layers=3, activation='silu', actor_outputs=13, log_std_min=-5.0...e='float32', autocast=False, initialization='orthogonal_sqrt2_actor0.01_critic0.01', zero_previous_action_inputs=False)
+gae_ready = True
+kl_guard = Rival2KLGuardConfig(minibatch_kl_limit=1e-20, completed_update_mean_kl_limit=1e-20, reject_minibatch_kl=False, reject_completed_update_kl=False)
+distribution_override = HybridDistributionOverride(analog_log_std=-4.605170185988091, button_temperature=0.02)
+
+    def ppo_update(
+        model: Rival2ActorCritic,
+        optimizer: torch.optim.Optimizer,
+        rollout: Rival2RolloutBuffer,
+        config: Rival2PPOConfig,
+        *,
+        generator: torch.Generator,
+        policy_config: Rival2PolicyConfig | None = None,
+        gae_ready: bool = False,
+        kl_guard: Rival2KLGuardConfig | None = None,
+        distribution_override: HybridDistributionOverride | None = None,
+    ) -&gt; dict[str, torch.Tensor]:
+        """Run all PPO shuffling, gathers, losses, and optimizer work on CUDA."""
+    
+        policy_config = policy_config or model.config
+        if not gae_ready:
+            rollout.compute_gae(config)
+        flat_mask = rollout.train_mask.reshape(-1)
+        indices = torch.nonzero(flat_mask, as_tuple=False).squeeze(-1)
+        sample_count = indices.shape[0]
+        if sample_count == 0:
+            raise RuntimeError("PPO rollout contains no trainable samples")
+    
+        observation = rollout.observations.reshape(-1, OBS_DIM).index_select(0, indices)
+        action = rollout.actions.reshape(-1, 8).index_select(0, indices)
+        pre_tanh = rollout.pre_tanh.reshape(-1, 5).index_select(0, indices)
+        old_log_probability = rollout.old_log_probability.reshape(-1).index_select(0, indices)
+        old_value = rollout.values.reshape(-1).index_select(0, indices)
+        returns = rollout.returns.reshape(-1).index_select(0, indices)
+        raw_advantage = rollout.advantages.reshape(-1).index_select(0, indices)
+        advantage = (raw_advantage - raw_advantage.mean()) / raw_advantage.std(
+            unbiased=False
+        ).clamp_min(1e-8)
+    
+        metrics: dict[str, list[torch.Tensor]] = {
+            "policy_loss": [],
+            "value_loss": [],
+            "entropy": [],
+            "total_loss": [],
+            "approx_kl": [],
+            "clip_fraction": [],
+            "gradient_norm": [],
+            "post_clip_gradient_norm": [],
+        }
+        guarded_post_step_kl: list[torch.Tensor] = []
+        optimizer_step_index = 0
+        for epoch in range(config.epochs):
+            permutation = torch.randperm(sample_count, device=rollout.device, generator=generator)
+            for start in range(0, sample_count, config.minibatch_size):
+                batch = permutation[start : start + config.minibatch_size]
+                batch_observation = observation.index_select(0, batch)
+                batch_action = action.index_select(0, batch)
+                batch_pre_tanh = pre_tanh.index_select(0, batch)
+                batch_old_log_probability = old_log_probability.index_select(0, batch)
+                actor_output, value = model(batch_observation)
+                new_log_probability = hybrid_log_probability(
+                    actor_output,
+                    batch_action,
+                    config=policy_config,
+                    pre_tanh=batch_pre_tanh,
+                    distribution_override=distribution_override,
+                )
+                log_ratio = new_log_probability - batch_old_log_probability
+                ratio = torch.exp(log_ratio)
+                batch_advantage = advantage.index_select(0, batch)
+                unclipped = ratio * batch_advantage
+                clipped = (
+                    ratio.clamp(1.0 - config.clip_range, 1.0 + config.clip_range) * batch_advantage
+                )
+                policy_loss = -torch.minimum(unclipped, clipped).mean()
+                value_loss = 0.5 * (value - returns.index_select(0, batch)).square().mean()
+                entropy = hybrid_entropy(
+                    actor_output,
+                    policy_config,
+                    distribution_override=distribution_override,
+                ).mean()
+                total_loss = (
+                    policy_loss
+                    + config.value_loss_coefficient * value_loss
+                    - config.entropy_coefficient * entropy
+                )
+                if kl_guard is not None and not bool(torch.isfinite(total_loss).item()):
+&gt;                   raise Rival2PolicyDisplacementRejected(
+                        {
+                            "reason": "nonfinite_total_loss",
+                            "epoch": epoch,
+                            "optimizer_step_index": optimizer_step_index,
+                            "minibatch_start": start,
+                            "minibatch_samples": int(batch.shape[0]),
+                            "minibatch_kl_limit": kl_guard.minibatch_kl_limit,
+                            "completed_update_mean_kl_limit": (kl_guard.completed_update_mean_kl_limit),
+                        }
+                    )
+E                   rivalsim.rival2_ppo.Rival2PolicyDisplacementRejected: Rival 2.0 PPO update rejected: nonfinite_total_loss
+
+rivalsim\rival2_ppo.py:447: Rival2PolicyDisplacementRejected</failure></testcase></testsuite></testsuites>

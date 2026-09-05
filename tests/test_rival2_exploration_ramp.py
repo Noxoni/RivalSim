@@ -112,6 +112,8 @@ def test_rollout_sampling_and_ppo_recompute_use_identical_scheduled_distribution
     )
     assert abs(float(metrics["approx_kl"].item())) < 1.0e-8
     assert abs(float(metrics["mean_log_ratio"].item())) < 1.0e-8
+    # gae_ready=True requires initialized advantage/return buffers, not torch.empty.
+    rollout.compute_gae(Rival2PPOConfig(rollout_horizon=1, minibatch_size=4))
     update_metrics = ppo_update(
         model,
         torch.optim.Adam(model.parameters(), lr=0.0),
@@ -148,9 +150,7 @@ def test_kl_telemetry_only_mode_accepts_threshold_excess() -> None:
         pre_tanh=sample.pre_tanh,
         old_log_probability=sample.log_probability,
         value=value,
-        reward=torch.tensor(
-            [[1.0, -1.0], [0.5, -0.5], [0.75, -0.75], [0.25, -0.25]]
-        ),
+        reward=torch.tensor([[1.0, -1.0], [0.5, -0.5], [0.75, -0.75], [0.25, -0.25]]),
         terminated=torch.zeros(4, 2, dtype=torch.bool),
         truncated=torch.zeros(4, 2, dtype=torch.bool),
         next_value=value,
@@ -158,6 +158,7 @@ def test_kl_telemetry_only_mode_accepts_threshold_excess() -> None:
         opponent_version=torch.zeros(4, 2, dtype=torch.int64),
         train_mask=torch.ones(4, 2, dtype=torch.bool),
     )
+    rollout.compute_gae(Rival2PPOConfig(rollout_horizon=1, minibatch_size=8, epochs=1))
     guard = Rival2KLGuardConfig(
         minibatch_kl_limit=1.0e-20,
         completed_update_mean_kl_limit=1.0e-20,
