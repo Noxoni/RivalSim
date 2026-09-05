@@ -81,6 +81,24 @@ the comparison now uses the identical CPU initialization procedure for both
 models. That failed report is retained, not relabeled. No trained checkpoint
 was changed by either diagnostic. No safety threshold was weakened.
 
+### Initial launch operational correction
+
+The first proposed PPO update was rolled back before any accepted update because
+the finite-state check stacked CPU Adam step-counter checks with CUDA parameter
+checks. All numerical checks now run grouped by device; neither CPU counters nor
+GPU moments are omitted. A CUDA sequence-update regression test exercises this
+actual mixed-device optimizer and separately injects nonfinite CPU counters and
+GPU moments, both of which are detected. The9-test recovery run passed.
+
+`operational_recovery_v1.json` binds the original source hashes to exactly three
+corrected source files, without changing the original training authority. The
+correction, tests, failure evidence and source hashes are committed and pushed
+before resuming the exact verified zero-update checkpoint. Original model and
+empty optimizer parity are verified. `launch_zero_before_recovery.pt` preserves
+the checkpoint bytes referenced by the initial evaluation and failure, because
+rolling files are intentionally reused. `failure_initial_cpu_adam_check.json`
+is historical, not evidence that a subsequently resumed healthy process failed.
+
 The first combined test invocation also encountered an OS permission error in
 the machine-wide pytest temporary directory after20 tests passed. That XML is
 retained; rerunning with a new isolated external temporary directory passed all

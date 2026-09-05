@@ -7,6 +7,7 @@ from rivalsim.fresh_ground_30hz import ppo_config
 from rivalsim.ssl_entity_policy import EntityJointControlActorCritic
 from rivalsim.ssl_entity_training import (
     JointRollout,
+    finite_model_and_optimizer,
     fresh_entity_optimizer,
     joint_ppo_update,
     joint_sequence_loss,
@@ -105,3 +106,26 @@ def test_complete_update_counts_and_corruption_rolls_back(monkeypatch):
         for k, v in s.items():
             assert torch.equal(v, optimizer.state[p][k])
     assert torch.equal(rng, generator.get_state())
+
+
+@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA required")
+def test_cuda_sequence_update_and_cpu_adam_counter_nonfinite_detection():
+    model, config, rollout = fixture()
+    model = model.cuda()
+    rollout.device = torch.device("cuda:0")
+    for name, value in vars(rollout).copy().items():
+        if torch.is_tensor(value):
+            setattr(rollout, name, value.cuda())
+    optimizer = fresh_entity_optimizer(model)
+    generator = torch.Generator(device="cuda:0").manual_seed(52)
+    report = joint_ppo_update(model, optimizer, rollout, config, generator)
+    assert report["optimizer_steps"] == 4
+    assert finite_model_and_optimizer(model, optimizer)
+    first = next(iter(optimizer.state.values()))
+    assert first["step"].device.type == "cpu"
+    assert first["exp_avg"].device.type == "cuda"
+    first["step"].fill_(float("nan"))
+    assert not finite_model_and_optimizer(model, optimizer)
+    first["step"].fill_(4.0)
+    first["exp_avg"].fill_(float("nan"))
+    assert not finite_model_and_optimizer(model, optimizer)

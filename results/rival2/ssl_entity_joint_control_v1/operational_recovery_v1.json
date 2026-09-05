@@ -1,0 +1,34 @@
+{
+  "accepted_updates_before_recovery": 0,
+  "authority_sha256": "7B623F582FC9144C901D9531E81FB4EBB6FE042821CBB26BC108434410700B7E",
+  "base_package_sha256": "551439BCFAD5E2783ABADA121393C574E59B0A8A1618EB65C6FC56AA4D5EFBCA",
+  "change": "Group finite checks by device. Check all CUDA parameters/moments AND CPU Adam step counters. No guard, loss, learning-rate, reward or model change. Runtime source override is explicitly limited to these three committed files.",
+  "diagnostic_only": true,
+  "failure_sha256": "8F957845F6423B7135D90D7F87C08FE11A720AAE51BB6DB16ADA223E57217AF8",
+  "initialized_model_unchanged": true,
+  "initialized_optimizer_empty": true,
+  "last_accepted_checkpoint": {
+    "accepted_updates": 0,
+    "path": "G:\\dev\\RivalSim-runs\\ssl-entity-joint-control-v1\\rolling_0.pt",
+    "sha256": "3FEB1E69A2758BCCE6BB0024F2287198A5E32B27330FADA1DB7E696D16A5D09A"
+  },
+  "numerical_checks_preserved": true,
+  "rollback": "Update exception handler completed model/Adam/shuffle-RNG restoration; no accepted update. Immutable saved zero-update checkpoint exactly matches initialization and empty Adam.",
+  "source_changes": {
+    "benchmarks/run_rival2_ssl_entity_joint_control.py": {
+      "after_sha256": "BE30CFA0BD1B1B0870FFF0BE655424DAB3D32D96FE44C12862D40486328DD6AB",
+      "before_sha256": "248146C4D5E466E3005285AAC10E03AA40240D4B31CD77AD4A18337CC92D7E8B"
+    },
+    "rivalsim/ssl_entity_training.py": {
+      "after_sha256": "1DE74E73009AC94D6FEFE14E0A1C99711F16DF3B9708049A5593DBF060EB3459",
+      "before_sha256": "2E121D5B8B12FD031F5E69CEE3D23BC0CF7DDD3503CF7FF88A1F34D9FA5EC4F5"
+    },
+    "tests/test_ssl_entity_training.py": {
+      "after_sha256": "B43F7470D71A2E5AC9559FE865E333DADFD04B6758F5AEC33AB2831851BEE353",
+      "before_sha256": "F3A1BE3DA823AEB69EE6011469BF69B711C19E01BF2DE17588FA724219069224"
+    }
+  },
+  "tests_sha256": "A79EB5B65DF3188179B54864CE401486281AA42DFB9BC464BFF1F7E875EEDF73",
+  "utc": "2026-09-05T19:38:50.252172+00:00",
+  "version": "ENTITY_CPU_ADAM_FINITE_CHECK_RECOVERY_V1"
+}

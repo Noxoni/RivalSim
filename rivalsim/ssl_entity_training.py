@@ -240,6 +240,17 @@ def fresh_entity_optimizer(model):
     )
 
 
+def finite_model_and_optimizer(model, optimizer):
+    """Adam step counters may be CPU scalars even when moments live on CUDA."""
+    by_device = {}
+    tensors = list(model.parameters()) + [
+        v for state in optimizer.state.values() for v in state.values() if torch.is_tensor(v)
+    ]
+    for tensor in tensors:
+        by_device.setdefault(tensor.device, []).append(torch.isfinite(tensor).all())
+    return all(bool(torch.stack(checks).all()) for checks in by_device.values())
+
+
 def joint_ppo_update(model, optimizer, rollout, config, generator):
     """Complete-sequence PPO with full update rollback for corruption, not KL.
 
@@ -280,14 +291,7 @@ def joint_ppo_update(model, optimizer, rollout, config, generator):
                         ) from exc
                     raise
                 optimizer.step()
-                checks = [torch.isfinite(p).all() for p in model.parameters()]
-                checks += [
-                    torch.isfinite(v).all()
-                    for s in optimizer.state.values()
-                    for v in s.values()
-                    if torch.is_tensor(v)
-                ]
-                if not bool(torch.stack(checks).all()):
+                if not finite_model_and_optimizer(model, optimizer):
                     raise Rival2RecurrentPPOCorruption(
                         {"reason": "nonfinite_entity_parameter_or_adam"}
                     )

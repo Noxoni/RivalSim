@@ -1,0 +1,13 @@
+{
+  "accepted_updates": 0,
+  "automatic_retry": false,
+  "classification": "requires_operational_audit",
+  "exception": "RuntimeError('Expected all tensors to be on the same device, but got tensors is on cpu, different from other tensors on cuda:0 (when checking argument in method wrapper_CUDA_cat)')",
+  "latest_checkpoint": {
+    "accepted_updates": 0,
+    "path": "G:\\dev\\RivalSim-runs\\ssl-entity-joint-control-v1\\rolling_0.pt",
+    "sha256": "3FEB1E69A2758BCCE6BB0024F2287198A5E32B27330FADA1DB7E696D16A5D09A"
+  },
+  "traceback": "Traceback (most recent call last):\n  File \"G:\\dev\\RivalSim\\benchmarks\\run_rival2_ssl_entity_joint_control.py\", line 360, in run\n    metrics = joint_ppo_update(model, optimizer, rollout, ppo_config(), shuffle)\n  File \"G:\\dev\\RivalSim\\rivalsim\\ssl_entity_training.py\", line 290, in joint_ppo_update\n    if not bool(torch.stack(checks).all()):\n                ~~~~~~~~~~~^^^^^^^^\nRuntimeError: Expected all tensors to be on the same device, but got tensors is on cpu, different from other tensors on cuda:0 (when checking argument in method wrapper_CUDA_cat)\n",
+  "utc": "2026-09-05T19:37:10.771768+00:00"
+}

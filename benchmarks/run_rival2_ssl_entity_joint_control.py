@@ -211,11 +211,37 @@ def verify(published=False):
     assert sha(PARENT) == PARENT_SHA and sha(INITIAL) == package["initial_checkpoint_sha256"]
     assert sha(RESULTS / "native_preflight.json") == package["native_preflight_sha256"]
     assert sha(RESULTS / "focused_tests.xml") == package["focused_tests_sha256"]
-    for name, digest in package["sources"].items():
+    recovery_path = RESULTS / "operational_recovery_v1.json"
+    effective_sources = dict(package["sources"])
+    recovery_files = []
+    if recovery_path.exists():
+        recovery = json.loads(recovery_path.read_text())
+        assert recovery["base_package_sha256"] == sha(RESULTS / "package.json")
+        assert recovery["authority_sha256"] == content_hash(authority())
+        assert recovery["accepted_updates_before_recovery"] == 0
+        assert recovery["numerical_checks_preserved"] is True
+        assert set(recovery["source_changes"]) == {
+            "rivalsim/ssl_entity_training.py",
+            "tests/test_ssl_entity_training.py",
+            "benchmarks/run_rival2_ssl_entity_joint_control.py",
+        }
+        for name, change in recovery["source_changes"].items():
+            assert change["before_sha256"] == package["sources"][name]
+            effective_sources[name] = change["after_sha256"]
+        assert sha(RESULTS / "operational_recovery_tests.xml") == recovery["tests_sha256"]
+        recovery_files = [
+            str(p.relative_to(ROOT)).replace("\\", "/")
+            for p in (recovery_path, RESULTS / "operational_recovery_tests.xml")
+        ]
+        package = dict(
+            package, operational_recovery=recovery, operational_recovery_sha256=sha(recovery_path)
+        )
+    for name, digest in effective_sources.items():
         assert sha(ROOT / name) == digest, name
     if published:
         for name in [
             *SOURCES,
+            *recovery_files,
             *[
                 f"results/rival2/ssl_entity_joint_control_v1/{s}"
                 for s in (
