@@ -11,7 +11,7 @@
     "snapshot_interval": 50,
     "wall_clock_seconds": 36000
   },
-  "created_utc": "2026-09-05T01:47:54.972941+00:00",
+  "created_utc": "2026-09-05T01:03:42.005565+00:00",
   "credit_assignment_amendment": {
     "bound": "stop at total local update 100, not 100 additional updates",
     "comparison": "report cumulative samples and elapsed time, not just update count",
@@ -43,53 +43,38 @@
   },
   "exploration": {
     "contract": {
-      "activation": "first new rollout after preserved accepted-boundary restart; constant thereafter",
       "analog": {
-        "raw_actor_log_std_bypassed": true,
-        "sigma": 0.3,
-        "space": "pre_tanh"
+        "interpolation": "linear_in_log_sigma",
+        "sigma_end": 0.04,
+        "sigma_start": 0.02
       },
       "buttons": {
-        "effective_logits": "learned_logits/temperature",
-        "temperature": 1.0
+        "effective_logits": "learned_logits/positive_temperature",
+        "temperature_end": 0.25,
+        "temperature_start": 0.1
       },
       "coherence": [
-        "sampling",
-        "stored log probability",
-        "PPO log probability",
-        "entropy",
-        "KL"
+        "rollout sampling",
+        "stored old log probability",
+        "PPO recomputation",
+        "ratio",
+        "entropy telemetry",
+        "KL telemetry"
       ],
-      "entropy_loss_coefficient_changed": false,
-      "kl_telemetry_only": true,
-      "new_action_hold_or_correlated_noise": false,
-      "scope": "current trainable Rival only; opponents and deterministic evaluation unchanged",
-      "version": "RIVAL2_SSL_STRONG_EXPLORATION_V1"
+      "purpose": "bounded stochastic PPO exploration without overwhelming Unified V5 behavior",
+      "schedule": {
+        "interior": "smoothstep x*x*(3-2*x)",
+        "ramp_end_accepted_update": 150,
+        "ramp_start_accepted_update": 30
+      },
+      "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
     },
-    "contract_sha256": "9B3D1FB5AF1785CEF0D0F31AE23F4435A07A5CA298F3EAB5488235D5EC2336B3"
-  },
-  "exploration_amendment": {
-    "anchor": {
-      "accepted_update": 84,
-      "contract_sha256": "9B3D1FB5AF1785CEF0D0F31AE23F4435A07A5CA298F3EAB5488235D5EC2336B3",
-      "first_stronger_update": 85,
-      "previous_authority_sha256": "AEA37884836DD4055BACCD605E3F660A0EC2D70162DF5C3032DF6C43134DFD72",
-      "source": "checkpoints/rival2/ssl_foundation_v5_long_trace_v1/pre_strong_exploration_u0084.pt",
-      "source_sha256": "89746B67570507CDED8DD5447276440A9E695C35F0D98827330C511C846FB87E",
-      "version": "RIVAL2_SSL_STRONG_EXPLORATION_V1"
-    },
-    "anchor_sha256": "943F48428957B1DE5E43AD23221096FE63BFE82D9734B44BDA92FC2BB300A853",
-    "budget_and_deadline_unchanged": true,
-    "model_optimizer_counters_rng_preserved": true,
-    "new_rollout_required": true,
-    "old_rollout_reused": false,
-    "restart_metadata_is_historical": "restart block describes local zero, not active exploration"
+    "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E"
   },
   "format": "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1_AUTHORITY",
-  "implementation_commit": "2d3e6b7a667138cb099bed4de770a008fdf959b3",
+  "implementation_commit": "c8955d0592f6549b5953affc4ec0082aa52b0698",
   "implementation_sha256": {
     "benchmarks/run_rival2_ssl_foundation_ppo_v1.py": "FB318C32CDACF0CB5CD9423A4DC12101F4BB94C3086801BC1B987303FE2ACBFB",
-    "benchmarks/run_rival2_ssl_foundation_strong_exploration.py": "953ACD42273D802AB39C40866D39139D34648A03C50111EC5D1859DE2A97A46F",
     "benchmarks/run_rival2_ssl_foundation_v5_long_trace_v1.py": "F930BDA84D527AAEE43E4E4E25B06BF1A6B256404A950102CB52C608B6592835",
     "benchmarks/run_rival2_ssl_foundation_v5_restart_v1.py": "5FEAFD669A49DF25E50EE8CCF51DF28C8FD8A729E75A2BE5199C9EA32E80FA0A",
     "rivalsim/recurrent_execution.py": "04C11878F3109A2868E7A9D1E52FF355DE706A5E792DFF247AFBC507AA404562",
@@ -426,6 +411,6 @@
     "initial_policy_version_increment": 0,
     "initial_resume_checkpoint": null
   },
-  "supersedes_authority_sha256": "AEA37884836DD4055BACCD605E3F660A0EC2D70162DF5C3032DF6C43134DFD72",
-  "supersession_reason": "user requested substantially stronger exploration before any 30Hz/fresh-weight transition"
+  "supersedes_authority_sha256": "AB4E37BE9A4D93EDA7578868B3831B5FFD7EF46A44ADA1EA4FC9CF59399A73C5",
+  "supersession_reason": "user requested longer retrospective credit, not new rewards"
 }
