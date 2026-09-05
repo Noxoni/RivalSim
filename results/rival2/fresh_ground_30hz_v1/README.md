@@ -105,7 +105,8 @@ from the live training worlds and preserve the learner RNG around evaluation.
 
 ## Validation and artifacts
 
-- `focused_tests.xml`: 13 new focused tests, including native forced goals at
+- `focused_tests.xml`: 13 new focused tests; `adjacent_tests.xml`: 23 combined
+  new/recurrent/legacy-SSL regression tests passed, including native forced goals at
   each sub-tick, repeated resets, no-touch/time-limit truncation, physical-time
   reward telescoping, fresh-init reproduction, critic isolation, action likelihood,
   recurrent PPO numerical smoke, and same-lineage resume. The small unit-test
@@ -140,6 +141,14 @@ and hashes the latest accepted checkpoint. Two atomically published rolling
 slots alternate every update; snapshots at 10,20,50 and every 50 thereafter are
 permanent. Check `latest.json`, not a guessed slot filename. Never overwrite old
 V5 checkpoints. A Windows file lease prevents two simultaneous learners.
+
+The existing heartbeat was repointed to **Monitor fresh 30 Hz Rival PPO**, every
+10 minutes, with the old lineage/cap/deadline explicitly removed. It reports
+new evaluations and actionable failures, not repeated unchanged status. The
+CPU-only `benchmarks/report_rival2_fresh_ground_30hz_v1.py` validates a stable
+rolling checkpoint and writes a complete-record curve snapshot for Git without
+interrupting or competing with the GPU learner. Checks distinguish finite-state
+integrity from demonstrated gameplay ability.
 
 To request a clean stop, create `STOP` in this run directory. The current update
 and any boundary evaluation finish, the accepted checkpoint is preserved, and
