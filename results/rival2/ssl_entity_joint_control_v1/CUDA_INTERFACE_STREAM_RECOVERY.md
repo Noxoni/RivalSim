@@ -29,3 +29,12 @@ authoritative position. The helper is corrected to set both representations
 for its same near-goal position and velocity. A focused CPU test confirms exact
 unit conversion and that only the fixture world is changed. No production
 physics or policy code is altered. Dynamic verification is still required.
+
+Final execution after commit `73c76c063a6222cf832caa8fb5dfd03a989af2ab`
+passes on CUDA: all 48 physics ticks have exact observation, actor-logit,
+emitted-action, hidden-state and reset-mask parity; exactly one forced native
+goal/reset occurs; checkpoint/model hashes are unchanged. The complete passing
+result is `full_match_cuda_interface_check.json`. The separate failure files
+above remain historical diagnostic evidence, not the current status. No forced
+fixture result is counted as a gameplay goal. Full-match gameplay evaluation
+is now running under the unchanged prospective protocol.
