@@ -1,0 +1,164 @@
+{
+  "evaluation100": {
+    "acquisition_selfplay": {
+      "deterministic": true,
+      "focal_touch_count": 59,
+      "focal_touch_fraction": 0.796875,
+      "goals_against": 2,
+      "goals_for": 10,
+      "goalward_touch_fraction": 0.9322034120559692,
+      "median_first_touch_seconds_if_touched": 0.9666666984558105,
+      "no_touch_truncations": 50,
+      "scenario_sha256": "3D75DAECDDA054B0A04B8CBD4723FAD65590744ECD5A883B265171F260C7E1E4",
+      "seconds_of_exposure": 968.7034301757812,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 3.6543691158294678,
+      "worlds": 64
+    },
+    "finishing_selfplay": {
+      "deterministic": true,
+      "focal_touch_count": 82,
+      "focal_touch_fraction": 0.96875,
+      "goals_against": 0,
+      "goals_for": 35,
+      "goalward_touch_fraction": 0.9878048896789551,
+      "median_first_touch_seconds_if_touched": 0.5250000357627869,
+      "no_touch_truncations": 28,
+      "scenario_sha256": "D7CCBF4363ECF3EFC253A05E24E17E2C1AE3494B3FA4BCD4E62F51F25B61C834",
+      "seconds_of_exposure": 643.6018676757812,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 7.644477367401123,
+      "worlds": 64
+    },
+    "standard_kickoff_nexto": {
+      "deterministic": true,
+      "focal_touch_count": 26,
+      "focal_touch_fraction": 0.203125,
+      "goals_against": 64,
+      "goals_for": 0,
+      "goalward_touch_fraction": 1.0,
+      "median_first_touch_seconds_if_touched": 2.575000047683716,
+      "no_touch_truncations": 0,
+      "scenario_sha256": "3573ED2BC754EDE9968EC4CCFB3E74F7F8B666322F4E18DF81E177FCC3F03AAB",
+      "seconds_of_exposure": 538.101318359375,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 2.8990824222564697,
+      "worlds": 64
+    }
+  },
+  "evaluation150": {
+    "acquisition_selfplay": {
+      "deterministic": true,
+      "focal_touch_count": 69,
+      "focal_touch_fraction": 0.8125,
+      "goals_against": 1,
+      "goals_for": 27,
+      "goalward_touch_fraction": 0.8985507488250732,
+      "median_first_touch_seconds_if_touched": 0.9666666984558105,
+      "no_touch_truncations": 34,
+      "scenario_sha256": "3D75DAECDDA054B0A04B8CBD4723FAD65590744ECD5A883B265171F260C7E1E4",
+      "seconds_of_exposure": 838.968505859375,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 4.93463134765625,
+      "worlds": 64
+    },
+    "finishing_selfplay": {
+      "deterministic": true,
+      "focal_touch_count": 86,
+      "focal_touch_fraction": 0.96875,
+      "goals_against": 0,
+      "goals_for": 42,
+      "goalward_touch_fraction": 0.9651162624359131,
+      "median_first_touch_seconds_if_touched": 0.5333333611488342,
+      "no_touch_truncations": 22,
+      "scenario_sha256": "D7CCBF4363ECF3EFC253A05E24E17E2C1AE3494B3FA4BCD4E62F51F25B61C834",
+      "seconds_of_exposure": 556.9013061523438,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 9.265555381774902,
+      "worlds": 64
+    },
+    "standard_kickoff_nexto": {
+      "deterministic": true,
+      "focal_touch_count": 13,
+      "focal_touch_fraction": 0.203125,
+      "goals_against": 64,
+      "goals_for": 0,
+      "goalward_touch_fraction": 0.0,
+      "median_first_touch_seconds_if_touched": 2.691666841506958,
+      "no_touch_truncations": 0,
+      "scenario_sha256": "3573ED2BC754EDE9968EC4CCFB3E74F7F8B666322F4E18DF81E177FCC3F03AAB",
+      "seconds_of_exposure": 631.66845703125,
+      "surviving_at_horizon": 0,
+      "touches_per_minute": 1.2348250150680542,
+      "worlds": 64
+    }
+  },
+  "identical_scenario_hashes": true,
+  "notes": [
+    "Development scenarios, not match win rates or untouched test data.",
+    "Self-play opponent also changes with the current model; fixed Nexto remains the opponent anchor.",
+    "First continuation block begins from fresh episodes; use later blocks for steady-state context."
+  ],
+  "training_blocks": [
+    {
+      "ended_player_episode_touch_fraction": 0.5103469476155211,
+      "entropy": 3.376917585266961,
+      "goals_per_world_minute": 1.29150390625,
+      "max_completed_kl": 0.005155007088554381,
+      "movement_speed": 738.6202531602647,
+      "no_touch_reset_fraction": 0.6898710299439685,
+      "through": 100,
+      "touches_per_player_minute": 3.0001220703125
+    },
+    {
+      "ended_player_episode_touch_fraction": 0.515895008605852,
+      "entropy": 3.2997748782899645,
+      "goals_per_world_minute": 1.64483642578125,
+      "max_completed_kl": 0.005409793262043255,
+      "movement_speed": 784.8644340176053,
+      "no_touch_reset_fraction": 0.5258175559380379,
+      "through": 110,
+      "touches_per_player_minute": 3.8192138671875
+    },
+    {
+      "ended_player_episode_touch_fraction": 0.5287159522941514,
+      "entropy": 3.322173247337341,
+      "goals_per_world_minute": 1.6185302734375,
+      "max_completed_kl": 0.004908952932844654,
+      "movement_speed": 763.094891289605,
+      "no_touch_reset_fraction": 0.6396802249882818,
+      "through": 120,
+      "touches_per_player_minute": 3.5213623046875
+    },
+    {
+      "ended_player_episode_touch_fraction": 0.5419542489863994,
+      "entropy": 3.2676825533972846,
+      "goals_per_world_minute": 1.691162109375,
+      "max_completed_kl": 0.0047281528519270135,
+      "movement_speed": 785.0060664198134,
+      "no_touch_reset_fraction": 0.5987768993992976,
+      "through": 130,
+      "touches_per_player_minute": 3.500457763671875
+    },
+    {
+      "ended_player_episode_touch_fraction": 0.5502809212095513,
+      "entropy": 3.2268909351030985,
+      "goals_per_world_minute": 1.97021484375,
+      "max_completed_kl": 0.004946784384007074,
+      "movement_speed": 825.0499352349175,
+      "no_touch_reset_fraction": 0.5411576073993587,
+      "through": 140,
+      "touches_per_player_minute": 3.795379638671875
+    },
+    {
+      "ended_player_episode_touch_fraction": 0.5642287758436144,
+      "entropy": 3.1917539599206712,
+      "goals_per_world_minute": 1.8104248046875,
+      "max_completed_kl": 0.005818969704266882,
+      "movement_speed": 864.4962636311849,
+      "no_touch_reset_fraction": 0.5385471241056842,
+      "through": 150,
+      "touches_per_player_minute": 3.6156005859375
+    }
+  ]
+}
