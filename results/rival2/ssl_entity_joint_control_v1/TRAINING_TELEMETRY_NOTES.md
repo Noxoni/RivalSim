@@ -77,3 +77,31 @@ basic acquisition, not evidence of useful aerials, possession, or match strength
 
 `training_summary_050.json` binds all50 source rows and their original byte
 prefix hash. Its presence does not authorize changing the live pilot budget.
+
+## Completed pilot through +100
+
+`training_summary_100.json` retains all 100 rows, the exact source-prefix hash,
+and every ten-update block. `training_curve.jsonl` is now closed and preserved
+in Git; it matches the external run log. The worker exited normally after its
+fixed +100 evaluation, with no numerical failure or KL rejection.
+
+| Metric | Updates1-10 | Updates91-100 |
+|---|---:|---:|
+| Touches / player-minute | 1.0851 | 3.0001 |
+| Physical goals / world-minute | 0.4730 | 1.2915 |
+| Ended player episodes with a touch | 17.87% | 51.03% |
+| No-touch fraction of world resets | 85.01% | 68.99% |
+| Conditional first-touch seconds | 1.5917 | 1.6829 |
+| Mean movement speed, uu/s | 747.13 | 738.62 |
+| Jump requested fraction | 19.36% | 11.64% |
+| Boost requested fraction | 25.11% | 26.52% |
+| Handbrake requested fraction | 29.87% | 23.70% |
+| Categorical entropy, nats | 3.2883 | 3.3769 |
+
+Touches and goals rose, and no-touch reset share fell. Mean speed and conditional
+first-touch timing did not improve over the synchronized initial block. These
+are stochastic self-play curriculum statistics with changing episode lengths,
+not a match win rate. The independent fixed +100 development scenarios improve
+acquisition and finishing, but still yield 0/64 goals against Nexto. The
+planned full-match comparison is the next gameplay check, not more training
+under an unannounced extension of this pilot.

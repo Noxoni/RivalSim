@@ -68,6 +68,15 @@ def run(*, initial_only=False, device="cpu"):
     policy = EntityJointControlActorCritic().eval()
     policy.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=False)["model"])
     before_hash = tensor_hash(policy.state_dict())
+    if device == "cuda:0":
+        # FreshGroundEnv adopts the current Torch stream. Use an owned nondefault
+        # Warp stream before constructing either world, so graph capture never
+        # receives Torch's default-stream handle (unsupported by Warp capture).
+        wp.init()
+        warp_stream = wp.Stream(device=device)
+        torch_stream = wp.stream_to_torch(warp_stream)
+        torch.cuda.set_stream(torch_stream)
+        wp.set_stream(warp_stream, device=device, sync=False)
     policy.to(device)
     layouts, sides = assignments()
     n = len(sides)

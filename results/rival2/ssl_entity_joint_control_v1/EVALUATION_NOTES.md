@@ -11,6 +11,7 @@ are numbers of focal cases with a touch, or goals, not percentages.
 | Entity candidate +10 | 20 | 58 | 14 | 13 | 0 / 64 |
 | Entity candidate +20 | 18 | 58 | 14 | 13 | 0 / 64 |
 | Entity candidate +50 | 35 | 55 | 17 | 13 | 0 / 64 |
+| Entity candidate +100 | 51 | 50 | 35 | 13 | 0 / 64 |
 
 The +10 acquisition change is +9cases relative to the changed-control
 initialization, and +4cases relative to the original hybrid parent. Finishing
@@ -55,3 +56,24 @@ mixture change is made; complete the prospectively frozen +100 pilot and the
 fixed post-pilot match comparison. The +50 model/optimizer integrity audit
 passes, with9100 steps per Adam counter and no nonfinite states. All50 detailed
 training rows are independently preserved in `training_summary_050.json`.
+
+## Completed initial pilot: +100
+
+Acquisition coverage is 51/64 (79.6875%), with 59 contacts and 10 goals for /
+2 against. Finishing coverage is 62/64, with 82 contacts and 35 goals for /
+0 against. Both exceed the original parent and +50 on these fixed development
+cases. Conditional median first-touch times are 0.966667s and 0.525000s; they
+exclude cases that never touched. No-touch timeouts remain common (50/64 in
+acquisition), including episodes that touched earlier but could not sustain play.
+
+Nexto kickoff outcomes remain 0 goals for / 64 against, 13/64 touched and 26
+contacts. Therefore the gain is in basic acquisition/finishing, not demonstrated
+Nexto strength or SSL gameplay. No lucky intermediate checkpoint is selected.
+The frozen +100 versus original-parent full-match comparison remains pending.
+
+All 100 PPO updates completed. The fixed +100 checkpoint SHA-256 is
+`B5F7D19471257758966EB0B407797CFCFBD0F6CE8E86BCF9E13D41FBA4EA7ABA`.
+The complete model and Adam state are finite, every Adam counter is 18,200,
+all intended parameter groups updated, and the action/entity-map buffers and
+original parent identity are preserved. The pilot added 589,824,000 trainable
+player decisions. These integrity checks are not capability acceptance.
