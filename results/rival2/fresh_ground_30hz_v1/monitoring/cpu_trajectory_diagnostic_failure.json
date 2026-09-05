@@ -1,0 +1,18 @@
+{
+  "campaign_process_interrupted": false,
+  "campaign_source_changes": false,
+  "command": [
+    "benchmarks/inspect_fresh_ground_30hz_trajectories.py",
+    "--update",
+    "250"
+  ],
+  "error": "CPU kernel build failed with error code -1",
+  "exception_type": "Exception",
+  "interpretation": "No completed trajectory evidence. This separate CPU diagnostic failure is not a failure of the active GPU learner.",
+  "optimizer_steps": 0,
+  "script_sha256": "C002F29092005035EEC3A852F58FB3C6A0B28CB7FD3155F12CBCB55A45A4AEE9",
+  "torch_cuda_bytes_allocated": 0,
+  "traceback": "Traceback (most recent call last):\n  File \"G:\\dev\\RivalSim\\benchmarks\\inspect_fresh_ground_30hz_trajectories.py\", line 162, in <module>\n    main()\n    ~~~~^^\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n  File \"G:\\dev\\RivalSim\\benchmarks\\inspect_fresh_ground_30hz_trajectories.py\", line 88, in main\n    tr = env.step(action)\n  File \"G:\\dev\\RivalSim\\rivalsim\\rival2_env.py\", line 1221, in step\n    return self._step_impl(action)\n           ~~~~~~~~~~~~~~~^^^^^^^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\fresh_ground_30hz.py\", line 253, in _step_impl\n    self.world.step(1)\n    ~~~~~~~~~~~~~~~^^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\simulator.py\", line 76, in step\n    self._launch_tick()\n    ~~~~~~~~~~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\rival2_env.py\", line 317, in _launch_tick\n    super()._launch_tick()\n    ~~~~~~~~~~~~~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\static_world.py\", line 1508, in _launch_tick\n    super()._launch_tick()\n    ~~~~~~~~~~~~~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\static_world.py\", line 991, in _launch_tick\n    super()._launch_tick()\n    ~~~~~~~~~~~~~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\static_world.py\", line 549, in _launch_tick\n    super()._launch_tick()\n    ~~~~~~~~~~~~~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\static_world.py\", line 355, in _launch_tick\n    wp.launch(\n    ~~~~~~~~~^\n        wheel_pre_tick,\n        ^^^^^^^^^^^^^^^\n    ...<2 lines>...\n        device=self.device,\n        ^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 10596, in launch\n    module_exec = kernel.module.load(device, block_dim)\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 4154, in load\n    raise e\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 4151, in load\n    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 4012, in _compile\n    raise (e)\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 3963, in _compile\n    warp._src.build.build_cpu(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~^\n        output_path,\n        ^^^^^^^^^^^^\n    ...<11 lines>...\n        enable_tiles_in_stack_memory=options[\"enable_tiles_in_stack_memory\"],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\build.py\", line 158, in build_cpu\n    raise Exception(f\"CPU kernel build failed with error code {err}\")\nException: CPU kernel build failed with error code -1\n",
+  "utc": "2026-09-05T16:28:06.665040+00:00",
+  "verdict": "BLOCKED_DIAGNOSTIC_ONLY"
+}
