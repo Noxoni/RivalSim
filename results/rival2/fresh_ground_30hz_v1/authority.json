@@ -1,0 +1,119 @@
+{
+  "access": "(1-max(control))*[.75*exp(-dself/2000)+.25*(exp(-dself/2000)-exp(-dopp/2000))]",
+  "checkpoint_each_update": true,
+  "critic_lr": 0.0003,
+  "deadline": null,
+  "direct_behavior_rewards": [],
+  "evaluation": {
+    "cases": [
+      "acquisition_selfplay",
+      "finishing_selfplay",
+      "standard_kickoff_nexto"
+    ],
+    "deterministic_current_policy": true,
+    "seconds": 30,
+    "seeds": [
+      2026090601,
+      2026090602,
+      2026090603
+    ],
+    "worlds_per_case": 64
+  },
+  "evaluation_every_after_50": 50,
+  "evaluation_updates": [
+    0,
+    10,
+    20,
+    50
+  ],
+  "exploration": {
+    "analog_std_bounds": [
+      0.2,
+      0.9
+    ],
+    "button_temperature": 1.0,
+    "initial_analog_std": 0.65,
+    "initial_button_probabilities": [
+      0.12,
+      0.35,
+      0.08
+    ],
+    "kind": "learned_hybrid"
+  },
+  "goal_reward_time": "first scoring physics tick; discount within held action",
+  "goal_successor_potential": 0,
+  "goal_velocity": "clamp(dot(ball_velocity,unit(ball->opponent_goal_center))/3000,-1,1)",
+  "initialization": "fresh_random_no_policy_parent",
+  "kl": "telemetry_only",
+  "maximum_updates": null,
+  "no_touch_limit_seconds": 15,
+  "opponents": {
+    "after_routine_acquisition": 0.2,
+    "both_selfplay_sides_trainable": true,
+    "frozen_old_policy_probability": 0.0,
+    "initial_nexto": 0.0,
+    "routine_acquisition": "two consecutive evaluation boundaries: focal touch fraction >=.60, conditional median first touch <=5s, >=1 finishing goal; actual Nexto remains eval-only until then"
+  },
+  "other_potentials": "unchanged deterministic ssl_foundation_v1 state functions",
+  "permanent_snapshot_every": 50,
+  "physics_discount": 0.9987476493904754,
+  "physics_hz": 120,
+  "physics_ticks_per_action": 4,
+  "policy": {
+    "activation": "silu",
+    "actor_outputs": 13,
+    "base_hidden_dim": 512,
+    "base_hidden_layers": 3,
+    "context_encoder_dim": 256,
+    "context_hidden_dim": 256,
+    "context_layers": 1,
+    "critic_architecture": "RIVAL2_INDEPENDENT_CRITIC_MLP_3X512_V1",
+    "dtype": "float32",
+    "log_std_max": -0.10536051565782628,
+    "log_std_min": -1.6094379124341003,
+    "obs_dim": 182,
+    "version": "RIVAL2_UNIFIED_CAPABILITY_POLICY_V1"
+  },
+  "policy_hz": 30,
+  "post_goal_remainder": "absorbing reward; reset once at decision boundary",
+  "potential_weights_change_during_run": false,
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.001,
+    "epochs": 2,
+    "gae_lambda": 0.9973145188572297,
+    "gamma": 0.995,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 90,
+    "value_loss_coefficient": 0.5
+  },
+  "recurrent_execution": "complete 90-decision sequences; native reset masks",
+  "resume": "only this lineage; fresh simulator episodes, preserved optimizer and all RNG counters",
+  "retention_objective": false,
+  "reward": "RIVAL2_REWARD_FRESH_GROUND_30HZ_V1",
+  "reward_form": "terminal +/-10 plus gamma*Phi(next)-Phi(now)",
+  "scenario_mix": {
+    "acquisition": 0.5,
+    "finishing": 0.25,
+    "ground_ongoing": 0.1,
+    "kickoff": 0.15
+  },
+  "seed": 2026090501,
+  "sequence_microbatch_size": 728,
+  "stop": "user interrupt or numerical/corruption/runtime fault",
+  "time_limit_seconds": 30,
+  "truncation": "bootstrap pre-reset final observation; cut GAE trace",
+  "version": "RIVAL2_FRESH_GROUND_30HZ_V1",
+  "weights": {
+    "access": 0.75,
+    "alignment": 0.3,
+    "boost": 0.15,
+    "control": 0.75,
+    "defense": 0.5,
+    "field": 1.25,
+    "goal_velocity": 0.25
+  },
+  "worlds": 32768
+}

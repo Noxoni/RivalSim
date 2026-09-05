@@ -58,6 +58,7 @@ class Rival2RecurrentTrainer:
             "unified_ground_acquisition_v2",
             "unified_ground_gameplay_v2",
             "ssl_foundation_v1",
+            "fresh_ground_30hz_v1",
         }:
             raise ValueError(f"unsupported recurrent PPO phase: {phase}")
         self.env = env
