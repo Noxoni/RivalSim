@@ -1,0 +1,144 @@
+{
+  "owner": "user-requested-long-trace-evaluation-20-20260904",
+  "checkpoint": {
+    "accepted_updates": 20,
+    "bytes": 20582627,
+    "path": "G:\\dev\\RivalSim\\checkpoints\\rival2\\ssl_foundation_v5_long_trace_v1\\evaluation_u0020.pt",
+    "policy_version": 20,
+    "schedule_authority_sha256": "9C7FAC5AF55D29032980E8494D33398A561F4048D50F1BF466D2127DABA1C0F6",
+    "sha256": "8CD78E5AE377158F133DA07B59D42A1C19A615F2A5C44505939EAD7B1852D8D8",
+    "total_agent_samples": 227954380
+  },
+  "evaluation": {
+    "accepted_updates": 20,
+    "deterministic_policy": true,
+    "evaluation_is_gate": false,
+    "opponents": {
+      "frozen_unified_v5": {
+        "goals_against": 386,
+        "goals_for": 400,
+        "goalward_touch_fraction": 0.8594104308390023,
+        "mean_reward_per_decision": -0.00012985188562224674,
+        "mean_speed_uu_per_second": 1186.038270090923,
+        "mean_state_potentials": {
+          "access": -0.007307643984928598,
+          "alignment": 0.13490647254388724,
+          "boost": 0.3560392810575083,
+          "control": -0.005275169634775773,
+          "defense": 0.0037428132814898226,
+          "field": -0.004785546577322573,
+          "weighted_total": 0.08033020076650024
+        },
+        "no_touch_resets": 2,
+        "touches": 3969,
+        "touches_per_minute": 15.50390625
+      },
+      "nexto": {
+        "goals_against": 946,
+        "goals_for": 174,
+        "goalward_touch_fraction": 0.8882810250503888,
+        "mean_reward_per_decision": -0.004222143809765109,
+        "mean_speed_uu_per_second": 1194.205446562741,
+        "mean_state_potentials": {
+          "access": -0.10535819932549935,
+          "alignment": 0.07387551293515013,
+          "boost": 0.351008980418858,
+          "control": -0.05915970481079459,
+          "defense": 0.0034185175367574265,
+          "field": -0.09431401192737889,
+          "weighted_total": -0.16475767879117528
+        },
+        "no_touch_resets": 0,
+        "touches": 3473,
+        "touches_per_minute": 13.56640625
+      }
+    },
+    "ticks": 3600,
+    "worlds": 1024
+  },
+  "comparison": {
+    "frozen_unified_v5": {
+      "goals_for": {
+        "update10": 362,
+        "update20": 400,
+        "delta": 38
+      },
+      "goals_against": {
+        "update10": 375,
+        "update20": 386,
+        "delta": 11
+      },
+      "touches_per_minute": {
+        "update10": 16.0078125,
+        "update20": 15.50390625,
+        "delta": -0.50390625
+      },
+      "no_touch_resets": {
+        "update10": 1,
+        "update20": 2,
+        "delta": 1
+      },
+      "goalward_touch_fraction": {
+        "update10": 0.8225963884821864,
+        "update20": 0.8594104308390023,
+        "delta": 0.036814042356815846
+      },
+      "mean_speed_uu_per_second": {
+        "update10": 1184.5603311633824,
+        "update20": 1186.038270090923,
+        "delta": 1.477938927540663
+      },
+      "goal_differential": {
+        "update10": -13,
+        "update20": 14,
+        "delta": 27
+      }
+    },
+    "nexto": {
+      "goals_for": {
+        "update10": 185,
+        "update20": 174,
+        "delta": -11
+      },
+      "goals_against": {
+        "update10": 923,
+        "update20": 946,
+        "delta": 23
+      },
+      "touches_per_minute": {
+        "update10": 13.609375,
+        "update20": 13.56640625,
+        "delta": -0.04296875
+      },
+      "no_touch_resets": {
+        "update10": 0,
+        "update20": 0,
+        "delta": 0
+      },
+      "goalward_touch_fraction": {
+        "update10": 0.8777267508610792,
+        "update20": 0.8882810250503888,
+        "delta": 0.010554274189309543
+      },
+      "mean_speed_uu_per_second": {
+        "update10": 1192.3136469974634,
+        "update20": 1194.205446562741,
+        "delta": 1.8917995652775517
+      },
+      "goal_differential": {
+        "update10": -738,
+        "update20": -772,
+        "delta": -34
+      }
+    }
+  },
+  "baseline_update": 10,
+  "accepted_updates_since_baseline": 10,
+  "new_trainable_samples": 169122582,
+  "new_physics_ticks": 117964800,
+  "training_wall_seconds": 923.4709764004219,
+  "physics_exposure_ratio_per_update_vs_old": 2.8125,
+  "interpretation": "matched protocol, sequential comparison; not a randomized causal test",
+  "reward_optimizer_and_learning_contract_changed": false,
+  "resume_semantics": "exact saved weights/Adam/RNG; fresh simulator episodes and hidden state"
+}
