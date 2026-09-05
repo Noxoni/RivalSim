@@ -49,6 +49,9 @@ terminal-goal reward. No new rewards or physics changes. Current-v-current, both
 sides trainable. Nexto is evaluation-only for this initial development stage.
 KL stays telemetry; numerical corruption triggers complete update rollback and
 stop at the most recent accepted checkpoint. No KL rejection or retention loss.
+Signed reward-component totals sum both self-play players; antisymmetric terms
+and terminal goals therefore cancel in those totals. Actual goals/concedes are
+reported independently. A zero signed total is not a zero-event count.
 
 Initial evidence budget: 100 accepted updates, evaluations/checkpoints at
 0/10/20/50/100 and rolling saves every update. This is a review boundary within
