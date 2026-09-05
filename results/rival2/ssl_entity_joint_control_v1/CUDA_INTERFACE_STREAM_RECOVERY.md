@@ -18,3 +18,14 @@ constructing either world. The compared policy, observations, 48-tick fixture,
 forced goal, physics, checkpoint, and full-match evaluation protocol do not
 change. The idle-only test and lint pass. Dynamic CUDA verification must still
 be executed after publication; do not count this document as a passing result.
+
+The second CUDA attempt successfully executed all 48 ticks. All observations,
+logits, actions, hidden states and reset masks matched exactly, but the deliberate
+goal fixture produced zero goals. That failed result is preserved in
+`full_match_cuda_pre_fixture_check.json`. Inspection showed the helper only
+wrote exported ball telemetry; native integration uses `ball_world.position_bt`
+and `velocity_bt`. The existing production forced-goal test already writes the
+authoritative position. The helper is corrected to set both representations
+for its same near-goal position and velocity. A focused CPU test confirms exact
+unit conversion and that only the fixture world is changed. No production
+physics or policy code is altered. Dynamic verification is still required.

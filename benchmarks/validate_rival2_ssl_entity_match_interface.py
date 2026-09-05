@@ -47,6 +47,16 @@ def check_idle_status(state):
         )
 
 
+def set_goal_fixture(world, bridge, device):
+    """Set both public telemetry and authoritative Bullet-scale ball state."""
+    position = torch.tensor([0.0, 5100.0, 120.0], device=device)
+    velocity = torch.tensor([0.0, 6000.0, 0.0], device=device)
+    bridge.views["ball_pos"][0] = position
+    bridge.views["ball_vel"][0] = velocity
+    wp.to_torch(world.ball_world.position_bt)[0] = position * 0.02
+    wp.to_torch(world.ball_world.velocity_bt)[0] = velocity * 0.02
+
+
 @torch.inference_mode()
 def run(*, initial_only=False, device="cpu"):
     torch.set_num_threads(2)
@@ -100,9 +110,8 @@ def run(*, initial_only=False, device="cpu"):
         if decision == 6:
             # Same deliberate near-goal physical fixture in both worlds.
             # Native physics/lifecycle must generate and consume the event.
-            for target in (train.bridge, bridge):
-                target.views["ball_pos"][0] = torch.tensor([0.0, 5100.0, 120.0], device=device)
-                target.views["ball_vel"][0] = torch.tensor([0.0, 6000.0, 0.0], device=device)
+            for target_world, target_bridge in ((train.world, train.bridge), (world, bridge)):
+                set_goal_fixture(target_world, target_bridge, device)
             train.observation = train.bridge.observation()
             observation = bridge.observation()
         difference = (train.observation - observation).abs()
