@@ -1,0 +1,1053 @@
+{
+  "accepted_update": 52,
+  "adam_step_deltas": {
+    "0": 1444.0,
+    "1": 1444.0,
+    "10": 1444.0,
+    "11": 1444.0,
+    "12": 1444.0,
+    "13": 1444.0,
+    "14": 1444.0,
+    "15": 1444.0,
+    "16": 1444.0,
+    "17": 1444.0,
+    "18": 1444.0,
+    "19": 1444.0,
+    "2": 1444.0,
+    "20": 1444.0,
+    "21": 1444.0,
+    "22": 1444.0,
+    "23": 1444.0,
+    "3": 1444.0,
+    "4": 1444.0,
+    "5": 1444.0,
+    "6": 1444.0,
+    "7": 1444.0,
+    "8": 1444.0,
+    "9": 1444.0
+  },
+  "authority_sha256": "AEA37884836DD4055BACCD605E3F660A0EC2D70162DF5C3032DF6C43134DFD72",
+  "baseline_mean_seconds": 73.95624059997499,
+  "baseline_update_rows": [
+    {
+      "accepted_update": 44,
+      "created_utc": "2026-09-05T00:50:38.426894+00:00",
+      "exploration": {
+        "accepted_update": 643,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.31136372685432434,
+        "actor_button_probability_handbrake": 0.3284452259540558,
+        "actor_button_probability_jump": 0.3499491512775421,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.10201827436685562,
+        "actor_mean_mean_roll": -0.020271049812436104,
+        "actor_mean_mean_steer": -0.0535750575363636,
+        "actor_mean_mean_throttle": 0.494329571723938,
+        "actor_mean_mean_yaw": -0.022936299443244934,
+        "advantage_before_normalization_mean": -0.02574363723397255,
+        "advantage_before_normalization_std": 1.4022643566131592,
+        "approx_kl": 0.07415404170751572,
+        "clip_fraction": 0.4603108763694763,
+        "completed_update_mean_kl": 0.07415404170751572,
+        "completed_update_sample_kl_max": 56.74623489379883,
+        "cuda_peak_allocated_gib": 20.839622974395752,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.002903691725805402,
+        "emitted_action_saturation_fraction_roll": 0.00015818182146176696,
+        "emitted_action_saturation_fraction_steer": 0.0011987723410129547,
+        "emitted_action_saturation_fraction_throttle": 0.0645994171500206,
+        "emitted_action_saturation_fraction_yaw": 0.0001900153438327834,
+        "entropy": -8.96119213104248,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 28.982379913330078,
+        "old_value_mean": -0.6629000306129456,
+        "optimizer_post_step_approx_kl_max": 0.1256088763475418,
+        "optimizer_post_step_approx_kl_mean": 0.05380314216017723,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.032938405871391296,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 12.506913185119629,
+        "post_update_value_mean": -0.683860182762146,
+        "post_update_value_std": 2.8843462467193604,
+        "return_mean": -0.6886436343193054,
+        "return_std": 3.2320780754089355,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.525800883769989,
+        "value_loss": 0.9857250452041626
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013810016540091239,
+        "curriculum": {
+          "goals_against": {
+            "current": 1203,
+            "frozen_unified_v5": 580,
+            "nexto": 2278
+          },
+          "goals_for": {
+            "current": 1146,
+            "frozen_unified_v5": 536,
+            "nexto": 292
+          },
+          "opponent_trainable_samples": {
+            "current": 10898990,
+            "frozen_unified_v5": 2669492,
+            "nexto": 3677493
+          },
+          "opponent_world_decisions": {
+            "current": 5449495,
+            "frozen_unified_v5": 2669492,
+            "nexto": 3677493
+          },
+          "reward_sum": {
+            "current": -2276.8847010870304,
+            "frozen_unified_v5": -1066.1323511389965,
+            "nexto": -19278.025845319877
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8396888260254597,
+        "mean_movement_speed_uu_per_second": 1171.043845621685,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 15,
+        "physical_player_minutes": 2395.2743055555557,
+        "potential_component_signed_sum": {
+          "access": 449.1280371108022,
+          "alignment": -1628.250546579215,
+          "boost": -2032.4385197548027,
+          "control": 220.76100732452124,
+          "defense": 3.3873476025380276,
+          "field": 666.3696588279754,
+          "total": -2321.042840784481
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 35350,
+        "touches_per_minute": 14.758226194807774,
+        "trainable_agent_samples": 17245975
+      },
+      "wall_seconds": 75.80809559999034
+    },
+    {
+      "accepted_update": 45,
+      "created_utc": "2026-09-05T00:51:52.160708+00:00",
+      "exploration": {
+        "accepted_update": 644,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.31124377250671387,
+        "actor_button_probability_handbrake": 0.3302970826625824,
+        "actor_button_probability_jump": 0.3505552411079407,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.09833689033985138,
+        "actor_mean_mean_roll": -0.022374950349330902,
+        "actor_mean_mean_steer": -0.05285126715898514,
+        "actor_mean_mean_throttle": 0.4935680329799652,
+        "actor_mean_mean_yaw": -0.025957897305488586,
+        "advantage_before_normalization_mean": -0.022759167477488518,
+        "advantage_before_normalization_std": 1.3995893001556396,
+        "approx_kl": 0.08976680785417557,
+        "clip_fraction": 0.4489790201187134,
+        "completed_update_mean_kl": 0.08976680785417557,
+        "completed_update_sample_kl_max": 919.3734130859375,
+        "cuda_peak_allocated_gib": 20.891698360443115,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.0029281049501150846,
+        "emitted_action_saturation_fraction_roll": 0.00019043596694245934,
+        "emitted_action_saturation_fraction_steer": 0.0010552433086559176,
+        "emitted_action_saturation_fraction_throttle": 0.06614873558282852,
+        "emitted_action_saturation_fraction_yaw": 0.00017677135474514216,
+        "entropy": -8.961069107055664,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 28.208799362182617,
+        "old_value_mean": -0.6814013123512268,
+        "optimizer_post_step_approx_kl_max": 0.0902278870344162,
+        "optimizer_post_step_approx_kl_mean": 0.05056273937225342,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.031224511563777924,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 12.629838943481445,
+        "post_update_value_mean": -0.5893371105194092,
+        "post_update_value_std": 2.8390214443206787,
+        "return_mean": -0.7041605114936829,
+        "return_std": 3.2045822143554688,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5131765604019165,
+        "value_loss": 0.963904082775116
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.014099857459641069,
+        "curriculum": {
+          "goals_against": {
+            "current": 1143,
+            "frozen_unified_v5": 612,
+            "nexto": 2208
+          },
+          "goals_for": {
+            "current": 1181,
+            "frozen_unified_v5": 565,
+            "nexto": 270
+          },
+          "opponent_trainable_samples": {
+            "current": 10948836,
+            "frozen_unified_v5": 2659966,
+            "nexto": 3662096
+          },
+          "opponent_world_decisions": {
+            "current": 5474418,
+            "frozen_unified_v5": 2659966,
+            "nexto": 3662096
+          },
+          "reward_sum": {
+            "current": -2308.3703454881907,
+            "frozen_unified_v5": -956.9241225055302,
+            "nexto": -18816.88230765272
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8432844212064992,
+        "mean_movement_speed_uu_per_second": 1171.5057267217437,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 27,
+        "physical_player_minutes": 2398.735833333333,
+        "potential_component_signed_sum": {
+          "access": 433.0969223521716,
+          "alignment": -1627.096117106478,
+          "boost": -2055.3946223430803,
+          "control": 244.60274455532226,
+          "defense": -11.17294144505045,
+          "field": 783.78687381041,
+          "total": -2232.176739753335
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 35574,
+        "touches_per_minute": 14.830311660690718,
+        "trainable_agent_samples": 17270898
+      },
+      "wall_seconds": 73.69043149985373
+    },
+    {
+      "accepted_update": 46,
+      "created_utc": "2026-09-05T00:53:06.997611+00:00",
+      "exploration": {
+        "accepted_update": 645,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.31239402294158936,
+        "actor_button_probability_handbrake": 0.32515770196914673,
+        "actor_button_probability_jump": 0.34710606932640076,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.09838608652353287,
+        "actor_mean_mean_roll": -0.020487338304519653,
+        "actor_mean_mean_steer": -0.05863715708255768,
+        "actor_mean_mean_throttle": 0.4926578998565674,
+        "actor_mean_mean_yaw": -0.02851019613444805,
+        "advantage_before_normalization_mean": -0.040588609874248505,
+        "advantage_before_normalization_std": 1.3963202238082886,
+        "approx_kl": 0.07805240899324417,
+        "clip_fraction": 0.4595743417739868,
+        "completed_update_mean_kl": 0.07805240899324417,
+        "completed_update_sample_kl_max": 365.1733093261719,
+        "cuda_peak_allocated_gib": 20.807258129119873,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.0027263767551630735,
+        "emitted_action_saturation_fraction_roll": 0.00021314372133929282,
+        "emitted_action_saturation_fraction_steer": 0.0011463129194453359,
+        "emitted_action_saturation_fraction_throttle": 0.0648551657795906,
+        "emitted_action_saturation_fraction_yaw": 0.00017923975246958435,
+        "entropy": -8.961078643798828,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 29.06572723388672,
+        "old_value_mean": -0.584862232208252,
+        "optimizer_post_step_approx_kl_max": 0.14448529481887817,
+        "optimizer_post_step_approx_kl_mean": 0.053609367460012436,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.0324360653758049,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 14.601619720458984,
+        "post_update_value_mean": -0.5634912252426147,
+        "post_update_value_std": 2.9368820190429688,
+        "return_mean": -0.625450849533081,
+        "return_std": 3.198617458343506,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5162736773490906,
+        "value_loss": 0.9676750898361206
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013824049151269625,
+        "curriculum": {
+          "goals_against": {
+            "current": 1158,
+            "frozen_unified_v5": 614,
+            "nexto": 2254
+          },
+          "goals_for": {
+            "current": 1135,
+            "frozen_unified_v5": 521,
+            "nexto": 315
+          },
+          "opponent_trainable_samples": {
+            "current": 10975262,
+            "frozen_unified_v5": 2660537,
+            "nexto": 3648312
+          },
+          "opponent_world_decisions": {
+            "current": 5487631,
+            "frozen_unified_v5": 2660537,
+            "nexto": 3648312
+          },
+          "reward_sum": {
+            "current": -2302.9663118313983,
+            "frozen_unified_v5": -1479.889230009394,
+            "nexto": -18821.624513522802
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8430098570040261,
+        "mean_movement_speed_uu_per_second": 1167.6195999265071,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 26,
+        "physical_player_minutes": 2400.5709722222223,
+        "potential_component_signed_sum": {
+          "access": 438.5459789918207,
+          "alignment": -1666.0087567011246,
+          "boost": -2039.4865191322278,
+          "control": 250.16240561288535,
+          "defense": -17.058633790726063,
+          "field": 749.3651515373208,
+          "total": -2284.480003873522
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 36015,
+        "touches_per_minute": 15.002680785838507,
+        "trainable_agent_samples": 17284111
+      },
+      "wall_seconds": 74.7963370999787
+    },
+    {
+      "accepted_update": 47,
+      "created_utc": "2026-09-05T00:54:21.549304+00:00",
+      "exploration": {
+        "accepted_update": 646,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.3152799606323242,
+        "actor_button_probability_handbrake": 0.32531803846359253,
+        "actor_button_probability_jump": 0.3437064290046692,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.09637830406427383,
+        "actor_mean_mean_roll": -0.024641958996653557,
+        "actor_mean_mean_steer": -0.05796412006020546,
+        "actor_mean_mean_throttle": 0.49578502774238586,
+        "actor_mean_mean_yaw": -0.03250700607895851,
+        "advantage_before_normalization_mean": -0.04277130588889122,
+        "advantage_before_normalization_std": 1.399844765663147,
+        "approx_kl": 0.06105852872133255,
+        "clip_fraction": 0.44988855719566345,
+        "completed_update_mean_kl": 0.06105852872133255,
+        "completed_update_sample_kl_max": 106.72544860839844,
+        "cuda_peak_allocated_gib": 20.8529109954834,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.002857483923435211,
+        "emitted_action_saturation_fraction_roll": 0.00019025197252631187,
+        "emitted_action_saturation_fraction_steer": 0.001072055660188198,
+        "emitted_action_saturation_fraction_throttle": 0.06444118171930313,
+        "emitted_action_saturation_fraction_yaw": 0.00020148071052972227,
+        "entropy": -8.960735321044922,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 27.97784423828125,
+        "old_value_mean": -0.5533514022827148,
+        "optimizer_post_step_approx_kl_max": 0.13398703932762146,
+        "optimizer_post_step_approx_kl_mean": 0.05132095888257027,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.030845599249005318,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 13.652135848999023,
+        "post_update_value_mean": -0.5358589887619019,
+        "post_update_value_std": 2.968251943588257,
+        "return_mean": -0.5961227416992188,
+        "return_std": 3.26362681388855,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5237354040145874,
+        "value_loss": 0.9857796430587769
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013752491160547426,
+        "curriculum": {
+          "goals_against": {
+            "current": 1193,
+            "frozen_unified_v5": 607,
+            "nexto": 2183
+          },
+          "goals_for": {
+            "current": 1117,
+            "frozen_unified_v5": 574,
+            "nexto": 301
+          },
+          "opponent_trainable_samples": {
+            "current": 10961216,
+            "frozen_unified_v5": 2667259,
+            "nexto": 3648613
+          },
+          "opponent_world_decisions": {
+            "current": 5480608,
+            "frozen_unified_v5": 2667259,
+            "nexto": 3648613
+          },
+          "reward_sum": {
+            "current": -2344.064475535488,
+            "frozen_unified_v5": -862.1922369463664,
+            "nexto": -18387.211776399796
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8413421008261676,
+        "mean_movement_speed_uu_per_second": 1166.2799130818833,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 28,
+        "physical_player_minutes": 2399.5955555555556,
+        "potential_component_signed_sum": {
+          "access": 360.7546206538032,
+          "alignment": -1704.1042478828829,
+          "boost": -2051.786805530228,
+          "control": 288.1630355704915,
+          "defense": -32.88019623197342,
+          "field": 696.3847828119387,
+          "total": -2443.468446714296
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 35586,
+        "touches_per_minute": 14.829999129482932,
+        "trainable_agent_samples": 17277088
+      },
+      "wall_seconds": 74.51035140012391
+    },
+    {
+      "accepted_update": 48,
+      "created_utc": "2026-09-05T00:55:35.284488+00:00",
+      "exploration": {
+        "accepted_update": 647,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.314461886882782,
+        "actor_button_probability_handbrake": 0.3240666091442108,
+        "actor_button_probability_jump": 0.3404061794281006,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.0953247919678688,
+        "actor_mean_mean_roll": -0.02424098737537861,
+        "actor_mean_mean_steer": -0.058395128697156906,
+        "actor_mean_mean_throttle": 0.49578097462654114,
+        "actor_mean_mean_yaw": -0.03389716148376465,
+        "advantage_before_normalization_mean": -0.042166583240032196,
+        "advantage_before_normalization_std": 1.4290696382522583,
+        "approx_kl": 0.06532778590917587,
+        "clip_fraction": 0.4464696943759918,
+        "completed_update_mean_kl": 0.06532778590917587,
+        "completed_update_sample_kl_max": 178.9116973876953,
+        "cuda_peak_allocated_gib": 20.869443893432617,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.0027607858646661043,
+        "emitted_action_saturation_fraction_roll": 0.0001299902069149539,
+        "emitted_action_saturation_fraction_steer": 0.0011051485780626535,
+        "emitted_action_saturation_fraction_throttle": 0.06462112069129944,
+        "emitted_action_saturation_fraction_yaw": 0.00023437628988176584,
+        "entropy": -8.960700988769531,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 29.2685546875,
+        "old_value_mean": -0.5287668704986572,
+        "optimizer_post_step_approx_kl_max": 0.21715588867664337,
+        "optimizer_post_step_approx_kl_mean": 0.05212529003620148,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.03149435669183731,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 12.790495872497559,
+        "post_update_value_mean": -0.6515713334083557,
+        "post_update_value_std": 2.969224214553833,
+        "return_mean": -0.57093346118927,
+        "return_std": 3.2748658657073975,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5385368466377258,
+        "value_loss": 1.0140849351882935
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013770285048147935,
+        "curriculum": {
+          "goals_against": {
+            "current": 1201,
+            "frozen_unified_v5": 647,
+            "nexto": 2136
+          },
+          "goals_for": {
+            "current": 1164,
+            "frozen_unified_v5": 575,
+            "nexto": 312
+          },
+          "opponent_trainable_samples": {
+            "current": 10932716,
+            "frozen_unified_v5": 2662057,
+            "nexto": 3668065
+          },
+          "opponent_world_decisions": {
+            "current": 5466358,
+            "frozen_unified_v5": 2662057,
+            "nexto": 3668065
+          },
+          "reward_sum": {
+            "current": -2341.373457701542,
+            "frozen_unified_v5": -1119.8310225984605,
+            "nexto": -17869.31247930351
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8473382702249546,
+        "mean_movement_speed_uu_per_second": 1165.1847606380386,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 23,
+        "physical_player_minutes": 2397.616388888889,
+        "potential_component_signed_sum": {
+          "access": 432.497824119654,
+          "alignment": -1704.6057194606763,
+          "boost": -2066.830972047598,
+          "control": 202.01181888134732,
+          "defense": -3.4604816231064652,
+          "field": 769.8703068665545,
+          "total": -2370.5169107756046
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 35785,
+        "touches_per_minute": 14.925239986611702,
+        "trainable_agent_samples": 17262838
+      },
+      "wall_seconds": 73.69422159995884
+    },
+    {
+      "accepted_update": 49,
+      "created_utc": "2026-09-05T00:56:48.158207+00:00",
+      "exploration": {
+        "accepted_update": 648,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.3154870569705963,
+        "actor_button_probability_handbrake": 0.32266655564308167,
+        "actor_button_probability_jump": 0.3389424681663513,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.09561172872781754,
+        "actor_mean_mean_roll": -0.02444721944630146,
+        "actor_mean_mean_steer": -0.05839620158076286,
+        "actor_mean_mean_throttle": 0.5007184743881226,
+        "actor_mean_mean_yaw": -0.0330127589404583,
+        "advantage_before_normalization_mean": -0.02561798505485058,
+        "advantage_before_normalization_std": 1.4294623136520386,
+        "approx_kl": 0.04599446803331375,
+        "clip_fraction": 0.454020231962204,
+        "completed_update_mean_kl": 0.04599446803331375,
+        "completed_update_sample_kl_max": 65.96562194824219,
+        "cuda_peak_allocated_gib": 20.84960126876831,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.002975722076371312,
+        "emitted_action_saturation_fraction_roll": 0.00017870235024020076,
+        "emitted_action_saturation_fraction_steer": 0.0010643788846209645,
+        "emitted_action_saturation_fraction_throttle": 0.06633542478084564,
+        "emitted_action_saturation_fraction_yaw": 0.00020336896704975516,
+        "entropy": -8.960792541503906,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 29.789505004882812,
+        "old_value_mean": -0.6622708439826965,
+        "optimizer_post_step_approx_kl_max": 0.09450747072696686,
+        "optimizer_post_step_approx_kl_mean": 0.05194878205657005,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.031225981190800667,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 13.185737609863281,
+        "post_update_value_mean": -0.6639663577079773,
+        "post_update_value_std": 2.9324069023132324,
+        "return_mean": -0.6878889203071594,
+        "return_std": 3.266575336456299,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5409129858016968,
+        "value_loss": 1.0193740129470825
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.014151519625801114,
+        "curriculum": {
+          "goals_against": {
+            "current": 1167,
+            "frozen_unified_v5": 630,
+            "nexto": 2153
+          },
+          "goals_for": {
+            "current": 1165,
+            "frozen_unified_v5": 591,
+            "nexto": 332
+          },
+          "opponent_trainable_samples": {
+            "current": 10866576,
+            "frozen_unified_v5": 2650088,
+            "nexto": 3713104
+          },
+          "opponent_world_decisions": {
+            "current": 5433288,
+            "frozen_unified_v5": 2650088,
+            "nexto": 3713104
+          },
+          "reward_sum": {
+            "current": -2263.921599350637,
+            "frozen_unified_v5": -963.7261342392521,
+            "nexto": -17856.19002302477
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8412973985890653,
+        "mean_movement_speed_uu_per_second": 1164.1158145852207,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 19,
+        "physical_player_minutes": 2393.0233333333335,
+        "potential_component_signed_sum": {
+          "access": 369.5142558614616,
+          "alignment": -1684.4811455163021,
+          "boost": -2035.2631576354054,
+          "control": 220.84273289463465,
+          "defense": -12.572171650976694,
+          "field": 658.1215750248168,
+          "total": -2483.8376910755687
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 36288,
+        "touches_per_minute": 15.16408114142918,
+        "trainable_agent_samples": 17229768
+      },
+      "wall_seconds": 72.82927109999582
+    },
+    {
+      "accepted_update": 50,
+      "created_utc": "2026-09-05T00:58:00.564587+00:00",
+      "exploration": {
+        "accepted_update": 649,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.31246358156204224,
+        "actor_button_probability_handbrake": 0.32000383734703064,
+        "actor_button_probability_jump": 0.3371874988079071,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.08437041193246841,
+        "actor_mean_mean_roll": -0.025481879711151123,
+        "actor_mean_mean_steer": -0.06032615900039673,
+        "actor_mean_mean_throttle": 0.4891691505908966,
+        "actor_mean_mean_yaw": -0.03746465593576431,
+        "advantage_before_normalization_mean": -0.0220195222645998,
+        "advantage_before_normalization_std": 1.3963887691497803,
+        "approx_kl": 0.0991499200463295,
+        "clip_fraction": 0.45742955803871155,
+        "completed_update_mean_kl": 0.0991499200463295,
+        "completed_update_sample_kl_max": 171.9018096923828,
+        "cuda_peak_allocated_gib": 20.855329513549805,
+        "cuda_peak_reserved_gib": 21.66015625,
+        "emitted_action_saturation_fraction_pitch": 0.002917238511145115,
+        "emitted_action_saturation_fraction_roll": 0.00016655665240250528,
+        "emitted_action_saturation_fraction_steer": 0.0010494579328224063,
+        "emitted_action_saturation_fraction_throttle": 0.06485290825366974,
+        "emitted_action_saturation_fraction_yaw": 0.0001901928335428238,
+        "entropy": -8.961525917053223,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 29.2991943359375,
+        "old_value_mean": -0.6767958402633667,
+        "optimizer_post_step_approx_kl_max": 0.1317933350801468,
+        "optimizer_post_step_approx_kl_mean": 0.05280609056353569,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.032795000821352005,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 11.734842300415039,
+        "post_update_value_mean": -0.6390585899353027,
+        "post_update_value_std": 2.930262565612793,
+        "return_mean": -0.6988154053688049,
+        "return_std": 3.24263596534729,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.5265944600105286,
+        "value_loss": 0.9875988364219666
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013835271286991635,
+        "curriculum": {
+          "goals_against": {
+            "current": 1120,
+            "frozen_unified_v5": 606,
+            "nexto": 2246
+          },
+          "goals_for": {
+            "current": 1157,
+            "frozen_unified_v5": 542,
+            "nexto": 318
+          },
+          "opponent_trainable_samples": {
+            "current": 10845772,
+            "frozen_unified_v5": 2645777,
+            "nexto": 3727817
+          },
+          "opponent_world_decisions": {
+            "current": 5422886,
+            "frozen_unified_v5": 2645777,
+            "nexto": 3727817
+          },
+          "reward_sum": {
+            "current": -2294.997785961001,
+            "frozen_unified_v5": -1111.9464660431222,
+            "nexto": -18893.608912204858
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8400899665368369,
+        "mean_movement_speed_uu_per_second": 1160.8357637755344,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 19,
+        "physical_player_minutes": 2391.578611111111,
+        "potential_component_signed_sum": {
+          "access": 394.12718667548427,
+          "alignment": -1674.5080997754387,
+          "boost": -2029.6314426649164,
+          "control": 244.56890185604556,
+          "defense": -12.538413845118459,
+          "field": 697.4284223679642,
+          "total": -2380.5531708547624
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 36458,
+        "touches_per_minute": 15.244324326458942,
+        "trainable_agent_samples": 17219366
+      },
+      "wall_seconds": 72.36497589992359
+    }
+  ],
+  "checkpoint_path": "checkpoints/rival2/ssl_foundation_v5_long_trace_v1/execution_verified_u0052.pt",
+  "checkpoint_sha256": "2F2942A12C1C7396D1850DF204CC1242AE61E1B85DE623D01B8A636B408CD84E",
+  "checks": {
+    "all_update_step_counts_exact": true,
+    "deadline_unchanged": true,
+    "every_adam_counter_exact": true,
+    "finite_model": true,
+    "finite_optimizer": true,
+    "learning_contracts_unchanged": true,
+    "no_hard_failure": true,
+    "original_update50_unchanged": true,
+    "preserved_parent_unchanged": true,
+    "same_model_parameter_keys": true,
+    "stderr_empty": true
+  },
+  "created_utc": "2026-09-05T01:07:12.765684+00:00",
+  "large_kl_is_failure": false,
+  "launch_authority_sha256": "E8B08BD9A0FA0CBAF81B352F98AC94DECBFBAA79E32EA932103B35B2AE10BB1A",
+  "observed_elapsed_reduction_percent": 16.169478062795307,
+  "observed_throughput_factor": 1.1928829463200463,
+  "optimized_mean_seconds": 61.997902500093915,
+  "optimized_update_rows": [
+    {
+      "accepted_update": 51,
+      "created_utc": "2026-09-05T01:05:32.796836+00:00",
+      "exploration": {
+        "accepted_update": 650,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.42088615894317627,
+        "actor_button_probability_handbrake": 0.2875770926475525,
+        "actor_button_probability_jump": 0.39268866181373596,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.05757291242480278,
+        "actor_mean_mean_roll": -0.018233438953757286,
+        "actor_mean_mean_steer": -0.005759785417467356,
+        "actor_mean_mean_throttle": 0.642449140548706,
+        "actor_mean_mean_yaw": -0.08004011958837509,
+        "advantage_before_normalization_mean": -0.020681189373135567,
+        "advantage_before_normalization_std": 1.4367753267288208,
+        "approx_kl": 0.04805798828601837,
+        "clip_fraction": 0.42433667182922363,
+        "completed_update_mean_kl": 0.04805798828601837,
+        "completed_update_sample_kl_max": 27.14310073852539,
+        "cuda_peak_allocated_gib": 21.028913974761963,
+        "cuda_peak_reserved_gib": 22.7265625,
+        "emitted_action_saturation_fraction_pitch": 0.009514320641756058,
+        "emitted_action_saturation_fraction_roll": 0.00013096655311528593,
+        "emitted_action_saturation_fraction_steer": 0.0017875967314466834,
+        "emitted_action_saturation_fraction_throttle": 0.05457456409931183,
+        "emitted_action_saturation_fraction_yaw": 9.665138350101188e-05,
+        "entropy": -8.95781135559082,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 30.167781829833984,
+        "old_value_mean": -0.5768452286720276,
+        "optimizer_post_step_approx_kl_max": 0.15315456688404083,
+        "optimizer_post_step_approx_kl_mean": 0.045615509152412415,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.028771603479981422,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 12.113341331481934,
+        "post_update_value_mean": -0.5964698195457458,
+        "post_update_value_std": 2.4757349491119385,
+        "return_mean": -0.5975264310836792,
+        "return_std": 2.835510015487671,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.535843551158905,
+        "value_loss": 1.014143943786621
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.013220819906335913,
+        "curriculum": {
+          "goals_against": {
+            "current": 480,
+            "frozen_unified_v5": 253,
+            "nexto": 545
+          },
+          "goals_for": {
+            "current": 466,
+            "frozen_unified_v5": 254,
+            "nexto": 285
+          },
+          "opponent_trainable_samples": {
+            "current": 9453644,
+            "frozen_unified_v5": 2368687,
+            "nexto": 4700971
+          },
+          "opponent_world_decisions": {
+            "current": 4726822,
+            "frozen_unified_v5": 2368687,
+            "nexto": 4700971
+          },
+          "reward_sum": {
+            "current": -4831.82816265944,
+            "frozen_unified_v5": -1362.0124091360922,
+            "nexto": -5953.6686372355325
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.8928020975428278,
+        "mean_movement_speed_uu_per_second": 1236.5928966635188,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 0,
+        "physical_player_minutes": 2294.9030555555555,
+        "potential_component_signed_sum": {
+          "access": -738.4751786911695,
+          "alignment": -4677.508584209186,
+          "boost": -3929.2191121313986,
+          "control": -293.78982867375043,
+          "defense": -69.83847428004049,
+          "field": 151.32178217057816,
+          "total": -9557.509169142133
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 56447,
+        "touches_per_minute": 24.596681704419613,
+        "trainable_agent_samples": 16523302
+      },
+      "wall_seconds": 58.863935500150546
+    },
+    {
+      "accepted_update": 52,
+      "created_utc": "2026-09-05T01:06:37.970157+00:00",
+      "exploration": {
+        "accepted_update": 651,
+        "analog_log_sigma": -3.2188758248682006,
+        "analog_sigma": 0.04,
+        "button_temperature": 0.25,
+        "contract_sha256": "83495B8ABD48E401D80D0F4659B10A0F44F41543BF4FE39F72CC7D37A71B220E",
+        "normalized_progress": 1.0,
+        "version": "RIVAL2_UNIFIED_GROUND_EXPLORATION_V1"
+      },
+      "ppo": {
+        "actor_button_probability_boost": 0.28443801403045654,
+        "actor_button_probability_handbrake": 0.3284420073032379,
+        "actor_button_probability_jump": 0.31166261434555054,
+        "actor_log_std_mean_pitch": -3.2188758850097656,
+        "actor_log_std_mean_roll": -3.2188758850097656,
+        "actor_log_std_mean_steer": -3.2188758850097656,
+        "actor_log_std_mean_throttle": -3.2188758850097656,
+        "actor_log_std_mean_yaw": -3.2188758850097656,
+        "actor_mean_mean_pitch": -0.08034534752368927,
+        "actor_mean_mean_roll": -0.03489656373858452,
+        "actor_mean_mean_steer": -0.05819724127650261,
+        "actor_mean_mean_throttle": 0.44103413820266724,
+        "actor_mean_mean_yaw": -0.01588626392185688,
+        "advantage_before_normalization_mean": -0.027355333790183067,
+        "advantage_before_normalization_std": 1.3176031112670898,
+        "approx_kl": 0.07269256561994553,
+        "clip_fraction": 0.45599016547203064,
+        "completed_update_mean_kl": 0.07269256561994553,
+        "completed_update_sample_kl_max": 134.2110595703125,
+        "cuda_peak_allocated_gib": 20.84718894958496,
+        "cuda_peak_reserved_gib": 22.734375,
+        "emitted_action_saturation_fraction_pitch": 0.002246480667963624,
+        "emitted_action_saturation_fraction_roll": 0.00014329614350572228,
+        "emitted_action_saturation_fraction_steer": 0.0009811201598495245,
+        "emitted_action_saturation_fraction_throttle": 0.059732478111982346,
+        "emitted_action_saturation_fraction_yaw": 0.00019045842054765671,
+        "entropy": -8.963391304016113,
+        "gae_lambda": 0.9993279525461148,
+        "gradient_norm": 29.545835494995117,
+        "old_value_mean": -0.7374662756919861,
+        "optimizer_post_step_approx_kl_max": 0.1187312975525856,
+        "optimizer_post_step_approx_kl_mean": 0.05292600765824318,
+        "optimizer_steps": 722.0,
+        "policy_loss": 0.03248022869229317,
+        "post_clip_gradient_norm": 0.5,
+        "post_update_value_max_abs": 13.49001693725586,
+        "post_update_value_mean": -0.7534447312355042,
+        "post_update_value_std": 2.755627155303955,
+        "return_mean": -0.7648215293884277,
+        "return_std": 3.070905923843384,
+        "rollout_horizon": 360.0,
+        "rollout_logical_gib": 17.9921875,
+        "sequence_microbatch_size": 182.0,
+        "total_loss": 0.46209436655044556,
+        "value_loss": 0.8592281937599182
+      },
+      "rollout": {
+        "analog_action_saturation_fraction": 0.012658766361376335,
+        "curriculum": {
+          "goals_against": {
+            "current": 836,
+            "frozen_unified_v5": 450,
+            "nexto": 1721
+          },
+          "goals_for": {
+            "current": 821,
+            "frozen_unified_v5": 429,
+            "nexto": 786
+          },
+          "opponent_trainable_samples": {
+            "current": 9569134,
+            "frozen_unified_v5": 2366430,
+            "nexto": 4645483
+          },
+          "opponent_world_decisions": {
+            "current": 4784567,
+            "frozen_unified_v5": 2366430,
+            "nexto": 4645483
+          },
+          "reward_sum": {
+            "current": -1735.3187518377308,
+            "frozen_unified_v5": -689.5124890116167,
+            "nexto": -11149.777176914016
+          }
+        },
+        "direct_non_goal_reward_terms": 0,
+        "goalward_touch_fraction": 0.852797682573563,
+        "mean_movement_speed_uu_per_second": 1122.6419059674874,
+        "named_mechanics_hot_path_absent": true,
+        "no_touch_truncations": 0,
+        "physical_player_minutes": 2302.9231944444446,
+        "potential_component_signed_sum": {
+          "access": 60.852355076886134,
+          "alignment": -900.7316059231782,
+          "boost": -2274.9407996254768,
+          "control": -165.3575336843562,
+          "defense": 124.00066326822645,
+          "field": -858.4317513969276,
+          "total": -4014.608371993887
+        },
+        "reward_version": "RIVAL2_REWARD_SSL_FOUNDATION_V1",
+        "touch_events": 26236,
+        "touches_per_minute": 11.392477206053393,
+        "trainable_agent_samples": 16581047
+      },
+      "wall_seconds": 65.13186950003728
+    }
+  ],
+  "parent_update50_sha256": "E5E6BDD72AABC6DFC3C948EFEF3E65DF50369F964282C9B7D47F2109B2C5210F",
+  "physical_ticks": 537395200,
+  "resume_semantics": "Existing fresh simulator episodes/zero hidden; saved model/Adam/counters/RNG preserved at transition.",
+  "source_original_update50_sha256": "107DAB963AEAA470D9521678E28E4E80DF187DBC985A1B59246E51D4A2E55AEF",
+  "timing_caveat": "Sequential live windows, not paired identical rollouts. Use exact_scale.json for matched-input measurements.",
+  "total_trainable_samples": 775824010,
+  "verdict": "PASS"
+}

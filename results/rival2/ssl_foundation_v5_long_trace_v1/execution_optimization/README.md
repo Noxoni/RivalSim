@@ -54,8 +54,9 @@ checkpoint. Every other checkpoint field must hash identically. It cannot reset
 model weights, Adam, counters or RNG, overwrite the preserved checkpoint, or
 extend the original wall-clock deadline. Commit/push the authority before resume.
 
-Production timing and update-50 evaluation results will be recorded separately
-after validation; a clean implementation test is not a gameplay capability claim.
+Production timing is in `production_verification.json`; update-50 gameplay is in
+`../evaluation_u0050_comparison.json`. A clean implementation test is not a
+gameplay capability claim.
 
 ## Rejected compact recurrent path
 
@@ -71,3 +72,46 @@ The corrected candidate keeps **both** recurrent encoder and GRU full-sized,
 reducing only base-trunk/head work. The same focused GPU parity test then passed.
 This is narrower than the initial performance proposal, selected to preserve
 numerical behavior rather than silently accept the changed recurrent calculation.
+
+## Verified deployment
+
+- 53 focused CPU/CUDA tests passed (`full_tests.xml`). Two cuDNN warnings come
+  from deep-copied synthetic test models, not production logs.
+- Exact-scale final candidate: PASS, 32768 worlds x 360 ticks, five different
+  182-sequence backward comparisons, no optimizer step. Measured actor/active
+  hidden/value outputs and all compared gradients had zero absolute discrepancy.
+  Parameter, optimizer and source identities remained unchanged.
+- Peak allocated tensor memory: 20.813 GiB in the isolated benchmark.
+- Matched-input bootstrap inference median: 6.060 -> 2.145 ms.
+- Matched-input frozen-opponent inference median: 3.865 -> 2.053 ms.
+- Mean of five paired minibatch medians: 52.505 -> 49.351 ms (about 6.4% more
+  minibatches/second). Includes full backward and post-step KL, but no Adam step.
+- Both the original accepted update50 and execution-metadata-rebound update50
+  are committed as immutable checkpoints. All 33 non-authority checkpoint fields
+  hash identically across the rebind, including weights, Adam, counters and RNG.
+- New authority SHA256: `AEA37884836DD4055BACCD605E3F660A0EC2D70162DF5C3032DF6C43134DFD72`.
+  New launch SHA256: `E8B08BD9A0FA0CBAF81B352F98AC94DECBFBAA79E32EA932103B35B2AE10BB1A`.
+  Authority and rebound checkpoint were pushed/read back before accepting update51.
+- Worker45640 (launcher15400) resumed at 2026-09-04 21:04:28 America/New_York.
+  Inspect `campaign.optimized.stdout.log` and `.stderr.log` in the same run directory.
+- Accepted updates51/52: 58.864 and 65.132 seconds, mean61.998, versus73.956 seconds
+  for the seven immediately preceding stable updates44-50. This is an early
+  sequential observation (16.2% less time, 19.3% greater throughput), **not** a
+  paired causal estimate; scenario/reset mix and runtime resource conditions vary.
+- Published update52: `execution_verified_u0052.pt`, SHA256
+  `2F2942A12C1C7396D1850DF204CC1242AE61E1B85DE623D01B8A636B408CD84E`.
+  All24 Adam step counters advanced exactly1444 (722/update). Model and optimizer
+  finite, contracts unchanged, original parent artifacts unchanged, no hard failure.
+- Training remains active under the original deadline and total-update100 bound.
+  Next scheduled evaluation is100. No extra optimization, evaluation or campaign
+  was authorized by the benchmark itself.
+
+## Update50 evaluation (before execution optimization)
+
+Same1024-world/3600-tick deterministic scenario protocol as20, not a full-match
+win-rate benchmark. Against Nexto:174/946 ->178/930 goals for/against,
+13.5664 ->14.1406 touches/min, no-touch resets0 ->0, speed1194.2 ->1177.0uu/s,
+goalward-touch fraction0.8883 ->0.8646. Against frozenV5:400/386 ->359/355,
+15.5039 ->15.9453 touches/min, no-touch resets2 ->3, speed1186.0 ->1163.9uu/s,
+goalward-touch fraction0.8594 ->0.8246. This is mixed/incremental gameplay movement,
+not a large capability gain; none of it is attributed to execution optimization.
