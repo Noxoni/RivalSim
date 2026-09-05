@@ -1,0 +1,353 @@
+{
+  "accepted_update_budget": 100,
+  "action_contract": {
+    "bernoulli_sampling": false,
+    "distribution": "90-way categorical over pinned standard lookup table",
+    "external_channels": [
+      "throttle",
+      "steer",
+      "pitch",
+      "yaw",
+      "roll",
+      "jump",
+      "boost",
+      "handbrake"
+    ],
+    "gaussian_sampling": false,
+    "ground_or_air_action_mask": false,
+    "hold_ticks": 4,
+    "hybrid_actor_contract_reused": false,
+    "initial_head_projection": "Fixed sigma .65 preference projection of u597 mean/button logits, not exact policy migration.",
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "version": "RIVAL2_ACTION_JOINT90_30HZ_V1"
+  },
+  "checkpoints": "Rolling each accepted update, immutable at 0/10/20/50/100.",
+  "evaluation": "Unchanged original 64-case acquisition/finishing/Nexto development evaluations through lossless deterministic interface. Argmax, no stochastic actions. No held-out test reuse.",
+  "evaluations": [
+    0,
+    10,
+    20,
+    50,
+    100
+  ],
+  "hold_ticks": 4,
+  "initialization_seed": 2026091202,
+  "initialize_old_v5_or_bc": false,
+  "interpretation": "Combined architecture/control/optimizer experiment, not a causal one-factor ablation. Compare every boundary with initial candidate and immutable u597. Judge acquisition coverage, no-touch and scoring together. Do not promote based on training health or lucky intermediate outcome.",
+  "learning_rates": {
+    "actor": 0.0001,
+    "critic": 0.0003
+  },
+  "named_rewards": false,
+  "new_human_demonstrations": false,
+  "next_review": "At100 preserve the whole curve and choose the next scoped experiment/continuation from evidence. No silent extension under this authority; SSL goal remains active.",
+  "no_online_ranked_automation": true,
+  "observation_schema_sha256": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+  "opponents": "Pure current self-play; both players train. Nexto only in evaluation.",
+  "optimizer": "Fresh Adam for changed actor/attention parameterization and independent critic; no moment reuse or projection.",
+  "parent_path": "checkpoints\\rival2\\ssl_development_exploration_v1\\parent_u000597.pt",
+  "parent_ppo_update": 597,
+  "parent_sha256": "B0B35CDAF3B3551EC667776EB99C3822F863AAA1F17A0BA2F013B5F216BD87A5",
+  "physics_hz": 120,
+  "policy": {
+    "architecture": "Learned entity residual into both actor logits and pre-GRU context. Independent MLP critic unchanged; value loss cannot train entity/actor features.",
+    "attention": "One 64-wide four-head self-query cross-attention over 38 tokens, dropout=0. No full quadratic entity self-attention.",
+    "ball": [
+      "ball.position.x",
+      "ball.position.y",
+      "ball.position.z",
+      "ball.linear_velocity.x",
+      "ball.linear_velocity.y",
+      "ball.linear_velocity.z",
+      "ball.angular_velocity.x",
+      "ball.angular_velocity.y",
+      "ball.angular_velocity.z",
+      "relative.ball_position.x",
+      "relative.ball_position.y",
+      "relative.ball_position.z",
+      "relative.ball_velocity.x",
+      "relative.ball_velocity.y",
+      "relative.ball_velocity.z"
+    ],
+    "context": [
+      "previous_action.throttle",
+      "previous_action.steer",
+      "previous_action.pitch",
+      "previous_action.yaw",
+      "previous_action.roll",
+      "previous_action.jump",
+      "previous_action.boost",
+      "previous_action.handbrake",
+      "lifecycle.kickoff_reset",
+      "lifecycle.self_touch_event",
+      "lifecycle.opponent_touch_event",
+      "lifecycle.self_demoed_event",
+      "lifecycle.opponent_demoed_event",
+      "lifecycle.episode_age",
+      "lifecycle.no_touch_age"
+    ],
+    "count": 38,
+    "initialization": "Zero entity output projections preserve the joint-control policy logits, value and hidden exactly. Joint-control head projection itself is NOT hybrid policy parity.",
+    "no_task_id": true,
+    "opponent": [
+      "opponent.position.x",
+      "opponent.position.y",
+      "opponent.position.z",
+      "opponent.linear_velocity.x",
+      "opponent.linear_velocity.y",
+      "opponent.linear_velocity.z",
+      "opponent.forward.x",
+      "opponent.forward.y",
+      "opponent.forward.z",
+      "opponent.up.x",
+      "opponent.up.y",
+      "opponent.up.z",
+      "opponent.angular_velocity.x",
+      "opponent.angular_velocity.y",
+      "opponent.angular_velocity.z",
+      "opponent.boost",
+      "opponent.on_ground",
+      "opponent.has_jumped",
+      "opponent.is_jumping",
+      "opponent.has_double_jumped",
+      "opponent.has_flipped",
+      "opponent.is_flipping",
+      "opponent.jump_available",
+      "opponent.dodge_available",
+      "opponent.is_demoed",
+      "opponent.demo_timer_remaining",
+      "opponent.wheel_contact.front_left",
+      "opponent.wheel_contact.front_right",
+      "opponent.wheel_contact.back_left",
+      "opponent.wheel_contact.back_right",
+      "opponent.jump_time",
+      "opponent.air_time",
+      "opponent.air_time_since_jump",
+      "opponent.flip_time",
+      "opponent.boosting_time",
+      "opponent.time_since_boosted",
+      "opponent.is_supersonic",
+      "opponent.supersonic_time",
+      "opponent.sticky_ticks",
+      "relative.opponent_position.x",
+      "relative.opponent_position.y",
+      "relative.opponent_position.z",
+      "relative.opponent_velocity.x",
+      "relative.opponent_velocity.y",
+      "relative.opponent_velocity.z"
+    ],
+    "pad_geometry": "Canonical SOCCAR_PAD_POSITIONS / POSITION_SCALE; large flag for indices 0..5; canonical pad minus self position. Orange pad remap already applied by native observation.",
+    "pads": [
+      [
+        "boost_pad.0.active",
+        "boost_pad.0.cooldown"
+      ],
+      [
+        "boost_pad.1.active",
+        "boost_pad.1.cooldown"
+      ],
+      [
+        "boost_pad.2.active",
+        "boost_pad.2.cooldown"
+      ],
+      [
+        "boost_pad.3.active",
+        "boost_pad.3.cooldown"
+      ],
+      [
+        "boost_pad.4.active",
+        "boost_pad.4.cooldown"
+      ],
+      [
+        "boost_pad.5.active",
+        "boost_pad.5.cooldown"
+      ],
+      [
+        "boost_pad.6.active",
+        "boost_pad.6.cooldown"
+      ],
+      [
+        "boost_pad.7.active",
+        "boost_pad.7.cooldown"
+      ],
+      [
+        "boost_pad.8.active",
+        "boost_pad.8.cooldown"
+      ],
+      [
+        "boost_pad.9.active",
+        "boost_pad.9.cooldown"
+      ],
+      [
+        "boost_pad.10.active",
+        "boost_pad.10.cooldown"
+      ],
+      [
+        "boost_pad.11.active",
+        "boost_pad.11.cooldown"
+      ],
+      [
+        "boost_pad.12.active",
+        "boost_pad.12.cooldown"
+      ],
+      [
+        "boost_pad.13.active",
+        "boost_pad.13.cooldown"
+      ],
+      [
+        "boost_pad.14.active",
+        "boost_pad.14.cooldown"
+      ],
+      [
+        "boost_pad.15.active",
+        "boost_pad.15.cooldown"
+      ],
+      [
+        "boost_pad.16.active",
+        "boost_pad.16.cooldown"
+      ],
+      [
+        "boost_pad.17.active",
+        "boost_pad.17.cooldown"
+      ],
+      [
+        "boost_pad.18.active",
+        "boost_pad.18.cooldown"
+      ],
+      [
+        "boost_pad.19.active",
+        "boost_pad.19.cooldown"
+      ],
+      [
+        "boost_pad.20.active",
+        "boost_pad.20.cooldown"
+      ],
+      [
+        "boost_pad.21.active",
+        "boost_pad.21.cooldown"
+      ],
+      [
+        "boost_pad.22.active",
+        "boost_pad.22.cooldown"
+      ],
+      [
+        "boost_pad.23.active",
+        "boost_pad.23.cooldown"
+      ],
+      [
+        "boost_pad.24.active",
+        "boost_pad.24.cooldown"
+      ],
+      [
+        "boost_pad.25.active",
+        "boost_pad.25.cooldown"
+      ],
+      [
+        "boost_pad.26.active",
+        "boost_pad.26.cooldown"
+      ],
+      [
+        "boost_pad.27.active",
+        "boost_pad.27.cooldown"
+      ],
+      [
+        "boost_pad.28.active",
+        "boost_pad.28.cooldown"
+      ],
+      [
+        "boost_pad.29.active",
+        "boost_pad.29.cooldown"
+      ],
+      [
+        "boost_pad.30.active",
+        "boost_pad.30.cooldown"
+      ],
+      [
+        "boost_pad.31.active",
+        "boost_pad.31.cooldown"
+      ],
+      [
+        "boost_pad.32.active",
+        "boost_pad.32.cooldown"
+      ],
+      [
+        "boost_pad.33.active",
+        "boost_pad.33.cooldown"
+      ]
+    ],
+    "self_car": [
+      "self.position.x",
+      "self.position.y",
+      "self.position.z",
+      "self.linear_velocity.x",
+      "self.linear_velocity.y",
+      "self.linear_velocity.z",
+      "self.forward.x",
+      "self.forward.y",
+      "self.forward.z",
+      "self.up.x",
+      "self.up.y",
+      "self.up.z",
+      "self.angular_velocity.x",
+      "self.angular_velocity.y",
+      "self.angular_velocity.z",
+      "self.boost",
+      "self.on_ground",
+      "self.has_jumped",
+      "self.is_jumping",
+      "self.has_double_jumped",
+      "self.has_flipped",
+      "self.is_flipping",
+      "self.jump_available",
+      "self.dodge_available",
+      "self.is_demoed",
+      "self.demo_timer_remaining",
+      "self.wheel_contact.front_left",
+      "self.wheel_contact.front_right",
+      "self.wheel_contact.back_left",
+      "self.wheel_contact.back_right",
+      "self.jump_time",
+      "self.air_time",
+      "self.air_time_since_jump",
+      "self.flip_time",
+      "self.boosting_time",
+      "self.time_since_boosted",
+      "self.is_supersonic",
+      "self.supersonic_time",
+      "self.sticky_ticks"
+    ],
+    "self_relative": "six exact zero self-to-self position/velocity components",
+    "supported_game": "Soccar 1v1; this 182-field contract does not expose additional players.",
+    "token_types": [
+      "self",
+      "opponent",
+      "ball",
+      "boost_pad",
+      "history_lifecycle"
+    ],
+    "version": "RIVAL2_ENTITY_JOINT_CONTROL90_RECURRENT_V1"
+  },
+  "policy_hz": 30,
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.001,
+    "epochs": 2,
+    "gae_lambda": 0.9973145188572297,
+    "gamma": 0.995,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 90,
+    "value_loss_coefficient": 0.5
+  },
+  "previous_action": "Unchanged fresh-30Hz native previous decision history; not the older BC masking lane.",
+  "resume": "Verified same-candidate model/Adam/RNG/counters; native scenarios and hidden restart fresh, explicitly not an exact world-state continuation.",
+  "reward_authority_sha256": "8734A6C70DEA8CB415BD9F6A8D5EEE241648CD3E2D66E284DD7AE4B13959DF2D",
+  "reward_changes": false,
+  "safety": "KL telemetry only; full model/Adam/shuffle RNG rollback on numerical corruption; preserve last accepted checkpoint and stop.",
+  "scenario": "Original fresh 30Hz bank, not easier reset-only probe.",
+  "scenario_seed": 2026090501,
+  "version": "RIVAL2_ENTITY_JOINT_CONTROL90_RECURRENT_V1",
+  "worlds": 32768
+}

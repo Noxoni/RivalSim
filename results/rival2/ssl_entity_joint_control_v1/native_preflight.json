@@ -1,0 +1,453 @@
+{
+  "action_table_sha256": "C5D42E936492C322F4E8B12D5F29AF4550C61006625D72D6BAF22E56AEE4448D",
+  "checks": {
+    "entity_actor_gradient_present": true,
+    "entity_context_gradient_present": true,
+    "exact_initial_joint_control_parity": true,
+    "finite_backward": true,
+    "likelihood_recomputed": true,
+    "model_unchanged": true,
+    "no_mechanic_hot_path": true,
+    "no_optimizer_steps": true,
+    "normalized_attention": true,
+    "observation_not_mutated": true,
+    "parent_hash": true,
+    "stored_actions_exact": true,
+    "values_recomputed": true
+  },
+  "complete_728_sequence_forward_backward_seconds": 0.1921686001587659,
+  "entity_schema": {
+    "architecture": "Learned entity residual into both actor logits and pre-GRU context. Independent MLP critic unchanged; value loss cannot train entity/actor features.",
+    "attention": "One 64-wide four-head self-query cross-attention over 38 tokens, dropout=0. No full quadratic entity self-attention.",
+    "ball": [
+      "ball.position.x",
+      "ball.position.y",
+      "ball.position.z",
+      "ball.linear_velocity.x",
+      "ball.linear_velocity.y",
+      "ball.linear_velocity.z",
+      "ball.angular_velocity.x",
+      "ball.angular_velocity.y",
+      "ball.angular_velocity.z",
+      "relative.ball_position.x",
+      "relative.ball_position.y",
+      "relative.ball_position.z",
+      "relative.ball_velocity.x",
+      "relative.ball_velocity.y",
+      "relative.ball_velocity.z"
+    ],
+    "context": [
+      "previous_action.throttle",
+      "previous_action.steer",
+      "previous_action.pitch",
+      "previous_action.yaw",
+      "previous_action.roll",
+      "previous_action.jump",
+      "previous_action.boost",
+      "previous_action.handbrake",
+      "lifecycle.kickoff_reset",
+      "lifecycle.self_touch_event",
+      "lifecycle.opponent_touch_event",
+      "lifecycle.self_demoed_event",
+      "lifecycle.opponent_demoed_event",
+      "lifecycle.episode_age",
+      "lifecycle.no_touch_age"
+    ],
+    "count": 38,
+    "initialization": "Zero entity output projections preserve the joint-control policy logits, value and hidden exactly. Joint-control head projection itself is NOT hybrid policy parity.",
+    "no_task_id": true,
+    "opponent": [
+      "opponent.position.x",
+      "opponent.position.y",
+      "opponent.position.z",
+      "opponent.linear_velocity.x",
+      "opponent.linear_velocity.y",
+      "opponent.linear_velocity.z",
+      "opponent.forward.x",
+      "opponent.forward.y",
+      "opponent.forward.z",
+      "opponent.up.x",
+      "opponent.up.y",
+      "opponent.up.z",
+      "opponent.angular_velocity.x",
+      "opponent.angular_velocity.y",
+      "opponent.angular_velocity.z",
+      "opponent.boost",
+      "opponent.on_ground",
+      "opponent.has_jumped",
+      "opponent.is_jumping",
+      "opponent.has_double_jumped",
+      "opponent.has_flipped",
+      "opponent.is_flipping",
+      "opponent.jump_available",
+      "opponent.dodge_available",
+      "opponent.is_demoed",
+      "opponent.demo_timer_remaining",
+      "opponent.wheel_contact.front_left",
+      "opponent.wheel_contact.front_right",
+      "opponent.wheel_contact.back_left",
+      "opponent.wheel_contact.back_right",
+      "opponent.jump_time",
+      "opponent.air_time",
+      "opponent.air_time_since_jump",
+      "opponent.flip_time",
+      "opponent.boosting_time",
+      "opponent.time_since_boosted",
+      "opponent.is_supersonic",
+      "opponent.supersonic_time",
+      "opponent.sticky_ticks",
+      "relative.opponent_position.x",
+      "relative.opponent_position.y",
+      "relative.opponent_position.z",
+      "relative.opponent_velocity.x",
+      "relative.opponent_velocity.y",
+      "relative.opponent_velocity.z"
+    ],
+    "pad_geometry": "Canonical SOCCAR_PAD_POSITIONS / POSITION_SCALE; large flag for indices 0..5; canonical pad minus self position. Orange pad remap already applied by native observation.",
+    "pads": [
+      [
+        "boost_pad.0.active",
+        "boost_pad.0.cooldown"
+      ],
+      [
+        "boost_pad.1.active",
+        "boost_pad.1.cooldown"
+      ],
+      [
+        "boost_pad.2.active",
+        "boost_pad.2.cooldown"
+      ],
+      [
+        "boost_pad.3.active",
+        "boost_pad.3.cooldown"
+      ],
+      [
+        "boost_pad.4.active",
+        "boost_pad.4.cooldown"
+      ],
+      [
+        "boost_pad.5.active",
+        "boost_pad.5.cooldown"
+      ],
+      [
+        "boost_pad.6.active",
+        "boost_pad.6.cooldown"
+      ],
+      [
+        "boost_pad.7.active",
+        "boost_pad.7.cooldown"
+      ],
+      [
+        "boost_pad.8.active",
+        "boost_pad.8.cooldown"
+      ],
+      [
+        "boost_pad.9.active",
+        "boost_pad.9.cooldown"
+      ],
+      [
+        "boost_pad.10.active",
+        "boost_pad.10.cooldown"
+      ],
+      [
+        "boost_pad.11.active",
+        "boost_pad.11.cooldown"
+      ],
+      [
+        "boost_pad.12.active",
+        "boost_pad.12.cooldown"
+      ],
+      [
+        "boost_pad.13.active",
+        "boost_pad.13.cooldown"
+      ],
+      [
+        "boost_pad.14.active",
+        "boost_pad.14.cooldown"
+      ],
+      [
+        "boost_pad.15.active",
+        "boost_pad.15.cooldown"
+      ],
+      [
+        "boost_pad.16.active",
+        "boost_pad.16.cooldown"
+      ],
+      [
+        "boost_pad.17.active",
+        "boost_pad.17.cooldown"
+      ],
+      [
+        "boost_pad.18.active",
+        "boost_pad.18.cooldown"
+      ],
+      [
+        "boost_pad.19.active",
+        "boost_pad.19.cooldown"
+      ],
+      [
+        "boost_pad.20.active",
+        "boost_pad.20.cooldown"
+      ],
+      [
+        "boost_pad.21.active",
+        "boost_pad.21.cooldown"
+      ],
+      [
+        "boost_pad.22.active",
+        "boost_pad.22.cooldown"
+      ],
+      [
+        "boost_pad.23.active",
+        "boost_pad.23.cooldown"
+      ],
+      [
+        "boost_pad.24.active",
+        "boost_pad.24.cooldown"
+      ],
+      [
+        "boost_pad.25.active",
+        "boost_pad.25.cooldown"
+      ],
+      [
+        "boost_pad.26.active",
+        "boost_pad.26.cooldown"
+      ],
+      [
+        "boost_pad.27.active",
+        "boost_pad.27.cooldown"
+      ],
+      [
+        "boost_pad.28.active",
+        "boost_pad.28.cooldown"
+      ],
+      [
+        "boost_pad.29.active",
+        "boost_pad.29.cooldown"
+      ],
+      [
+        "boost_pad.30.active",
+        "boost_pad.30.cooldown"
+      ],
+      [
+        "boost_pad.31.active",
+        "boost_pad.31.cooldown"
+      ],
+      [
+        "boost_pad.32.active",
+        "boost_pad.32.cooldown"
+      ],
+      [
+        "boost_pad.33.active",
+        "boost_pad.33.cooldown"
+      ]
+    ],
+    "self_car": [
+      "self.position.x",
+      "self.position.y",
+      "self.position.z",
+      "self.linear_velocity.x",
+      "self.linear_velocity.y",
+      "self.linear_velocity.z",
+      "self.forward.x",
+      "self.forward.y",
+      "self.forward.z",
+      "self.up.x",
+      "self.up.y",
+      "self.up.z",
+      "self.angular_velocity.x",
+      "self.angular_velocity.y",
+      "self.angular_velocity.z",
+      "self.boost",
+      "self.on_ground",
+      "self.has_jumped",
+      "self.is_jumping",
+      "self.has_double_jumped",
+      "self.has_flipped",
+      "self.is_flipping",
+      "self.jump_available",
+      "self.dodge_available",
+      "self.is_demoed",
+      "self.demo_timer_remaining",
+      "self.wheel_contact.front_left",
+      "self.wheel_contact.front_right",
+      "self.wheel_contact.back_left",
+      "self.wheel_contact.back_right",
+      "self.jump_time",
+      "self.air_time",
+      "self.air_time_since_jump",
+      "self.flip_time",
+      "self.boosting_time",
+      "self.time_since_boosted",
+      "self.is_supersonic",
+      "self.supersonic_time",
+      "self.sticky_ticks"
+    ],
+    "self_relative": "six exact zero self-to-self position/velocity components",
+    "supported_game": "Soccar 1v1; this 182-field contract does not expose additional players.",
+    "token_types": [
+      "self",
+      "opponent",
+      "ball",
+      "boost_pad",
+      "history_lifecycle"
+    ],
+    "version": "RIVAL2_ENTITY_JOINT_CONTROL90_RECURRENT_V1"
+  },
+  "horizon": 90,
+  "initialization_sha256": "4862AFD3BB00D40D07C8FE130FF602A164B55E611EEB2EA98DCF69E2618D31B0",
+  "loss_metrics": {
+    "approx_kl": 0.0,
+    "clip_fraction": 0.0,
+    "entropy": 2.8262264728546143,
+    "policy_loss": 0.004000394605100155,
+    "value_loss": 0.43369829654693604
+  },
+  "maximum_old_logprob_error": 0.0,
+  "maximum_value_error": 0.0,
+  "note": "Native rollout and backward only, not a trained model or learning-speed claim. Entity encoders initially have zero downstream gradient until zero residual projections first learn; output projections have nonzero gradients.",
+  "optimizer_steps": 0,
+  "parent_sha256": "B0B35CDAF3B3551EC667776EB99C3822F863AAA1F17A0BA2F013B5F216BD87A5",
+  "peak_allocated_bytes": 16296817664,
+  "physics_hz": 120,
+  "policy_config_sha256": "08CF995A86E73476DF8C8CF13075D188D83B31F9620D78EF0749E3E5061AE6A9",
+  "policy_hz": 30,
+  "rollout_logical_bytes": 4880072704,
+  "rollout_metrics": {
+    "action_index_counts": [
+      13867,
+      4350,
+      97220,
+      31145,
+      9994,
+      3388,
+      61025,
+      17132,
+      425301,
+      121900,
+      44232,
+      13236,
+      26446,
+      6815,
+      149338,
+      35109,
+      186234,
+      47876,
+      880534,
+      164275,
+      19604,
+      5415,
+      122338,
+      18581,
+      7015,
+      31685,
+      19653,
+      86766,
+      5776,
+      26620,
+      49490,
+      178059,
+      7929,
+      1450,
+      136768,
+      458940,
+      19960,
+      3253,
+      39784,
+      140787,
+      5194,
+      715,
+      5159,
+      21480,
+      14579,
+      54196,
+      4312,
+      16236,
+      20207,
+      50714,
+      18998,
+      50087,
+      138981,
+      307866,
+      21014,
+      2955,
+      110663,
+      16343,
+      135483,
+      297499,
+      14396,
+      1719,
+      14429,
+      42298,
+      14514,
+      42211,
+      6624,
+      8484,
+      21341,
+      26573,
+      7306,
+      9573,
+      46529,
+      57857,
+      6312,
+      648,
+      155532,
+      183302,
+      17189,
+      1582,
+      53388,
+      67805,
+      4620,
+      407,
+      4812,
+      9835,
+      16357,
+      32245,
+      5852,
+      12529
+    ],
+    "boost": 3612894.0,
+    "concedes": 1392.0,
+    "current_selfplay_only": true,
+    "ended_player_episode_touch_fraction": 0.5,
+    "ended_player_episodes": 2784.0,
+    "entropy": 16684425.21875,
+    "episodes_with_touch": 1392.0,
+    "first_touch_age": 15850.000961095095,
+    "first_touches": 12523.0,
+    "goals": 1392.0,
+    "goalward_touch_fraction": 0.9508805825964182,
+    "goalward_touches": 12796.0,
+    "handbrake": 578565.0,
+    "jump": 236349.0,
+    "kl_telemetry_only": true,
+    "mean_entropy": 2.828712500466241,
+    "mean_first_touch_seconds_if_touched": 1.2656712418026905,
+    "movement_speed": 1202.1233184814453,
+    "no_touch": 0.0,
+    "physical_physics_ticks": 11796480,
+    "potential_reward_components": {
+      "access": -8890.095485470525,
+      "alignment": -6443.261852875273,
+      "boost": -6590.060142945214,
+      "control": 0.0,
+      "defense": 0.0,
+      "field": 0.0,
+      "goal_velocity": -320.3284948981443,
+      "terminal_goal": 0.0,
+      "total": -22243.745943933303
+    },
+    "resets": 1392.0,
+    "speed": 7090411842.0,
+    "time_limit": 0.0,
+    "touches": 13457.0,
+    "touches_per_minute": 4.10675048828125,
+    "trainable_agent_samples": 5898240
+  },
+  "rollout_seconds": 6.288116900017485,
+  "scenario_sha256": "B86A7AB5E0C599CF327AA49FE4BE2D37EF68A34DA1F2A903CCF0910F13F34825",
+  "training_capability_claim": false,
+  "utc": "2026-09-05T19:31:41.573216+00:00",
+  "verdict": "PASS",
+  "worlds": 32768
+}
