@@ -1,6 +1,7 @@
-"""CPU-only native training/full-match interface check, with no learning.
+"""Native training/full-match interface check, with no learning.
 
-Does not replace CUDA full-match validation. Forced goals are test fixtures,
+CPU initial-only mode is available alongside training. CUDA mode requires the
+completed pilot and its exclusive process lease. Forced goals are test fixtures,
 never counted as policy success or used as training data.
 """
 
@@ -8,6 +9,8 @@ never counted as policy success or used as training data.
 from __future__ import annotations
 
 import argparse
+import json
+import subprocess
 import sys
 import traceback
 from pathlib import Path
@@ -21,7 +24,14 @@ import warp as wp
 from benchmarks.evaluate_rival2_ssl_entity_full_match import SEED, assignments
 from benchmarks.inspect_fresh_ground_30hz_trajectories import CPUInspectionEnv
 from benchmarks.run_rival2_fresh_ground_30hz_v1 import sha, tensor_hash, utc, write_json
-from benchmarks.run_rival2_ssl_entity_joint_control import CHECKPOINTS, COLLISION, RESULTS, verify
+from benchmarks.run_rival2_ssl_entity_joint_control import (
+    CHECKPOINTS,
+    COLLISION,
+    EXTERNAL,
+    RESULTS,
+    verify,
+)
+from rivalsim.fresh_ground_30hz import FreshGroundEnv
 from rivalsim.full_match import FullMatchState, FullMatchTelemetry
 from rivalsim.rival2_contracts import ACTION_NAMES, OBS_FIELD_NAMES
 from rivalsim.rival2_env import Rival2TensorBridge, Rival2WorldSim
@@ -30,25 +40,48 @@ from rivalsim.ssl_entity_policy import EntityJointControlActorCritic
 CHECKPOINT_SHA = "EDC6B3C01DF1BD17CD17A9F466FC6676414DB42A9EB5A6358A1C4DC123726983"
 
 
+def check_idle_status(state):
+    if state.get("accepted_updates") != 100 or state.get("status") != "completed":
+        raise RuntimeError(
+            "CUDA diagnostic requires completed +100 pilot; do not interrupt training"
+        )
+
+
 @torch.inference_mode()
-def run(*, initial_only=False):
+def run(*, initial_only=False, device="cpu"):
     torch.set_num_threads(2)
-    verify()
+    lease = None
+    if device == "cuda:0":
+        import msvcrt
+
+        check_idle_status(json.loads((EXTERNAL / "campaign_state.json").read_text()))
+        lease = (EXTERNAL / "campaign.lock").open("r+b")
+        msvcrt.locking(lease.fileno(), msvcrt.LK_NBLCK, 1)
+        relative = Path(__file__).relative_to(ROOT).as_posix()
+        published = subprocess.check_output(["git", "show", f"origin/main:{relative}"], cwd=ROOT)
+        assert published.replace(b"\r\n", b"\n") == Path(__file__).read_bytes().replace(
+            b"\r\n", b"\n"
+        ), "publish the stable diagnostic before native CUDA execution"
+    verify(published=device == "cuda:0")
     checkpoint = CHECKPOINTS / "plus_020.pt"
     assert sha(checkpoint) == CHECKPOINT_SHA
     policy = EntityJointControlActorCritic().eval()
     policy.load_state_dict(torch.load(checkpoint, map_location="cpu", weights_only=False)["model"])
     before_hash = tensor_hash(policy.state_dict())
+    policy.to(device)
     layouts, sides = assignments()
     n = len(sides)
-    kwargs = dict(device="cpu", seed=SEED, kickoff_selector=layouts, car_lifecycle_seed=SEED)
-    train = CPUInspectionEnv(n, COLLISION, **kwargs)
+    kwargs = dict(device=device, seed=SEED, kickoff_selector=layouts, car_lifecycle_seed=SEED)
+    train_type = CPUInspectionEnv if device == "cpu" else FreshGroundEnv
+    train = train_type(n, COLLISION, **kwargs)
     world = Rival2WorldSim(n, COLLISION, **kwargs)
     bridge = Rival2TensorBridge(world)
     match = FullMatchState(n, world.device, layouts, sides)
     views = match.torch_views()
     telemetry = FullMatchTelemetry(match)
     telemetry.attach(world)
+    if device == "cuda:0":
+        world.capture_graph(block_ticks=1)
     observation = bridge.observation()
     hidden_train = policy.initial_hidden(n * 2)
     hidden_match = hidden_train.clone()
@@ -59,8 +92,8 @@ def run(*, initial_only=False):
             # Same deliberate near-goal physical fixture in both worlds.
             # Native physics/lifecycle must generate and consume the event.
             for target in (train.bridge, bridge):
-                target.views["ball_pos"][0] = torch.tensor([0.0, 5100.0, 120.0])
-                target.views["ball_vel"][0] = torch.tensor([0.0, 6000.0, 0.0])
+                target.views["ball_pos"][0] = torch.tensor([0.0, 5100.0, 120.0], device=device)
+                target.views["ball_vel"][0] = torch.tensor([0.0, 6000.0, 0.0], device=device)
             train.observation = train.bridge.observation()
             observation = bridge.observation()
         difference = (train.observation - observation).abs()
@@ -89,7 +122,7 @@ def run(*, initial_only=False):
                 actor_logits_exact=torch.equal(actor_train, actor_match),
                 actions_exact=torch.equal(action, match_action),
                 native_kickoff_actions=initial,
-                device="cpu",
+                device=device,
                 physics_ticks_advanced=0,
                 optimizer_steps=0,
                 dynamic_reset_check="NOT_RUN",
@@ -100,16 +133,23 @@ def run(*, initial_only=False):
                 "not dynamic CUDA gameplay",
                 source_sha256=sha(__file__),
             )
-            write_json(RESULTS / "full_match_initial_interface_check.json", initial_report)
+            initial_name = (
+                "full_match_initial_interface_check.json"
+                if device == "cpu"
+                else ("full_match_cuda_initial_interface_check.json")
+            )
+            write_json(RESULTS / initial_name, initial_report)
             assert initial_report["verdict"] == "PASS_INITIAL_ONLY"
             if initial_only:
                 print(initial_report, flush=True)
+                if lease is not None:
+                    lease.close()
                 return
         transition = train.step(action)
         world.begin_decision()
         for _ in range(4):
             bridge.set_actions(match_action)
-            world.step(1)
+            world.step_graph(1) if device == "cuda:0" else world.step(1)
         wp.copy(world.rival2.reset_mask, match.pending_reset)
         reset = (views["pending_reset"] != 0).clone()
         world.apply_interval_resets()
@@ -149,7 +189,8 @@ def run(*, initial_only=False):
     report = dict(
         utc=utc(),
         verdict="PASS" if all_equal and goals == 1 and unchanged else "FAIL",
-        device="cpu",
+        device=device,
+        match_graph_execution=device == "cuda:0",
         checkpoint_sha256=CHECKPOINT_SHA,
         optimizer_steps=0,
         cuda_allocated_bytes=torch.cuda.memory_allocated(),
@@ -158,8 +199,8 @@ def run(*, initial_only=False):
         checkpoint_and_model_unchanged=unchanged,
         initial_kickoff_actions=initial,
         decisions=checks,
-        scope="CPU native observation/action/recurrent/goal-reset parity only; "
-        "not CUDA parity or gameplay evidence",
+        scope="Native observation/action/recurrent/goal-reset interface only on declared device; "
+        "not gameplay evidence or cross-device parity",
         sources={
             str(Path(__file__).relative_to(ROOT)): sha(__file__),
             "benchmarks/inspect_fresh_ground_30hz_trajectories.py": sha(
@@ -167,21 +208,27 @@ def run(*, initial_only=False):
             ),
         },
     )
-    write_json(RESULTS / "full_match_cpu_interface_check.json", report)
+    device_name = "cuda" if device == "cuda:0" else "cpu"
+    write_json(RESULTS / f"full_match_{device_name}_interface_check.json", report)
     print(report["verdict"], "forced goals:", goals, "exact:", all_equal, flush=True)
     assert report["verdict"] == "PASS"
-    assert report["cuda_allocated_bytes"] == 0
+    if device == "cpu":
+        assert report["cuda_allocated_bytes"] == 0
+    if lease is not None:
+        lease.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--initial-only", action="store_true")
+    parser.add_argument("--device", choices=("cpu", "cuda:0"), default="cpu")
     args = parser.parse_args()
     try:
-        run(initial_only=args.initial_only)
+        run(initial_only=args.initial_only, device=args.device)
     except Exception:
         write_json(
-            RESULTS / "full_match_cpu_interface_failure.json",
+            RESULTS
+            / f"full_match_{'cuda' if args.device == 'cuda:0' else 'cpu'}_interface_failure.json",
             dict(
                 utc=utc(),
                 verdict="NOT_COMPLETED",

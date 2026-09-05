@@ -35,11 +35,23 @@ full-match smoke has run. GPU execution and checkpoint/hash parity must still
 be verified when training finishes. Any implementation error will be reported
 and corrected explicitly, without changing the evaluation question or policy.
 
-Command after the pilot has completed and the worker has exited:
+Commands after the pilot has completed and the worker has exited:
 
 ```
+.venv\Scripts\python.exe benchmarks/validate_rival2_ssl_entity_match_interface.py --device cuda:0
 .venv\Scripts\python.exe benchmarks/evaluate_rival2_ssl_entity_full_match.py run
 ```
+
+The first command is a 48-physics-tick interface smoke using immutable +20
+weights, ten native kickoff states and one forced goal fixture. It compares
+the actual training observation path with the full-match CUDA-graph path,
+including emitted controls and recurrent resets. It is not gameplay evaluation
+and must never count its forced goal as a scored policy goal. The existing
+CPU dynamic backend could not compile its vehicle kernel (documented in
+`CPU_INTERFACE_LIMITATION.md`), so the production-device check remains pending.
+The separate CUDA mode verifies completed +100 status, holds the same exclusive
+training lease, and requires its source to match published `origin/main`.
+The original fixed full-match comparison protocol itself remains unchanged.
 
 This is a small deterministic development comparison, not SSL certification,
 human rank equivalence, or a deployment decision. No online/ranked play occurs.
