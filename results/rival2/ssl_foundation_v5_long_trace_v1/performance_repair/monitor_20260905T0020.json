@@ -1,0 +1,45 @@
+{
+  "observed_utc": "2026-09-05T00:21:00Z",
+  "timestamp_precision": "rounded to minute; readings collected during the 00:19 heartbeat",
+  "accepted_update": 24,
+  "latest_evaluation": 20,
+  "last_notified_evaluation": 20,
+  "training_process_alive": true,
+  "training_worker_pid": 44708,
+  "training_stderr_empty": true,
+  "hard_failure_file_present": false,
+  "intentional_stop_marker_present": false,
+  "authority_sha256": "BE82C618296A6124858BFCCE99EB66E779074B524108476690D2E227F6B8CB4C",
+  "launch_authority_sha256": "9C7FAC5AF55D29032980E8494D33398A561F4048D50F1BF466D2127DABA1C0F6",
+  "update_11_20_mean_seconds": 92.3470976400422,
+  "update_21_24_mean_seconds": 190.27510119997896,
+  "optimizer_steps_per_completed_update": 722,
+  "post_resume_pytorch_peak_allocated_gib_range": [
+    20.85517930984497,
+    20.958634853363037
+  ],
+  "post_resume_pytorch_peak_reserved_gib_range": [
+    21.64453125,
+    21.65625
+  ],
+  "gpu_memory_used_mib_samples": [
+    31579,
+    31667
+  ],
+  "gpu_memory_total_mib": 32607,
+  "windows_gpu_process_memory_dedicated_usage_gib": {
+    "training_pid_44708": 27.037,
+    "desktop_window_manager_pid_33492": 8.839,
+    "rocket_league_pid_33892": 1.023,
+    "eldara_pid_36380": 0.605
+  },
+  "diagnosis": "Throughput regression and high total GPU memory occupancy observed. Resource contention is a hypothesis, not a proven causal explanation.",
+  "caveats": [
+    "Windows per-process allocation counters are not equivalent to simultaneously resident physical VRAM; do not sum them as physical occupancy.",
+    "No controlled app-open/app-closed comparison or GPU paging trace was performed.",
+    "Do not attribute the entire slowdown to DWM, games, or training on these snapshots alone.",
+    "No new completed evaluation; do not repeat the update20 gameplay report."
+  ],
+  "action": "No process interruption, reward/PPO/config changes, optimizer mutation, or extra GPU workload. Continue monitoring the healthy progressing campaign; do not terminate DWM or user applications.",
+  "next_evaluation_update": 50
+}
