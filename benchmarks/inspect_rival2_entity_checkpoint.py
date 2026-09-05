@@ -3,6 +3,7 @@
 # ruff: noqa: E402
 from __future__ import annotations
 
+import argparse
 import hashlib
 import io
 import json
@@ -25,8 +26,20 @@ from benchmarks.run_rival2_ssl_entity_joint_control import (
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--sha256")
+    args = parser.parse_args()
     verify(published=True)
-    latest = json.loads((EXTERNAL / "latest.json").read_text())
+    latest = (
+        json.loads((EXTERNAL / "latest.json").read_text())
+        if args.checkpoint is None
+        else {
+            "path": str(args.checkpoint),
+            "sha256": args.sha256,
+        }
+    )
+    assert latest["sha256"], "Explicit checkpoint requires --sha256"
     raw = Path(latest["path"]).read_bytes()
     digest = hashlib.sha256(raw).hexdigest().upper()
     assert digest == latest["sha256"], (
@@ -34,8 +47,15 @@ def main():
     )
     p = torch.load(io.BytesIO(raw), map_location="cpu", weights_only=False)
     initial = torch.load(INITIAL, map_location="cpu", weights_only=False)
-    assert p["accepted_updates"] == latest["accepted_updates"] > 0
-    path = CHECKPOINTS / f"audited_plus_{p['accepted_updates']:03d}.pt"
+    assert p["accepted_updates"] > 0
+    if args.checkpoint is None:
+        assert p["accepted_updates"] == latest["accepted_updates"]
+    source = Path(latest["path"]).resolve()
+    path = (
+        source
+        if source.parent == CHECKPOINTS.resolve() and source.name.startswith("plus_")
+        else CHECKPOINTS / f"audited_plus_{p['accepted_updates']:03d}.pt"
+    )
     if path.exists():
         assert sha(path) == digest
     else:
@@ -74,7 +94,9 @@ def main():
             float(s["step"]) == p["accepted_updates"] * 182
             for s in p["optimizer"]["state"].values()
         ),
-        all_expected_parameter_groups_updated=all(g["changed_tensors"] > 0 for g in groups.values()),
+        all_expected_parameter_groups_updated=all(
+            g["changed_tensors"] > 0 for g in groups.values()
+        ),
         entity_map_and_action_table_unchanged=all(
             torch.equal(p["model"][name], initial["model"][name])
             for name in (
@@ -101,7 +123,8 @@ def main():
         optimizer_state_tensors=len(p["optimizer"]["state"]),
         sampled_training_row=row,
         capability_claim=False,
-        note="This proves parameters actually updated finitely, not learned gameplay. Use scheduled deterministic evaluations.",
+        note="This proves parameters actually updated finitely, not learned gameplay. "
+        "Use scheduled deterministic evaluations.",
     )
     write_json(RESULTS / f"accepted_{p['accepted_updates']:03d}_integrity.json", result)
     print(

@@ -1,0 +1,133 @@
+{
+  "evaluations": [
+    {
+      "accepted_updates": 0,
+      "cases": {
+        "acquisition_selfplay": {
+          "full_match_winrate_available": false,
+          "goals_against": 0,
+          "goals_for": 3,
+          "initial_goals_for": 3,
+          "initial_no_touch": 61,
+          "initial_touched": 11,
+          "median_first_touch_seconds_if_touched": 0.8416666984558105,
+          "no_touch_truncations": 61,
+          "parent_goals_for": 2,
+          "parent_no_touch": 61,
+          "parent_touched": 16,
+          "touch_count_change_vs_initial": 0,
+          "touch_count_change_vs_parent": -5,
+          "touched": 11,
+          "touches_per_minute": 0.7062559723854065,
+          "worlds": 64
+        },
+        "finishing_selfplay": {
+          "full_match_winrate_available": false,
+          "goals_against": 0,
+          "goals_for": 11,
+          "initial_goals_for": 11,
+          "initial_no_touch": 53,
+          "initial_touched": 40,
+          "median_first_touch_seconds_if_touched": 0.4583333432674408,
+          "no_touch_truncations": 53,
+          "parent_goals_for": 14,
+          "parent_no_touch": 50,
+          "parent_touched": 46,
+          "touch_count_change_vs_initial": 0,
+          "touch_count_change_vs_parent": -6,
+          "touched": 40,
+          "touches_per_minute": 3.4983248710632324,
+          "worlds": 64
+        },
+        "standard_kickoff_nexto": {
+          "full_match_winrate_available": false,
+          "goals_against": 64,
+          "goals_for": 0,
+          "initial_goals_for": 0,
+          "initial_no_touch": 0,
+          "initial_touched": 26,
+          "median_first_touch_seconds_if_touched": 2.1583335399627686,
+          "no_touch_truncations": 0,
+          "parent_goals_for": 0,
+          "parent_no_touch": 0,
+          "parent_touched": 13,
+          "touch_count_change_vs_initial": 0,
+          "touch_count_change_vs_parent": 13,
+          "touched": 26,
+          "touches_per_minute": 4.349438190460205,
+          "worlds": 64
+        }
+      },
+      "checkpoint": "checkpoints\\rival2\\ssl_entity_joint_control_v1\\launch_zero_before_recovery.pt"
+    },
+    {
+      "accepted_updates": 10,
+      "cases": {
+        "acquisition_selfplay": {
+          "full_match_winrate_available": false,
+          "goals_against": 1,
+          "goals_for": 5,
+          "initial_goals_for": 3,
+          "initial_no_touch": 61,
+          "initial_touched": 11,
+          "median_first_touch_seconds_if_touched": 0.8916667103767395,
+          "no_touch_truncations": 58,
+          "parent_goals_for": 2,
+          "parent_no_touch": 61,
+          "parent_touched": 16,
+          "touch_count_change_vs_initial": 9,
+          "touch_count_change_vs_parent": 4,
+          "touched": 20,
+          "touches_per_minute": 1.3746378421783447,
+          "worlds": 64
+        },
+        "finishing_selfplay": {
+          "full_match_winrate_available": false,
+          "goals_against": 0,
+          "goals_for": 14,
+          "initial_goals_for": 11,
+          "initial_no_touch": 53,
+          "initial_touched": 40,
+          "median_first_touch_seconds_if_touched": 0.4750000238418579,
+          "no_touch_truncations": 50,
+          "parent_goals_for": 14,
+          "parent_no_touch": 50,
+          "parent_touched": 46,
+          "touch_count_change_vs_initial": 4,
+          "touch_count_change_vs_parent": -2,
+          "touched": 44,
+          "touches_per_minute": 3.7610414028167725,
+          "worlds": 64
+        },
+        "standard_kickoff_nexto": {
+          "full_match_winrate_available": false,
+          "goals_against": 64,
+          "goals_for": 0,
+          "initial_goals_for": 0,
+          "initial_no_touch": 0,
+          "initial_touched": 26,
+          "median_first_touch_seconds_if_touched": 2.575000047683716,
+          "no_touch_truncations": 0,
+          "parent_goals_for": 0,
+          "parent_no_touch": 0,
+          "parent_touched": 13,
+          "touch_count_change_vs_initial": -13,
+          "touch_count_change_vs_parent": 0,
+          "touched": 13,
+          "touches_per_minute": 3.2461647987365723,
+          "worlds": 64
+        }
+      },
+      "checkpoint": "checkpoints\\rival2\\ssl_entity_joint_control_v1\\plus_010.pt"
+    }
+  ],
+  "evidence_hashes": {
+    "results\\rival2\\ssl_entity_joint_control_v1\\evaluation_000.json": "B30548CA9C82CFF8256CFA618CDC19AB5D7CB77077909214AF8396776C1AA32C",
+    "results\\rival2\\ssl_entity_joint_control_v1\\evaluation_010.json": "F7F8F22874B1D06D5CAE174306D9697EB4446990D925FCA89A49BC38DAB325FA"
+  },
+  "interpretation": "All cases are original fixed development scenarios, not complete match win rates or a held-out acceptance test. Candidate head initialization differs from the hybrid parent, so report both baselines. No-touch truncations can overlap earlier touches. Compare coverage together with conditional touch speed and scoring; do not select a lucky intermediate boundary.",
+  "latest_completed_evaluation": 10,
+  "ssl_capability_proven": false,
+  "status": "PILOT_IN_PROGRESS",
+  "utc": "2026-09-05T19:45:47.872417+00:00"
+}
