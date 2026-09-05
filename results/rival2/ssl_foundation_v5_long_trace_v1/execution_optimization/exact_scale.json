@@ -1,0 +1,388 @@
+{
+  "accepted_update": 50,
+  "authority_sha256": "BE82C618296A6124858BFCCE99EB66E779074B524108476690D2E227F6B8CB4C",
+  "checks": {
+    "active_actor_close": true,
+    "active_buttons_exact": true,
+    "active_hidden_close": true,
+    "actor_close": true,
+    "finite_rollout": true,
+    "gradients_close": true,
+    "hidden_close": true,
+    "metrics_close": true,
+    "model_unchanged": true,
+    "no_accepted_update": true,
+    "optimizer_unchanged": true,
+    "physical_tensor_headroom": true,
+    "source_unchanged": true,
+    "value_exact": true
+  },
+  "component_timings": {
+    "frozen_opponent": {
+      "baseline": {
+        "median_seconds": 0.003865449922159314,
+        "seconds": [
+          0.0049270999152213335,
+          0.0036134999245405197,
+          0.004081499995663762,
+          0.003624300006777048,
+          0.004559600027278066,
+          0.0036307000555098057,
+          0.0041408000979572535,
+          0.0036184999626129866,
+          0.00432960013858974,
+          0.0036493998486548662
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.002053450094535947,
+        "seconds": [
+          0.0022060999181121588,
+          0.0021768000442534685,
+          0.0018893000669777393,
+          0.0018657001201063395,
+          0.0027152998372912407,
+          0.0019301001448184252,
+          0.00187740009278059,
+          0.001880299998447299,
+          0.002210100181400776,
+          0.0021856999956071377
+        ]
+      }
+    },
+    "next_value": {
+      "baseline": {
+        "median_seconds": 0.006060000043362379,
+        "seconds": [
+          0.006041399901732802,
+          0.0063714999705553055,
+          0.005480899941176176,
+          0.006061099935323,
+          0.006800600094720721,
+          0.006065800087526441,
+          0.005887300008907914,
+          0.005904699908569455,
+          0.006058900151401758,
+          0.006751099834218621
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.0021449500927701592,
+        "seconds": [
+          0.0020897998474538326,
+          0.002091699978336692,
+          0.0026883999817073345,
+          0.0021428000181913376,
+          0.0020799001213163137,
+          0.00312180002219975,
+          0.0023739999160170555,
+          0.002147100167348981,
+          0.002142100129276514,
+          0.002755099907517433
+        ]
+      }
+    }
+  },
+  "cuda_peak_allocated_gib": 20.812710762023926,
+  "cuda_peak_reserved_gib": 22.47265625,
+  "errors": {
+    "active_actor_max_abs": 0.0,
+    "active_hidden_max_abs": 0.0,
+    "actor_max_abs": 0.0
+  },
+  "horizon": 360,
+  "implementation_sha256": {
+    "benchmarks/run_rival2_ssl_foundation_v5_long_trace_v1.py": "F930BDA84D527AAEE43E4E4E25B06BF1A6B256404A950102CB52C608B6592835",
+    "rivalsim/recurrent_execution.py": "04C11878F3109A2868E7A9D1E52FF355DE706A5E792DFF247AFBC507AA404562",
+    "rivalsim/rival2_recurrent_ppo.py": "1C95DAB1BFFFED90046024CCD6F1CA5706B300CC83EB637B55B9DACE3C39542B",
+    "rivalsim/rival2_recurrent_training.py": "7F33FF23EF2F60370B1C587E6C46950ED509FCE74E47968A1DBD5C4EFC83A456",
+    "rivalsim/rival2_ssl_foundation_training.py": "A3B26F6BE620B2A350385ED91DEE64B0CB317FE56D6E03AADCDF10B90B956A16",
+    "rivalsim/rival2_unified_policy.py": "E1031E6CC3C7F117BE60C9EBCC613A4A42F81AA6D4159F982B3EFA67097200FD"
+  },
+  "minibatch_sequences": 182,
+  "minibatches": [
+    {
+      "baseline": {
+        "median_seconds": 0.052336799912154675,
+        "seconds": [
+          0.05826860014349222,
+          0.05197919998317957,
+          0.051718899980187416,
+          0.052336799912154675,
+          0.05633080005645752
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.048606100026518106,
+        "seconds": [
+          0.0482137999497354,
+          0.048606100026518106,
+          0.04898820002563298,
+          0.04944239999167621,
+          0.04850759985856712
+        ]
+      },
+      "gradient_close": true,
+      "max_gradient_abs_error": 0.0,
+      "metrics_close": true,
+      "sequence_offset": 0
+    },
+    {
+      "baseline": {
+        "median_seconds": 0.05049759987741709,
+        "seconds": [
+          0.05181579990312457,
+          0.050027200020849705,
+          0.05090909986756742,
+          0.05047990009188652,
+          0.05049759987741709
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.04726950009353459,
+        "seconds": [
+          0.04580669989809394,
+          0.04726950009353459,
+          0.049658500123769045,
+          0.04984270012937486,
+          0.046958399936556816
+        ]
+      },
+      "gradient_close": true,
+      "max_gradient_abs_error": 0.0,
+      "metrics_close": true,
+      "sequence_offset": 182
+    },
+    {
+      "baseline": {
+        "median_seconds": 0.052156100049614906,
+        "seconds": [
+          0.05300679989159107,
+          0.05396170006133616,
+          0.052156100049614906,
+          0.05124840000644326,
+          0.05141189997084439
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.049250599928200245,
+        "seconds": [
+          0.048171000089496374,
+          0.05276630003936589,
+          0.05113649996928871,
+          0.04808380012400448,
+          0.049250599928200245
+        ]
+      },
+      "gradient_close": true,
+      "max_gradient_abs_error": 0.0,
+      "metrics_close": true,
+      "sequence_offset": 910
+    },
+    {
+      "baseline": {
+        "median_seconds": 0.054056999972090125,
+        "seconds": [
+          0.05646880017593503,
+          0.05739909992553294,
+          0.05393059994094074,
+          0.054050799924880266,
+          0.054056999972090125
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.05240619997493923,
+        "seconds": [
+          0.051854899851605296,
+          0.05682590021751821,
+          0.05240619997493923,
+          0.0511295001488179,
+          0.05441759992390871
+        ]
+      },
+      "gradient_close": true,
+      "max_gradient_abs_error": 0.0,
+      "metrics_close": true,
+      "sequence_offset": 3640
+    },
+    {
+      "baseline": {
+        "median_seconds": 0.053477599984034896,
+        "seconds": [
+          0.05429040011949837,
+          0.05374830006621778,
+          0.05228939978405833,
+          0.05116939987055957,
+          0.053477599984034896
+        ]
+      },
+      "candidate": {
+        "median_seconds": 0.04922279994934797,
+        "seconds": [
+          0.04910990013740957,
+          0.052043800009414554,
+          0.04922279994934797,
+          0.0497789999935776,
+          0.04832089995034039
+        ]
+      },
+      "gradient_close": true,
+      "max_gradient_abs_error": 0.0,
+      "metrics_close": true,
+      "sequence_offset": 8190
+    }
+  ],
+  "no_optimizer_step": true,
+  "optimized_collect_seconds": 14.060938999988139,
+  "production_preflight": {
+    "authority_sha256": "BE82C618296A6124858BFCCE99EB66E779074B524108476690D2E227F6B8CB4C",
+    "checks": {
+      "all_kickoff_layouts_present": true,
+      "bounded_100_updates": true,
+      "critic_does_not_alias_actor": true,
+      "current_model_exact_at_update_zero": true,
+      "direct_non_goal_reward_terms_zero": true,
+      "effective_minibatch_preserved": true,
+      "episode_boundary_uses_actual_120hz_cadence": true,
+      "evaluation_30_seconds": true,
+      "exact_scale": true,
+      "exact_unified_v5_source_sha256": true,
+      "execution_reuse_enabled": true,
+      "exploration_matches_amended_run": true,
+      "frozen_v5_model_exact": true,
+      "gamma_and_reward_unchanged": true,
+      "goal_only_native_kernel": true,
+      "ground_heading_momentum_coherent": true,
+      "independent_critic": true,
+      "kl_telemetry_only": true,
+      "long_trace_config": true,
+      "native_120hz": true,
+      "no_gameplay_v2_or_v3_state": true,
+      "nonfinite_rollback_enabled": true,
+      "only_six_potential_components": true,
+      "opponent_probabilities_exact": true,
+      "optimizer_continued": true,
+      "optimizer_lrs_exact": true,
+      "optimizer_state_matches_offset": true,
+      "plus_174_not_loaded": true,
+      "reward_contract_exact": true,
+      "scenario_id_absent": true,
+      "scenario_reset_cycles_full_bank": true,
+      "scenario_reset_template_resident": true,
+      "source_optimizer_not_loaded": true,
+      "standard_kickoffs_present": true,
+      "two_ppo_passes": true,
+      "value_loss_isolated": true,
+      "wall_aerial_variants_present": true
+    },
+    "contracts": {
+      "RIVAL2_ACTION_V2_120HZ": "5E3747CCF9F59BA18D81D07014D60637F7D886907A0F44B0CA681C74F20EF91A",
+      "RIVAL2_EPISODE_V1": "E22B6014C6D975D700D1129B9F554D6F35E4CA5003F1C1BD09C7D394D4F9347E",
+      "RIVAL2_OBS_V2_120HZ": "BF9E141E5A1E5D2F15581C8BBB10F31F11FC5AA6736B327E61C03DD8D2388237",
+      "RIVAL2_REWARD_SSL_FOUNDATION_V1": "C960B465914395BD7181DE0C1FC737165ACD69D507C65C563E575A8E017028D5"
+    },
+    "created_utc": "2026-09-05T01:02:39.109682+00:00",
+    "format": "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1_PREFLIGHT",
+    "initial_opponent_counts": {
+      "current": 13145,
+      "frozen_unified_v5": 6586,
+      "nexto": 13037
+    },
+    "optimizer_group_lrs": {
+      "critic": 0.0003,
+      "policy": 0.0001
+    },
+    "ppo_config": {
+      "clip_range": 0.2,
+      "entropy_coefficient": 0.0,
+      "epochs": 2,
+      "gae_lambda": 0.9993279525461148,
+      "gamma": 0.9987476493904754,
+      "learning_rate": 0.0001,
+      "max_gradient_norm": 0.5,
+      "minibatch_size": 65536,
+      "rollout_horizon": 360,
+      "value_loss_coefficient": 0.5
+    },
+    "reset_curriculum": {
+      "counts": {
+        "catch_control_possession": 4915,
+        "contested_fifty": 3277,
+        "defensive_shadow_save": 3277,
+        "loose_ball_access": 4915,
+        "natural_ongoing": 4915,
+        "recovery_scramble_low_boost": 1638,
+        "shooting_finishing": 3277,
+        "standard_kickoff": 3277,
+        "wall_aerial": 3277
+      },
+      "focal_side_counts": {
+        "0": 16384,
+        "1": 16384
+      },
+      "ground_heading_momentum_semantics": "coherent_with_off_angle_coverage",
+      "reset_source_schedule": {
+        "coprime_stride": 16385,
+        "mode": "deterministic_full_cycle",
+        "source_worlds": 32768
+      },
+      "scripted_solution_prefix_ticks": 0,
+      "standard_kickoff_layout_counts": {
+        "0": 655,
+        "1": 655,
+        "2": 655,
+        "3": 656,
+        "4": 656
+      },
+      "standard_kickoff_starts": 3277,
+      "task_or_scenario_id_in_observation": false,
+      "wall_aerial_variant_counts": {
+        "airborne_intercept": 1092,
+        "grounded_elevated_ball": 1092,
+        "side_wall_car": 1093
+      },
+      "worlds": 32768
+    },
+    "schedule_authority_sha256": "9C7FAC5AF55D29032980E8494D33398A561F4048D50F1BF466D2127DABA1C0F6",
+    "source": {
+      "authority_sha256": "BE82C618296A6124858BFCCE99EB66E779074B524108476690D2E227F6B8CB4C",
+      "credit_assignment_amendment": {
+        "authority_sha256": "BE82C618296A6124858BFCCE99EB66E779074B524108476690D2E227F6B8CB4C",
+        "optimizer_reset": false,
+        "parent_model_sha256": "72C8FA1BDF041F7739C40DC7C96F9E921D316107BD801B4848233D3F73335AA1",
+        "parent_optimizer_sha256": "9281F76E5A2D2AFE3AFB2C9B09ED87BD32FF0D317BC59109B20F31AFCE023154",
+        "parent_sha256": "EFDB7725D8DBFAFBFA75A66F4AAF618AC561DE6BDC660B0976B6AFDAE775927B",
+        "parent_update": 10,
+        "version": "RIVAL2_SSL_FOUNDATION_V5_LONG_TRACE_V1"
+      },
+      "format": "RIVAL2_SSL_FOUNDATION_V5_RESTART_V1_SOURCE_TRANSITION",
+      "fresh_ppo_optimizer": true,
+      "loaded_current_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+      "loaded_frozen_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+      "plus_174_descendant_loaded": false,
+      "restart": {
+        "augmented_initial_model_sha256": "A301727E5E8C7CEDD71B72AA8A43CD0E2375ACDD9F3A61C5D2179266169DEF26",
+        "authority_sha256": "AB4E37BE9A4D93EDA7578868B3831B5FFD7EF46A44ADA1EA4FC9CF59399A73C5",
+        "critic_architecture": "RIVAL2_INDEPENDENT_CRITIC_MLP_3X512_V1",
+        "exploration_schedule_offset": 600,
+        "initial_accepted_updates": 0,
+        "initial_trainable_samples": 0,
+        "optimizer_state_entries_at_initialization": 0,
+        "optimizer_state_loaded": false,
+        "source_checkpoint_sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216",
+        "version": "RIVAL2_SSL_FOUNDATION_V5_RESTART_V1"
+      },
+      "schedule_authority_sha256": "9C7FAC5AF55D29032980E8494D33398A561F4048D50F1BF466D2127DABA1C0F6",
+      "source_model_tensor_sha256": "AE36371F012982EA419B6CB06BB67F3DD8480484963F53DAC610EDA14887C07D",
+      "source_optimizer_loaded": false,
+      "source_sha256": "955C93BF538BC913CC2E42F42E3B0EDC4CCDB1065DA9581FB88D84C363B7C216"
+    },
+    "verdict": "PASS"
+  },
+  "rollout_logical_gib": 17.9921875,
+  "scope": "Matched real-input no-step timings; not an end-to-end update speed claim",
+  "source": "G:\\dev\\RivalSim\\checkpoints\\rival2\\ssl_foundation_v5_long_trace_v1\\evaluation_u0050.pt",
+  "source_sha256": "107DAB963AEAA470D9521678E28E4E80DF187DBC985A1B59246E51D4A2E55AEF",
+  "verdict": "PASS",
+  "worlds": 32768
+}

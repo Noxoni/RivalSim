@@ -132,8 +132,9 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
     def active_frozen_forward(self, observation, step_reset):
         """Advance only assigned frozen opponents. Reassignments occur after world resets.
 
-        Unused hidden rows are intentionally not advanced; the existing reset path
-        zeroes both sides before any new assignment can become active.
+        Keep the full recurrent encoder and GRU batch shapes: compacting that path
+        changes numerical rounding. Only the base trunk and actor heads are
+        gathered/scattered. Existing resets zero both sides before reassignment.
         Current-policy sampling still consumes exactly the original full RNG draw.
         """
         rows = self.world_rows[self.opponent_family == OPPONENT_FROZEN_V5]
@@ -142,13 +143,19 @@ class Rival2SslFoundationTrainer(Rival2RecurrentTrainer):
         actors = observation.new_zeros((self.env.num_envs * 2, 13))
         next_hidden = hidden.clone()
         if flat_index.numel():
-            selected, selected_hidden = self.frozen_v5.forward_actor(
-                observation.reshape(-1, self.policy_config.obs_dim).index_select(0, flat_index),
-                hidden.index_select(1, flat_index),
-                reset_before=step_reset.reshape(-1).index_select(0, flat_index),
+            model = self.frozen_v5
+            selected_obs = observation.reshape(-1, self.policy_config.obs_dim).index_select(
+                0, flat_index
             )
+            base_actor = model.actor(model.trunk(selected_obs))
+            encoded = model.context_activation(
+                model.context_encoder(observation.reshape(-1, 1, self.policy_config.obs_dim))
+            )
+            context, next_hidden = model._context_with_resets(
+                encoded, hidden, step_reset.reshape(-1, 1)
+            )
+            selected = base_actor + model.context_actor(context[:, 0].index_select(0, flat_index))
             actors.index_copy_(0, flat_index, selected)
-            next_hidden.index_copy_(1, flat_index, selected_hidden)
         return actors, next_hidden
 
     @torch.no_grad()

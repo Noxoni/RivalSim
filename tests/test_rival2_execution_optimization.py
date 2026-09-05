@@ -251,3 +251,67 @@ def test_execution_rebinding_changes_only_authority_metadata():
         if key not in {"source", "phase_transition"}:
             assert tree_sha256(payload[key]) == tree_sha256(result[key])
     assert result["source"]["sha256"] == "root"
+
+
+def test_optimized_corruption_still_rolls_back_entire_update(device, monkeypatch):
+    from rivalsim import rival2_recurrent_training as training
+
+    model = model_on(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    for parameter in model.parameters():
+        parameter.grad = torch.ones_like(parameter)
+    optimizer.step()
+    optimizer.zero_grad(set_to_none=True)
+    trainer = SimpleNamespace(
+        model=model,
+        optimizer=optimizer,
+        device=device,
+        exploration=SimpleNamespace(distribution_override=None),
+        ppo_config=Rival2PPOConfig(),
+        shuffle_generator=torch.Generator(device=device).manual_seed(829),
+        sequence_microbatch_size=182,
+        optimize_execution=True,
+        accepted_updates_total=50,
+        phase="selfplay",
+        phase_accepted_updates=50,
+        policy_version=50,
+    )
+    if device == "cpu":
+        monkeypatch.setattr(torch.cuda, "get_rng_state", lambda *_: torch.get_rng_state())
+        monkeypatch.setattr(
+            torch.cuda, "set_rng_state", lambda state, *_: torch.set_rng_state(state)
+        )
+    before_model = copy.deepcopy(model.state_dict())
+    before_optimizer = copy.deepcopy(optimizer.state_dict())
+    before_rng = trainer.shuffle_generator.get_state().clone()
+    global_rng = torch.get_rng_state().clone()
+
+    def failing_update(model, optimizer, *args, **kwargs):
+        assert kwargs["optimize_execution"] is True
+        for parameter in model.parameters():
+            parameter.grad = torch.ones_like(parameter)
+        optimizer.step()
+        with torch.no_grad():
+            next(model.parameters()).flatten()[0] = float("nan")
+        torch.rand(1)
+        torch.rand(1, device=device, generator=kwargs["generator"])
+        assert not _finite_parameters_grouped(model)
+        raise Rival2RecurrentPPOCorruption({"reason": "nonfinite_parameter"})
+
+    monkeypatch.setattr(training, "recurrent_ppo_update", failing_update)
+    with pytest.raises(Rival2RecurrentPPOCorruption) as failure:
+        training.Rival2RecurrentTrainer.update(trainer, None)
+    assert failure.value.diagnostics["transactional_rollback_completed"]
+    assert (
+        trainer.accepted_updates_total
+        == trainer.phase_accepted_updates
+        == trainer.policy_version
+        == 50
+    )
+    for name, value in model.state_dict().items():
+        assert torch.equal(value, before_model[name])
+    for key, state in optimizer.state_dict()["state"].items():
+        for field, value in state.items():
+            assert torch.equal(value, before_optimizer["state"][key][field])
+    assert torch.equal(trainer.shuffle_generator.get_state(), before_rng)
+    assert torch.equal(torch.get_rng_state(), global_rng)

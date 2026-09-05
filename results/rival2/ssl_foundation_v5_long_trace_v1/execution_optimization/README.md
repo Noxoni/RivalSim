@@ -18,12 +18,13 @@ The existing monitor is temporarily paused during maintenance.
 - Check every model parameter for nonfinite values at the same post-step boundary
   with one host reduction, instead of one per parameter. Existing corruption
   exceptions and whole-update model/Adam/RNG rollback remain unchanged.
-- Run frozen V5 inference only for the assigned frozen opponent, not all world
-  perspectives. Current policy sampling still draws the original complete batch
-  from the same generator. Unused frozen hidden rows are **not equivalent** to the
-  old unused computation: they are deliberately not advanced. They cannot become
-  active without the existing world reset, which zeroes both sides. Active hidden
-  state, actor outputs, button decisions and reassignment resets are tested.
+- Gather/scatter the frozen V5 **base trunk and actor heads** only for assigned
+  frozen opponents. Preserve the original full-batch recurrent encoder and GRU.
+  Current policy sampling still draws the complete batch from the same generator.
+  If there are no frozen opponents, their inference can be skipped entirely;
+  inactive hidden state cannot become active without the existing world reset,
+  which zeroes both sides. Active hidden state, actor outputs, button decisions
+  and reassignment resets are tested.
 
 The architecture, precision, 32768 worlds, 360-tick recurrent sequences,
 182-sequence effective minibatch, two epochs, 722 Adam steps, learning rates,
@@ -55,3 +56,18 @@ extend the original wall-clock deadline. Commit/push the authority before resume
 
 Production timing and update-50 evaluation results will be recorded separately
 after validation; a clean implementation test is not a gameplay capability claim.
+
+## Rejected compact recurrent path
+
+The first compact-batch candidate failed GPU hidden-state parity, both in focused
+tests and at production scale: `compact_batch_initial_tests.xml` (52 passed,
+one failed) and `compact_batch_initial_scale.json`. Full-scale maximum hidden
+discrepancy was 0.0001582503318786621. No optimizer step or production update ran
+with that candidate. Model/Adam/source stayed unchanged, and the tolerance was
+not relaxed. Keeping just the GRU full-sized still failed the small GPU test
+(maximum hidden discrepancy approximately 0.0000431).
+
+The corrected candidate keeps **both** recurrent encoder and GRU full-sized,
+reducing only base-trunk/head work. The same focused GPU parity test then passed.
+This is narrower than the initial performance proposal, selected to preserve
+numerical behavior rather than silently accept the changed recurrent calculation.
