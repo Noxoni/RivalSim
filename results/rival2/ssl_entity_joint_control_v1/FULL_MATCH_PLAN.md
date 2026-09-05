@@ -55,3 +55,11 @@ The original fixed full-match comparison protocol itself remains unchanged.
 
 This is a small deterministic development comparison, not SSL certification,
 human rank equivalence, or a deployment decision. No online/ranked play occurs.
+
+## Execution completed
+
+The CUDA interface check and fixed twenty-match comparison have now run.
+See `CUDA_INTERFACE_STREAM_RECOVERY.md` for the diagnostic corrections and
+`FULL_MATCH_RESULTS.md` for the completed results. The preparatory/pending
+statements above describe the prospective state when this plan was frozen;
+the protocol itself did not change.
