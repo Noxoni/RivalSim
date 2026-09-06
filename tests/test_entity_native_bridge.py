@@ -103,3 +103,15 @@ def test_script_rejects_wrong_observation_width():
     script = torch.jit.script(EntityNativeActor(EntityJointControlActorCritic().eval()))
     with pytest.raises(torch.jit.Error):
         script(torch.zeros(1, 181), torch.zeros(1, 1, script.hidden_dim))
+
+
+def test_field_availability_complete_and_never_promotes_missing_wheels():
+    from benchmarks.audit_entity_native_inputs import classify
+    from rivalsim.rival2_contracts import OBS_FIELD_NAMES
+    rows = [classify(name) for name in OBS_FIELD_NAMES]
+    assert len(rows) == 182 and all(note for _,note in rows)
+    missing = [name for name in OBS_FIELD_NAMES if classify(name)[0] == "unavailable"]
+    assert len(missing) == 10
+    assert all("wheel_contact" in name or "sticky_ticks" in name for name in missing)
+    with pytest.raises(ValueError):
+        classify("self.new_unclassified_field")

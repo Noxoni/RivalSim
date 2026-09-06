@@ -1,0 +1,76 @@
+{
+  "artifact": {
+    "bytes": 4809176,
+    "path": "checkpoints/rival2/entity_native_bridge_v1/reference600.ts",
+    "sha256": "7C034675349144A4BBEF588F6954CF0D786217164052428777742C57F109EB72"
+  },
+  "checkpoint_unchanged": true,
+  "compatibility": "Scripted using existing repository PyTorch runtime. TorchScript deprecation warning recorded; target RLBot interpreter load still must be tested, not assumed.",
+  "contracts": {
+    "action": {
+      "bernoulli_sampling": false,
+      "distribution": "90-way categorical over pinned standard lookup table",
+      "external_channels": [
+        "throttle",
+        "steer",
+        "pitch",
+        "yaw",
+        "roll",
+        "jump",
+        "boost",
+        "handbrake"
+      ],
+      "gaussian_sampling": false,
+      "ground_or_air_action_mask": false,
+      "hold_ticks": 4,
+      "hybrid_actor_contract_reused": false,
+      "initial_head_projection": "Fixed sigma .65 preference projection of u597 mean/button logits, not exact policy migration.",
+      "physics_hz": 120,
+      "policy_hz": 30,
+      "version": "RIVAL2_ACTION_JOINT90_30HZ_V1"
+    },
+    "action_table_sha256": "5CF46D16243B2E8D1ECDAA584ABA32009B1B4F4D37F78CCDCDF0725F509F5F7C",
+    "hold_ticks": 4,
+    "observation_dim": 182,
+    "observation_schema_sha256": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "physics_hz": 120,
+    "policy_hz": 30
+  },
+  "corpus": {
+    "path": "results/rival2/entity_native_bridge_v1/reference600_native_sequences.npz",
+    "sha256": "1BC2BF218161999A578A8C8D6A6B414243403D14391508F737DEF7ACD43BF75D"
+  },
+  "format": "RIVAL2_ENTITY_JOINT90_NATIVE_BRIDGE_V1",
+  "hidden_shape": [
+    1,
+    1,
+    256
+  ],
+  "installed": false,
+  "live_gameplay": false,
+  "optimizer_steps": 0,
+  "outputs": [
+    "eight_channel_action",
+    "next_hidden",
+    "90_logits"
+  ],
+  "parity": {
+    "all_five_layouts_both_sides": true,
+    "compared_decisions": 6000,
+    "exact_eight_channel_actions": true,
+    "export_hidden_abs": 0.0,
+    "export_logit_abs": 0.0,
+    "gpu_to_cpu_action_differences": 0,
+    "gpu_to_cpu_hidden_abs": 0.005903810262680054,
+    "held_tick_checks": 18000,
+    "packet_domain_parity": false,
+    "real_goal_resets": 17
+  },
+  "source": {
+    "model_sha256": "1219DDFFD91F1E6DDDBE6C3AAACCAEC622CE9EA8D69168BBB4B9588D064F888B",
+    "path": "checkpoints/rival2/direct_skills_v1/plus_000600.pt",
+    "policy_config_sha256": "08CF995A86E73476DF8C8CF13075D188D83B31F9620D78EF0749E3E5061AE6A9",
+    "sha256": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2"
+  },
+  "torch_version": "2.13.0+cu130"
+}

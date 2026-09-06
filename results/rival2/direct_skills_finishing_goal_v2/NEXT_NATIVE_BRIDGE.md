@@ -39,3 +39,17 @@ recurrent runtime independently requires120Hz/hold1 and its exporter uses hybrid
 output slices. Build the correct interface rather than loosening its guard.
 No new PPO campaign is authorized by this note. It is the next no-learning step
 toward the ongoing goal, not cancellation of that goal or a claim it is blocked.
+
+## Preparation progress (2026-09-06)
+
+The inference export, recurrent packet scheduler, native-sequence parity,
+target RLBot interpreter loading and complete source-level input availability
+audit are now implemented. Read `results/rival2/entity_native_bridge_v1/RESULTS.md`
+and its manifests before continuing; do not repeat the completed12000-decision
+capture/export probe or old-loader incompatibility investigation.
+
+Remaining next action is the separately versioned packet integration inside
+RivalSim, with real phase/reset/ordinary-pause handling, interval metadata,
+unavailable-field qualifications and cold warm-up validation. Then freeze the
+bounded native local-game comparison before installation. Neither export has
+been installed; no native match or new learning occurred during preparation.
