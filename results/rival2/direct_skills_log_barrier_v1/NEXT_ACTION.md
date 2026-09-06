@@ -1,5 +1,10 @@
 # COMPLETE: exploration-only arm stopped at +30
 
+UPDATE: the reviewed unchanged-settings continuation is now live under
+results/rival2/direct_skills_exploration_continuation_v1/NEXT_ACTION.md.
+Prospective commit fe93e5cb5e2e67465da7db8a127d715d09f96344 was remotely verified
+before its launch. Follow that new authority; do not restart this old arm.
+
 Worker exited normally at 2026-09-06T16:31:45Z. `completion.json` is generated
 and verified. Final: 0/10 wins, 2 scored /228 conceded, 8.88 touches/minute,
 zero kickoff first contacts. This recovers from +15 but remains worse than the
@@ -20,7 +25,8 @@ pressure or a stuck critic the established cause. If proposing a continuation
 or changed approach, freeze its concrete hypothesis, checkpoint identity,
 budget, comparisons and stop conditions before any new optimizer step. Keep
 the existing checkpoint/evaluation protocol; no large new benchmark suite.
-No new learning authority exists yet.
+A new continuation authority now exists at the path above; this old authority
+remains closed and unchanged.
 
 The saved critic-residual analysis in the learning-diagnostic directory is
 also complete. It shows the previous kickoff child adapted its critic without
