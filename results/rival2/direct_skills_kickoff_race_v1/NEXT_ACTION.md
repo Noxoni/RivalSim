@@ -1,5 +1,10 @@
 # Completed arm: do not restart or extend this directory
 
+SUPERSEDING DEVELOPMENT STATE: the planned learning-signal diagnostic is COMPLETE
+in commitc72e06cf25fd93e176bd54a197a7b590b91c9788. Follow
+results/rival2/direct_skills_log_barrier_v1/NEXT_ACTION.md for the new live
+exploration-only30-update arm. Do not rerun the diagnostic or this completed arm.
+
 The frozen kickoff-outcome arm completed exactly +15 / cumulative665 on
 2026-09-06 at15:52:44Z. Worker43944 exited after full evaluation. Read
 REVIEW_000015.md and completion.json first. This section supersedes the live-run
