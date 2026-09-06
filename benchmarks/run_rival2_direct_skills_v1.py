@@ -65,6 +65,7 @@ CHECKPOINTS = ROOT / "checkpoints/rival2/direct_skills_v1"
 EXTERNAL = Path("G:/dev/RivalSim-runs/direct-skills-v1")
 PARENT = CHECKPOINTS / "parent_entity_000293.pt"
 PARENT_SHA = "01CD1D075C3319D19FF607C0498DFFF6FE6335BE70EEA9708B2679884601DCBE"
+MATCH_RESET_VERSION = "RIVAL2_STANDARD_KICKOFF_CONTACT_CACHE_RESET_V2"
 SOURCES = (
     "benchmarks/run_rival2_direct_skills_v1.py",
     "benchmarks/direct_skills_eval_stream.py",
@@ -529,6 +530,8 @@ def run(args):
                         accepted_updates=offset,
                         checkpoint=identity,
                         authority_sha256=content_hash(authority()),
+                        match_reset_version=MATCH_RESET_VERSION,
+                        runtime_package_sha256=content_hash(package),
                         summary=summarize(raw),
                         raw={k: v.tolist() for k, v in raw.items()},
                         wall_seconds=elapsed,

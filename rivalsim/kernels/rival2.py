@@ -863,6 +863,7 @@ def rival2_interval_reset(
     solver_angular_velocity: wp.array(dtype=wp.vec3),
     pad_cooldown: wp.array(dtype=wp.float32),
     pad_previous_locked_car: wp.array(dtype=wp.int32),
+    wheel_contact: wp.array(dtype=wp.int32),
 ):
     """Apply the accepted v0.4 deterministic kickoff writes to selected worlds."""
 
@@ -893,6 +894,11 @@ def rival2_interval_reset(
         boosting_time[car] = 0.0
         time_since_boosted[car] = 0.0
         on_ground[car] = 1
+        # Teleporting to a new kickoff invalidates the previous episode's
+        # contact cache. Match initial construction and curriculum resets;
+        # the next physics tick computes actual wheel contacts at the spawn.
+        for wheel in range(4):
+            wheel_contact[car * 4 + wheel] = 0
         air_control_disabled[car] = 0
         has_jumped[car] = 0
         is_jumping[car] = 0

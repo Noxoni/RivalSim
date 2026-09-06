@@ -481,6 +481,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 vehicle.solver_angular_velocity,
                 self.boost_pad_cooldown,
                 self.boost_pad_previous_locked_car,
+                vehicle.wheel_contact,
             ],
             device=self.device,
         )
