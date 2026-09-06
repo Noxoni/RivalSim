@@ -89,3 +89,12 @@ See `results/rival2/entity_native_gap_v1/RESULTS.md`; no production fix or learn
 has occurred. Follow its `NEXT_RESET_ALIGNMENT.md` for a separate, explicit,
 qualified research-runtime compatibility test. Do not repeat completed audits
 or silently zero unavailable fields as if they were measured native zeros.
+
+## Superseding native reset V2 launch (2026-09-06)
+
+The separate research runtime and 27 focused tests are published at
+`9c9dffe8b59c6b2bdd909bf672fdc630ea7fd4f8`. The bounded two-team native comparison
+is now launched, with first actual kickoff projection verified in the first120
+flushed decisions. Follow `results/rival2/entity_native_reset_v2/NEXT_ACTION.md`
+and its external campaign state. Do not repeat implementation, restart the run,
+or treat the launch receipt as a completed result. No learning is active.
