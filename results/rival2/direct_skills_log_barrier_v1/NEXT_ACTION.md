@@ -1,4 +1,23 @@
-# Live exploration-only arm: continue unchanged to frozen +30
+# COMPLETE: exploration-only arm stopped at +30
+
+Worker exited normally at 2026-09-06T16:31:45Z. `completion.json` is generated
+and verified. Final: 0/10 wins, 2 scored /228 conceded, 8.88 touches/minute,
+zero kickoff first contacts. This recovers from +15 but remains worse than the
+actual parent. Do not restart, extend, rerun these matches, or promote this arm.
+The final checkpoint SHA is
+16BF2B904785D49E0363B869AF953CFCCC62FF754286A307D386729AC691DDAD.
+
+Next: follow `results/rival2/direct_skills_post_exploration_probe_v1/PLAN.md`
+for one bounded no-optimizer gradient check after the completed package is
+committed, pushed and remotely verified. Do not invent a coefficient change
+from negative gameplay or increased entropy alone. Once its summary exists,
+the probe is complete: do not rerun it. No new learning authority exists yet.
+
+The saved critic-residual analysis in the learning-diagnostic directory is
+also complete. It shows the previous kickoff child adapted its critic without
+improving full matches; do not claim a stuck critic is the proven explanation.
+
+## Historical execution instructions (completed; do not restart)
 
 Prospective commitc72e06cf25fd93e176bd54a197a7b590b91c9788 was pushed and all22
 files remotely read back before launch. Authority:
