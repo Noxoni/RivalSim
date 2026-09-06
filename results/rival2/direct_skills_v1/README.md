@@ -14,8 +14,11 @@ complete:49/64 initially open-net goals,50/64 recovering-defender goals,5/64 set
 keeper goals. Rival gets first contact in all cases. The next bounded
 [650to675 curriculum-only continuation](shooting_progress_v1/README.md) changes
 half of finishing starts to intermediate pressure while retaining all other
-states,rewards,PPO and source650 lineage. Publish/verify its prospective package
-before launch. Evaluation stays on the original cases. Do not repeat completed
+states,rewards,PPO and source650 lineage. Its package was published/verified at
+957a039f634a4b9ab67eab993b9d1a47604ff912 before launch. Actual learner20016 started
+2026-09-06T10:40:00Z; [entry/first-update proof](shooting_progress_v1/ENTRY.md)
+confirms bit-exact source model/Adam/RNG and accepted651. Evaluation stays on
+the original cases. Do not repeat completed
 diagnostics or restart the expired650 runner. The goal remains active and unmet.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
