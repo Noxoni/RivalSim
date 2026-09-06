@@ -130,3 +130,42 @@ The helper and this prospective method must be committed, pushed and read back
 before the first native diagnostic execution. Reward/PPO/model authority remains
 unchanged. If +350 recovers match performance, review the measured evidence before
 interrupting it; the trace is prepared, not an unconditional stop request.
+
+## Follow-up source finding after the +350 review
+
+The +350 score recovered to +250, so the conditional pause did not trigger.
+The next decision is the published +400 review. While the learner continued,
+CPU source inspection identified a specific input-asymmetry candidate:
+
+- `rivalsim/vehicle_state.py:170` initializes individual `wheel_contact` flags
+  to zero for a new world, including the full evaluator's initial kickoff.
+- `rivalsim/ssl_foundation_v1.py:848` explicitly clears them in each curriculum
+  reset. The same reset also clears world-contact flags, wheel/contact counts
+  and handbrake interpolation state.
+- `rivalsim/kernels/rival2.py:803` (`rival2_interval_reset`) does not receive the
+  wheel-contact buffer. The later strict-dash reset reads that buffer; it does
+  not clear it. With no scenario template in `CandidateMatchRunner`, the
+  curriculum's wheel-state clearing is not applied after full-match goals.
+- `Rival2TensorBridge._car_block` reads those individual flags directly into
+  both car observation blocks. The full-match runner builds the reset observation
+  and selects its next action before another physics tick recomputes contacts.
+
+This establishes a source-level difference between the reset paths. It does not
+establish the actual retained values, whether they differ for a particular
+kickoff, whether the deterministic action changes, or how much of the later-goal
+deficit it explains. Other reset state and Nexto cadence remain competing or
+interacting explanations. The existing trace already records wheel flags, both
+182-field observations, hidden state and selected action; no extra native replay
+or instrumentation change was made.
+
+`kickoff_wheel_source_audit.json` binds six inspected source hashes and four
+CPU AST checks. Those checks verify source structure, not native reset correctness
+or behavioral causality. The first inline inspection invocation had a shell-quote
+syntax error before execution; a corrected AST-only invocation produced the
+artifact. Neither invocation constructed a policy, optimizer or simulator.
+
+If the prepared trace is run, explicitly compare wheel flags at age zero for
+matching layout/side starts before attributing differences to hidden memory or
+Nexto. Do not automatically force these flags to zero or one: a correction must
+first establish the intended reset-state semantics and preserve physical validity.
+No training source, reward, physics, checkpoint or evaluation result was changed.
