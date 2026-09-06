@@ -3,6 +3,7 @@ import json
 
 import pytest
 
+from benchmarks import report_rival2_direct_skills as reporting
 from benchmarks.report_rival2_direct_skills import RESULTS, compare_documents, group_start_cases
 
 
@@ -78,3 +79,59 @@ def test_start_groups_reject_invalid_metadata(baseline, fault):
         sides[0] = 2
     with pytest.raises(AssertionError):
         group_start_cases(baseline["skills"]["kickoff"], kickoff, layouts, sides)
+
+
+@pytest.mark.parametrize("grouped", [False, True])
+def test_prior_review_comparison_keeps_root_evidence_and_rebuilds(
+    baseline, tmp_path, monkeypatch, grouped
+):
+    monkeypatch.setattr(reporting, "RESULTS", tmp_path)
+    for offset in (0, 50, 100):
+        document = copy.deepcopy(baseline)
+        document["accepted_updates"] = offset
+        (tmp_path / f"evaluation_{offset:06d}.json").write_text(json.dumps(document))
+    build = reporting.start_groups if grouped else reporting.main
+    prefix = "start_groups" if grouped else "comparison"
+    build(100)
+    root_output = tmp_path / f"{prefix}_000100.json"
+    original = root_output.read_bytes()
+    build(100, 50)
+    pair_output = tmp_path / f"{prefix}_000050_to_000100.json"
+    pair = json.loads(pair_output.read_text())
+    assert pair["baseline_updates"] == 50 and pair["accepted_updates"] == 100
+    assert set(pair["sources"]) == {"evaluation_000050.json", "evaluation_000100.json"}
+    first = pair_output.read_bytes()
+    build(100, 50)
+    assert pair_output.read_bytes() == first
+    assert root_output.read_bytes() == original
+    assert pair["optimizer_steps"] == pair["policy_evaluations_run"] == 0
+
+
+@pytest.mark.parametrize("baseline_offset,offset", [(-1, 100), (100, 50)])
+def test_prior_review_rejects_invalid_offset_order(baseline_offset, offset):
+    with pytest.raises(AssertionError):
+        reporting.load_pair(offset, baseline_offset)
+
+
+def test_prior_review_rejects_mislabeled_source(baseline, tmp_path, monkeypatch):
+    monkeypatch.setattr(reporting, "RESULTS", tmp_path)
+    for offset in (50, 100):
+        (tmp_path / f"evaluation_{offset:06d}.json").write_text(json.dumps(baseline))
+    with pytest.raises(AssertionError):
+        reporting.load_pair(100, 50)
+
+
+def test_prior_review_reports_regression_even_when_root_improved(baseline):
+    previous, candidate = copy.deepcopy(baseline), copy.deepcopy(baseline)
+    previous["accepted_updates"], candidate["accepted_updates"] = 50, 100
+    for document, gains in ((previous, 2), (candidate, 1)):
+        skill = document["skills"]["finishing"]
+        for _ in range(gains):
+            i = skill["raw"]["concedes"].index(1)
+            skill["raw"]["concedes"][i], skill["raw"]["goals"][i] = 0, 1
+            skill["goals_against"] -= 1
+            skill["goals_for"] += 1
+    assert compare_documents(baseline, candidate)["finishing"]["goals_for"]["change"] == 1
+    row = compare_documents(previous, candidate)["finishing"]
+    assert row["goals_for"]["change"] == -1
+    assert row["paired_goal_outcome"] == {"improved": 0, "worsened": 1, "unchanged": 63}

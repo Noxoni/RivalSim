@@ -81,13 +81,24 @@ def compare_documents(baseline, candidate):
     return report
 
 
-def main(offset):
-    paths = [RESULTS / f"evaluation_{i:06d}.json" for i in (0, offset)]
+def load_pair(offset, baseline_offset):
+    assert 0 <= baseline_offset <= offset
+    paths = [RESULTS / f"evaluation_{i:06d}.json" for i in (baseline_offset, offset)]
     docs = [json.loads(p.read_text()) for p in paths]
-    assert docs[1]["accepted_updates"] == offset
+    assert [d["accepted_updates"] for d in docs] == [baseline_offset, offset]
+    return paths, docs
+
+
+def output_path(prefix, offset, baseline_offset):
+    suffix = f"{offset:06d}" if baseline_offset == 0 else f"{baseline_offset:06d}_to_{offset:06d}"
+    return RESULTS / f"{prefix}_{suffix}.json"
+
+
+def main(offset, baseline_offset=0):
+    paths, docs = load_pair(offset, baseline_offset)
     report = dict(
         accepted_updates=offset,
-        baseline_updates=0,
+        baseline_updates=baseline_offset,
         sources={
             p.name: hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest().upper()
             for p in paths
@@ -102,7 +113,7 @@ def main(offset):
         optimizer_steps=0,
         policy_evaluations_run=0,
     )
-    path = RESULTS / f"comparison_{offset:06d}.json"
+    path = output_path("comparison", offset, baseline_offset)
     if path.exists():
         assert json.loads(path.read_text()) == report
     else:
@@ -143,15 +154,13 @@ def group_start_cases(item, kickoff, layouts, sides):
     }
 
 
-def start_groups(offset):
+def start_groups(offset, baseline_offset=0):
     # The imported generator constructs NumPy initial states only. No simulator,
     # policy, optimizer or CUDA rollout is constructed or evaluated here.
     from rivalsim.direct_skills_v1 import NAMES, SEED, scenarios
     from rivalsim.fresh_ground_30hz import scenario_hash
 
-    paths = [RESULTS / f"evaluation_{i:06d}.json" for i in (0, offset)]
-    docs = [json.loads(p.read_text()) for p in paths]
-    assert docs[1]["accepted_updates"] == offset
+    paths, docs = load_pair(offset, baseline_offset)
     compare_documents(*docs)
     families = {}
     for family in (0, 4):
@@ -169,7 +178,7 @@ def start_groups(offset):
         )
     result = dict(
         accepted_updates=offset,
-        baseline_updates=0,
+        baseline_updates=baseline_offset,
         authority_sha256=docs[0]["authority_sha256"],
         checkpoints=[d["checkpoint"] for d in docs],
         sources={
@@ -185,7 +194,7 @@ def start_groups(offset):
         policy_evaluations_run=0,
         optimizer_steps=0,
     )
-    output = RESULTS / f"start_groups_{offset:06d}.json"
+    output = output_path("start_groups", offset, baseline_offset)
     if output.exists():
         assert json.loads(output.read_text()) == result
     else:
@@ -196,6 +205,12 @@ def start_groups(offset):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--update", required=True, type=int)
+    parser.add_argument(
+        "--baseline", default=0, type=int, help="Completed comparison offset (default 0)"
+    )
     parser.add_argument("--start-groups", action="store_true")
     args = parser.parse_args()
-    start_groups(args.update) if args.start_groups else main(args.update)
+    if args.start_groups:
+        start_groups(args.update, args.baseline)
+    else:
+        main(args.update, args.baseline)

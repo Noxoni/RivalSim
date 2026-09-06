@@ -8,6 +8,10 @@ case scores and control remain weak. Continue unchanged to the next scheduled
 skill/full-match review at +100. This is progress, not an SSL/promotion verdict.
 Use `benchmarks/report_rival2_direct_skills.py --update N`, including
 `--start-groups`, after the corresponding completed evaluation/checkpoint audit.
+Also compare each new review with the previous completed review, for example
+`--update 100 --baseline 50` (with and without `--start-groups`). These CPU-only
+reports use the saved outcomes and preserve the separate baseline-zero reports;
+they do not run an extra evaluation or change training/selection semantics.
 
 The user explicitly superseded the potential-only continuation on September 6,
 2026 (UTC). The old learner exited cleanly at entity **+293**, 52,150 cumulative
