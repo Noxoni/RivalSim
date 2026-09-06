@@ -1,5 +1,10 @@
 # Current handoff: completed block, inspect Rival's failed kickoff approach
 
+SUPERSEDED CURRENT ACTION: the kickoff learning arm has now been implemented,
+frozen, published and launched. Follow
+`results/rival2/direct_skills_kickoff_race_v1/NEXT_ACTION.md` and its live external
+state. Do not reimplement or relaunch it from the historical instructions below.
+
 The25-update block and both corrected-opponent evaluations are COMPLETE.
 Worker43740 exited normally after `complete_review` at2026-09-06T15:14:24Z.
 Do not resume this completed directory, remove STOP markers, or interpret the
