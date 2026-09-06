@@ -169,3 +169,12 @@ directory passed all 22 without source changes. Both JUnit files are retained:
 checkpoint or evaluation failure and did not require a training restart.
 The failed-test XML retains pytest's original traceback whitespace; the staged
 whitespace check excludes only that raw generated failure artifact.
+
+Subsequent CPU-only reduction narrowed a transfer question: Rival scored eight
+of ten opening goals, but only 21 of the 216 goals after the first goal in each
+match. At +250 those figures were eight opening goals and 36 of 217 later goals.
+`learning_transfer_review_000300.json` preserves exact partitions and action/reward
+accounting. `KICKOFF_RESET_TRACE_DIAGNOSTIC.md` prospectively specifies a bounded
+read-only input/reset/opponent-cadence trace if the +350 review warrants the
+already described pause. This preparation is not a native replay result or an
+assertion of a reset bug; no live training source or setting was changed.
