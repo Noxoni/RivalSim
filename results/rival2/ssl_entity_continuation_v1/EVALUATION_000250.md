@@ -54,8 +54,9 @@ finishing time-limit endings. These are derived counts, not an extra recorded fi
 
 ## Interpretation and next check
 
-No Nexto scoring breakthrough is established. The last completed full-match
-comparison is still +200 versus +100 (zero Rival goals/wins, fewer concessions).
+No Nexto scoring breakthrough is established. At the time of this short report,
+the last full-match comparison was +200 versus +100 (zero Rival goals/wins,
+fewer concessions); the completed follow-up is appended below.
 The mixed +250 short result warrants a bounded natural-match follow-up using the
 same ten-match method. `FULL_MATCH_000250_PLAN.md` fixes +250 versus already recorded
 +200 before any +250 full-match inference. This is development diagnosis, not a
@@ -65,3 +66,12 @@ Training update times ranged from 35.7 to 169.1 seconds in this interval. Later
 updates slowed while the GPU was shared with other applications. Contention is a
 plausible contributor, not a controlled causal benchmark; no applications were
 stopped or resource/capability settings changed. All scheduled updates completed.
+
+## Follow-up result
+
+The separately published natural-match follow-up is now complete. See
+`FULL_MATCH_000250.md` and `full_match_000250_integrity.json`: contacts increased
+238 to 302, but concessions increased 243 to 317 and same-player follow-ups fell
+22/237 to 6/301. Rival scored zero and lost all ten. This is a gameplay regression
+relative to +200, not a positive result inferred from fewer scenario no-touch
+endings. The original short-evaluation measurements above remain unchanged.

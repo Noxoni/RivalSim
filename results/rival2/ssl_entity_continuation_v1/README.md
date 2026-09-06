@@ -139,3 +139,9 @@ must not compete with a live GPU learner.
 The monitor reports only new evaluation results, material findings or actionable
 failures. Training/serialization PASS, scenario improvement, natural match
 strength, deployment and SSL capability remain separate verdicts.
+
+Latest published fixed-boundary findings are in `EVALUATION_000250.md` and
+`FULL_MATCH_000250.md`: the +250 natural Nexto comparison regressed from +200
+despite more contacts. The latter also records the exact +270 same-Adam resume
+and the next fixed +300 natural-match diagnostic; it is not a new training
+authority or an automatic checkpoint-selection rule.
