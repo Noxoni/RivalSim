@@ -1,0 +1,39 @@
+{
+  "arms": [
+    [
+      "baseline",
+      false
+    ],
+    [
+      "native_timing_and_table",
+      true
+    ]
+  ],
+  "checkpoint": "checkpoints\\rival2\\direct_skills_v1\\plus_000600.pt",
+  "checkpoint_sha256": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2",
+  "intervention": "Exact same diagnostic timing/table arm as completed20s; no new opponent settings",
+  "limitations": "Neural compute/emission and kickoff yaw only. Other Nexto admission, observation construction, argmax/RNG, native countdown timing and physical differences remain unchanged. Not full-native parity or SSL proof.",
+  "optimizer_steps": 0,
+  "physics_hz": 120,
+  "prior_trace_check": "First2400ticks all Rival and Nexto controls and600pose rows must match respective prior arms exactly",
+  "rival_policy_hz": 30,
+  "sources": {
+    "benchmarks/compare_nexto_native_full_match.py": "6529E775112DAE885C17F63270DB4250AC0659D215E1FE95AF345665E00F9ABF",
+    "benchmarks/compare_nexto_native_integration.py": "ED946C9F0BCAA2A789EDC3B272993603F05CAB7745C997C4F3187F53D2B29BB6",
+    "benchmarks/direct_skills_eval_stream.py": "8661C52AB994665C0ADA28887B9959D63201423FC35B0DA4FFE49D6011FAFBB2",
+    "benchmarks/evaluate_rival2_ssl_entity_full_match.py": "B1AEF301DB6B3BB21D980A9589E51BE617CB9D684A2D98B1E68A85F72F490CD8",
+    "benchmarks/probe_nexto_native_timing.py": "E1079AA7C4253568AF56CF8D6AC2544811C989DCFC81C163F056D083A50DE4CC",
+    "results/rival2/native_nexto_integration_audit_v1/kickoff_tables.npz": "4EF73F8AF0215B864EDDC0B4EEA0A6D6DB6086FD1AE90509E449905AA72C620B",
+    "results/rival2/nexto_native_causal_v1/baseline.npz": "ADBBFD66FA8EDD2A43B1F72132F0D9010E3FDACFC209408475E0BAB725C9DE63",
+    "results/rival2/nexto_native_causal_v1/results.json": "9FF810809B122A259905601CF6B5CB38C6E95BE482B06887F56B469E36F547BB",
+    "results/rival2/nexto_native_causal_v1/table_and_timing.npz": "B7ADC4632A2DDEC9766015F7EE33A6CF4AFEFCE41A5D2C4D57B949C0B5CF2C03",
+    "rivalsim/full_match.py": "55BA34D717A7053EDF2CC1A1970B9FA3F59B6E8B8466C2BD79BB947B58184FC3",
+    "rivalsim/rival2_env.py": "0E7F0895E3D7D3FD669E97124257654F1114A4DA0F74AA2C545FCA80CDC55E99",
+    "third_party/nexto/adapter.py": "5A99F6AAD771029A4F68A77A643B5F508644F8605B7AEE990F5DE92B3D26AC06"
+  },
+  "start": "Same fixed five layouts on each side and seed as the completed 20s comparison",
+  "stop": "Full300seconds of simulator regulation; no overtime extension, ties explicitly unresolved",
+  "telemetry": "Existing full-match score, touches and physical outcomes. No reward modification or candidate selection",
+  "ticks": 36000,
+  "worlds": 10
+}
