@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="10" time="2.293" timestamp="2026-09-06T10:11:58.942125-04:00" hostname="Brick"><testcase classname="tests.test_nexto_native_v5" name="test_oracle_uses_bound_installed_methods_and_actual_literal" time="0.010" /><testcase classname="tests.test_nexto_native_v5" name="test_batched_controller_matches_native_with_inactive_worlds_and_resume[None]" time="0.002"><failure message="ValueError: player indices must be device int64 world indices">resume_at = None
+
+    @pytest.mark.parametrize("resume_at",[None,17,87,255])
+    def test_batched_controller_matches_native_with_inactive_worlds_and_resume(resume_at):
+&gt;       assert replay_oracle(resume_at=resume_at)==4096
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_nexto_native_v5.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_nexto_native_v5.py:37: in replay_oracle
+    obj.set_player_index(to("side"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;third_party.nexto.native_v5.NativeNextoController object at 0x00000258839196A0&gt;
+value = tensor([0, 1, 0, 1, 0, 1, 0, 1], dtype=torch.int32)
+
+    def set_player_index(self, value):
+        if value.shape != self.player_index.shape or value.device != self.device or value.dtype != torch.long:
+&gt;           raise ValueError("player indices must be device int64 world indices")
+E           ValueError: player indices must be device int64 world indices
+
+third_party\nexto\native_v5.py:65: ValueError</failure></testcase><testcase classname="tests.test_nexto_native_v5" name="test_batched_controller_matches_native_with_inactive_worlds_and_resume[17]" time="0.001"><failure message="ValueError: player indices must be device int64 world indices">resume_at = 17
+
+    @pytest.mark.parametrize("resume_at",[None,17,87,255])
+    def test_batched_controller_matches_native_with_inactive_worlds_and_resume(resume_at):
+&gt;       assert replay_oracle(resume_at=resume_at)==4096
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_nexto_native_v5.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_nexto_native_v5.py:37: in replay_oracle
+    obj.set_player_index(to("side"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;third_party.nexto.native_v5.NativeNextoController object at 0x0000025883FB0690&gt;
+value = tensor([0, 1, 0, 1, 0, 1, 0, 1], dtype=torch.int32)
+
+    def set_player_index(self, value):
+        if value.shape != self.player_index.shape or value.device != self.device or value.dtype != torch.long:
+&gt;           raise ValueError("player indices must be device int64 world indices")
+E           ValueError: player indices must be device int64 world indices
+
+third_party\nexto\native_v5.py:65: ValueError</failure></testcase><testcase classname="tests.test_nexto_native_v5" name="test_batched_controller_matches_native_with_inactive_worlds_and_resume[87]" time="0.001"><failure message="ValueError: player indices must be device int64 world indices">resume_at = 87
+
+    @pytest.mark.parametrize("resume_at",[None,17,87,255])
+    def test_batched_controller_matches_native_with_inactive_worlds_and_resume(resume_at):
+&gt;       assert replay_oracle(resume_at=resume_at)==4096
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_nexto_native_v5.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_nexto_native_v5.py:37: in replay_oracle
+    obj.set_player_index(to("side"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;third_party.nexto.native_v5.NativeNextoController object at 0x0000025883FB0A50&gt;
+value = tensor([0, 1, 0, 1, 0, 1, 0, 1], dtype=torch.int32)
+
+    def set_player_index(self, value):
+        if value.shape != self.player_index.shape or value.device != self.device or value.dtype != torch.long:
+&gt;           raise ValueError("player indices must be device int64 world indices")
+E           ValueError: player indices must be device int64 world indices
+
+third_party\nexto\native_v5.py:65: ValueError</failure></testcase><testcase classname="tests.test_nexto_native_v5" name="test_batched_controller_matches_native_with_inactive_worlds_and_resume[255]" time="0.001"><failure message="ValueError: player indices must be device int64 world indices">resume_at = 255
+
+    @pytest.mark.parametrize("resume_at",[None,17,87,255])
+    def test_batched_controller_matches_native_with_inactive_worlds_and_resume(resume_at):
+&gt;       assert replay_oracle(resume_at=resume_at)==4096
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_nexto_native_v5.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_nexto_native_v5.py:37: in replay_oracle
+    obj.set_player_index(to("side"))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;third_party.nexto.native_v5.NativeNextoController object at 0x0000025883ADE780&gt;
+value = tensor([0, 1, 0, 1, 0, 1, 0, 1], dtype=torch.int32)
+
+    def set_player_index(self, value):
+        if value.shape != self.player_index.shape or value.device != self.device or value.dtype != torch.long:
+&gt;           raise ValueError("player indices must be device int64 world indices")
+E           ValueError: player indices must be device int64 world indices
+
+third_party\nexto\native_v5.py:65: ValueError</failure></testcase><testcase classname="tests.test_nexto_native_v5" name="test_invalid_checkpoint_rejected_before_mutation" time="0.433" /><testcase classname="tests.test_nexto_native_v5" name="test_kickoff_notification_does_not_reset_neural_clock_or_action" time="0.001" /><testcase classname="tests.test_nexto_native_v5" name="test_sampling_and_rng_checkpoint_reproduce_selected_subset[native_v5]" time="0.006" /><testcase classname="tests.test_nexto_native_v5" name="test_sampling_and_rng_checkpoint_reproduce_selected_subset[deterministic_argmax]" time="0.002" /><testcase classname="tests.test_nexto_native_v5" name="test_nonfinite_nexto_outputs_rejected" time="0.001" /></testsuite></testsuites>
