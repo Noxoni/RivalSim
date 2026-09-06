@@ -79,3 +79,18 @@ from actual gameplay evidence; no automatic extension, deployment or SSL claim.
 Closeout implementation and adjacent terminal checks: 35 focused tests passed.
 Evidence: closeout_tests.xml. This is reporting-only code, not a change to the
 frozen training source package, reward, loss, or stopping boundary.
+
+After that finalizer has completed, generate the final task-window breakdown:
+
+```powershell
+.venv\Scripts\python.exe -B benchmarks/summarize_direct_skills_task_progress_750.py
+```
+
+This standard-library-only reducer requires the closed750 completion artifact
+and its curve hash. It combines the immutable original30-update prefix and
+continuation70 prefix into ten nonoverlapping windows. It creates
+task_progress_750.json and TASK_PROGRESS_750.md without a model, new rollout,
+evaluation or optimizer. Use it alongside the full-match results, not instead
+of them. Existing through700 output rebuilt byte-identically;20 focused tests
+passed (task_progress_750_tests.xml). Do not attempt this final reduction while
+the training arm is still active or rerun prior GPU probes.

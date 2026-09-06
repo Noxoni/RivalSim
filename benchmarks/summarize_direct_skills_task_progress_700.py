@@ -40,9 +40,9 @@ def aggregate(records):
                                              if totals['episode_endings'] else None))
 
 
-def summarize():
+def summarize(*, sources=SOURCES, version='RIVAL2_TASK_PROGRESS_THROUGH_700_V1'):
     windows = []
-    for path, digest, parent, count in SOURCES:
+    for path, digest, parent, count in sources:
         raw = (ROOT/path).read_bytes()
         if hashlib.sha256(raw).hexdigest().upper() != digest:
             raise ValueError('Changed immutable source: '+path)
@@ -69,7 +69,7 @@ def summarize():
                 source_path=path, source_sha256=digest,
                 roles={role: aggregate([r['training']['by_reward_role_and_opponent'][role] for r in block])
                        for role in block[0]['training']['by_reward_role_and_opponent']}))
-    return dict(version='RIVAL2_TASK_PROGRESS_THROUGH_700_V1', windows=windows,
+    return dict(version=version, windows=windows,
         optimizer_steps=0, new_rollouts=0, model_loaded=False,
         semantics=dict(exposure='30 Hz learner decisions; rates use pooled sums, not averages of rates.',
             outcomes='Goals/concedes native. Finishing success is exactly scored goals, not on-target projection.',
