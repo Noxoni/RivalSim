@@ -1,6 +1,15 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
+Latest completed review: [offset +675](EVALUATION_000675.md). The bounded shooting
+curriculum block completed cleanly. Original finishing stays5/64; ten full Nexto
+matches worsen42/139 ->37/168 goals,0/10wins,9/10 cases worse than650. Follow-ups
+39.21% ->31.22%. Do not automatically extend a non-transferring curriculum.
+The current675 checkpoint/model/Adam/RNG and full evidence are preserved. Next:
+[bounded corrected-runtime kickoff continuity tap](kickoff_continuity_000675/AUTHORITY.md),
+no learning, with exact original fullmatch replay required. No new reset defect
+is claimed from scores alone. Goal active and unmet; current runner has exited.
+
+Previous completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
 matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
 Repeat-contact fraction rose29.3% to39.2%, but scoring fell and finishing remains
 5/64. These are not SSL-level results. The learner stopped cleanly at650.
