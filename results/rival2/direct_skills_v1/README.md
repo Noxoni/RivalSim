@@ -9,10 +9,14 @@ is now complete: three seeds average37/146.667 goals,0wins,649contacts. Every
 sampled seed scores less and concedes more than greedy650. Finishing is only
 5-8 goals/64 despite52-54 on-target proxies. Sampling does not rescue this model.
 No weights, reward, PPO or deployment changed; the650 checkpoint is preserved.
-Next, use a bounded shooting-difficulty comparison to distinguish finishing an
-accessible shot from beating a recovering or established keeper, then choose a
-small prospective curriculum correction. Do not repeat completed diagnostics or
-launch another unchanged block. The ongoing goal is active, not blocked.
+The [shooting-pressure comparison](shooting_diagnostic_000650/RESULTS.md) is also
+complete:49/64 initially open-net goals,50/64 recovering-defender goals,5/64 set
+keeper goals. Rival gets first contact in all cases. The next bounded
+[650to675 curriculum-only continuation](shooting_progress_v1/README.md) changes
+half of finishing starts to intermediate pressure while retaining all other
+states,rewards,PPO and source650 lineage. Publish/verify its prospective package
+before launch. Evaluation stays on the original cases. Do not repeat completed
+diagnostics or restart the expired650 runner. The goal remains active and unmet.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
 reward/GAE/recurrent replay and found narrow exploration. Simple critic
