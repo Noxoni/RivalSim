@@ -146,3 +146,10 @@ It identified inconsistent contact placement and goalkeeper/follow-up outcomes,
 not a missing-goal/reset fault. Continue from the preserved +250 checkpoint
 unchanged toward +300; details and exact trajectory evidence are in
 `FINISHING_DIAGNOSIS_000250.md`.
+
+Resume completed at 05:42:27 UTC, with actual learner PID 1200 (launcher 25920).
+The pre-update restored checkpoint matched +250 model, Adam, counters, contracts
+and action/shuffle/CPU/CUDA RNG exactly. `resume_after_diagnosis_000250.json`
+records those fourteen comparisons. Update +251 was accepted with no current
+stderr or KL rejection. Initial post-resume telemetry starts fresh episodes and
+must not be misreported as an instantaneous policy improvement.
