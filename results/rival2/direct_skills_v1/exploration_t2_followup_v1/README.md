@@ -51,3 +51,27 @@ block remains a development experiment, not a promise to beat Nexto.
 Monitoring uses the existing task, not a duplicate. The OpenAI Docs workflow
 informed the update and preservation of the user's new-results-only reporting
 preference; see [official scheduled-task guidance](https://learn.chatgpt.com/docs/automations).
+
+## Actual launch and first accepted step
+
+Prospective package commit `78deefac82a034647c42f12cd5aef1668420788f` was pushed
+and all8files remotely read back before launch. The recognized agent600STOP
+was moved to `STOP.review600.completed`; no user/unknown stop was cleared.
+Actual learner PID1952 (launcher38724) started2026-09-06T09:43:00Z. Inspect the
+live process rather than treating this historical PID as ongoing proof.
+
+This entry snapshot was captured before optimization and independently checked
+against source600: exact model,Adam,and allfour RNG tensor identities; parent
+binding and137558Adam counter verified. Nine checks pass in `live_entry_000600.json`.
+Preserved `checkpoints/rival2/direct_skills_v1/exploration_entry_000600.pt`, SHA256
+`FB92E5A49F37A4D27486F7755283FEA35324F437BF366A0DC12E6613AB4D01F1`.
+
+First accepted601 has136 newAdam steps,137694cumulative,2658631680direct learner
+decisions. Seventeen CPU integrity checks pass. Source reward/contracts and
+optimizer groups unchanged, finite model/Adam, one-thirdNexto samples and correct
+new/prior authority bindings. Preserved
+`checkpoints/rival2/direct_skills_v1/exploration_resume_000601.pt`, SHA256
+`B70141EB185AC457AD21708BC57C547602A150D19500A96128F6464A811EEDF3`.
+See `resume_accepted_000601.json` and immutable601curve. No additional optimizer
+step or evaluator was started for these audits. First fresh-rollout counts
+remain unsuitable for claiming immediate gameplay gains.
