@@ -93,7 +93,24 @@ class RecurrentPacketScheduler:
         self.identity = None
         self.was_active = False
         self.stats = dict(packets=0, decisions=0, held=0, duplicates=0, out_of_order=0,
-                          missed_ticks=0, skipped_decisions=0, resets=0)
+                          missed_ticks=0, skipped_decisions=0, resets=0, paused_frames=0)
+
+    def pause(self, frame: int) -> None:
+        """Suspend the decision clock, not the episode/memory, during a real pause.
+
+        No observation, recurrent advance, event/timer update or controller
+        mutation. Caller returns neutral controls while the game is paused.
+        Frame-number advance in a paused game is not active physics exposure.
+        """
+        if not isinstance(frame, int) or frame < 0:
+            raise ValueError("Need nonnegative frame")
+        if self.last_frame is None or frame <= self.last_frame:
+            return
+        delta = frame - self.last_frame
+        self.stats["paused_frames"] += delta
+        self.last_frame = frame
+        if self.last_decision is not None:
+            self.last_decision += delta
 
     def step(self, *, frame: int, identity: Hashable, active: bool,
              observation: Callable[[], torch.Tensor],

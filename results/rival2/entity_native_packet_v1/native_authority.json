@@ -1,0 +1,43 @@
+{
+  "cases": [
+    "reference600_blue",
+    "finishing650_orange",
+    "finishing650_blue",
+    "reference600_orange"
+  ],
+  "cold_warmup": true,
+  "deterministic": true,
+  "hold_ticks": 4,
+  "installation": "Separate bot definitions/run commands in RivalSim repo; old installed Rival/Nexto sources/configs unchanged.",
+  "limits": {
+    "case_wall_seconds": 600,
+    "initial_start_seconds": 150,
+    "overtime_seconds": 120
+  },
+  "method": "Four standard five-minute native local RLBot Soccar matches, each exact candidate on each side. No ranking claim, no optimizer, no checkpoint selection during testing.",
+  "nexto": {
+    "config": "C:\\Users\\patri\\AppData\\Local\\RLBot5\\bots\\bob_build_x86_64-windows\\Nexto\\bot.toml",
+    "config_sha256": "0E4818A04E2364A6B8C84B38BE24DB8F6856F7377F7CF3B802FDFAC4B526828F",
+    "executable_sha256": "6371A5B9DD740AEA858D86532F928E0FDB13BF387D8379F76CCD679C9B33E845"
+  },
+  "observation_qualification": "39direct104derived29approximate10unavailable; explicit wheel/sticky proxies, no feature masking. Gaps logged; packet-derived inputs not claimed simulator-exact.",
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "sources": {
+    "benchmarks/run_entity_native_comparison.py": "8B86FF1B84A8052F875CBD2C93EB94E8A4F6E2717E9A92D379A4B67A813F0A74",
+    "deployment/entity_native_v1/bot.py": "7A0F4266F601E548E04DD4869215551E3595F49DB1299BB72E74D58526570FB4",
+    "deployment/entity_native_v1/finishing650_blue.toml": "C09DE70F37EF0559657596BBFAA66E9D09903D51CF0A33EFA008DF86BABE650C",
+    "deployment/entity_native_v1/finishing650_orange.toml": "7DE9B922FEC86E120B7AB4A14034576BD333BCD76F90E79E406D8589921536D8",
+    "deployment/entity_native_v1/packet_observation.py": "3A53CDEE6829AC8C748CD9F69ED0FA2E28D8E499B8A338FD7FB82EC23D556813",
+    "deployment/entity_native_v1/reference600_blue.toml": "899D0B6A9D5147582C50AEF7574F5F435B515014EAC409ECA11C512C8993FAD0",
+    "deployment/entity_native_v1/reference600_orange.toml": "0856B94B51E423A0C2A602DE3F04109479BD54B92E75C617675EEA5F2B9E4FD0",
+    "deployment/entity_native_v1/runtime.py": "A157A3754930B6BCA8CB899EA73A4FFEE2AFC98F6A3DA77809266D20B5721BB5",
+    "results/rival2/entity_native_packet_v1/captured_state_mapping.json": "D05A56EA4FD5F6DC1247E546578A11D9D77AA66976BA008B76204CC183B28980",
+    "results/rival2/entity_native_packet_v1/finishing650_manifest.json": "B5FADE053E9E99575D7BD623D8EC64082BE407D0E6EF422D3F0DC9AA5B2F43B8",
+    "results/rival2/entity_native_packet_v1/reference600_manifest.json": "DAD2B5FDC39DC76CFB5ACECB22A980BB241E7D9170563B7E42CB101D9B6653D2",
+    "results/rival2/entity_native_packet_v1/tests.xml": "1EFF4A60905388C064863BED4AD5D49FA4CA17FBA8F68C619A350C781FB298A1",
+    "rivalsim/entity_native_bridge.py": "C91E52104BBEB3BA6F8C21FE87DEE4499AD8BF2D9FF2BA8793311D3E13ABC201"
+  },
+  "stop": "User STOP, native runtime nonfinite/error or stalled packet stream. Do not retrain/modify weights or reward. Completed native match evidence is separate from simulator results.",
+  "version": "RIVAL2_ENTITY_NATIVE_LOCAL_COMPARISON_V1"
+}
