@@ -4,10 +4,15 @@ Latest completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
 matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
 Repeat-contact fraction rose29.3% to39.2%, but scoring fell and finishing remains
 5/64. These are not SSL-level results. The learner stopped cleanly at650.
-Before another training block, execute the prospectively frozen read-only
-[sampling-versus-greedy diagnostic](sampling_diagnostic_000650/README.md).
-Sampled training outcomes improved while greedy scoring fell; that discrepancy
-needs measurement, not an assumed explanation or another blind continuation.
+The frozen [sampling-versus-greedy diagnostic](sampling_diagnostic_000650/RESULTS.md)
+is now complete: three seeds average37/146.667 goals,0wins,649contacts. Every
+sampled seed scores less and concedes more than greedy650. Finishing is only
+5-8 goals/64 despite52-54 on-target proxies. Sampling does not rescue this model.
+No weights, reward, PPO or deployment changed; the650 checkpoint is preserved.
+Next, use a bounded shooting-difficulty comparison to distinguish finishing an
+accessible shot from beating a recovering or established keeper, then choose a
+small prospective curriculum correction. Do not repeat completed diagnostics or
+launch another unchanged block. The ongoing goal is active, not blocked.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
 reward/GAE/recurrent replay and found narrow exploration. Simple critic
