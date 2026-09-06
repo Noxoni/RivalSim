@@ -84,8 +84,19 @@ def prepare():
 def verify():
     verify_evaluator()
     frozen = json.loads((OUT / "protocol.json").read_text())
-    assert frozen == json.loads(json.dumps(protocol()))
-    for p in (*SOURCES, (OUT / "protocol.json").relative_to(ROOT).as_posix()):
+    current = json.loads(json.dumps(protocol()))
+    recovery_path = OUT / "serialization_recovery.json"
+    extra = []
+    if recovery_path.exists():
+        recovery = json.loads(recovery_path.read_text())
+        assert recovery["original_protocol_sha256"] == sha(OUT / "protocol.json")
+        assert recovery["capture_semantics_changed"] is False
+        assert recovery["failed_archive_sha256"] == sha(OUT / "parent650.npz")
+        for p, h in recovery["replacement_sources"].items():
+            frozen["sources"][p] = h
+        extra.append(recovery_path.relative_to(ROOT).as_posix())
+    assert frozen == current
+    for p in (*SOURCES, (OUT / "protocol.json").relative_to(ROOT).as_posix(), *extra):
         remote = subprocess.check_output(["git", "show", "origin/main:" + p], cwd=ROOT)
         assert remote.replace(b"\r\n", b"\n") == (ROOT / p).read_bytes().replace(b"\r\n", b"\n"), p
     for case in CASES.values():
@@ -195,7 +206,7 @@ def physical_summary(data, sides, layouts):
             along = np.sum(vel * diff, axis=-1) / np.maximum(distance, 1e-12)
             c = controls[:, world, car]
             mask = race
-            measurements = dict(car=car, is_rival=car == side,
+            measurements = dict(car=car, is_rival=bool(car == side),
                 first_action=c[0].tolist(),
                 first_jump_tick=first_index((c[:, 5] != 0) & valid),
                 first_boost_tick=first_index((c[:, 6] != 0) & valid),
@@ -238,12 +249,18 @@ def goal_prefix(raw, full, ticks=TICKS):
 
 
 @torch.inference_mode()
-def run_case(name):
+def run_case(name, attempt=1):
     verify()
     case = CASES[name]
-    assert not (OUT / (name + ".started.json")).exists(), "Do not silently rerun a case"
+    if attempt != 1:
+        assert name == "parent650" and attempt == 2
+        assert (OUT / "serialization_recovery.json").exists()
+    output_name = name if attempt == 1 else name + "_attempt2"
+    assert not (OUT / (output_name + ".started.json")).exists(), "Do not silently rerun a case"
     with gpu_lease(), owned_match_stream():
-        save_json(OUT / (name + ".started.json"), dict(utc=utc(), case=case, protocol_sha256=sha(OUT / "protocol.json")))
+        save_json(OUT / (output_name + ".started.json"), dict(utc=utc(), case=case, attempt=attempt,
+            protocol_sha256=sha(OUT / "protocol.json"),
+            recovery_sha256=sha(OUT / "serialization_recovery.json") if (OUT / "serialization_recovery.json").exists() else None))
         runner = TracedRunner(ROOT / case["path"], case["sha256"])
         nexto_before = tensor_hash(runner.nexto.actor.state_dict())
         elapsed = runner.run_ticks(TICKS).seconds
@@ -270,7 +287,7 @@ def run_case(name):
             goal_prefix_exact=all(v["exact"] for v in prefix), no_goal_overflow=not any(raw["goal_overflow"]))
         arrays["rival_side"] = sides
         arrays["starting_layout"] = np.asarray(raw["match.starting_layout"])
-        path = OUT / (name + ".npz")
+        path = OUT / (output_name + ".npz")
         with path.open("xb") as stream:
             np.savez_compressed(stream, **arrays)
         result = dict(version=VERSION, utc=utc(), case=case, wall_seconds=elapsed, checks=checks,
@@ -280,7 +297,13 @@ def run_case(name):
                 arrays={k: dict(shape=v.shape, dtype=str(v.dtype), sha256=hashlib.sha256(v.tobytes()).hexdigest().upper()) for k,v in arrays.items()}),
             goal_prefix=prefix, raw_match=raw,
             physical=physical_summary(arrays, sides, arrays["starting_layout"]))
-        save_json(OUT / (name + ".json"), result)
+        if attempt == 2:
+            with np.load(OUT / "parent650.npz", allow_pickle=False) as old:
+                result["operational_retry_all_arrays_byte_equal"] = all(
+                    old[k].dtype == v.dtype and old[k].shape == v.shape and old[k].tobytes() == v.tobytes()
+                    for k, v in arrays.items()) and set(old.files) == set(arrays)
+            checks["operational_retry_all_arrays_byte_equal"] = result["operational_retry_all_arrays_byte_equal"]
+        save_json(OUT / (output_name + ".json"), result)
         print(json.dumps(dict(case=name, checks=checks, seconds=elapsed)), flush=True)
         del runner; gc.collect(); torch.cuda.empty_cache()
         assert all(checks.values()), "Trace integrity failure preserved; audit without silent rerun"
@@ -290,6 +313,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("prepare", "run"))
     parser.add_argument("--case", choices=tuple(CASES))
+    parser.add_argument("--attempt", type=int, default=1, choices=(1, 2))
     args = parser.parse_args()
     torch.set_num_threads(2)
     if args.mode == "prepare":
@@ -297,4 +321,4 @@ if __name__ == "__main__":
     else:
         if args.case is None:
             parser.error("--case required")
-        run_case(args.case)
+        run_case(args.case, args.attempt)

@@ -119,6 +119,12 @@ def test_json_immutable_and_no_nan(tmp_path):
         trace.save_json(tmp_path / "bad.json", {"bad": float("nan")})
 
 
+def test_physical_report_serializes_actual_numpy_side_identity(tmp_path):
+    report = trace.physical_summary(fixture(), np.array([0]), np.array([0]))
+    trace.save_json(tmp_path / "physical.json", report)
+    assert json.loads((tmp_path / "physical.json").read_text())[0]["cars"][0]["is_rival"] is True
+
+
 def test_source_freezes_corrected_three_checkpoints_and_finite_scope():
     spec = trace.protocol()
     assert spec["ticks"] == 720 and spec["worlds"] == 10

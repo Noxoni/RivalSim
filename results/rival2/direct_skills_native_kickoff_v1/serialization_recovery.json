@@ -1,0 +1,16 @@
+{
+  "allowed_retry": {
+    "attempt": 2,
+    "case": "parent650"
+  },
+  "capture_semantics_changed": false,
+  "exception": "TypeError: numpy.bool is not JSON serializable in physical_summary.is_rival; capture and archive completed but summary was not written.",
+  "failed_archive_sha256": "D18883F7B8722C144B8CE3EABF5D293F48F67AF5C529D4D114AB4D3148C8801E",
+  "fix": "Cast is_rival to Python bool. Original archive and receipt remain untouched. Parent650 attempt2 is one explicit operational retry and must match every array byte of attempt1. No training, reward or controller modification.",
+  "focused_tests_sha256": "9B1AEE03709D8DFDB02FB698E65AA9E12C49B7855DA05F9C5B59E1503873C562",
+  "original_protocol_sha256": "BF3E5B20C41591040103647D694AD07863DAAF69EB8ACAFFF2F80CC80EAC7DDE",
+  "replacement_sources": {
+    "benchmarks/trace_direct_skills_native_kickoff_v1.py": "9F12063845204D78D7FCA6F631E93C90FF1D3CF472CBBB6F392022E6F552AC00",
+    "tests/test_direct_skills_native_kickoff_v1.py": "FA28E3E4F3DC6065ADB55ADB2AF2952F3EBB9D83A419EAE4B0B6B767EA362E6B"
+  }
+}
