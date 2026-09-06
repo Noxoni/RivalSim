@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="13" time="12.279" timestamp="2026-09-06T07:52:19.644229-04:00" hostname="Brick"><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_raw_projection_contact_retained_but_unpaid" time="0.003" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_saved_projected_shot_times_out_as_failure_only_once" time="0.003" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_goal_and_concede_never_also_timeout_failure[0]" time="0.002" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_goal_and_concede_never_also_timeout_failure[1]" time="0.002" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_non_finishing_outputs_and_shared_event_state_exact" time="0.479" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_approach_retired_only_in_finishing" time="0.002" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_native_goal_at_every_hold_tick_and_reset" time="1.733" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_native_projected_shot_does_not_excuse_timeout_bootstrap" time="0.023" /><testcase classname="tests.test_direct_skills_finishing_goal_v2" name="test_native_actions_observations_and_non_finishing_transitions_exact" time="2.529"><failure message="AttributeError: 'Rival2Step' object has no attribute 'action'">def test_native_actions_observations_and_non_finishing_transitions_exact():
+        root=Path('G:/dev/RLBot-Rival/bot/collision_meshes')
+        old=DirectSkillsEnv(32,root,device='cuda:0',seed=193,ssl_foundation_scenarios=scenarios(32))
+        new=FinishingGoalEnv(32,root,device='cuda:0',seed=193,ssl_foundation_scenarios=scenarios(32))
+        generator=torch.Generator().manual_seed(431)
+        for tick in range(16):
+            action=torch.rand((32,2,8),generator=generator).cuda()*2-1
+            action[...,5:]=(action[...,5:]&gt;0).float()
+            assert torch.equal(old.observation,new.observation)
+            a,b=old.step(action),new.step(action)
+            for name in ('observation','transition_observation','action','terminated','truncated','reset_mask'):
+&gt;               assert torch.equal(getattr(a,name),getattr(b,name)),name
+                                   ^^^^^^^^^^^^^^^
+E               AttributeError: 'Rival2Step' object has no attribute 'action'
+
+tests\test_direct_skills_finishing_goal_v2.py:140: AttributeError</failure></testcase><testcase classname="tests.test_direct_skills_native" name="test_first_native_goal_each_tick_and_exact_reset_no_skill_leak" time="1.312" /><testcase classname="tests.test_direct_skills_native" name="test_skill_and_natural_time_limits_have_prereset_bootstrap" time="0.024" /><testcase classname="tests.test_direct_skills_native" name="test_fixed_nexto_share_mask_and_role_telemetry" time="0.386" /><testcase classname="tests.test_direct_skills_native" name="test_untouched_ground_shots_score_in_native_physics" time="5.679" /></testsuite></testsuites>
