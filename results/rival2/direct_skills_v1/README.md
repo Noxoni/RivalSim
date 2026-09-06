@@ -8,10 +8,14 @@ The current675 checkpoint/model/Adam/RNG and full evidence are preserved. Next:
 [completed corrected-runtime kickoff continuity tap](kickoff_continuity_000675/RESULTS.md):
 all1,640 initial/post-goal action pairs identical, original matches exactly
 reproduced, but motion differs after four ticks. Next is
-[bounded native cold-start/cache isolation](kickoff_native_isolation_000675/AUTHORITY.md),
-not a blind training continuation. Native tick-zero initialization is a known
-confound to distinguish from stale caches. No new reset defect is yet proven.
-Goal active and unmet; current runner has exited.
+[completed native cold-start/cache isolation](kickoff_native_isolation_000675/RESULTS.md):
+exact120Hz controls and baseline motion reproduced; residual handbrake affects
+five cars' first post-goal kickoff motion. Other cache interventions are null
+in those cases; a clock-only cold-state control is invalid and explicitly
+excluded from causal claims. Follow the
+[narrow reset correction plan](kickoff_native_isolation_000675/RESET_CORRECTION_PLAN.md),
+not a blind training continuation. This does not explain all poor gameplay.
+Goal active and unmet; current runner has exited. No learning after675.
 
 Previous completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
 matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
