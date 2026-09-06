@@ -1,17 +1,22 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +100](EVALUATION_000100.md). Compared with +50,
-ten full Nexto matches changed from 17/212 to 12/209 goals for/against, 313 to 366
-contacts and forty to thirty-seven same-player follow-ups. All ten remained
-losses. Acquisition and finishing-drill results improved, but possession and
-full-match offense did not. Kickoff timeout gains are not possession wins.
-Continue unchanged to the next scheduled +150 review, explicitly tracking these
-regressions rather than claiming uniformly better gameplay. No SSL/promotion
-verdict or deployment is warranted. Preserve +50 as well as +100.
+Latest completed review: [offset +150](EVALUATION_000150.md). Ten full Nexto
+matches produced 24/203 goals for/against, versus 12/209 at +100 and 17/212 at
++50. All ten remained losses. Contacts were almost unchanged at 368 versus 366;
+finishing-drill goals increased from 8 to 9 of 64. There is actual scoring
+progress, not uniformly better possession: same-player follow-ups fell to
+25/339, challenge control remains only 3/64, and ongoing-ground acquisition
+regressed. The review explains the follow-up denominator's exclusion of goals;
+its fraction alone is not an exact possession-retention measure.
+Continue unchanged to the scheduled +200 review, comparing +50, +100 and +150
+and explicitly tracking open-play control rather than declaring the drills
+solved. No SSL/promotion verdict, reward retuning or deployment is warranted.
+Keep all independently preserved snapshots. Shooting is already 20% of the
+episode-source mixture; no extra shooting family was added to this frozen run.
 Use `benchmarks/report_rival2_direct_skills.py --update N`, including
 `--start-groups`, after the corresponding completed evaluation/checkpoint audit.
 Also compare each new review with the previous completed review, for example
-`--update 100 --baseline 50` (with and without `--start-groups`). These CPU-only
+`--update 150 --baseline 100` (with and without `--start-groups`). These CPU-only
 reports use the saved outcomes and preserve the separate baseline-zero reports;
 they do not run an extra evaluation or change training/selection semantics.
 
