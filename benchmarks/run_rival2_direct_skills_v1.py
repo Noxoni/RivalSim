@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 import torch
 
+from benchmarks.direct_skills_eval_stream import owned_match_stream
 from benchmarks.evaluate_rival2_ssl_entity_full_match import (
     OVERTIME_CAP_TICKS,
     REGULATION_TICKS,
@@ -66,6 +67,8 @@ PARENT = CHECKPOINTS / "parent_entity_000293.pt"
 PARENT_SHA = "01CD1D075C3319D19FF607C0498DFFF6FE6335BE70EEA9708B2679884601DCBE"
 SOURCES = (
     "benchmarks/run_rival2_direct_skills_v1.py",
+    "benchmarks/direct_skills_eval_stream.py",
+    "tests/test_direct_skills_eval_stream.py",
     "rivalsim/direct_skills_v1.py",
     "rivalsim/direct_skills_training.py",
     "tests/test_direct_skills_v1.py",
@@ -128,20 +131,15 @@ def verify(published=True):
     assert sha(PARENT) == PARENT_SHA
     for path, digest in package["sources"].items():
         assert text_sha(ROOT / path) == digest, path
-    for name in ("focused_tests.xml", "native_preflight.json"):
+    for name in package["evidence"]:
         assert text_sha(RESULTS / name) == package["evidence"][name]
     if published:
         paths = [
-            *SOURCES,
+            *package["sources"],
             PARENT.relative_to(ROOT).as_posix(),
             *[
                 (RESULTS / n).relative_to(ROOT).as_posix()
-                for n in (
-                    "authority.json",
-                    "package.json",
-                    "focused_tests.xml",
-                    "native_preflight.json",
-                )
+                for n in ("authority.json", "package.json", *package["evidence"])
             ],
         ]
         for path in paths:
@@ -514,33 +512,34 @@ def run(args):
         match_path = RESULTS / f"full_match_{offset:06d}.json"
         if offset % 50 == 0 and not match_path.exists():
             # Same predeclared method, not a new candidate selection or training opponent.
-            runner = CandidateMatchRunner(frozen, identity["sha256"], entity=True)
-            elapsed = runner.run_ticks(REGULATION_TICKS).seconds
-            for _ in range(OVERTIME_CAP_TICKS // 600):
-                if bool(runner.phase_status()["done"].all()):
-                    break
-                elapsed += runner.run_ticks(600).seconds
-            raw = runner.export()["raw"]
-            assert not bool(raw["goal_overflow"].any())
-            assert tensor_hash(runner.rival_policy.state_dict()) == runner.model_hash_before
-            write_json(
-                match_path,
-                dict(
-                    utc=utc(),
-                    accepted_updates=offset,
-                    checkpoint=identity,
-                    authority_sha256=content_hash(authority()),
-                    summary=summarize(raw),
-                    raw={k: v.tolist() for k, v in raw.items()},
-                    wall_seconds=elapsed,
-                    hidden_resets=runner.hidden_reset_count.cpu().tolist(),
-                    optimizer_steps=0,
-                    model_unchanged=True,
-                    checkpoint_unchanged=sha(frozen) == identity["sha256"],
-                ),
-            )
-            print("MATCH_EVAL " + json.dumps(summarize(raw)), flush=True)
-            del runner
+            with owned_match_stream():
+                runner = CandidateMatchRunner(frozen, identity["sha256"], entity=True)
+                elapsed = runner.run_ticks(REGULATION_TICKS).seconds
+                for _ in range(OVERTIME_CAP_TICKS // 600):
+                    if bool(runner.phase_status()["done"].all()):
+                        break
+                    elapsed += runner.run_ticks(600).seconds
+                raw = runner.export()["raw"]
+                assert not bool(raw["goal_overflow"].any())
+                assert tensor_hash(runner.rival_policy.state_dict()) == runner.model_hash_before
+                write_json(
+                    match_path,
+                    dict(
+                        utc=utc(),
+                        accepted_updates=offset,
+                        checkpoint=identity,
+                        authority_sha256=content_hash(authority()),
+                        summary=summarize(raw),
+                        raw={k: v.tolist() for k, v in raw.items()},
+                        wall_seconds=elapsed,
+                        hidden_resets=runner.hidden_reset_count.cpu().tolist(),
+                        optimizer_steps=0,
+                        model_unchanged=True,
+                        checkpoint_unchanged=sha(frozen) == identity["sha256"],
+                    ),
+                )
+                print("MATCH_EVAL " + json.dumps(summarize(raw)), flush=True)
+                del runner
         torch.set_rng_state(cpu)
         torch.cuda.set_rng_state(cuda)
         gc.collect()

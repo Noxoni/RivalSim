@@ -1,0 +1,12 @@
+{
+  "accepted_updates": 0,
+  "automatic_retry": false,
+  "exception": "RuntimeError('Warp error: unknown stream')",
+  "latest_checkpoint": {
+    "accepted_updates": 0,
+    "path": "G:\\dev\\RivalSim-runs\\direct-skills-v1\\rolling_0.pt",
+    "sha256": "DCD2ACC6203CF83228B28FCEBCADD487F93ED2B446466F29D883FF77DE523CD4"
+  },
+  "traceback": "Traceback (most recent call last):\n  File \"G:\\dev\\RivalSim\\benchmarks\\run_rival2_direct_skills_v1.py\", line 552, in run\n    evaluate()\n    ~~~~~~~~^^\n  File \"G:\\dev\\RivalSim\\benchmarks\\run_rival2_direct_skills_v1.py\", line 517, in evaluate\n    runner = CandidateMatchRunner(frozen, identity[\"sha256\"], entity=True)\n  File \"G:\\dev\\RivalSim\\benchmarks\\evaluate_rival2_ssl_entity_full_match.py\", line 153, in __init__\n    self.world.capture_graph(block_ticks=1)\n    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"G:\\dev\\RivalSim\\rivalsim\\simulator.py\", line 87, in capture_graph\n    wp.capture_begin(device=self.device)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"G:\\dev\\RivalSim\\.venv\\Lib\\site-packages\\warp\\_src\\context.py\", line 11903, in capture_begin\n    raise RuntimeError(runtime.get_error_string())\nRuntimeError: Warp error: unknown stream\n",
+  "utc": "2026-09-06T01:39:29.524437+00:00"
+}
