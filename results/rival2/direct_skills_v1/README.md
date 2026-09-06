@@ -1,22 +1,30 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +200](EVALUATION_000200.md). Ten full Nexto
-matches produced 33/187 goals for/against, versus 24/203 at +150, 12/209 at +100
-and 17/212 at +50. All ten remained losses. Full-match scoring improved again,
-but finishing-drill goals regressed from 9 to 5 of 64, challenge control from
-3 to 2, and contacts/min fell from 7.36 to 7.04. Kickoff scoring now covers
-layouts 0/1/3 rather than 0/3; no kickoff controlled acquisition is demonstrated.
-Same-player follow-ups are 26/317. As explained in the +150 review, the
-denominator excludes goals and is not an exact possession-retention measure.
-Continue unchanged to the scheduled +250 review, explicitly checking whether
-the finishing regression persists, not assuming all competencies improve with
-the aggregate score. No SSL/promotion, reward retuning or deployment is warranted.
-Keep all independently preserved snapshots. Shooting remains 20% of the
-episode-source mixture; it was already included and has not been duplicated.
+Latest completed review: [offset +550](EVALUATION_000550.md). Ten full Nexto
+matches produced **62/163 goals for/against and 0/10 wins**, versus 70/165 at
++500. Contacts rose from 431 to 500, but finishing is still only 5/64 goals and
+ongoing-ground drill scoring 3/29. These are not SSL-level results.
+
+The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
+reward/GAE/recurrent replay and found narrow exploration. Simple critic
+calibration did not improve held-out error; no critic or reward edit was made.
+After a clean +554 pause, the same model/Adam lineage resumed under the
+[prospective temperature-only amendment](exploration_t2_v1/authority.json),
+published in commit `8ce15e88828ac275fe7375d7919000c1218969c8` before training.
+Use **`benchmarks/run_direct_skills_exploration_v1.py run`**, not the old runner,
+for amended checkpoints. It uses training temperature 2 in both sampling and
+PPO likelihoods; deterministic evaluation remains original raw argmax.
+The bounded continuation stops at +600 for the unchanged evaluations and a
+concrete review decision. The user's ongoing goal is not canceled by that pause.
+
+See [resume evidence](exploration_t2_v1/RESUME.md). Preserve all snapshots and
+the original reward, authority and 20 runtime-source identities. Shooting
+remains **20% of episode-source starts**; it was already included and has not
+been duplicated. No capability or RLBot deployment promotion is claimed.
 Use `benchmarks/report_rival2_direct_skills.py --update N`, including
 `--start-groups`, after the corresponding completed evaluation/checkpoint audit.
 Also compare each new review with the previous completed review, for example
-`--update 200 --baseline 150` (with and without `--start-groups`). These CPU-only
+`--update 550 --baseline 500` (with and without `--start-groups`). These CPU-only
 reports use the saved outcomes and preserve the separate baseline-zero reports;
 they do not run an extra evaluation or change training/selection semantics.
 
