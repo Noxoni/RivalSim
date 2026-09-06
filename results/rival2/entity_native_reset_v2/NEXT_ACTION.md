@@ -1,6 +1,29 @@
-# Native reset V2 is launched, not awaiting another implementation
+# Native reset V2 is complete; do not relaunch or reduce again
 
-## Latest completed work
+## Completion supersedes the historical launch instructions below
+
+Both games have closed and been reduced: reference600 lost 0-24 on Blue and 1-30
+on Orange against actual native Nexto. Read `RESULTS.md` and both case audits.
+External state is `complete_review`; runner PID 23972 has exited. No learning
+is running. Final state/logs are preserved in `completion/`.
+
+The full Blue-game CPU observation-format comparison is also complete in
+`results/rival2/entity_native_observation_math_v1/`. It isolates formatting only:
+97 reconstructed timer/wheel/pad/lifecycle fields were shared inputs. Do not
+repeat it or the installed Nexto identity/table/scheduler audit.
+
+Continue bounded, read-only transfer diagnosis using preserved native packets.
+A concrete unproven candidate is native `air_time_since_jump`: the native
+reconstruction increments during held initial jump, while simulator physics
+resets it during `is_jumping`. Inspect supported native `dodge_timeout`
+semantics and quantify the discrepancy before changing any deployment runtime.
+Do not treat formatting PASS as proof of exact native state or physics.
+
+Preserve reference600, finishing650 and all negative evidence. Do not promote
+either checkpoint, restart games or start PPO as a substitute for resolving the
+transfer gap. The broad SSL goal is active; native competence is not demonstrated.
+
+## Historical launch/progress record (superseded)
 
 Blue has now completed a full native0–24loss. Its three audits and full raw
 captures are in `reference600_blue/`; replay is exact, all25projections occur

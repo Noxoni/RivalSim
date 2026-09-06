@@ -1,10 +1,10 @@
-# Native reset V2: first completed game, comparison still in progress
+# Native reset V2: completed two-side comparison
 
 Exact reference600, unchanged policy weights/export, against installed native
 Nexto. No training or optimizer steps. The separate protocol was published at
 `9c9dffe8b59c6b2bdd909bf672fdc630ea7fd4f8` before either game. This report currently
-covers **Blue only**; do not call the two-case comparison complete until Orange
-has closed and been reduced.
+covers both completed games. Orange has closed and passed the same published
+reducer. Both reached actual native Ended packets within their unchanged caps.
 
 ## Blue completed result
 
@@ -46,15 +46,50 @@ Raw captures, ready/closed state, actual match result, hashes, replay/motion
 audit, consumed-control audit and projection audit are in `reference600_blue/`.
 The reduced records are committed byte-exactly rather than newline-normalized.
 
-## Current next action
+## Orange completed result
 
-The same runner automatically started the Orange case. Inspect its actual
-process plus `G:/dev/RivalSim-runs/entity-native-reset-v2/campaign_state.json`;
-do not relaunch, restart, extend deadlines or change the live runtime.
-After it closes, run the same published reducer and add the second result.
+- Full regulation game: **Rival 1 - Nexto 30**, actual native Ended packet.
+- Wall duration 610.45 seconds, within the unchanged 900-second cap.
+- Observed distinct touch timestamps: Rival 57, Nexto 176 (30 Hz lower bounds).
+- Mean speed 1150.31 uu/s; p95 1972.96; below 100 uu/s 1.61% of decisions.
+- Grounded 77.74%; car above 300 uu 1.03%; supersonic 2.27%.
+- Forward throttle 84.03%, reverse 9.40%, boost 40.31%, jump 2.43%.
+- Mean car-ball distance 2192.59 uu; ball in opponent half 21.31%.
+
+All 11,251 Orange decisions replay exactly. All 71,853 delivered packet records
+pass held-control checks. All 32 projections occur only at their intended first
+kickoff decisions, with unchanged other inputs and unavailable wheel masks.
+All 11,219 eligible consumed-control endpoints match all eight issued channels;
+32 reset boundaries are excluded. All missed/duplicate/out-of-order/skipped
+decision counters are zero. Source/export hashes remain unchanged.
+
+Rival is active but is not competitive with native Nexto on either side.
+This is not native recovery, finishing mastery or SSL. The earlier partial V1
+game is not a completed matched baseline; causal improvement is not established.
+
+## Completed integrity checks and next action
+
+The runner has exited with external status `complete_review`. Final external
+state and launcher logs are preserved in `completion/`. Both raw cases and
+their audits are complete; do not relaunch or reduce them again. No learning
+or production runtime changes occurred during the comparison.
 
 A parallel read-only audit now rules out different Nexto model weights, but
 finds simulator kickoff-table and action-scheduling discrepancies plus a weak
 old table reference. See `results/rival2/native_nexto_integration_audit_v1/RESULTS.md`.
 These are specific fidelity findings, not an explanation of the entire native
 loss. No opponent or policy implementation was changed during this comparison.
+
+The full Blue-game observation-format comparison in
+`results/rival2/entity_native_observation_math_v1/RESULTS.md` found a maximum
+normalized difference of 2.384185791015625e-7 across 10,793 decisions, with zero
+sequential action changes. It uses the actual production simulator observation
+methods. Its 97 shared reconstructed fields are explicitly not independent
+measurements of native timers, wheels, pads or lifecycle. This isolates formatting
+but does not establish complete state or physics equivalence.
+
+Continue focused transfer diagnosis, not PPO. A native jump-timer reconstruction
+discrepancy is a candidate for measurement, not yet a proven cause of poor play.
+Shooting already occupies 20% of the direct-skills scenario bank; the completed
+finishing-goal block uses actual goals/concedes/timeouts. Another shooting
+scenario is not the missing implementation here.
