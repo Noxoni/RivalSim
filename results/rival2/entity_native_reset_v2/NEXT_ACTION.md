@@ -47,14 +47,21 @@ development baseline was0/10 wins for both reference600 (5-204 goals) and
 finishing650 (7-196 goals). The prospective rule selected finishing650. These
 are corrected simulator development results, not new actual native games.
 
-The new runner `benchmarks/run_direct_skills_native_nexto_v1.py` is LIVE as of
-2026-09-06 14:42:31 UTC, five accepted updates, actual worker43740 and empty
-stderr. Recheck actual process/state instead of assuming these observations
-remain current. External state is
-`G:/dev/RivalSim-runs/direct-skills-native-nexto-v1`. The existing monitor now
-follows that directory and its new notification cursor. Do not start a duplicate
-runner or resume a legacy campaign. Corrected evaluations are at child10/25;
-the25-update block ends for review and is not the SSL goal's completion.
+The new runner `benchmarks/run_direct_skills_native_nexto_v1.py` has now COMPLETED
+exactly25 updates and both evaluations. Worker43740 exited normally at about
+2026-09-06 15:14:25UTC; stderr is empty. Results and final checkpoint were pushed
+at `91d5eca6aa7b695edb9203a4586635310fccbd25` and all14 commit files remotely
+verified. Parent7-196goals ->child10 10-198 ->child25 2-203, all0/10wins. The early
+contact gains did not hold. Do not resume the completed directory or promote
+any candidate as native/SSL competence.
+
+Read `results/rival2/direct_skills_native_nexto_v1/NEXT_ACTION.md` for the next
+bounded read-only trace of Rival's own kickoff commands/physical approach. The
+controller and source-start admission checks are already complete; this is a
+policy-behavior question, not a reason to repeat those compatibility audits.
+External state remains `G:/dev/RivalSim-runs/direct-skills-native-nexto-v1`,
+status `complete_review`. The existing monitor cursor now records child25 as
+reported. The broad SSL goal remains active; no new learning block is frozen yet.
 
 Model/Adam/four RNG entry parity and the first actual accepted update are
 audited. Native-v5 sampling/seed, fresh physical episodes and recurrent reset
