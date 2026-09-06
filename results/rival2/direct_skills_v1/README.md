@@ -1,12 +1,13 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +600](EVALUATION_000600.md). Ten full Nexto
-matches produced **65/144 goals for/against and 0/10 wins**, versus62/163 at
-+550. Seven matched cases improved, one tied and two worsened. Finishing is
-still only6/64 goals and ongoing-ground drill scoring3/29. These are not
-SSL-level results. The temperature-only block completed safely and stopped for
-review. The [prospective +600 to +650 follow-up](exploration_t2_followup_v1/README.md)
-keeps all learning settings unchanged; verify its publication before launch.
+Latest completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
+matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
+Repeat-contact fraction rose29.3% to39.2%, but scoring fell and finishing remains
+5/64. These are not SSL-level results. The learner stopped cleanly at650.
+Before another training block, execute the prospectively frozen read-only
+[sampling-versus-greedy diagnostic](sampling_diagnostic_000650/README.md).
+Sampled training outcomes improved while greedy scoring fell; that discrepancy
+needs measurement, not an assumed explanation or another blind continuation.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
 reward/GAE/recurrent replay and found narrow exploration. Simple critic
@@ -15,11 +16,11 @@ After a clean +554 pause, the same model/Adam lineage resumed under the
 [prospective temperature-only amendment](exploration_t2_v1/authority.json),
 published in commit `8ce15e88828ac275fe7375d7919000c1218969c8` before training.
 The original `benchmarks/run_direct_skills_exploration_v1.py` segment ended at600.
-For the new block use **`benchmarks/run_direct_skills_exploration_followup_v1.py run`**
-with explicit latest checkpoint/SHA, not either older runner. Training temperature2
-remains in both sampling and PPO likelihoods; deterministic evaluation remains
-original raw argmax. The next review is650. The user's ongoing goal is not
-canceled by a review pause.
+The `benchmarks/run_direct_skills_exploration_followup_v1.py` block ended at650.
+Do not restart either bounded runner after this intentional review stop.
+Training used temperature2 in both sampling and PPO likelihoods; deterministic
+evaluation remains original raw argmax. The user's ongoing goal is not canceled
+by the review/diagnostic pause.
 
 See [resume evidence](exploration_t2_v1/RESUME.md). Preserve all snapshots and
 the original reward, authority and 20 runtime-source identities. Shooting
