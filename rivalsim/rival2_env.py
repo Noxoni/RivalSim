@@ -482,6 +482,7 @@ class Rival2WorldSim(CompleteWorldSim):
                 self.boost_pad_cooldown,
                 self.boost_pad_previous_locked_car,
                 vehicle.wheel_contact,
+                vehicle.handbrake_value,
             ],
             device=self.device,
         )

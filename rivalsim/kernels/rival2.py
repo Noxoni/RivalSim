@@ -864,6 +864,7 @@ def rival2_interval_reset(
     pad_cooldown: wp.array(dtype=wp.float32),
     pad_previous_locked_car: wp.array(dtype=wp.int32),
     wheel_contact: wp.array(dtype=wp.int32),
+    handbrake_value: wp.array(dtype=wp.float32),
 ):
     """Apply the accepted v0.4 deterministic kickoff writes to selected worlds."""
 
@@ -899,6 +900,9 @@ def rival2_interval_reset(
         # the next physics tick computes actual wheel contacts at the spawn.
         for wheel in range(4):
             wheel_contact[car * 4 + wheel] = 0
+        # Handbrake friction smoothing belongs to the old car state as well;
+        # resetting only prev_handbrake leaves residual tire slip at kickoff.
+        handbrake_value[car] = 0.0
         air_control_disabled[car] = 0
         has_jumped[car] = 0
         is_jumping[car] = 0

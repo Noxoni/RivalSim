@@ -19,13 +19,14 @@ if str(ROOT) not in sys.path:
 from benchmarks.report_rival2_ssl_entity_match_followup import reduce  # noqa: E402
 
 METHOD = "RIVAL2_STANDARD_KICKOFF_CONTACT_CACHE_RESET_V2"
+SUPPORTED_METHODS = {METHOD, "RIVAL2_STANDARD_KICKOFF_HANDBRAKE_RESET_V3"}
 
 
 def validate_comparability(baseline, target):
     for field in ("match_reset_version", "runtime_package_sha256", "authority_sha256"):
         if not baseline.get(field) or baseline[field] != target.get(field):
             raise ValueError(f"Not a same-method learning comparison: {field}")
-    if baseline["match_reset_version"] != METHOD:
+    if baseline["match_reset_version"] not in SUPPORTED_METHODS:
         raise ValueError("Use the corrected-reset baseline, not untagged historical matches")
     if target["accepted_updates"] <= baseline["accepted_updates"]:
         raise ValueError("Target must follow baseline; no backward/identical comparison")
@@ -89,7 +90,7 @@ def compare(baseline_path, target_path):
     ) for reduction, group in zip(reductions, rows, strict=True)]
     return dict(
         schema="RIVAL2_DIRECT_SKILLS_SAME_METHOD_MATCH_COMPARISON_V1",
-        match_reset_version=METHOD, runtime_package_sha256=sources[0]["runtime_package_sha256"],
+        match_reset_version=sources[0]["match_reset_version"], runtime_package_sha256=sources[0]["runtime_package_sha256"],
         baseline_update=sources[0]["accepted_updates"], target_update=sources[1]["accepted_updates"],
         source_identities=[{k: r[k] for k in ("source", "source_text_sha256", "checkpoint")} for r in reductions],
         source_integrity=[r["integrity"] for r in reductions],

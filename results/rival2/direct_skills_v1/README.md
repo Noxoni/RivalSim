@@ -13,9 +13,12 @@ exact120Hz controls and baseline motion reproduced; residual handbrake affects
 five cars' first post-goal kickoff motion. Other cache interventions are null
 in those cases; a clock-only cold-state control is invalid and explicitly
 excluded from causal claims. Follow the
-[narrow reset correction plan](kickoff_native_isolation_000675/RESET_CORRECTION_PLAN.md),
-not a blind training continuation. This does not explain all poor gameplay.
-Goal active and unmet; current runner has exited. No learning after675.
+[implemented narrow reset correction](handbrake_reset_v3/IMPLEMENTATION.md).
+Native4,368array/trace parity and17focused tests pass; both curriculum paths
+remain exactly unchanged. New `handbrake_reset_v3/authority.json` binds the
+corrected match method without rewriting old packages/results. Corrected675
+and600 fixed matches are next, no learning. This does not explain all poor
+gameplay. Goal active and unmet; training stopped at675.
 
 Previous completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
 matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
