@@ -1,0 +1,148 @@
+{
+  "cases": {
+    "reference600_blue": {
+      "changed_observation_rows": 1032,
+      "decisions": 10793,
+      "hashes": {
+        "results\\rival2\\entity_native_jump_timer_v1\\reference600_blue.npz": "E8C49C6AB0E5E9CBA2A0E9D6C1806280DA4CDF167D97A46A27F8BFDB9D5D6EE9",
+        "results\\rival2\\entity_native_reset_v2\\reference600_blue\\decision_packets.bin.gz": "090F99C74DCDD309368E7BD75265BB0B23D4EC67F0487C4D273FA46B67AFD1ED",
+        "results\\rival2\\entity_native_reset_v2\\reference600_blue\\decisions.bin.gz": "E6BFB887E4B87637C2348587539FD10DF4928BE34DCCA902840C09D55E1E7579"
+      },
+      "modified_fields": [
+        "self.air_time_since_jump",
+        "opponent.air_time_since_jump",
+        "self.dodge_available",
+        "opponent.dodge_available"
+      ],
+      "original_action_replay_exact": true,
+      "paired_per_channel_changes": {
+        "boost": 0,
+        "handbrake": 2,
+        "jump": 2,
+        "pitch": 2,
+        "roll": 1,
+        "steer": 2,
+        "throttle": 1,
+        "yaw": 2
+      },
+      "paired_same_hidden_action_changes": 3,
+      "roles": {
+        "opponent": {
+          "dodge_available_changed": 8,
+          "initial_jump_zero": {
+            "disagreement_over_1ms": 320,
+            "max_abs_seconds": 0.1833333820104599,
+            "mean_signed_seconds": 0.05958334356546402,
+            "samples": 320
+          },
+          "positive_native_remaining": {
+            "disagreement_over_1ms": 526,
+            "max_abs_seconds": 0.20000013709068298,
+            "mean_signed_seconds": 0.119771808385849,
+            "samples": 526
+          }
+        },
+        "self": {
+          "dodge_available_changed": 6,
+          "initial_jump_zero": {
+            "disagreement_over_1ms": 76,
+            "max_abs_seconds": 0.2000000774860382,
+            "mean_signed_seconds": 0.05350876972079277,
+            "samples": 76
+          },
+          "positive_native_remaining": {
+            "disagreement_over_1ms": 137,
+            "max_abs_seconds": 0.2000001221895218,
+            "mean_signed_seconds": 0.10529182851314545,
+            "samples": 137
+          }
+        }
+      },
+      "sequential_action_changes": 4
+    },
+    "reference600_orange": {
+      "changed_observation_rows": 1039,
+      "decisions": 11251,
+      "hashes": {
+        "results\\rival2\\entity_native_jump_timer_v1\\reference600_orange.npz": "015ABA9A9CF47D3689AF179A8CC6F511D34EC352012129A237F0A856F7BC3696",
+        "results\\rival2\\entity_native_reset_v2\\reference600_orange\\decision_packets.bin.gz": "459077C54FD46D1D5B0A1E26C3D158923A5FC3FB7C9A7CE8354792527E64DC78",
+        "results\\rival2\\entity_native_reset_v2\\reference600_orange\\decisions.bin.gz": "65B7D92C6823A49549104AC2A015099A5F2393D2F2EB388029D839BC7A9D7F8E"
+      },
+      "modified_fields": [
+        "self.air_time_since_jump",
+        "opponent.air_time_since_jump",
+        "self.dodge_available",
+        "opponent.dodge_available"
+      ],
+      "original_action_replay_exact": true,
+      "paired_per_channel_changes": {
+        "boost": 0,
+        "handbrake": 0,
+        "jump": 0,
+        "pitch": 0,
+        "roll": 1,
+        "steer": 2,
+        "throttle": 2,
+        "yaw": 2
+      },
+      "paired_same_hidden_action_changes": 3,
+      "roles": {
+        "opponent": {
+          "dodge_available_changed": 0,
+          "initial_jump_zero": {
+            "disagreement_over_1ms": 408,
+            "max_abs_seconds": 0.1833333820104599,
+            "mean_signed_seconds": 0.06474674493074417,
+            "samples": 408
+          },
+          "positive_native_remaining": {
+            "disagreement_over_1ms": 469,
+            "max_abs_seconds": 0.20000013709068298,
+            "mean_signed_seconds": 0.12466242909431458,
+            "samples": 469
+          }
+        },
+        "self": {
+          "dodge_available_changed": 15,
+          "initial_jump_zero": {
+            "disagreement_over_1ms": 78,
+            "max_abs_seconds": 0.2000000774860382,
+            "mean_signed_seconds": 0.05470086261630058,
+            "samples": 78
+          },
+          "positive_native_remaining": {
+            "disagreement_over_1ms": 132,
+            "max_abs_seconds": 0.2000001221895218,
+            "mean_signed_seconds": 0.15580783784389496,
+            "samples": 132
+          }
+        }
+      },
+      "sequential_action_changes": 5
+    }
+  },
+  "cpu_only": true,
+  "installed_schema": {
+    "path": "G:\\dev\\RLBot-Rival\\.venv\\Lib\\site-packages\\rlbot_flatbuffers\\__init__.pyi",
+    "sha256": "C819354866CA9E102228CA0D15A43C9AFE9DCA63F21590309879D45D6B135571"
+  },
+  "interpretation": "One-factor offline sensitivity, not a corrected deployed actor or gameplay forecast. Recorded trajectory and original previous actions retained even when counterfactual actions differ. Spent/expired/unsupported timers unchanged; no full native-observation exactness claim. No quality-mask promotion.",
+  "optimizer_steps": 0,
+  "phase_codes": {
+    "Dodging": 3,
+    "DoubleJumping": 4,
+    "InAir": 2,
+    "Jumping": 1,
+    "OnGround": 0
+  },
+  "production_changed": false,
+  "source_hashes": {
+    "benchmarks\\audit_entity_native_jump_timer.py": "15481F7D45DAE31994F8545D55442C5049E5A4FF45C2995D1A5B63C96313144C",
+    "checkpoints\\rival2\\direct_skills_v1\\plus_000600.pt": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2",
+    "checkpoints\\rival2\\entity_native_bridge_v1\\reference600.ts": "7C034675349144A4BBEF588F6954CF0D786217164052428777742C57F109EB72",
+    "deployment\\entity_native_v1\\packet_observation.py": "3A53CDEE6829AC8C748CD9F69ED0FA2E28D8E499B8A338FD7FB82EC23D556813",
+    "rivalsim\\kernels\\vehicle.py": "A976B93F1E1C6E8793627E82F05BD6D76F466D5463FD86C3CB1E998898714D07",
+    "rivalsim\\rival2_env.py": "0E7F0895E3D7D3FD669E97124257654F1114A4DA0F74AA2C545FCA80CDC55E99"
+  },
+  "timer_scale_seconds": 1.25
+}

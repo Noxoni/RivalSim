@@ -12,12 +12,18 @@ The full Blue-game CPU observation-format comparison is also complete in
 97 reconstructed timer/wheel/pad/lifecycle fields were shared inputs. Do not
 repeat it or the installed Nexto identity/table/scheduler audit.
 
-Continue bounded, read-only transfer diagnosis using preserved native packets.
-A concrete unproven candidate is native `air_time_since_jump`: the native
-reconstruction increments during held initial jump, while simulator physics
-resets it during `is_jumping`. Inspect supported native `dodge_timeout`
-semantics and quantify the discrepancy before changing any deployment runtime.
-Do not treat formatting PASS as proof of exact native state or physics.
+The native jump-timer diagnosis is now also complete in
+`results/rival2/entity_native_jump_timer_v1/RESULTS.md`; do not repeat it.
+The bounded native-timeout/held-jump comparison changes 2,071 observations but
+only six same-hidden-state controller decisions across both games. Maximum
+timer mismatch is about 0.2 seconds. It is real but does not establish the
+cause of the entire loss; no deployment fix or quality promotion was applied.
+
+Continue bounded physical/opponent-fidelity diagnosis using existing evidence.
+Prioritize a causal simulator comparison for the already measured installed
+Nexto kickoff-table/scheduling differences, or independent contact dynamics;
+do not multiply another observation-format audit. Preserve completed negative
+results. Do not treat formatting PASS as proof of exact native state or physics.
 
 Preserve reference600, finishing650 and all negative evidence. Do not promote
 either checkpoint, restart games or start PPO as a substitute for resolving the

@@ -88,8 +88,10 @@ methods. Its 97 shared reconstructed fields are explicitly not independent
 measurements of native timers, wheels, pads or lifecycle. This isolates formatting
 but does not establish complete state or physics equivalence.
 
-Continue focused transfer diagnosis, not PPO. A native jump-timer reconstruction
-discrepancy is a candidate for measurement, not yet a proven cause of poor play.
+Continue focused transfer diagnosis, not PPO. The jump-timer discrepancy is now
+measured in `results/rival2/entity_native_jump_timer_v1/RESULTS.md`: about 0.2
+seconds maximum error, but only six paired immediate action changes over both
+games under the supported-case probe. No closed-loop causal result is claimed.
 Shooting already occupies 20% of the direct-skills scenario bank; the completed
 finishing-goal block uses actual goals/concedes/timeouts. Another shooting
 scenario is not the missing implementation here.
