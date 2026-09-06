@@ -1,0 +1,21 @@
+{
+  "checkpoint": {
+    "path": "checkpoints/rival2/direct_skills_log_barrier_v1/child_000015.pt",
+    "sha256": "654728AC18A877CA3267A44BAB855772079927536F75DBAE972A821B53CADE8A"
+  },
+  "checks": {
+    "coefficient_frozen": true,
+    "every_update_coefficient_correct": true,
+    "every_update_has_new_loss": true,
+    "nonnegative_barrier": true,
+    "objective_checkpoint_bound": true,
+    "weighted_loss_correct": true
+  },
+  "first_entropy": 0.8483505249023438,
+  "first_exploration_barrier": 8.520735740661621,
+  "latest_entropy": 2.3625285625457764,
+  "latest_exploration_barrier": 1.8263088464736938,
+  "note": "The inherited unchanged_ppo check refers to base PPO configuration, not the entire objective. This arm explicitly adds the prospectively bound uniform log barrier.",
+  "offset": 15,
+  "optimizer_steps_in_audit": 0
+}

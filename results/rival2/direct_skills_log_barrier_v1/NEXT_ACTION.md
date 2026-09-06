@@ -46,6 +46,25 @@ three complete evaluations. A finalizer must use this directory and30boundary;
 do not run the old hardcoded15finalizer. No automatic gameplay promotion.
 The broader SSL goal remains active.
 
+The CPU-only finalizer is now implemented and tested (17 focused tests):
+
+```powershell
+.venv\Scripts\python.exe -B benchmarks/finalize_direct_skills_log_barrier_v1.py
+```
+
+It checks actual worker absence, complete 30-row state, all 5/15/30 evaluation
+audits, the separate exploration objective, frozen source hashes, and exact
+rolling/permanent checkpoint equality. It neither trains nor reruns matches.
+Implementation and tests were pushed and remotely read back at
+6ecbf17e4500b7abb8eaea1ea3c7c7a23d50bfcd.
+
+Update +5 evidence is published at 6ea9ad77dfe7f4955ae8873d001db27225cbfdfe.
+Update +15 is complete: 0/10 wins, 1 scored / 291 conceded, 6.64 touches/minute,
+no kickoff first contact. All 26 core +6 objective +11 match checks pass. Both
+evaluations are worse than the parent. Already reported to the user; do not
+repeat them as newly completed evidence. Next scheduled result is +30. Do not
+interpret increased entropy as competitive improvement or extend blindly.
+
 The no-update saturation diagnostic is COMPLETE, not an ongoing investigation.
 Do not repeat the completed native-controller/observation/timing/trace work or
 restart the old completed15/25arms. New actual match evidence determines what
