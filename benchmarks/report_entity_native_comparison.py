@@ -77,11 +77,11 @@ def compare_delivered_history(ds, native_inputs):
         interpretation="Native packet last_input is compared with the prior emitted command, not the command just being calculated. Excludes reset boundaries and missing-packet intervals. Decision endpoints only: not proof of every intervening 120Hz applied input or observation-domain equivalence.")
 
 
-def report_delivery(case):
-    folder=OUT/case
+def report_delivery(case,*,out=OUT,decision_dtype=DECISION):
+    folder=out/case
     assert json.loads((folder/"bot_state.json").read_text())["closed"]
     ready=json.loads((folder/"ready.json").read_text())
-    ds=read_records(folder/"decisions.bin.gz",DECISION)
+    ds=read_records(folder/"decisions.bin.gz",decision_dtype)
     inputs=[]
     for i,packet in enumerate(packets(folder/"decision_packets.bin.gz")):
         assert i<len(ds) and int(packet.match_info.frame_num)==int(ds[i]["frame"])
@@ -97,8 +97,8 @@ def report_delivery(case):
     print(json.dumps(result))
 
 
-def report(case):
-    folder=EXTERNAL/case
+def report(case,*,external=EXTERNAL,out=OUT,decision_dtype=DECISION,tick_dtype=TICK):
+    folder=external/case
     state=json.loads((folder/"bot_state.json").read_text())
     assert state["closed"],"Wait for completed/closed native actor files"
     completed_result=folder/"match_result.json"
@@ -109,14 +109,14 @@ def report(case):
     if result is not None:
         assert ready==result["readiness"]
     else:
-        partial_state=json.loads((EXTERNAL/"campaign_state.json").read_text())
+        partial_state=json.loads((external/"campaign_state.json").read_text())
         assert partial_state["status"]=="stopped" and partial_state["case"]==case
     artifact=ROOT/ready["artifact"]["path"]
     source=ROOT/ready["source"]["path"]
     assert sha(artifact)==ready["artifact"]["sha256"]
     assert sha(source)==ready["source"]["sha256"]
-    ds=read_records(folder/"decisions.bin.gz",DECISION)
-    ticks=read_records(folder/"ticks.bin.gz",TICK)
+    ds=read_records(folder/"decisions.bin.gz",decision_dtype)
+    ticks=read_records(folder/"ticks.bin.gz",tick_dtype)
     assert len(ds)>0 and len(ds)==int(ticks["decision"].sum())
     assert len(ds)==state["runtime"]["scheduler"]["decisions"]
     np.testing.assert_array_equal(ticks["frame"][ticks["decision"]!=0],ds["frame"])
@@ -191,7 +191,7 @@ def report(case):
         observation_domain_exact=False,
         record_sha256={p.name:sha(p) for p in folder.iterdir() if p.is_file()},
         interpretation="Actual native local-game outcome, not ranked SSL proof. Compare each candidate on both sides; do not equate simulator scoring rates with native games.")
-    target=OUT/case
+    target=out/case
     assert not target.exists(),"Preserve previous reduction"
     target.mkdir()
     for p in folder.iterdir():

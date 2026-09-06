@@ -1,0 +1,67 @@
+{
+  "artifact": {
+    "bytes": 4809176,
+    "path": "checkpoints/rival2/entity_native_bridge_v1/reference600.ts",
+    "sha256": "7C034675349144A4BBEF588F6954CF0D786217164052428777742C57F109EB72"
+  },
+  "cases": [
+    "reference600_blue",
+    "reference600_orange"
+  ],
+  "comparison": "Prior V1 partial0-37 is diagnostic context, not a completed matched-seed baseline. This tests an explicit empty-cache compatibility projection, not physically measured absent wheel contacts.",
+  "deterministic": true,
+  "existing_game_safety": "Only reuse the exact previous test-owned process identity after5second read-only observer sees no active packet. No unrelated game termination. Otherwise require no game.",
+  "hold_ticks": 4,
+  "limits": {
+    "case_wall_seconds": 900,
+    "initial_start_seconds": 150,
+    "overtime_seconds": 120
+  },
+  "method": "Exact reference600 on both teams, two standard5minute native local Soccar matches. No learning or selection. Separate protocol, not resumed V1.",
+  "nexto": {
+    "config": "C:\\Users\\patri\\AppData\\Local\\RLBot5\\bots\\bob_build_x86_64-windows\\Nexto\\bot.toml",
+    "config_sha256": "0E4818A04E2364A6B8C84B38BE24DB8F6856F7377F7CF3B802FDFAC4B526828F",
+    "executable_sha256": "6371A5B9DD740AEA858D86532F928E0FDB13BF387D8379F76CCD679C9B33E845"
+  },
+  "owned_existing_game": {
+    "command": [
+      "f:\\steam\\steamapps\\common\\rocketleague\\Binaries\\Win64\\RocketLeague.exe",
+      "-rlbot",
+      "RLBot_ControllerURL=127.0.0.1:23233",
+      "RLBot_PacketSendRate=240",
+      "-nomovie"
+    ],
+    "created": 1788698364.1378198,
+    "parent": 42896,
+    "pid": 29304
+  },
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "projection": "First Kickoff decision following observed Countdown only; eight unavailable wheel-cache fields0; on_ground and all other inputs unchanged.",
+  "record": "Both base and final observation, unavailable quality mask, projection flag, phase per delivered packet, actual controls and raw decision packets.",
+  "source": {
+    "model_sha256": "1219DDFFD91F1E6DDDBE6C3AAACCAEC622CE9EA8D69168BBB4B9588D064F888B",
+    "path": "checkpoints/rival2/direct_skills_v1/plus_000600.pt",
+    "policy_config_sha256": "08CF995A86E73476DF8C8CF13075D188D83B31F9620D78EF0749E3E5061AE6A9",
+    "sha256": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2"
+  },
+  "sources": {
+    "benchmarks/report_entity_native_comparison.py": "BA44D81687479F10352AC156C1F1611F4B0B5930252EAFF3F37E4EB3D5BE22C5",
+    "benchmarks/report_entity_native_reset_v2.py": "B381CFF3F80FA26D7A2EE8318208BFFCDCC960FC946603D907E2D3E62432D764",
+    "benchmarks/run_entity_native_reset_v2.py": "38CF24897B76C1779B84AA34331A58B4C3866D03C1ACB72F9BC5D1F0E677B392",
+    "deployment/entity_native_v1/packet_observation.py": "3A53CDEE6829AC8C748CD9F69ED0FA2E28D8E499B8A338FD7FB82EC23D556813",
+    "deployment/entity_native_v1/runtime.py": "A157A3754930B6BCA8CB899EA73A4FFEE2AFC98F6A3DA77809266D20B5721BB5",
+    "deployment/entity_native_v2/bot.py": "3ABA8A370D718B0287482898F66EDF0FE5158217D5CBFAA0A94ED7327107D164",
+    "deployment/entity_native_v2/reference600_blue.toml": "55C64C858D8424D5FD6763A988F7F9FC4358202A9A7385E5802753A77A82AAD3",
+    "deployment/entity_native_v2/reference600_orange.toml": "D2D466400A56415CFBB4C6CFC8FB9B2F96E0D6EE003115E22D084249B30D54CD",
+    "deployment/entity_native_v2/reset_runtime.py": "FE008348C92CD4D1E57E258904C5E497657325E8625F18C840E81BCE080DB755",
+    "results/rival2/entity_native_packet_v1/reference600_manifest.json": "DAD2B5FDC39DC76CFB5ACECB22A980BB241E7D9170563B7E42CB101D9B6653D2",
+    "results/rival2/entity_native_reset_v2/manifest.json": "578545D684600A33A26DEB1F30B081C50761F05A4B3FA489E180EE27ABC3FFF5",
+    "results/rival2/entity_native_reset_v2/tests.xml": "DBE3D188109F1D90FAD6AE2B9BB8A42347BD008766A928F90960574EB9DC5A77",
+    "rivalsim/entity_native_bridge.py": "C91E52104BBEB3BA6F8C21FE87DEE4499AD8BF2D9FF2BA8793311D3E13ABC201",
+    "tests/test_entity_native_reset_report.py": "CB717D90B1159D2CB9AFD17E5D9CCFDE957F48C4CF4B9251E313384198FB7B70",
+    "tests/test_entity_native_reset_runtime.py": "6BEE68A396A4065E31924ED06EBCDC1ABA8378E1F3958C10449E7F7A056088CB"
+  },
+  "stop": "User STOP, nonfinite/error, no projection exercised within120decisions, packet stall, or prospective time bound. No guard/reward/weights change.",
+  "version": "RIVAL2_ENTITY_NATIVE_RESET_COMPARISON_V2"
+}
