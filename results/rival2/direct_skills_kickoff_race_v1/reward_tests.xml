@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="2" failures="0" skipped="0" tests="10" time="6.445" timestamp="2026-09-06T11:37:46.934326-04:00" hostname="Brick"><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_physics_tick_order_tie_goal_and_reset" time="0.665" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_race_pays_only_once_and_only_winner[0]" time="0.003" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_race_pays_only_once_and_only_winner[1]" time="0.002" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_race_pays_only_once_and_only_winner[-2]" time="0.002" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_later_loser_touch_is_unpaid_but_can_gain_control" time="0.007" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_terminal_goal_suppresses_race_bonus_and_clears_at_reset" time="0.001" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_other_reward_roles_and_state_exact" time="0.033" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_start_bank_only_changes_half_kickoff_focal_velocities" time="0.347" /><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_native_hook_does_not_change_physics_actions_or_other_rewards" time="2.638"><error message="failed on setup with &quot;ValueError: Invalid device identifier: cuda:0&quot;">self = &lt;[AttributeError("'array' object has no attribute 'shape'") raised in repr()] array object at 0x1c109c24e20&gt;
+dtype = &lt;class 'warp._src.types.int32'&gt;, shape = (32,), strides = None
+device = device(type='cuda', index=0), pinned = False
+
+    def _init_new(self, dtype, shape, strides, device, pinned):
+        try:
+            # Performance note: try first, ask questions later
+&gt;           device = warp._src.context.runtime.get_device(device)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.venv\Lib\site-packages\warp\_src\types.py:3684: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;warp._src.context.Runtime object at 0x000001C15B05F8C0&gt;
+ident = device(type='cuda', index=0)
+
+    def get_device(self, ident: DeviceLike = None) -&gt; Device:
+        # special cases
+        if type(ident) is Device:
+            return ident
+        elif ident is None:
+            return self.default_device
+    
+        # string lookup
+        device = self.device_map.get(ident)
+        if device is not None:
+            return device
+        elif ident == "cuda":
+            return self.get_current_cuda_device()
+    
+&gt;       raise ValueError(f"Invalid device identifier: {ident}")
+E       ValueError: Invalid device identifier: cuda:0
+
+.venv\Lib\site-packages\warp\_src\context.py:7874: ValueError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture(scope='module')
+    def envs():
+        root=Path('G:/dev/RLBot-Rival/bot/collision_meshes')
+        assert torch.cuda.is_available() and root.exists()
+        torch.set_num_threads(4)
+        from benchmarks.direct_skills_eval_stream import owned_match_stream
+        with owned_match_stream():
+            yield (FinishingGoalEnv(32,root,device='cuda:0',seed=911,ssl_foundation_scenarios=parent_scenarios(32)),
+&gt;                  KickoffRaceEnv(32,root,device='cuda:0',seed=911,ssl_foundation_scenarios=parent_scenarios(32)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_direct_skills_kickoff_race_v1.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+rivalsim\direct_skills_kickoff_race_v1.py:117: in __init__
+    self.race = RaceState(self.num_envs, self.device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+rivalsim\direct_skills_kickoff_race_v1.py:80: in __init__
+    self.array = wp.full(worlds, -1, dtype=wp.int32, device=device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\warp\_src\context.py:9158: in full
+    arr = empty(
+.venv\Lib\site-packages\warp\_src\context.py:9261: in empty
+    arr = warp.array(
+.venv\Lib\site-packages\warp\_src\types.py:3285: in __init__
+    self._init_new(dtype, shape, strides, device, pinned)
+.venv\Lib\site-packages\warp\_src\types.py:3688: in _init_new
+    device = warp._src.context.get_device(device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\warp\_src\context.py:8137: in get_device
+    return runtime.get_device(ident)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;warp._src.context.Runtime object at 0x000001C15B05F8C0&gt;
+ident = device(type='cuda', index=0)
+
+    def get_device(self, ident: DeviceLike = None) -&gt; Device:
+        # special cases
+        if type(ident) is Device:
+            return ident
+        elif ident is None:
+            return self.default_device
+    
+        # string lookup
+        device = self.device_map.get(ident)
+        if device is not None:
+            return device
+        elif ident == "cuda":
+            return self.get_current_cuda_device()
+    
+&gt;       raise ValueError(f"Invalid device identifier: {ident}")
+E       ValueError: Invalid device identifier: cuda:0
+
+.venv\Lib\site-packages\warp\_src\context.py:7874: ValueError</error></testcase><testcase classname="tests.test_direct_skills_kickoff_race_v1" name="test_native_goal_on_each_tick_clears_race_and_preserves_reward" time="0.000"><error message="failed on setup with &quot;ValueError: Invalid device identifier: cuda:0&quot;">self = &lt;[AttributeError("'array' object has no attribute 'shape'") raised in repr()] array object at 0x1c109c24e20&gt;
+dtype = &lt;class 'warp._src.types.int32'&gt;, shape = (32,), strides = None
+device = device(type='cuda', index=0), pinned = False
+
+    def _init_new(self, dtype, shape, strides, device, pinned):
+        try:
+            # Performance note: try first, ask questions later
+&gt;           device = warp._src.context.runtime.get_device(device)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.venv\Lib\site-packages\warp\_src\types.py:3684: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;warp._src.context.Runtime object at 0x000001C15B05F8C0&gt;
+ident = device(type='cuda', index=0)
+
+    def get_device(self, ident: DeviceLike = None) -&gt; Device:
+        # special cases
+        if type(ident) is Device:
+            return ident
+        elif ident is None:
+            return self.default_device
+    
+        # string lookup
+        device = self.device_map.get(ident)
+        if device is not None:
+            return device
+        elif ident == "cuda":
+            return self.get_current_cuda_device()
+    
+&gt;       raise ValueError(f"Invalid device identifier: {ident}")
+E       ValueError: Invalid device identifier: cuda:0
+
+.venv\Lib\site-packages\warp\_src\context.py:7874: ValueError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture(scope='module')
+    def envs():
+        root=Path('G:/dev/RLBot-Rival/bot/collision_meshes')
+        assert torch.cuda.is_available() and root.exists()
+        torch.set_num_threads(4)
+        from benchmarks.direct_skills_eval_stream import owned_match_stream
+        with owned_match_stream():
+            yield (FinishingGoalEnv(32,root,device='cuda:0',seed=911,ssl_foundation_scenarios=parent_scenarios(32)),
+&gt;                  KickoffRaceEnv(32,root,device='cuda:0',seed=911,ssl_foundation_scenarios=parent_scenarios(32)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_direct_skills_kickoff_race_v1.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+rivalsim\direct_skills_kickoff_race_v1.py:117: in __init__
+    self.race = RaceState(self.num_envs, self.device)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+rivalsim\direct_skills_kickoff_race_v1.py:80: in __init__
+    self.array = wp.full(worlds, -1, dtype=wp.int32, device=device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\warp\_src\context.py:9158: in full
+    arr = empty(
+.venv\Lib\site-packages\warp\_src\context.py:9261: in empty
+    arr = warp.array(
+.venv\Lib\site-packages\warp\_src\types.py:3285: in __init__
+    self._init_new(dtype, shape, strides, device, pinned)
+.venv\Lib\site-packages\warp\_src\types.py:3688: in _init_new
+    device = warp._src.context.get_device(device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\warp\_src\context.py:8137: in get_device
+    return runtime.get_device(ident)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;warp._src.context.Runtime object at 0x000001C15B05F8C0&gt;
+ident = device(type='cuda', index=0)
+
+    def get_device(self, ident: DeviceLike = None) -&gt; Device:
+        # special cases
+        if type(ident) is Device:
+            return ident
+        elif ident is None:
+            return self.default_device
+    
+        # string lookup
+        device = self.device_map.get(ident)
+        if device is not None:
+            return device
+        elif ident == "cuda":
+            return self.get_current_cuda_device()
+    
+&gt;       raise ValueError(f"Invalid device identifier: {ident}")
+E       ValueError: Invalid device identifier: cuda:0
+
+.venv\Lib\site-packages\warp\_src\context.py:7874: ValueError</error></testcase></testsuite></testsuites>
