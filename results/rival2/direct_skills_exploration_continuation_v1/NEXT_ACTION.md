@@ -7,6 +7,14 @@ compared in progress_000020.json; interpretation is REVIEW_000020.md. More
 contacts, not established competitive improvement. Next evaluation45/cumulative725.
 Consult the external publication/notification cursor before repeating results.
 
+The no-rollout task-telemetry reduction through700 is COMPLETE in
+TASK_PROGRESS_700.md / task_progress_700.json. It used committed prefixes only,
+passed seven focused tests and deterministic rebuild. Nexto finishing goals are
+only8.0642% of observed endings in691-700; training kickoff first-contact recovery
+does not establish control or standing-kickoff skill. Do not claim the skills
+are mastered but merely fail to transfer. These on-policy windows do not prove
+a cause, and must not justify changing this active arm's frozen settings.
+
 Previous goal turn was a verified wait: worker 30656 was confirmed live and
 advancing at the user's status check. The broad SSL goal is not achieved.
 
