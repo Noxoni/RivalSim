@@ -39,18 +39,32 @@ explicit sampling modes; 32,768 worlds completed 90 rollout-only decisions with
 unchanged weights and correct learner masks. No optimizer/backward occurred.
 Do not repeat those diagnostics or substitute the old all-active probe into PPO.
 
-Next concrete task: freeze a corrected learning/evaluation configuration using
-`DirectSkillNativeNextoCollector`, explicit native-v5 sampling/seed, an exact
-preserved parent, and honest fresh-physical-episode resume semantics. All future
-Nexto comparisons must identify the corrected controller, not silently use the
-legacy benchmark. Keep the existing finishing-goal reward/curriculum unless a
-new measured implementation fault demands correction. No new training until
-the corrected campaign configuration and baseline have been recorded. Preserve
-legacy code/results; do not call their 8/10 wins native competence.
+The corrected baseline and learning configuration are now COMPLETE at
+`05c18d111950c4e89131a9055214bdbbc3eaa400`, remotely read back before learning.
+Read `results/rival2/direct_skills_native_nexto_v1/BASELINE.md`, `PLAN.md`,
+`training_authority.json` and `ENTRY_AND_FIRST_UPDATE.md`. The native-v5 full
+development baseline was0/10 wins for both reference600 (5-204 goals) and
+finishing650 (7-196 goals). The prospective rule selected finishing650. These
+are corrected simulator development results, not new actual native games.
 
-Preserve reference600, finishing650 and all negative evidence. Do not promote
-either checkpoint, restart games or start PPO as a substitute for resolving the
-transfer gap. The broad SSL goal is active; native competence is not demonstrated.
+The new runner `benchmarks/run_direct_skills_native_nexto_v1.py` is LIVE as of
+2026-09-06 14:42:31 UTC, five accepted updates, actual worker43740 and empty
+stderr. Recheck actual process/state instead of assuming these observations
+remain current. External state is
+`G:/dev/RivalSim-runs/direct-skills-native-nexto-v1`. The existing monitor now
+follows that directory and its new notification cursor. Do not start a duplicate
+runner or resume a legacy campaign. Corrected evaluations are at child10/25;
+the25-update block ends for review and is not the SSL goal's completion.
+
+Model/Adam/four RNG entry parity and the first actual accepted update are
+audited. Native-v5 sampling/seed, fresh physical episodes and recurrent reset
+semantics are explicit. Reward/curriculum/PPO settings remain the latest
+finishing parent settings; shooting already has20% of scenario starts.
+
+Preserve reference600, finishing650, every new accepted checkpoint and all
+negative evidence. Native competence remains unproven. No need to repeat these
+completed bridge/timer/observation/controller diagnoses; verify whether actual
+learning against the corrected opponent improves gameplay at the next boundary.
 
 ## Historical launch/progress record (superseded)
 
