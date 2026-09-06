@@ -1,22 +1,22 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +150](EVALUATION_000150.md). Ten full Nexto
-matches produced 24/203 goals for/against, versus 12/209 at +100 and 17/212 at
-+50. All ten remained losses. Contacts were almost unchanged at 368 versus 366;
-finishing-drill goals increased from 8 to 9 of 64. There is actual scoring
-progress, not uniformly better possession: same-player follow-ups fell to
-25/339, challenge control remains only 3/64, and ongoing-ground acquisition
-regressed. The review explains the follow-up denominator's exclusion of goals;
-its fraction alone is not an exact possession-retention measure.
-Continue unchanged to the scheduled +200 review, comparing +50, +100 and +150
-and explicitly tracking open-play control rather than declaring the drills
-solved. No SSL/promotion verdict, reward retuning or deployment is warranted.
-Keep all independently preserved snapshots. Shooting is already 20% of the
-episode-source mixture; no extra shooting family was added to this frozen run.
+Latest completed review: [offset +200](EVALUATION_000200.md). Ten full Nexto
+matches produced 33/187 goals for/against, versus 24/203 at +150, 12/209 at +100
+and 17/212 at +50. All ten remained losses. Full-match scoring improved again,
+but finishing-drill goals regressed from 9 to 5 of 64, challenge control from
+3 to 2, and contacts/min fell from 7.36 to 7.04. Kickoff scoring now covers
+layouts 0/1/3 rather than 0/3; no kickoff controlled acquisition is demonstrated.
+Same-player follow-ups are 26/317. As explained in the +150 review, the
+denominator excludes goals and is not an exact possession-retention measure.
+Continue unchanged to the scheduled +250 review, explicitly checking whether
+the finishing regression persists, not assuming all competencies improve with
+the aggregate score. No SSL/promotion, reward retuning or deployment is warranted.
+Keep all independently preserved snapshots. Shooting remains 20% of the
+episode-source mixture; it was already included and has not been duplicated.
 Use `benchmarks/report_rival2_direct_skills.py --update N`, including
 `--start-groups`, after the corresponding completed evaluation/checkpoint audit.
 Also compare each new review with the previous completed review, for example
-`--update 150 --baseline 100` (with and without `--start-groups`). These CPU-only
+`--update 200 --baseline 150` (with and without `--start-groups`). These CPU-only
 reports use the saved outcomes and preserve the separate baseline-zero reports;
 they do not run an extra evaluation or change training/selection semantics.
 
