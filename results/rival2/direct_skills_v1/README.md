@@ -1,9 +1,12 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +550](EVALUATION_000550.md). Ten full Nexto
-matches produced **62/163 goals for/against and 0/10 wins**, versus 70/165 at
-+500. Contacts rose from 431 to 500, but finishing is still only 5/64 goals and
-ongoing-ground drill scoring 3/29. These are not SSL-level results.
+Latest completed review: [offset +600](EVALUATION_000600.md). Ten full Nexto
+matches produced **65/144 goals for/against and 0/10 wins**, versus62/163 at
++550. Seven matched cases improved, one tied and two worsened. Finishing is
+still only6/64 goals and ongoing-ground drill scoring3/29. These are not
+SSL-level results. The temperature-only block completed safely and stopped for
+review. A further50-update unchanged-settings block is the recorded decision;
+publish/verify its prospective executable authority before restarting.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
 reward/GAE/recurrent replay and found narrow exploration. Simple critic
