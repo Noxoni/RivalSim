@@ -1,0 +1,100 @@
+{
+  "architecture_change": false,
+  "budget": "Exactly30accepted updates maximum,132710400learnerdecisions. Review, no automatic extension.",
+  "calibration_sha256": "BD03FB01E4D4ACF3E9DE251474BFC0FD5AF6F10233775C66E187A60DCA3A52C9",
+  "changes": "Only added actor exploration regularizer. Preserve reward/curriculum/model/Adam from controlled parent650; do not initialize from the negative child15.",
+  "checkpoints": "Entry0,first1,permanent5/15/30,alternating durable latest every accepted update.",
+  "child_updates": 30,
+  "critic_lr": 0.0003,
+  "curriculum": {
+    "changes": "Only focal car linear velocity, along its existing native quaternion forward direction, uniform250..750uu/s. Standard positions, ball, boost, orientations and opponent untouched. These are momentum-assisted approach exercises, not genuine standing kickoffs.",
+    "evaluation": "Unchanged original standing starts, no momentum assistance",
+    "family_distribution": {
+      "challenge": 0.2,
+      "defense": 0.15,
+      "finishing": 0.2,
+      "kickoff": 0.15,
+      "natural": 0.3
+    },
+    "momentum_range": [
+      250.0,
+      750.0
+    ],
+    "nearest_car_admission": "Both original standard positions unchanged, preserving Nexto nearest-car kickoff admission. Do not use distance handicaps that disable its routine.",
+    "no_extra_observation": true,
+    "no_scripted_controls": true,
+    "parent": "Unchanged shooting-pressure V1 source bank",
+    "selection": "Separate RNG(seed+67001), shuffle role4 row IDs and change floor(count/2). No other family altered.",
+    "unchanged_fraction_of_dedicated_kickoffs": 0.5,
+    "version": "RIVAL2_DIRECT_SKILLS_KICKOFF_RACE_V1_STARTS"
+  },
+  "diagnosis_sha256": "706980C9BAAD6BC604A60855CB3D23390013C457588D7A2AFB96C83888593213",
+  "end": "Stop at30 for review, respect user STOP. The broad SSL-development goal remains active.",
+  "evaluation": "Same ten complete native-v5 Nexto matches at+5,+15,+30; unassisted standard starts. Compare exactparent650 and frozen prior arm; no new benchmark or easy-start acceptance.",
+  "evaluation_boundaries": [
+    5,
+    15,
+    30
+  ],
+  "evaluation_spec_sha256": "3185D379D0F9C577744C776ECC8C9E6F39797555582B43B2A72F700BFD6CCE4D",
+  "exploration_objective": {
+    "coefficient": 0.01,
+    "formula": "PPO loss + beta*(-mean_action(log_softmax(logits_T2))-log(90))",
+    "gradient": "For each state: beta*(pi_i-1/90); no vanishing probability factor on suppressed-action term",
+    "reference": "Uniform across all90 joint actions, NOT parent-policy retention",
+    "unchanged": "Same on-policy T2 sampling/likelihood, raw argmax evaluation, existing entropy0.001, no action injection or reward change",
+    "version": "RIVAL2_DIRECT_SKILLS_UNIFORM_LOG_BARRIER_V1"
+  },
+  "fresh_optimizer": false,
+  "initialization": "Exact parent650 model/Adam/groups/counters/four RNG. Fresh physical episodes and zero hidden. New native Nexto RNG from fixedseed. Not child10/25 continuation.",
+  "opponents": {
+    "collector": "RIVAL2_DIRECT_SKILLS_NATIVE_NEXTO_COLLECTOR_V1",
+    "controller": "NEXTO_NATIVE_V5_CONTROLLER_V1",
+    "nexto_learner_sample_fraction": 0.3333333333333333,
+    "nexto_world_fraction": 0.5,
+    "sampling_mode": "native_v5",
+    "seed": 2026090691
+  },
+  "parent": {
+    "accepted_updates": 650,
+    "path": "checkpoints/rival2/direct_skills_finishing_goal_v2/child_000025.pt",
+    "sha256": "939213BF57FFC751C7C173FFCC8AC34DE84D2CAA66CFECB79C59792CBABB0F6D"
+  },
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.001,
+    "epochs": 2,
+    "gae_lambda": 0.9973145188572297,
+    "gamma": 0.995,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 90,
+    "value_loss_coefficient": 0.5
+  },
+  "previous_arm_authority_sha256": "C048BA31AA975E5A92D62C7E1EB21FD18128785FFFC980D8D9A7B411011B361E",
+  "resume": "Same new lineage, exact latest accepted checkpoint only; model/Adam/four RNG/native-opponent RNG restored with fresh physical episodes/hidden and explicit controller-cache reset. Not exact physical replay.",
+  "reward": {
+    "changed_role": 4,
+    "no_action_or_mechanic_reward": true,
+    "no_task_id_or_router": true,
+    "parent_sha256": "A2DAFE92E114B72D5976961C2C186B24E93AE56A2A40B9CD28DDA9844F6A774B",
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "preserved": "Kickoff control gain1.5, controlled advancement0.75, lost-control-0.5, unsuccessful timeout-1, native goals+10/-10. All natural/challenge/finishing/defense rewards and success semantics unchanged. A successful second-touch control play remains worth more than just first contact.",
+    "race": "Only the first native contacting player in the entire world episode receives0.5, once. Observe after each physics tick; same-physics-tick bilateral first contact is a tie and pays neither. A later contact in the same four-tick decision cannot steal or split the earlier result.",
+    "race_bonus": 0.5,
+    "replaced": "Kickoff personal-first-touch bonus only. Existing first_touch telemetry means race-first-touch for role4; other roles retain their existing meaning.",
+    "terminal": "As before, no direct task event on true goal terminal; terminal reward remains the original discounted native goal. Race state clears only at actual episode reset.",
+    "version": "RIVAL2_DIRECT_SKILLS_KICKOFF_RACE_V1"
+  },
+  "reward_sha256": "0C8E214593A98D9A4CF4A9006260B364CAC2A3B075EE932FFA6979D96500A7F7",
+  "safety": "Unchanged finite model/gradient/Adam and transactional corruption protection. KL telemetry only; no KL gate or preservation loss.",
+  "scenario_seed": 2026090601,
+  "success": "Directional improvement in real standard kickoff and subsequent control/scoring, without confusing easy curriculum wins with deployment. No SSL claim from this short experiment.",
+  "training_temperature": 2.0,
+  "version": "RIVAL2_DIRECT_SKILLS_LOG_BARRIER_CAMPAIGN_V1",
+  "worlds": 32768
+}
