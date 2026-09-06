@@ -119,8 +119,51 @@ def audit(offset):
     print(json.dumps(result, indent=2))
 
 
+def audit_start():
+    """Freeze the first accepted update without running another evaluation."""
+    path = CHECKPOINTS / "first_accepted_000001.pt"
+    q = torch.load(path, map_location="cpu", weights_only=False)
+    p = torch.load(CHECKPOINTS / "parent_entity_000293.pt", map_location="cpu", weights_only=False)
+    row = json.loads((EXTERNAL / "training_curve.jsonl").read_text().splitlines()[0])
+    assert q["accepted_updates"] == row["accepted_updates"] == 1
+    assert q["direct_skill_samples"] == row["samples"] == 4423680
+    assert q["cumulative_optimizer_steps"] == 52150 + row["ppo"]["optimizer_steps"]
+    assert {int(s["step"]) for s in q["optimizer"]["state"].values()} == {
+        q["cumulative_optimizer_steps"]
+    }
+    assert all(bool(torch.isfinite(t).all()) for t in q["model"].values())
+    assert all(
+        bool(torch.isfinite(t).all())
+        for s in q["optimizer"]["state"].values()
+        for t in s.values()
+        if isinstance(t, torch.Tensor)
+    )
+    assert not equal(q["model"], p["model"]) and not equal(q["optimizer"], p["optimizer"])
+    assert row["ppo"]["kl_rejections"] == 0
+    assert row["training"]["nexto_training_sample_count"] == 1474560
+    result = dict(
+        verdict="PASS",
+        meaning="Real accepted learning and checkpoint integrity, not capability improvement",
+        checkpoint=str(path.relative_to(ROOT)),
+        checkpoint_sha256=digest(path),
+        accepted_updates=1,
+        model_and_adam_changed=True,
+        model_and_adam_finite=True,
+        audit_optimizer_steps=0,
+        first_training_row=row,
+    )
+    output = RESULTS / "first_accepted_update.json"
+    if output.exists():
+        assert json.loads(output.read_text()) == result
+    else:
+        output.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
+    print(json.dumps({k: v for k, v in result.items() if k != "first_training_row"}, indent=2))
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--update", type=int, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--update", type=int)
+    mode.add_argument("--startup", action="store_true")
     args = parser.parse_args()
-    audit(args.update)
+    audit_start() if args.startup else audit(args.update)
