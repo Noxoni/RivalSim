@@ -1,0 +1,2974 @@
+{
+  "conclusion": "Stronger fixed kickoff-origin match result does not establish broad gameplay: keep original shooting/ongoing-start outcomes separate. No runtime or learner change.",
+  "matches": {
+    "checkpoint": {
+      "accepted_updates": 600,
+      "path": "checkpoints/rival2/direct_skills_v1/plus_000600.pt",
+      "sha256": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2"
+    },
+    "contacts": {
+      "ball_displacement_until_next_contact_or_goal": {
+        "backward": 25,
+        "forward": 266,
+        "neutral": 189
+      },
+      "ball_velocity_change": {
+        "backward": 17,
+        "forward": 464,
+        "neutral": 5
+      },
+      "conceded_with_at_most_one_contact_since_reset": 0,
+      "native_rival_demo_events": 0,
+      "nexto": 1315,
+      "opponent_followup": 261,
+      "resolved_followups": 311,
+      "rival": 486,
+      "same_player_followup": 50,
+      "same_player_followup_fraction": 0.1607717041800643
+    },
+    "integrity": {
+      "all_goals_valid": true,
+      "checkpoint_unchanged": true,
+      "hidden_reset_per_goal": true,
+      "model_unchanged": true,
+      "no_goal_overflow": true,
+      "regulation_completed": true,
+      "scoreboard_matches_summary": true,
+      "scorers_match_scoreboard": true,
+      "scoring_conserved": true,
+      "ten_complete_matches": true,
+      "zero_optimizer_steps": true
+    },
+    "source": "results/rival2/direct_skills_v1/handbrake_reset_v3/full_match_000600.json",
+    "source_text_sha256": "DC94B58E46218CB5FA7A5E6128DFE69B4FD19C0F08A5F5DAB823262F9B62C871",
+    "summary": {
+      "goals_against": 122,
+      "goals_for": 169,
+      "kickoff_first_touches": 0,
+      "losses": 2,
+      "matches_without_rival_touch": 0,
+      "native_goal_resets": true,
+      "no_touch_semantics": "Zero by protocol; use matches_without_rival_touch, not reset count",
+      "no_touch_truncations": 0,
+      "touches": 486,
+      "touches_per_minute": 9.72,
+      "unresolved": 0,
+      "wins": 8
+    }
+  },
+  "new_policy_evaluations": 0,
+  "optimizer_steps": 0,
+  "parent_sha256": "8AC192B4154223DB7CE82B41C77DC475D63B6AFB260EF0B9B9AC4455F6C6F6B2",
+  "skills": {
+    "families": {
+      "challenge": {
+        "events": {
+          "control_gain": 11.0,
+          "failed_attempt": 16.0,
+          "first_touch": 56.0,
+          "forward_control": 4.0,
+          "lost_control": 0.0,
+          "on_target_touch": 0.0,
+          "shot_clear": 0.0
+        },
+        "goals_against": 38,
+        "goals_for": 0,
+        "touched_worlds": 56,
+        "touches": 127,
+        "truncation_endings": 26,
+        "worlds": 64
+      },
+      "defense": {
+        "events": {
+          "control_gain": 13.0,
+          "failed_attempt": 11.0,
+          "first_touch": 0.0,
+          "forward_control": 0.0,
+          "lost_control": 0.0,
+          "on_target_touch": 0.0,
+          "shot_clear": 38.0
+        },
+        "goals_against": 21,
+        "goals_for": 8,
+        "touched_worlds": 62,
+        "touches": 158,
+        "truncation_endings": 35,
+        "worlds": 64
+      },
+      "finishing": {
+        "events": {
+          "control_gain": 0.0,
+          "failed_attempt": 2.0,
+          "first_touch": 64.0,
+          "forward_control": 0.0,
+          "lost_control": 0.0,
+          "on_target_touch": 47.0,
+          "shot_clear": 0.0
+        },
+        "goals_against": 42,
+        "goals_for": 6,
+        "touched_worlds": 64,
+        "touches": 91,
+        "truncation_endings": 16,
+        "worlds": 64
+      },
+      "kickoff": {
+        "events": {
+          "control_gain": 0.0,
+          "failed_attempt": 0.0,
+          "first_touch": 64.0,
+          "forward_control": 0.0,
+          "lost_control": 0.0,
+          "on_target_touch": 0.0,
+          "shot_clear": 0.0
+        },
+        "goals_against": 0,
+        "goals_for": 64,
+        "touched_worlds": 64,
+        "touches": 77,
+        "truncation_endings": 0,
+        "worlds": 64
+      },
+      "natural": {
+        "events": {
+          "control_gain": 0.0,
+          "failed_attempt": 0.0,
+          "first_touch": 0.0,
+          "forward_control": 0.0,
+          "lost_control": 0.0,
+          "on_target_touch": 0.0,
+          "shot_clear": 0.0
+        },
+        "goals_against": 25,
+        "goals_for": 38,
+        "touched_worlds": 56,
+        "touches": 88,
+        "truncation_endings": 1,
+        "worlds": 64
+      }
+    },
+    "meaning": "Each fixed skill case ends at its first native goal or time limit. Natural includes kickoff AND ongoing ground; do not call aggregate kickoff gains general ground play.",
+    "natural_start_groups": {
+      "kickoff_layout_0_side_0": {
+        "case_indices": [
+          14,
+          29,
+          34,
+          39,
+          59
+        ],
+        "cases": 5,
+        "goals_against": 0,
+        "goals_for": 5,
+        "timeouts": 0,
+        "touched_cases": 5,
+        "touches": 5
+      },
+      "kickoff_layout_0_side_1": {
+        "case_indices": [
+          19
+        ],
+        "cases": 1,
+        "goals_against": 0,
+        "goals_for": 1,
+        "timeouts": 0,
+        "touched_cases": 1,
+        "touches": 1
+      },
+      "kickoff_layout_1_side_0": {
+        "case_indices": [
+          50
+        ],
+        "cases": 1,
+        "goals_against": 0,
+        "goals_for": 1,
+        "timeouts": 0,
+        "touched_cases": 1,
+        "touches": 2
+      },
+      "kickoff_layout_1_side_1": {
+        "case_indices": [
+          15,
+          25,
+          35,
+          45,
+          60
+        ],
+        "cases": 5,
+        "goals_against": 0,
+        "goals_for": 5,
+        "timeouts": 0,
+        "touched_cases": 5,
+        "touches": 10
+      },
+      "kickoff_layout_2_side_0": {
+        "case_indices": [
+          16,
+          36,
+          46,
+          51
+        ],
+        "cases": 4,
+        "goals_against": 0,
+        "goals_for": 4,
+        "timeouts": 0,
+        "touched_cases": 4,
+        "touches": 4
+      },
+      "kickoff_layout_2_side_1": {
+        "case_indices": [
+          6,
+          11,
+          31,
+          41,
+          61
+        ],
+        "cases": 5,
+        "goals_against": 0,
+        "goals_for": 5,
+        "timeouts": 0,
+        "touched_cases": 5,
+        "touches": 5
+      },
+      "kickoff_layout_3_side_0": {
+        "case_indices": [
+          2,
+          22,
+          52,
+          62
+        ],
+        "cases": 4,
+        "goals_against": 0,
+        "goals_for": 4,
+        "timeouts": 0,
+        "touched_cases": 4,
+        "touches": 4
+      },
+      "kickoff_layout_3_side_1": {
+        "case_indices": [
+          7,
+          17,
+          37,
+          47
+        ],
+        "cases": 4,
+        "goals_against": 0,
+        "goals_for": 4,
+        "timeouts": 0,
+        "touched_cases": 4,
+        "touches": 4
+      },
+      "kickoff_layout_4_side_0": {
+        "case_indices": [
+          3,
+          63
+        ],
+        "cases": 2,
+        "goals_against": 0,
+        "goals_for": 2,
+        "timeouts": 0,
+        "touched_cases": 2,
+        "touches": 2
+      },
+      "kickoff_layout_4_side_1": {
+        "case_indices": [
+          18,
+          33,
+          38,
+          48
+        ],
+        "cases": 4,
+        "goals_against": 0,
+        "goals_for": 4,
+        "timeouts": 0,
+        "touched_cases": 4,
+        "touches": 4
+      },
+      "ongoing_ground": {
+        "case_indices": [
+          0,
+          1,
+          4,
+          5,
+          8,
+          9,
+          10,
+          12,
+          13,
+          20,
+          21,
+          23,
+          24,
+          26,
+          27,
+          28,
+          30,
+          32,
+          40,
+          42,
+          43,
+          44,
+          49,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58
+        ],
+        "cases": 29,
+        "goals_against": 25,
+        "goals_for": 3,
+        "timeouts": 1,
+        "touched_cases": 21,
+        "touches": 47
+      }
+    }
+  },
+  "sources": [
+    {
+      "path": "results/rival2/direct_skills_v1/evaluation_000600.json",
+      "text_sha256": "3A0009D6F61D174D3CB72EB4491511FB515930F3A9B8BCA2B385727DCC708907"
+    },
+    {
+      "path": "results/rival2/direct_skills_v1/handbrake_reset_v3/full_match_000600.json",
+      "text_sha256": "DC94B58E46218CB5FA7A5E6128DFE69B4FD19C0F08A5F5DAB823262F9B62C871"
+    }
+  ],
+  "timings": {
+    "events": [
+      {
+        "entry_x": 329.3169250488281,
+        "entry_z": 182.10430908203125,
+        "goal_index": 0,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.475,
+        "tick": 896
+      },
+      {
+        "entry_x": 314.2442626953125,
+        "entry_z": 417.0397644042969,
+        "goal_index": 1,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.466666666666667,
+        "tick": 2752
+      },
+      {
+        "entry_x": 549.6956787109375,
+        "entry_z": 246.0310821533203,
+        "goal_index": 2,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.033333333333335,
+        "tick": 4676
+      },
+      {
+        "entry_x": -342.715087890625,
+        "entry_z": 178.581787109375,
+        "goal_index": 3,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 5322
+      },
+      {
+        "entry_x": -298.12786865234375,
+        "entry_z": 418.4787902832031,
+        "goal_index": 4,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.25,
+        "tick": 7152
+      },
+      {
+        "entry_x": 584.5172729492188,
+        "entry_z": 279.10400390625,
+        "goal_index": 5,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.708333333333334,
+        "tick": 8557
+      },
+      {
+        "entry_x": 510.0477294921875,
+        "entry_z": 155.4890899658203,
+        "goal_index": 6,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.35,
+        "tick": 9439
+      },
+      {
+        "entry_x": 83.23651123046875,
+        "entry_z": 402.2260437011719,
+        "goal_index": 7,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.383333333333334,
+        "tick": 10325
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 8,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.375,
+        "tick": 10970
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 9,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 12784
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 10,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 14814
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 11,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 15693
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 12,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 16548
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 13,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 17194
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 14,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 19008
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 15,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 21038
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 16,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 21917
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 17,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 22772
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 18,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 23418
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 19,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 25232
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 20,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 27262
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 21,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 28141
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 22,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 28996
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 23,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 29642
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 24,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 31456
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 25,
+        "match": 0,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 33486
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 26,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 34365
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 27,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 35220
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 28,
+        "match": 0,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 35866
+      },
+      {
+        "entry_x": 569.7416381835938,
+        "entry_z": 445.6482238769531,
+        "goal_index": 0,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.108333333333333,
+        "tick": 852
+      },
+      {
+        "entry_x": 570.0498046875,
+        "entry_z": 445.6230773925781,
+        "goal_index": 1,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 1708
+      },
+      {
+        "entry_x": -342.715087890625,
+        "entry_z": 178.581787109375,
+        "goal_index": 2,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 2354
+      },
+      {
+        "entry_x": -298.12786865234375,
+        "entry_z": 418.4787902832031,
+        "goal_index": 3,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.25,
+        "tick": 4184
+      },
+      {
+        "entry_x": 584.5172729492188,
+        "entry_z": 279.10400390625,
+        "goal_index": 4,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.708333333333334,
+        "tick": 5589
+      },
+      {
+        "entry_x": 510.0477294921875,
+        "entry_z": 155.4890899658203,
+        "goal_index": 5,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.35,
+        "tick": 6471
+      },
+      {
+        "entry_x": 83.23651123046875,
+        "entry_z": 402.2260437011719,
+        "goal_index": 6,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.383333333333334,
+        "tick": 7357
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 7,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.375,
+        "tick": 8002
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 8,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 9816
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 9,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 11846
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 10,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 12725
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 11,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 13580
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 12,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 14226
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 13,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 16040
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 14,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 18070
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 15,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 18949
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 16,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 19804
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 17,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 20450
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 18,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 22264
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 19,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 24294
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 20,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 25173
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 21,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 26028
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 22,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 26674
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 23,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 28488
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 24,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 30518
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 25,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 31397
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 26,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 32252
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 27,
+        "match": 1,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 32898
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 28,
+        "match": 1,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 34712
+      },
+      {
+        "entry_x": -342.75848388671875,
+        "entry_z": 178.64938354492188,
+        "goal_index": 0,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.358333333333333,
+        "tick": 642
+      },
+      {
+        "entry_x": 459.1719055175781,
+        "entry_z": 427.9028625488281,
+        "goal_index": 1,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.3,
+        "tick": 2358
+      },
+      {
+        "entry_x": -474.0179748535156,
+        "entry_z": 259.0198669433594,
+        "goal_index": 2,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 12.675,
+        "tick": 3879
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 3,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.55,
+        "tick": 4545
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 4,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 5559
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 5,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 7449
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 6,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 8865
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 7,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 11245
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 8,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 11913
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 9,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 12927
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 10,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 14817
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 11,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 16233
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 12,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 18613
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 13,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 19281
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 14,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 20295
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 15,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 22185
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 16,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 23601
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 17,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 25981
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 18,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 26649
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 19,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 27663
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 20,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 29553
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 21,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 30969
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 22,
+        "match": 2,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 33349
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 23,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 34017
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 24,
+        "match": 2,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 35031
+      },
+      {
+        "entry_x": -324.7776794433594,
+        "entry_z": 93.15481567382812,
+        "goal_index": 0,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.216666666666667,
+        "tick": 625
+      },
+      {
+        "entry_x": -294.95159912109375,
+        "entry_z": 546.0,
+        "goal_index": 1,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.45,
+        "tick": 2599
+      },
+      {
+        "entry_x": -444.367919921875,
+        "entry_z": 94.3208236694336,
+        "goal_index": 2,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.541666666666667,
+        "tick": 3264
+      },
+      {
+        "entry_x": -734.1311645507812,
+        "entry_z": 151.05149841308594,
+        "goal_index": 3,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.3,
+        "tick": 4260
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 4,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 5116
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 5,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 5762
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 6,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 7576
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 7,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 9606
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 8,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 10485
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 9,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 11340
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 10,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 11986
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 11,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 13800
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 12,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 15830
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 13,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 16709
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 14,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 17564
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 15,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 18210
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 16,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 20024
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 17,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 22054
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 18,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 22933
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 19,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 23788
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 20,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 24434
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 21,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 26248
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 22,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 28278
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 23,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 29157
+      },
+      {
+        "entry_x": 570.0609741210938,
+        "entry_z": 445.6218566894531,
+        "goal_index": 24,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.125,
+        "tick": 30012
+      },
+      {
+        "entry_x": -342.9259948730469,
+        "entry_z": 178.4624786376953,
+        "goal_index": 25,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 30658
+      },
+      {
+        "entry_x": -358.9881591796875,
+        "entry_z": 182.2773895263672,
+        "goal_index": 26,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.116666666666667,
+        "tick": 32472
+      },
+      {
+        "entry_x": 317.530517578125,
+        "entry_z": 325.2555236816406,
+        "goal_index": 27,
+        "match": 3,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 16.916666666666668,
+        "tick": 34502
+      },
+      {
+        "entry_x": 442.9481506347656,
+        "entry_z": 232.76608276367188,
+        "goal_index": 28,
+        "match": 3,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.325,
+        "tick": 35381
+      },
+      {
+        "entry_x": -470.9422912597656,
+        "entry_z": 94.69434356689453,
+        "goal_index": 0,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.55,
+        "tick": 665
+      },
+      {
+        "entry_x": 241.55555725097656,
+        "entry_z": 93.12102508544922,
+        "goal_index": 1,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.166666666666666,
+        "tick": 1765
+      },
+      {
+        "entry_x": 329.5257263183594,
+        "entry_z": 182.0968780517578,
+        "goal_index": 2,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.491666666666666,
+        "tick": 2664
+      },
+      {
+        "entry_x": -270.44989013671875,
+        "entry_z": 403.1446228027344,
+        "goal_index": 3,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.358333333333333,
+        "tick": 4027
+      },
+      {
+        "entry_x": -663.120361328125,
+        "entry_z": 312.82098388671875,
+        "goal_index": 4,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 13.5,
+        "tick": 5647
+      },
+      {
+        "entry_x": 273.5828552246094,
+        "entry_z": 105.3244857788086,
+        "goal_index": 5,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 41.525,
+        "tick": 10630
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 6,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.558333333333334,
+        "tick": 11297
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 7,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 12311
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 8,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 14201
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 9,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 15617
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 10,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 17997
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 11,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 18665
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 12,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 19679
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 13,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 21569
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 14,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 22985
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 15,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 25365
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 16,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 26033
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 17,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 27047
+      },
+      {
+        "entry_x": -593.284423828125,
+        "entry_z": 161.87448120117188,
+        "goal_index": 18,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.75,
+        "tick": 28937
+      },
+      {
+        "entry_x": 191.2940673828125,
+        "entry_z": 406.5529479980469,
+        "goal_index": 19,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.8,
+        "tick": 30353
+      },
+      {
+        "entry_x": 84.46170043945312,
+        "entry_z": 126.2360610961914,
+        "goal_index": 20,
+        "match": 4,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.833333333333332,
+        "tick": 32733
+      },
+      {
+        "entry_x": -470.58770751953125,
+        "entry_z": 94.72029876708984,
+        "goal_index": 21,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.566666666666666,
+        "tick": 33401
+      },
+      {
+        "entry_x": -759.7283935546875,
+        "entry_z": 198.56407165527344,
+        "goal_index": 22,
+        "match": 4,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.45,
+        "tick": 34415
+      },
+      {
+        "entry_x": 329.56890869140625,
+        "entry_z": 182.0958251953125,
+        "goal_index": 0,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.475,
+        "tick": 896
+      },
+      {
+        "entry_x": 74.76249694824219,
+        "entry_z": 393.805908203125,
+        "goal_index": 1,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.091666666666667,
+        "tick": 2587
+      },
+      {
+        "entry_x": 27.88020896911621,
+        "entry_z": 235.8951416015625,
+        "goal_index": 2,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 8.958333333333334,
+        "tick": 3662
+      },
+      {
+        "entry_x": -332.7207336425781,
+        "entry_z": 149.35940551757812,
+        "goal_index": 3,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.375,
+        "tick": 4307
+      },
+      {
+        "entry_x": -86.77999114990234,
+        "entry_z": 321.3398132324219,
+        "goal_index": 4,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 55.708333333333336,
+        "tick": 10992
+      },
+      {
+        "entry_x": 785.2835083007812,
+        "entry_z": 326.2735290527344,
+        "goal_index": 5,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 11.15,
+        "tick": 12330
+      },
+      {
+        "entry_x": -686.60302734375,
+        "entry_z": 142.54608154296875,
+        "goal_index": 6,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.241666666666667,
+        "tick": 13319
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 7,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.108333333333333,
+        "tick": 14172
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 8,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 14818
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 9,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 16616
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 10,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 17809
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 11,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 18804
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 12,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 19660
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 13,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 20306
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 14,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 22104
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 15,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 23297
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 16,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 24292
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 17,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 25148
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 18,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 25794
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 19,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 27592
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 20,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 28785
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 21,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 29780
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 22,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 30636
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 23,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 31282
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 24,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 33080
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 25,
+        "match": 5,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 34273
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 26,
+        "match": 5,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 35268
+      },
+      {
+        "entry_x": 571.1357421875,
+        "entry_z": 445.6857604980469,
+        "goal_index": 0,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.108333333333333,
+        "tick": 852
+      },
+      {
+        "entry_x": 571.7164916992188,
+        "entry_z": 445.70849609375,
+        "goal_index": 1,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 1708
+      },
+      {
+        "entry_x": -344.1705627441406,
+        "entry_z": 179.209228515625,
+        "goal_index": 2,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 2354
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 3,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 4152
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 4,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 5345
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 5,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 6340
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 6,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 7196
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 7,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 7842
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 8,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 9640
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 9,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 10833
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 10,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 11828
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 11,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 12684
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 12,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 13330
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 13,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 15128
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 14,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 16321
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 15,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 17316
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 16,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 18172
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 17,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 18818
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 18,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 20616
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 19,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 21809
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 20,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 22804
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 21,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 23660
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 22,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 24306
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 23,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 26104
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 24,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 27297
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 25,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 28292
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 26,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 29148
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 27,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 29794
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 28,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 31592
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 29,
+        "match": 6,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 32785
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 30,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 33780
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 31,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 34636
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 32,
+        "match": 6,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 35282
+      },
+      {
+        "entry_x": -344.3525085449219,
+        "entry_z": 179.19467163085938,
+        "goal_index": 0,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.358333333333333,
+        "tick": 642
+      },
+      {
+        "entry_x": -284.0499572753906,
+        "entry_z": 95.53936004638672,
+        "goal_index": 1,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 19.566666666666666,
+        "tick": 2990
+      },
+      {
+        "entry_x": -326.1544494628906,
+        "entry_z": 93.14521026611328,
+        "goal_index": 2,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.225,
+        "tick": 3617
+      },
+      {
+        "entry_x": -319.0555725097656,
+        "entry_z": 340.3750305175781,
+        "goal_index": 3,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.408333333333333,
+        "tick": 5466
+      },
+      {
+        "entry_x": -734.4225463867188,
+        "entry_z": 151.1685791015625,
+        "goal_index": 4,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.283333333333333,
+        "tick": 6460
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 5,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 7316
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 6,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 7962
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 7,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 9760
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 8,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 10953
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 9,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 11948
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 10,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 12804
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 11,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 13450
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 12,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 15248
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 13,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 16441
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 14,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 17436
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 15,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 18292
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 16,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 18938
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 17,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 20736
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 18,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 21929
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 19,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 22924
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 20,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 23780
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 21,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 24426
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 22,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 26224
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 23,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 27417
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 24,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 28412
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 25,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 29268
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 26,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 29914
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 27,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 31712
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 28,
+        "match": 7,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 32905
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 29,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 33900
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 30,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 34756
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 31,
+        "match": 7,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 35402
+      },
+      {
+        "entry_x": -326.18292236328125,
+        "entry_z": 93.15064239501953,
+        "goal_index": 0,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.216666666666667,
+        "tick": 625
+      },
+      {
+        "entry_x": 334.72845458984375,
+        "entry_z": 184.1724853515625,
+        "goal_index": 1,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 15.883333333333333,
+        "tick": 2531
+      },
+      {
+        "entry_x": -217.1336212158203,
+        "entry_z": 93.08707427978516,
+        "goal_index": 2,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 18.25,
+        "tick": 4721
+      },
+      {
+        "entry_x": -734.4225463867188,
+        "entry_z": 151.1685791015625,
+        "goal_index": 3,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 5716
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 4,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 6572
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 5,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 7218
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 6,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 9016
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 7,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 10209
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 8,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 11204
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 9,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 12060
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 10,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 12706
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 11,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 14504
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 12,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 15697
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 13,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 16692
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 14,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 17548
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 15,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 18194
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 16,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 19992
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 17,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 21185
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 18,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 22180
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 19,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 23036
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 20,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 23682
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 21,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 25480
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 22,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 26673
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 23,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 27668
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 24,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 28524
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 25,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 29170
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 26,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 30968
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 27,
+        "match": 8,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 32161
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 28,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 33156
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 29,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 34012
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 30,
+        "match": 8,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 34658
+      },
+      {
+        "entry_x": -475.3033142089844,
+        "entry_z": 94.47053527832031,
+        "goal_index": 0,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.558333333333334,
+        "tick": 666
+      },
+      {
+        "entry_x": -410.2915344238281,
+        "entry_z": 376.878662109375,
+        "goal_index": 1,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 1859
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 2,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.275,
+        "tick": 2852
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 3,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 3708
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 4,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 4354
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 5,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 6152
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 6,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 7345
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 7,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 8340
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 8,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 9196
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 9,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 9842
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 10,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 11640
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 11,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 12833
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 12,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 13828
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 13,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 14684
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 14,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 15330
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 15,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 17128
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 16,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 18321
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 17,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 19316
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 18,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 20172
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 19,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 20818
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 20,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 22616
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 21,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 23809
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 22,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 24804
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 23,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 25660
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 24,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 26306
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 25,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 28104
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 26,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 29297
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 27,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 30292
+      },
+      {
+        "entry_x": 571.7589111328125,
+        "entry_z": 445.69793701171875,
+        "goal_index": 28,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 7.133333333333334,
+        "tick": 31148
+      },
+      {
+        "entry_x": -344.18060302734375,
+        "entry_z": 179.21206665039062,
+        "goal_index": 29,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 5.383333333333334,
+        "tick": 31794
+      },
+      {
+        "entry_x": 697.9657592773438,
+        "entry_z": 316.8172912597656,
+        "goal_index": 30,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 14.983333333333333,
+        "tick": 33592
+      },
+      {
+        "entry_x": -468.64483642578125,
+        "entry_z": 387.9214782714844,
+        "goal_index": 31,
+        "match": 9,
+        "scored_by_rival": false,
+        "seconds_since_previous_goal_or_start": 9.941666666666666,
+        "tick": 34785
+      },
+      {
+        "entry_x": -734.4396362304688,
+        "entry_z": 151.17303466796875,
+        "goal_index": 32,
+        "match": 9,
+        "scored_by_rival": true,
+        "seconds_since_previous_goal_or_start": 8.291666666666666,
+        "tick": 35780
+      }
+    ],
+    "goal_entry_height": {
+      "count": 291,
+      "maximum": 546.0,
+      "median": 232.76608276367188,
+      "minimum": 93.08707427978516
+    },
+    "interval_seconds": {
+      "count": 291,
+      "maximum": 55.708333333333336,
+      "median": 8.291666666666666,
+      "minimum": 5.216666666666667
+    },
+    "meaning": "Time between native goal events, with up to three ticks reset-boundary rounding. Entry height does not identify aerial control, shot intent or last touch."
+  }
+}
