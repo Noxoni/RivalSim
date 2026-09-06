@@ -1,9 +1,9 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +10](EVALUATION_000010.md), with raw fixed-case
-outcomes, checkpoint integrity and deterministic CPU comparison. It is mixed,
-not proof of general gameplay improvement. Next skill review +25; next full
-natural-match review +50. Use `benchmarks/report_rival2_direct_skills.py --update N`
+Latest completed review: [offset +25](EVALUATION_000025.md), with raw fixed-case
+outcomes, checkpoint integrity and deterministic CPU comparison. Contact acquisition
+increased, but possession remains absent and broad gameplay improvement is unproven.
+Next skill and full natural-match review +50. Use `benchmarks/report_rival2_direct_skills.py --update N`
 after the corresponding completed evaluation and checkpoint audit.
 
 The user explicitly superseded the potential-only continuation on September 6,
