@@ -5,9 +5,13 @@ curriculum block completed cleanly. Original finishing stays5/64; ten full Nexto
 matches worsen42/139 ->37/168 goals,0/10wins,9/10 cases worse than650. Follow-ups
 39.21% ->31.22%. Do not automatically extend a non-transferring curriculum.
 The current675 checkpoint/model/Adam/RNG and full evidence are preserved. Next:
-[bounded corrected-runtime kickoff continuity tap](kickoff_continuity_000675/AUTHORITY.md),
-no learning, with exact original fullmatch replay required. No new reset defect
-is claimed from scores alone. Goal active and unmet; current runner has exited.
+[completed corrected-runtime kickoff continuity tap](kickoff_continuity_000675/RESULTS.md):
+all1,640 initial/post-goal action pairs identical, original matches exactly
+reproduced, but motion differs after four ticks. Next is
+[bounded native cold-start/cache isolation](kickoff_native_isolation_000675/AUTHORITY.md),
+not a blind training continuation. Native tick-zero initialization is a known
+confound to distinguish from stale caches. No new reset defect is yet proven.
+Goal active and unmet; current runner has exited.
 
 Previous completed review: [offset +650](EVALUATION_000650.md). Ten full Nexto
 matches produced **42/139 goals for/against and0/10 wins**, versus65/144 at600.
