@@ -21,4 +21,12 @@ Older scores remain valid measurements of the **legacy simulator opponent**,
 not proof Rival beats actual native Nexto. Do not delete/rewrite those results,
 promote a model based on them, or label the diagnostic timing subclass a complete
 production/native-fidelity correction. Native Rival results remain poor (0-24,
-1-30). Production-safe integration and its focused validation are the next step.
+1-30).
+
+The separately versioned opt-in production controller is now validated in
+`results/rival2/nexto_native_controller_v1/RESULTS.md`, including the actual
+installed-method oracle, per-world activation, CUDA RNG replay and a real
+32,768-world collector. This is a controller/wiring correction, not full native
+observation/physics parity or learned capability. No old runner default or
+checkpoint was silently changed. Further learning needs a corrected prospective
+campaign configuration using the explicit new controller version.

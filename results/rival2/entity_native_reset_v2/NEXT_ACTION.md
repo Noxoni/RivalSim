@@ -32,15 +32,21 @@ Both full traces exactly reproduce their respective first20s segments. Ten
 focused tests passed; worker42976/launcher21200 exited. No training is live.
 Do not rerun either comparison or the earlier native games/audits.
 
-Next concrete task: implement a separately versioned production Nexto correction,
-with pending neural action distinct from emitted controls and per-world cadence.
-Validate against actual installed controller methods, including batching,
-activation/deactivation and resets; correct the kickoff literal/reference.
-Do not copy the diagnostic all-active-only subclass directly into PPO. Preserve
-old code/results for reproduction and label the old benchmark legacy-opponent
-evidence. Read `results/rival2/NEXTO_BENCHMARK_CORRECTION_NOTICE.md` first.
-No reward/policy/physics changes or more training until the corrected opponent
-path has focused validation and a prospectively recorded configuration.
+The versioned production-controller correction is now also COMPLETE. Read
+`results/rival2/nexto_native_controller_v1/RESULTS.md`: actual installed controller
+oracle matches on CPU/CUDA; real pinned-model masked/RNG replay is exact in both
+explicit sampling modes; 32,768 worlds completed 90 rollout-only decisions with
+unchanged weights and correct learner masks. No optimizer/backward occurred.
+Do not repeat those diagnostics or substitute the old all-active probe into PPO.
+
+Next concrete task: freeze a corrected learning/evaluation configuration using
+`DirectSkillNativeNextoCollector`, explicit native-v5 sampling/seed, an exact
+preserved parent, and honest fresh-physical-episode resume semantics. All future
+Nexto comparisons must identify the corrected controller, not silently use the
+legacy benchmark. Keep the existing finishing-goal reward/curriculum unless a
+new measured implementation fault demands correction. No new training until
+the corrected campaign configuration and baseline have been recorded. Preserve
+legacy code/results; do not call their 8/10 wins native competence.
 
 Preserve reference600, finishing650 and all negative evidence. Do not promote
 either checkpoint, restart games or start PPO as a substitute for resolving the

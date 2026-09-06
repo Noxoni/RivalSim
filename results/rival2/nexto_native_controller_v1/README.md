@@ -56,8 +56,9 @@ validation was not weakened. Both initial and corrected XML evidence remain.
 implementation sources before execution. It requires a CUDA oracle replay,
 real-model replay with both sampling modes, a ten-world 20-second integration
 smoke, and one 90-decision/32,768-world collector rollout. No optimizer is
-constructed and no backward call or policy update is permitted. Results will
-be recorded separately; CPU success alone is not GPU/integration success.
+constructed and no backward call or policy update is permitted. These checks
+have now completed; read `RESULTS.md` and `gpu_results.json`. The final combined
+suite passed 27 tests. CPU success alone was not treated as integration success.
 
 This correction does not prove all Nexto observations or RivalSim physics equal
 Rocket League. Native countdown timing is not fabricated; inactive simulated
