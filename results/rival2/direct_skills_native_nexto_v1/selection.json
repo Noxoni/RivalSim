@@ -1,0 +1,47 @@
+{
+  "checkpoint": {
+    "accepted_updates": 650,
+    "path": "checkpoints/rival2/direct_skills_finishing_goal_v2/child_000025.pt",
+    "sha256": "939213BF57FFC751C7C173FFCC8AC34DE84D2CAA66CFECB79C59792CBABB0F6D"
+  },
+  "optimizer_steps": 0,
+  "protocol_sha256": "C6766B7D1479B8A462CF28577D42721EA7506CA34987AC36007D2B025F714F42",
+  "results": {
+    "finishing650": {
+      "file_sha256": "1D8697248575F945A4FDD959D98B5CBD0AADB2DB156C6D7762999BC29F60A601",
+      "summary": {
+        "goals_against": 196,
+        "goals_for": 7,
+        "kickoff_first_touches": 0,
+        "losses": 10,
+        "matches_without_rival_touch": 0,
+        "native_goal_resets": true,
+        "no_touch_semantics": "Zero by protocol; use matches_without_rival_touch, not reset count",
+        "no_touch_truncations": 0,
+        "touches": 456,
+        "touches_per_minute": 9.12,
+        "unresolved": 0,
+        "wins": 0
+      }
+    },
+    "reference600": {
+      "file_sha256": "F9ACD319F1814A77A5B0F025CF8FFC124A47CA6962039E320107ABAC5DF45818",
+      "summary": {
+        "goals_against": 204,
+        "goals_for": 5,
+        "kickoff_first_touches": 1,
+        "losses": 10,
+        "matches_without_rival_touch": 0,
+        "native_goal_resets": true,
+        "no_touch_semantics": "Zero by protocol; use matches_without_rival_touch, not reset count",
+        "no_touch_truncations": 0,
+        "touches": 475,
+        "touches_per_minute": 9.5,
+        "unresolved": 0,
+        "wins": 0
+      }
+    }
+  },
+  "rule": "Lexicographic: wins, aggregate goal difference, fewer concedes; exact ties prefer finishing650. Only these two preserved checkpoints; no optimization during selection.",
+  "selected_name": "finishing650"
+}
