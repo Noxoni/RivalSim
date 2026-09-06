@@ -1,10 +1,11 @@
 # Live: unchanged-settings exploration continuation from cumulative 680
 
-Latest completed evaluation: branch20 / total exploration50 / cumulative700.
-0/10 wins, 1 scored /222 conceded, 10.30 contacts/min, zero kickoff first contact.
+Latest completed evaluation: branch45 / total exploration75 / cumulative725.
+0/10 wins, 6 scored /209 conceded, 10.16 contacts/min, zero kickoff first contact.
 All 28 core +6 objective +11 match-integrity checks passed. Both parents are
-compared in progress_000020.json; interpretation is REVIEW_000020.md. More
-contacts, not established competitive improvement. Next evaluation45/cumulative725.
+compared in progress_000045.json; interpretation is REVIEW_000045.md. Partial
+recovery from700, still worse scoring/goal difference than original650.
+Next and final evaluation70/cumulative750, then this arm stops for review.
 Consult the external publication/notification cursor before repeating results.
 
 The no-rollout task-telemetry reduction through700 is COMPLETE in

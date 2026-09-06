@@ -1,0 +1,1419 @@
+{
+  "audit_device": "cpu",
+  "authority_sha256": "933F08E12D5A2B310458AACA29DF704715DA011C5EB4D334EB36C680392124FD",
+  "branch_updates": 45,
+  "checkpoint": {
+    "path": "checkpoints/rival2/direct_skills_exploration_continuation_v1/child_000045.pt",
+    "sha256": "515A15B34087220B6548DF3ED5F5D19717C5EAEDD3C27B407D8122B44445F7AA"
+  },
+  "checks": {
+    "adam_steps": true,
+    "adam_steps_uniform": true,
+    "authorities_bound": true,
+    "corpus_bound": true,
+    "entry_counters_exact": true,
+    "entry_four_rng_exact": true,
+    "entry_model_exact": true,
+    "entry_native_rng_exact": true,
+    "entry_opponent_rng_exact": true,
+    "entry_optimizer_exact": true,
+    "exploration_exact": true,
+    "finite_adam": true,
+    "finite_model": true,
+    "lineage_bound": true,
+    "model_changed": true,
+    "native_mode": true,
+    "native_opponent": true,
+    "new_format": true,
+    "parent_file_exact": true,
+    "parents_bound": true,
+    "physics_count": true,
+    "rng_saved": true,
+    "runtime_reward": true,
+    "sample_count": true,
+    "target_offset": true,
+    "unchanged_architecture": true,
+    "unchanged_ppo": true,
+    "unchanged_reward": true
+  },
+  "comparisons": {
+    "immediate_parent": {
+      "goal_difference_worlds": {
+        "improved": 8,
+        "unchanged": 1,
+        "worsened": 1
+      },
+      "inference": "Descriptive fixed development comparison; ten matches do not establish statistical significance, native parity or SSL.",
+      "paired_worlds": [
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -19,
+            "goals_against": 20,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 39,
+            "goal_difference": -20,
+            "goals_against": 20,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 6,
+            "goal_difference": 1,
+            "goals_against": 0,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 0,
+          "world": 0
+        },
+        {
+          "after": {
+            "contacts": 49,
+            "goal_difference": -17,
+            "goals_against": 17,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 41,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 8,
+            "goal_difference": 4,
+            "goals_against": -5,
+            "goals_for": -1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 1,
+          "world": 1
+        },
+        {
+          "after": {
+            "contacts": 39,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 48,
+            "goal_difference": -27,
+            "goals_against": 27,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -9,
+            "goal_difference": 7,
+            "goals_against": -6,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 2,
+          "world": 2
+        },
+        {
+          "after": {
+            "contacts": 67,
+            "goal_difference": -22,
+            "goals_against": 22,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 36,
+            "goal_difference": -21,
+            "goals_against": 21,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 31,
+            "goal_difference": -1,
+            "goals_against": 1,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 3,
+          "world": 3
+        },
+        {
+          "after": {
+            "contacts": 66,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 42,
+            "goal_difference": -21,
+            "goals_against": 21,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 24,
+            "goal_difference": 1,
+            "goals_against": 0,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 4,
+          "world": 4
+        },
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -22,
+            "goals_against": 22,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 50,
+            "goal_difference": -23,
+            "goals_against": 23,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -5,
+            "goal_difference": 1,
+            "goals_against": -1,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 0,
+          "world": 5
+        },
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 60,
+            "goal_difference": -24,
+            "goals_against": 24,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -15,
+            "goal_difference": 3,
+            "goals_against": -2,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 1,
+          "world": 6
+        },
+        {
+          "after": {
+            "contacts": 52,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 40,
+            "goal_difference": -25,
+            "goals_against": 25,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 12,
+            "goal_difference": 5,
+            "goals_against": -4,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 2,
+          "world": 7
+        },
+        {
+          "after": {
+            "contacts": 52,
+            "goal_difference": -21,
+            "goals_against": 21,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 44,
+            "goal_difference": -21,
+            "goals_against": 21,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 8,
+            "goal_difference": 0,
+            "goals_against": 0,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 3,
+          "world": 8
+        },
+        {
+          "after": {
+            "contacts": 48,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 44,
+            "goal_difference": -23,
+            "goals_against": 24,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 4,
+            "goal_difference": 2,
+            "goals_against": -2,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 4,
+          "world": 9
+        }
+      ],
+      "summary": {
+        "goals_against": {
+          "after": 209,
+          "before": 228,
+          "delta": -19
+        },
+        "goals_for": {
+          "after": 6,
+          "before": 2,
+          "delta": 4
+        },
+        "kickoff_first_touches": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        },
+        "losses": {
+          "after": 10,
+          "before": 10,
+          "delta": 0
+        },
+        "matches_without_rival_touch": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        },
+        "touches": {
+          "after": 508,
+          "before": 444,
+          "delta": 64
+        },
+        "touches_per_minute": {
+          "after": 10.16,
+          "before": 8.88,
+          "delta": 1.2799999999999994
+        },
+        "wins": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        }
+      }
+    },
+    "original_control": {
+      "goal_difference_worlds": {
+        "improved": 3,
+        "unchanged": 1,
+        "worsened": 6
+      },
+      "inference": "Descriptive fixed development comparison; ten matches do not establish statistical significance, native parity or SSL.",
+      "paired_worlds": [
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -19,
+            "goals_against": 20,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 52,
+            "goal_difference": -17,
+            "goals_against": 18,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -7,
+            "goal_difference": -2,
+            "goals_against": 2,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 0,
+          "world": 0
+        },
+        {
+          "after": {
+            "contacts": 49,
+            "goal_difference": -17,
+            "goals_against": 17,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 62,
+            "goal_difference": -22,
+            "goals_against": 22,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -13,
+            "goal_difference": 5,
+            "goals_against": -5,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 1,
+          "world": 1
+        },
+        {
+          "after": {
+            "contacts": 39,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 43,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": -4,
+            "goal_difference": 1,
+            "goals_against": -1,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 2,
+          "world": 2
+        },
+        {
+          "after": {
+            "contacts": 67,
+            "goal_difference": -22,
+            "goals_against": 22,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 44,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 23,
+            "goal_difference": -1,
+            "goals_against": 0,
+            "goals_for": -1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 3,
+          "world": 3
+        },
+        {
+          "after": {
+            "contacts": 66,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 36,
+            "goal_difference": -20,
+            "goals_against": 20,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 30,
+            "goal_difference": 0,
+            "goals_against": 1,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 0,
+          "starting_layout": 4,
+          "world": 4
+        },
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -22,
+            "goals_against": 22,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 45,
+            "goal_difference": -23,
+            "goals_against": 24,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 0,
+            "goal_difference": 1,
+            "goals_against": -2,
+            "goals_for": -1,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 0,
+          "world": 5
+        },
+        {
+          "after": {
+            "contacts": 45,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 39,
+            "goal_difference": -19,
+            "goals_against": 19,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 6,
+            "goal_difference": -2,
+            "goals_against": 3,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 1,
+          "world": 6
+        },
+        {
+          "after": {
+            "contacts": 52,
+            "goal_difference": -20,
+            "goals_against": 21,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 43,
+            "goal_difference": -10,
+            "goals_against": 10,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 9,
+            "goal_difference": -10,
+            "goals_against": 11,
+            "goals_for": 1,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 2,
+          "world": 7
+        },
+        {
+          "after": {
+            "contacts": 52,
+            "goal_difference": -21,
+            "goals_against": 21,
+            "goals_for": 0,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 50,
+            "goal_difference": -18,
+            "goals_against": 20,
+            "goals_for": 2,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 2,
+            "goal_difference": -3,
+            "goals_against": 1,
+            "goals_for": -2,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 3,
+          "world": 8
+        },
+        {
+          "after": {
+            "contacts": 48,
+            "goal_difference": -21,
+            "goals_against": 22,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "before": {
+            "contacts": 42,
+            "goal_difference": -18,
+            "goals_against": 19,
+            "goals_for": 1,
+            "seconds": 300.0
+          },
+          "delta": {
+            "contacts": 6,
+            "goal_difference": -3,
+            "goals_against": 3,
+            "goals_for": 0,
+            "seconds": 0.0
+          },
+          "rival_side": 1,
+          "starting_layout": 4,
+          "world": 9
+        }
+      ],
+      "summary": {
+        "goals_against": {
+          "after": 209,
+          "before": 196,
+          "delta": 13
+        },
+        "goals_for": {
+          "after": 6,
+          "before": 7,
+          "delta": -1
+        },
+        "kickoff_first_touches": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        },
+        "losses": {
+          "after": 10,
+          "before": 10,
+          "delta": 0
+        },
+        "matches_without_rival_touch": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        },
+        "touches": {
+          "after": 508,
+          "before": 456,
+          "delta": 52
+        },
+        "touches_per_minute": {
+          "after": 10.16,
+          "before": 9.12,
+          "delta": 1.040000000000001
+        },
+        "wins": {
+          "after": 0,
+          "before": 0,
+          "delta": 0
+        }
+      }
+    }
+  },
+  "contacts": {
+    "ball_displacement_until_next_contact_or_goal": {
+      "backward": 90,
+      "forward": 199,
+      "neutral": 217
+    },
+    "ball_velocity_change": {
+      "backward": 35,
+      "forward": 441,
+      "neutral": 32
+    },
+    "conceded_with_at_most_one_contact_since_reset": 0,
+    "native_rival_demo_events": 31,
+    "nexto": 1384,
+    "opponent_followup": 373,
+    "resolved_followups": 498,
+    "rival": 508,
+    "same_player_followup": 125,
+    "same_player_followup_fraction": 0.25100401606425704
+  },
+  "entry": {
+    "path": "checkpoints/rival2/direct_skills_exploration_continuation_v1/entry_000000.pt",
+    "sha256": "FAFDD5FB907403241F39971C041C971ED3EDFF257F25E8BD04F96159636D149B"
+  },
+  "evaluation_hashes": {
+    "G:/dev/RivalSim/results/rival2/direct_skills_exploration_continuation_v1/child_000045.integrity.json": "D95AF887E1D92B20229C05FCD047B96F721EF03602E9ACE14FA48B25EF239CC8",
+    "G:/dev/RivalSim/results/rival2/direct_skills_exploration_continuation_v1/child_000045.json": "66D764E66B0D90B78431BD10BB0AF146597815D6DEB1D97EE80A3358ACCE2BD8",
+    "G:/dev/RivalSim/results/rival2/direct_skills_log_barrier_v1/child_000030.json": "B28924024A5DB577A95673F60DE4F02F15EAE177A16E4E0FBD35317B12AA427E",
+    "G:/dev/RivalSim/results/rival2/direct_skills_native_nexto_v1/finishing650.json": "1D8697248575F945A4FDD959D98B5CBD0AADB2DB156C6D7762999BC29F60A601"
+  },
+  "interpretation": "Resumable accepted learning and execution integrity, not automatic gameplay promotion or SSL.",
+  "model_sha256": "9CC6D713DD959C5AC71A888DEA23EDF585A4152EEFAA5CE241AA457FAA030990",
+  "objective_checks": {
+    "coefficient_frozen": true,
+    "every_update_coefficient_correct": true,
+    "every_update_has_new_loss": true,
+    "nonnegative_barrier": true,
+    "objective_checkpoint_bound": true,
+    "weighted_loss_correct": true
+  },
+  "optimizer_steps_in_audit": 0,
+  "parent": {
+    "accepted_updates": 680,
+    "path": "checkpoints/rival2/direct_skills_log_barrier_v1/child_000030.pt",
+    "sha256": "16BF2B904785D49E0363B869AF953CFCCC62FF754286A307D386729AC691DDAD"
+  },
+  "total_exploration_updates": 75,
+  "training": {
+    "first_row": {
+      "accepted_updates": 681,
+      "branch_updates": 1,
+      "cuda_peak_allocated_bytes": 16321580544,
+      "cumulative_optimizer_steps": 149066,
+      "native_nexto_authority_sha256": "933F08E12D5A2B310458AACA29DF704715DA011C5EB4D334EB36C680392124FD",
+      "physical_ticks": 8033402880,
+      "ppo": {
+        "approx_kl": 0.002889400813728571,
+        "clip_fraction": 0.020241422578692436,
+        "completed_update_mean_kl": 0.003665713948675381,
+        "completed_update_sample_kl_max": 0.7304229736328125,
+        "entropy": 2.925600051879883,
+        "exploration_barrier": 1.440350890159607,
+        "exploration_coefficient": 0.009999998845160007,
+        "gradient_norm": 1.1908167600631714,
+        "kl_rejections": 0,
+        "optimizer_steps": 136,
+        "policy_loss": 1.957615495484788e-05,
+        "total_loss": 0.6941096782684326,
+        "value_loss": 1.3652243614196777,
+        "weighted_exploration_barrier": 0.014403508976101875
+      },
+      "ppo_seconds": 17.11018759990111,
+      "rollout_seconds": 7.867809700081125,
+      "samples": 3012526080,
+      "training": {
+        "action_index_counts": [
+          56031,
+          25682,
+          36665,
+          31010,
+          41673,
+          28515,
+          40258,
+          31585,
+          173720,
+          31562,
+          28660,
+          33242,
+          207155,
+          30725,
+          131030,
+          31128,
+          203385,
+          33180,
+          220434,
+          45518,
+          188307,
+          32711,
+          100827,
+          29528,
+          23872,
+          54300,
+          32630,
+          33719,
+          29693,
+          28194,
+          34086,
+          48220,
+          12284,
+          9612,
+          34981,
+          82273,
+          10346,
+          13669,
+          27523,
+          36268,
+          12379,
+          11169,
+          28990,
+          28923,
+          32920,
+          41561,
+          28093,
+          34506,
+          26928,
+          111532,
+          27899,
+          28149,
+          29489,
+          154665,
+          12870,
+          11982,
+          15323,
+          42930,
+          26746,
+          303943,
+          11806,
+          10676,
+          23365,
+          43900,
+          60513,
+          157051,
+          23835,
+          35824,
+          27375,
+          54999,
+          26718,
+          28816,
+          26691,
+          57358,
+          10005,
+          9976,
+          36948,
+          125412,
+          12118,
+          10456,
+          29444,
+          59025,
+          11068,
+          9520,
+          31140,
+          32717,
+          29899,
+          34200,
+          22984,
+          34643
+        ],
+        "boost": 2338653.0,
+        "by_reward_role_and_opponent": {
+          "challenge_nexto": {
+            "approach_reward": 269.6384436161963,
+            "concedes": 70.0,
+            "control_gain": 166.0,
+            "direct_reward": 1987.8884436161961,
+            "episode_endings": 71.0,
+            "failed_attempt": 0.0,
+            "first_touch": 2838.0,
+            "forward_control": 69.0,
+            "goals": 1.0,
+            "lost_control": 3.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 295435.0,
+            "shot_clear": 0.0,
+            "success_endings": 1.0,
+            "touches": 4795.0
+          },
+          "challenge_selfplay": {
+            "approach_reward": 666.0591693731885,
+            "concedes": 16.0,
+            "control_gain": 627.0,
+            "direct_reward": 4843.809169373192,
+            "episode_endings": 32.0,
+            "failed_attempt": 0.0,
+            "first_touch": 5809.0,
+            "forward_control": 445.0,
+            "goals": 16.0,
+            "lost_control": 2.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 603092.0,
+            "shot_clear": 0.0,
+            "success_endings": 16.0,
+            "touches": 8391.0
+          },
+          "defense_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 132.0,
+            "control_gain": 34.0,
+            "direct_reward": 1932.0,
+            "episode_endings": 132.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 0.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 220511.0,
+            "shot_clear": 1254.0,
+            "success_endings": 12.0,
+            "touches": 2674.0
+          },
+          "defense_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 943.0,
+            "control_gain": 60.0,
+            "direct_reward": 4764.0,
+            "episode_endings": 943.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 0.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 496721.0,
+            "shot_clear": 3116.0,
+            "success_endings": 17.0,
+            "touches": 5087.0
+          },
+          "finishing_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 0.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 251.0,
+            "failed_attempt": 0.0,
+            "first_touch": 3349.0,
+            "forward_control": 0.0,
+            "goals": 251.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 2476.0,
+            "samples": 292451.0,
+            "shot_clear": 0.0,
+            "success_endings": 251.0,
+            "touches": 5462.0
+          },
+          "finishing_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 0.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 943.0,
+            "failed_attempt": 0.0,
+            "first_touch": 4101.0,
+            "forward_control": 0.0,
+            "goals": 943.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 2897.0,
+            "samples": 496721.0,
+            "shot_clear": 0.0,
+            "success_endings": 943.0,
+            "touches": 5651.0
+          },
+          "kickoff_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 0.0,
+            "control_gain": 1.0,
+            "direct_reward": 43.5,
+            "episode_endings": 0.0,
+            "failed_attempt": 0.0,
+            "first_touch": 84.0,
+            "forward_control": 0.0,
+            "goals": 0.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 225878.0,
+            "shot_clear": 0.0,
+            "success_endings": 0.0,
+            "touches": 1161.0
+          },
+          "kickoff_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 0.0,
+            "control_gain": 2.0,
+            "direct_reward": 1145.0,
+            "episode_endings": 0.0,
+            "failed_attempt": 0.0,
+            "first_touch": 2284.0,
+            "forward_control": 0.0,
+            "goals": 0.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 444768.0,
+            "shot_clear": 0.0,
+            "success_endings": 0.0,
+            "touches": 5027.0
+          },
+          "natural_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 110.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 131.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 21.0,
+            "lost_control": 0.0,
+            "natural_reward": -3439.228979640924,
+            "on_target_touch": 0.0,
+            "samples": 440285.0,
+            "shot_clear": 0.0,
+            "success_endings": 21.0,
+            "touches": 1360.0
+          },
+          "natural_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 73.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 146.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 73.0,
+            "lost_control": 0.0,
+            "natural_reward": 136.52105305805162,
+            "on_target_touch": 0.0,
+            "samples": 907818.0,
+            "shot_clear": 0.0,
+            "success_endings": 73.0,
+            "touches": 8231.0
+          }
+        },
+        "concedes": 1344.0,
+        "current_selfplay_only": false,
+        "ended_player_episode_touch_fraction": 0.5383163457908645,
+        "ended_player_episodes": 2649.0,
+        "entropy": 12745332.3359375,
+        "episodes_with_touch": 1426.0,
+        "first_touch_age": 47038.86934259534,
+        "first_touches": 35365.0,
+        "goals": 1305.0,
+        "goalward_touch_fraction": 0.8589644432366897,
+        "goalward_touches": 41092.0,
+        "handbrake": 564322.0,
+        "jump": 238189.0,
+        "kl_telemetry_only": true,
+        "learner_only_action_index_counts": true,
+        "mean_entropy": 2.8811605577115658,
+        "mean_first_touch_seconds_if_touched": 1.3300966871934212,
+        "movement_speed": 1169.789634648076,
+        "nexto_samples": 1474560.0,
+        "nexto_training_sample_count": 1474560,
+        "no_touch": 0.0,
+        "opponent_nexto_probability": 0.5,
+        "physical_goals": 1617.0,
+        "physical_physics_ticks": 11796480,
+        "potential_reward_components": {
+          "access": 1086.7395482215943,
+          "alignment": 23.181463125129625,
+          "boost": -1536.8692341089663,
+          "control": -9.468193035274282,
+          "defense": -107.17835191002077,
+          "field": -1215.6158027234196,
+          "goal_velocity": -655.0990749300618,
+          "terminal_goal": -389.17432022094727,
+          "total": 11912.71364919033
+        },
+        "resets": 1617.0,
+        "samples": 4423680.0,
+        "speed": 5174775011.0,
+        "time_limit": 0.0,
+        "touches": 47839.0,
+        "touches_per_minute": 19.465738932291668,
+        "trainable_agent_samples": 4423680,
+        "unused_opponent_buffer_actions": "Dummy current-policy proposals, not PPO targets. Nexto controls emitted by per-physics-tick provider.",
+        "world_reset_counts_include_all_opponent_families": true
+      },
+      "utc": "2026-09-06T16:45:46.068111+00:00"
+    },
+    "kl_rejections": 0,
+    "last_row": {
+      "accepted_updates": 725,
+      "branch_updates": 45,
+      "cuda_peak_allocated_bytes": 16352972800,
+      "cumulative_optimizer_steps": 155388,
+      "native_nexto_authority_sha256": "933F08E12D5A2B310458AACA29DF704715DA011C5EB4D334EB36C680392124FD",
+      "physical_ticks": 8552448000,
+      "ppo": {
+        "approx_kl": 0.002931751310825348,
+        "clip_fraction": 0.014656801708042622,
+        "completed_update_mean_kl": 0.003830807532093331,
+        "completed_update_sample_kl_max": 0.8335561752319336,
+        "entropy": 3.86354398727417,
+        "exploration_barrier": 0.685850977897644,
+        "exploration_coefficient": 0.009999999776482582,
+        "gradient_norm": 0.8716950416564941,
+        "kl_rejections": 0,
+        "optimizer_steps": 144,
+        "policy_loss": -0.00011663966870401055,
+        "total_loss": 0.3219583034515381,
+        "value_loss": 0.638159990310669,
+        "weighted_exploration_barrier": 0.006858509965240955
+      },
+      "ppo_seconds": 24.064872599905357,
+      "rollout_seconds": 9.096217900048941,
+      "samples": 3207168000,
+      "training": {
+        "action_index_counts": [
+          57690,
+          31722,
+          39146,
+          29321,
+          49804,
+          39357,
+          47036,
+          38225,
+          76536,
+          37605,
+          45312,
+          36301,
+          161917,
+          51466,
+          90115,
+          47350,
+          56230,
+          40983,
+          102612,
+          61337,
+          110535,
+          56143,
+          83703,
+          53611,
+          40427,
+          55689,
+          46101,
+          50034,
+          38649,
+          45798,
+          40109,
+          68881,
+          26387,
+          21244,
+          41025,
+          68998,
+          21186,
+          27109,
+          33918,
+          71680,
+          23125,
+          24520,
+          45452,
+          61997,
+          40402,
+          50376,
+          34988,
+          62171,
+          35613,
+          78092,
+          42229,
+          60658,
+          42361,
+          64716,
+          29671,
+          20160,
+          21352,
+          31906,
+          44337,
+          119147,
+          21920,
+          21671,
+          40017,
+          64915,
+          48821,
+          63550,
+          35519,
+          52599,
+          44670,
+          65959,
+          40280,
+          47196,
+          41067,
+          70182,
+          25260,
+          22478,
+          39179,
+          78161,
+          22028,
+          26317,
+          40245,
+          70658,
+          18085,
+          22786,
+          40711,
+          74428,
+          42883,
+          70340,
+          36861,
+          60329
+        ],
+        "boost": 2233473.0,
+        "by_reward_role_and_opponent": {
+          "challenge_nexto": {
+            "approach_reward": 111.48429547119524,
+            "concedes": 855.0,
+            "control_gain": 114.0,
+            "direct_reward": 676.7342954907531,
+            "episode_endings": 1028.0,
+            "failed_attempt": 95.0,
+            "first_touch": 918.0,
+            "forward_control": 61.0,
+            "goals": 23.0,
+            "lost_control": 31.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 245118.0,
+            "shot_clear": 0.0,
+            "success_endings": 123.0,
+            "touches": 1977.0
+          },
+          "challenge_selfplay": {
+            "approach_reward": 218.11194892282623,
+            "concedes": 236.0,
+            "control_gain": 479.0,
+            "direct_reward": 1102.1119488531954,
+            "episode_endings": 1514.0,
+            "failed_attempt": 714.0,
+            "first_touch": 1264.0,
+            "forward_control": 354.0,
+            "goals": 236.0,
+            "lost_control": 36.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 464404.0,
+            "shot_clear": 0.0,
+            "success_endings": 578.0,
+            "touches": 4325.0
+          },
+          "defense_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 499.0,
+            "control_gain": 121.0,
+            "direct_reward": 699.5,
+            "episode_endings": 797.0,
+            "failed_attempt": 67.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 27.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 227015.0,
+            "shot_clear": 390.0,
+            "success_endings": 427.0,
+            "touches": 1626.0
+          },
+          "defense_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 201.0,
+            "control_gain": 429.0,
+            "direct_reward": 1566.5,
+            "episode_endings": 1338.0,
+            "failed_attempt": 232.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 322.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 389951.0,
+            "shot_clear": 770.0,
+            "success_endings": 914.0,
+            "touches": 3589.0
+          },
+          "finishing_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 919.0,
+            "control_gain": 0.0,
+            "direct_reward": -102.0,
+            "episode_endings": 1108.0,
+            "failed_attempt": 102.0,
+            "first_touch": 1060.0,
+            "forward_control": 0.0,
+            "goals": 87.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 809.0,
+            "samples": 264596.0,
+            "shot_clear": 0.0,
+            "success_endings": 87.0,
+            "touches": 1967.0
+          },
+          "finishing_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 322.0,
+            "control_gain": 0.0,
+            "direct_reward": -815.0,
+            "episode_endings": 1338.0,
+            "failed_attempt": 815.0,
+            "first_touch": 985.0,
+            "forward_control": 0.0,
+            "goals": 201.0,
+            "lost_control": 0.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 657.0,
+            "samples": 389951.0,
+            "shot_clear": 0.0,
+            "success_endings": 201.0,
+            "touches": 1975.0
+          },
+          "kickoff_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 481.0,
+            "control_gain": 12.0,
+            "direct_reward": -142.5,
+            "episode_endings": 759.0,
+            "failed_attempt": 246.0,
+            "first_touch": 162.0,
+            "forward_control": 8.0,
+            "goals": 11.0,
+            "lost_control": 3.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 240066.0,
+            "shot_clear": 0.0,
+            "success_endings": 33.0,
+            "touches": 1069.0
+          },
+          "kickoff_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 114.0,
+            "control_gain": 158.0,
+            "direct_reward": -171.25,
+            "episode_endings": 1088.0,
+            "failed_attempt": 749.0,
+            "first_touch": 592.0,
+            "forward_control": 63.0,
+            "goals": 114.0,
+            "lost_control": 5.0,
+            "natural_reward": 0.0,
+            "on_target_touch": 0.0,
+            "samples": 387796.0,
+            "shot_clear": 0.0,
+            "success_endings": 225.0,
+            "touches": 2556.0
+          },
+          "natural_nexto": {
+            "approach_reward": 0.0,
+            "concedes": 1525.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 1561.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 31.0,
+            "lost_control": 0.0,
+            "natural_reward": -14702.568598569473,
+            "on_target_touch": 0.0,
+            "samples": 497765.0,
+            "shot_clear": 0.0,
+            "success_endings": 31.0,
+            "touches": 1810.0
+          },
+          "natural_selfplay": {
+            "approach_reward": 0.0,
+            "concedes": 771.0,
+            "control_gain": 0.0,
+            "direct_reward": 0.0,
+            "episode_endings": 2278.0,
+            "failed_attempt": 0.0,
+            "first_touch": 0.0,
+            "forward_control": 0.0,
+            "goals": 771.0,
+            "lost_control": 0.0,
+            "natural_reward": -2098.996879581002,
+            "on_target_touch": 0.0,
+            "samples": 1317018.0,
+            "shot_clear": 0.0,
+            "success_endings": 771.0,
+            "touches": 11107.0
+          }
+        },
+        "concedes": 5923.0,
+        "current_selfplay_only": false,
+        "ended_player_episode_touch_fraction": 0.8326957607931923,
+        "ended_player_episodes": 12809.0,
+        "entropy": 17050514.828125,
+        "episodes_with_touch": 10666.0,
+        "first_touch_age": 19323.07601928711,
+        "first_touches": 10840.0,
+        "goals": 1823.0,
+        "goalward_touch_fraction": 0.8469110340301865,
+        "goalward_touches": 27102.0,
+        "handbrake": 897368.0,
+        "jump": 427205.0,
+        "kl_telemetry_only": true,
+        "learner_only_action_index_counts": true,
+        "mean_entropy": 3.854373469176116,
+        "mean_first_touch_seconds_if_touched": 1.7825715884951208,
+        "movement_speed": 1036.0645191333913,
+        "nexto_samples": 1474560.0,
+        "nexto_training_sample_count": 1474560,
+        "no_touch": 55.0,
+        "opponent_nexto_probability": 0.5,
+        "physical_goals": 6102.0,
+        "physical_physics_ticks": 11796480,
+        "potential_reward_components": {
+          "access": -2004.491495363478,
+          "alignment": -295.7156607361222,
+          "boost": -544.998803202132,
+          "control": 118.74712498138604,
+          "defense": 2.127081703809133,
+          "field": 746.7210634587973,
+          "goal_velocity": 88.17784711108925,
+          "terminal_goal": -40923.95625305176,
+          "total": -39999.292861278445
+        },
+        "resets": 9031.0,
+        "samples": 4423680.0,
+        "speed": 4583217892.0,
+        "time_limit": 2874.0,
+        "touches": 32001.0,
+        "touches_per_minute": 13.021240234375,
+        "trainable_agent_samples": 4423680,
+        "unused_opponent_buffer_actions": "Dummy current-policy proposals, not PPO targets. Nexto controls emitted by per-physics-tick provider.",
+        "world_reset_counts_include_all_opponent_families": true
+      },
+      "utc": "2026-09-06T17:11:29.717721+00:00"
+    },
+    "learner_decisions": 199065600,
+    "max_completed_update_mean_kl": 0.004372165780408788,
+    "max_sample_kl_telemetry": 3.6825273036956787,
+    "optimizer_steps": 6458,
+    "physics_ticks": 530841600,
+    "updates": 45
+  }
+}
