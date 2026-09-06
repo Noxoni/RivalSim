@@ -15,8 +15,11 @@ does not establish control or standing-kickoff skill. Do not claim the skills
 are mastered but merely fail to transfer. These on-policy windows do not prove
 a cause, and must not justify changing this active arm's frozen settings.
 
-Previous goal turn was a verified wait: worker 30656 was confirmed live and
-advancing at the user's status check. The broad SSL goal is not achieved.
+The read-only EXPLORATION_REGRESSION_REVIEW.md records the current loss's
+continuing uniformizing pressure and why the completed gradient calibration
+does not prove that pressure harmless or causal. No new probe or learning was
+launched for that review. It is a hypothesis for the terminal review, not
+permission to change settings inside this arm. The broad SSL goal is not achieved.
 
 This arm was prospectively frozen and remotely read back at
 fe93e5cb5e2e67465da7db8a127d715d09f96344 before launch on
