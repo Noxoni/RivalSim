@@ -103,6 +103,11 @@ def run(offset, output):
     assert saved["accepted_updates"] == offset and saved["optimizer_steps"] == 0
     assert saved["model_unchanged"] and saved["checkpoint_unchanged"]
     package = json.loads((results / "package.json").read_text())
+    authority = json.loads((results / "authority.json").read_text())
+    authority_hash = hashlib.sha256(
+        json.dumps(authority, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+    ).hexdigest().upper()
+    assert saved["authority_sha256"] == package["authority_sha256"] == authority_hash
     for name, expected in package["sources"].items():
         actual = hashlib.sha256((ROOT / name).read_bytes().replace(b"\r\n", b"\n"))
         assert actual.hexdigest().upper() == expected, name
@@ -200,8 +205,11 @@ def run(offset, output):
 
 
 if __name__ == "__main__":
+    import torch
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--update", type=int, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    torch.set_num_threads(8)  # Match the production evaluator's process configuration.
     run(args.update, args.output)

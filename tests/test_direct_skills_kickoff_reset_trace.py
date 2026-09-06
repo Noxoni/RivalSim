@@ -131,8 +131,13 @@ def test_busy_lease_prevents_stream_runner_and_output(monkeypatch, tmp_path):
         checkpoint_unchanged=True,
         checkpoint=dict(sha256=hashlib.sha256(checkpoint.read_bytes()).hexdigest().upper()),
     )
+    authority_hash = hashlib.sha256(b"{}").hexdigest().upper()
+    saved["authority_sha256"] = authority_hash
     (result_dir / "full_match_000300.json").write_text(json.dumps(saved))
-    (result_dir / "package.json").write_text(json.dumps(dict(sources={})))
+    (result_dir / "package.json").write_text(
+        json.dumps(dict(sources={}, authority_sha256=authority_hash))
+    )
+    (result_dir / "authority.json").write_text("{}")
 
     @contextmanager
     def busy():
