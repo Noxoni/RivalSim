@@ -77,3 +77,15 @@ integration/identity. Do not invent unknown physics state as exact, assume a
 root cause, mask fields, rewrite rewards, or restart PPO as a workaround. Do not
 extend the expired native comparison deadline or present its partial game as a
 full result. Both candidate checkpoints and all prior evidence stay preserved.
+
+## Superseding measured diagnosis (2026-09-06)
+
+The initial native packet wheel proxy versus simulator reset-cache mismatch is
+now demonstrated to matter: changing only those first-decision wheel fields in
+the same20second simulator test changes14/3goals to4/14, and34touches to8.
+All38native kickoffs were checked;30first commands change under that ablation.
+The short grounded motion replay is close, not a gross acceleration failure.
+See `results/rival2/entity_native_gap_v1/RESULTS.md`; no production fix or learning
+has occurred. Follow its `NEXT_RESET_ALIGNMENT.md` for a separate, explicit,
+qualified research-runtime compatibility test. Do not repeat completed audits
+or silently zero unavailable fields as if they were measured native zeros.
