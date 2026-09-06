@@ -19,11 +19,28 @@ only six same-hidden-state controller decisions across both games. Maximum
 timer mismatch is about 0.2 seconds. It is real but does not establish the
 cause of the entire loss; no deployment fix or quality promotion was applied.
 
-Continue bounded physical/opponent-fidelity diagnosis using existing evidence.
-Prioritize a causal simulator comparison for the already measured installed
-Nexto kickoff-table/scheduling differences, or independent contact dynamics;
-do not multiply another observation-format audit. Preserve completed negative
-results. Do not treat formatting PASS as proof of exact native state or physics.
+The four-arm Nexto causal comparison is complete at
+`results/rival2/nexto_native_causal_v1/RESULTS.md`: baseline 14-3 and 34 touches;
+native timing 2-10 and 23 touches, across ten 20-second worlds. Kickoff yaw alone
+leaves all sampled poses exact. Read the limitations; this is not full native
+Nexto parity. The baseline's 6,000 Rival decisions matched prior evidence.
+
+The full-regulation follow-up is also COMPLETE in
+`results/rival2/nexto_native_full_match_v1/RESULTS.md`. Baseline reproduces 8/10
+wins and 169-122 goals; native timing plus table gives 0/10 wins and 34-239 goals.
+Both full traces exactly reproduce their respective first20s segments. Ten
+focused tests passed; worker42976/launcher21200 exited. No training is live.
+Do not rerun either comparison or the earlier native games/audits.
+
+Next concrete task: implement a separately versioned production Nexto correction,
+with pending neural action distinct from emitted controls and per-world cadence.
+Validate against actual installed controller methods, including batching,
+activation/deactivation and resets; correct the kickoff literal/reference.
+Do not copy the diagnostic all-active-only subclass directly into PPO. Preserve
+old code/results for reproduction and label the old benchmark legacy-opponent
+evidence. Read `results/rival2/NEXTO_BENCHMARK_CORRECTION_NOTICE.md` first.
+No reward/policy/physics changes or more training until the corrected opponent
+path has focused validation and a prospectively recorded configuration.
 
 Preserve reference600, finishing650 and all negative evidence. Do not promote
 either checkpoint, restart games or start PPO as a substitute for resolving the
