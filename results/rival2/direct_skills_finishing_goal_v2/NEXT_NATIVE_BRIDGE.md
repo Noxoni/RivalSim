@@ -53,3 +53,27 @@ RivalSim, with real phase/reset/ordinary-pause handling, interval metadata,
 unavailable-field qualifications and cold warm-up validation. Then freeze the
 bounded native local-game comparison before installation. Neither export has
 been installed; no native match or new learning occurred during preparation.
+
+## Superseding next action after native comparison (2026-09-06)
+
+Packet integration, bounded protocol publication and the first native launch
+are now complete. Read `results/rival2/entity_native_packet_v1/RESULTS.md` and
+`reference600_blue/audit.json` before acting. Do not repeat preparation above.
+
+Reference600 trailed native Nexto 0-37 when the frozen600-second wall-clock
+limit stopped its still-incomplete match, with about80seconds regulation left.
+No finishing650 or opposite-side game ran. This is a severe performance gap,
+not a completed four-case comparison and not a native promotion.
+
+All9171recorded policy decisions reproduce exactly. Actual native consumed
+controls match the previous command on all9132eligible uninterrupted decision
+endpoints; the source/export hashes are unchanged. Rival was moving, requesting
+boost and touching the ball, but not scoring. No learning occurred.
+
+Next: a bounded read-only discrepancy audit using these preserved actual native
+packets, especially initial kickoff/approach segments. Check physical inputs,
+phase semantics, short motion/contact fidelity and simulator-versus-native Nexto
+integration/identity. Do not invent unknown physics state as exact, assume a
+root cause, mask fields, rewrite rewards, or restart PPO as a workaround. Do not
+extend the expired native comparison deadline or present its partial game as a
+full result. Both candidate checkpoints and all prior evidence stay preserved.
