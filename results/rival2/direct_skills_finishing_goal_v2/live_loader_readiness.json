@@ -1,0 +1,52 @@
+{
+  "action_shape": [
+    1,
+    8
+  ],
+  "actual_runtime_requirements": {
+    "decision": "Joint90 argmax lookup, not tanh/BCE hybrid decoding",
+    "hold_ticks": 4,
+    "physics_hz": 120,
+    "policy_hz": 30,
+    "recurrent": "Advance GRU only at policy decision; hold both GRU/action on other ticks; reset per real episode/kickoff"
+  },
+  "checkpoint": {
+    "path": "checkpoints/rival2/direct_skills_reset_recovery_v1/child_000025.pt",
+    "sha256": "8EBC09AF738CA89554854D9854EDAE46E01083A9B2841F9E0428D5A054E85AA3"
+  },
+  "checkpoint_unchanged": true,
+  "exact_model_cpu_loading": true,
+  "export_created": false,
+  "external_files_changed": false,
+  "hidden_shape": [
+    1,
+    1,
+    256
+  ],
+  "installed_feedforward_runtime": "Supports held action cadence but invokes model(observation) without recurrent state; also not this policy.",
+  "installed_recurrent_runtime": "Requires physics120/policy120/hold1 and legacy hybrid export; not compatible with this checkpoint.",
+  "interpretation": "Zero-input forward proves loader/output interface only, not meaningful controls or gameplay. A separate entity/joint90 recurrent 30Hz export/runtime and honest packet-observation validation are needed before native RLBot tests. No active training change.",
+  "joint90_argmax_table_exact": true,
+  "legacy_export_loader": {
+    "accepted": false,
+    "error": "Rival2UnifiedPolicyConfig.__init__() got an unexpected keyword argument 'critic_architecture'",
+    "error_type": "TypeError"
+  },
+  "live_deployment": false,
+  "live_gameplay_evaluation": false,
+  "logit_shape": [
+    1,
+    90
+  ],
+  "model_unchanged": true,
+  "observation_scope": "No full packet parity test here. Prior individually measured simulator wheel contacts versus aggregate packet ground-contact broadcast remains a separate documented domain gap; unavailable state must not be relabeled exact.",
+  "optimizer_steps": 0,
+  "simulator_steps": 0,
+  "source_hashes": {
+    "G:\\dev\\RLBot-Rival\\bot\\rival2_live\\runtime.py": "89C3CDEE30A941D4AB8E3DD084F2677A00EEBA357D92F534316AB53BF213CB41",
+    "G:\\dev\\RLBot-Rival\\bot\\rival2_unified_v5\\unified_runtime.py": "59946E65855CE12A141BCB0C0BF00DDA1CE2E320D882B3B8E500144FD339F846",
+    "G:\\dev\\RLBot-Rival\\scripts\\export_rival2_unified_v5.py": "37D9C9548EF46E088CD88A0B23B59E64552DBEF5C3B41F4019FF0AEB7AF77480"
+  },
+  "utc": "2026-09-06T12:08:21.895703+00:00",
+  "version": "RIVAL2_DIRECT_SKILLS_LEGACY_LIVE_LOADER_AUDIT_V1"
+}
