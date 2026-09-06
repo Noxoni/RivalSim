@@ -43,6 +43,13 @@ CAR_FIELDS = (
     "demo_respawn_timer",
 )
 BALL_FIELDS = ("ball_pos", "ball_vel", "ball_ang_vel")
+CAR_VECTOR_WIDTHS = dict(car_pos=3, car_vel=3, car_quat=4, car_ang_vel=3, wheel_contact=4)
+
+
+def car_view_shape(name, worlds):
+    """Warp scalar wheel storage is flat; do not infer components from ndim."""
+    width = CAR_VECTOR_WIDTHS.get(name)
+    return (worlds, 2, width) if width is not None else (worlds, 2)
 
 
 @contextmanager
@@ -194,7 +201,7 @@ def install_finishing_tap(campaign, physics, decisions, identity):
         def native(self):
             n, views = self.num_envs, self.bridge.views
             row = {
-                name: views[name].reshape(n, 2, *views[name].shape[1:]).cpu().numpy()
+                name: views[name].reshape(car_view_shape(name, n)).cpu().numpy()
                 for name in CAR_FIELDS
             }
             row.update({name: views[name].cpu().numpy() for name in BALL_FIELDS})

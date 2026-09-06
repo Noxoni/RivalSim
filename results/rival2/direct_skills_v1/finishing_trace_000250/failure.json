@@ -1,0 +1,14 @@
+{
+  "verdict": "INCOMPLETE_DIAGNOSTIC_CAPTURE",
+  "helper_commit": "bb3969c3375375f66bdcd3d424e8f4d9f426f601",
+  "checkpoint_sha256": "657EBB91830C3602495BDF71FD9EE6E66645C63C61159B6B63BE0F6BEA4FF93E",
+  "accepted_updates": 250,
+  "exception": "RuntimeError: shape '[64, 2]' is invalid for input of size 512",
+  "location": "trace_rival2_direct_skills.TracedEnvironment.native",
+  "cause": "Read-only helper inferred car field dimensions from tensor rank. Native wheel_contact storage is flat with four values per car",
+  "completed_before_failure": ["natural", "challenge"],
+  "finishing_trace_written": false,
+  "optimizer_steps": 0,
+  "training_or_reward_failure": false,
+  "resolution": "Explicit native component widths including four wheel contacts; regression test on actual flat layout; new output directory for retry"
+}

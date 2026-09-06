@@ -192,7 +192,7 @@ def test_tapped_environment_delegates_and_keeps_pre_reset_state(monkeypatch, fai
     import torch
     import warp as wp
 
-    from benchmarks.trace_rival2_direct_skills import BALL_FIELDS, CAR_FIELDS
+    from benchmarks.trace_rival2_direct_skills import BALL_FIELDS, CAR_FIELDS, CAR_VECTOR_WIDTHS
 
     monkeypatch.setattr(wp, "to_torch", lambda value: value)
 
@@ -217,6 +217,9 @@ def test_tapped_environment_delegates_and_keeps_pre_reset_state(monkeypatch, fai
             self.observation = torch.zeros(2, 2, 182)
             self.goal_latched = torch.zeros(2, dtype=torch.int32)
             views = {name: torch.zeros(4) for name in CAR_FIELDS}
+            views.update({name: torch.zeros(4, width) for name, width in CAR_VECTOR_WIDTHS.items()})
+            # The real wrapper exposes four wheel contacts per car as flat scalars.
+            views["wheel_contact"] = torch.arange(16, dtype=torch.int32)
             views.update({name: torch.zeros(2, 3) for name in BALL_FIELDS})
             views["rival2.previous_action"] = torch.zeros(2, 2, 8)
             views["rival2.touch_count"] = torch.zeros(4, dtype=torch.int32)
@@ -272,5 +275,8 @@ def test_tapped_environment_delegates_and_keeps_pre_reset_state(monkeypatch, fai
             assert row["pre.ball_pos"].min() == tick
             assert row["post.ball_pos"].min() == tick + 1
             assert row["pre.applied_action"][0, 1, 0] == 0.25 * (tick + 1)
+            np.testing.assert_array_equal(
+                row["pre.wheel_contact"], np.arange(16, dtype=np.int32).reshape(2, 2, 4)
+            )
         assert not env.bridge.views["ball_pos"].any()
     assert env.world.step == original and "step" not in vars(env.world)
