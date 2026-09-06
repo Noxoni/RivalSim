@@ -178,6 +178,9 @@ def stepwise_replay(model, data):
 
 def gradients(model, data, roles, stepwise_logp):
     """Entry-of-update policy gradients, same normalization and full sequences."""
+    # Match production PPO forward mode: cuDNN GRU backward requires train().
+    # No dropout/batchnorm exists in this policy; state_dict parity is checked.
+    model.train()
     config = ppo_config()
     eligible = data["train_mask"].any(1).nonzero().flatten()
     index = eligible[: config.minibatch_size // config.rollout_horizon]
@@ -272,6 +275,7 @@ def gradients(model, data, roles, stepwise_logp):
             norm = float(a.norm() * b.norm())
             cosine[name][other] = float(torch.dot(a, b)) / norm if norm > 0 else None
     model.zero_grad(set_to_none=True)
+    model.eval()
     return dict(
         sequences=len(index),
         trainable_samples=int(mask.sum()),
@@ -443,6 +447,7 @@ def run():
             )
             assert terminal_return_error is None or terminal_return_error <= 2e-5
             replay_logp, replay_report = stepwise_replay(policy, data)
+            write_json(OUTPUT / f"rollout_{iteration:02d}_replay.json", replay_report)
             grad_report = gradients(policy, data, stacked["roles"], replay_logp)
             result = dict(
                 rollout=iteration,
