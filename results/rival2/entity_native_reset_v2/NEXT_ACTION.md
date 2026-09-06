@@ -1,5 +1,16 @@
 # Native reset V2 is launched, not awaiting another implementation
 
+## Latest completed work
+
+Blue has now completed a full native0–24loss. Its three audits and full raw
+captures are in `reference600_blue/`; replay is exact, all25projections occur
+only at their intended first kickoff decisions, and all10,768eligible native
+consumed-control endpoints match. Do not reduce Blue again or report its result
+as a new Orange result. Orange is running under the same existing runner.
+Read `RESULTS.md` and `results/rival2/native_nexto_integration_audit_v1/RESULTS.md`.
+The installed Nexto model identity/table/scheduler audit is also complete;
+do not repeat it. Neither discovery is permission to modify the active test.
+
 The protocol is published at `9c9dffe8b59c6b2bdd909bf672fdc630ea7fd4f8`.
 All 13 commit files were read back from the remote, 15 local authority source
 hashes matched, and the checkpoint/export hashes matched before launch.
