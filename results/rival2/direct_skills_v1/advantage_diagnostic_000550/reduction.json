@@ -1,0 +1,723 @@
+{
+  "batched_replay_clip_exceedances": 0,
+  "checks": [
+    {
+      "independent_gae_exact": true,
+      "rollout": 0,
+      "same_batch_replay_exact": true,
+      "terminal_goal_reward_error": 7.150870313665791e-07,
+      "total_reward_accounting_error": 0.0,
+      "value_loss_actor_gradient_exactly_zero": true
+    },
+    {
+      "independent_gae_exact": true,
+      "rollout": 1,
+      "same_batch_replay_exact": true,
+      "terminal_goal_reward_error": 7.150870313665791e-07,
+      "total_reward_accounting_error": 0.0,
+      "value_loss_actor_gradient_exactly_zero": true
+    },
+    {
+      "independent_gae_exact": true,
+      "rollout": 2,
+      "same_batch_replay_exact": true,
+      "terminal_goal_reward_error": 7.150870313665791e-07,
+      "total_reward_accounting_error": 0.0,
+      "value_loss_actor_gradient_exactly_zero": true
+    },
+    {
+      "independent_gae_exact": true,
+      "rollout": 3,
+      "same_batch_replay_exact": true,
+      "terminal_goal_reward_error": 7.150870313665791e-07,
+      "total_reward_accounting_error": 0.0,
+      "value_loss_actor_gradient_exactly_zero": true
+    }
+  ],
+  "collection_counts": [
+    {
+      "rollout": 0,
+      "trainable_samples": 138240,
+      "true_terminals": 124,
+      "truncations": 0
+    },
+    {
+      "rollout": 1,
+      "trainable_samples": 138240,
+      "true_terminals": 394,
+      "truncations": 0
+    },
+    {
+      "rollout": 2,
+      "trainable_samples": 138240,
+      "true_terminals": 416,
+      "truncations": 0
+    },
+    {
+      "rollout": 3,
+      "trainable_samples": 138240,
+      "true_terminals": 346,
+      "truncations": 682
+    }
+  ],
+  "descriptive_calibration": {
+    "applied_to_policy": false,
+    "caveat": "Small temporal diagnostic holdout, not randomized independent games. No role-conditioned neural critic was trained. This is descriptive error structure, not a counterfactual actor or proof a PPO change will improve play.",
+    "fit_rollouts": [
+      0,
+      1
+    ],
+    "fitted_parameters_per_role": 2,
+    "held_out_rollouts": [
+      2,
+      3
+    ],
+    "optimizer_steps": 0,
+    "original_held_out_mse": 1.8176021575927734,
+    "pooled_coefficients": [
+      1.0119112593178072,
+      0.05543964321353614
+    ],
+    "pooled_held_out_mse": 1.8243474616612667,
+    "role_coefficients": {
+      "challenge": [
+        1.011599272199726,
+        0.018458658433457932
+      ],
+      "defense": [
+        1.0164346604484757,
+        -0.049783094290423505
+      ],
+      "finishing": [
+        0.994646638383959,
+        0.1057608551960778
+      ],
+      "kickoff": [
+        1.0675876402260862,
+        0.1793643271522805
+      ],
+      "natural": [
+        0.9917842656673621,
+        -0.011897620011432174
+      ]
+    },
+    "role_conditioned_held_out_mse": 1.8281903327326725
+  },
+  "diagnostic_summary_sha256": "01BF93CBC5FC6D225DDC196AB26D59292064DE01F570A22DDCEFD6DF07F1C2D9",
+  "health": {
+    "all": {
+      "entropy": {
+        "count": 552960,
+        "max": 3.2620747089385986,
+        "mean": 0.26773902061152016,
+        "median": 0.05139511823654175,
+        "min": 3.267630306960645e-12,
+        "positive_fraction": 1.0,
+        "q05": 1.7771499187801965e-05,
+        "q95": 1.207963365316389,
+        "std": 0.41916924030994535
+      },
+      "maximum_probability_above_95_fraction": 0.6870822482638889,
+      "maximum_probability_above_99_fraction": 0.525632957175926,
+      "mean_maximum_probability": 0.9139470458030701,
+      "samples": 552960
+    },
+    "nexto": {
+      "entropy": {
+        "count": 184320,
+        "max": 2.9997551441192627,
+        "mean": 0.17054264512783449,
+        "median": 0.01493996661156416,
+        "min": 3.267630306960645e-12,
+        "positive_fraction": 1.0,
+        "q05": 5.1422903197817504e-06,
+        "q95": 0.874099725484847,
+        "std": 0.3223241598132791
+      },
+      "maximum_probability_above_95_fraction": 0.7822970920138889,
+      "maximum_probability_above_99_fraction": 0.642626953125,
+      "mean_maximum_probability": 0.9441781044006348,
+      "samples": 184320
+    },
+    "selfplay": {
+      "entropy": {
+        "count": 368640,
+        "max": 3.2620747089385986,
+        "mean": 0.316337208353363,
+        "median": 0.08669707179069519,
+        "min": 1.4139191553685926e-11,
+        "positive_fraction": 1.0,
+        "q05": 4.776172027050052e-05,
+        "q95": 1.3207615673542017,
+        "std": 0.45224163284463625
+      },
+      "maximum_probability_above_95_fraction": 0.6394748263888889,
+      "maximum_probability_above_99_fraction": 0.4671359592013889,
+      "mean_maximum_probability": 0.8988314867019653,
+      "samples": 368640
+    }
+  },
+  "interpretation": "Negative advantage on a scoring tick or positive advantage on a conceding tick is a baseline-relative residual, not causal proof that PPO rewards conceding. Here the consistent natural/skill differences motivate critic calibration investigation; reward signs, goal bootstrapping and GAE are verified separately.",
+  "maximum_batched_replay_logp_error": 0.005251407623291016,
+  "no_optimizer_or_simulator": true,
+  "roles": {
+    "challenge_nexto": {
+      "critic_rmse": 1.3211910724639893,
+      "entropy": {
+        "count": 38746,
+        "max": 2.88828706741333,
+        "mean": 0.20664968353294713,
+        "median": 0.027187044732272625,
+        "min": 7.651159705801547e-10,
+        "positive_fraction": 1.0,
+        "q05": 1.725303764033015e-05,
+        "q95": 0.9936689734458923,
+        "std": 0.3599787228314484
+      },
+      "maximum_probability": {
+        "count": 38746,
+        "max": 1.0,
+        "mean": 0.9318004512740868,
+        "median": 0.9963042140007019,
+        "min": 0.15373292565345764,
+        "positive_fraction": 1.0,
+        "q05": 0.5837147831916809,
+        "q95": 0.999998927116394,
+        "std": 0.1368478279736943
+      },
+      "normalized_advantage": {
+        "count": 38746,
+        "max": 5.927110195159912,
+        "mean": -0.10737912394708872,
+        "median": -0.04533315822482109,
+        "min": -7.556385517120361,
+        "positive_fraction": 0.46458989315026067,
+        "q05": -1.8463937640190125,
+        "q95": 1.401691496372223,
+        "std": 0.9779561494027904
+      },
+      "samples": 38746
+    },
+    "challenge_selfplay": {
+      "critic_rmse": 1.3356702327728271,
+      "entropy": {
+        "count": 68830,
+        "max": 2.826570987701416,
+        "mean": 0.29192758564936194,
+        "median": 0.07995400205254555,
+        "min": 1.582731457006048e-08,
+        "positive_fraction": 1.0,
+        "q05": 0.00011202116838830989,
+        "q95": 1.2267592191696166,
+        "std": 0.4215859894284566
+      },
+      "maximum_probability": {
+        "count": 68830,
+        "max": 1.0,
+        "mean": 0.9065635973163578,
+        "median": 0.987249493598938,
+        "min": 0.13515272736549377,
+        "positive_fraction": 1.0,
+        "q05": 0.5271723866462708,
+        "q95": 0.9999918937683105,
+        "std": 0.156287559230744
+      },
+      "normalized_advantage": {
+        "count": 68830,
+        "max": 9.442173957824707,
+        "mean": 0.03917486286079563,
+        "median": -0.021895358338952065,
+        "min": -8.324673652648926,
+        "positive_fraction": 0.4790934185674851,
+        "q05": -1.5120923399925232,
+        "q95": 1.778307116031645,
+        "std": 1.0639179470149656
+      },
+      "samples": 68830
+    },
+    "defense_nexto": {
+      "critic_rmse": 1.4077225923538208,
+      "entropy": {
+        "count": 31686,
+        "max": 2.730286121368408,
+        "mean": 0.17543159546209836,
+        "median": 0.01845154259353876,
+        "min": 5.597512470895127e-12,
+        "positive_fraction": 1.0,
+        "q05": 1.9767615413002204e-05,
+        "q95": 0.8624397218227386,
+        "std": 0.31917744387348707
+      },
+      "maximum_probability": {
+        "count": 31686,
+        "max": 1.0,
+        "mean": 0.9410571469189069,
+        "median": 0.9976262450218201,
+        "min": 0.173333540558815,
+        "positive_fraction": 1.0,
+        "q05": 0.6158618628978729,
+        "q95": 0.9999986886978149,
+        "std": 0.1255234168235093
+      },
+      "normalized_advantage": {
+        "count": 31686,
+        "max": 5.047584533691406,
+        "mean": -0.12241385118086169,
+        "median": -0.04316115751862526,
+        "min": -8.563488006591797,
+        "positive_fraction": 0.46518967367291547,
+        "q05": -1.7704296112060547,
+        "q95": 1.4171078205108643,
+        "std": 1.0116985389074962
+      },
+      "samples": 31686
+    },
+    "defense_selfplay": {
+      "critic_rmse": 1.4838472604751587,
+      "entropy": {
+        "count": 59545,
+        "max": 2.866370677947998,
+        "mean": 0.247726123059933,
+        "median": 0.04700329154729843,
+        "min": 1.1684461176386662e-09,
+        "positive_fraction": 1.0,
+        "q05": 2.8735132946167166e-05,
+        "q95": 1.1232587099075309,
+        "std": 0.3907521111236672
+      },
+      "maximum_probability": {
+        "count": 59545,
+        "max": 1.0,
+        "mean": 0.9199219833309038,
+        "median": 0.9931419491767883,
+        "min": 0.15150952339172363,
+        "positive_fraction": 1.0,
+        "q05": 0.5528900384902954,
+        "q95": 0.9999980926513672,
+        "std": 0.14634409024735295
+      },
+      "normalized_advantage": {
+        "count": 59545,
+        "max": 6.860548496246338,
+        "mean": 0.0015644217743937274,
+        "median": -0.02962218038737774,
+        "min": -7.394685745239258,
+        "positive_fraction": 0.47029977328071204,
+        "q05": -1.7235253334045406,
+        "q95": 1.8576425313949563,
+        "std": 1.1371694968310502
+      },
+      "samples": 59545
+    },
+    "finishing_nexto": {
+      "critic_rmse": 1.4990171194076538,
+      "entropy": {
+        "count": 34654,
+        "max": 2.7757763862609863,
+        "mean": 0.16697225602581206,
+        "median": 0.010327700525522232,
+        "min": 6.989607677365672e-12,
+        "positive_fraction": 1.0,
+        "q05": 2.4035999899751916e-06,
+        "q95": 0.8809118509292602,
+        "std": 0.32374918432544536
+      },
+      "maximum_probability": {
+        "count": 34654,
+        "max": 1.0,
+        "mean": 0.9438974888580449,
+        "median": 0.998759925365448,
+        "min": 0.12323345988988876,
+        "positive_fraction": 1.0,
+        "q05": 0.6153751760721207,
+        "q95": 0.9999998807907104,
+        "std": 0.1256195027336998
+      },
+      "normalized_advantage": {
+        "count": 34654,
+        "max": 8.65650463104248,
+        "mean": 0.016806328934289926,
+        "median": -0.00616813451051712,
+        "min": -5.310599327087402,
+        "positive_fraction": 0.49422866047209557,
+        "q05": -1.586407870054245,
+        "q95": 1.7406450390815726,
+        "std": 1.0713318028694616
+      },
+      "samples": 34654
+    },
+    "finishing_selfplay": {
+      "critic_rmse": 1.408958911895752,
+      "entropy": {
+        "count": 59545,
+        "max": 2.930894374847412,
+        "mean": 0.2489776860443958,
+        "median": 0.047542475163936615,
+        "min": 8.143167390395334e-11,
+        "positive_fraction": 1.0,
+        "q05": 3.947741352021696e-05,
+        "q95": 1.1470406770706174,
+        "std": 0.40115255897695656
+      },
+      "maximum_probability": {
+        "count": 59545,
+        "max": 1.0,
+        "mean": 0.9197555919852802,
+        "median": 0.9930709004402161,
+        "min": 0.14995817840099335,
+        "positive_fraction": 1.0,
+        "q05": 0.5470337986946107,
+        "q95": 0.9999973773956299,
+        "std": 0.1487438843874861
+      },
+      "normalized_advantage": {
+        "count": 59545,
+        "max": 8.733256340026855,
+        "mean": 0.060043210844643466,
+        "median": -0.00858698133379221,
+        "min": -9.823541641235352,
+        "positive_fraction": 0.4908724494080107,
+        "q05": -1.4457563161849976,
+        "q95": 1.836410999298094,
+        "std": 1.0770868900974127
+      },
+      "samples": 59545
+    },
+    "kickoff_nexto": {
+      "critic_rmse": 1.3962640762329102,
+      "entropy": {
+        "count": 25415,
+        "max": 2.5606589317321777,
+        "mean": 0.13102616786125318,
+        "median": 0.007271456532180309,
+        "min": 9.635111375416727e-09,
+        "positive_fraction": 1.0,
+        "q05": 2.121272564181709e-06,
+        "q95": 0.723377627134323,
+        "std": 0.2722942531973625
+      },
+      "maximum_probability": {
+        "count": 25415,
+        "max": 1.0,
+        "mean": 0.9605039156728576,
+        "median": 0.9991604089736938,
+        "min": 0.21003983914852142,
+        "positive_fraction": 1.0,
+        "q05": 0.7426286220550538,
+        "q95": 0.9999998807907104,
+        "std": 0.09947643403767155
+      },
+      "normalized_advantage": {
+        "count": 25415,
+        "max": 4.761711597442627,
+        "mean": 0.352961628698688,
+        "median": 0.29191040992736816,
+        "min": -5.996086597442627,
+        "positive_fraction": 0.6912453275624632,
+        "q05": -1.3286861777305603,
+        "q95": 1.609728741645813,
+        "std": 0.9179840089785232
+      },
+      "samples": 25415
+    },
+    "kickoff_selfplay": {
+      "critic_rmse": 0.9557055830955505,
+      "entropy": {
+        "count": 62060,
+        "max": 3.2620747089385986,
+        "mean": 0.40121619671569864,
+        "median": 0.15771863609552383,
+        "min": 6.389709872323124e-10,
+        "positive_fraction": 1.0,
+        "q05": 3.3044030715245754e-05,
+        "q95": 1.5032479584217056,
+        "std": 0.5105013342446685
+      },
+      "maximum_probability": {
+        "count": 62060,
+        "max": 1.0,
+        "mean": 0.8722082322393161,
+        "median": 0.9716498553752899,
+        "min": 0.0920880138874054,
+        "positive_fraction": 1.0,
+        "q05": 0.4554735064506531,
+        "q95": 0.9999977350234985,
+        "std": 0.18465863720745565
+      },
+      "normalized_advantage": {
+        "count": 62060,
+        "max": 5.164673805236816,
+        "mean": -0.043072213212410816,
+        "median": -0.03208000585436821,
+        "min": -5.235919952392578,
+        "positive_fraction": 0.4527070576861102,
+        "q05": -1.1356780529022215,
+        "q95": 1.0104002475738512,
+        "std": 0.7147967414636249
+      },
+      "samples": 62060
+    },
+    "natural_nexto": {
+      "critic_rmse": 1.3702285289764404,
+      "entropy": {
+        "count": 53819,
+        "max": 2.9997551441192627,
+        "mean": 0.1626295464700309,
+        "median": 0.013202745467424393,
+        "min": 3.267630306960645e-12,
+        "positive_fraction": 1.0,
+        "q05": 3.611519855439839e-06,
+        "q95": 0.844304764270782,
+        "std": 0.31349564895075804
+      },
+      "maximum_probability": {
+        "count": 53819,
+        "max": 1.0,
+        "mean": 0.9473975770162029,
+        "median": 0.99835604429245,
+        "min": 0.1401313841342926,
+        "positive_fraction": 1.0,
+        "q05": 0.6466571390628815,
+        "q95": 0.9999997615814209,
+        "std": 0.1195752898994696
+      },
+      "normalized_advantage": {
+        "count": 53819,
+        "max": 6.884690284729004,
+        "mean": -0.02812406217381264,
+        "median": -0.0039730798453092575,
+        "min": -6.311663627624512,
+        "positive_fraction": 0.4965718426577974,
+        "q05": -1.6957066178321838,
+        "q95": 1.4096291065216064,
+        "std": 0.9590381165892301
+      },
+      "samples": 53819
+    },
+    "natural_selfplay": {
+      "critic_rmse": 1.254993200302124,
+      "entropy": {
+        "count": 118660,
+        "max": 3.0990071296691895,
+        "mean": 0.35433564205161494,
+        "median": 0.12145267054438591,
+        "min": 1.4139191553685926e-11,
+        "positive_fraction": 1.0,
+        "q05": 5.473643195728077e-05,
+        "q95": 1.4070809185504898,
+        "std": 0.4779325477487273
+      },
+      "maximum_probability": {
+        "count": 118660,
+        "max": 1.0,
+        "mean": 0.88718726074459,
+        "median": 0.9793972671031952,
+        "min": 0.12334230542182922,
+        "positive_fraction": 1.0,
+        "q05": 0.48407861590385437,
+        "q95": 0.9999961853027344,
+        "std": 0.17356851220685787
+      },
+      "normalized_advantage": {
+        "count": 118660,
+        "max": 9.489845275878906,
+        "mean": -0.031112169616525485,
+        "median": -0.06987724080681801,
+        "min": -9.831539154052734,
+        "positive_fraction": 0.4234282824877802,
+        "q05": -1.416645950078964,
+        "q95": 1.4817019879817954,
+        "std": 0.9732248536322966
+      },
+      "samples": 118660
+    }
+  },
+  "schema": "RIVAL2_DIRECT_SKILLS_SIGNAL_REDUCTION_V1",
+  "source_sha256": "45D3BA61E24B9B1101EEF0094789C6DD2176C0A94F81B3A19990A2FFBFDC63BF",
+  "terminal_groups": {
+    "natural_concede": {
+      "advantage": {
+        "count": 102,
+        "max": 1.923121452331543,
+        "mean": 0.6979453563690186,
+        "median": 0.9012646675109863,
+        "min": -6.856814384460449,
+        "positive_fraction": 0.8921568627450981,
+        "q05": -0.6551972866058349,
+        "q95": 1.5986825466155996,
+        "std": 1.017643067901582
+      },
+      "normalized_advantage": {
+        "count": 102,
+        "max": 1.895733118057251,
+        "mean": 0.5945566987488122,
+        "median": 0.761112242937088,
+        "min": -5.95448112487793,
+        "positive_fraction": 0.8921568627450981,
+        "q05": -0.39596674144268035,
+        "q95": 1.359861999750137,
+        "std": 0.8873489093115956
+      },
+      "reward": {
+        "count": 102,
+        "max": -7.898372173309326,
+        "mean": -8.61608645027759,
+        "median": -8.583564281463623,
+        "min": -9.542000770568848,
+        "positive_fraction": 0.0,
+        "q05": -9.291427183151246,
+        "q95": -8.039469146728516,
+        "std": 0.3228091067755296
+      },
+      "value": {
+        "count": 102,
+        "max": -1.9953420162200928,
+        "mean": -9.314031804309172,
+        "median": -9.451834201812744,
+        "min": -10.682662010192871,
+        "positive_fraction": 0.0,
+        "q05": -10.140571784973144,
+        "q95": -8.204500722885133,
+        "std": 0.9241631645091724
+      }
+    },
+    "natural_goal": {
+      "advantage": {
+        "count": 122,
+        "max": 1.0483880043029785,
+        "mean": -0.43259333391658594,
+        "median": -0.33914613723754883,
+        "min": -2.401719093322754,
+        "positive_fraction": 0.27049180327868855,
+        "q05": -1.629539155960083,
+        "q95": 0.40341634750366184,
+        "std": 0.6479365286366738
+      },
+      "normalized_advantage": {
+        "count": 122,
+        "max": 0.8357915282249451,
+        "mean": -0.3268702249405295,
+        "median": -0.22775598615407944,
+        "min": -2.5626349449157715,
+        "positive_fraction": 0.319672131147541,
+        "q05": -1.57134547829628,
+        "q95": 0.4086344882845874,
+        "std": 0.5942162399251056
+      },
+      "reward": {
+        "count": 122,
+        "max": 8.942285537719727,
+        "mean": 8.470057854886916,
+        "median": 8.457046508789062,
+        "min": 7.685176849365234,
+        "positive_fraction": 1.0,
+        "q05": 7.914121055603028,
+        "q95": 8.758098554611205,
+        "std": 0.25415637857929946
+      },
+      "value": {
+        "count": 122,
+        "max": 11.34400463104248,
+        "mean": 8.902651188803501,
+        "median": 8.7767972946167,
+        "min": 7.333883762359619,
+        "positive_fraction": 1.0,
+        "q05": 8.152738046646117,
+        "q95": 10.046958446502686,
+        "std": 0.5943291855628174
+      }
+    },
+    "skills_concede": {
+      "advantage": {
+        "count": 348,
+        "max": 1.0784015655517578,
+        "mean": -0.327918607613136,
+        "median": -0.23589658737182617,
+        "min": -3.6468610763549805,
+        "positive_fraction": 0.3074712643678161,
+        "q05": -1.3190649032592774,
+        "q95": 0.3843541622161864,
+        "std": 0.6118802812646726
+      },
+      "normalized_advantage": {
+        "count": 348,
+        "max": 1.054517388343811,
+        "mean": -0.20705752982490364,
+        "median": -0.13773607462644577,
+        "min": -2.597764015197754,
+        "positive_fraction": 0.3448275862068966,
+        "q05": -0.9814923375844955,
+        "q95": 0.3775917023420334,
+        "std": 0.4660572713693444
+      },
+      "reward": {
+        "count": 348,
+        "max": -9.96247673034668,
+        "mean": -9.980152475422827,
+        "median": -9.974967956542969,
+        "min": -10.0,
+        "positive_fraction": 0.0,
+        "q05": -10.0,
+        "q95": -9.96247673034668,
+        "std": 0.014260622187191343
+      },
+      "value": {
+        "count": 348,
+        "max": -6.315615653991699,
+        "mean": -9.65223386780969,
+        "median": -9.749009609222412,
+        "min": -11.078401565551758,
+        "positive_fraction": 0.0,
+        "q05": -10.359322118759156,
+        "q95": -8.661250543594361,
+        "std": 0.6129508940891183
+      }
+    },
+    "skills_goal": {
+      "advantage": {
+        "count": 270,
+        "max": 3.2542724609375,
+        "mean": 0.7867842691916006,
+        "median": 0.7456378936767578,
+        "min": -0.9459552764892578,
+        "positive_fraction": 0.9111111111111111,
+        "q05": -0.2614278793334961,
+        "q95": 1.6618566513061523,
+        "std": 0.6299017899474011
+      },
+      "normalized_advantage": {
+        "count": 270,
+        "max": 2.9254462718963623,
+        "mean": 0.6558365128491089,
+        "median": 0.6500563323497772,
+        "min": -0.7512243986129761,
+        "positive_fraction": 0.9,
+        "q05": -0.19824051186442376,
+        "q95": 1.4681805849075316,
+        "std": 0.5466933922685703
+      },
+      "reward": {
+        "count": 270,
+        "max": 10.0,
+        "mean": 9.982156802989818,
+        "median": 9.987476348876953,
+        "min": 9.96247673034668,
+        "positive_fraction": 1.0,
+        "q05": 9.96247673034668,
+        "q95": 10.0,
+        "std": 0.01399581732574598
+      },
+      "value": {
+        "count": 270,
+        "max": 10.920923233032227,
+        "mean": 9.195372533798217,
+        "median": 9.240530014038086,
+        "min": 6.7457275390625,
+        "positive_fraction": 1.0,
+        "q05": 8.306885814666748,
+        "q95": 10.255792236328125,
+        "std": 0.6313317135541079
+      }
+    }
+  }
+}
