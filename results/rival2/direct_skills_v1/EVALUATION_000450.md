@@ -66,3 +66,20 @@ how much full-match scoring is caused by them. Initial states and training
 curriculum resets already invalidate these contact caches; the standard native
 kickoff reset omitted that invalidation. Training rewards, optimizer settings,
 curriculum, weights and Nexto cadence have not been changed by the diagnosis.
+
+## Additional CPU reduction
+
+The initial goal is Rival's in all ten +450 matches, just as at +400. Later
+Rival goals increase 48 to 50 while later concessions increase 167 to 175.
+Thus the slight scoring increase is not merely initial-kickoff improvement.
+Unequal segment exposure still prevents comparing these counts as success rates.
+
+Over updates 351-400 versus 401-450, training contacts/minute increase
+12.947900390625 to 13.8086669921875; movement speed 1169.1454566876446 to
+1179.9278998119212 uu/s; ended-player-episode contact fraction 0.8747884430312154
+to 0.8827977115304821. Categorical entropy declines 0.44863318954573733 to
+0.39073902188407045. Mean completed-update KL is 0.002349214511110117 in the
+latest block; maximum sample KL 60.38947296142578 is finite telemetry, not a
+rejection condition. These acquisition changes do not cancel the worse match
+goal differential or demonstrate finishing. Full role/exposure totals are in
+`review_reduction_000450.json`; no optimization occurred during reduction.

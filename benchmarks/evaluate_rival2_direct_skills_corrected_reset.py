@@ -42,7 +42,7 @@ def run():
                 assert saved['checkpoint']['sha256'] == digest
                 assert saved['match_reset_version'] == MATCH_RESET_VERSION
                 assert saved['runtime_package_sha256'] == content_hash(package)
-                assert all(reduce(output)['checks'].values())
+                assert all(reduce(output)['integrity'].values())
                 continue
             runner = CandidateMatchRunner(checkpoint, digest, entity=True)
             elapsed = runner.run_ticks(REGULATION_TICKS).seconds
