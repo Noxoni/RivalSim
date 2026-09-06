@@ -1,10 +1,13 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +25](EVALUATION_000025.md), with raw fixed-case
-outcomes, checkpoint integrity and deterministic CPU comparison. Contact acquisition
-increased, but possession remains absent and broad gameplay improvement is unproven.
-Next skill and full natural-match review +50. Use `benchmarks/report_rival2_direct_skills.py --update N`
-after the corresponding completed evaluation and checkpoint audit.
+Latest completed review: [offset +50](EVALUATION_000050.md). Ten full matches
+against Nexto improved from 1/266 to 17/212 goals for/against, 170 to 313 contacts
+and zero to forty same-player follow-up contacts. All ten matches were still
+losses. Drill gains are concentrated in two kickoff layouts; ongoing-ground
+case scores and control remain weak. Continue unchanged to the next scheduled
+skill/full-match review at +100. This is progress, not an SSL/promotion verdict.
+Use `benchmarks/report_rival2_direct_skills.py --update N`, including
+`--start-groups`, after the corresponding completed evaluation/checkpoint audit.
 
 The user explicitly superseded the potential-only continuation on September 6,
 2026 (UTC). The old learner exited cleanly at entity **+293**, 52,150 cumulative
@@ -19,8 +22,8 @@ The previous source has 1,676,472,162 entity-stage learner decisions. This is no
 the total lifetime sample count. Existing model weights and Adam state are used
 without a restart, adapter, behavior cloning, new architecture or specialist
 router. The new reward and scenario authority begins at **direct-skills +0**.
-The old campaign's user-transition STOP remains in place. Its monitor is paused
-during implementation and will be redirected to this new campaign after launch.
+The old campaign's user-transition STOP remains in place; do not resume that
+superseded campaign.
 
 ## What changes
 

@@ -118,7 +118,84 @@ def main(offset):
     )
 
 
+def group_start_cases(item, kickoff, layouts, sides):
+    """Partition existing results by initial state, never by successful outcome."""
+    verify_cases(item)
+    assert len(kickoff) == len(layouts) == len(sides) == item["worlds"]
+    groups = {}
+    for i, (is_kickoff, layout, side) in enumerate(zip(kickoff, layouts, sides, strict=True)):
+        assert is_kickoff in (0, 1) and side in (0, 1)
+        assert layout in range(5) if is_kickoff else layout == -1
+        label = f"kickoff_layout_{layout}_side_{side}" if is_kickoff else "ongoing_ground"
+        groups.setdefault(label, []).append(i)
+    raw = item["raw"]
+    return {
+        name: dict(
+            cases=len(indices),
+            case_indices=indices,
+            goals_for=int(sum(raw["goals"][i] for i in indices)),
+            goals_against=int(sum(raw["concedes"][i] for i in indices)),
+            touches=int(sum(raw["touches"][i] for i in indices)),
+            touched_cases=sum(raw["touches"][i] > 0 for i in indices),
+            timeouts=sum(raw["endings"][i] == 2 for i in indices),
+        )
+        for name, indices in sorted(groups.items())
+    }
+
+
+def start_groups(offset):
+    # The imported generator constructs NumPy initial states only. No simulator,
+    # policy, optimizer or CUDA rollout is constructed or evaluated here.
+    from rivalsim.direct_skills_v1 import NAMES, SEED, scenarios
+    from rivalsim.fresh_ground_30hz import scenario_hash
+
+    paths = [RESULTS / f"evaluation_{i:06d}.json" for i in (0, offset)]
+    docs = [json.loads(p.read_text()) for p in paths]
+    assert docs[1]["accepted_updates"] == offset
+    compare_documents(*docs)
+    families = {}
+    for family in (0, 4):
+        name = NAMES[family]
+        bank = scenarios(64, SEED + 1000 + family, family_only=family)
+        digest = scenario_hash(bank)
+        assert all(d["skills"][name]["scenario_sha256"] == digest for d in docs)
+        metadata = [
+            a.tolist() for a in (bank.kickoff_indicator, bank.kickoff_layout, bank.focal_side)
+        ]
+        families[name] = dict(
+            scenario_sha256=digest,
+            baseline=group_start_cases(docs[0]["skills"][name], *metadata),
+            candidate=group_start_cases(docs[1]["skills"][name], *metadata),
+        )
+    result = dict(
+        accepted_updates=offset,
+        baseline_updates=0,
+        authority_sha256=docs[0]["authority_sha256"],
+        checkpoints=[d["checkpoint"] for d in docs],
+        sources={
+            p.name: hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest().upper()
+            for p in paths
+        },
+        families=families,
+        interpretation=(
+            "Recorded cases grouped by hash-verified initial-state metadata. Repeated "
+            "standard kickoff layouts are not independent scenario generalization. "
+            "A gain on kickoff starts must not be called a gain on ongoing-ground starts."
+        ),
+        policy_evaluations_run=0,
+        optimizer_steps=0,
+    )
+    output = RESULTS / f"start_groups_{offset:06d}.json"
+    if output.exists():
+        assert json.loads(output.read_text()) == result
+    else:
+        output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    print(json.dumps(result, indent=2))
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--update", required=True, type=int)
-    main(parser.parse_args().update)
+    parser.add_argument("--start-groups", action="store_true")
+    args = parser.parse_args()
+    start_groups(args.update) if args.start_groups else main(args.update)
