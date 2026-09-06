@@ -1,96 +1,36 @@
-# Live: unchanged-settings exploration continuation from cumulative 680
+# Completed at750: do not resume this arm
 
-Latest completed evaluation: branch45 / total exploration75 / cumulative725.
-0/10 wins, 6 scored /209 conceded, 10.16 contacts/min, zero kickoff first contact.
-All 28 core +6 objective +11 match-integrity checks passed. Both parents are
-compared in progress_000045.json; interpretation is REVIEW_000045.md. Partial
-recovery from700, still worse scoring/goal difference than original650.
-Next and final evaluation70/cumulative750, then this arm stops for review.
-Consult the external publication/notification cursor before repeating results.
+The70-update exploration continuation is COMPLETE and its actual worker exited
+after the final evaluation on2026-09-06 at17:29:47Z. No update beyond750 occurred.
+Read FINAL_REVIEW.md, completion.json, TASK_PROGRESS_750.md and progress_000070.json.
 
-The no-rollout task-telemetry reduction through700 is COMPLETE in
-TASK_PROGRESS_700.md / task_progress_700.json. It used committed prefixes only,
-passed seven focused tests and deterministic rebuild. Nexto finishing goals are
-only8.0642% of observed endings in691-700; training kickoff first-contact recovery
-does not establish control or standing-kickoff skill. Do not claim the skills
-are mastered but merely fail to transfer. These on-policy windows do not prove
-a cause, and must not justify changing this active arm's frozen settings.
+Final750:0/10 wins,2 scored/194 conceded,14.34 contacts/minute,zero standing
+kickoff first contacts. Original650:0/10,7/196,9.12/min; immediate parent680:
+0/10,2/228,8.88/min. Late contact sequencing/conceding improved, but scoring
+did not recover. Same-player next-contact identity49.0113% is not continuous
+possession or a mechanic proof. No SSL claim or automatic deployment.
 
-The read-only EXPLORATION_REGRESSION_REVIEW.md records the current loss's
-continuing uniformizing pressure and why the completed gradient calibration
-does not prove that pressure harmless or causal. No new probe or learning was
-launched for that review. It is a hypothesis for the terminal review, not
-permission to change settings inside this arm. The broad SSL goal is not achieved.
+Checkpoint: checkpoints/rival2/direct_skills_exploration_continuation_v1/child_000070.pt
+SHA:517A2217CBDF4124612B518E10F30BC4D5F00F5C1DC77A5119D10D2B1DD89613.
+Exact final rolling counterpart is under the external run directory.
 
-This arm was prospectively frozen and remotely read back at
-fe93e5cb5e2e67465da7db8a127d715d09f96344 before launch on
-2026-09-06T16:45:08Z. Actual worker 30656, launcher 13972: historical identities
-only, always inspect the current process command and campaign state.
+All audits and the final task reduction are COMPLETE. Do not rerun completed
+matches, first-step/gradient/controller/critic probes, or obsolete finalizers.
+The finalizer did no new learning/matches; task reduction rebuilt identically.
+Detailed counters/source hashes/closed logs and both parent comparisons are
+bound in completion.json. The20 task-reduction tests and35 closeout tests are
+recorded. Preserve concurrent unrelated work.
 
-External: G:/dev/RivalSim-runs/direct-skills-exploration-continuation-v1.
-Entrypoint: benchmarks/run_direct_skills_exploration_continuation_v1.py run.
-Authority: 933F08E12D5A2B310458AACA29DF704715DA011C5EB4D334EB36C680392124FD.
+The dedicated heartbeat monitor monitor-corrected-ssl-ppo-v2 is PAUSED after
+normal completion. The broad SSL-development goal remains active, not achieved
+or blocked. Check the external notification/publication cursor for publication
+status before repeating evaluation results.
 
-First saved update audited: 28 core plus 6 embedded objective checks pass,
-136 optimizer steps, 4,423,680 learner decisions. Exact model/Adam/counters,
-four learner RNGs, native-opponent and assignment RNGs preserved at entry.
-Fresh physical worlds and hidden/controller caches are explicit, not exact
-physical replay. Rewards, corpus, PPO, architecture and exploration unchanged.
-
-Entry checkpoint SHA:
-FAFDD5FB907403241F39971C041C971ED3EDFF257F25E8BD04F96159636D149B.
-First accepted checkpoint SHA:
-28B7930B0751444EBE29824F8446CBC6387480DB2645249D80A4AC0CBE3C1D15.
-
-Run at most 70 additional updates. Evaluations 20/45/70 map to total exploration
-50/75/100, cumulative 700/725/750. Compare immediate parent680 and original650.
-The immediate parent's 0/10 wins, 2/228 scored/conceded, 8.88 touches/min was
-already reported, as was original650's 0/10, 7/196, 9.12/min. Both had zero kickoff
-first contacts. No new result exists merely because an update was accepted.
-
-Do not interrupt a healthy process or retune this arm. KL is telemetry only;
-finite/corruption protection and user STOP remain authoritative. No concurrent
-GPU jobs. All old controller/saturation/critic/gradient probes are complete;
-do not repeat them or restart completed arms.
-
-At new completed evaluation, run CPU-only reporter with 20, 45 or 70:
-
-```powershell
-.venv\Scripts\python.exe -B benchmarks/report_direct_skills_exploration_continuation_v1.py 20
-```
-
-Objective checks are embedded in progress reports. Publish immutable checkpoint,
-match evidence and prefix; verify remote persistence and update the external
-last_notified_evaluation.json cursor. The existing heartbeat is retargeted here
-and stays quiet for unchanged state. Notify new evaluations/actionable changes.
-
-At 70 and actual worker exit, use the continuation-specific CPU finalizer:
-
-```powershell
-.venv\Scripts\python.exe -B benchmarks/finalize_direct_skills_exploration_continuation_v1.py
-```
-
-It audits entry/first and all three completed evaluation checkpoints, unchanged
-source package, full curve/counters, both parents, exact rolling/permanent hash
-and closed process/logs. It does not run a new match or optimizer step. Reject
-old 30-update/parent650 assumptions. Publish the closeout, then decide next work
-from actual gameplay evidence; no automatic extension, deployment or SSL claim.
-
-Closeout implementation and adjacent terminal checks: 35 focused tests passed.
-Evidence: closeout_tests.xml. This is reporting-only code, not a change to the
-frozen training source package, reward, loss, or stopping boundary.
-
-After that finalizer has completed, generate the final task-window breakdown:
-
-```powershell
-.venv\Scripts\python.exe -B benchmarks/summarize_direct_skills_task_progress_750.py
-```
-
-This standard-library-only reducer requires the closed750 completion artifact
-and its curve hash. It combines the immutable original30-update prefix and
-continuation70 prefix into ten nonoverlapping windows. It creates
-task_progress_750.json and TASK_PROGRESS_750.md without a model, new rollout,
-evaluation or optimizer. Use it alongside the full-match results, not instead
-of them. Existing through700 output rebuilt byte-identically;20 focused tests
-passed (task_progress_750_tests.xml). Do not attempt this final reduction while
-the training arm is still active or rerun prior GPU probes.
+Next: make the prospective matched exploration-retention/withdrawal comparison
+described in FINAL_REVIEW.md, if that remains the evidence-based choice after
+review. No alternative has been frozen or launched. Prefer retaining the
+observed750 contact-sequencing change in a common parent rather than silently
+restarting random weights or declaring the older680 intervention point mandatory.
+Keep rewards, curriculum, architecture, temperature and ordinary entropy fixed
+while testing the extra barrier. Do not keep running this closed authority.
+Preserve numerical safeguards; KL is telemetry, not a rejection threshold.
