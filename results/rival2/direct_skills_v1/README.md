@@ -5,8 +5,8 @@ matches produced **65/144 goals for/against and 0/10 wins**, versus62/163 at
 +550. Seven matched cases improved, one tied and two worsened. Finishing is
 still only6/64 goals and ongoing-ground drill scoring3/29. These are not
 SSL-level results. The temperature-only block completed safely and stopped for
-review. A further50-update unchanged-settings block is the recorded decision;
-publish/verify its prospective executable authority before restarting.
+review. The [prospective +600 to +650 follow-up](exploration_t2_followup_v1/README.md)
+keeps all learning settings unchanged; verify its publication before launch.
 
 The [bounded no-learning diagnosis](LEARNING_SIGNAL_000550.md) verified goal
 reward/GAE/recurrent replay and found narrow exploration. Simple critic
@@ -14,11 +14,12 @@ calibration did not improve held-out error; no critic or reward edit was made.
 After a clean +554 pause, the same model/Adam lineage resumed under the
 [prospective temperature-only amendment](exploration_t2_v1/authority.json),
 published in commit `8ce15e88828ac275fe7375d7919000c1218969c8` before training.
-Use **`benchmarks/run_direct_skills_exploration_v1.py run`**, not the old runner,
-for amended checkpoints. It uses training temperature 2 in both sampling and
-PPO likelihoods; deterministic evaluation remains original raw argmax.
-The bounded continuation stops at +600 for the unchanged evaluations and a
-concrete review decision. The user's ongoing goal is not canceled by that pause.
+The original `benchmarks/run_direct_skills_exploration_v1.py` segment ended at600.
+For the new block use **`benchmarks/run_direct_skills_exploration_followup_v1.py run`**
+with explicit latest checkpoint/SHA, not either older runner. Training temperature2
+remains in both sampling and PPO likelihoods; deterministic evaluation remains
+original raw argmax. The next review is650. The user's ongoing goal is not
+canceled by a review pause.
 
 See [resume evidence](exploration_t2_v1/RESUME.md). Preserve all snapshots and
 the original reward, authority and 20 runtime-source identities. Shooting
