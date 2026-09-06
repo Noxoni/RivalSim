@@ -1,11 +1,13 @@
 # Direct skill objectives plus natural gameplay — one entity-aware policy
 
-Latest completed review: [offset +50](EVALUATION_000050.md). Ten full matches
-against Nexto improved from 1/266 to 17/212 goals for/against, 170 to 313 contacts
-and zero to forty same-player follow-up contacts. All ten matches were still
-losses. Drill gains are concentrated in two kickoff layouts; ongoing-ground
-case scores and control remain weak. Continue unchanged to the next scheduled
-skill/full-match review at +100. This is progress, not an SSL/promotion verdict.
+Latest completed review: [offset +100](EVALUATION_000100.md). Compared with +50,
+ten full Nexto matches changed from 17/212 to 12/209 goals for/against, 313 to 366
+contacts and forty to thirty-seven same-player follow-ups. All ten remained
+losses. Acquisition and finishing-drill results improved, but possession and
+full-match offense did not. Kickoff timeout gains are not possession wins.
+Continue unchanged to the next scheduled +150 review, explicitly tracking these
+regressions rather than claiming uniformly better gameplay. No SSL/promotion
+verdict or deployment is warranted. Preserve +50 as well as +100.
 Use `benchmarks/report_rival2_direct_skills.py --update N`, including
 `--start-groups`, after the corresponding completed evaluation/checkpoint audit.
 Also compare each new review with the previous completed review, for example
