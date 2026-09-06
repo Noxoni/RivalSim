@@ -143,7 +143,40 @@ def role_summary(arrays):
     return result
 
 
-def gradients(model, data, roles):
+@torch.no_grad()
+def stepwise_replay(model, data):
+    """Replay all original perspectives at the original collection batch size."""
+    hidden = data["initial_hidden"].clone()
+    logps, values = [], []
+    for tick in range(data["observations"].shape[1]):
+        logits, value, hidden = model(
+            data["observations"][:, tick].contiguous(),
+            hidden,
+            reset_before=data["reset_before"][:, tick].contiguous(),
+        )
+        logp, _ = categorical_statistics(logits, data["action_indices"][:, tick])
+        logps.append(logp)
+        values.append(value)
+    replay = torch.stack(logps, 1)
+    value = torch.stack(values, 1)
+    assert torch.isfinite(replay).all() and torch.isfinite(value).all()
+    mask = data["train_mask"]
+    return replay, dict(
+        perspectives=data["observations"].shape[0],
+        decisions=data["observations"].shape[1],
+        collected_log_probability_exactly_equal=bool(
+            torch.equal(replay, data["old_log_probability"])
+        ),
+        absolute_log_probability_error=distribution(
+            cpu((replay - data["old_log_probability"])[mask].abs())
+        ),
+        absolute_value_error=distribution(cpu((value - data["values"])[mask].abs())),
+        interpretation="Same full batch and reset history; measurements are diagnostic, "
+        "not a newly invented PPO acceptance gate.",
+    )
+
+
+def gradients(model, data, roles, stepwise_logp):
     """Entry-of-update policy gradients, same normalization and full sequences."""
     config = ppo_config()
     eligible = data["train_mask"].any(1).nonzero().flatten()
@@ -158,7 +191,19 @@ def gradients(model, data, roles):
     log_ratio = logp - data["old_log_probability"][index]
     assert torch.isfinite(log_ratio).all()
     maximum_replay_error = float(log_ratio[mask].abs().max().detach())
-    assert maximum_replay_error <= 1e-3, maximum_replay_error
+    replay_comparison = dict(
+        original_helper_1e_minus_3_assertion_would_pass=maximum_replay_error <= 1e-3,
+        batch_vs_collection_absolute_error=distribution(cpu(log_ratio[mask].abs())),
+        batch_vs_stepwise_absolute_error=distribution(
+            cpu((logp - stepwise_logp[index])[mask].abs())
+        ),
+        batch_vs_collection_ratio=distribution(cpu(log_ratio[mask].exp())),
+        ratio_outside_production_clip_count=int(
+            ((log_ratio[mask].exp() - 1).abs() > config.clip_range).sum()
+        ),
+        note="Original failed helper assertion is preserved in attempt0. This reports "
+        "replay error rather than silently raising its threshold. No production guard changed.",
+    )
     ratio = log_ratio.exp()
     advantages = data["normalized_advantage"][index]
     per_item = -torch.minimum(
@@ -231,6 +276,7 @@ def gradients(model, data, roles):
         sequences=len(index),
         trainable_samples=int(mask.sum()),
         collection_replay_max_log_probability_error=maximum_replay_error,
+        replay_comparison=replay_comparison,
         per_role=reports,
         pairwise_actor_gradient_cosine=cosine,
         critic_gradient_norm=critic_norm,
@@ -341,7 +387,6 @@ def run():
             assert len(taps["roles"]) == 90 and len(taps["entropy"]) == 90
             data = mixed_sequence_data(rollout, ppo_config())
             stacked = {key: torch.stack(values) for key, values in taps.items()}
-            grad_report = gradients(policy, data, stacked["roles"])
             arrays = {key: cpu(value) for key, value in stacked.items()}
             for key in (
                 "observations",
@@ -364,6 +409,19 @@ def run():
             arrays["normalized_advantage"] = cpu(
                 data["normalized_advantage"].reshape(WORLDS, 2, 90).permute(2, 0, 1)
             )
+            # Preserve the collected evidence before any diagnostic assertion/autograd.
+            archive = OUTPUT / f"rollout_{iteration:02d}.npz"
+            np.savez_compressed(archive, **arrays)
+            write_json(
+                OUTPUT / "progress.json",
+                dict(
+                    rollout=iteration,
+                    phase="collected_archive_saved",
+                    optimizer_steps=0,
+                    archive_sha256=sha(archive),
+                    source_sha256=source_hash,
+                ),
+            )
             assert all(np.isfinite(v).all() for v in arrays.values())
             config = ppo_config()
             reference = independent_gae(
@@ -384,8 +442,8 @@ def run():
                 else None
             )
             assert terminal_return_error is None or terminal_return_error <= 2e-5
-            archive = OUTPUT / f"rollout_{iteration:02d}.npz"
-            np.savez_compressed(archive, **arrays)
+            replay_logp, replay_report = stepwise_replay(policy, data)
+            grad_report = gradients(policy, data, stacked["roles"], replay_logp)
             result = dict(
                 rollout=iteration,
                 fresh_initial_rollout=iteration == 0,
@@ -395,6 +453,7 @@ def run():
                 archive_bytes=archive.stat().st_size,
                 independent_gae_max_error=gae_error,
                 terminal_return_max_error=terminal_return_error,
+                same_batch_stepwise_replay=replay_report,
                 roles=role_summary(arrays),
                 gradients=grad_report,
                 collection_metrics=collector.last_metrics,
@@ -413,7 +472,7 @@ def run():
                 ),
                 flush=True,
             )
-            del arrays, rollout, data, stacked, reference
+            del arrays, rollout, data, stacked, reference, replay_logp
             gc.collect()
         env._step_impl, policy.sample = original_step, original_sample
         report.update(

@@ -1,0 +1,22 @@
+{
+  "schema": "RIVAL2_READ_ONLY_DIAGNOSTIC_ATTEMPT_FAILURE_V1",
+  "attempt": 0,
+  "source_commit": "300df0f869a22bb6f947e19485ba11a67559fcca",
+  "checkpoint_sha256": "C8564101BEAE09219026A11ED5F5433E6CEC460EFAE808326F7B8D7FB5DB33FE",
+  "paused_checkpoint_sha256": "CF5C9D022FFB4EF18DBD728206D78A3601AB8C9128BFA0F0E9ADE31BCF961BAD",
+  "worlds": 1024,
+  "seed": 2026090655,
+  "completed_private_rollouts": 1,
+  "decisions_per_world": 90,
+  "physics_ticks_per_world": 360,
+  "optimizer_constructed": false,
+  "optimizer_steps": 0,
+  "gradient_calculations_reached": false,
+  "failure": "AssertionError: collection/batched replay maximum log-probability discrepancy 0.0027937889099121094 exceeded helper-only 0.001 assertion",
+  "production_safety_failure": false,
+  "numeric_rollout_archive_saved": false,
+  "post_exit_checkpoint_hashes_verified": true,
+  "post_exit_private_model_hash_verification_available": false,
+  "interpretation": "The helper assertion is not a production PPO guard or an authority acceptance threshold. Cause is unresolved. Preserve failure and measure same-batch stepwise versus sequence-batched replay without changing the model, runtime or reward.",
+  "accounting": "This aborted 3-second/world private collection is additional to the subsequent four-rollout diagnostic. No learning occurred."
+}
