@@ -1,0 +1,974 @@
+{
+  "action_differences": {
+    "child10": {
+      "full_six_second_different_actions": 418,
+      "interpretation": "Same opening starts; own closed-loop trajectories can diverge. This is control sequence similarity, not same-observation policy distribution KL.",
+      "pre_parent_first_contact_decisions": 670,
+      "pre_parent_first_contact_different_actions": 3,
+      "total_decisions": 1800
+    },
+    "child25": {
+      "full_six_second_different_actions": 641,
+      "interpretation": "Same opening starts; own closed-loop trajectories can diverge. This is control sequence similarity, not same-observation policy distribution KL.",
+      "pre_parent_first_contact_decisions": 670,
+      "pre_parent_first_contact_different_actions": 12,
+      "total_decisions": 1800
+    }
+  },
+  "findings": "All three use full throttle/boost before first contact, zero reverse throttle, and lose all ten initial first contacts. No Rival native flip occurs before first contact; every Nexto car has one. Rival is slower over the initial race. Child25 changes only12/670 pre-contact action decisions versus parent. These observations isolate an approach/acceleration deficit, not refusal to pursue the ball. They do not prove prescribing a flip is the optimal solution or prove causality for the full-match losses.",
+  "limitations": "Ten fixed development starts only, no goals in the six-second traces so matching goal prefixes are empty. Exact full capture/action/hidden replay checks passed; no independent full-trajectory reference exists beyond the preserved parent operational retry. No named mechanic detector or reward added.",
+  "no_optimizer_or_policy_change": true,
+  "reports": {
+    "child10": {
+      "archive_sha256": "C5A47AA4605A866F5F623ED21D1D3B490E127AABF00877AA9B24B124D0FB98CD",
+      "checkpoint": {
+        "match": "results/rival2/direct_skills_native_nexto_v1/child_000010.json",
+        "path": "checkpoints/rival2/direct_skills_native_nexto_v1/child_000010.pt",
+        "sha256": "8764A22E0A678A0559DA53F7DD6A9EEC58415AF3565A58C582AEC4630EC1BE1E"
+      },
+      "path": "results/rival2/direct_skills_native_kickoff_v1/child10.json",
+      "sha256": "547862A9E84FA43A55CAD2B44B173ABF9C8BEA4812B3A9A8A36D4A2FB249A0DC"
+    },
+    "child25": {
+      "archive_sha256": "597CD24763D737ECB71D83CEAC36846E9686EDAD2E8EF43CAC4D572103B56C27",
+      "checkpoint": {
+        "match": "results/rival2/direct_skills_native_nexto_v1/child_000025.json",
+        "path": "checkpoints/rival2/direct_skills_native_nexto_v1/child_000025.pt",
+        "sha256": "D53603E3B3DBD990EBC06E44179932C33F03358F4B4300098E2CAD1BD523B29D"
+      },
+      "path": "results/rival2/direct_skills_native_kickoff_v1/child25.json",
+      "sha256": "4A16782ECC151C7C48AEE7DF309AB28026BE85955D5B728A4E46CF04484CEF18"
+    },
+    "parent650": {
+      "archive_sha256": "D18883F7B8722C144B8CE3EABF5D293F48F67AF5C529D4D114AB4D3148C8801E",
+      "checkpoint": {
+        "match": "results/rival2/direct_skills_native_nexto_v1/finishing650.json",
+        "path": "checkpoints/rival2/direct_skills_finishing_goal_v2/child_000025.pt",
+        "sha256": "939213BF57FFC751C7C173FFCC8AC34DE84D2CAA66CFECB79C59792CBABB0F6D"
+      },
+      "path": "results/rival2/direct_skills_native_kickoff_v1/parent650_attempt2.json",
+      "sha256": "2113BF847EF97DD2F375FC1782C5228F8E03AD38981EFA218C844D5D62B14979"
+    }
+  },
+  "results": {
+    "child10": {
+      "aggregate": {
+        "first_contacts_won": 0,
+        "nexto_pre_contact_flips": 10,
+        "nexto_race_mean_speed": 1637.2924560546876,
+        "rival_contact_lag_max_ticks": 19,
+        "rival_contact_lag_min_ticks": 5,
+        "rival_pre_contact_flips": 0,
+        "rival_race_boost_command_fraction": 1.0,
+        "rival_race_full_throttle_fraction": 1.0,
+        "rival_race_mean_speed": 1456.658544921875,
+        "rival_race_reverse_throttle_fraction": 0.0
+      },
+      "worlds": [
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 256,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1411.8548583984375,
+              "race_ticks": 245
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 246,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1588.934814453125,
+              "race_ticks": 245
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 0
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 247,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 217,
+              "is_rival": true,
+              "race_airborne_ticks": 14,
+              "race_mean_speed": 1413.7872314453125,
+              "race_ticks": 236
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 237,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 145,
+              "race_mean_speed": 1604.4661865234375,
+              "race_ticks": 236
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 1
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1455.58837890625,
+              "race_ticks": 275
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1615.884033203125,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 2
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 282,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 261,
+              "is_rival": true,
+              "race_airborne_ticks": 10,
+              "race_mean_speed": 1515.2156982421875,
+              "race_ticks": 276
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 277,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 152,
+              "race_mean_speed": 1615.702880859375,
+              "race_ticks": 276
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 0,
+          "world": 3
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 323,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 29,
+              "race_mean_speed": 1490.2535400390625,
+              "race_ticks": 303
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 304,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 150,
+              "race_mean_speed": 1764.028076171875,
+              "race_ticks": 303
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 19,
+          "rival_first": false,
+          "side": 0,
+          "world": 4
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 253,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1407.938232421875,
+              "race_ticks": 243
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 244,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1588.1248779296875,
+              "race_ticks": 243
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 5
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 248,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 221,
+              "is_rival": true,
+              "race_airborne_ticks": 12,
+              "race_mean_speed": 1418.0196533203125,
+              "race_ticks": 238
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 239,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 130,
+              "race_mean_speed": 1595.271240234375,
+              "race_ticks": 238
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 6
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1453.0223388671875,
+              "race_ticks": 274
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 275,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1616.6771240234375,
+              "race_ticks": 274
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 11,
+          "rival_first": false,
+          "side": 1,
+          "world": 7
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 281,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 261,
+              "is_rival": true,
+              "race_airborne_ticks": 9,
+              "race_mean_speed": 1512.3623046875,
+              "race_ticks": 275
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 144,
+              "race_mean_speed": 1618.202880859375,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 1,
+          "world": 8
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 322,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 28,
+              "race_mean_speed": 1488.543212890625,
+              "race_ticks": 302
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 303,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 148,
+              "race_mean_speed": 1765.6324462890625,
+              "race_ticks": 302
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 19,
+          "rival_first": false,
+          "side": 1,
+          "world": 9
+        }
+      ]
+    },
+    "child25": {
+      "aggregate": {
+        "first_contacts_won": 0,
+        "nexto_pre_contact_flips": 10,
+        "nexto_race_mean_speed": 1637.2924560546876,
+        "rival_contact_lag_max_ticks": 18,
+        "rival_contact_lag_min_ticks": 5,
+        "rival_pre_contact_flips": 0,
+        "rival_race_boost_command_fraction": 1.0,
+        "rival_race_full_throttle_fraction": 1.0,
+        "rival_race_mean_speed": 1456.4491088867187,
+        "rival_race_reverse_throttle_fraction": 0.0
+      },
+      "worlds": [
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 256,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1411.8548583984375,
+              "race_ticks": 245
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 246,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1588.934814453125,
+              "race_ticks": 245
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 0
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 247,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 217,
+              "is_rival": true,
+              "race_airborne_ticks": 14,
+              "race_mean_speed": 1413.7872314453125,
+              "race_ticks": 236
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 237,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 145,
+              "race_mean_speed": 1604.4661865234375,
+              "race_ticks": 236
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 1
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1455.58837890625,
+              "race_ticks": 275
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1615.884033203125,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 2
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 282,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 261,
+              "is_rival": true,
+              "race_airborne_ticks": 10,
+              "race_mean_speed": 1515.2156982421875,
+              "race_ticks": 276
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 277,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 152,
+              "race_mean_speed": 1615.702880859375,
+              "race_ticks": 276
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 0,
+          "world": 3
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 320,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 29,
+              "race_mean_speed": 1488.3170166015625,
+              "race_ticks": 303
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 304,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 150,
+              "race_mean_speed": 1764.028076171875,
+              "race_ticks": 303
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 16,
+          "rival_first": false,
+          "side": 0,
+          "world": 4
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 253,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1407.938232421875,
+              "race_ticks": 243
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 244,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1588.1248779296875,
+              "race_ticks": 243
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 5
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 248,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 225,
+              "is_rival": true,
+              "race_airborne_ticks": 8,
+              "race_mean_speed": 1417.603515625,
+              "race_ticks": 238
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 239,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 130,
+              "race_mean_speed": 1595.271240234375,
+              "race_ticks": 238
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 6
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1453.0223388671875,
+              "race_ticks": 274
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 275,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1616.6771240234375,
+              "race_ticks": 274
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 11,
+          "rival_first": false,
+          "side": 1,
+          "world": 7
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 281,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 261,
+              "is_rival": true,
+              "race_airborne_ticks": 9,
+              "race_mean_speed": 1512.3623046875,
+              "race_ticks": 275
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 144,
+              "race_mean_speed": 1618.202880859375,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 1,
+          "world": 8
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 321,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 28,
+              "race_mean_speed": 1488.801513671875,
+              "race_ticks": 302
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 303,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 148,
+              "race_mean_speed": 1765.6324462890625,
+              "race_ticks": 302
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 18,
+          "rival_first": false,
+          "side": 1,
+          "world": 9
+        }
+      ]
+    },
+    "parent650": {
+      "aggregate": {
+        "first_contacts_won": 0,
+        "nexto_pre_contact_flips": 10,
+        "nexto_race_mean_speed": 1637.2924560546876,
+        "rival_contact_lag_max_ticks": 19,
+        "rival_contact_lag_min_ticks": 5,
+        "rival_pre_contact_flips": 0,
+        "rival_race_boost_command_fraction": 1.0,
+        "rival_race_full_throttle_fraction": 1.0,
+        "rival_race_mean_speed": 1456.6245361328124,
+        "rival_race_reverse_throttle_fraction": 0.0
+      },
+      "worlds": [
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 256,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1411.8548583984375,
+              "race_ticks": 245
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 246,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1588.934814453125,
+              "race_ticks": 245
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 0
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 247,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 217,
+              "is_rival": true,
+              "race_airborne_ticks": 14,
+              "race_mean_speed": 1413.7872314453125,
+              "race_ticks": 236
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 237,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 145,
+              "race_mean_speed": 1604.4661865234375,
+              "race_ticks": 236
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 1
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1455.58837890625,
+              "race_ticks": 275
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 146,
+              "race_mean_speed": 1615.884033203125,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 10,
+          "rival_first": false,
+          "side": 0,
+          "world": 2
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 282,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 265,
+              "is_rival": true,
+              "race_airborne_ticks": 6,
+              "race_mean_speed": 1514.8756103515625,
+              "race_ticks": 276
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 277,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 152,
+              "race_mean_speed": 1615.702880859375,
+              "race_ticks": 276
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 0,
+          "world": 3
+        },
+        {
+          "cars": [
+            {
+              "car": 0,
+              "first_contact_tick": 323,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 29,
+              "race_mean_speed": 1490.2535400390625,
+              "race_ticks": 303
+            },
+            {
+              "car": 1,
+              "first_contact_tick": 304,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 150,
+              "race_mean_speed": 1764.028076171875,
+              "race_ticks": 303
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 19,
+          "rival_first": false,
+          "side": 0,
+          "world": 4
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 253,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1407.938232421875,
+              "race_ticks": 243
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 244,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1588.1248779296875,
+              "race_ticks": 243
+            }
+          ],
+          "layout": 0,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 5
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 248,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 221,
+              "is_rival": true,
+              "race_airborne_ticks": 12,
+              "race_mean_speed": 1418.0196533203125,
+              "race_ticks": 238
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 239,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 130,
+              "race_mean_speed": 1595.271240234375,
+              "race_ticks": 238
+            }
+          ],
+          "layout": 1,
+          "rival_contact_lag_ticks": 9,
+          "rival_first": false,
+          "side": 1,
+          "world": 6
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 286,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": null,
+              "is_rival": true,
+              "race_airborne_ticks": 0,
+              "race_mean_speed": 1453.0223388671875,
+              "race_ticks": 274
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 275,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 143,
+              "race_mean_speed": 1616.6771240234375,
+              "race_ticks": 274
+            }
+          ],
+          "layout": 2,
+          "rival_contact_lag_ticks": 11,
+          "rival_first": false,
+          "side": 1,
+          "world": 7
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 281,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 261,
+              "is_rival": true,
+              "race_airborne_ticks": 9,
+              "race_mean_speed": 1512.3623046875,
+              "race_ticks": 275
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 276,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 144,
+              "race_mean_speed": 1618.202880859375,
+              "race_ticks": 275
+            }
+          ],
+          "layout": 3,
+          "rival_contact_lag_ticks": 5,
+          "rival_first": false,
+          "side": 1,
+          "world": 8
+        },
+        {
+          "cars": [
+            {
+              "car": 1,
+              "first_contact_tick": 322,
+              "first_native_flipped_tick": null,
+              "first_native_jumped_tick": 269,
+              "is_rival": true,
+              "race_airborne_ticks": 28,
+              "race_mean_speed": 1488.543212890625,
+              "race_ticks": 302
+            },
+            {
+              "car": 0,
+              "first_contact_tick": 303,
+              "first_native_flipped_tick": 73,
+              "first_native_jumped_tick": 61,
+              "is_rival": false,
+              "race_airborne_ticks": 148,
+              "race_mean_speed": 1765.6324462890625,
+              "race_ticks": 302
+            }
+          ],
+          "layout": 4,
+          "rival_contact_lag_ticks": 19,
+          "rival_first": false,
+          "side": 1,
+          "world": 9
+        }
+      ]
+    }
+  },
+  "version": "RIVAL2_NATIVE_KICKOFF_PHYSICAL_REDUCTION_V1"
+}

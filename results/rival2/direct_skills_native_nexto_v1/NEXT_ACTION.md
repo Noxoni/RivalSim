@@ -23,7 +23,34 @@ The final checkpoint is `checkpoints/rival2/direct_skills_native_nexto_v1/child_
 SHA `D53603E3B3DBD990EBC06E44179932C33F03358F4B4300098E2CAD1BD523B29D`.
 See `REVIEW_000025.md`, `completion.json` and both progress files for full detail.
 
-## Next bounded action, not another broad compatibility investigation
+## Update: the bounded kickoff trace below is now COMPLETE
+
+See `results/rival2/direct_skills_native_kickoff_v1/REPORT.md` and `analysis.json`.
+All three cases are captured and verified. Do not repeat this trace. Rival uses
+full throttle/boost and reasonable ball alignment but approaches about11% slower
+than Nexto, losing all first contacts. No Rival native flip occurs before first
+contact; Nexto has one in every start. Child25 changes only12/670 opening actions.
+This is useful diagnosis, not trained improvement or proof that a flip alone
+solves the full-match problem.
+
+Next action: implement a small, separately frozen kickoff race-and-follow-through
+learning arm. Preserve shooting20%, natural play and the existing other roles.
+Kickoff-only: prospectively replace the personal-first-touch bonus with a bounded
+world-first-contact race bonus, retaining larger control/advancement and true
+goal rewards. Use physically valid near-tie/advantaged kickoff starts alongside
+all standard layouts to make positive outcomes reachable; no scripted controls
+or named mechanic reward. Good second-touch control must remain more valuable
+than just being first. Start from parent650 for a controlled comparison, not the
+regressed child25. Freeze exact weights, reset distribution, finite sample budget
+and early kickoff/full-match evaluation before learning. This is an explicit next
+experiment, not permission for an unbounded extension of the completed25block.
+
+The current bonus is documented as each player's first personal touch; that is
+not a lifecycle bug. Do not reopen Nexto/native/bridge investigations or add a
+speed/flip/button reward. Judge actual race, post-contact control and scoring
+outcomes, not training-loss improvement alone. The broad SSL goal remains active.
+
+## Completed trace specification (historical, do not rerun)
 
 Implement and freeze a six-second (720physics-tick), ten-world kickoff trace
 of **Rival's own policy behavior** for the parent650, child10 and child25.
