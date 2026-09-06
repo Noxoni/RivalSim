@@ -2,7 +2,8 @@
 
 Prepared after the scheduled +200 review, without modifying any of the twenty
 frozen campaign source files, reward/curriculum authority, policy or optimizer.
-The learner remained active. **Live replay has not yet been run or validated.**
+The learner remained active during initial preparation. Live replay was then
+validated after a clean +250 diagnostic pause; see the dated outcome below.
 
 ## Why this exists
 
@@ -93,5 +94,17 @@ refusal before model/output creation, and real tap delegation on a fake CPU
 environment including per-tick opponent controls and pre-reset state. Exception
 paths restore the original instance/class methods.
 
-These tests validate diagnostic mechanics, **not live CUDA trajectory parity**.
-No new shooting capability, improvement or causal explanation is claimed yet.
+Those initial tests validate diagnostic mechanics, **not live CUDA trajectory
+parity**. On their own they establish no new shooting capability or cause.
+
+## Live outcome on 2026-09-06
+
+After the complete +250 evaluation, training paused cleanly at that accepted
+checkpoint. The first capture exposed flat native wheel-contact storage; its
+helper-only correction was published and the 38 CPU tests rerun. The retry at
++250 and a paired +150 replay then passed exact saved-evaluation parity for
+every family, native contact/goal accounting and model/checkpoint immutability.
+The archives and manifests are committed under `finishing_trace_000250_v2` and
+`finishing_trace_000150`; the failed first attempt remains recorded separately.
+`FINISHING_DIAGNOSIS_000250.md` gives the bounded physical interpretation and
+the decision to resume the same +250 lineage without reward changes.
