@@ -1,0 +1,27 @@
+{
+  "accepted_updates_per_arm": 30,
+  "arms": {
+    "retain": 0.01,
+    "withdraw": 0.0
+  },
+  "endpoint": "Primary: total and paired-world goal difference at+30; also report scored and conceded separately, wins, contacts, next-contact identity, standing-kickoff first contacts. +10 is an intermediate report, not an adaptive stopping/selection point.",
+  "evaluation_offsets": [
+    10,
+    30
+  ],
+  "execution_order": [
+    "retain",
+    "withdraw"
+  ],
+  "interpretation": "A better final scoreline in one arm is descriptive evidence only: one training seed and ten reused development matches, not statistical significance or an SSL claim. Contact/entropy improvement alone is not success. Report ties and tradeoffs; no automatic promotion, deployment, restart, hyperparameter change or extension.",
+  "matching": "Same750 model/Adam/groups/counters/four learner RNG/native-opponent RNG, same deterministic fresh physical scenario bank/seed and zero recurrent hidden. Independent processes; not continuation of750 physical episodes. Entry identities are audited; no assertion of bit-identical subsequent trajectories.",
+  "maximum_total_learner_decisions": 265420800,
+  "parent": {
+    "accepted_updates": 750,
+    "path": "checkpoints/rival2/direct_skills_exploration_continuation_v1/child_000070.pt",
+    "sha256": "517A2217CBDF4124612B518E10F30BC4D5F00F5C1DC77A5119D10D2B1DD89613"
+  },
+  "stopping": "Each arm stops after30 accepted updates. User STOP and numerical/corruption failures stop work at the latest accepted checkpoint. KL remains telemetry only. Failure prevents automatic launch of the other arm; investigate before any recovery.",
+  "variable": "Only added uniform exploration loss coefficient: retain0.01 versus withdraw0.0. Ordinary entropy0.001 and temperature2 remain in both. No reward change.",
+  "version": "RIVAL2_DIRECT_SKILLS_EXPLORATION_ABLATION_V1"
+}

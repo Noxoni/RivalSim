@@ -1,0 +1,64 @@
+{
+  "authority_sha256": "95A4D2D3702BED783E834FF292FEC739F6B6AA15B1B68F6997FFD877582B16D9",
+  "comparison_authority_sha256": "7128668CD6FF11E3F6A18F5031389BDFFF7400ADF360B85CECD2F9035B4BD3E8",
+  "decision_evidence": {
+    "results/rival2/direct_skills_exploration_continuation_v1/FINAL_REVIEW.md": "C71F129BCC66134D7F1EBAA728F2C2C555B01F47221A3E0193521998B09A9DFC",
+    "results/rival2/direct_skills_exploration_continuation_v1/child_000070.json": "2C37E0E8CCC0E6226140A0CF0A882196BD31875AEBCE27DF6EFA28CBB287414C",
+    "results/rival2/direct_skills_exploration_continuation_v1/completion.json": "B5AC2B11A6C8F756FA347F05C5923EBB792B4045AD785154A37A0A2796721FFA",
+    "results/rival2/direct_skills_exploration_continuation_v1/task_progress_750.json": "1994E321ADFF8BF3186D391E646F80702370E696070A4A812604706F621BCBF2"
+  },
+  "evidence": {
+    "results/rival2/direct_skills_exploration_ablation_v1/tests.xml": "C5E134AB4D38BA2ECE47DB7066BEDC5FC942B7F52A0A2368FF3AE46DD37271E5",
+    "results/rival2/direct_skills_exploration_ablation_v1/withdraw/training_preflight.json": "01ED4F5EBF080D3FCB0E8EFF603682427A3802429E1CE270001EF89A138E7A8E"
+  },
+  "exploration_objective": {
+    "coefficient": 0.0,
+    "formula": "PPO loss + beta*(-mean_action(log_softmax(logits_T2))-log(90))",
+    "gradient": "For each state: beta*(pi_i-1/90); no vanishing probability factor on suppressed-action term",
+    "reference": "Uniform across all90 joint actions, NOT parent-policy retention",
+    "unchanged": "Same on-policy T2 sampling/likelihood, raw argmax evaluation, existing entropy0.001, no action injection or reward change",
+    "version": "RIVAL2_DIRECT_SKILLS_UNIFORM_LOG_BARRIER_V1"
+  },
+  "lineage": {
+    "arm": "withdraw",
+    "comparison_authority_sha256": "7128668CD6FF11E3F6A18F5031389BDFFF7400ADF360B85CECD2F9035B4BD3E8",
+    "parent": {
+      "accepted_updates": 750,
+      "path": "checkpoints/rival2/direct_skills_exploration_continuation_v1/child_000070.pt",
+      "sha256": "517A2217CBDF4124612B518E10F30BC4D5F00F5C1DC77A5119D10D2B1DD89613"
+    }
+  },
+  "scenario_sha256": "B53F1DC28DD2273377FC4528CE4C86B44B641B1C47CD5B2D233658F8CFDA1B3E",
+  "sources": {
+    "benchmarks/analyze_direct_skills_learning_v1.py": "0AF8E0F2F94E11C68EBDABFB0306D9A785919F6F54411D7257C6A57C0990DCBA",
+    "benchmarks/calibrate_direct_skills_log_barrier_v1.py": "AB53A663CC6F2B8D4E104818EF9B1A5A3FB9C34B62FABCC2E6DB9EE3E0248F3A",
+    "benchmarks/report_direct_skills_exploration_ablation_v1.py": "71ECE640C67BAAE3BE931541D895DFC37239126EABD69EBBC0238BE0266CCBE4",
+    "benchmarks/report_direct_skills_exploration_continuation_v1.py": "AF607F8889A17C781B2606F661F15E19DA12FB08EB79374D3419D1D2C76F8A2D",
+    "benchmarks/run_direct_skills_exploration_ablation_v1.py": "2B06BD87253CC9166F3744E140E11D127E9021646C706F4A0305C9EF592DA419",
+    "benchmarks/run_direct_skills_exploration_continuation_v1.py": "40F7FE529F7A20597F93A9AE4FD49FD35FE58ABF697BA9C096CE11A0170E2ACF",
+    "benchmarks/run_direct_skills_kickoff_race_v1.py": "587D119CD3E7AB08686A539ECA7E9ABB853322B2A10CC509F73404E0866E6C8F",
+    "benchmarks/run_direct_skills_log_barrier_v1.py": "BDE8ABF31D50CDF87FEA3795AE0F6CC5F99C69481CA665309FD2B3370D68CB28",
+    "benchmarks/run_direct_skills_native_nexto_v1.py": "F571DA2773D77BA402BD92DE8701B7013B0C7AB19C4F2E015483958419A96D91",
+    "benchmarks/run_direct_skills_shooting_progress_v1.py": "B44575322C7D98F6F07EF2F39E357A6303FA662CF943AF00EC4389C0DF8FC084",
+    "benchmarks/run_rival2_direct_skills_v1.py": "F87E7A2A4200C55D7BDE64A9F91D4117AD2891E981B74D98754E25AA1C7B4A22",
+    "rivalsim/direct_skills_exploration_v1.py": "7C83C310E309BA72D3B767912BFA0286505F3459200EE0EDC963A2971031F319",
+    "rivalsim/direct_skills_finishing_goal_v2.py": "11ACC668B7536F4DC483AD99B89C4935BE987DAE43760887FA9A78393CD9FD95",
+    "rivalsim/direct_skills_kickoff_race_v1.py": "79A41186BE033D9435844BA315C2FDAD7745EC675B48DC68C891AAA07EEC0F04",
+    "rivalsim/direct_skills_log_barrier_v1.py": "01F8A55692BCF0671D4DC27652CA7A6DA80940CB17725B78374961EF35E6F7DE",
+    "rivalsim/direct_skills_native_nexto.py": "30CE9874A52F677ECAB82AA340ADB73CD49E6269EA39342EF9A6228692278F99",
+    "rivalsim/direct_skills_shooting_curriculum_v1.py": "21170FE595C030EE98C4C6B4D4BCDA38EEB56C7A6C164BEF0FCE681392E8DA92",
+    "rivalsim/direct_skills_training.py": "1A24A2CA220CDA9A64170638478C7D118A05E8C8F8E2DCFBA4B387EB7ADD8CB3",
+    "rivalsim/direct_skills_v1.py": "D0AD4075C7C1405E20374703B76426C4CEAEF1F8AEA62F76856CE9E87421120F",
+    "rivalsim/fresh_ground_30hz.py": "F8766E9A8917C9019D6FD5FCD3F8B775A8E1E7A5E243A802E5A2F1E595FA27C0",
+    "rivalsim/rival2_recurrent_ppo.py": "1C95DAB1BFFFED90046024CCD6F1CA5706B300CC83EB637B55B9DACE3C39542B",
+    "rivalsim/ssl_entity_mixed_training.py": "355812347D8FCEE9FFB4D4A229F3D12ACB67AC6AF2B8047C852F0A5624075141",
+    "rivalsim/ssl_entity_training.py": "1DE74E73009AC94D6FEFE14E0A1C99711F16DF3B9708049A5593DBF060EB3459",
+    "tests/test_direct_skills_exploration_ablation_v1.py": "02E9DCFCB1871270F0694275643277A1642A1580E6E152A22644BB59142B1ABB",
+    "tests/test_direct_skills_exploration_continuation_v1.py": "F847437B4FAFF5CBCA646D2867D1364E3D3B10C06E00E0B6DDAB9764336E4199",
+    "tests/test_direct_skills_kickoff_race_runner_v1.py": "61F11A48AA46132D28C37713EFC38AEE5A07E3330717F1D92BFF111E6695D2EF",
+    "tests/test_direct_skills_kickoff_race_v1.py": "F61AE31F3415C7BC1942C801003981F8115A389A2121F3470267EB8394D4D985",
+    "tests/test_direct_skills_log_barrier_runner_v1.py": "8B3C61E8A3BFAC5F41E16F17604532583E5B3E8770F9DF031F2CF867C273BD7A",
+    "tests/test_direct_skills_log_barrier_v1.py": "A4D3040A761CEB2C3A8AD98E590C0583843BDC23E4A21E4EE6833E85771F2A3A",
+    "tests/test_direct_skills_native_nexto_runner.py": "E441483F3D5EAA5FA321A3F8F9D52A44D97BE72D26B75987111266AB26F0141C"
+  }
+}
