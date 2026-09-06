@@ -56,10 +56,12 @@ Use the existing virtualenv Python and the **new** entry point:
 
 ```powershell
 .venv\Scripts\python.exe benchmarks/run_direct_skills_exploration_v1.py verify
-.venv\Scripts\python.exe -u benchmarks/run_direct_skills_exploration_v1.py run --resume <verified-amended-latest.pt> --resume-sha256 <exact-SHA256>
+.venv\Scripts\python.exe -u benchmarks/resume_direct_skills_exploration_v1.py --resume <verified-amended-latest.pt> --resume-sha256 <exact-SHA256>
 ```
 
-Do not use the old untempered runner for amended checkpoints. The artifact's
+Use the [latest-checkpoint recovery guard](RECOVERY_GUARD.md), which dispatches
+the frozen training implementation without changing it. Do not omit the resume
+identity or use the old untempered runner for amended checkpoints. The artifact's
 `model` remains compatible with the original deterministic inference class;
 the additional distribution/authority metadata is mandatory for PPO resume.
 No fresh optimizer, temperature-free likelihood, reward change or KL stop is
