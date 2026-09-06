@@ -7,11 +7,20 @@ actual parent. Do not restart, extend, rerun these matches, or promote this arm.
 The final checkpoint SHA is
 16BF2B904785D49E0363B869AF953CFCCC62FF754286A307D386729AC691DDAD.
 
-Next: follow `results/rival2/direct_skills_post_exploration_probe_v1/PLAN.md`
-for one bounded no-optimizer gradient check after the completed package is
-committed, pushed and remotely verified. Do not invent a coefficient change
-from negative gameplay or increased entropy alone. Once its summary exists,
-the probe is complete: do not rerun it. No new learning authority exists yet.
+The post-exploration no-optimizer probe is COMPLETE. Its summary and results
+are in `results/rival2/direct_skills_post_exploration_probe_v1/`. At beta 0.01
+the median exploration/PPO gradient norm ratio is 0.09665, maximum 0.16416:
+not evidence of a dominating exploration term. The raw candidate selection
+0.03 is NOT adopted; do not use it as a new authority. Do not rerun the probe.
+
+Next work is an evidence-based learning decision under the continuing SSL goal,
+not resuming this completed arm. Consider the late recovery (+15 to +30) and
+continued failure versus parent separately. Do not declare the exploration
+pressure or a stuck critic the established cause. If proposing a continuation
+or changed approach, freeze its concrete hypothesis, checkpoint identity,
+budget, comparisons and stop conditions before any new optimizer step. Keep
+the existing checkpoint/evaluation protocol; no large new benchmark suite.
+No new learning authority exists yet.
 
 The saved critic-residual analysis in the learning-diagnostic directory is
 also complete. It shows the previous kickoff child adapted its critic without

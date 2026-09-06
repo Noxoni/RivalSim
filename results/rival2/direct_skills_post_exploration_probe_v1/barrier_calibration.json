@@ -1,0 +1,137 @@
+{
+  "candidates": {
+    "0.01": {
+      "eligible": true,
+      "max_gradient_ratio": 0.16416165833845525,
+      "median_gradient_ratio": 0.09665246102611287
+    },
+    "0.03": {
+      "eligible": true,
+      "max_gradient_ratio": 0.49248497501536576,
+      "median_gradient_ratio": 0.28995738307833857
+    },
+    "0.1": {
+      "eligible": false,
+      "max_gradient_ratio": 1.6416165833845526,
+      "median_gradient_ratio": 0.9665246102611287
+    }
+  },
+  "caveat": "Gradient norms are initialization diagnostics, not a guarantee about future optimization or gameplay.",
+  "horizon": 90,
+  "model_unchanged": true,
+  "optimizer_constructed": false,
+  "optimizer_steps": 0,
+  "parent_sha256": "16BF2B904785D49E0363B869AF953CFCCC62FF754286A307D386729AC691DDAD",
+  "records": [
+    {
+      "collection_logp_max_error": 0.0012984275817871094,
+      "norms": {
+        "existing_entropy": 0.0028585693798959255,
+        "policy": 0.3593551516532898,
+        "unit_barrier": 3.548038959503174
+      },
+      "policy_barrier_cosine": 0.09937108308076859,
+      "sequence_count": 128,
+      "sequence_start": 0,
+      "trainable_decisions": 11489,
+      "unit_barrier": 1.495608925819397
+    },
+    {
+      "collection_logp_max_error": 0.0008665323257446289,
+      "norms": {
+        "existing_entropy": 0.003036732552573085,
+        "policy": 0.3825884759426117,
+        "unit_barrier": 3.6181938648223877
+      },
+      "policy_barrier_cosine": -0.18687060475349426,
+      "sequence_count": 128,
+      "sequence_start": 128,
+      "trainable_decisions": 11520,
+      "unit_barrier": 1.516641616821289
+    },
+    {
+      "collection_logp_max_error": 0.0008542537689208984,
+      "norms": {
+        "existing_entropy": 0.0032805607188493013,
+        "policy": 0.2980502247810364,
+        "unit_barrier": 3.754511833190918
+      },
+      "policy_barrier_cosine": 0.13942395150661469,
+      "sequence_count": 128,
+      "sequence_start": 256,
+      "trainable_decisions": 11520,
+      "unit_barrier": 1.477073073387146
+    },
+    {
+      "collection_logp_max_error": 0.000804901123046875,
+      "norms": {
+        "existing_entropy": 0.0028559607453644276,
+        "policy": 0.5484399795532227,
+        "unit_barrier": 3.5709683895111084
+      },
+      "policy_barrier_cosine": -0.26485517621040344,
+      "sequence_count": 128,
+      "sequence_start": 384,
+      "trainable_decisions": 11520,
+      "unit_barrier": 1.4807417392730713
+    },
+    {
+      "collection_logp_max_error": 0.0011591911315917969,
+      "norms": {
+        "existing_entropy": 0.0031268501188606024,
+        "policy": 0.22828304767608643,
+        "unit_barrier": 3.747532367706299
+      },
+      "policy_barrier_cosine": -0.47010499238967896,
+      "sequence_count": 128,
+      "sequence_start": 512,
+      "trainable_decisions": 11520,
+      "unit_barrier": 1.5140266418457031
+    },
+    {
+      "collection_logp_max_error": 0.00174713134765625,
+      "norms": {
+        "existing_entropy": 0.0028710283804684877,
+        "policy": 0.3256493806838989,
+        "unit_barrier": 3.4844419956207275
+      },
+      "policy_barrier_cosine": -0.34796833992004395,
+      "sequence_count": 128,
+      "sequence_start": 640,
+      "trainable_decisions": 11379,
+      "unit_barrier": 1.5143365859985352
+    },
+    {
+      "collection_logp_max_error": 0.0010399818420410156,
+      "norms": {
+        "existing_entropy": 0.002962380414828658,
+        "policy": 0.5214031934738159,
+        "unit_barrier": 3.478092908859253
+      },
+      "policy_barrier_cosine": 0.08858446776866913,
+      "sequence_count": 128,
+      "sequence_start": 768,
+      "trainable_decisions": 11474,
+      "unit_barrier": 1.4849469661712646
+    },
+    {
+      "collection_logp_max_error": 0.0008361339569091797,
+      "norms": {
+        "existing_entropy": 0.003065810538828373,
+        "policy": 0.6455463171005249,
+        "unit_barrier": 3.494349479675293
+      },
+      "policy_barrier_cosine": -0.3088083267211914,
+      "sequence_count": 128,
+      "sequence_start": 896,
+      "trainable_decisions": 11483,
+      "unit_barrier": 1.47629976272583
+    }
+  ],
+  "scenario_sha256": "A0A240DE8A1C33F866F86CB0D6F85863D8A510D136E1DBE9B83FD645FD7735FC",
+  "selected_coefficient": 0.03,
+  "selection": "Highest of0.01,0.03,0.1 with median added/policy gradient norm<=0.5 and maximum<=1.0 on eight128-sequence parent-only training microbatches. No test data or student outcomes.",
+  "sequence_sampling_seed": 2026173602,
+  "version": "RIVAL2_DIRECT_SKILLS_LOG_BARRIER_CALIBRATION_V1",
+  "worlds": 1024
+}
