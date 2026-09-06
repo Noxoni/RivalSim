@@ -1,0 +1,74 @@
+{
+  "blocks": [
+    {
+      "first_update": 101,
+      "last_update": 150,
+      "nexto_decision_fraction": 0.0,
+      "nexto_fraction_of_goal_endings_scored_by_learner": null,
+      "nexto_learner_concede_endings": 0,
+      "nexto_learner_decisions": 0,
+      "nexto_learner_goal_endings": 0,
+      "physical_goal_endings": 143117,
+      "regulation_match_win_rate": null,
+      "selfplay_physical_goal_endings": 143117,
+      "trainable_decisions": 294912000
+    },
+    {
+      "first_update": 151,
+      "last_update": 200,
+      "nexto_decision_fraction": 0.05783684345950957,
+      "nexto_fraction_of_goal_endings_scored_by_learner": 0.12030325538508824,
+      "nexto_learner_concede_endings": 68692,
+      "nexto_learner_decisions": 16124206,
+      "nexto_learner_goal_endings": 9394,
+      "physical_goal_endings": 272430,
+      "regulation_match_win_rate": null,
+      "selfplay_physical_goal_endings": 194344,
+      "trainable_decisions": 278787794
+    },
+    {
+      "first_update": 201,
+      "last_update": 250,
+      "nexto_decision_fraction": 0.06743146617788282,
+      "nexto_fraction_of_goal_endings_scored_by_learner": 0.13729785151698745,
+      "nexto_learner_concede_endings": 74044,
+      "nexto_learner_decisions": 18630094,
+      "nexto_learner_goal_endings": 11784,
+      "physical_goal_endings": 343385,
+      "regulation_match_win_rate": null,
+      "selfplay_physical_goal_endings": 257557,
+      "trainable_decisions": 276281906
+    }
+  ],
+  "derivation": {
+    "nexto_learner_concedes": "physical_goals - learner_goals",
+    "nexto_learner_goals": "physical_goals - learner_concedes",
+    "selfplay_goals": "learner_goals + learner_concedes - physical_goals"
+  },
+  "optimizer_steps_performed": 0,
+  "runtime_changed": false,
+  "semantics": [
+    "Derived exact counts from existing counters, not newly observed goal events.",
+    "Requires both self-play agents train; only current agent trains against Nexto.",
+    "Training uses sampled actions and changing curriculum states; not fixed evaluation.",
+    "20 percent episode assignment is not 20 percent learner sample exposure.",
+    "Goal-ending fractions exclude no-touch and time-limit episodes, and are not match wins.",
+    "No scenario-family attribution or cause of natural-match regression is inferred."
+  ],
+  "source_sha256": "A7D623CA24F7D9EB5E13C1B6900E91DD9AB5C370777E950CFEE7A5592C3DEB22",
+  "through_update": 250,
+  "total": {
+    "first_update": 101,
+    "last_update": 250,
+    "nexto_decision_fraction": 0.040888292065582116,
+    "nexto_fraction_of_goal_endings_scored_by_learner": 0.12920189855656014,
+    "nexto_learner_concede_endings": 142736,
+    "nexto_learner_decisions": 34754300,
+    "nexto_learner_goal_endings": 21178,
+    "physical_goal_endings": 758932,
+    "regulation_match_win_rate": null,
+    "selfplay_physical_goal_endings": 595018,
+    "trainable_decisions": 849981700
+  },
+  "version": "RIVAL2_ENTITY_EXPOSURE_REDUCTION_V1"
+}
