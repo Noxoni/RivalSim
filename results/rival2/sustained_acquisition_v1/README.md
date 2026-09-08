@@ -1,5 +1,12 @@
 # Temporary ball-acquisition starts for sustained gameplay
 
+**Current kickoff amendment:** after accepted update 76, use
+[`STANDING_KICKOFF_AMENDMENT.md`](STANDING_KICKOFF_AMENDMENT.md) and
+`standing_kickoff_package.json` in addition to the original authority. All kickoff
+starts are stationary standard layouts. After acquisition retirement the original
+five-family bank is restored **with this stationary kickoff correction retained**.
+The historical authority/package below remain unchanged for provenance.
+
 User amendment: add an initial learning-to-touch scenario, retained until no-touch
 acquisition is no longer an issue, then drop that extra scenario. This is a
 curriculum amendment, **not another random restart or a new reward contract**.

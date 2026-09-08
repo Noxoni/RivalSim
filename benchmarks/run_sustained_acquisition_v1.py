@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import asdict
 import gc
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -29,6 +30,10 @@ from rivalsim.sustained_gameplay_v1 import SustainedPolicy,POLICY_VERSION,VERSIO
 from rivalsim.fresh_ground_30hz import content_hash,scenario_hash
 from rivalsim.ssl_entity_training import fresh_entity_optimizer,joint_sequence_loss,finite_model_and_optimizer
 from rivalsim.ssl_entity_mixed_training import mixed_sequence_data,mixed_joint_ppo_update
+from rivalsim.sustained_standing_kickoff_v1 import (
+    VERSION as STANDING_VERSION, specification as standing_specification,
+    standing_training_starts, validate_resume as validate_standing_resume,
+)
 
 OUT=ROOT/"results/rival2/sustained_acquisition_v1"
 CKPTS=ROOT/"checkpoints/rival2/sustained_acquisition_v1"
@@ -141,13 +146,28 @@ def freeze():
 
 def verify():
     package=json.loads((OUT/"package.json").read_text())
+    amendment_path=OUT/"standing_kickoff_package.json"
+    amendment=json.loads(amendment_path.read_text())
+    assert amendment["specification"]==standing_specification()
+    assert amendment["base_authority_sha256"]==package["authority_sha256"]
+    runner="benchmarks/run_sustained_acquisition_v1.py"
+    assert amendment["replaced_sources"]=={runner:package["sources"][runner]}
     assert package["authority_sha256"]==content_hash(authority())
     assert json.loads((OUT/"authority.json").read_text())==authority()
     assert package["parent"]==parent_identity() and sha(PARENT)==PARENT_SHA
-    for p,h in package["sources"].items():assert text_sha(ROOT/p)==h,p
+    for p,h in package["sources"].items():
+        if p in amendment["replaced_sources"]:
+            original=subprocess.check_output(["git","show",amendment["base_implementation_commit"]+":"+p],cwd=ROOT)
+            assert hashlib.sha256(original.replace(b"\r\n",b"\n")).hexdigest().upper()==h,p
+        else:assert text_sha(ROOT/p)==h,p
+    for p,h in amendment["sources"].items():assert text_sha(ROOT/p)==h,p
     for p,h in package["evidence"].items():assert sha(OUT/p)==h,p
+    for p,h in amendment["evidence"].items():assert sha(ROOT/p)==h,p
+    assert sha(ROOT/amendment["resume"]["path"])==amendment["resume"]["sha256"]
     prefix=OUT.relative_to(ROOT).as_posix()+"/"
-    paths=(*SOURCES,parent_identity()["path"],*(prefix+p for p in ("authority.json","package.json",*package["evidence"])))
+    paths=(*SOURCES,*amendment["sources"],*amendment["evidence"],amendment["resume"]["path"],
+        prefix+"standing_kickoff_package.json",parent_identity()["path"],
+        *(prefix+p for p in ("authority.json","package.json",*package["evidence"])))
     for p in paths:
         remote=subprocess.check_output(["git","show","origin/main:"+p],cwd=ROOT)
         local=(ROOT/p).read_bytes()
@@ -157,21 +177,24 @@ def verify():
 
 def run(args):
     package=verify();spec=authority();EXTERNAL.mkdir(parents=True,exist_ok=True)
+    standing=json.loads((OUT/"standing_kickoff_package.json").read_text())
+    standing_identity=dict(version=STANDING_VERSION,sha256=content_hash(standing),
+                           from_update=standing["resume"]["accepted_updates"])
     if (EXTERNAL/"STOP").exists():raise RuntimeError("Respect STOP")
     if args.resume:
         latest=json.loads((EXTERNAL/"latest.json").read_text())
         assert Path(args.resume).resolve()==Path(latest["path"]).resolve()
         assert args.resume_sha256 and latest["sha256"]==args.resume_sha256.upper()==sha(args.resume)
         source=torch.load(args.resume,map_location="cpu",weights_only=False)
+        validate_standing_resume(source,sha(args.resume),standing,content_hash(standing))
         assert source["format"]==VERSION+"_CHECKPOINT" and source["authority_sha256"]==content_hash(spec)
         assert source["parent"]==parent_identity()
         retirement=Retirement(**source["retirement"])
     else:
-        if (EXTERNAL/"campaign_state.json").exists():raise RuntimeError("Existing run requires explicit resume")
-        source=load_parent();retirement=Retirement()
+        raise RuntimeError("Stationary kickoff correction requires explicit latest-checkpoint resume, not a restart")
     model,optimizer=restore_model(source)
-    bank=training_starts(32768,retirement.retired)
-    assert scenario_hash(bank)==package["scenario_sha256"]["retired" if retirement.retired else "active"]
+    bank=standing_training_starts(32768,retirement.retired)
+    assert scenario_hash(bank)==standing["scenario_sha256"]["retired" if retirement.retired else "active"]
     env=AcquisitionEnv(32768,COLLISION,device="cuda:0",seed=SEED,ssl_foundation_scenarios=bank)
     assert env.contract_hashes==source["runtime_contract_hashes"]
     collector=AcquisitionCollector(env,model)
@@ -190,14 +213,16 @@ def run(args):
         shuffle_rng_exact=torch.equal(shuffle.get_state().cpu(),source["shuffle_rng"].cpu()),
         cpu_rng_exact=torch.equal(torch.get_rng_state().cpu(),source["cpu_rng"].cpu()),
         cuda_rng_exact=torch.equal(torch.cuda.get_rng_state().cpu(),source["cuda_rng"].cpu()),
-        fresh_physical_episodes=True,both_memories_zero=not bool(collector.hidden.any()),retirement=asdict(retirement))
+        fresh_physical_episodes=True,both_memories_zero=not bool(collector.hidden.any()),retirement=asdict(retirement),
+        standing_kickoff_amendment=standing_identity,reset_bank_sha256=scenario_hash(bank))
     assert all(entry[k] for k in ("model_exact","adam_exact","policy_rng_exact","shuffle_rng_exact","cpu_rng_exact","cuda_rng_exact","both_memories_zero"))
     write_json(EXTERNAL/f"entry_{step:06d}_{time.time_ns()}.json",entry)
     del source;gc.collect()
     def state(status,**extra):
         write_json(EXTERNAL/"campaign_state.json",dict(utc=utc(),pid=os.getpid(),status=status,
             accepted_updates=step,additional_updates=step-27,learner_decisions=samples,
-            optimizer_steps=optimizer_steps,latest_checkpoint=latest,retirement=asdict(retirement),**extra))
+            optimizer_steps=optimizer_steps,latest_checkpoint=latest,retirement=asdict(retirement),
+            standing_kickoff_amendment=standing_identity,**extra))
     def save(path):
         return atomic_checkpoint(path,dict(format=VERSION+"_CHECKPOINT",policy_version=POLICY_VERSION,
             parent=parent_identity(),initialized_checkpoint_sha256=sha(INITIAL),seed=SEED,
@@ -207,6 +232,7 @@ def run(args):
             policy_rng=collector.generator.get_state(),shuffle_rng=shuffle.get_state(),cpu_rng=torch.get_rng_state(),
             cuda_rng=torch.cuda.get_rng_state(),opponent_state=collector.opponent_checkpoint_state(),
             runtime_contract_hashes=env.contract_hashes,retirement=asdict(retirement),last_metrics=collector.last_metrics,
+            standing_kickoff_amendment=standing_identity,
             recurrent_state_audit=dict(shape=list(collector.hidden.shape),sha256=tensor_hash({"hidden":collector.hidden}),
                 semantics="Fresh physics and cleared memories on process resume; carry in-process")))
     def rolling():
@@ -237,8 +263,8 @@ def run(args):
             write_json(OUT/"latest_evaluation.json",dict(accepted_updates=step,checkpoint=receipt,
                 evaluation_file=f"eval_{step:06d}.json",summary=match["summary"]))
         if wants_match and retirement.confirm_match(step,match["summary"]):
-            bank=training_starts(32768,True)
-            assert scenario_hash(bank)==package["scenario_sha256"]["retired"]
+            bank=standing_training_starts(32768,True)
+            assert scenario_hash(bank)==standing["scenario_sha256"]["retired"]
             env.retire_starts(bank)
             write_json(OUT/"retirement.json",dict(utc=utc(),accepted_updates=step,checkpoint=receipt,
                 rule=specification()["retirement"],probe=probe_result,match=match["summary"],
@@ -258,7 +284,8 @@ def run(args):
             ticks+=collector.last_metrics["physical_physics_ticks"];optimizer_steps+=report["optimizer_steps"]
             row=dict(utc=utc(),accepted_updates=step,additional_updates=step-27,learner_decisions=samples,
                 world_physics_ticks=ticks,optimizer_steps=optimizer_steps,collect_seconds=collected-start,
-                optimize_seconds=time.perf_counter()-collected,ppo=report,training=collector.last_metrics,retirement=asdict(retirement))
+                optimize_seconds=time.perf_counter()-collected,ppo=report,training=collector.last_metrics,retirement=asdict(retirement),
+                standing_kickoff_amendment=standing_identity)
             del rollout;gc.collect();rolling()
             append_json(EXTERNAL/"training_curve.jsonl",row);write_json(EXTERNAL/"progress.json",row)
             state("accepted");print("ACCEPTED "+json.dumps(dict(update=step,touches_min=collector.last_metrics["touches_per_minute"],retired=retirement.retired)),flush=True)

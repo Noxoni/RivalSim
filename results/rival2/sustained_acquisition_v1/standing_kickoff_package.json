@@ -1,0 +1,37 @@
+{
+  "base_authority_sha256": "36784FA9322D98E5D4204F82E40E8FF1E346A63268BF5E46F0335A38615BAF29",
+  "base_implementation_commit": "0460643df78642a20e4864a7394b434e5e4b33c5",
+  "evidence": {
+    "results/rival2/sustained_acquisition_v1/standing_kickoff_audit.json": "9DAFB5238B508D502456CC9D27BAFC3FCB36777E098A8331CB790ACBAB3C9859",
+    "results/rival2/sustained_acquisition_v1/standing_kickoff_tests.xml": "BF45241CC61F87ACF73206E37B49B030698141FC0043FC1877D6EDB0908CE03B"
+  },
+  "replaced_sources": {
+    "benchmarks/run_sustained_acquisition_v1.py": "08C2B8B0B1E824A2F03CC0BA0187DA67FE26B684F54AA0EE2C7917103FFF284B"
+  },
+  "resume": {
+    "accepted_updates": 76,
+    "path": "checkpoints/rival2/sustained_acquisition_v1/plus_000076.pt",
+    "sha256": "FBC1715C787CDD9DAFD1434D0B9DBEF9D717F9187C6858D1D5C25A3E12EF7C73"
+  },
+  "scenario_sha256": {
+    "active": "275F9284FA30D991DD4CB5A3446E0FA3E78FE6A94BB72034D2B37D5373D503D7",
+    "retired": "A095350CA07C88AC4AAB7C9DEB1A668374B49D64A4023C8D1DB01CC68FE52E66"
+  },
+  "sources": {
+    "benchmarks/freeze_sustained_standing_kickoff_v1.py": "B8537EC7A40168692649D348A3A26A28B56BF7116F483A3D8B01ADBD66BAFEA3",
+    "benchmarks/run_sustained_acquisition_v1.py": "D52C34F90C48998E59F11899E6647AB729679CE1E24CE0DFCA2093A85D26A2A5",
+    "rivalsim/static_world.py": "21C6ABBBB72D2FC0D4DF49127359EA374A9C50DE8231BB6C3B5D3A50CB34B36F",
+    "rivalsim/sustained_standing_kickoff_v1.py": "DB8117B9160A927A9C85443ABFDDE1EC136EBD0F9BC6463A9753115A1E3E95D6",
+    "tests/test_sustained_standing_kickoff_v1.py": "A85F6A3CB2ADE2E25F59A4FBAB642327FC76E3CEC2EFD991227066D804BF2C09"
+  },
+  "specification": {
+    "continuation": "Exact accepted update76 model, Adam, RNG and counters; documented fresh physical episodes and cleared actor/critic memory at process restart",
+    "controls": "Policy acts from first actionable tick; no controller prefix, speedflip script or opening-specific reward",
+    "initialization": "Exact make_standard_kickoff_state for the existing layout: both cars stationary, zero linear/angular velocity, native positions/orientations, 100/3 boost, centered stationary ball, cleared prior inputs and jump/flip state",
+    "preserved": "Every non-kickoff state and all family/focal/layout metadata remain byte-identical; acquisition probes and full-match evaluation unchanged",
+    "retirement": "Apply the same stationary correction to the original five-family bank after acquisition retirement; never restore assisted kickoff momentum",
+    "rewards": "Unchanged sustained-gameplay reward and goal/inactivity episode semantics",
+    "selection": "Every kickoff_indicator row, including dedicated and natural-family kickoffs",
+    "version": "RIVAL2_SUSTAINED_STANDING_KICKOFF_V1"
+  }
+}
