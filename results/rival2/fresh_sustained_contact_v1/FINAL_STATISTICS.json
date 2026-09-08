@@ -1,0 +1,3189 @@
+{
+  "schema": "RIVAL2_FRESH_SUSTAINED_CONTACT_FINAL_AUDIT_V1",
+  "verdict": {
+    "execution": "COMPLETED_BOUNDED_DIAGNOSTIC",
+    "integrity": "PASS",
+    "behavior": "NOT_PROMOTED",
+    "automatic_extension": false,
+    "reward_retuning": false,
+    "hard_failure": false
+  },
+  "authority_sha256": "63B4B5D911957322D9358D3BE9EA3E0DFF5E0F17552241D74C0CC2ED185F71BD",
+  "initial_sha256": "DACF9FC9995CBA6E2C8E6E65DBF0175AB71286DADB4F4CBAC34037398D703A93",
+  "scenario_sha256": "275F9284FA30D991DD4CB5A3446E0FA3E78FE6A94BB72034D2B37D5373D503D7",
+  "probe_scenario_sha256": "E331A5A5EEB6BE101945647E246FF9FDEAEEE7B5F081CB722B2248FB99B2925F",
+  "runtime_contract_hashes": {
+    "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+    "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+    "RIVAL2_SUSTAINED_GAMEPLAY_V1_EPISODES": "D097B64CFDE236C31EC681DF698B881221110EB7096DD84D2B0FDDFFC876A732",
+    "RIVAL2_FRESH_SUSTAINED_CONTACT_V1_REWARD": "28783C35F70476D384783C9318133293682C8B09DF38478FABB67243B025AF11"
+  },
+  "campaign_state": {
+    "accepted_updates": 150,
+    "authority_sha256": "63B4B5D911957322D9358D3BE9EA3E0DFF5E0F17552241D74C0CC2ED185F71BD",
+    "last_probe_update": 150,
+    "latest_checkpoint": {
+      "accepted_updates": 150,
+      "path": "G:\\dev\\RivalSim-runs\\fresh-sustained-contact-v1\\rolling_0.pt",
+      "sha256": "CFA12BEF4E825A95D60A844D0ED3405A194DB9191DCF72D2FA017BB327BB97F4"
+    },
+    "learner_decisions": 663552000,
+    "optimizer_steps": 21210,
+    "pid": 50200,
+    "status": "completed_bounded_diagnostic",
+    "utc": "2026-09-08T20:17:28.884537+00:00"
+  },
+  "entry": {
+    "accepted_updates": 0,
+    "both_memories_zero": true,
+    "fresh_random_initialization": true,
+    "model_sha256": "38C58096DD2E8B947908892C1A0C6ED0BE46FC0E88A372371172B62BCA18677F",
+    "optimizer_empty": true,
+    "parent": null,
+    "reset_bank_sha256": "275F9284FA30D991DD4CB5A3446E0FA3E78FE6A94BB72034D2B37D5373D503D7",
+    "runtime_contract_hashes": {
+      "RIVAL2_ACTION_V1": "145AF5B49E1A0C85209022A6DE862F05EF996EB89B90B124072A59BC9936727B",
+      "RIVAL2_FRESH_SUSTAINED_CONTACT_V1_REWARD": "28783C35F70476D384783C9318133293682C8B09DF38478FABB67243B025AF11",
+      "RIVAL2_OBS_V1": "10669E7D240D553BEA601F8AD7AEF9F9029310E55EA6DC4072E866F34BB218AF",
+      "RIVAL2_SUSTAINED_GAMEPLAY_V1_EPISODES": "D097B64CFDE236C31EC681DF698B881221110EB7096DD84D2B0FDDFFC876A732"
+    },
+    "utc": "2026-09-08T17:50:09.894689+00:00"
+  },
+  "single_process_entry_no_resume": true,
+  "rolling": {
+    "accepted_updates": 150,
+    "path": "G:\\dev\\RivalSim-runs\\fresh-sustained-contact-v1\\rolling_0.pt",
+    "sha256": "CFA12BEF4E825A95D60A844D0ED3405A194DB9191DCF72D2FA017BB327BB97F4"
+  },
+  "rolling_and_evaluated_final_model_optimizer_equal": true,
+  "snapshot_last_probe_update": 140,
+  "rolling_last_probe_update": 150,
+  "counters": {
+    "accepted_updates": 150,
+    "learner_decisions": 663552000,
+    "world_physics_ticks": 1769472000,
+    "learner_physics_exposure": 2654208000,
+    "optimizer_steps": 21210
+  },
+  "elapsed_seconds": 8838.989848,
+  "frozen_source_count": 42,
+  "all_frozen_sources_initial_tests_preflight_unchanged": true,
+  "raw_all_16_probes_recomputed_and_hash_verified": true,
+  "all_rows_contact_reward_count_bound_check": true,
+  "final_report_checks": {
+    "adam_counters": true,
+    "adam_finite": true,
+    "all_six_exposed": true,
+    "authority": true,
+    "contact_accounting": true,
+    "contiguous": true,
+    "contracts": true,
+    "counters": true,
+    "decisions": true,
+    "evaluation_identity": true,
+    "evaluation_read_only": true,
+    "format": true,
+    "initial_identity": true,
+    "model_finite": true,
+    "no_kl_rejection": true,
+    "parent_none": true,
+    "physics_ticks": true
+  },
+  "training_curve_sha256": "89BED3DF21C76D2674CB6F4B5B2B87CEE94D461E1400A60F0A6E155C5A41FBBE",
+  "closed_prefix_sha256": "64D3ED87AA2E8BCE90F5FA00CDB919A1AE138D7494A06DE1448D163A495E55A2",
+  "stderr_bytes": 0,
+  "no_failure_or_stop_file": true,
+  "ppo_safety": {
+    "kl_rejections": 0,
+    "max_completed_update_mean_kl": 0.006568310661950145,
+    "max_completed_update_sample_kl": 1.3069863319396973,
+    "final": {
+      "approx_kl": 0.0038738183211535215,
+      "clip_fraction": 0.02099791169166565,
+      "completed_update_mean_kl": 0.004438789888536963,
+      "completed_update_sample_kl_max": 0.31078457832336426,
+      "entropy": 3.5187082290649414,
+      "gradient_norm": 0.721437931060791,
+      "kl_rejections": 0,
+      "optimizer_steps": 138,
+      "policy_loss": -0.00023810700804460794,
+      "total_loss": 0.10329904407262802,
+      "value_loss": 0.21411171555519104
+    }
+  },
+  "evaluation_curve": [
+    {
+      "offset": 0,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.5083333333333333,
+        "no_focal_contact_fraction": 0.939453125,
+        "success_count": 31,
+        "success_fraction": 0.060546875,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.0083333333333333,
+        "no_focal_contact_fraction": 0.978515625,
+        "success_count": 11,
+        "success_fraction": 0.021484375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 42,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000000.pt",
+        "sha256": "CF71FC5184EFCEDE3A4779AD8E45A6640943C1F15D7A79B7AEC28B785FB7A03A"
+      },
+      "probe_sha256": "701B13259D7EC2ED1F13CB06FE33CA59A05E54BFA46AD391D200FFEC0304E7AF"
+    },
+    {
+      "offset": 10,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.5916666666666667,
+        "no_focal_contact_fraction": 0.517578125,
+        "success_count": 247,
+        "success_fraction": 0.482421875,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.05,
+        "no_focal_contact_fraction": 0.90625,
+        "success_count": 48,
+        "success_fraction": 0.09375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 295,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000010.pt",
+        "sha256": "56D0467D29788AFB72109CF4B60CA41377C7C6F61CCD6323970002E6ABA126F7"
+      },
+      "probe_sha256": "49EE36D8748C5077481C18313419B9C446AA193C1A33E77FA9CA47E35E1333A3"
+    },
+    {
+      "offset": 20,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.5916666666666667,
+        "no_focal_contact_fraction": 0.517578125,
+        "success_count": 247,
+        "success_fraction": 0.482421875,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.05,
+        "no_focal_contact_fraction": 0.90625,
+        "success_count": 48,
+        "success_fraction": 0.09375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 295,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000020.pt",
+        "sha256": "311306F39FA6C9325374250773A162D9DEADCC69593D4199AB006D4CC82C1B39"
+      },
+      "probe_sha256": "905FA5733FD9CCD7399D8E90B0D322063A8FDAD7EA411FA910F7676DFF994BB8"
+    },
+    {
+      "offset": 30,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.6333333333333333,
+        "no_focal_contact_fraction": 0.57421875,
+        "success_count": 218,
+        "success_fraction": 0.42578125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.1583333333333334,
+        "no_focal_contact_fraction": 0.91796875,
+        "success_count": 42,
+        "success_fraction": 0.08203125,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 260,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000030.pt",
+        "sha256": "DDECF9427E610D26C9DEA7BFE4CC91AC9D1DAF1B9E8DDA34828E2A2C3C4DB199"
+      },
+      "probe_sha256": "7BDF92C4A0F70C8C54DB30A46813C95D67AE07452C75F4E85DFDAD18F08E08B1"
+    },
+    {
+      "offset": 40,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.6916666666666667,
+        "no_focal_contact_fraction": 0.599609375,
+        "success_count": 203,
+        "success_fraction": 0.396484375,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.1666666666666667,
+        "no_focal_contact_fraction": 0.849609375,
+        "success_count": 77,
+        "success_fraction": 0.150390625,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 280,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000040.pt",
+        "sha256": "ACB2FF5BA5E1CEDB6371AB9682E1AC77A8DD3670DFE2CF99D254C169AAB44FA6"
+      },
+      "probe_sha256": "E572C19F42F058912696BC01B0638FFA2EB5688BAFB14A64F294A525F5F53916"
+    },
+    {
+      "offset": 50,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.6416666666666667,
+        "no_focal_contact_fraction": 0.921875,
+        "success_count": 39,
+        "success_fraction": 0.076171875,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.775,
+        "no_focal_contact_fraction": 0.947265625,
+        "success_count": 27,
+        "success_fraction": 0.052734375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 66,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000050.pt",
+        "sha256": "B602F1BC3411B7B02E6056E385AA85FB3FD8B2841426DD97DDA992607D467047"
+      },
+      "probe_sha256": "D0ADA681F22E668094B3B869CDE7731DCCA756C91BD0CF4AB4B7D46DD1274462"
+    },
+    {
+      "offset": 60,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.825,
+        "no_focal_contact_fraction": 0.9453125,
+        "success_count": 25,
+        "success_fraction": 0.048828125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 2.6083333333333334,
+        "no_focal_contact_fraction": 0.9609375,
+        "success_count": 20,
+        "success_fraction": 0.0390625,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 45,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000060.pt",
+        "sha256": "A4E18DFFCD0D042FD5C749F856BA750D9A940E1537BC60C50CFDD4564DECE4FE"
+      },
+      "probe_sha256": "2B8C4C7517512E7F8A4FB8ED8A6BA3289B75DB252CADC4B8EAFAB6BDB9B96532"
+    },
+    {
+      "offset": 70,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.0083333333333333,
+        "no_focal_contact_fraction": 0.84375,
+        "success_count": 68,
+        "success_fraction": 0.1328125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 2.158333333333333,
+        "no_focal_contact_fraction": 0.8984375,
+        "success_count": 52,
+        "success_fraction": 0.1015625,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 120,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000070.pt",
+        "sha256": "624108BF03562FEFAD9EC3F0E6FECD36AA058FED533B71EFDA7D7F577D9746EA"
+      },
+      "probe_sha256": "9CCF82D5B164238C79D47C7C9431F5D53D9B96AF1833BCEF7B3DCD1D530C8303"
+    },
+    {
+      "offset": 80,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.2833333333333334,
+        "no_focal_contact_fraction": 0.884765625,
+        "success_count": 49,
+        "success_fraction": 0.095703125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.8583333333333334,
+        "no_focal_contact_fraction": 0.875,
+        "success_count": 64,
+        "success_fraction": 0.125,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 113,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000080.pt",
+        "sha256": "EA392ED54F81A5B55B71925AD1F6421ED93FB8E834A7F25D3A762AB37D56A12A"
+      },
+      "probe_sha256": "550143E37819418725C95966FE0EA3FDE3A44A9436A1BA67FD15623BF8EED006"
+    },
+    {
+      "offset": 90,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.8666666666666667,
+        "no_focal_contact_fraction": 0.83984375,
+        "success_count": 76,
+        "success_fraction": 0.1484375,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.75,
+        "no_focal_contact_fraction": 0.810546875,
+        "success_count": 97,
+        "success_fraction": 0.189453125,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 173,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000090.pt",
+        "sha256": "292F430820412B82066A963ADDBA2D118CCC209A8C82A701BC1010C2A640DAC3"
+      },
+      "probe_sha256": "27BCEFA557D67C28C9463CB1A15A89E3AFC52F64C4FB800120E2ED364EF5D756"
+    },
+    {
+      "offset": 100,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.05,
+        "no_focal_contact_fraction": 0.802734375,
+        "success_count": 93,
+        "success_fraction": 0.181640625,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.7083333333333333,
+        "no_focal_contact_fraction": 0.818359375,
+        "success_count": 93,
+        "success_fraction": 0.181640625,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 186,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000100.pt",
+        "sha256": "8CEB8189E16B43B958E279320E1778FAEC49F6A88031589F44294A5D26DCC89B"
+      },
+      "probe_sha256": "8774EAA70BBBCED984B935D070DE3D88A6AD2329D38072FAA37653416997A541"
+    },
+    {
+      "offset": 110,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.1,
+        "no_focal_contact_fraction": 0.845703125,
+        "success_count": 68,
+        "success_fraction": 0.1328125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.8333333333333333,
+        "no_focal_contact_fraction": 0.775390625,
+        "success_count": 115,
+        "success_fraction": 0.224609375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 183,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000110.pt",
+        "sha256": "805AE7A4ED6297D5F7D764451A2E293B561738EDBB781C266385C4FDF3A8D4C1"
+      },
+      "probe_sha256": "EA37D6071948A7862AFC8BCDDC5504C4F623B9F62AF2F1138DFB0C74079197BD"
+    },
+    {
+      "offset": 120,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.05,
+        "no_focal_contact_fraction": 0.841796875,
+        "success_count": 71,
+        "success_fraction": 0.138671875,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 2.0083333333333333,
+        "no_focal_contact_fraction": 0.826171875,
+        "success_count": 89,
+        "success_fraction": 0.173828125,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 160,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000120.pt",
+        "sha256": "BAB0495F3D9275B41FCD960D73B230EAD05897C7A1971E3D69FE2B7B14179C0E"
+      },
+      "probe_sha256": "1B350715F7E9354C75EBA514EFF1BC45CB9B1B0814EEFAAD170F091BC6F1EF29"
+    },
+    {
+      "offset": 130,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.925,
+        "no_focal_contact_fraction": 0.833984375,
+        "success_count": 78,
+        "success_fraction": 0.15234375,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.95,
+        "no_focal_contact_fraction": 0.828125,
+        "success_count": 88,
+        "success_fraction": 0.171875,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 166,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000130.pt",
+        "sha256": "A69D9ED4F02E51B90755382873A9B89DD7CDBB4A3E366D6897974DF801BBF26C"
+      },
+      "probe_sha256": "5136D71CFC7E3F5F51A150782922EC26F506DD70F5EFC00B111175A16EB6EF52"
+    },
+    {
+      "offset": 140,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 0.9416666666666667,
+        "no_focal_contact_fraction": 0.8046875,
+        "success_count": 97,
+        "success_fraction": 0.189453125,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 1.9,
+        "no_focal_contact_fraction": 0.78515625,
+        "success_count": 110,
+        "success_fraction": 0.21484375,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 207,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000140.pt",
+        "sha256": "3DD98B4282554504EB3D907EE0A97991D37FB4C3F11C42D4C5F9F2DB1E1401E3"
+      },
+      "probe_sha256": "AE7C5C68AEB39B58AC8BDABE64DF6AB0976D9808D63788B66535EE049FE8347E"
+    },
+    {
+      "offset": 150,
+      "easy": {
+        "deadline_seconds": 5,
+        "median_seconds_if_success": 1.1916666666666667,
+        "no_focal_contact_fraction": 0.923828125,
+        "success_count": 35,
+        "success_fraction": 0.068359375,
+        "worlds": 512
+      },
+      "varied": {
+        "deadline_seconds": 8,
+        "median_seconds_if_success": 2.033333333333333,
+        "no_focal_contact_fraction": 0.861328125,
+        "success_count": 71,
+        "success_fraction": 0.138671875,
+        "worlds": 512
+      },
+      "combined_count_descriptive_only": 106,
+      "checkpoint": {
+        "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000150.pt",
+        "sha256": "B51C3BA6CBB455B9F902BEFEE34CDF7765541F2CB083C87940D45E66822A1552"
+      },
+      "probe_sha256": "3593F130F11B93C5B53BCFFA0E6FF0E4307FCEDCB582F5FDEF590A56A096B4C6"
+    }
+  ],
+  "descriptive_snapshots": {
+    "best_easy": {
+      "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000010.pt",
+      "sha256": "56D0467D29788AFB72109CF4B60CA41377C7C6F61CCD6323970002E6ABA126F7",
+      "offset": 10
+    },
+    "best_varied": {
+      "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000110.pt",
+      "sha256": "805AE7A4ED6297D5F7D764451A2E293B561738EDBB781C266385C4FDF3A8D4C1",
+      "offset": 110
+    },
+    "best_combined": {
+      "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000010.pt",
+      "sha256": "56D0467D29788AFB72109CF4B60CA41377C7C6F61CCD6323970002E6ABA126F7",
+      "offset": 10
+    },
+    "final": {
+      "path": "checkpoints/rival2/fresh_sustained_contact_v1/plus_000150.pt",
+      "sha256": "B51C3BA6CBB455B9F902BEFEE34CDF7765541F2CB083C87940D45E66822A1552",
+      "offset": 150
+    }
+  },
+  "whole_run": {
+    "from": 1,
+    "through": 150,
+    "by_family_and_opponent": {
+      "ball_acquisition_nexto": {
+        "ended_episode_seconds": 4982385.098431826,
+        "goals_focal": 51,
+        "goals_opponent": 242008,
+        "inactivity_resets": 52532,
+        "touches_focal": 117849,
+        "touches_opponent": 501431,
+        "world_seconds": 5285001.499948338
+      },
+      "ball_acquisition_selfplay": {
+        "ended_episode_seconds": 3432269.555704117,
+        "goals_focal": 8371,
+        "goals_opponent": 6408,
+        "inactivity_resets": 60707,
+        "touches_focal": 70580,
+        "touches_opponent": 41945,
+        "world_seconds": 3910385.0333016743
+      },
+      "challenge_nexto": {
+        "ended_episode_seconds": 350585.9857261181,
+        "goals_focal": 6,
+        "goals_opponent": 60713,
+        "inactivity_resets": 377,
+        "touches_focal": 30004,
+        "touches_opponent": 315064,
+        "world_seconds": 354479.0666665053
+      },
+      "challenge_selfplay": {
+        "ended_episode_seconds": 691900.8437824249,
+        "goals_focal": 1385,
+        "goals_opponent": 1360,
+        "inactivity_resets": 12201,
+        "touches_focal": 14089,
+        "touches_opponent": 13225,
+        "world_seconds": 797540.133335205
+      },
+      "defense_nexto": {
+        "ended_episode_seconds": 188514.74329650402,
+        "goals_focal": 1,
+        "goals_opponent": 45765,
+        "inactivity_resets": 6,
+        "touches_focal": 12534,
+        "touches_opponent": 141648,
+        "world_seconds": 190463.1333332587
+      },
+      "defense_selfplay": {
+        "ended_episode_seconds": 190429.81000113487,
+        "goals_focal": 729,
+        "goals_opponent": 8596,
+        "inactivity_resets": 2492,
+        "touches_focal": 6056,
+        "touches_opponent": 3336,
+        "world_seconds": 228909.6333332236
+      },
+      "finishing_nexto": {
+        "ended_episode_seconds": 511980.2275519371,
+        "goals_focal": 256,
+        "goals_opponent": 60046,
+        "inactivity_resets": 469,
+        "touches_focal": 46443,
+        "touches_opponent": 298788,
+        "world_seconds": 519246.233333826
+      },
+      "finishing_selfplay": {
+        "ended_episode_seconds": 590419.2359700203,
+        "goals_focal": 4845,
+        "goals_opponent": 800,
+        "inactivity_resets": 9689,
+        "touches_focal": 18848,
+        "touches_opponent": 7566,
+        "world_seconds": 677140.8333336768
+      },
+      "kickoff_nexto": {
+        "ended_episode_seconds": 337201.88505005836,
+        "goals_focal": 8,
+        "goals_opponent": 45639,
+        "inactivity_resets": 0,
+        "touches_focal": 3671,
+        "touches_opponent": 164502,
+        "world_seconds": 339826.86666645634
+      },
+      "kickoff_selfplay": {
+        "ended_episode_seconds": 515958.6669564247,
+        "goals_focal": 1212,
+        "goals_opponent": 1147,
+        "inactivity_resets": 9000,
+        "touches_focal": 9275,
+        "touches_opponent": 9178,
+        "world_seconds": 588343.5666662606
+      },
+      "natural_nexto": {
+        "ended_episode_seconds": 677422.2364428043,
+        "goals_focal": 100,
+        "goals_opponent": 91034,
+        "inactivity_resets": 117,
+        "touches_focal": 5676,
+        "touches_opponent": 395124,
+        "world_seconds": 683783.2000017349
+      },
+      "natural_selfplay": {
+        "ended_episode_seconds": 1026298.0022790432,
+        "goals_focal": 2513,
+        "goals_opponent": 2499,
+        "inactivity_resets": 17634,
+        "touches_focal": 14216,
+        "touches_opponent": 14680,
+        "world_seconds": 1170480.8000066204
+      }
+    },
+    "by_opponent": {
+      "nexto": {
+        "ended_episode_seconds": 7048090.176499248,
+        "goals_focal": 422,
+        "goals_opponent": 545205,
+        "inactivity_resets": 53501,
+        "touches_focal": 216177,
+        "touches_opponent": 1816557,
+        "world_seconds": 7372799.999950119
+      },
+      "selfplay": {
+        "ended_episode_seconds": 6447276.114693165,
+        "goals_focal": 19055,
+        "goals_opponent": 20810,
+        "inactivity_resets": 111723,
+        "touches_focal": 133064,
+        "touches_opponent": 89930,
+        "world_seconds": 7372799.999976661
+      }
+    },
+    "contact_bonuses": {
+      "air_budget_capped_agent_decisions": 39954,
+      "excluded_air_awards": 902343,
+      "excluded_first_awards": 542797,
+      "learner_air_awards": 101526,
+      "learner_air_reward": 25374.150753200054,
+      "learner_eligible_air_contacts": 101707,
+      "learner_first_awards": 299110,
+      "learner_first_reward": 299023.7335958481,
+      "repeated_contacts_without_first_bonus": 140061
+    },
+    "discounted_reward_contributions": {
+      "access": -311537.00124066946,
+      "air_touch": 25374.150753200054,
+      "alignment": -125968.77306399109,
+      "boost": -115157.16377924198,
+      "control": -12408.135043883045,
+      "defense": 10318.758677089852,
+      "field": 3555.1471449944806,
+      "first_touch": 299023.7335958481,
+      "goal_velocity": 9243.441691201184,
+      "inactivity": -276787.07701063156,
+      "sustained_control": 4552.982470037986,
+      "terminal_goal": -5446256.6739292145,
+      "total": -5936046.609131092
+    },
+    "mean_update_metrics": {
+      "movement_speed": 541.2891565762743,
+      "touches_per_minute": 1.1913275824652778,
+      "mean_entropy": 4.086668537705033
+    }
+  },
+  "ten_update_windows": [
+    {
+      "from": 1,
+      "through": 10,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 221233.77838253975,
+          "goals_focal": 5,
+          "goals_opponent": 41159,
+          "inactivity_resets": 0,
+          "touches_focal": 10851,
+          "touches_opponent": 76348,
+          "world_seconds": 249175.59999805698
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 6011.433660984039,
+          "goals_focal": 297,
+          "goals_opponent": 99,
+          "inactivity_resets": 0,
+          "touches_focal": 2217,
+          "touches_opponent": 738,
+          "world_seconds": 262948.3999978566
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 40099.468807935715,
+          "goals_focal": 2,
+          "goals_opponent": 8407,
+          "inactivity_resets": 0,
+          "touches_focal": 3801,
+          "touches_opponent": 44532,
+          "world_seconds": 44689.76666668348
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 1735.333426952362,
+          "goals_focal": 74,
+          "goals_opponent": 56,
+          "inactivity_resets": 0,
+          "touches_focal": 665,
+          "touches_opponent": 522,
+          "world_seconds": 52124.900000111484
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 18951.934353470802,
+          "goals_focal": 0,
+          "goals_opponent": 6751,
+          "inactivity_resets": 0,
+          "touches_focal": 1070,
+          "touches_opponent": 12401,
+          "world_seconds": 20652.466666654458
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 5799.533632278442,
+          "goals_focal": 21,
+          "goals_opponent": 1227,
+          "inactivity_resets": 0,
+          "touches_focal": 185,
+          "touches_opponent": 67,
+          "world_seconds": 10345.266666663832
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 50639.3359760046,
+          "goals_focal": 64,
+          "goals_opponent": 7890,
+          "inactivity_resets": 0,
+          "touches_focal": 4646,
+          "touches_opponent": 34238,
+          "world_seconds": 57678.26666684886
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 3950.566873192787,
+          "goals_focal": 349,
+          "goals_opponent": 23,
+          "inactivity_resets": 0,
+          "touches_focal": 802,
+          "touches_opponent": 243,
+          "world_seconds": 47296.73333338334
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 34706.668666124344,
+          "goals_focal": 2,
+          "goals_opponent": 6164,
+          "inactivity_resets": 0,
+          "touches_focal": 330,
+          "touches_opponent": 15571,
+          "world_seconds": 39429.39999997085
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 688.3333692550659,
+          "goals_focal": 20,
+          "goals_opponent": 19,
+          "inactivity_resets": 0,
+          "touches_focal": 131,
+          "touches_opponent": 108,
+          "world_seconds": 39056.93333330439
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 69940.37052631378,
+          "goals_focal": 14,
+          "goals_opponent": 12093,
+          "inactivity_resets": 0,
+          "touches_focal": 585,
+          "touches_opponent": 43641,
+          "world_seconds": 79894.50000046135
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 3319.466838121414,
+          "goals_focal": 112,
+          "goals_opponent": 105,
+          "inactivity_resets": 0,
+          "touches_focal": 312,
+          "touches_opponent": 255,
+          "world_seconds": 79747.76666712986
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 435571.556712389,
+          "goals_focal": 87,
+          "goals_opponent": 82464,
+          "inactivity_resets": 0,
+          "touches_focal": 21283,
+          "touches_opponent": 226731,
+          "world_seconds": 491519.99999867595
+        },
+        "selfplay": {
+          "ended_episode_seconds": 21504.66780078411,
+          "goals_focal": 873,
+          "goals_opponent": 1529,
+          "inactivity_resets": 0,
+          "touches_focal": 4312,
+          "touches_opponent": 1933,
+          "world_seconds": 491519.99999844946
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 97895,
+        "excluded_first_awards": 91067,
+        "learner_air_awards": 5995,
+        "learner_air_reward": 1498.3073618113995,
+        "learner_eligible_air_contacts": 5995,
+        "learner_first_awards": 22233,
+        "learner_first_reward": 22226.566292524338,
+        "repeated_contacts_without_first_bonus": 5295
+      },
+      "discounted_reward_contributions": {
+        "access": -39645.54433564767,
+        "air_touch": 1498.3073618113995,
+        "alignment": -18047.86744097609,
+        "boost": -15396.090686935253,
+        "control": -2155.1391766411507,
+        "defense": 1067.305657737214,
+        "field": -4829.619400491263,
+        "first_touch": 22226.566292524338,
+        "goal_velocity": 251.10949993152263,
+        "inactivity": 0,
+        "sustained_control": 109.39610323846351,
+        "terminal_goal": -823532.1558208466,
+        "total": -878453.7318486737
+      },
+      "mean_update_metrics": {
+        "movement_speed": 743.2717394228335,
+        "touches_per_minute": 1.1201171875,
+        "mean_entropy": 4.481849685598303
+      }
+    },
+    {
+      "from": 11,
+      "through": 20,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 253602.4800760746,
+          "goals_focal": 10,
+          "goals_opponent": 39521,
+          "inactivity_resets": 0,
+          "touches_focal": 13356,
+          "touches_opponent": 67721,
+          "world_seconds": 260061.9333312319
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 368234.2620754242,
+          "goals_focal": 409,
+          "goals_opponent": 128,
+          "inactivity_resets": 7843,
+          "touches_focal": 3169,
+          "touches_opponent": 770,
+          "world_seconds": 266548.4333311375
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 41662.83553671837,
+          "goals_focal": 2,
+          "goals_opponent": 8185,
+          "inactivity_resets": 1,
+          "touches_focal": 3355,
+          "touches_opponent": 40976,
+          "world_seconds": 41302.49999998057
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 72473.73861217499,
+          "goals_focal": 64,
+          "goals_opponent": 68,
+          "inactivity_resets": 1542,
+          "touches_focal": 617,
+          "touches_opponent": 535,
+          "world_seconds": 52364.40000011453
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 19186.767683506012,
+          "goals_focal": 0,
+          "goals_opponent": 6018,
+          "inactivity_resets": 0,
+          "touches_focal": 952,
+          "touches_opponent": 12761,
+          "world_seconds": 19325.33333332233
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 10969.667226314545,
+          "goals_focal": 13,
+          "goals_opponent": 1002,
+          "inactivity_resets": 132,
+          "touches_focal": 187,
+          "touches_opponent": 60,
+          "world_seconds": 9793.23333333085
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 57590.103036403656,
+          "goals_focal": 64,
+          "goals_opponent": 8029,
+          "inactivity_resets": 0,
+          "touches_focal": 5818,
+          "touches_opponent": 37926,
+          "world_seconds": 58044.60000018686
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 61263.337740659714,
+          "goals_focal": 455,
+          "goals_opponent": 24,
+          "inactivity_resets": 1220,
+          "touches_focal": 1225,
+          "touches_opponent": 242,
+          "world_seconds": 44530.16666668145
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 36698.06880545616,
+          "goals_focal": 0,
+          "goals_opponent": 6141,
+          "inactivity_resets": 0,
+          "touches_focal": 273,
+          "touches_opponent": 15766,
+          "world_seconds": 36403.36666664013
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 55326.63782405853,
+          "goals_focal": 18,
+          "goals_opponent": 17,
+          "inactivity_resets": 1194,
+          "touches_focal": 128,
+          "touches_opponent": 137,
+          "world_seconds": 40020.96666663738
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 77092.50429582596,
+          "goals_focal": 15,
+          "goals_opponent": 12298,
+          "inactivity_resets": 0,
+          "touches_focal": 536,
+          "touches_opponent": 46227,
+          "world_seconds": 76382.26666708702
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 107186.74195218086,
+          "goals_focal": 76,
+          "goals_opponent": 93,
+          "inactivity_resets": 2269,
+          "touches_focal": 258,
+          "touches_opponent": 265,
+          "world_seconds": 78262.8000004443
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 485832.75943398476,
+          "goals_focal": 91,
+          "goals_opponent": 80192,
+          "inactivity_resets": 1,
+          "touches_focal": 24290,
+          "touches_opponent": 221377,
+          "world_seconds": 491519.9999984488
+        },
+        "selfplay": {
+          "ended_episode_seconds": 675454.3854308128,
+          "goals_focal": 1035,
+          "goals_opponent": 1332,
+          "inactivity_resets": 14200,
+          "touches_focal": 5584,
+          "touches_opponent": 2009,
+          "world_seconds": 491519.99999834603
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 100140,
+        "excluded_first_awards": 78761,
+        "learner_air_awards": 6854,
+        "learner_air_reward": 1713.0031270384789,
+        "learner_eligible_air_contacts": 6854,
+        "learner_first_awards": 25232,
+        "learner_first_reward": 25224.71721214056,
+        "repeated_contacts_without_first_bonus": 6651
+      },
+      "discounted_reward_contributions": {
+        "access": -35166.161913728894,
+        "air_touch": 1713.0031270384789,
+        "alignment": -15306.902113698185,
+        "boost": -13519.955568110123,
+        "control": -1074.4372995453245,
+        "defense": 1199.3590609791618,
+        "field": 1428.0774651561103,
+        "first_touch": 25224.71721214056,
+        "goal_velocity": 1423.197044479012,
+        "inactivity": -28384.599848270416,
+        "sustained_control": 155.369177263216,
+        "terminal_goal": -800778.3138856888,
+        "total": -863086.6473525285
+      },
+      "mean_update_metrics": {
+        "movement_speed": 758.5798845757379,
+        "touches_per_minute": 1.2973225911458335,
+        "mean_entropy": 4.432568233278063
+      }
+    },
+    {
+      "from": 21,
+      "through": 30,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 270700.68099212646,
+          "goals_focal": 6,
+          "goals_opponent": 36316,
+          "inactivity_resets": 0,
+          "touches_focal": 13196,
+          "touches_opponent": 57848,
+          "world_seconds": 275132.4333310126
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 215513.84981536865,
+          "goals_focal": 277,
+          "goals_opponent": 131,
+          "inactivity_resets": 4203,
+          "touches_focal": 999,
+          "touches_opponent": 487,
+          "world_seconds": 269232.6333310985
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 38088.568697690964,
+          "goals_focal": 0,
+          "goals_opponent": 7388,
+          "inactivity_resets": 0,
+          "touches_focal": 3095,
+          "touches_opponent": 37162,
+          "world_seconds": 37998.23333330535
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 37934.96952581406,
+          "goals_focal": 49,
+          "goals_opponent": 37,
+          "inactivity_resets": 731,
+          "touches_focal": 182,
+          "touches_opponent": 139,
+          "world_seconds": 52619.46666678445
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 18262.834297180176,
+          "goals_focal": 0,
+          "goals_opponent": 5525,
+          "inactivity_resets": 0,
+          "touches_focal": 906,
+          "touches_opponent": 11831,
+          "world_seconds": 18177.89999999004
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 2555.3001503944397,
+          "goals_focal": 26,
+          "goals_opponent": 209,
+          "inactivity_resets": 13,
+          "touches_focal": 47,
+          "touches_opponent": 23,
+          "world_seconds": 6589.200000000581
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 53775.56951224804,
+          "goals_focal": 46,
+          "goals_opponent": 7270,
+          "inactivity_resets": 0,
+          "touches_focal": 5588,
+          "touches_opponent": 34421,
+          "world_seconds": 53735.20000013199
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 29070.06870663166,
+          "goals_focal": 213,
+          "goals_opponent": 28,
+          "inactivity_resets": 464,
+          "touches_focal": 324,
+          "touches_opponent": 112,
+          "world_seconds": 41142.199999976445
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 34188.73527312279,
+          "goals_focal": 1,
+          "goals_opponent": 5463,
+          "inactivity_resets": 0,
+          "touches_focal": 178,
+          "touches_opponent": 15148,
+          "world_seconds": 34011.79999997564
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 36481.56953430176,
+          "goals_focal": 15,
+          "goals_opponent": 13,
+          "inactivity_resets": 744,
+          "touches_focal": 67,
+          "touches_opponent": 81,
+          "world_seconds": 42938.73333332785
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 72087.57061886787,
+          "goals_focal": 15,
+          "goals_opponent": 10992,
+          "inactivity_resets": 0,
+          "touches_focal": 379,
+          "touches_opponent": 44448,
+          "world_seconds": 72464.4333337038
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 73750.40567684174,
+          "goals_focal": 97,
+          "goals_opponent": 91,
+          "inactivity_resets": 1403,
+          "touches_focal": 171,
+          "touches_opponent": 153,
+          "world_seconds": 78997.76666712032
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 487103.9593912363,
+          "goals_focal": 68,
+          "goals_opponent": 72954,
+          "inactivity_resets": 0,
+          "touches_focal": 23342,
+          "touches_opponent": 200858,
+          "world_seconds": 491519.9999981194
+        },
+        "selfplay": {
+          "ended_episode_seconds": 395306.1634093523,
+          "goals_focal": 677,
+          "goals_opponent": 509,
+          "inactivity_resets": 7558,
+          "touches_focal": 1790,
+          "touches_opponent": 995,
+          "world_seconds": 491519.99999830814
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 90474,
+        "excluded_first_awards": 71995,
+        "learner_air_awards": 6426,
+        "learner_air_reward": 1606.029643625021,
+        "learner_eligible_air_contacts": 6426,
+        "learner_first_awards": 20008,
+        "learner_first_reward": 20002.238678514957,
+        "repeated_contacts_without_first_bonus": 6119
+      },
+      "discounted_reward_contributions": {
+        "access": -28944.663564822724,
+        "air_touch": 1606.029643625021,
+        "alignment": -11378.514458377722,
+        "boost": -9675.802025393761,
+        "control": -1156.8332634964981,
+        "defense": 1226.574932651276,
+        "field": 695.5701102584677,
+        "first_touch": 20002.238678514957,
+        "goal_velocity": 1255.1192831827748,
+        "inactivity": -15107.271268844604,
+        "sustained_control": 153.03248102644028,
+        "terminal_goal": -728650.0410308838,
+        "total": -769974.560345789
+      },
+      "mean_update_metrics": {
+        "movement_speed": 675.8507951298467,
+        "touches_per_minute": 1.0631103515625,
+        "mean_entropy": 4.392931731895164
+      }
+    },
+    {
+      "from": 31,
+      "through": 40,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 274978.9811911583,
+          "goals_focal": 10,
+          "goals_opponent": 33556,
+          "inactivity_resets": 0,
+          "touches_focal": 14276,
+          "touches_opponent": 55347,
+          "world_seconds": 280357.5666642699
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 234766.0822916031,
+          "goals_focal": 567,
+          "goals_opponent": 154,
+          "inactivity_resets": 4630,
+          "touches_focal": 3746,
+          "touches_opponent": 958,
+          "world_seconds": 262017.39999787012
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 36035.80190563202,
+          "goals_focal": 2,
+          "goals_opponent": 6851,
+          "inactivity_resets": 0,
+          "touches_focal": 3034,
+          "touches_opponent": 33969,
+          "world_seconds": 35930.533333307234
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 50298.069886446,
+          "goals_focal": 89,
+          "goals_opponent": 61,
+          "inactivity_resets": 1004,
+          "touches_focal": 653,
+          "touches_opponent": 578,
+          "world_seconds": 53380.26666679414
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 17790.83428144455,
+          "goals_focal": 0,
+          "goals_opponent": 5066,
+          "inactivity_resets": 0,
+          "touches_focal": 984,
+          "touches_opponent": 11783,
+          "world_seconds": 18014.166666656856
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 12352.300660729408,
+          "goals_focal": 23,
+          "goals_opponent": 1041,
+          "inactivity_resets": 154,
+          "touches_focal": 226,
+          "touches_opponent": 82,
+          "world_seconds": 11511.76666666277
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 52939.13614487648,
+          "goals_focal": 35,
+          "goals_opponent": 6973,
+          "inactivity_resets": 1,
+          "touches_focal": 5636,
+          "touches_opponent": 32493,
+          "world_seconds": 52193.233333445685
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 44778.102638959885,
+          "goals_focal": 477,
+          "goals_opponent": 26,
+          "inactivity_resets": 827,
+          "touches_focal": 1469,
+          "touches_opponent": 221,
+          "world_seconds": 44507.33333334782
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 34317.10189676285,
+          "goals_focal": 1,
+          "goals_opponent": 5086,
+          "inactivity_resets": 0,
+          "touches_focal": 84,
+          "touches_opponent": 15637,
+          "world_seconds": 34873.533333308194
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 33097.669098854065,
+          "goals_focal": 20,
+          "goals_opponent": 23,
+          "inactivity_resets": 666,
+          "touches_focal": 192,
+          "touches_opponent": 201,
+          "world_seconds": 39855.53333330366
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 69758.93709754944,
+          "goals_focal": 10,
+          "goals_opponent": 10177,
+          "inactivity_resets": 0,
+          "touches_focal": 280,
+          "touches_opponent": 41251,
+          "world_seconds": 70150.96666700767
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 60852.83772587776,
+          "goals_focal": 111,
+          "goals_opponent": 119,
+          "inactivity_resets": 1166,
+          "touches_focal": 344,
+          "touches_opponent": 362,
+          "world_seconds": 80247.70000046957
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 485820.79251742363,
+          "goals_focal": 58,
+          "goals_opponent": 67709,
+          "inactivity_resets": 1,
+          "touches_focal": 24294,
+          "touches_opponent": 190480,
+          "world_seconds": 491519.99999799556
+        },
+        "selfplay": {
+          "ended_episode_seconds": 436145.0623024702,
+          "goals_focal": 1287,
+          "goals_opponent": 1424,
+          "inactivity_resets": 8447,
+          "touches_focal": 6630,
+          "touches_opponent": 2402,
+          "world_seconds": 491519.99999844807
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 186,
+        "excluded_air_awards": 88184,
+        "excluded_first_awards": 67035,
+        "learner_air_awards": 7940,
+        "learner_air_reward": 1984.416649594903,
+        "learner_eligible_air_contacts": 7940,
+        "learner_first_awards": 25495,
+        "learner_first_reward": 25487.592095077038,
+        "repeated_contacts_without_first_bonus": 7831
+      },
+      "discounted_reward_contributions": {
+        "access": -31281.609169208572,
+        "air_touch": 1984.416649594903,
+        "alignment": -13587.891844258103,
+        "boost": -12178.911552166877,
+        "control": -1070.7205892576712,
+        "defense": 1184.6801284251842,
+        "field": 676.3121899470314,
+        "first_touch": 25487.592095077038,
+        "goal_velocity": 1204.3793868520884,
+        "inactivity": -16885.243985652924,
+        "sustained_control": 209.45455753885255,
+        "terminal_goal": -676313.9377965927,
+        "total": -720571.4797574452
+      },
+      "mean_update_metrics": {
+        "movement_speed": 701.5909081127026,
+        "touches_per_minute": 1.3560384114583335,
+        "mean_entropy": 4.3546236741101305
+      }
+    },
+    {
+      "from": 41,
+      "through": 50,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 263400.8804514408,
+          "goals_focal": 6,
+          "goals_opponent": 27529,
+          "inactivity_resets": 0,
+          "touches_focal": 14008,
+          "touches_opponent": 54183,
+          "world_seconds": 295226.4999973868
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 332725.157327652,
+          "goals_focal": 434,
+          "goals_opponent": 258,
+          "inactivity_resets": 6723,
+          "touches_focal": 4137,
+          "touches_opponent": 1650,
+          "world_seconds": 265019.3333311598
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 33002.20176410675,
+          "goals_focal": 0,
+          "goals_opponent": 6086,
+          "inactivity_resets": 0,
+          "touches_focal": 2915,
+          "touches_opponent": 29501,
+          "world_seconds": 32472.49999997704
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 67675.2380566597,
+          "goals_focal": 69,
+          "goals_opponent": 65,
+          "inactivity_resets": 1369,
+          "touches_focal": 715,
+          "touches_opponent": 651,
+          "world_seconds": 52896.36666678797
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 17829.434262633324,
+          "goals_focal": 0,
+          "goals_opponent": 4433,
+          "inactivity_resets": 0,
+          "touches_focal": 1063,
+          "touches_opponent": 12869,
+          "world_seconds": 18000.666666656867
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 12332.933963537216,
+          "goals_focal": 25,
+          "goals_opponent": 810,
+          "inactivity_resets": 167,
+          "touches_focal": 258,
+          "touches_opponent": 120,
+          "world_seconds": 11550.899999996069
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 46978.63582766056,
+          "goals_focal": 26,
+          "goals_opponent": 6016,
+          "inactivity_resets": 0,
+          "touches_focal": 5494,
+          "touches_opponent": 29869,
+          "world_seconds": 46648.56666670842
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 53803.703426122665,
+          "goals_focal": 457,
+          "goals_opponent": 27,
+          "inactivity_resets": 999,
+          "touches_focal": 1461,
+          "touches_opponent": 263,
+          "world_seconds": 42395.166666654266
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 33441.00175976753,
+          "goals_focal": 0,
+          "goals_opponent": 4442,
+          "inactivity_resets": 0,
+          "touches_focal": 56,
+          "touches_opponent": 17103,
+          "world_seconds": 33430.433333309506
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 50679.50380849838,
+          "goals_focal": 53,
+          "goals_opponent": 42,
+          "inactivity_resets": 1020,
+          "touches_focal": 368,
+          "touches_opponent": 338,
+          "world_seconds": 41039.7999999721
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 66277.43684911728,
+          "goals_focal": 12,
+          "goals_opponent": 8930,
+          "inactivity_resets": 0,
+          "touches_focal": 230,
+          "touches_opponent": 38706,
+          "world_seconds": 65741.3333336182
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 99010.27418637276,
+          "goals_focal": 117,
+          "goals_opponent": 104,
+          "inactivity_resets": 1986,
+          "touches_focal": 500,
+          "touches_opponent": 515,
+          "world_seconds": 78618.43333378216
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 460929.59091472626,
+          "goals_focal": 44,
+          "goals_opponent": 57436,
+          "inactivity_resets": 0,
+          "touches_focal": 23766,
+          "touches_opponent": 182231,
+          "world_seconds": 491519.99999765685
+        },
+        "selfplay": {
+          "ended_episode_seconds": 616226.8107688427,
+          "goals_focal": 1155,
+          "goals_opponent": 1306,
+          "inactivity_resets": 12264,
+          "touches_focal": 7439,
+          "touches_opponent": 3537,
+          "world_seconds": 491519.9999983524
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 90836,
+        "excluded_first_awards": 55680,
+        "learner_air_awards": 7585,
+        "learner_air_reward": 1895.6983144432306,
+        "learner_eligible_air_contacts": 7585,
+        "learner_first_awards": 26985,
+        "learner_first_reward": 26977.192861437798,
+        "repeated_contacts_without_first_bonus": 7757
+      },
+      "discounted_reward_contributions": {
+        "access": -25779.887593079573,
+        "air_touch": 1895.6983144432306,
+        "alignment": -11582.428986381141,
+        "boost": -10439.1107518701,
+        "control": -671.4941328567954,
+        "defense": 1170.2992561196875,
+        "field": 860.8836220210394,
+        "first_touch": 26977.192861437798,
+        "goal_velocity": 1205.5968378248067,
+        "inactivity": -24513.836311340332,
+        "sustained_control": 250.5633010967636,
+        "terminal_goal": -573754.4102859497,
+        "total": -614380.9339264643
+      },
+      "mean_update_metrics": {
+        "movement_speed": 611.4676901584202,
+        "touches_per_minute": 1.4136555989583335,
+        "mean_entropy": 4.295560671135232
+      }
+    },
+    {
+      "from": 51,
+      "through": 60,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 205113.14441609383,
+          "goals_focal": 1,
+          "goals_opponent": 14608,
+          "inactivity_resets": 184,
+          "touches_focal": 8792,
+          "touches_opponent": 35654,
+          "world_seconds": 356275.8999964985
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 168046.9115176201,
+          "goals_focal": 452,
+          "goals_opponent": 325,
+          "inactivity_resets": 3060,
+          "touches_focal": 2387,
+          "touches_opponent": 1329,
+          "world_seconds": 266763.8333311344
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 21527.634467840195,
+          "goals_focal": 0,
+          "goals_opponent": 3729,
+          "inactivity_resets": 0,
+          "touches_focal": 1805,
+          "touches_opponent": 18977,
+          "world_seconds": 21189.999999987303
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 33225.168919324875,
+          "goals_focal": 73,
+          "goals_opponent": 68,
+          "inactivity_resets": 611,
+          "touches_focal": 460,
+          "touches_opponent": 397,
+          "world_seconds": 52772.900000119735
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 13249.267370462418,
+          "goals_focal": 0,
+          "goals_opponent": 2824,
+          "inactivity_resets": 0,
+          "touches_focal": 763,
+          "touches_opponent": 11280,
+          "world_seconds": 12482.166666661888
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 6495.93368434906,
+          "goals_focal": 40,
+          "goals_opponent": 395,
+          "inactivity_resets": 74,
+          "touches_focal": 144,
+          "touches_opponent": 57,
+          "world_seconds": 11074.433333329835
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 33125.935070991516,
+          "goals_focal": 6,
+          "goals_opponent": 3871,
+          "inactivity_resets": 0,
+          "touches_focal": 3045,
+          "touches_opponent": 18677,
+          "world_seconds": 32047.566666644096
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 24802.334799528122,
+          "goals_focal": 234,
+          "goals_opponent": 26,
+          "inactivity_resets": 416,
+          "touches_focal": 665,
+          "touches_opponent": 187,
+          "world_seconds": 41508.06666664297
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 25299.83466911316,
+          "goals_focal": 0,
+          "goals_opponent": 3024,
+          "inactivity_resets": 0,
+          "touches_focal": 37,
+          "touches_opponent": 12439,
+          "world_seconds": 23662.699999985052
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 27064.001916885376,
+          "goals_focal": 80,
+          "goals_opponent": 63,
+          "inactivity_resets": 483,
+          "touches_focal": 341,
+          "touches_opponent": 342,
+          "world_seconds": 40120.89999997008
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 49044.56924152374,
+          "goals_focal": 4,
+          "goals_opponent": 6031,
+          "inactivity_resets": 2,
+          "touches_focal": 123,
+          "touches_opponent": 28392,
+          "world_seconds": 45861.66666671289
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 56129.7372674942,
+          "goals_focal": 140,
+          "goals_opponent": 158,
+          "inactivity_resets": 992,
+          "touches_focal": 473,
+          "touches_opponent": 485,
+          "world_seconds": 79279.86666712392
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 347360.38523602486,
+          "goals_focal": 11,
+          "goals_opponent": 34087,
+          "inactivity_resets": 186,
+          "touches_focal": 14565,
+          "touches_opponent": 125419,
+          "world_seconds": 491519.9999964897
+        },
+        "selfplay": {
+          "ended_episode_seconds": 315764.0881052017,
+          "goals_focal": 1019,
+          "goals_opponent": 1035,
+          "inactivity_resets": 5636,
+          "touches_focal": 4470,
+          "touches_opponent": 2797,
+          "world_seconds": 491519.99999832094
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 65577,
+        "excluded_first_awards": 31301,
+        "learner_air_awards": 4488,
+        "learner_air_reward": 1121.672954082489,
+        "learner_eligible_air_contacts": 4488,
+        "learner_first_awards": 16537,
+        "learner_first_reward": 16532.25196123123,
+        "repeated_contacts_without_first_bonus": 5295
+      },
+      "discounted_reward_contributions": {
+        "access": -18409.391456472757,
+        "air_touch": 1121.672954082489,
+        "alignment": -6438.365455421315,
+        "boost": -6006.4321998247615,
+        "control": -605.4657775313549,
+        "defense": 680.5138909142013,
+        "field": 2048.111478110469,
+        "first_touch": 16532.25196123123,
+        "goal_velocity": 836.146374632037,
+        "inactivity": -11451.383580207825,
+        "sustained_control": 210.095850584997,
+        "terminal_goal": -340661.5482711792,
+        "total": -362143.79418963415
+      },
+      "mean_update_metrics": {
+        "movement_speed": 473.1836117440683,
+        "touches_per_minute": 0.8883463541666667,
+        "mean_entropy": 4.234886082896479
+      }
+    },
+    {
+      "from": 61,
+      "through": 70,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 386317.59422039986,
+          "goals_focal": 1,
+          "goals_opponent": 9118,
+          "inactivity_resets": 5179,
+          "touches_focal": 7607,
+          "touches_opponent": 25495,
+          "world_seconds": 385182.3333294112
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 305051.65299892426,
+          "goals_focal": 500,
+          "goals_opponent": 504,
+          "inactivity_resets": 5960,
+          "touches_focal": 5006,
+          "touches_opponent": 2693,
+          "world_seconds": 263183.73333118646
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 17842.667637586594,
+          "goals_focal": 0,
+          "goals_opponent": 2859,
+          "inactivity_resets": 20,
+          "touches_focal": 1541,
+          "touches_opponent": 15143,
+          "world_seconds": 18251.86666665664
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 60811.17056512833,
+          "goals_focal": 80,
+          "goals_opponent": 92,
+          "inactivity_resets": 1225,
+          "touches_focal": 978,
+          "touches_opponent": 852,
+          "world_seconds": 51366.633333435166
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 9455.467172503471,
+          "goals_focal": 0,
+          "goals_opponent": 2071,
+          "inactivity_resets": 0,
+          "touches_focal": 654,
+          "touches_opponent": 7158,
+          "world_seconds": 9689.166666664427
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 15271.367449522018,
+          "goals_focal": 36,
+          "goals_opponent": 737,
+          "inactivity_resets": 233,
+          "touches_focal": 406,
+          "touches_opponent": 113,
+          "world_seconds": 14816.266666659765
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 25194.767987012863,
+          "goals_focal": 6,
+          "goals_opponent": 2657,
+          "inactivity_resets": 14,
+          "touches_focal": 2266,
+          "touches_opponent": 14492,
+          "world_seconds": 26645.233333315675
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 51404.83633136749,
+          "goals_focal": 384,
+          "goals_opponent": 48,
+          "inactivity_resets": 960,
+          "touches_focal": 1524,
+          "touches_opponent": 389,
+          "world_seconds": 45078.533333355095
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 17939.134268283844,
+          "goals_focal": 0,
+          "goals_opponent": 2125,
+          "inactivity_resets": 0,
+          "touches_focal": 27,
+          "touches_opponent": 8757,
+          "world_seconds": 17597.2333333239
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 46675.002989292145,
+          "goals_focal": 110,
+          "goals_opponent": 105,
+          "inactivity_resets": 861,
+          "touches_focal": 617,
+          "touches_opponent": 576,
+          "world_seconds": 38403.633333304984
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 34286.8684732914,
+          "goals_focal": 2,
+          "goals_opponent": 4101,
+          "inactivity_resets": 10,
+          "touches_focal": 115,
+          "touches_opponent": 19766,
+          "world_seconds": 34154.16666664218
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 86229.57252788544,
+          "goals_focal": 213,
+          "goals_opponent": 196,
+          "inactivity_resets": 1625,
+          "touches_focal": 798,
+          "touches_opponent": 842,
+          "world_seconds": 78671.20000044949
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 491036.499759078,
+          "goals_focal": 9,
+          "goals_opponent": 22931,
+          "inactivity_resets": 5223,
+          "touches_focal": 12210,
+          "touches_opponent": 90811,
+          "world_seconds": 491519.99999601406
+        },
+        "selfplay": {
+          "ended_episode_seconds": 565443.6028621197,
+          "goals_focal": 1323,
+          "goals_opponent": 1682,
+          "inactivity_resets": 10864,
+          "touches_focal": 9329,
+          "touches_opponent": 5465,
+          "world_seconds": 491519.99999839097
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 48701,
+        "excluded_first_awards": 22385,
+        "learner_air_awards": 5478,
+        "learner_air_reward": 1369.1086609512568,
+        "learner_eligible_air_contacts": 5478,
+        "learner_first_awards": 20296,
+        "learner_first_reward": 20290.127035975456,
+        "repeated_contacts_without_first_bonus": 6708
+      },
+      "discounted_reward_contributions": {
+        "access": -17628.73133157329,
+        "air_touch": 1369.1086609512568,
+        "alignment": -7237.767271378657,
+        "boost": -6966.8801596839,
+        "control": -642.3344811529629,
+        "defense": 519.3434105072214,
+        "field": 749.1261169402508,
+        "first_touch": 20290.127035975456,
+        "goal_velocity": 479.0709338150535,
+        "inactivity": -26935.437150478363,
+        "sustained_control": 264.544224476345,
+        "terminal_goal": -229153.34920692444,
+        "total": -264893.17919819365
+      },
+      "mean_update_metrics": {
+        "movement_speed": 478.4199354835793,
+        "touches_per_minute": 1.0987955729166667,
+        "mean_entropy": 4.161092777252198
+      }
+    },
+    {
+      "from": 71,
+      "through": 80,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 368924.0928966999,
+          "goals_focal": 3,
+          "goals_opponent": 8137,
+          "inactivity_resets": 4885,
+          "touches_focal": 6880,
+          "touches_opponent": 24270,
+          "world_seconds": 386993.8666627182
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 285959.9180774689,
+          "goals_focal": 526,
+          "goals_opponent": 509,
+          "inactivity_resets": 5365,
+          "touches_focal": 4335,
+          "touches_opponent": 2454,
+          "world_seconds": 264422.3666645018
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 17069.367619991302,
+          "goals_focal": 0,
+          "goals_opponent": 2603,
+          "inactivity_resets": 33,
+          "touches_focal": 1429,
+          "touches_opponent": 13631,
+          "world_seconds": 17192.9666666576
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 55069.436750888824,
+          "goals_focal": 81,
+          "goals_opponent": 90,
+          "inactivity_resets": 1050,
+          "touches_focal": 866,
+          "touches_opponent": 853,
+          "world_seconds": 52104.66666677789
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 9962.933863520622,
+          "goals_focal": 0,
+          "goals_opponent": 1949,
+          "inactivity_resets": 0,
+          "touches_focal": 705,
+          "touches_opponent": 8317,
+          "world_seconds": 9731.299999997722
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 14954.5674431324,
+          "goals_focal": 65,
+          "goals_opponent": 566,
+          "inactivity_resets": 228,
+          "touches_focal": 403,
+          "touches_opponent": 181,
+          "world_seconds": 15539.59999999244
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 26756.6014482975,
+          "goals_focal": 2,
+          "goals_opponent": 2660,
+          "inactivity_resets": 35,
+          "touches_focal": 2000,
+          "touches_opponent": 14785,
+          "world_seconds": 26641.93333331568
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 47725.302953481674,
+          "goals_focal": 305,
+          "goals_opponent": 40,
+          "inactivity_resets": 873,
+          "touches_focal": 1335,
+          "touches_opponent": 339,
+          "world_seconds": 45444.40000002642
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 16960.10089969635,
+          "goals_focal": 0,
+          "goals_opponent": 1973,
+          "inactivity_resets": 0,
+          "touches_focal": 81,
+          "touches_opponent": 8000,
+          "world_seconds": 16852.499999991247
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 38469.10228252411,
+          "goals_focal": 101,
+          "goals_opponent": 81,
+          "inactivity_resets": 694,
+          "touches_focal": 620,
+          "touches_opponent": 623,
+          "world_seconds": 37783.766666638876
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 34270.33516049385,
+          "goals_focal": 3,
+          "goals_opponent": 4000,
+          "inactivity_resets": 8,
+          "touches_focal": 165,
+          "touches_opponent": 19467,
+          "world_seconds": 34107.43333330889
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 82657.0388276577,
+          "goals_focal": 183,
+          "goals_opponent": 172,
+          "inactivity_resets": 1514,
+          "touches_focal": 815,
+          "touches_opponent": 847,
+          "world_seconds": 76225.20000041835
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 473943.43188869953,
+          "goals_focal": 8,
+          "goals_opponent": 21322,
+          "inactivity_resets": 4961,
+          "touches_focal": 11260,
+          "touches_opponent": 88470,
+          "world_seconds": 491519.9999959893
+        },
+        "selfplay": {
+          "ended_episode_seconds": 524835.3663351536,
+          "goals_focal": 1261,
+          "goals_opponent": 1458,
+          "inactivity_resets": 9724,
+          "touches_focal": 8374,
+          "touches_opponent": 5297,
+          "world_seconds": 491519.99999835575
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 0,
+        "excluded_air_awards": 47454,
+        "excluded_first_awards": 20775,
+        "learner_air_awards": 5335,
+        "learner_air_reward": 1333.3700658679008,
+        "learner_eligible_air_contacts": 5335,
+        "learner_first_awards": 18295,
+        "learner_first_reward": 18289.815958619118,
+        "repeated_contacts_without_first_bonus": 6636
+      },
+      "discounted_reward_contributions": {
+        "access": -15950.44853933341,
+        "air_touch": 1333.3700658679008,
+        "alignment": -6097.828571513062,
+        "boost": -6045.716957313935,
+        "control": -586.3327289170716,
+        "defense": 553.3310057416044,
+        "field": 398.28030113738015,
+        "first_touch": 18289.815958619118,
+        "goal_velocity": 370.3226022952091,
+        "inactivity": -24394.905027866364,
+        "sustained_control": 270.2576243116104,
+        "terminal_goal": -213078.58697891235,
+        "total": -244938.44122038924
+      },
+      "mean_update_metrics": {
+        "movement_speed": 475.6440993923611,
+        "touches_per_minute": 1.0144449869791667,
+        "mean_entropy": 4.10945431638647
+      }
+    },
+    {
+      "from": 81,
+      "through": 90,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 379395.127096653,
+          "goals_focal": 3,
+          "goals_opponent": 6812,
+          "inactivity_resets": 5244,
+          "touches_focal": 6702,
+          "touches_opponent": 20557,
+          "world_seconds": 391557.7999959851
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 211330.47939777374,
+          "goals_focal": 573,
+          "goals_opponent": 567,
+          "inactivity_resets": 3709,
+          "touches_focal": 4257,
+          "touches_opponent": 2425,
+          "world_seconds": 258707.4333312516
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 16844.200941562653,
+          "goals_focal": 0,
+          "goals_opponent": 2423,
+          "inactivity_resets": 47,
+          "touches_focal": 1471,
+          "touches_opponent": 13350,
+          "world_seconds": 16468.399999991594
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 41290.369188547134,
+          "goals_focal": 92,
+          "goals_opponent": 111,
+          "inactivity_resets": 717,
+          "touches_focal": 853,
+          "touches_opponent": 777,
+          "world_seconds": 53366.800000127296
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 9870.133857131004,
+          "goals_focal": 0,
+          "goals_opponent": 1908,
+          "inactivity_resets": 1,
+          "touches_focal": 778,
+          "touches_opponent": 8105,
+          "world_seconds": 9709.86666666441
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 12642.167333960533,
+          "goals_focal": 67,
+          "goals_opponent": 453,
+          "inactivity_resets": 184,
+          "touches_focal": 385,
+          "touches_opponent": 216,
+          "world_seconds": 17386.99999999076
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 25552.63475370407,
+          "goals_focal": 2,
+          "goals_opponent": 2437,
+          "inactivity_resets": 51,
+          "touches_focal": 1869,
+          "touches_opponent": 13538,
+          "world_seconds": 25375.799999983497
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 35702.935406565666,
+          "goals_focal": 276,
+          "goals_opponent": 56,
+          "inactivity_resets": 578,
+          "touches_focal": 1132,
+          "touches_opponent": 350,
+          "world_seconds": 45508.73333336058
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 16421.700883626938,
+          "goals_focal": 1,
+          "goals_opponent": 1864,
+          "inactivity_resets": 0,
+          "touches_focal": 128,
+          "touches_opponent": 8432,
+          "world_seconds": 16494.99999999157
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 30340.468433856964,
+          "goals_focal": 122,
+          "goals_opponent": 108,
+          "inactivity_resets": 511,
+          "touches_focal": 632,
+          "touches_opponent": 615,
+          "world_seconds": 39517.6666666373
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 32004.368344783783,
+          "goals_focal": 6,
+          "goals_opponent": 3664,
+          "inactivity_resets": 3,
+          "touches_focal": 253,
+          "touches_opponent": 18193,
+          "world_seconds": 31913.133333310885
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 62955.97066164017,
+          "goals_focal": 194,
+          "goals_opponent": 184,
+          "inactivity_resets": 1069,
+          "touches_focal": 820,
+          "touches_opponent": 895,
+          "world_seconds": 77032.3666670953
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 480088.16587746143,
+          "goals_focal": 12,
+          "goals_opponent": 19108,
+          "inactivity_resets": 5346,
+          "touches_focal": 11201,
+          "touches_opponent": 82175,
+          "world_seconds": 491519.9999959271
+        },
+        "selfplay": {
+          "ended_episode_seconds": 394262.3904223442,
+          "goals_focal": 1324,
+          "goals_opponent": 1479,
+          "inactivity_resets": 6768,
+          "touches_focal": 8079,
+          "touches_opponent": 5278,
+          "world_seconds": 491519.99999846285
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 424,
+        "excluded_air_awards": 44648,
+        "excluded_first_awards": 18653,
+        "learner_air_awards": 5384,
+        "learner_air_reward": 1345.6091427654028,
+        "learner_eligible_air_contacts": 5386,
+        "learner_first_awards": 17189,
+        "learner_first_reward": 17184.007693111897,
+        "repeated_contacts_without_first_bonus": 7369
+      },
+      "discounted_reward_contributions": {
+        "access": -15401.680450741598,
+        "air_touch": 1345.6091427654028,
+        "alignment": -5834.9129610884565,
+        "boost": -5453.242326043725,
+        "control": -771.3203777712987,
+        "defense": 442.59837109219745,
+        "field": 572.3942686129337,
+        "first_touch": 17184.007693111897,
+        "goal_velocity": 398.3148828302833,
+        "inactivity": -18871.096592903137,
+        "sustained_control": 317.30576996139996,
+        "terminal_goal": -190905.4110174179,
+        "total": -216977.43361251967
+      },
+      "mean_update_metrics": {
+        "movement_speed": 458.3995683684172,
+        "touches_per_minute": 0.999267578125,
+        "mean_entropy": 4.072572594395391
+      }
+    },
+    {
+      "from": 91,
+      "through": 100,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 382244.5601491928,
+          "goals_focal": 0,
+          "goals_opponent": 6431,
+          "inactivity_resets": 5062,
+          "touches_focal": 5867,
+          "touches_opponent": 19579,
+          "world_seconds": 397337.06666256767
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 273412.4165687561,
+          "goals_focal": 629,
+          "goals_opponent": 500,
+          "inactivity_resets": 5005,
+          "touches_focal": 5243,
+          "touches_opponent": 2697,
+          "world_seconds": 256928.99999794416
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 14847.467495441437,
+          "goals_focal": 0,
+          "goals_opponent": 2211,
+          "inactivity_resets": 30,
+          "touches_focal": 1297,
+          "touches_opponent": 12212,
+          "world_seconds": 15425.099999992544
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 58088.40346097946,
+          "goals_focal": 108,
+          "goals_opponent": 118,
+          "inactivity_resets": 1068,
+          "touches_focal": 1069,
+          "touches_opponent": 1011,
+          "world_seconds": 53085.86666679039
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 8627.700437307358,
+          "goals_focal": 0,
+          "goals_opponent": 1700,
+          "inactivity_resets": 1,
+          "touches_focal": 608,
+          "touches_opponent": 6961,
+          "world_seconds": 8580.999999998769
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 18419.934321165085,
+          "goals_focal": 47,
+          "goals_opponent": 556,
+          "inactivity_resets": 302,
+          "touches_focal": 461,
+          "touches_opponent": 333,
+          "world_seconds": 19125.866666655846
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 24435.934686660767,
+          "goals_focal": 1,
+          "goals_opponent": 2259,
+          "inactivity_resets": 40,
+          "touches_focal": 1916,
+          "touches_opponent": 12296,
+          "world_seconds": 24758.266666650725
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 48570.06956386566,
+          "goals_focal": 359,
+          "goals_opponent": 68,
+          "inactivity_resets": 840,
+          "touches_focal": 1594,
+          "touches_opponent": 455,
+          "world_seconds": 47348.70000005067
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 15165.06748509407,
+          "goals_focal": 0,
+          "goals_opponent": 1714,
+          "inactivity_resets": 0,
+          "touches_focal": 228,
+          "touches_opponent": 8233,
+          "world_seconds": 15049.63333332622
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 43151.90245103836,
+          "goals_focal": 96,
+          "goals_opponent": 100,
+          "inactivity_resets": 766,
+          "touches_focal": 781,
+          "touches_opponent": 775,
+          "world_seconds": 38140.499999971886
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 30197.501598596573,
+          "goals_focal": 6,
+          "goals_opponent": 3504,
+          "inactivity_resets": 5,
+          "touches_focal": 302,
+          "touches_opponent": 16834,
+          "world_seconds": 30368.93333331229
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 80901.43841838837,
+          "goals_focal": 190,
+          "goals_opponent": 193,
+          "inactivity_resets": 1431,
+          "touches_focal": 1074,
+          "touches_opponent": 1065,
+          "world_seconds": 76890.06666709349
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 475518.231852293,
+          "goals_focal": 7,
+          "goals_opponent": 17819,
+          "inactivity_resets": 5138,
+          "touches_focal": 10218,
+          "touches_opponent": 76115,
+          "world_seconds": 491519.9999958482
+        },
+        "selfplay": {
+          "ended_episode_seconds": 522544.16478419304,
+          "goals_focal": 1429,
+          "goals_opponent": 1535,
+          "inactivity_resets": 9412,
+          "touches_focal": 10222,
+          "touches_opponent": 6336,
+          "world_seconds": 491519.99999850645
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 900,
+        "excluded_air_awards": 41299,
+        "excluded_first_awards": 17454,
+        "learner_air_awards": 6319,
+        "learner_air_reward": 1579.2958117127419,
+        "learner_eligible_air_contacts": 6319,
+        "learner_first_awards": 18852,
+        "learner_first_reward": 18846.512792289257,
+        "repeated_contacts_without_first_bonus": 7924
+      },
+      "discounted_reward_contributions": {
+        "access": -15456.396835204447,
+        "air_touch": 1579.2958117127419,
+        "alignment": -6039.94402103929,
+        "boost": -5817.40085434376,
+        "control": -921.2625659329358,
+        "defense": 496.825722803561,
+        "field": 203.7879513252921,
+        "first_touch": 18846.512792289257,
+        "goal_velocity": 360.5725675072426,
+        "inactivity": -23948.16314792633,
+        "sustained_control": 320.05158168378864,
+        "terminal_goal": -178068.3160047531,
+        "total": -208444.43704737144
+      },
+      "mean_update_metrics": {
+        "movement_speed": 498.2283802173755,
+        "touches_per_minute": 1.0895182291666667,
+        "mean_entropy": 4.02528792946427
+      }
+    },
+    {
+      "from": 101,
+      "through": 110,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 382967.76026391983,
+          "goals_focal": 1,
+          "goals_opponent": 5318,
+          "inactivity_resets": 5386,
+          "touches_focal": 5071,
+          "touches_opponent": 16778,
+          "world_seconds": 401457.76666250767
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 239545.81424117088,
+          "goals_focal": 574,
+          "goals_opponent": 505,
+          "inactivity_resets": 4087,
+          "touches_focal": 4889,
+          "touches_opponent": 2933,
+          "world_seconds": 256984.36666461002
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 15116.167531490326,
+          "goals_focal": 0,
+          "goals_opponent": 2071,
+          "inactivity_resets": 52,
+          "touches_focal": 1285,
+          "touches_opponent": 11209,
+          "world_seconds": 15247.466666659373
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 48672.802839040756,
+          "goals_focal": 102,
+          "goals_opponent": 106,
+          "inactivity_resets": 828,
+          "touches_focal": 1070,
+          "touches_opponent": 945,
+          "world_seconds": 53804.40000013287
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 7731.667074203491,
+          "goals_focal": 0,
+          "goals_opponent": 1586,
+          "inactivity_resets": 0,
+          "touches_focal": 573,
+          "touches_opponent": 6196,
+          "world_seconds": 8037.1333333325965
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 18392.500977873802,
+          "goals_focal": 39,
+          "goals_opponent": 425,
+          "inactivity_resets": 296,
+          "touches_focal": 435,
+          "touches_opponent": 292,
+          "world_seconds": 18420.133333323152
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 22989.56792962551,
+          "goals_focal": 2,
+          "goals_opponent": 2106,
+          "inactivity_resets": 44,
+          "touches_focal": 1677,
+          "touches_opponent": 11756,
+          "world_seconds": 22971.99999998568
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 44998.20268535614,
+          "goals_focal": 291,
+          "goals_opponent": 51,
+          "inactivity_resets": 744,
+          "touches_focal": 1284,
+          "touches_opponent": 451,
+          "world_seconds": 46980.16666671264
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 14502.534086942673,
+          "goals_focal": 0,
+          "goals_opponent": 1632,
+          "inactivity_resets": 0,
+          "touches_focal": 296,
+          "touches_opponent": 7601,
+          "world_seconds": 14684.366666659884
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 36225.96876335144,
+          "goals_focal": 98,
+          "goals_opponent": 134,
+          "inactivity_resets": 593,
+          "touches_focal": 796,
+          "touches_opponent": 870,
+          "world_seconds": 38014.599999972
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 29445.33487677574,
+          "goals_focal": 1,
+          "goals_opponent": 3286,
+          "inactivity_resets": 12,
+          "touches_focal": 367,
+          "touches_opponent": 16023,
+          "world_seconds": 29121.266666646756
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 72403.67107725143,
+          "goals_focal": 184,
+          "goals_opponent": 217,
+          "inactivity_resets": 1195,
+          "touches_focal": 1092,
+          "touches_opponent": 1196,
+          "world_seconds": 77316.33333376558
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 472753.0317629576,
+          "goals_focal": 4,
+          "goals_opponent": 15999,
+          "inactivity_resets": 5494,
+          "touches_focal": 9269,
+          "touches_opponent": 69563,
+          "world_seconds": 491519.99999579194
+        },
+        "selfplay": {
+          "ended_episode_seconds": 460238.96058404446,
+          "goals_focal": 1288,
+          "goals_opponent": 1438,
+          "inactivity_resets": 7743,
+          "touches_focal": 9566,
+          "touches_opponent": 6687,
+          "world_seconds": 491519.9999985163
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 227,
+        "excluded_air_awards": 38322,
+        "excluded_first_awards": 15661,
+        "learner_air_awards": 5979,
+        "learner_air_reward": 1494.3221829384565,
+        "learner_eligible_air_contacts": 5981,
+        "learner_first_awards": 17698,
+        "learner_first_reward": 17692.923563539982,
+        "repeated_contacts_without_first_bonus": 7824
+      },
+      "discounted_reward_contributions": {
+        "access": -13770.641998767827,
+        "air_touch": 1494.3221829384565,
+        "alignment": -5762.873492276203,
+        "boost": -5327.439564625807,
+        "control": -945.5400225762138,
+        "defense": 454.8595636874628,
+        "field": 129.70379162183463,
+        "first_touch": 17692.923563539982,
+        "goal_velocity": 301.2401200716005,
+        "inactivity": -20967.885103225708,
+        "sustained_control": 334.9397960966273,
+        "terminal_goal": -159903.5807943344,
+        "total": -186269.97202780726
+      },
+      "mean_update_metrics": {
+        "movement_speed": 487.99755601671006,
+        "touches_per_minute": 1.0384928385416667,
+        "mean_entropy": 3.9627140299479167
+      }
+    },
+    {
+      "from": 111,
+      "through": 120,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 397536.7614133358,
+          "goals_focal": 2,
+          "goals_opponent": 4827,
+          "inactivity_resets": 5734,
+          "touches_focal": 3507,
+          "touches_opponent": 15864,
+          "world_seconds": 401611.7999958388
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 229470.54693508148,
+          "goals_focal": 723,
+          "goals_opponent": 637,
+          "inactivity_resets": 3636,
+          "touches_focal": 5793,
+          "touches_opponent": 3707,
+          "world_seconds": 256667.49999794795
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 15440.13420343399,
+          "goals_focal": 0,
+          "goals_opponent": 2077,
+          "inactivity_resets": 49,
+          "touches_focal": 1229,
+          "touches_opponent": 11510,
+          "world_seconds": 14738.133333326503
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 46819.00272703171,
+          "goals_focal": 107,
+          "goals_opponent": 107,
+          "inactivity_resets": 743,
+          "touches_focal": 1141,
+          "touches_opponent": 1110,
+          "world_seconds": 53666.86666679778
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 8820.93381011486,
+          "goals_focal": 0,
+          "goals_opponent": 1619,
+          "inactivity_resets": 1,
+          "touches_focal": 738,
+          "touches_opponent": 7020,
+          "world_seconds": 9056.366666665002
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 15988.7674690485,
+          "goals_focal": 70,
+          "goals_opponent": 413,
+          "inactivity_resets": 226,
+          "touches_focal": 531,
+          "touches_opponent": 323,
+          "world_seconds": 18844.999999989435
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 22954.201289653778,
+          "goals_focal": 1,
+          "goals_opponent": 2098,
+          "inactivity_resets": 57,
+          "touches_focal": 1575,
+          "touches_opponent": 11561,
+          "world_seconds": 23040.09999998562
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 41559.63575088978,
+          "goals_focal": 285,
+          "goals_opponent": 86,
+          "inactivity_resets": 624,
+          "touches_focal": 1383,
+          "touches_opponent": 597,
+          "world_seconds": 46728.16666670943
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 14916.434114694595,
+          "goals_focal": 0,
+          "goals_opponent": 1621,
+          "inactivity_resets": 0,
+          "touches_focal": 365,
+          "touches_opponent": 8215,
+          "world_seconds": 14805.93333332644
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 32677.00186729431,
+          "goals_focal": 131,
+          "goals_opponent": 117,
+          "inactivity_resets": 496,
+          "touches_focal": 881,
+          "touches_opponent": 855,
+          "world_seconds": 37963.89999997205
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 28028.30149626732,
+          "goals_focal": 3,
+          "goals_opponent": 3090,
+          "inactivity_resets": 14,
+          "touches_focal": 430,
+          "touches_opponent": 15933,
+          "world_seconds": 28267.666666647532
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 66695.40399956703,
+          "goals_focal": 196,
+          "goals_opponent": 212,
+          "inactivity_resets": 1026,
+          "touches_focal": 1359,
+          "touches_opponent": 1374,
+          "world_seconds": 77648.56666710314
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 487696.76632750034,
+          "goals_focal": 6,
+          "goals_opponent": 15332,
+          "inactivity_resets": 5855,
+          "touches_focal": 7844,
+          "touches_opponent": 70103,
+          "world_seconds": 491519.9999957899
+        },
+        "selfplay": {
+          "ended_episode_seconds": 433210.3587489128,
+          "goals_focal": 1512,
+          "goals_opponent": 1572,
+          "inactivity_resets": 6751,
+          "touches_focal": 11088,
+          "touches_opponent": 7966,
+          "world_seconds": 491519.9999985198
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 2180,
+        "excluded_air_awards": 38625,
+        "excluded_first_awards": 14914,
+        "learner_air_awards": 6434,
+        "learner_air_reward": 1608.036428451538,
+        "learner_eligible_air_contacts": 6446,
+        "learner_first_awards": 17801,
+        "learner_first_reward": 17795.865633547306,
+        "repeated_contacts_without_first_bonus": 9097
+      },
+      "discounted_reward_contributions": {
+        "access": -13510.385146326598,
+        "air_touch": 1608.036428451538,
+        "alignment": -5201.866075819682,
+        "boost": -5058.457321940767,
+        "control": -715.2735816898133,
+        "defense": 462.0824837741308,
+        "field": 65.17224973802183,
+        "first_touch": 17795.865633547306,
+        "goal_velocity": 348.3073772341845,
+        "inactivity": -19345.82230424881,
+        "sustained_control": 333.18036261538884,
+        "terminal_goal": -153216.03897476196,
+        "total": -176435.19887256454
+      },
+      "mean_update_metrics": {
+        "movement_speed": 466.3193149142795,
+        "touches_per_minute": 1.094482421875,
+        "mean_entropy": 3.844367915259467
+      }
+    },
+    {
+      "from": 121,
+      "through": 130,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 395469.729105711,
+          "goals_focal": 1,
+          "goals_opponent": 3484,
+          "inactivity_resets": 6492,
+          "touches_focal": 2807,
+          "touches_opponent": 11919,
+          "world_seconds": 400870.0666625162
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 210889.24523997307,
+          "goals_focal": 722,
+          "goals_opponent": 642,
+          "inactivity_resets": 3069,
+          "touches_focal": 6372,
+          "touches_opponent": 4683,
+          "world_seconds": 254028.99999798636
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 13957.434125423431,
+          "goals_focal": 0,
+          "goals_opponent": 1998,
+          "inactivity_resets": 35,
+          "touches_focal": 1162,
+          "touches_opponent": 10840,
+          "world_seconds": 14183.96666666034
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 42596.23572397232,
+          "goals_focal": 120,
+          "goals_opponent": 96,
+          "inactivity_resets": 615,
+          "touches_focal": 1247,
+          "touches_opponent": 1190,
+          "world_seconds": 54310.56666680598
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 8909.033810257912,
+          "goals_focal": 0,
+          "goals_opponent": 1472,
+          "inactivity_resets": 0,
+          "touches_focal": 799,
+          "touches_opponent": 7290,
+          "world_seconds": 9242.9333333315
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 17040.23426747322,
+          "goals_focal": 76,
+          "goals_opponent": 316,
+          "inactivity_resets": 224,
+          "touches_focal": 658,
+          "touches_opponent": 298,
+          "world_seconds": 19942.666666655103
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 23380.734634399414,
+          "goals_focal": 0,
+          "goals_opponent": 1989,
+          "inactivity_resets": 71,
+          "touches_focal": 1628,
+          "touches_opponent": 11219,
+          "world_seconds": 23726.199999984998
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 38263.6688375473,
+          "goals_focal": 289,
+          "goals_opponent": 77,
+          "inactivity_resets": 528,
+          "touches_focal": 1352,
+          "touches_opponent": 893,
+          "world_seconds": 46911.16666671177
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 14165.567399263382,
+          "goals_focal": 1,
+          "goals_opponent": 1509,
+          "inactivity_resets": 0,
+          "touches_focal": 480,
+          "touches_opponent": 8047,
+          "world_seconds": 14558.399999993333
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 31128.801681518555,
+          "goals_focal": 120,
+          "goals_opponent": 115,
+          "inactivity_resets": 433,
+          "touches_focal": 1044,
+          "touches_opponent": 1010,
+          "world_seconds": 38825.96666663793
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 28647.568176031113,
+          "goals_focal": 4,
+          "goals_opponent": 3052,
+          "inactivity_resets": 15,
+          "touches_focal": 536,
+          "touches_opponent": 16230,
+          "world_seconds": 28938.43333331359
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 65815.00392389297,
+          "goals_focal": 231,
+          "goals_opponent": 205,
+          "inactivity_resets": 925,
+          "touches_focal": 1604,
+          "touches_opponent": 1608,
+          "world_seconds": 77500.63333376792
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 484530.06725108624,
+          "goals_focal": 6,
+          "goals_opponent": 13504,
+          "inactivity_resets": 6613,
+          "touches_focal": 7412,
+          "touches_opponent": 65545,
+          "world_seconds": 491519.99999579997
+        },
+        "selfplay": {
+          "ended_episode_seconds": 405733.18967437744,
+          "goals_focal": 1558,
+          "goals_opponent": 1451,
+          "inactivity_resets": 5794,
+          "touches_focal": 12277,
+          "touches_opponent": 9682,
+          "world_seconds": 491519.99999856506
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 6185,
+        "excluded_air_awards": 37498,
+        "excluded_first_awards": 13233,
+        "learner_air_awards": 7309,
+        "learner_air_reward": 1826.7245417684317,
+        "learner_eligible_air_contacts": 7339,
+        "learner_first_awards": 17867,
+        "learner_first_reward": 17861.87294614315,
+        "repeated_contacts_without_first_bonus": 11504
+      },
+      "discounted_reward_contributions": {
+        "access": -13260.932446311355,
+        "air_touch": 1826.7245417684317,
+        "alignment": -4826.092070680341,
+        "boost": -4820.569242224639,
+        "control": -468.5224687197179,
+        "defense": 319.2670395126533,
+        "field": 288.60007754967864,
+        "first_touch": 17861.87294614315,
+        "goal_velocity": 285.6390941675221,
+        "inactivity": -18190.489836215973,
+        "sustained_control": 384.9782810944525,
+        "terminal_goal": -134941.21718025208,
+        "total": -155540.74120612457
+      },
+      "mean_update_metrics": {
+        "movement_speed": 445.35302612304685,
+        "touches_per_minute": 1.1951090494791667,
+        "mean_entropy": 3.7311692262578893
+      }
+    },
+    {
+      "from": 131,
+      "through": 140,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 398895.93022465706,
+          "goals_focal": 1,
+          "goals_opponent": 2762,
+          "inactivity_resets": 7027,
+          "touches_focal": 2359,
+          "touches_opponent": 10222,
+          "world_seconds": 401464.93332917424
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 187439.94345641136,
+          "goals_focal": 799,
+          "goals_opponent": 676,
+          "inactivity_resets": 2159,
+          "touches_focal": 7934,
+          "touches_opponent": 5762,
+          "world_seconds": 253130.93333133275
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 14187.96747970581,
+          "goals_focal": 0,
+          "goals_opponent": 1926,
+          "inactivity_resets": 52,
+          "touches_focal": 1270,
+          "touches_opponent": 10942,
+          "world_seconds": 14632.633333326597
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 39826.002120018005,
+          "goals_focal": 125,
+          "goals_opponent": 123,
+          "inactivity_resets": 440,
+          "touches_focal": 1454,
+          "touches_opponent": 1528,
+          "world_seconds": 54762.90000014508
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 10222.967198729515,
+          "goals_focal": 1,
+          "goals_opponent": 1468,
+          "inactivity_resets": 2,
+          "touches_focal": 946,
+          "touches_opponent": 8750,
+          "world_seconds": 9818.599999997643
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 13807.934051036835,
+          "goals_focal": 96,
+          "goals_opponent": 212,
+          "inactivity_resets": 142,
+          "touches_focal": 765,
+          "touches_opponent": 470,
+          "world_seconds": 21282.666666653888
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 23118.16798877716,
+          "goals_focal": 0,
+          "goals_opponent": 1936,
+          "inactivity_resets": 75,
+          "touches_focal": 1630,
+          "touches_opponent": 11100,
+          "world_seconds": 23335.966666652017
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 34144.235213279724,
+          "goals_focal": 229,
+          "goals_opponent": 97,
+          "inactivity_resets": 386,
+          "touches_focal": 1407,
+          "touches_opponent": 1188,
+          "world_seconds": 46126.86666670178
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 14797.234110355377,
+          "goals_focal": 1,
+          "goals_opponent": 1525,
+          "inactivity_resets": 0,
+          "touches_focal": 539,
+          "touches_opponent": 8050,
+          "world_seconds": 14292.566666660241
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 28343.10160636902,
+          "goals_focal": 99,
+          "goals_opponent": 111,
+          "inactivity_resets": 325,
+          "touches_focal": 1188,
+          "touches_opponent": 1160,
+          "world_seconds": 38943.59999997116
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 27262.401446819305,
+          "goals_focal": 4,
+          "goals_opponent": 2935,
+          "inactivity_resets": 15,
+          "touches_focal": 654,
+          "touches_opponent": 14820,
+          "world_seconds": 27975.299999981133
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 56794.56982707977,
+          "goals_focal": 233,
+          "goals_opponent": 208,
+          "inactivity_resets": 632,
+          "touches_focal": 1926,
+          "touches_opponent": 2020,
+          "world_seconds": 77273.03333376502
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 488484.6684490442,
+          "goals_focal": 7,
+          "goals_opponent": 12552,
+          "inactivity_resets": 7171,
+          "touches_focal": 7398,
+          "touches_opponent": 63884,
+          "world_seconds": 491519.9999957919
+        },
+        "selfplay": {
+          "ended_episode_seconds": 360355.7862741947,
+          "goals_focal": 1581,
+          "goals_opponent": 1427,
+          "inactivity_resets": 4084,
+          "touches_focal": 14674,
+          "touches_opponent": 12128,
+          "world_seconds": 491519.99999856966
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 9717,
+        "excluded_air_awards": 36759,
+        "excluded_first_awards": 12273,
+        "learner_air_awards": 8841,
+        "learner_air_reward": 2209.614387586713,
+        "learner_eligible_air_contacts": 8878,
+        "learner_first_awards": 17556,
+        "learner_first_reward": 17550.97688895464,
+        "repeated_contacts_without_first_bonus": 16644
+      },
+      "discounted_reward_contributions": {
+        "access": -13255.989545299979,
+        "air_touch": 2209.614387586713,
+        "alignment": -4181.680953099685,
+        "boost": -4353.477443928654,
+        "control": -424.23198793663477,
+        "defense": 298.538202353673,
+        "field": 92.30303821135641,
+        "first_touch": 17550.97688895464,
+        "goal_velocity": 260.9689832999923,
+        "inactivity": -15330.14249753952,
+        "sustained_control": 498.235136034782,
+        "terminal_goal": -125413.78515911102,
+        "total": -142048.67089921384
+      },
+      "mean_update_metrics": {
+        "movement_speed": 423.88782886646413,
+        "touches_per_minute": 1.3916015625,
+        "mean_entropy": 3.633894709481133
+      }
+    },
+    {
+      "from": 141,
+      "through": 150,
+      "by_family_and_opponent": {
+        "ball_acquisition_nexto": {
+          "ended_episode_seconds": 401603.59755182266,
+          "goals_focal": 1,
+          "goals_opponent": 2430,
+          "inactivity_resets": 7339,
+          "touches_focal": 2570,
+          "touches_opponent": 9646,
+          "world_seconds": 402295.9333291622
+        },
+        "ball_acquisition_selfplay": {
+          "ended_episode_seconds": 163871.842099905,
+          "goals_focal": 889,
+          "goals_opponent": 773,
+          "inactivity_resets": 1258,
+          "touches_focal": 10096,
+          "touches_opponent": 8659,
+          "world_seconds": 253800.66666465634
+        },
+        "challenge_nexto": {
+          "ended_episode_seconds": 14864.067511558533,
+          "goals_focal": 0,
+          "goals_opponent": 1899,
+          "inactivity_resets": 58,
+          "touches_focal": 1315,
+          "touches_opponent": 11110,
+          "world_seconds": 14754.999999993153
+        },
+        "challenge_selfplay": {
+          "ended_episode_seconds": 35384.90197944641,
+          "goals_focal": 152,
+          "goals_opponent": 162,
+          "inactivity_resets": 258,
+          "touches_focal": 2119,
+          "touches_opponent": 2137,
+          "world_seconds": 54913.13333348032
+        },
+        "defense_nexto": {
+          "ended_episode_seconds": 9642.833824038506,
+          "goals_focal": 0,
+          "goals_opponent": 1375,
+          "inactivity_resets": 1,
+          "touches_focal": 995,
+          "touches_opponent": 8926,
+          "world_seconds": 9944.066666664196
+        },
+        "defense_selfplay": {
+          "ended_episode_seconds": 13406.667370319366,
+          "goals_focal": 85,
+          "goals_opponent": 234,
+          "inactivity_resets": 117,
+          "touches_focal": 965,
+          "touches_opponent": 701,
+          "world_seconds": 22685.633333319278
+        },
+        "finishing_nexto": {
+          "ended_episode_seconds": 22548.901265621185,
+          "goals_focal": 1,
+          "goals_opponent": 1855,
+          "inactivity_resets": 81,
+          "touches_focal": 1655,
+          "touches_opponent": 10417,
+          "world_seconds": 22403.2999999862
+        },
+        "finishing_selfplay": {
+          "ended_episode_seconds": 30382.23504257202,
+          "goals_focal": 242,
+          "goals_opponent": 123,
+          "inactivity_resets": 230,
+          "touches_focal": 1891,
+          "touches_opponent": 1636,
+          "world_seconds": 45634.433333362176
+        },
+        "kickoff_nexto": {
+          "ended_episode_seconds": 13682.700731754303,
+          "goals_focal": 1,
+          "goals_opponent": 1356,
+          "inactivity_resets": 0,
+          "touches_focal": 569,
+          "touches_opponent": 7503,
+          "world_seconds": 13679.999999994132
+        },
+        "kickoff_selfplay": {
+          "ended_episode_seconds": 25609.60132932663,
+          "goals_focal": 129,
+          "goals_opponent": 99,
+          "inactivity_resets": 214,
+          "touches_focal": 1489,
+          "touches_opponent": 1487,
+          "world_seconds": 37717.06666663894
+        },
+        "natural_nexto": {
+          "ended_episode_seconds": 29078.16824054718,
+          "goals_focal": 1,
+          "goals_opponent": 2881,
+          "inactivity_resets": 33,
+          "touches_focal": 721,
+          "touches_opponent": 15193,
+          "world_seconds": 28441.69999998071
+        },
+        "natural_selfplay": {
+          "ended_episode_seconds": 51595.86936879158,
+          "goals_focal": 236,
+          "goals_opponent": 242,
+          "inactivity_resets": 401,
+          "touches_focal": 2670,
+          "touches_opponent": 2798,
+          "world_seconds": 76769.06666709195
+        }
+      },
+      "by_opponent": {
+        "nexto": {
+          "ended_episode_seconds": 491420.26912534237,
+          "goals_focal": 4,
+          "goals_opponent": 11796,
+          "inactivity_resets": 7512,
+          "touches_focal": 7825,
+          "touches_opponent": 62795,
+          "world_seconds": 491519.9999957806
+        },
+        "selfplay": {
+          "ended_episode_seconds": 320251.117190361,
+          "goals_focal": 1733,
+          "goals_opponent": 1633,
+          "inactivity_resets": 2478,
+          "touches_focal": 19230,
+          "touches_opponent": 17418,
+          "world_seconds": 491519.999998549
+        }
+      },
+      "contact_bonuses": {
+        "air_budget_capped_agent_decisions": 20135,
+        "excluded_air_awards": 35931,
+        "excluded_first_awards": 11610,
+        "learner_air_awards": 11159,
+        "learner_air_reward": 2788.941480562091,
+        "learner_eligible_air_contacts": 11257,
+        "learner_first_awards": 17066,
+        "learner_first_reward": 17061.071982741356,
+        "repeated_contacts_without_first_bonus": 27407
+      },
+      "discounted_reward_contributions": {
+        "access": -14074.536914150787,
+        "air_touch": 2788.941480562091,
+        "alignment": -4443.83734798316,
+        "boost": -4097.6771248359155,
+        "control": -199.22658985760157,
+        "defense": 243.1799507906225,
+        "field": 176.44388485587797,
+        "first_touch": 17061.071982741356,
+        "goal_velocity": 263.4567030778542,
+        "inactivity": -12460.800355911255,
+        "sustained_control": 741.5782230148584,
+        "terminal_goal": -117885.98152160645,
+        "total": -131887.38762637335
+      },
+      "mean_update_metrics": {
+        "movement_speed": 421.14301011827257,
+        "touches_per_minute": 1.8096110026041667,
+        "mean_entropy": 3.5670544882173894
+      }
+    }
+  ],
+  "limitations": [
+    "Best snapshots are descriptive only, not promoted models; ties choose earliest offset. Combined count pools cohorts with different deadlines.",
+    "Deterministic probe tests own contact in original episode, not possession/scoring/wins/aerials/SSL.",
+    "Training family/opponent goals are stochastic scenario outcomes, not match scores. Self-play both sides share the evolving policy.",
+    "Per-family reward and contact-bonus decomposition was not recorded. All per-family gameplay, global learner reward and global contact accounting are retained; unavailable allocation is not fabricated.",
+    "No new full-match evaluation or mechanism investigation was conducted. Reward and scenario mix changed together, so comparison with older acquisition-only run is not single-factor causal.",
+    "Resets occur at goals or45s without either contact, not fixed45s episodes. World-time exposure therefore need not match reset-source mixture.",
+    "Rolling differs from evaluated snapshot metadata because evaluation follows snapshot; model and optimizer tensors equal. No physics-state-exact resume claim; runner resume starts fresh physical episodes."
+  ]
+}
