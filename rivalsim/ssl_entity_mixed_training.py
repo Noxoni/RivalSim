@@ -66,11 +66,13 @@ class MixedJointRollout(Rival2RecurrentRolloutBuffer):
 
 
 class MixedEntityRolloutCollector:
-    def __init__(self, env, model, seed=SEED):
+    def __init__(self, env, model, seed=SEED, *, config=None, reward_component_names=None):
         self.env, self.model = env, model.to(env.device)
-        self.config = ppo_config()
+        self.config = config if config is not None else ppo_config()
+        self.reward_component_names = reward_component_names
         self.generator = torch.Generator(device=env.device).manual_seed(seed)
-        self.hidden = model.initial_hidden(env.num_envs * 2).reshape(1, env.num_envs, 2, -1)
+        initial_hidden = model.initial_hidden(env.num_envs * 2)
+        self.hidden = initial_hidden.reshape(initial_hidden.shape[0], env.num_envs, 2, -1)
         self.reset_before = torch.ones((env.num_envs, 2), dtype=torch.bool, device=env.device)
         self.episode_has_touch = torch.zeros_like(self.reset_before)
         self.last_metrics = {}
@@ -163,13 +165,14 @@ class MixedEntityRolloutCollector:
         }
         components = {
             key: torch.zeros_like(totals["touches"])
-            for key in (*authority()["weights"], "terminal_goal", "total")
+            for key in (self.reward_component_names if self.reward_component_names is not None
+                        else (*authority()["weights"], "terminal_goal", "total"))
         }
         counts = torch.zeros(90, dtype=torch.int64, device=env.device)
         for tick in range(horizon):
             logits, value, hidden = model(
                 obs.reshape(-1, 182),
-                self.hidden.reshape(1, -1, model.config.context_hidden_dim),
+                self.hidden.reshape(self.hidden.shape[0], -1, model.config.context_hidden_dim),
                 reset_before=self.reset_before.reshape(-1),
             )
             if not bool(
@@ -199,9 +202,14 @@ class MixedEntityRolloutCollector:
                 else env.step(action)
             )
             native = env.last_native
-            next_value = model.isolated_value(
-                transition.transition_observation.reshape(-1, 182)
-            ).reshape(n, 2)
+            successor = transition.transition_observation.reshape(-1, 182)
+            if hasattr(model, "bootstrap_value"):
+                # Peek with history AFTER the current observation. Do not carry
+                # the peek state: the next observation is consumed on the next
+                # decision, exactly once. Timeout uses this pre-reset state.
+                next_value = model.bootstrap_value(successor, hidden).reshape(n, 2)
+            else:
+                next_value = model.isolated_value(successor).reshape(n, 2)
             reset = transition.reset_mask[:, None].expand(-1, 2)
             buffer.action_indices[tick].copy_(index.reshape(n, 2))
             buffer.add(
@@ -307,7 +315,8 @@ def mixed_sequence_data(rollout, config):
             "train_mask",
         )
     }
-    data["initial_hidden"] = rollout.initial_hidden.reshape(1, -1, rollout.initial_hidden.shape[-1])
+    data["initial_hidden"] = rollout.initial_hidden.reshape(
+        rollout.initial_hidden.shape[0], -1, rollout.initial_hidden.shape[-1])
     family = _sequence_major(rollout.opponent_family)
     data["normalized_advantage"] = family_normalize(data["advantages"], data["train_mask"], family)
     data["opponent_family"] = family

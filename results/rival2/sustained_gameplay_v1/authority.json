@@ -1,0 +1,113 @@
+{
+  "budget": "Continue until user STOP; no automatic reconfiguration or silent numerical retry. Evaluation failures pause. Numerical/corruption faults roll back and stop; KL is telemetry only.",
+  "checkpoints": "Initialized0, first1,10,20 and every50 permanent. Alternating atomic rolling each accepted update.",
+  "critic": "Independent 182->512->512->512->256 SiLU features -> GRU256 -> scalar value; no value gradient into actor. Packed hidden banks actor/critic, each1xBx256.",
+  "evaluation": {
+    "interpretation": "Repeated development telemetry, not held-out acceptance or SSL/ranked proof",
+    "matches": 10,
+    "nexto_controller": "NEXTO_NATIVE_V5_CONTROLLER_V1",
+    "nexto_sampling_mode": "native_v5",
+    "nexto_seed": 2026090805,
+    "optimizer_steps": 0,
+    "overtime_cap_seconds": 120,
+    "physics_seed": 2026090573,
+    "rival": "Raw deterministic joint90 argmax; actor hidden persists until native goal reset",
+    "seconds": 300,
+    "starts": "Five standard standing kickoff layouts, both sides; no training-state assistance",
+    "timeouts": "No training inactivity rule in evaluation. Regulation/overtime match clock only.",
+    "version": "RIVAL2_SUSTAINED_GAMEPLAY_V1_DEVELOPMENT_EVAL"
+  },
+  "evaluation_every_after_50": 50,
+  "evaluation_updates": [
+    0,
+    10,
+    20,
+    50
+  ],
+  "exploration": "Categorical joint90 with temperature1, entropy0.001. No inherited temperature2 uniform-barrier intervention intended for saturated old weights.",
+  "hold_ticks": 4,
+  "initialization": "New random actor, entities, actor GRU and independent critic MLP/GRU; fresh Adam. No prior policy or optimizer loaded.",
+  "opponents": {
+    "current_selfplay_both_sides_trainable": true,
+    "frozen_old_rival": 0,
+    "mode": "native_v5",
+    "native_nexto_seed": 2026090804,
+    "nexto_learner_sample_fraction": 0.3333333333333333,
+    "nexto_world_fraction": 0.5,
+    "selfplay_world_fraction": 0.5
+  },
+  "parent": null,
+  "physics_hz": 120,
+  "policy_hz": 30,
+  "policy_version": "RIVAL2_ENTITY_JOINT90_SEPARATE_RECURRENT_CRITIC_V1",
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.001,
+    "epochs": 2,
+    "gae_lambda": 0.9930924954370359,
+    "gamma": 0.9992301329658564,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 90,
+    "value_loss_coefficient": 0.5
+  },
+  "recurrent_training": "Complete90-decision sequences; carry both hidden states between rollouts, detach only BPTT boundary; reset only ended rows. Successor bootstrap uses critic history AFTER current observation, without advancing stored state twice.",
+  "resume": "Only this lineage with exact latest checkpoint hash. Model/Adam/all learner and Nexto RNG preserved. Physical episodes restart explicitly and both memories clear on process resume; unfinished episodes are NOT assigned synthetic rewards or appended to GAE. In-process evaluations/checkpoint saves do not reset training worlds or memories.",
+  "reward": {
+    "concede": -10.0,
+    "control_max_discounted_forever": 0.8657003605411363,
+    "fixed_episode_duration_limit": null,
+    "gae_lambda": 0.9930924954370359,
+    "gamma": 0.9992301329658564,
+    "goal": 10.0,
+    "idle_ticks": 5400,
+    "inactivity": "45 seconds without a native car-ball contact by EITHER player, including sustained contact, not just a new contact onset. Goal takes precedence. Apply -1 to both players once at decision boundary. Truncated, not goal-terminal; bootstrap pre-reset critic value, cut GAE chain and reset both memories before the replacement scenario.",
+    "inactivity_penalty": -1.0,
+    "limitation": "A deliberately small occupancy objective, not purely policy-invariant shaping. Its maximum discounted lifetime payment is below 1 versus goal 10, but that does not prove lexicographic goal dominance or eliminate stalling incentives.",
+    "physics_gamma": 0.9998074776513175,
+    "potential": "Same seven state potentials, combined gamma*Phi(next)-Phi(before). True goal successor potential zero; inactivity retains pre-reset potential.",
+    "reward_half_life_seconds": 30.0,
+    "sustained_control": "At each physics tick: native last-exclusive toucher times positive own-minus-opponent physical controllability. Controllability is proximity clamp((500-distance)/350,0,1) times velocity match clamp(1-relative_speed/1200,0,1). Simultaneous touches clear exclusivity. No touch itself earns a bonus. Contact ownership resets at episode reset; payment continues while control is maintained. No control payment on or after a goal tick.",
+    "sustained_control_rate": 0.02,
+    "task_success_resets": false,
+    "trace_half_life_seconds": 3.0,
+    "version": "RIVAL2_SUSTAINED_GAMEPLAY_V1",
+    "weights": {
+      "access": 0.75,
+      "alignment": 0.3,
+      "boost": 0.15,
+      "control": 0.75,
+      "defense": 0.5,
+      "field": 1.25,
+      "goal_velocity": 0.25
+    }
+  },
+  "scenario_bank": {
+    "changes": "Only focal car linear velocity, along its existing native quaternion forward direction, uniform250..750uu/s. Standard positions, ball, boost, orientations and opponent untouched. These are momentum-assisted approach exercises, not genuine standing kickoffs.",
+    "evaluation": "Unchanged original standing starts, no momentum assistance",
+    "family_distribution": {
+      "challenge": 0.2,
+      "defense": 0.15,
+      "finishing": 0.2,
+      "kickoff": 0.15,
+      "natural": 0.3
+    },
+    "momentum_range": [
+      250.0,
+      750.0
+    ],
+    "nearest_car_admission": "Both original standard positions unchanged, preserving Nexto nearest-car kickoff admission. Do not use distance handicaps that disable its routine.",
+    "no_extra_observation": true,
+    "no_scripted_controls": true,
+    "parent": "Unchanged shooting-pressure V1 source bank",
+    "selection": "Separate RNG(seed+67001), shuffle role4 row IDs and change floor(count/2). No other family altered.",
+    "unchanged_fraction_of_dedicated_kickoffs": 0.5,
+    "version": "RIVAL2_DIRECT_SKILLS_KICKOFF_RACE_V1_STARTS"
+  },
+  "scenario_seed": 2026090601,
+  "scenario_semantics": "Exactly preserve previous 32768-state start bank including challenge/finishing/defense/standing and momentum-assisted kickoff starts. Replace ALL task rewards/short timeouts with the same sustained-gameplay reward and goal/45s-contact-inactivity lifecycle. No scenario ID in policy input.",
+  "seed": 2026090801,
+  "version": "RIVAL2_SUSTAINED_GAMEPLAY_V1",
+  "worlds": 32768
+}

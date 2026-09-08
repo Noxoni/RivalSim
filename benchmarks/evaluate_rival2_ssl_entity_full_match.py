@@ -93,13 +93,13 @@ def reset_hidden(hidden, mask):
 
 
 class CandidateMatchRunner(FullMatchRunner):
-    def __init__(self, checkpoint, checkpoint_sha, *, entity):
+    def __init__(self, checkpoint, checkpoint_sha, *, entity, policy_factory=None):
         # Reuse the accepted world, match state, telemetry and inherited export/
         # timing methods. Avoid the legacy base constructor's hybrid-only loader.
         assert sha(checkpoint) == checkpoint_sha
         payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
         self.entity = entity
-        self.rival_policy = (
+        self.rival_policy = policy_factory() if policy_factory is not None else (
             EntityJointControlActorCritic()
             if entity
             else IndependentCriticActorCritic(policy_config())
