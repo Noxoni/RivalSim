@@ -1,0 +1,58 @@
+{
+  "budget": "Continue until user STOP, no automatic reward/hyperparameter changes. KL telemetry only; nonfinite/corruption still stops at last accepted checkpoint.",
+  "checkpoints": "Atomic alternating rolling every accepted update, permanent at entry, first amendment update, all diagnostic boundaries and every50 total. Preserve retirement state, original counters, model and Adam.",
+  "checks": "Acquisition probe at entry27 then every10 additional updates while active. After retirement every50 total updates. Full original10-match Nexto check every50 total and whenever two acquisition probes pass and removal is considered. No gameplay claims from probes alone.",
+  "continuation": "Exact accepted+27 model, Adam and optimizer counters, learner/Nexto RNG. No new random lineage. Fresh physical episodes and cleared recurrent memory on process entry, as already documented for parent resume.",
+  "curriculum": {
+    "acquisition_reset_bank_fraction": 0.5,
+    "action_or_observation_change": false,
+    "early_touch_reset": false,
+    "easy": "Half of acquisition rows:350..850uu away, stationary/slow rolling ball<=120uu/s, coherent heading error at most0.7rad, half standing cars otherwise0..150uu/s",
+    "geometry": "Grounded cars and ground ball, initial center separation>=350uu, ball centrally placed, active opponent initially3000..3400uu upfield. Both focal sides. No controller prefix, frozen opponent or disabled collision.",
+    "limitations": "Development curriculum criterion, not held-out acceptance, kickoff-winning, possession or SSL proof. Fixed bank share is not learner-frame share; report actual exposures. No guarantee scenario changes alone solve acquisition.",
+    "preserve_other_families_relative_mix": true,
+    "probe": {
+      "consecutive_checks": 2,
+      "easy_seconds": 5.0,
+      "easy_success_fraction": 0.95,
+      "every_additional_updates": 10,
+      "initial_parent_probe": true,
+      "policy": "Deterministic current actor, active native_v5 Nexto at original cadence, both sides",
+      "seconds": 8.0,
+      "success": "Native focal first contact in ORIGINAL episode by deadline. Opponent contact is not focal success. Goal before focal contact is failure. Diagnostic ends after8s but does not generate training data.",
+      "varied_seconds": 8.0,
+      "varied_success_fraction": 0.9,
+      "worlds": 1024
+    },
+    "probe_seed": 2026090902,
+    "retirement": "After two consecutive passing probes AND a full10-match Nexto check at that SAME checkpoint has>=5 Rival touches/min and zero matches without Rival touch. Remove only from future resets, not live episodes. Retired status persists across process resume; no automatic reinsertion.",
+    "reward_change": false,
+    "termination": "Unchanged sustained goal or45s without any physical car-ball contact; keep playing after first touch",
+    "training_seed": 2026090802,
+    "varied": "Half:850..1800uu, stationary/rolling ball<=300uu/s, heading error at most1.4rad, half standing cars otherwise0..400uu/s",
+    "version": "RIVAL2_SUSTAINED_ACQUISITION_CURRICULUM_V1"
+  },
+  "original_authority_path": "results/rival2/sustained_gameplay_v1/authority.json",
+  "original_authority_sha256": "AD4495A5FF09C6B88F218117FFEC8D2C8737EC7E310CA98DB02746580934A02F",
+  "original_initialization_sha256": "39A255AE4B8B999FE4616C5D3BD592F8C998FAAC180B982DB9E22D779D587247",
+  "parent": {
+    "accepted_updates": 27,
+    "path": "checkpoints/rival2/sustained_gameplay_v1/plus_000027.pt",
+    "sha256": "C2532D3D347A13C23919D52CA5A1E30409BBA0E5102577CB5DE2FDC9888D8DAF"
+  },
+  "ppo": {
+    "clip_range": 0.2,
+    "entropy_coefficient": 0.001,
+    "epochs": 2,
+    "gae_lambda": 0.9930924954370359,
+    "gamma": 0.9992301329658564,
+    "learning_rate": 0.0001,
+    "max_gradient_norm": 0.5,
+    "minibatch_size": 65536,
+    "rollout_horizon": 90,
+    "value_loss_coefficient": 0.5
+  },
+  "unchanged": "All parent reward/episode/observation/action/architecture/PPO/exploration and opponent semantics remain unchanged. Only reset-bank curriculum and its read-only contact diagnostics change.",
+  "version": "RIVAL2_SUSTAINED_ACQUISITION_CURRICULUM_V1",
+  "worlds": 32768
+}
